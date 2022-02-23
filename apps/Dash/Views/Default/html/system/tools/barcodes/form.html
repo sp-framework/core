@@ -1,0 +1,506 @@
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row vdivide">
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'enabledCodes',
+                                'fieldLabel'                     : 'Available Codes',
+                                'fieldHelp'                      : true,
+                                'fieldAdditionalClass'           : 'mb-1',
+                                'fieldHelpTooltipContent'        : 'Select codes to enable across the system.',
+                                'fieldRequired'                  : false,
+                                'fieldType'                      : 'html',
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldBazScan'                   : true
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row codes">
+                    {% set codes = [] %}
+                    {% for codeKey, code in barcodesSettings['availableCodes'] %}
+                        {% set codes[codeKey] =
+                            [
+                                'id'    : codeKey,
+                                'name'  : code
+                            ]
+                        %}
+                        {% set checkboxCodes[componentId ~ '-' ~ sectionId ~ '-code-' ~ codeKey] = codeKey %}
+                        <div class="col-md-6 code" data-code="{{codeKey}}">
+                            {% if code in barcodesSettings['enabledCodes'] %}
+                                {% set checked = true %}
+                            {% else %}
+                                {% set checked = false %}
+                            {% endif %}
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'code-' ~ codeKey,
+                                    'fieldLabel'                     : false,
+                                    'fieldType'                      : 'checkbox',
+                                    'fieldData'                      :
+                                        [
+                                            'code'  : codeKey
+                                        ],
+                                    'fieldCheckboxType'              : 'success',
+                                    'fieldCheckboxLabel'             : code,
+                                    'fieldCheckboxChecked'           : checked,
+                                    'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                                    'fieldBazScan'                   : false
+                                ]
+                            )}}
+                        </div>
+                    {% endfor %}
+                    {% set checkboxCodes = json_encode(checkboxCodes, 16) %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {% set generators = [] %}
+                        {% for generatorKey, generator in barcodesSettings['availableGenerators'] %}
+                            {% set generators[generatorKey] =
+                                [
+                                    'id'    : generatorKey,
+                                    'name'  : generator
+                                ]
+                            %}
+                        {% endfor %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'defaultGenerator',
+                                'fieldLabel'                     : 'Code Generator',
+                                'fieldType'                      : 'select2',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Select Code Generator.',
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldRequired'                  : true,
+                                'fieldDataSelect2Options'        : generators,
+                                'fieldDataSelect2OptionsKey'     : 'id',
+                                'fieldDataSelect2OptionsValue'   : 'name',
+                                'fieldDataSelect2OptionsArray'   : true,
+                                'fieldDataSelect2OptionsSelected': barcodesSettings['defaultGenerator']
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {% set scales =
+                            [
+                                [
+                                    'id'    : '1',
+                                    'name'  : '1'
+                                ],
+                                [
+                                    'id'    : '2',
+                                    'name'  : '2'
+                                ],
+                                [
+                                    'id'    : '3',
+                                    'name'  : '3'
+                                ],
+                                [
+                                    'id'    : '4',
+                                    'name'  : '4'
+                                ],
+                                [
+                                    'id'    : '5',
+                                    'name'  : '5'
+                                ]
+                            ]
+                        %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'widthFactor',
+                                'fieldLabel'                     : 'Scale (Width)',
+                                'fieldType'                      : 'select2',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Select barcode scale (width factor)',
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldRequired'                  : true,
+                                'fieldDataSelect2Options'        : scales,
+                                'fieldDataSelect2OptionsKey'     : 'id',
+                                'fieldDataSelect2OptionsValue'   : 'name',
+                                'fieldDataSelect2OptionsArray'   : true,
+                                'fieldDataSelect2OptionsSelected': barcodesSettings['widthFactor']
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'height',
+                                'fieldLabel'                            : 'Height',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Height of the barcode',
+                                'fieldRequired'                         : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 3,
+                                'fieldValue'                            : barcodesSettings['height']
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'foreground',
+                                'fieldLabel'                            : 'Color',
+                                'fieldType'                             : 'colorpicker',
+                                'fieldColorpickerPreAddonColorSquare'   : true,
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Color of the barcode',
+                                'fieldRequired'                         : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 10,
+                                'fieldValue'                            : barcodesSettings['foreground']
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {% if barcodesSettings['showText'] === true %}
+                            {% set showTextCheckbox = true %}
+                        {% else %}
+                            {% set showTextCheckbox = false %}
+                        {% endif %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'showText',
+                                'fieldLabel'                     : 'Show Text',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Show/Hide text on top or bottom of the barcode',
+                                'fieldRequired'                  : false,
+                                'fieldType'                      : 'checkbox',
+                                'fieldCheckboxType'              : 'primary',
+                                'fieldCheckboxChecked'           : showTextCheckbox,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : true
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {% set textPlacements = [] %}
+                        {% for textPlacementKey, textPlacement in barcodesSettings['textPlacements'] %}
+                            {% set textPlacements[textPlacementKey] =
+                                [
+                                    'id'    : textPlacementKey,
+                                    'name'  : textPlacement
+                                ]
+                            %}
+                        {% endfor %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'defaultTextPlacement',
+                                'fieldLabel'                     : 'Text Placement',
+                                'fieldType'                      : 'select2',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Where to place text on the barcode.',
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataSelect2Options'        : textPlacements,
+                                'fieldDataSelect2OptionsKey'     : 'id',
+                                'fieldDataSelect2OptionsValue'   : 'name',
+                                'fieldDataSelect2OptionsArray'   : true,
+                                'fieldDataSelect2OptionsSelected': barcodesSettings['defaultTextPlacement']
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row vdivide">
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'test-barcode-select',
+                                'fieldLabel'                     : 'Test Barcode Settings',
+                                'fieldType'                      : 'select2',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Select code to test.',
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : false,
+                                'fieldDataSelect2Options'        : codes,
+                                'fieldDataSelect2OptionsKey'     : 'id',
+                                'fieldDataSelect2OptionsValue'   : 'name',
+                                'fieldDataSelect2OptionsArray'   : true,
+                                'fieldDataSelect2OptionsSelected': 'EAN13'
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'test-barcode-text',
+                                'fieldLabel'                            : 'Barcode Text',
+                                'fieldType'                             : 'input',
+                                'fieldGroupPostAddonButtonId'           : 'testbutton',
+                                'fieldGroupPostAddonButtonValue'        : 'Test',
+                                'fieldGroupPostAddonButtonTooltipTitle' : 'Test Barcode',
+                                'fieldGroupPostAddonButtonIcon'         : 'cog fa-spin',
+                                'fieldGroupPostAddonButtonIconHidden'   : true,
+                                'fieldGroupPostAddonButtonDisabled'     : true,
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Test Barcode Settings with this text',
+                                'fieldBazScan'                          : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 50
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'test-barcode-image',
+                                'fieldLabel'                     : 'Barcode',
+                                'fieldHelp'                      : true,
+                                'fieldAdditionalClass'           : 'mb-1',
+                                'fieldHelpTooltipContent'        : 'Generated Barcode Image',
+                                'fieldRequired'                  : false,
+                                'fieldType'                      : 'html',
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : false,
+                                'fieldBazScan'                   : true
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <div id="barcode-image"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-enabledCodes'                         : {
+            afterInit : function() {
+                var checkboxCodes = JSON.parse('{{checkboxCodes}}');
+
+                for (var checkbox in checkboxCodes) {
+                    $('#' + checkbox).click(function() {
+                        extractCheckboxData();
+                    });
+                }
+                extractCheckboxData();
+
+                function extractCheckboxData() {
+                    dataCollectionSection['data']['enabledCodes'] = [];
+
+                    for (var checkbox in checkboxCodes) {
+                        if ($('#' + checkbox)[0].checked === true) {
+                            dataCollectionSection['data']['enabledCodes'].push($('#' + checkbox).parents('.code').data('code'));
+                        }
+                    }
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-defaultGenerator'                        : {
+            'placeholder'   : 'SELECT GENERATOR',
+            afterInit       : function() {
+                $('#{{componentId}}-{{sectionId}}-defaultGenerator').on('select2:select', function(e) {
+                    var generatorId = e.params.data.id;
+
+                    $('.generator-settings').attr('hidden', true);
+
+                    $('#' + generatorId + '-settings').attr('hidden', false);
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-widthFactor'                             : {
+            placeholder : "SELECT BARCODE WIDTH"
+        },
+        '{{componentId}}-{{sectionId}}-height'                                  : { },
+        '{{componentId}}-{{sectionId}}-foreground'                              : { },
+        '{{componentId}}-{{sectionId}}-showText'                                : { },
+        '{{componentId}}-{{sectionId}}-defaultTextPlacement'                    : {
+            placeholder : 'SELECT TEXT PLACEMENT'
+        },
+        '{{componentId}}-{{sectionId}}-test-barcode-select'                     : {
+            placeholder : 'SELECT CODE'
+        },
+        '{{componentId}}-{{sectionId}}-test-barcode-text'                       : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-test-barcode-text').keyup(function() {
+                    if ($(this).val() !== '') {
+                        $('#{{componentId}}-{{sectionId}}-test-barcode-text-testbutton').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-test-barcode-text-testbutton').attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-test-barcode-text-testbutton').click(function(e) {
+                    e.preventDefault();
+
+                    $('#barcode-image').empty();
+
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+
+                    var postData = { };
+                    postData['barcode'] = $('#{{componentId}}-{{sectionId}}-test-barcode-text').val();
+                    postData['barcodeType'] = $('#{{componentId}}-{{sectionId}}-test-barcode-select').select2('data')[0].id;
+                    postData['generatorName'] = $('#{{componentId}}-{{sectionId}}-defaultGenerator').select2('data')[0].id;
+                    postData['widthFactor'] = $('#{{componentId}}-{{sectionId}}-widthFactor').select2('data')[0].id;
+                    postData['height'] = $('#{{componentId}}-{{sectionId}}-height').val();
+                    postData['foreground'] = $('#{{componentId}}-{{sectionId}}-foreground').val();
+                    postData['showText'] = $('#{{componentId}}-{{sectionId}}-showText')[0].checked;
+                    postData['textPlacement'] = $('#{{componentId}}-{{sectionId}}-defaultTextPlacement').select2('data')[0].id;
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    var url = '{{links.url("system/tools/barcodes/testbarcode")}}';
+
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode === 0) {
+                            if (postData['generatorName'] === 'HTML' ||
+                                postData['generatorName'] === 'SVG'
+                            ) {
+                                $('#barcode-image').append(response.barcode);
+                            } else if (postData['generatorName'] === 'PNG' ||
+                                       postData['generatorName'] === 'JPG'
+                            ) {
+                                var imgSrc;
+                                if (postData['generatorName'] === 'PNG') {
+                                    imgSrc = 'data:image/png;charset=utf-8;base64, ' + response.barcode;
+                                } else if (postData['generatorName'] === 'JPG') {
+                                    imgSrc = 'data:image/jpeg;charset=utf-8;base64, ' + response.barcode;
+                                }
+                                $('#barcode-image').append(
+                                    '<img src="' + imgSrc + '" />'
+                                );
+                            }
+                        } else {
+                            PNotify.error({
+                                'title' : response.responseMessage
+                            });
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+                        $('#{{componentId}}-{{sectionId}}-test-barcode-text-testbutton').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-test-barcode-text-testbutton').children('i').attr('hidden', true);
+
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-test-barcode-image'                      : { },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-height'                            : 'required',
+                '{{componentId}}-{{sectionId}}-foreground'                        : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-height'                            : 'Please enter barcode height',
+                '{{componentId}}-{{sectionId}}-foreground'                        : 'Please enter barcode color'
+            }
+        }
+    });
+</script>

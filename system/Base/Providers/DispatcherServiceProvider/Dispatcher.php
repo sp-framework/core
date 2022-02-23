@@ -6,6 +6,7 @@ use Phalcon\Config\Adapter\Grouped;
 use Phalcon\Di\DiInterface;
 use Phalcon\Events\Event;
 use Phalcon\Events\Manager;
+use Phalcon\Helper\Arr;
 use Phalcon\Mvc\Dispatcher as PhalconDispatcher;
 use Phalcon\Mvc\Dispatcher\Exception as PhalconDispatcherException;
 
@@ -13,11 +14,23 @@ class Dispatcher
 {
     protected $dispatcher;
 
-    protected $applicationsInfo;
+    protected $events;
 
-    public function __construct($applicationsInfo, $config)
+    protected $appsInfo;
+
+    protected $components;
+
+    protected $router;
+
+    public function __construct($appsInfo, $config, $events, $components, $router)
     {
-        $this->applicationsInfo = $applicationsInfo;
+        $this->appsInfo = $appsInfo;
+
+        $this->events = $events;
+
+        $this->components = $components;
+
+        $this->router = $router;
 
         $this->dispatcher = new PhalconDispatcher();
 
@@ -25,16 +38,23 @@ class Dispatcher
 
         $this->dispatcher->setDefaultAction('view');
 
-        if ($this->applicationsInfo && !$config->debug) {
-            $applicationDefaults = json_decode($applicationsInfo['settings'], true);
+        if ($this->appsInfo) {
+            $component = $this->components->getComponentById($this->appsInfo['errors_component']);
 
-            if (isset($applicationDefaults['errorComponent'])) {
-                $this->dispatcher->setEventsManager(
-                    $this->register404(
-                        $applicationDefaults['errorComponent']
-                    )
-                );
+            if (isset($this->appsInfo['errors_component']) &&
+                $this->appsInfo['errors_component'] != 0
+            ) {
+                $errorClassArr = explode('\\', $component['class']);
+                unset($errorClassArr[Arr::lastKey($errorClassArr)]);
+                $errorComponent = ucfirst($component['route']);
+                $namespace = implode('\\', $errorClassArr);
+            } else {
+                $errorComponent = 'Errors';
+                $namespace = 'System\Base\Providers\ErrorServiceProvider';
             }
+            $this->dispatcher->setEventsManager($this->register404($errorComponent, $namespace));
+        } else {
+            $this->dispatcher->setEventsManager($this->events);//Register Other events
         }
     }
 
@@ -43,24 +63,22 @@ class Dispatcher
         return $this->dispatcher;
     }
 
-    protected function register404($errorComponent)
+    protected function register404($errorComponent, $namespace)
     {
-        $eventsManager = new Manager();
-
-        $eventsManager->attach(
+        $this->events->attach(
             'dispatch:beforeException',
             function (
                 Event $event,
                 $dispatcher,
                 \Exception $exception
-            ) use ($errorComponent) {
-
+            ) use ($errorComponent, $namespace) {
                 switch ($exception->getCode()) {
                     case PhalconDispatcherException::EXCEPTION_HANDLER_NOT_FOUND:
                         $dispatcher->forward(
                             [
                                 'controller' => $errorComponent,
                                 'action'     => 'controllerNotFound',
+                                'namespace'  => $namespace
                             ]
                         );
 
@@ -71,6 +89,7 @@ class Dispatcher
                             [
                                 'controller' => $errorComponent,
                                 'action'     => 'actionNotFound',
+                                'namespace'  => $namespace
                             ]
                         );
 
@@ -79,7 +98,6 @@ class Dispatcher
             }
         );
 
-        return $eventsManager;
-
+        return $this->events;
     }
 }

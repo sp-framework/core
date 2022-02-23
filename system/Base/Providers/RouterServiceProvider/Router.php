@@ -5,18 +5,34 @@ namespace System\Base\Providers\RouterServiceProvider;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use Phalcon\Mvc\Router as PhalconRouter;
+use System\Base\Providers\RouterServiceProvider\Exceptions\AppNotAllowedException;
+use System\Base\Providers\RouterServiceProvider\Exceptions\DomainNotRegisteredException;
 
 class Router
 {
-	protected $router;
+	protected $domains;
 
-	protected $applications;
+	protected $domain;
 
-	protected $applicationInfo;
+	protected $domainAppExclusive = false;
 
-	protected $applicationDefaults;
+	protected $domainDefaults;
+
+	protected $apps;
+
+	protected $components;
+
+	protected $views;
+
+	protected $logger;
 
 	protected $request;
+
+	protected $router;
+
+	protected $appInfo;
+
+	protected $appDefaults;
 
 	protected $requestUri;
 
@@ -32,11 +48,15 @@ class Router
 
 	protected $uri;
 
-	public function __construct($domains, $applications, $logger, $request)
+	public function __construct($domains, $apps, $components, $views, $logger, $request)
 	{
 		$this->domains = $domains;
 
-		$this->applications = $applications;
+		$this->apps = $apps;
+
+		$this->components = $components;
+
+		$this->views = $views;
 
 		$this->logger = $logger;
 
@@ -51,33 +71,28 @@ class Router
 
 	public function init()
 	{
-		if ($this->setApplicationInfo()) {
-			$this->defaultNamespace =
-				'Applications\\' . ucfirst($this->applicationDefaults['application']) . '\\Components';
-
-			$this->router->setDefaultNamespace($this->defaultNamespace);
+		if ($this->validateDomain()) {
 
 			$this->getURI();
 
-			if ($this->applicationInfo && $this->applicationDefaults) {
-				if ($this->applicationInfo['name'] !== $this->applicationDefaults['application']) {
+			if ($this->appInfo && $this->appDefaults) {
+				if ($this->appInfo['route'] !== $this->appDefaults['app']) {
 					if ($this->uri !== '' &&
-						$this->uri !== strtolower($this->applicationInfo['name']) &&
-						$this->uri !== strtolower($this->applicationInfo['route'])
+						$this->uri !== strtolower($this->appInfo['route'])
 					) {
 						$this->registerRoute($this->uri);
 					}
 				} else {
 					if ($this->uri !== '' &&
-						$this->uri !== strtolower($this->applicationDefaults['application']) &&
-						$this->uri !== strtolower($this->applicationInfo['route'])
+						$this->uri !== strtolower($this->appDefaults['app']) &&
+						$this->uri !== strtolower($this->appInfo['route'])
 					) {
 
 						$this->registerRoute($this->uri);
 
 					} else if ($this->uri === '' ||
-							   $this->uri === strtolower($this->applicationDefaults['application']) ||
-							   $this->uri === strtolower($this->applicationInfo['route'])
+							   $this->uri === strtolower($this->appDefaults['app']) ||
+							   $this->uri === strtolower($this->appInfo['route'])
 					) {
 						$this->registerHome();
 					}
@@ -92,28 +107,62 @@ class Router
 		return $this->router;
 	}
 
+	protected function setDefaultNamespace(bool $home = false)
+	{
+		if ($home) {
+			$this->defaultNamespace =
+				'Apps\\' .
+				ucfirst($this->appDefaults['app_type']) .
+				'\\Components\\' .
+				ucfirst($this->appDefaults['component'])
+				;
+		} else {
+			if ($this->givenRouteClass !== '') {
+				$this->defaultNamespace =
+					'Apps\\' .
+					ucfirst($this->appDefaults['app_type']) .
+					'\\Components' .
+					$this->givenRouteClass . '\\' .
+					ucfirst($this->controller)
+					;
+			} else {
+				$this->defaultNamespace =
+					'Apps\\' .
+					ucfirst($this->appDefaults['app_type']) .
+					'\\Components\\' .
+					$this->givenRouteClass .
+					ucfirst($this->controller)
+					;
+			}
+		}
+
+		$this->router->setDefaultNamespace($this->defaultNamespace);
+	}
+
 	protected function registerHome()
 	{
+		$this->setDefaultNamespace(true);
+
 		$this->router->add(
 			'/',
 			[
-				'controller'	=> 	strtolower($this->applicationDefaults['component']),
+				'controller'	=> 	strtolower($this->appDefaults['component']),
 				'action'		=> 'view'
 			]
 		);
 
 		$this->router->add(
-			'/' . strtolower($this->applicationInfo['name']),
+			'/' . strtolower($this->appInfo['route']),
 			[
-				'controller'	=> 	strtolower($this->applicationDefaults['component']),
+				'controller'	=> 	strtolower($this->appDefaults['component']),
 				'action'		=> 'view'
 			]
 		);
 
 		$this->router->add(
-			'/' . strtolower($this->applicationInfo['route']),
+			'/' . strtolower($this->appInfo['route']) . '/',
 			[
-				'controller'	=> 	strtolower($this->applicationDefaults['component']),
+				'controller'	=> 	strtolower($this->appDefaults['component']),
 				'action'		=> 'view'
 			]
 		);
@@ -121,6 +170,12 @@ class Router
 
 	protected function registerRoute($givenRoute)
 	{
+		//SEO
+		if (isset($this->appInfo['seo_urls']) && $this->appInfo['seo_urls'] == 1) {
+			//Using $this->uri, we can extract the route from seo url from SEO db
+			//$givenRoute = $this->usePackage()
+		}
+
 		$routeArray = explode('/', $givenRoute);
 
 		$this->getGivenRouteClass($routeArray);
@@ -131,10 +186,12 @@ class Router
 			$routeToMatch = '/' . $givenRoute;
 		}
 
+		$this->setDefaultNamespace(false);
+
 		$this->router->add(
 			$routeToMatch,
 			[
-				'namespace' 	=> $this->defaultNamespace . $this->givenRouteClass,
+				'namespace' 	=> $this->defaultNamespace,
 				'controller'	=> $this->controller,
 				'action'		=> $this->action,
 				'params'		=> isset($this->getQuery) ? 1 : null
@@ -144,17 +201,17 @@ class Router
 
 	protected function getGivenRouteClass(array $routeArray)
 	{
-		unset($routeArray[0]); //Remove application name
+		if (!$this->domainAppExclusive) {
+			unset($routeArray[0]); //Remove app name
+		}
 
 		if ($this->request->isGet()) {
 			$this->controller = Arr::last($routeArray);
 			$this->action = 'view';
 			unset($routeArray[Arr::lastKey($routeArray)]);
-
 			foreach ($routeArray as $route) {
 				$this->givenRouteClass .= '\\' . ucfirst($route);
 			}
-
 		} elseif ($this->request->isPost()) {
 			$this->action = Arr::last($routeArray);
 			unset($routeArray[Arr::lastKey($routeArray)]);
@@ -179,92 +236,79 @@ class Router
 
 	protected function regitserNotFound()
 	{
-		if ($this->applicationDefaults) {
+		if ($this->appDefaults) {
+			if (isset($this->appDefaults['errorComponent'])) {
 
-			$settings = Json::decode($this->applicationInfo['settings'], true);
-
-			if (isset($settings['errorComponent'])) {
-
-				$errorComponent = $settings['errorComponent'];
+				$errorComponent = ucfirst($this->appDefaults['errorComponent']);
 
 			} else {
-				$this->router->setDefaultNamespace
-				(
-					'System\Base\Providers\ErrorServiceProvider'
-				);
 
 				$errorComponent = 'Errors';
 			}
 
 		} else {
-			$this->router->setDefaultNamespace
-			(
-				'System\Base\Providers\ErrorServiceProvider'
-			);
-
 			$errorComponent = 'Errors';
 		}
 
 		$this->router->notFound(
 			[
 				'controller' => $errorComponent,
-				'action'     => 'routenotfound',
+				'action'     => 'routeNotFound',
 			]
 		);
 	}
 
-	protected function setApplicationInfo()
-	{
-		$this->applicationInfo = $this->applications->getApplicationInfo();
-
-		if ($this->applicationInfo) {
-
-			if (!$this->validateDomain()) {
-				return false;
-			}
-
-			$this->applicationDefaults = $this->applications->getApplicationDefaults();
-
-			if (!$this->applicationDefaults ||
-				$this->applicationInfo['name'] !== $this->applicationDefaults['application']
-			) {
-				$this->applicationDefaults =
-					$this->applications->getApplicationDefaults($this->applicationInfo['name']);
-			}
-			return true;
-		}
-		return false;
-	}
-
 	protected function validateDomain()
 	{
-		$applicationDomain = Json::decode($this->applicationInfo['settings'], true);
+		$this->domain = $this->domains->getDomain();
+		if (!$this->domain) {
+			$this->logger->log->alert(
+				'Domain ' . $this->request->getHttpHost() . ' is not registered with system!'
+			);
 
-		if (isset($applicationDomain['domain']) &&
-				($applicationDomain['domain'] !== '' && $applicationDomain['domain'] !== '0')
-		) {
-			if (!$this->domains->getNamedDomain($this->request->getHttpHost())) {
-				$this->logger->log->alert(
-					'Domain ' . $this->request->getHttpHost() . ' is not registered with system!'
-				);
-
-				return false;
-			}
-
-			if ($this->request->getHttpHost() === $applicationDomain['domain']) {
-				return true;
-			} else {
-				$this->logger->log->alert(
-					'Trying to access application ' . $this->applicationInfo['name'] .
-					' on domain ' . $this->request->getHttpHost() . '. Application is restricted to ' .
-					$applicationDomain['domain']
-				);
-
-				return false;
-			}
-		} else {
-			return true;
+			throw new DomainNotRegisteredException('Domain ' . $this->request->getHttpHost() . ' is not registered with system!');
 		}
+
+		if (isset($this->domain['exclusive_to_default_app']) &&
+			$this->domain['exclusive_to_default_app'] == 1
+		) {
+			$this->appInfo = $this->apps->getIdApp($this->domain['default_app_id']);
+
+			$this->domainAppExclusive = true;
+
+		} else  {
+			$this->appInfo = $this->apps->getAppInfo();
+
+			if (!$this->appInfo) {
+				return false;
+			}
+
+			if ((isset($this->domain['apps'][$this->appInfo['id']]['allowed']) &&
+				!$this->domain['apps'][$this->appInfo['id']]['allowed']) ||
+				!isset($this->domain['apps'][$this->appInfo['id']])
+			) {
+				$this->logger->log->alert(
+					'Trying to access app ' . $this->appInfo['name'] .
+					' on domain ' . $this->request->getHttpHost()
+				);
+				throw new AppNotAllowedException('Trying to access app ' . $this->appInfo['name'] .
+					' on domain ' . $this->request->getHttpHost());
+			}
+		}
+
+		$this->appDefaults['id'] = $this->appInfo['id'];
+		$this->appDefaults['app'] = $this->appInfo['route'];
+		$this->appDefaults['app_type'] = $this->appInfo['app_type'];
+		$this->appDefaults['component'] =
+			$this->components->getComponentById($this->appInfo['default_component'])['route'];
+		$this->appDefaults['errorComponent'] =
+			isset($this->appInfo['errors_component']) && $this->appInfo['errors_component'] != 0 ?
+			$this->components->getComponentById($this->appInfo['errors_component'])['route'] :
+			null;
+		$this->appDefaults['view'] =
+			$this->views->getIdViews($this->domain['apps'][$this->appInfo['id']]['view'])['name'];
+
+		return true;
 	}
 
 	protected function getURI()

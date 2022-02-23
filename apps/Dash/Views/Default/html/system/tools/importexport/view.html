@@ -1,0 +1,58 @@
+{% if importexport['id'] is defined %}
+    {% set importexportId = importexport['id'] %}
+    {% set title = importexport['type'] ~ ' Request (' ~ importexport['id'] ~ ')' %}
+{% else %}
+    {% set importexportId = '' %}
+    {% set title = 'New ' ~ importexport['type'] ~ ' Request' %}
+{% endif %}
+{% if importexport['type'] === 'import' %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'exchange-alt fa-flip-horizontal',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'importexport/types/import/form',
+            'formButtons'                   :
+            [
+                'addActionUrl'                  : 'system/tools/importexport/add',
+                'addSuccessRedirectUrl'         : 'system/tools/importexport',
+                'cancelActionUrl'               : 'system/tools/importexport',
+                'closeActionUrl'                : 'system/tools/importexport'
+            ]
+        ]
+    )}}
+{% elseif importexport['type'] === 'export' %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'exchange-alt fa-flip-horizontal',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'importexport/types/export/form',
+            'formButtons'                   :
+            [
+                'addActionUrl'                  : 'system/tools/importexport/add',
+                'addSuccessRedirectUrl'         : 'system/tools/importexport',
+                'cancelActionUrl'               : 'system/tools/importexport',
+                'closeActionUrl'                : 'system/tools/importexport'
+            ]
+        ]
+    )}}
+{% endif %}

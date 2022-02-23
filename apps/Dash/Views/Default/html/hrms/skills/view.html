@@ -1,0 +1,36 @@
+{% if skill['id'] is defined %}
+    {% set skillId = skill['id'] %}
+    {% set title = 'Brand (' ~ skill['name'] ~ ')' %}
+{% else %}
+    {% set skillId = '' %}
+    {% set title = 'New Brand' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'magic',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardShowTools'                 : ['maximize'],
+        'cardBodyInclude'               : 'skills/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : skillId,
+            'addActionUrl'                  : 'inventory/skills/add',
+            'addSuccessRedirectUrl'         : 'inventory/skills',
+            'updateActionUrl'               : 'inventory/skills/update',
+            'updateSuccessRedirectUrl'      : 'inventory/skills',
+            'cancelActionUrl'               : 'inventory/skills',
+            'closeActionUrl'                : 'inventory/skills'
+        ]
+    ]
+)}}

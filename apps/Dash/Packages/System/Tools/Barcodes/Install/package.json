@@ -1,0 +1,51 @@
+{
+    "name"          : "Barcodes",
+    "display_name"  : "Barcodes Package",
+    "description"   : "Package for generating and validating Barcodes",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-system-admin-tools-barcodes",
+    "class"         : "Apps\\Dash\\Packages\\System\\Tools\\Barcodes\\Barcodes",
+    "settings"      : {
+        "availableCodes"        : {
+            "C128"              : "C128",
+            "C128A"             : "C128A",
+            "C128B"             : "C128B",
+            "C128C"             : "C128C",
+            "EAN2"              : "EAN2",
+            "EAN5"              : "EAN5",
+            "EAN8"              : "EAN8",
+            "EAN13"             : "EAN13",
+            "UPCA"              : "UPCA",
+            "UPCE"              : "UPCE",
+            "PHARMA"            : "PHARMA",
+            "PHARMA2T"          : "PHARMA2T"
+        },
+        "enabledCodes"          :
+            [
+                "C128",
+                "C128A",
+                "C128B",
+                "C128C",
+                "EAN13",
+                "UPCA"
+            ],
+        "availableGenerators"   : {
+            "SVG"               : "SVG",
+            "PNG"               : "PNG",
+            "HTML"              : "HTML"
+        },
+        "defaultGenerator"      : "HTML",
+        "widthFactor"           : 2,
+        "height"                : 30,
+        "foreground"            : "#000000",
+        "showText"              : false,
+        "textPlacements"        : {
+            "TOP"               : "TOP",
+            "BOTTOM"            : "BOTTOM"
+        },
+        "defaultTextPlacement"  : "BOTTOM"
+    }
+}

@@ -5,15 +5,24 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta name="description" content="">
 		<meta name="author" content="">
-		<title>Soaring Phalcon Setup</title>
-		<link rel="stylesheet" href="Admin/Default/css/bootstrap.min.css">
-		<link rel="stylesheet" href="Admin/Default/css/icheck.css">
-		<link rel="stylesheet" href="Admin/Default/css/core.css">
-		<link rel="stylesheet" href="Admin/Default/css/font-awesome.min.css">
-		<script src="Admin/Default/js/jquery-3.5.1.min.js"></script>
-		<script src="Admin/Default/js/bootstrap.min.js"></script>
+		<title>Bazaari Framework Core Setup</title>
+		<link rel="stylesheet" type="text/css" href="/dash/default/css/core.css">
+		<link rel="stylesheet" type="text/css" href="/dash/default/css/plugins.css">
+		<script src="/dash/default/js/header/jsHeaderDependencies.js"></script>
+		<script src="/dash/default/js/header/jsHeaderCore.js"></script>
+		<script src="/dash/default/js/header/jsHeaderPlugins.js"></script>
 	</head>
 	<body>
+		<script type="text/javascript" charset="utf-8">
+			if (!window.dataCollection) {
+				window.dataCollection = { };
+				dataCollection = window.dataCollection;
+				dataCollection.env = { };
+				dataCollection.env.sounds = { };
+				dataCollection.env.rootPath = '{{request.getScheme()}}' + '://' + '{{request.getHttpHost()}}' + '/';
+				dataCollection.env.libsLoaded = false;
+			}
+		</script>
 		<div class="main-content">
 			<div class="container-fluid">
 				<div class="row">
@@ -24,89 +33,132 @@
 				<div class="row">
 					<div class="col">
 						<div class="card mt-2 mb-2">
-							<div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase"></div>
-							<div class="card-body bg-white">
-								<div class="row justify-content-center p-3">
-									<div class="col-6">
-										<div class="form-group">
-											<label for="host">Host *</label>
-											<div class="input-group">
-												<input type="text" name="host" id="host" class="form-control" value="localhost">
+							<form autocomplete="off">
+								<div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase">Bazaari Framework Core Setup</div>
+								<div class="card-body bg-white">
+									<div class="row vdivide">
+										<div class="col-6 p-3">
+											<legend>Database</legend>
+											<div class="form-group">
+												<label for="host">Host *</label>
+												<div class="input-group">
+													<input type="text" name="host" id="host" class="form-control" value="localhost">
+												</div>
 											</div>
-										</div>
-										<div class="form-group">
-											<label for="port">Port *</label>
-											<div class="input-group">
-												<input type="text" name="port" id="port" class="form-control" value="3306">
+											<div class="form-group">
+												<label for="port">Port *</label>
+												<div class="input-group">
+													<input type="text" name="port" id="port" class="form-control" value="3306">
+												</div>
 											</div>
-										</div>
-										<div class="form-group">
-											<label for="database_name">Database Name *</label>
-											<div class="input-group">
-												<input type="text" name="database_name" id="database_name" class="form-control">
+											<div class="form-group">
+												<label for="database_name">Database Name *</label>
+												<div class="input-group">
+													<input type="text" name="database_name" id="database_name" class="form-control" value="sp">
+												</div>
 											</div>
-										</div>
-										<div class="form-group">
-											<label for="username">Username *</label>
-											<div class="input-group">
-												<input type="text" name="username" id="username" class="form-control">
+											<div class="form-group">
+												<label for="username">Database Username *</label>
+												<div class="input-group">
+													<input type="text" name="username" id="username" class="form-control" value="sp">
+												</div>
 											</div>
-										</div>
-										<div class="form-group">
-											<label for="password">Password *</label>
-											<div class="input-group">
-												<input type="password" name="password" id="password" class="form-control">
+											<div class="form-group">
+												<label for="password">Database Password *</label>
+												<div class="input-group">
+													<input type="password" name="password" id="password" class="form-control">
+												</div>
 											</div>
-										</div>
-										<div class="row">
-											<div class="col">
-												<div class="form-group">
-													<div class="checkbox icheck-danger">
-														<input type="checkbox" name="drop" id="drop">
-														<label for="drop">
-															Drop tables if exists
-														</label>
+											<div class="row">
+												<div class="col">
+													<div class="form-group">
+														<div class="checkbox icheck-danger">
+															<input type="checkbox" name="drop" id="drop">
+															<label for="drop">
+																Drop tables if exists
+															</label>
+														</div>
 													</div>
 												</div>
 											</div>
-											<div class="col text-center">
-												<div class="btn-group btn-group-toggle" data-toggle="buttons">
-													<label class="btn btn-secondary">
-														<input type="radio" name="mode-options" class="mode-options" id="production">Production
-													</label>
-													<label class="btn btn-primary active">
-														<input type="radio" name="mode-options" class="mode-options" id="development" checked>Development
-													</label>
+										</div>
+										<div class="col-6 p-3">
+											<legend>Admin Account</legend>
+											<div class="form-group">
+												<label for="email">Email *</label>
+												<div class="input-group">
+													<input type="text" name="email" id="email" class="form-control">
 												</div>
 											</div>
+											<div class="form-group">
+												<label for="pass">Password *</label>
+												<div class="input-group">
+													<input type="password" name="pass" id="pass" class="form-control">
+												</div>
+											</div>
+											<hr>
+											<legend>Security</legend>
+											<div class="form-group">
+												<label for="pwf">Password Encryption Level *</label>
+												<div class="input-group">
+													<input type="number" min="4" max="16" name="pwf" id="pwf" class="form-control" value="8" disabled>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="cwf">Cookies Encryption Level *</label>
+												<div class="input-group">
+													<input type="number" min="4" max="16" name="cwf" id="cwf" class="form-control" value="8" disabled>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col">
+													<div class="form-group">
+														<div class="checkbox icheck-info">
+															<input type="checkbox" name="auto-encrypt-level" id="auto-encrypt-level" checked>
+															<label for="auto-encrypt-level">
+																Calculate level as per system configuration
+															</label>
+														</div>
+													</div>
+												</div>
+											</div>
+											<small>Note: Higher the number, better the security but, slower the performance. Range: 4-16</small>
 										</div>
-										<hr>
-										<button id="submit" class="btn btn-primary">
-											<span id="submit-spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
-											Create Schema
-										</button>
 									</div>
-								</div>
-								<div class="row text-center m-2" id="next-div" hidden>
-									<div class="col">
-										<a href='/admin/modules' id="next" class="btn btn-success" disabled=""><i class="fa fa-check"></i> Install Modules</a>
+									<hr>
+									<div class="row text-center p-3">
+										<div class="col" id="submit-div">
+											<button id="submit" class="btn btn-primary">
+												<i id="submit-spinner" class="fa fa-cog fa-spin" hidden></i>
+												Setup
+											</button>
+										</div>
+										<div class="col" id="next-div" hidden>
+											<a href='/' id="next" class="btn btn-success" disabled=""><i class="fa fa-check"></i> Access Admin</a>
+										</div>
 									</div>
+									<hr>
+									<footer class="footer text-center">
+										<strong>Copyright © Bazaari E Trade Pty Ltd.</strong> All rights reserved.
+										<script src="/dash/default/js/footer/jsFooterDependencies.js"></script>
+										<script src="/dash/default/js/footer/jsFooterCore.js"></script>
+										<script src="/dash/default/js/footer/jsFooterPlugins.js"></script>
+									</footer>
 								</div>
-							</div>
+							</form>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 		<script type="text/javascript">
-			$(document).ready(function() {
-				$('.card-header').html('Soaring Phalcon Setup : MySQL Database Schema');
-			});
+			$('#submit').click(function(e) {
+				e.preventDefault();
 
-			$('#submit').click(function() {
 				$(this).attr('disabled', true);
 				$('#submit-spinner').attr('hidden', false);
 				$('#alert').attr('hidden', true);
+
 				if ($('#host').val() === '') {
 					$('#host').addClass('is-invalid');
 					$('#host').focus(function() {
@@ -142,19 +194,52 @@
 					});
 					$('#submit-spinner').attr('hidden', true);
 					$('#submit').attr('disabled', false);
+				} else if ($('#email').val() === '') {
+					$('#email').addClass('is-invalid');
+					$('#email').focus(function() {
+						$(this).removeClass('is-invalid');
+					});
+					$('#submit-spinner').attr('hidden', true);
+					$('#submit').attr('disabled', false);
+				} else if ($('#pass').val() === '') {
+					$('#pass').addClass('is-invalid');
+					$('#pass').focus(function() {
+						$(this).removeClass('is-invalid');
+					});
+					$('#submit-spinner').attr('hidden', true);
+					$('#submit').attr('disabled', false);
+				} else if ($('#pwf').val() === '') {
+					$('#pwf').addClass('is-invalid');
+					$('#pwf').focus(function() {
+						$(this).removeClass('is-invalid');
+					});
+					$('#submit-spinner').attr('hidden', true);
+					$('#submit').attr('disabled', false);
+				} else if ($('#cwf').val() === '') {
+					$('#cwf').addClass('is-invalid');
+					$('#cwf').focus(function() {
+						$(this).removeClass('is-invalid');
+					});
+					$('#submit-spinner').attr('hidden', true);
+					$('#submit').attr('disabled', false);
 				} else {
 					$.ajax({
 						type    : 'POST',
 						url     : '/',
 						data    :
 							{
-								"host"          : $('#host').val(),
-								"port"          : $('#port').val(),
-								"database_name" : $('#database_name').val(),
-								"username"      : $('#username').val(),
-								"password"      : $('#password').val(),
-								"drop"          : $('#drop')[0].checked,
-								"mode"          : $("input[name='mode-options']:checked")[0].id
+								"host"          		: $('#host').val(),
+								"port"          		: $('#port').val(),
+								"database_name" 		: $('#database_name').val(),
+								"username"      		: $('#username').val(),
+								"password"      		: $('#password').val(),
+								"drop"          		: $('#drop')[0].checked,
+								"email"      			: $('#email').val(),
+								"pass"      			: $('#pass').val(),
+								"pwf"       			: $('#pwf').val(),
+								"cwf"       			: $('#cwf').val(),
+								"auto-encrypt-level"  	: $('#auto-encrypt-level')[0].checked,
+								"country"      			: $('#country').val()
 							},
 						dataType: 'json',
 						success: function (data) {
@@ -166,6 +251,7 @@
 								}).addClass('alert-success').html(data.responseMessage);
 								$('#next').attr('disabled', false);
 								$('#next-div').attr('hidden', false);
+								$('#submit-div').attr('hidden', true);
 							} else if (data.responseCode === 1) {
 								$('#alert').attr('hidden', false);
 								$('#alert').html('');
@@ -191,21 +277,29 @@
 				}
 			});
 
-			$('.mode-options').each(function(index, option) {
-				$($(option).parent()).click(function() {
-					var selectedOptionId = $(this).children()[0].id;
-
-					if (selectedOptionId === 'production') {
-						$('#' + selectedOptionId).parent().addClass('btn-primary').removeClass('btn-secondary');
-						$('#development').parent().removeClass('btn-primary').addClass('btn-secondary');
-					}
-
-					if (selectedOptionId === 'development') {
-						$('#' + selectedOptionId).parent().addClass('btn-primary').removeClass('btn-secondary');
-						$('#production').parent().removeClass('btn-primary').addClass('btn-secondary');
-					}
-				});
+			$('#auto-encrypt-level').click(function() {
+				if ($(this)[0].checked === true) {
+					$('#pwf, #cwf').attr('disabled', true);
+				} else if ($(this)[0].checked === false) {
+					$('#pwf, #cwf').attr('disabled', false);
+				}
 			});
+
+			// $('.debug-options').each(function(index, option) {
+			// 	$($(option).parent()).click(function() {
+			// 		var selectedOptionId = $(this).children()[0].id;
+
+			// 		if (selectedOptionId === 'production') {
+			// 			$('#' + selectedOptionId).parent().addClass('btn-primary').removeClass('btn-secondary');
+			// 			$('#development').parent().removeClass('btn-primary').addClass('btn-secondary');
+			// 		}
+
+			// 		if (selectedOptionId === 'development') {
+			// 			$('#' + selectedOptionId).parent().addClass('btn-primary').removeClass('btn-secondary');
+			// 			$('#production').parent().removeClass('btn-primary').addClass('btn-secondary');
+			// 		}
+			// 	});
+			// });
 		</script>
 	</body>
 </html>

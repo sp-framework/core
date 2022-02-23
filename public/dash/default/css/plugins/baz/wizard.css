@@ -1,0 +1,308 @@
+/* --------------------------------
+Basic Style
+-------------------------------- */
+.wizard, .wizard.multi-steps {
+    padding: 0.5em 1em;
+    background-color: #edeff0;
+    border-radius: .25em;
+}
+.wizard.vertical {
+    display: grid;
+}
+.wizard.vertical span {
+    max-width: 180px;
+}
+.wizard:after, .wizard.multi-steps:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+.wizard li, .wizard.multi-steps li {
+    display: inline-block;
+    float: left;
+    margin: 0.5em 0;
+}
+.wizard li::after, .wizard.multi-steps li::after {
+    font-family: 'Font Awesome\ 5 Free';
+    font-weight: 900;
+    content: '\f054';
+    vertical-align: bottom;
+    color: #959fa5;
+    margin-left: .5rem;
+    margin-right: .5rem;
+}
+.wizard.vertical li:after {
+    float: right;
+}
+.wizard li:last-of-type::after, .wizard.multi-steps li:last-of-type::after {
+    display: none;
+}
+.wizard li > *, .wizard.multi-steps li > * {
+    display: inline-block;
+    text-transform: uppercase;
+    color: #2c3f4c;
+}
+.wizard li.current > *, .wizard.multi-steps li.current > * {
+    color: #3498DB;
+}
+.wizard li.visited > *, .wizard.multi-steps li.visited > * {
+    color: #18BC9C;
+}
+@media only screen and (min-width: 768px) {
+    .wizard, .wizard.multi-steps {
+        padding: 0 1.2em;
+    }
+    .wizard li, .wizard.multi-steps li {
+        margin: .3rem 0;
+    }
+    .wizard li::after, .wizard.multi-steps li::after {
+        margin: 0 1em;
+    }
+    .wizard li > *, .wizard.multi-steps li > * {
+        text-transform: uppercase;
+    }
+}
+/* --------------------------------
+Triangle basic
+-------------------------------- */
+@media only screen and (min-width: 768px) {
+    .wizard.triangle {
+        background-color: transparent;
+        padding: 0;
+        line-height: 1.55;
+    }
+    .wizard.triangle li {
+        position: relative;
+        padding: 0;
+        margin: 4px 4px 4px 0;
+    }
+    .wizard.triangle li:last-of-type {
+        margin-right: 0;
+    }
+    .wizard.triangle li > * {
+        position: relative;
+        padding: .21rem .8rem .2rem 1.75rem;
+        color: #2c3f4c;
+        background-color: #edeff0;
+        border-color: #edeff0;
+    }
+    .wizard.triangle li.visited > * {
+        color: #ffffff;
+        background-color: #18BC9C;
+        border-color: #18BC9C;
+    }
+    .wizard.triangle li.current > * {
+        color: #ffffff;
+        background-color: #3498DB;
+        border-color: #3498DB;
+    }
+    .wizard.triangle li:first-of-type > * {
+        padding-left: 1.6em;
+        border-radius: .25em 0 0 .25em;
+    }
+    .wizard.triangle li:last-of-type > * {
+        padding-right: 1.6em;
+        border-radius: 0 .25em .25em 0;
+    }
+    .wizard.triangle li::after, .wizard.triangle li > *::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 100%;
+        content: '';
+        height: 0;
+        width: 0;
+        border: .88rem solid transparent;
+        border-top-width: .89rem;
+        border-bottom-width: .89rem;
+        border-right-width: 0;
+        border-left-width: 20px;
+    }
+    .wizard.triangle li::after {
+        z-index: 1;
+        -webkit-transform: translateX(4px);
+        -moz-transform: translateX(4px);
+        -ms-transform: translateX(4px);
+        -o-transform: translateX(4px);
+        transform: translateX(4px);
+        border-left-color: #ffffff;
+        margin: 0;
+    }
+    .wizard.triangle li > *::after {
+        z-index: 2;
+        border-left-color: inherit;
+    }
+    .wizard.triangle li:last-of-type::after, .wizard.triangle li:last-of-type > *::after {
+        display: none;
+    }
+    @-moz-document url-prefix() {
+        .wizard.triangle li::after,
+        .wizard.triangle li > *::after {
+            border-left-style: dashed;
+        }
+    }
+}
+/* --------------------------------
+Multi steps indicator
+-------------------------------- */
+@media only screen and (min-width: 768px) {
+    .wizard.multi-steps {
+        /* reset style */
+        background-color: transparent;
+        padding: 0;
+        text-align: center;
+    }
+
+    .wizard.multi-steps li {
+        position: relative;
+        float: none;
+        margin: 0.4em 80px 0.4em 0;
+    }
+    .wizard.multi-steps li:last-of-type {
+        margin-right: 0;
+    }
+    .wizard.multi-steps li::after {
+        position: absolute;
+        content: '';
+        height: 4px;
+        background: #edeff0;
+        margin: 0;
+    }
+    .wizard.multi-steps li.visited::after {
+        background-color: #18BC9C;
+    }
+    .wizard.multi-steps li > * {
+        position: relative;
+        color: #2c3f4c;
+    }
+    .wizard.multi-steps li.current > * {
+        color: #3498DB;
+    }
+    .wizard.multi-steps.text-center li::after {
+        width: 100%;
+        top: 50%;
+        left: 100%;
+        -webkit-transform: translateY(-50%) translateX(-1px);
+        -moz-transform: translateY(-50%) translateX(-1px);
+        -ms-transform: translateY(-50%) translateX(-1px);
+        -o-transform: translateY(-50%) translateX(-1px);
+        transform: translateY(-50%) translateX(-1px);
+    }
+    .wizard.multi-steps.text-center li > * {
+        z-index: 1;
+        padding: .2rem 1rem;
+        border-radius: .25em;
+        background-color: #edeff0;
+    }
+    .wizard.multi-steps.text-center li.visited > * {
+        color: #ffffff;
+        background-color: #18BC9C;
+    }
+    .wizard.multi-steps.text-center li.current > * {
+        color: #ffffff;
+        background-color: #3498DB;
+    }
+    .wizard.multi-steps.text-top li, .wizard.multi-steps.text-bottom li {
+        width: 100px;
+        text-align: center;
+    }
+    .wizard.multi-steps.text-top li::after, .wizard.multi-steps.text-bottom li::after {
+        position: absolute;
+        left: 50%;
+        width: calc(100% + 80px);
+    }
+    .wizard.multi-steps.text-top li > *::before, .wizard.multi-steps.text-bottom li > *::before {
+        content: '';
+        position: absolute;
+        z-index: 1;
+        left: 50%;
+        right: auto;
+        -webkit-transform: translateX(-50%);
+        -moz-transform: translateX(-50%);
+        -ms-transform: translateX(-50%);
+        -o-transform: translateX(-50%);
+        transform: translateX(-50%);
+        height: 12px;
+        width: 12px;
+        border-radius: 50%;
+        background-color: #edeff0;
+    }
+    .wizard.multi-steps.text-top li.visited > *::before,
+    .wizard.multi-steps.text-bottom li.visited > *::before {
+        background-color: #18BC9C;
+    }
+    .wizard.multi-steps.text-top li.current > *::before,
+    .wizard.multi-steps.text-bottom li.current > *::before {
+        background-color: #3498DB;
+    }
+    .wizard.multi-steps.text-top li::after {
+        bottom: 4px;
+    }
+    .wizard.multi-steps.text-top li > * {
+        padding-bottom: 20px;
+    }
+    .wizard.multi-steps.text-top li > *::before {
+        bottom: 0;
+    }
+
+    .wizard.multi-steps.text-bottom li::after {
+        top: 4px;
+    }
+    .wizard.multi-steps.text-bottom li > * {
+        padding-top: 20px;
+    }
+    .wizard.multi-steps.text-bottom li > *::before {
+        top: 0;
+    }
+}
+/* --------------------------------
+Add a counter to the multi-steps indicator
+-------------------------------- */
+.wizard.multi-steps.count li {
+    counter-increment: steps;
+}
+
+.wizard.multi-steps.count li > *::before {
+    content: counter(steps) " - ";
+}
+
+@media only screen and (min-width: 768px) {
+    .wizard.multi-steps.text-top.count li > *::before,
+    .wizard.multi-steps.text-bottom.count li > *::before {
+        /* this is the spot indicator */
+        content: counter(steps);
+        height: 26px;
+        width: 26px;
+        line-height: 26px;
+        text-transform: uppercase;
+        color: #ffffff;
+    }
+
+    .wizard.multi-steps.text-top.count li:not(.current) span::before,
+    .wizard.multi-steps.text-bottom.count li:not(.current) span::before {
+        /* steps not visited yet - counter color */
+        color: #2c3f4c;
+    }
+
+    .wizard.multi-steps.text-top.count li.visited:not(.current) span::before,
+    .wizard.multi-steps.text-bottom.count li.visited:not(.current) span::before {
+        /* steps not visited yet - counter color */
+        color: #ffffff;
+    }
+
+    .wizard.multi-steps.text-top.count li::after {
+        bottom: 11px;
+    }
+
+    .wizard.multi-steps.text-top.count li > * {
+        padding-bottom: 34px;
+    }
+
+    .wizard.multi-steps.text-bottom.count li::after {
+        top: 11px;
+    }
+
+    .wizard.multi-steps.text-bottom.count li > * {
+        padding-top: 34px;
+    }
+}

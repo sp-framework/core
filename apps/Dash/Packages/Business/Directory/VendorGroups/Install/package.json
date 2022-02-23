@@ -1,0 +1,12 @@
+{
+    "name"          : "VendorGroups",
+    "display_name"  : "Business Vendor Groups",
+    "description"   : "Package for Business Directory Vendor Groups component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-admin-vendorgroups",
+    "class"         : "Apps\\Dash\\Packages\\Business\\Directory\\VendorGroups\\VendorGroups",
+    "settings"      : {"componentRoute":"business/directory/vendorgroups"}
+}

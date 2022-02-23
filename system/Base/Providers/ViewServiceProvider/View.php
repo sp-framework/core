@@ -2,11 +2,10 @@
 
 namespace System\Base\Providers\ViewServiceProvider;
 
+use Phalcon\Events\Event;
+use Phalcon\Events\Manager;
 use Phalcon\Mvc\View as PhalconView;
-use Phalcon\Mvc\ViewBaseInterface;
 use Phalcon\Mvc\View\Engine\Php as PhpTemplateService;
-use Phalcon\Mvc\View\Engine\Volt;
-use System\Base\Providers\ModulesServiceProvider\Views\ViewsData;
 
 class View
 {
@@ -14,25 +13,36 @@ class View
 
 	protected $views;
 
-	protected $view;
+	protected $events;
 
-	protected $applications;
-
-	protected $applicationInfo;
-
-	protected $db;
-
-	protected $path;
-
-	protected $cache;
-
-	public function __construct($views)
+	public function __construct($views, $events)
 	{
 		$this->views = $views;
+
+		$this->events = $events;
 	}
 
 	public function init()
 	{
+		$this->events->attach(
+			'view',
+			function (Event $event, $view) {
+
+				if($event->getType() == 'beforeRender') {
+
+					$path = $view->getViewsDir();
+
+					$path .= strtolower($view->getControllerName()) . '/';
+
+					$path .= $view->getActionName() . '.html';
+
+					if (!file_exists($path)) {
+						throw new \Exception('Template '.$path.' not found');
+					}
+				}
+			}
+		);
+
 		$this->phalconView = new PhalconView();
 
 		$this->phalconView->setViewsDir($this->views->getPhalconViewPath());
@@ -45,10 +55,12 @@ class View
 
 		$this->phalconView->registerEngines(
 			[
-				'.html'     => 'voltTemplateService',
+				'.html'     => 'volt',
 				'.phtml'    => PhpTemplateService::class
 			]
 		);
+
+		$this->phalconView->setEventsManager($this->events);
 
 		return $this->phalconView;
 	}

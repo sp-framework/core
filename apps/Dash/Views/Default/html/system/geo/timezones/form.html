@@ -1,0 +1,255 @@
+{% if timezone['id'] is defined %}
+    {% set timezoneId = timezone['id'] %}
+    {% set timezoneZoneName = timezone['zone_name'] %}
+    {% set timezoneTimeZoneName = timezone['tz_name'] %}
+    {% set timezoneGmtOffset = timezone['gmt_offset'] %}
+    {% set timezoneGmtOffsetName = timezone['gmt_offset_name'] %}
+    {% set timezoneAbbreviation = timezone['abbreviation'] %}
+{% else %}
+    {% set timezoneId = '' %}
+    {% set timezoneZoneName = '' %}
+    {% set timezoneTimeZoneName = '' %}
+    {% set timezoneGmtOffset = '' %}
+    {% set timezoneGmtOffsetName = '' %}
+    {% set timezoneAbbreviation = '' %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Timezone ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Timezone ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : timezoneId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'zone_name',
+                        'fieldLabel'                     : 'Zone Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Zone Name Example: Australia/Brisbane',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : timezoneZoneName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'tz_name',
+                        'fieldLabel'                     : 'Time Zone Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Time Zone Name Example: Australian Eastern Standard Time',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : timezoneTimeZoneName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'abbreviation',
+                        'fieldLabel'                     : 'Abbreviation',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Time Zone Abbreviation Example: AEST',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 10,
+                        'fieldValue'                     : timezoneAbbreviation
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'gmt_offset',
+                        'fieldLabel'                     : 'GMT Offset (secs)',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'GMT offset in seconds. Example: 36000 for +10:00',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : timezoneGmtOffset
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'gmt_offset_name',
+                        'fieldLabel'                     : 'GMT Offset Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'GMT offset name. Example: UTC+10:00',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : timezoneGmtOffsetName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'gmt_offset_dst',
+                        'fieldLabel'                     : 'GMT Offset DST (secs)',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'GMT offset in seconds. Example: 36000 for +10:00',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : timezoneGmtOffset
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'gmt_offset_name_dst',
+                        'fieldLabel'                     : 'GMT Offset Name DST',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'GMT offset name. Example: UTC+10:00',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : timezoneGmtOffsetName
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                          : { },
+        '{{componentId}}-{{sectionId}}-zone_name'                   : { },
+        '{{componentId}}-{{sectionId}}-tz_name'                     : { },
+        '{{componentId}}-{{sectionId}}-gmt_offset'                  : { },
+        '{{componentId}}-{{sectionId}}-gmt_offset_name'             : { },
+        '{{componentId}}-{{sectionId}}-gmt_offset_dst'              : { },
+        '{{componentId}}-{{sectionId}}-gmt_offset_name_dst'         : { },
+        '{{componentId}}-{{sectionId}}-abbreviation'                : { },
+        '{{componentId}}-{{sectionId}}-form'                        : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-zone_name'           : 'required',
+                '{{componentId}}-{{sectionId}}-tz_name'             : 'required',
+                '{{componentId}}-{{sectionId}}-gmt_offset'          : 'required',
+                '{{componentId}}-{{sectionId}}-gmt_offset_name'     : 'required',
+                '{{componentId}}-{{sectionId}}-abbreviation'        : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-zone_name'           : 'Please enter zone name',
+                '{{componentId}}-{{sectionId}}-tz_name'             : 'Please enter time zone name',
+                '{{componentId}}-{{sectionId}}-gmt_offset'          : 'Please enter gmt offset',
+                '{{componentId}}-{{sectionId}}-gmt_offset_name'     : 'Please enter gmt offset name',
+                '{{componentId}}-{{sectionId}}-abbreviation'        : 'Please enter abbreviation'
+            }
+        }
+    });
+</script>

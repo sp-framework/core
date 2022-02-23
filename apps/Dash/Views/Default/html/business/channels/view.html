@@ -1,0 +1,48 @@
+{% if channel['id'] is defined %}
+    {% set channelId = channel['id'] %}
+    {% set title = channelType ~ ' Channel (' ~ channel['name'] ~ ')' %}
+{% else %}
+    {% set channelId = '' %}
+    {% set title = 'New ' ~ channelType ~ ' Channel' %}
+{% endif %}
+{% if channelType === 'ebay' %}
+    {% set dataDependencies =
+        [
+            [
+                'componentName'      : 'Api',
+                'componentVar'       : apis,
+                'componentRoute'     : 'system/api'
+            ]
+        ]
+    %}
+{% else %}
+    {% set dataDependencies = [] %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'store',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'channels/types/' ~ channelType ~ '/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : channelId,
+            'addActionUrl'                  : 'business/channels/add',
+            'addSuccessRedirectUrl'         : 'business/channels',
+            'updateActionUrl'               : 'business/channels/update',
+            'updateSuccessRedirectUrl'      : 'business/channels',
+            'cancelActionUrl'               : 'business/channels',
+            'closeActionUrl'                : 'business/channels'
+        ],
+        'dataDependencies'              : dataDependencies
+    ]
+)}}

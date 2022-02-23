@@ -1,0 +1,12 @@
+{
+    "name"          : "Products",
+    "display_name"  : "Products",
+    "description"   : "Package for Products component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "ims",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-ims-products",
+    "class"         : "Apps\\Dash\\Packages\\Ims\\Products\\Products",
+    "settings"      : {"componentRoute":"ims/products"}
+}

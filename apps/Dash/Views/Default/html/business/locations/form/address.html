@@ -1,0 +1,118 @@
+{% if location['id'] is defined and location['address']|length > 0  %}
+    {% set locationAddressId = location['address']['id'] %}
+    {% set locationStreetAddress = location['address']['street_address'] %}
+    {% set locationStreetAddress2 = location['address']['street_address_2'] %}
+    {% set locationCityId = location['address']['city_id'] %}
+    {% set locationCity = location['address']['city_name'] %}
+    {% set locationPostCode = location['address']['post_code'] %}
+    {% set locationStateId = location['address']['state_id'] %}
+    {% set locationState = location['address']['state_name'] %}
+    {% set locationCountryId = location['address']['country_id'] %}
+    {% set locationCountry = location['address']['country_name'] %}
+{% else %}
+    {% set locationAddressId = '' %}
+    {% set locationStreetAddress = '' %}
+    {% set locationStreetAddress2 = '' %}
+    {% set locationCityId = '' %}
+    {% set locationCity = '' %}
+    {% set locationPostCode = '' %}
+    {% set locationStateId = '' %}
+    {% set locationState = '' %}
+    {% set locationCountryId = '' %}
+    {% set locationCountry = '' %}
+{% endif %}
+{% if locationInboundShipping == '1' %}
+    {% set locationInboundShippingChecked = true %}
+{% else %}
+    {% set locationInboundShippingChecked = false %}
+{% endif %}
+{% if locationOutboundShipping == '1' %}
+    {% set locationOutboundShippingChecked = true %}
+{% else %}
+    {% set locationOutboundShippingChecked = false %}
+{% endif %}
+{% if locationCanStock == '1' %}
+    {% set locationCanStockChecked = true %}
+{% else %}
+    {% set locationCanStockChecked = false %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                     : 'button',
+                'buttons'                        :
+                    [
+                        'copy'          : [
+                            'title'                    : 'Copy from entity',
+                            'size'                     : 'xs',
+                            'type'                     : 'info',
+                            'icon'                     : 'copy',
+                            'disabled'                 : true
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'address_id',
+                'fieldLabel'                     : 'Location Address ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Location Address ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : locationAddressId
+            ]
+        )}}
+        {{adminltetags.useTag('addresses',
+            [
+                'component'                                   : component,
+                'componentName'                               : componentName,
+                'componentId'                                 : componentId,
+                'sectionId'                                   : sectionId,
+                'addressFieldType'                            : 'single',
+                'includeStreet'                               : true,
+                'searchType'                                  : 'city',
+                'streetAddress'                               : locationStreetAddress,
+                'streetAddressFieldBazPostOnCreate'           : true,
+                'streetAddressFieldBazPostOnUpdate'           : true,
+                'streetAddress2'                              : locationStreetAddress2,
+                'streetAddress2FieldBazPostOnCreate'          : true,
+                'streetAddress2FieldBazPostOnUpdate'          : true,
+                'cityId'                                      : locationCityId,
+                'cityName'                                    : locationCity,
+                'cityFieldBazPostOnCreate'                    : true,
+                'cityFieldBazPostOnUpdate'                    : true,
+                'postCode'                                    : locationPostCode,
+                'postCodeFieldBazPostOnCreate'                : true,
+                'postCodeFieldBazPostOnUpdate'                : true,
+                'stateId'                                     : locationStateId,
+                'stateName'                                   : locationState,
+                'stateFieldBazPostOnCreate'                   : true,
+                'stateFieldBazPostOnUpdate'                   : true,
+                'countryId'                                   : locationCountryId,
+                'countryName'                                 : locationCountry,
+                'countryFieldBazPostOnCreate'                 : true,
+                'countryFieldBazPostOnUpdate'                 : true
+            ]
+        )}}
+    </div>
+</div>

@@ -1,0 +1,23 @@
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'qrcode',
+        'cardTitle'                     : 'Qrcodes',
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'qrcodes/form',
+        'formButtons'                   :
+        [
+            'updateActionUrl'               : 'system/tools/qrcodes/update',
+            'updateSuccessRedirectUrl'      : 'system/tools/qrcodes',
+            'closeActionUrl'                : 'system/tools/qrcodes'
+        ]
+    ]
+)}}

@@ -1,0 +1,106 @@
+{% if app['default_component'] is defined and app['default_component'] == '0' %}
+    {% set wizard = true %}
+{% else %}
+    {% set wizard = false %}
+{% endif %}
+{% if wizard === true %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+{% endif %}
+        <div class="row">
+            {% if wizard is defined and wizard === true %}
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'id',
+                            'fieldLabel'                     : 'App ID',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'App ID',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldHidden'                    : true,
+                            'fieldDisabled'                  : true,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+            {% endif %}
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : sectionId,
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                            [
+                                'components'   :
+                                [
+                                    'tabTitle'          : 'Components',
+                                    'tabInclude'        : 'apps/wizard/modules/form/components',
+                                    'tabDataAttributes' : {'jstree' : 'false'}
+                                ],
+                                'views'   :
+                                [
+                                    'tabTitle'          : 'Views',
+                                    'tabInclude'        : 'apps/wizard/modules/form/views',
+                                    'tabDataAttributes' : {'jstree' : 'false'}
+                                ],
+                                'middlewares'   :
+                                [
+                                    'tabTitle'          : 'Middlewares',
+                                    'tabInclude'        : 'apps/wizard/modules/form/middlewares',
+                                    'tabDataAttributes' : {'jstree' : 'false'}
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
+{% if wizard === true %}
+    </fieldset>
+</form>
+{% endif %}
+<script>
+/* globals Sortable */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                              : { },
+        '{{componentId}}-{{sectionId}}-modules'                         : { }
+    });
+</script>

@@ -1,0 +1,23 @@
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'barcode',
+        'cardTitle'                     : 'Barcodes',
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'barcodes/form',
+        'formButtons'                   :
+        [
+            'updateActionUrl'               : 'system/tools/barcodes/update',
+            'updateSuccessRedirectUrl'      : 'system/tools/barcodes',
+            'closeActionUrl'                : 'system/tools/barcodes'
+        ]
+    ]
+)}}

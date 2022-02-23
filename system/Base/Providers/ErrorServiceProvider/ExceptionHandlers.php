@@ -6,23 +6,64 @@ use System\Base\BaseComponent;
 
 class ExceptionHandlers extends BaseComponent
 {
-	// public function handleEmailException($exception)
-	// {
-	// 	$this->view->responseCode = 1;
+	protected $baseErrorDir = 'system/Base/Providers/ErrorServiceProvider/View/errors/';
 
-	// 	$this->view->responseMessage = $exception->getMessage();
+	public function handlePermissionDeniedException($exception)
+	{
+		if ($this->request->getBestAccept() === 'application/json') {
 
-	// 	return $this->sendJson();
-	// }
+			$this->addResponse('Permission Denied!', 1);
 
-	public function handleValidationException()
+			return $this->sendJson();
+		}
+
+		return $this->setViewsDir('permissionDenied');
+	}
+
+	public function handleAppNotAllowedException($exception)
+	{
+		if ($this->request->getBestAccept() === 'application/json') {
+
+			$this->addResponse($exception->getMessage(), 1);
+
+			return $this->sendJson();
+		}
+
+		return $this->setViewsDir('notFound');
+	}
+
+	public function handleControllerNotFoundException($exception)
+	{
+		if ($this->request->getBestAccept() === 'application/json') {
+
+			$this->addResponse($exception->getMessage(), 1);
+
+			return $this->sendJson();
+		}
+
+		return $this->setViewsDir('notFound');
+	}
+
+	public function handleIdNotFoundException($exception)
+	{
+		if ($this->request->getBestAccept() === 'application/json') {
+
+			$this->addResponse($exception->getMessage(), 1);
+
+			return $this->sendJson();
+		}
+
+		return $this->setViewsDir('notFound');
+	}
+
+	public function handleValidationException($exception)
 	{
 		$this->session->set([
-			'errors' => $e->getErrors(),
-			'old' => $e->getOldInput(),
+			'errors' => $exception->getErrors(),
+			'old' => $exception->getOldInput(),
 		]);
 
-		return redirect($e->getPath());
+		return redirect($exception->getPath());
 	}
 
 	public function handleCsrfTokenException()
@@ -30,5 +71,12 @@ class ExceptionHandlers extends BaseComponent
 		$this->flash->now('warning', 'Session expired, please login again.');
 
 		return redirect('/auth/login');
+	}
+
+	private function setViewsDir($partial)
+	{
+		$this->view->setViewsDir(base_path($this->baseErrorDir));
+
+		return $this->view->partial($partial);
 	}
 }

@@ -1,0 +1,381 @@
+<!-- htmlhint tag-pair:false -->
+{% if purchaseOrder['id'] is defined %}
+    {% set purchaseOrderId = purchaseOrder['id'] %}
+    {% set purchaseOrderEntity = purchaseOrder['entity_id'] %}
+    {% set purchaseReferences = purchaseOrder['references'] %}
+    {% set purchaseOrderStatus = purchaseOrder['status'] %}
+    {% set purchaseOrderVendor = purchaseOrder['vendor_id'] %}
+    {% set purchaseOrderStatusDisabled = false %}
+    {% set purchaseOrderVendorDetailsHidden = '' %}
+{% else %}
+    {% set purchaseOrderId = '' %}
+    {% set purchaseOrderEntity = '' %}
+    {% set purchaseReferences = '' %}
+    {% set purchaseOrderStatus = '1' %}
+    {% set purchaseOrderVendor = '' %}
+    {% set purchaseOrderStatusDisabled = true %}
+    {% set purchaseOrderVendorDetailsHidden = 'hidden=""' %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'id',
+                'fieldLabel'                     : 'Purchase Order ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Purchase Order ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : purchaseOrderId
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'entity_id',
+                'fieldLabel'                           : 'Business Entity',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select a business entity that is placing the purchase order.',
+                'fieldRequired'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldBazJstreeSearch'                 : true,
+                'fieldDataSelect2Options'              : entities,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'business_name',
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsSelected'      : purchaseOrderEntity
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'references',
+                'fieldLabel'                     : 'References',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'References (Internal, eBay, etc)',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 100,
+                'fieldValue'                     : purchaseReferences
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'status',
+                'fieldLabel'                           : 'Order Status',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select a status of the purchase order.',
+                'fieldRequired'                        : true,
+                'fieldDisabled'                        : purchaseOrderStatusDisabled,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldBazJstreeSearch'                 : true,
+                'fieldDataSelect2Options'              : orderStatuses,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsSelected'      : purchaseOrderStatus
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'vendor_id',
+                'fieldLabel'                           : 'Vendor',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select a vendor.',
+                'fieldRequired'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldBazJstreeSearch'                 : true,
+                'fieldDataSelect2Options'              : vendors,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'business_name',
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsSelected'      : purchaseOrderVendor
+            ]
+        )}}
+    </div>
+</div>
+<div class="row vdivide" id="{{componentId}}-{{sectionId}}-vendor_details" {{purchaseOrderVendorDetailsHidden}}>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                
+                {% if purchaseOrder['vendor_addresses'] is defined and purchaseOrder['vendor_addresses']|length > 0 %}
+                    {% set vendorAddresses = '' %}
+                    {% for vendorAddress in purchaseOrder['vendor_addresses'] %}
+                        {% if vendorAddress['id'] == purchaseOrder['vendor_address_id'] %}
+                            {% set addressChecked = 'checked=""' %}
+                        {% else %}
+                            {% set addressChecked = '' %}
+                        {% endif %}
+                        {% set addressContent =
+                            '<dl class="row mb-0">
+                                <dt class="col-sm-4">Street Address</dt>
+                                <dd class="col-sm-8 cla-street mb-0">' ~ vendorAddress['street_address'] ~ '</dd>
+                                <dt class="col-sm-4">Street Address 2</dt>
+                                <dd class="col-sm-8 cla-street2 mb-0">' ~ vendorAddress['street_address_2'] ~ '</dd>
+                                <dt class="col-sm-4">City</dt>
+                                <dd class="col-sm-8 cla-city mb-0">' ~ vendorAddress['city_name'] ~ '</dd>
+                                <dt class="col-sm-4">Post Code</dt>
+                                <dd class="col-sm-8 cla-postcode mb-0">' ~ vendorAddress['post_code'] ~ '</dd>
+                                <dt class="col-sm-4">State</dt>
+                                <dd class="col-sm-8 cla-state mb-0">' ~ vendorAddress['state_name'] ~ '</dd>
+                                <dt class="col-sm-4">Country</dt>
+                                <dd class="col-sm-8 cla-country mb-0">' ~ vendorAddress['country_name'] ~ '</dd>
+                            </dl>'
+                        %}
+                        {% set vendorAddresses = vendorAddresses ~
+                            '<div class="info-box">
+                                <div class="info-box-content">
+                                    <div class="row">
+                                        <div class="col-md-1">
+                                            <div class="icheck-primary">
+                                                <input type="radio" id="' ~ vendorAddress['id'] ~ '" data-value="' ~ vendorAddress['id'] ~ '" name="' ~ componentId ~ '-' ~ sectionId ~ '-vendor-addresses" ' ~ addressChecked ~ '>
+                                                <label for="' ~ vendorAddress['id'] ~ '"></label>
+                                            </div>
+                                        </div>
+                                        <div class="col">' ~ addressContent ~ '</div>
+                                    </div>
+                                </div>
+                            </div>'
+                        %}
+                    {% endfor %}
+                    {% set vendorAddressesHidden = false %}
+                {% else %}
+                    {% set vendorAddresses = '' %}
+                    {% set vendorAddressesHidden = true %}
+                {% endif %}
+                
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'vendor_address_id',
+                        'fieldLabel'                     : 'Vendor Billing Address',
+                        'fieldType'                      : 'html',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select an address from the given addresses for this supplier.',
+                        'fieldAdditionalClass'           : 'mb-0',
+                        'fieldHidden'                    : vendorAddressesHidden,
+                        'fieldHtmlContent'               : vendorAddresses,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'vendor_address_id_error',
+                        'fieldLabel'                     : 'Address Error',
+                        'fieldType'                      : 'html',
+                        'fieldAdditionalClass'           : 'mb-0',
+                        'fieldHidden'                    : true,
+                        'fieldBazScan'                   : false,
+                        'fieldBazJstreeSearch'           : false,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                
+                {% if purchaseOrder['id'] is defined %}
+                    {% set vendorContacts = '' %}
+                    {% if purchaseOrder['vendor_contact_id'] is defined and purchaseOrder['vendor_contact_id'] == 0 %}
+                        {% set contactChecked = 'checked=""' %}
+                    {% else %}
+                        {% set contactChecked = '' %}
+                    {% endif %}
+                    {% set contactContent =
+                        '<dl class="row mb-0">
+                            <dt class="col-sm-4">Email</dt>
+                            <dd class="col-sm-8 cla-email mb-0">' ~ purchaseOrder['vendor']['email'] ~ '</dd>
+                            <dt class="col-sm-4">Phone</dt>
+                            <dd class="col-sm-8 cla-phone mb-0">' ~ purchaseOrder['vendor']['contact_phone']
+                    %}
+
+                    {% if purchaseOrder['vendor']['contact_phone_ext'] is defined and purchaseOrder['vendor']['contact_phone_ext'] !== '' %}
+                        {% set contactContent = contactContent ~ ' x' ~ purchaseOrder['vendor']['contact_phone_ext'] ~ '</dd>' %}
+                    {% else %}
+                        {% set contactContent = contactContent ~ '</dd>' %}
+                    {% endif %}
+
+                    {% set contactContent = contactContent ~ '</dl>' %}
+                    {% set vendorContacts = vendorContacts ~
+                        '<div class="info-box">
+                            <div class="info-box-content">
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="icheck-primary">
+                                            <input type="radio" id="0" data-value="0" name="' ~ componentId ~ '-' ~ sectionId ~ '-vendor-contacts" ' ~ contactChecked ~ '>
+                                            <label for="0"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col">' ~ contactContent ~ '</div>
+                                </div>
+                            </div>
+                        </div>'
+                    %}
+                    {% if purchaseOrder['vendor_contacts'] is defined and purchaseOrder['vendor_contacts']|length > 0 %}
+                        {% for vendorContact in purchaseOrder['vendor_contacts'] %}
+                            {% if vendorContact['id'] == purchaseOrder['vendor_contact_id'] %}
+                                {% set contactChecked = 'checked=""' %}
+                            {% else %}
+                                {% set contactChecked = '' %}
+                            {% endif %}
+
+                            {% set contactContent =
+                                '<dl class="row mb-0">
+                                    <dt class="col-sm-4">Name</dt>
+                                    <dd class="col-sm-8 cla-name mb-0">' ~ vendorContact['full_name'] ~ '</dd>
+                                    <dt class="col-sm-4">Email</dt>
+                                    <dd class="col-sm-8 cla-email mb-0">' ~ vendorContact['account_email'] ~ '</dd>
+                                    <dt class="col-sm-4">Phone</dt>
+                                    <dd class="col-sm-8 cla-phone mb-0">' ~ vendorContact['contact_phone']
+                            %}
+
+                            {% if vendorContact['contact_phone_ext'] is defined and vendorContact['contact_phone_ext'] !== '' %}
+                                {% set contactContent = contactContent ~ ' x' ~ vendorContact['contact_phone_ext'] ~ '</dd>' %}
+                            {% else %}
+                                {% set contactContent = contactContent ~ '</dd>' %}
+                            {% endif %}
+
+                            {% if vendorContact['contact_mobile'] !== '' %}
+                                {% set contactContent =
+                                    contactContent ~
+                                        '<dt class="col-sm-4">Mobile</dt>
+                                        <dd class="col-sm-8 cla-mobile mb-0">' ~ vendorContact['contact_mobile'] ~ '</dd>'
+                                %}
+                            {% endif %}
+
+                            {% set contactContent = contactContent ~ '</dl>' %}
+                            {% set vendorContacts = vendorContacts ~
+                                '<div class="info-box">
+                                    <div class="info-box-content">
+                                        <div class="row">
+                                            <div class="col-md-1">
+                                                <div class="icheck-primary">
+                                                    <input type="radio" id="' ~ vendorContact['id'] ~ '" data-value="' ~ vendorContact['id'] ~ '" name="' ~ componentId ~ '-' ~ sectionId ~ '-vendor-contacts" ' ~ contactChecked ~ '>
+                                                    <label for="' ~ vendorContact['id'] ~ '"></label>
+                                                </div>
+                                            </div>
+                                            <div class="col">' ~ contactContent ~ '</div>
+                                        </div>
+                                    </div>
+                                </div>'
+                            %}
+                        {% endfor %}
+                        {% set vendorContactsHidden = false %}
+                    {% else %}
+                        {% set vendorContacts = '' %}
+                        {% set vendorContactsHidden = true %}
+                    {% endif %}
+                {% else %}
+                    {% set vendorContacts = '' %}
+                    {% set vendorContactsHidden = true %}
+                {% endif %}
+                
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'vendor_contact_id',
+                        'fieldLabel'                     : 'Vendor Contact',
+                        'fieldType'                      : 'html',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select a contact for this supplier.',
+                        'fieldAdditionalClass'           : 'mb-0',
+                        'fieldHidden'                    : vendorContactsHidden,
+                        'fieldHtmlContent'               : vendorContacts,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'vendor_contact_id_error',
+                        'fieldLabel'                     : 'Contact Error',
+                        'fieldType'                      : 'html',
+                        'fieldAdditionalClass'           : 'mb-0',
+                        'fieldHidden'                    : true,
+                        'fieldBazScan'                   : false,
+                        'fieldBazJstreeSearch'           : false,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+{% if status['id'] is defined %}
+    {% set statusId = status['id'] %}
+    {% set title = 'Status (' ~ status['name'] ~ ')' %}
+{% else %}
+    {% set statusId = '' %}
+    {% set title = 'New Status' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'dot-circle',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'statuses/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : statusId,
+            'addActionUrl'                  : 'hrms/statuses/add',
+            'addSuccessRedirectUrl'         : 'hrms/statuses',
+            'updateActionUrl'               : 'hrms/statuses/update',
+            'updateSuccessRedirectUrl'      : 'hrms/statuses',
+            'cancelActionUrl'               : 'hrms/statuses',
+            'closeActionUrl'                : 'hrms/statuses'
+        ]
+    ]
+)}}

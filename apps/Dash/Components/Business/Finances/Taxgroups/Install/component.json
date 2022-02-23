@@ -1,0 +1,57 @@
+{
+    "route"         : "business/finances/taxgroups",
+    "name"          : "Tax Groups",
+    "description"   : "List tax groups via this component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-admin-taxgroups",
+    "class"         : "Apps\\Dash\\Components\\Business\\Finances\\Taxgroups\\TaxgroupsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "TaxGroups",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-admin-taxgroups"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 4,
+        "business"      : {
+            "title"     : "business",
+            "icon"      : "suitcase",
+            "childs"    : {
+                "finances"       : {
+                    "title"     : "finances",
+                    "icon"      : "dollar-sign",
+                    "childs"    : {
+                        "taxgroups" : {
+                            "title"     : "tax groups",
+                            "link"      : "business/finances/taxgroups"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

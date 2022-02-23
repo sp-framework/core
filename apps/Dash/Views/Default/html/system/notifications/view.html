@@ -1,0 +1,27 @@
+{% if notification['id'] is defined %}
+    {% set notificationId = notification['id'] %}
+    {% set title = 'Notification ID: (' ~ notificationId ~ ')' %}
+
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'clipboard-list',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'notifications/form',
+            'formButtons'                   :
+            [
+                'updateButtonId'                : notificationId,
+                'closeActionUrl'                : 'system/notifications'
+            ]
+        ]
+    )}}
+{% endif %}

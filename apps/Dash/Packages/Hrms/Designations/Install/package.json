@@ -1,0 +1,12 @@
+{
+    "name"          : "HrmsDesignations",
+    "display_name"  : "Designations",
+    "description"   : "Package for Hrms Designations component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "hrms",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-hrms-designations",
+    "class"         : "Apps\\Dash\\Packages\\Hrms\\Designations\\HrmsDesignations",
+    "settings"      : {"componentRoute":"hrms/designations"}
+}

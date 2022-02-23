@@ -1,0 +1,56 @@
+{
+    "route"         : "business/entities",
+    "name"          : "Business Entities",
+    "description"   : "List entities via this component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-admin-entities",
+    "class"         : "Apps\\Dash\\Components\\Business\\Entities\\EntitiesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Entities",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-admin-entities"
+            },
+            {
+                "name"      : "ABNLookup",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-tools-abnlookup"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 4,
+        "business"      : {
+            "icon"      : "suitcase",
+            "title"     : "business",
+            "childs"    : {
+                "entities" : {
+                    "title"     : "entities",
+                    "link"      : "business/entities"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

@@ -1,0 +1,46 @@
+{
+    "route"         : "system/storages",
+    "name"          : "Storages",
+    "description"   : "List storages via this component",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-system-admin-storages",
+    "class"         : "Apps\\Dash\\Components\\System\\Storages\\StoragesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 6,
+        "system"      : {
+            "icon"      : "cogs",
+            "title"     : "system",
+            "childs"    : {
+                "storages" : {
+                    "title"     : "storages",
+                    "icon"      : "boxes",
+                    "link"      : "system/storages"
+                }
+            }
+        }
+    },
+    "settings"          : {
+        "mandatory"     : true
+    }
+}

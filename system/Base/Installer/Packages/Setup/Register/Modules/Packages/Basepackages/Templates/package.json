@@ -1,0 +1,12 @@
+{
+    "name"          : "Templates",
+    "display_name"  : "Templates",
+    "description"   : "Basepackage Templates",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "tools",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Templates",
+    "settings"      : {"componentRoute":"system/templates"}
+}

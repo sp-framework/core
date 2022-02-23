@@ -4,49 +4,44 @@ namespace System\Base\Providers\ErrorServiceProvider;
 
 use System\Base\Providers\ErrorServiceProvider\ExceptionHandlers;
 
-
 class Error
 {
-	protected $applicationInfo;
+	protected $appInfo;
 
 	protected $config;
 
 	protected $logger;
 
+	protected $request;
+
+	protected $response;
+
 	protected $exception;
 
-	protected $applicationDebug;
+	protected $appDebug;
 
 	protected $class;
 
 	protected $newException = null;
 
-	public function __construct($applicationInfo, $config, $logger)
+	public function __construct($appInfo, $config, $logger, $request, $response)
 	{
-		$this->applicationInfo = $applicationInfo;
+		$this->appInfo = $appInfo;
 
 		$this->config = $config;
 
 		$this->logger = $logger;
 
-		$this->exceptionHandler = new ExceptionHandlers;
+		$this->request = $request;
+
+		$this->response = $response;
 	}
 
 	public function init()
 	{
-		if ($this->applicationInfo) {
-			if ($this->applicationInfo['mode'] === 0) {
-				$this->applicationDebug = false;
-			} else if ($this->applicationInfo['mode'] === 1) {
-				$this->applicationDebug = true;
-			} else {
-				$this->applicationDebug = (bool) $this->config->debug;
-			}
-		} else {
-			$this->applicationDebug = (bool) $this->config->debug;
-		}
+		$this->appDebug = (bool) $this->config->debug;
 
-		if ($this->applicationDebug) {
+		if ($this->appDebug) {
 			error_reporting(-1);
 		} else {
 			error_reporting(0);
@@ -71,10 +66,25 @@ class Error
 			$this->logMessage();
 		}
 
+		if ($this->config->logs->exceptions) {
+			$this->logger->logExceptions->debug($exception);
+
+			if (!$this->appDebug) {
+				echo 'Exception: Please check exceptions log for more details.';
+
+				return;
+			}
+		}
+
+		if ($this->class === 'DomainNotRegisteredException') {
+			$this->showOnScreen();
+			return;
+		}
+
 		$customHandler = $this->customHandler($this->class);
 
 		if (!$customHandler) {
-			if ($this->applicationDebug) {
+			if ($this->appDebug) {
 				$this->showOnScreen();
 			}
 		} else {
@@ -84,8 +94,10 @@ class Error
 
 	public function customHandler()
 	{
-		if (method_exists($this->exceptionHandler, $method = "handle{$this->class}")) {
-			return $this->exceptionHandler->{$method}($this->exception);
+		$exceptionHandler = new ExceptionHandlers;
+
+		if (method_exists($exceptionHandler, $method = "handle{$this->class}")) {
+			return $exceptionHandler->{$method}($this->exception);
 		} else {
 			return false;
 		}
@@ -127,7 +139,6 @@ class Error
 	protected function emailMessage()
 	{
 		try {
-
 			$this->logger->commitEmail($this->buildMessage(true, false));
 
 		} catch (\Exception $exception) {

@@ -1,0 +1,31 @@
+{% if entity['id'] is defined %}
+    {% set entityApiId = entity['api_id'] %}
+{% else %}
+    {% set entityApiId = '' %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'api_id',
+                'fieldLabel'                            : 'Xero API',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select a xero api to use for this entity.',
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldDataSelect2Options'               : apis,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : entityApiId
+            ]
+        )}}
+    </div>
+</div>

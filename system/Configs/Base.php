@@ -7,33 +7,29 @@ return
 		[
 			"host" 				=> "localhost",
 			"dbname" 			=> "sp",
-			"username" 			=> "guru",
+			"username" 			=> "sp",
 			"password" 			=> "123",
 			"port" 				=> "3306",
+			"charset" 	 	    => "utf8mb4"
 		],
 		"cache"			=>
 		[
-			"enabled"			=> false, //Global Cache value //true - Production false - Development
-			"timeout"			=> 60, //Global Cache timeout in seconds
+			"enabled"			=> true, //Global Cache value //true - Production false - Development
+			"timeout"			=> 3600, //Global Cache timeout in seconds
 			"service"			=> "streamCache"
+		],
+		"security"		=>
+		[
+			"passwordWorkFactor"=> 8,
+			"cookiesWorkFactor" => 4,
 		],
 		"logs"			=>
 		[
 			"enabled"			=> true,
+			"exceptions"		=> true,
 			"level"				=> "DEBUG",
 			"service"			=> "streamLogs", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
 			"email"				=> false,
-			"emergencyEmails"	=> "",
-		],
-		"email"			=>
-		[
-			"enabled"			=> false,
-			"encryption"	 	=> "",
-			"allow_html_body"	=> "",
-			"host"				=> "",
-			"port"				=> "",
-			"auth" 				=> "",
-			"username"			=> "",
-			"password"			=> ""
+			"emergencyEmails"	=> "support@bazaari.com.au",
 		]
 	];

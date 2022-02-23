@@ -1,0 +1,290 @@
+{% if email['id'] is defined %}
+    {% set emailId = email['id'] %}
+    {% set emailStatus = email['status'] %}
+    {% set emailPriority = email['priority'] %}
+    {% set emailSentOn = email['sent_on'] %}
+    {% set emailConfidential = email['confidential'] %}
+    {% set emailToAddresses = email['to_addresses'] %}
+    {% set emailCCAddresses = email['cc_addresses'] %}
+    {% set emailBCCAddresses = email['bcc_addresses'] %}
+    {% set emailSubject = email['subject'] %}
+    {% set emailBody = email['body'] %}
+    {% set emailLogs = email['logs'] %}
+    <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+        <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'status',
+                            'fieldLabel'                     : 'Status',
+                            'fieldType'                      : 'html',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Status',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 50,
+                            'fieldHtmlContent'               : emailStatus
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'priority',
+                            'fieldLabel'                     : 'Priority',
+                            'fieldType'                      : 'html',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Priority',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldHtmlContent'               : emailPriority
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'sent_on',
+                            'fieldLabel'                     : 'Sent On',
+                            'fieldType'                      : 'html',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Sent On',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldHtmlContent'               : emailSentOn
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'confidential',
+                            'fieldLabel'                     : 'Confidential',
+                            'fieldType'                      : 'html',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Confidential',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldHtmlContent'               : emailConfidential
+                        ]
+                    )}}
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'to_addresses',
+                            'fieldLabel'                     : 'To Addresses',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 1024,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'To Addresses',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldDataInputMaxLength'        : 1024,
+                            'fieldTextareaRows'              : 2,
+                            'fieldValue'                     : emailToAddresses
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'cc_addresses',
+                            'fieldLabel'                     : 'CC Addresses',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 1024,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'CC Addresses',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldDataInputMaxLength'        : 1024,
+                            'fieldTextareaRows'              : 2,
+                            'fieldValue'                     : emailCCAddresses
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'bcc_addresses',
+                            'fieldLabel'                     : 'BCC Addresses',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 1024,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'BCC Addresses',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldDataInputMaxLength'        : 1024,
+                            'fieldTextareaRows'              : 2,
+                            'fieldValue'                     : emailBCCAddresses
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'subject',
+                            'fieldLabel'                     : 'Subject',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Subject',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 200,
+                            'fieldValue'                     : emailSubject
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'body',
+                            'fieldLabel'                     : 'Body',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 2048,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Body',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldTextareaRows'              : 10,
+                            'fieldValue'                     : emailBody
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'logs',
+                            'fieldLabel'                     : 'Logs',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 2048,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Logs',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldTextareaRows'              : 10,
+                            'fieldValue'                     : emailLogs
+                        ]
+                    )}}
+                </div>
+            </div>
+        </fieldset>
+    </form>
+    <script>
+/* globals PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                      : { },
+        '{{componentId}}-{{sectionId}}-status'                  : { },
+        '{{componentId}}-{{sectionId}}-priority'                : { },
+        '{{componentId}}-{{sectionId}}-sent_on'                 : { },
+        '{{componentId}}-{{sectionId}}-confidential'            : { },
+        '{{componentId}}-{{sectionId}}-to_addresses'            : { },
+        '{{componentId}}-{{sectionId}}-cc_addresses'            : { },
+        '{{componentId}}-{{sectionId}}-bcc_addresses'           : { },
+        '{{componentId}}-{{sectionId}}-subject'                 : { },
+        '{{componentId}}-{{sectionId}}-body'                    : { },
+        '{{componentId}}-{{sectionId}}-logs'                    : {
+            rules: {
+            },
+            messages: {
+            }
+        }
+    });
+</script>
+{% endif %}

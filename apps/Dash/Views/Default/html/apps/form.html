@@ -1,0 +1,162 @@
+<div class="row vdivide">
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'form-fields',
+                'fieldLabel'                                : 'Form Fields',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Form Fields',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldJstreeDataSrcArr'                     : [],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeToggleAllChildren'              : false,
+                'fieldJstreeIncludeRootInPath'              : false,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : false,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                'fieldJstreeHideJstreeIcons'                : false
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : 'main',
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                            [
+                                'info'   :
+                                [
+                                    'tabTitle'          : 'Info',
+                                    'tabInclude'        : 'apps/wizard/register/form'
+                                ],
+                                'modules'   :
+                                [
+                                    'tabTitle'          : 'Modules',
+                                    'tabInclude'        : 'apps/wizard/modules/form'
+                                ]
+                            ]
+                    ]
+                )}}
+            </fieldset>
+        </form>
+    </div>
+</div>
+<script>
+/* globals Sortable */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                              : { },
+        '{{componentId}}-{{sectionId}}-name'                            : { },
+        '{{componentId}}-{{sectionId}}-app_type'                        : {
+            'placeholder'   : 'SELECT APP TYPE'
+        },
+        '{{componentId}}-{{sectionId}}-route'                           : { },
+        '{{componentId}}-{{sectionId}}-description'                     : { },
+        '{{componentId}}-{{sectionId}}-registration_allowed'            : {
+            afterInit: function() {
+
+                $('#{{componentId}}-{{sectionId}}-registration_allowed').click(function() {
+                    if ($(this)[0].checked === true) {
+                        $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-guest_role_id').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-registration_role_id').val(null).trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-guest_role_id').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-guest_role_id').val(null).trigger('change');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-registration_role_id'            : {
+            'placeholder'   : 'SELECT REGISTRATION ROLE',
+            afterInit: function() {
+                if ($('#{{componentId}}-{{sectionId}}-registration_allowed')[0].checked === true) {
+                    $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-guest_role_id').attr('disabled', false);
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-guest_role_id'                   : {
+            'placeholder'   : 'SELECT GUEST ROLE',
+            afterInit: function() {
+                if ($('#{{componentId}}-{{sectionId}}-registration_allowed')[0].checked === true) {
+                    $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-guest_role_id').attr('disabled', false);
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-can_login_role_ids'              : {
+            'placeholder'   : 'SELECT ROLES'
+        },
+        '{{componentId}}-{{sectionId}}-form'                            : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'required',
+                '{{componentId}}-{{sectionId}}-route'                   : 'required',
+                '{{componentId}}-{{sectionId}}-app_type'                : 'required',
+                '{{componentId}}-{{sectionId}}-registration_role_id'    : 'required',
+                '{{componentId}}-{{sectionId}}-guest_role_id'           : 'required',
+                '{{componentId}}-{{sectionId}}-default_component'       : 'required',
+                '{{componentId}}-{{sectionId}}-errors_component'        : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'Please enter app name',
+                '{{componentId}}-{{sectionId}}-route'                   : 'Please enter app route',
+                '{{componentId}}-{{sectionId}}-app_type'                : 'Please select app type',
+                '{{componentId}}-{{sectionId}}-registration_role_id'    : 'Please select registration role',
+                '{{componentId}}-{{sectionId}}-guest_role_id'           : 'Please select guest role',
+                '{{componentId}}-{{sectionId}}-default_component'       : 'Please select app default component',
+                '{{componentId}}-{{sectionId}}-errors_component'        : 'Please select app errors component',
+            }
+        }
+    });
+</script>

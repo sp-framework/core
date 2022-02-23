@@ -2,12 +2,13 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\ModulesServiceProvider\Modules\Model\Components as ComponentsModel;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesComponents;
 
 class Components extends BasePackage
 {
-	protected $modelToUse = ComponentsModel::class;
+	protected $modelToUse = ModulesComponents::class;
 
 	public $components;
 
@@ -18,177 +19,220 @@ class Components extends BasePackage
 		return $this;
 	}
 
-	public function getNamedComponentForApplication($name, $applicationId)
+	public function getComponentByName($name)
 	{
-		$filter =
-			$this->model->filter(
-				function($component) use ($name, $applicationId) {
-					if ($component->name === ucfirst($name) &&
-						$component->application_id === $applicationId
-					) {
-						return $component;
-					}
-				}
-			);
-
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate component name found for component ' . $name);
-		} else if (count($filter) === 1) {
-			return $filter[0]->toArray();
-		} else {
-			return false;
+		foreach($this->components as $component) {
+			if (strtolower($component['name']) === strtolower($name)) {
+				return $component;
+			}
 		}
+
+		return false;
 	}
 
-	public function getComponentsForApplication($applicationId)
+	public function getRouteComponentForApp($route, $appId)
+	{
+		foreach($this->components as $component) {
+			$component['apps'] = Json::decode($component['apps'], true);
+
+			if (isset($component['apps'][$appId])) {
+				if (isset($component['apps'][$appId]['enabled']) &&
+					$component['apps'][$appId]['enabled'] === true &&
+					$component['route'] === $route
+				) {
+					return $component;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public function getNamedComponentForApp($name, $appId)
+	{
+		foreach($this->components as $component) {
+			$component['apps'] = Json::decode($component['apps'], true);
+
+			if (isset($component['apps'][$appId])) {
+				if (isset($component['apps'][$appId]['enabled']) &&
+					$component['apps'][$appId]['enabled'] === true &&
+					strtolower($component['name']) === strtolower($name)
+				) {
+					return $component;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public function getComponentsForApp($appId)
 	{
 		$components = [];
 
-		$filter =
-			$this->model->filter(
-				function($component) use ($applicationId) {
-					if ($component->application_id === $applicationId) {
-						return $component;
-					}
-				}
-			);
+		foreach($this->components as $component) {
+			$component['apps'] = Json::decode($component['apps'], true);
 
-		foreach ($filter as $key => $value) {
-			array_push($components, $value->toArray());
+			if (isset($component['apps'][$appId]['enabled']) &&
+				$component['apps'][$appId]['enabled'] === true
+			) {
+				$components[$component['id']] = $component;
+			}
 		}
 
 		return $components;
 	}
-	// public function getAll(bool $resetCache = false)
-	// {
-	// 	if ($this->cacheKey) {
-	// 		$parameters = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
-	// 	}
 
-	// 	if (!$this->components || $resetCache) {
+	public function getComponentsForAppAndType($appId, $type)
+	{
+		$components = [];
 
-	// 		$this->model = ComponentsModel::find($parameters);
+		foreach($this->components as $component) {
+			if ($component['app_id'] == $appId &&
+				$component['type'] == $type
+			) {
+				$components[$component['id']] = $component;
+			}
+		}
 
-	// 		$this->components = $this->model->toArray();
-	// 	}
+		return $components;
+	}
 
-	// 	return $this;
-	// }
+	public function getComponentById($id)
+	{
+		foreach($this->components as $component) {
+			if ($component['id'] == $id) {
+				return $component;
+			}
+		}
+	}
 
-	// public function getById(int $id = null, bool $resetCache = false)
-	// {
-	// 	$parameters = $this->paramsWithCache($this->getIdParams($id));
+	public function getComponentsForCategoryAndSubcategory($category, $subCategory)
+	{
+		$components = [];
 
-	// 	$this->model = ComponentsModel::find($parameters);
+		foreach($this->components as $component) {
+			if ($component['category'] === $category &&
+				$component['sub_category'] === $subCategory
+			) {
+				$components[$component['id']] = $component;
+			}
+		}
 
-	// 	if ($this->model->count() === 1) {
-	// 		$this->packagesData->responseCode = 0;
-	// 		$this->packagesData->responseMessage = 'Found';
+		return $components;
+	}
 
-	// 		array_push($this->cacheKeys, $parameters['cache']['key']);
+	public function getComponentsForAppType(string $type)
+	{
+		$components = [];
 
-	// 		return $this->model->toArray()[0];
+		foreach($this->components as $component) {
+			if ($component['app_type'] === $type) {
+				$components[$component['id']] = $component;
+			}
+		}
 
-	// 	} else if ($this->model->count() > 1) {
-	// 		$this->packagesData->responseCode = 1;
-	// 		$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
+		return $components;
+	}
 
-	// 	} else if ($this->model->count() === 0) {
-	// 		$this->packagesData->responseCode = 1;
-	// 		$this->packagesData->responseMessage = 'No Record Found with that ID!';
-	// 	}
+	public function getImportComponents()
+	{
+		$components = [];
 
-	// 	$this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
+		foreach($this->components as $component) {
+			$component['settings'] = Json::decode($component['settings'], true);
 
-	// 	return false;
-	// }
+			if (isset($component['settings']['import']) &&
+				$component['settings']['import'] == 'true' &&
+				isset($component['settings']['importexportPackage']) &&
+				isset($component['settings']['importMethod'])
+			) {
+				$package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
 
-	// public function add(array $data)
-	// {
-	// 	try {
-	// 		$txManager = new Manager();
-	// 		$transaction = $txManager->get();
+				if ($package &&
+					$this->usePackage($package['class']) &&
+					(method_exists($package['class'], 'add' . $component['settings']['importMethod']) &&
+					 method_exists($package['class'], 'update' . $component['settings']['importMethod']))
+				) {
+					$availableComponent['id'] = $component['id'];
+					$availableComponent['name'] = $component['name'];
 
-	// 		$component = new ComponentsModel();
+					array_push($components, $availableComponent);
+				}
+			}
+		}
 
-	// 		$component->setTransaction($transaction);
+		return $components;
+	}
 
-	// 		$component->assign($data);
+	public function getExportComponents()
+	{
+		$components = [];
 
-	// 		$create = $component->create();
+		foreach($this->components as $component) {
+			$component['settings'] = Json::decode($component['settings'], true);
 
-	// 		if (!$create) {
-	// 			$transaction->rollback('Could not add component.');
-	// 		}
+			if (isset($component['settings']['export']) &&
+				$component['settings']['export'] == 'true' &&
+				isset($component['settings']['importexportPackage'])
+			) {
+				$package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
 
-	// 		if ($transaction->commit()) {
-	// 			$this->resetCache();
+				if ($package && $this->usePackage($package['class'])) {
+					$availableComponent['id'] = $component['id'];
+					$availableComponent['name'] = $component['name'];
 
-	// 			$this->packagesData->responseCode = 0;
+					array_push($components, $availableComponent);
+				}
+			}
+		}
 
-	// 			$this->packagesData->responseMessage = 'Added component!';
+		return $components;
+	}
 
-	// 			return true;
-	// 		}
-	// 	} catch (\Exception $e) {
-	// 		throw $e;
-	// 	}
-	// }
+	public function updateComponents(array $data)
+	{
+		$components = Json::decode($data['components'], true);
 
-	// public function update(array $data)
-	// {
-	// 	try {
-	// 		$txManager = new Manager();
-	// 		$transaction = $txManager->get();
+		foreach ($components as $componentId => $status) {
+			$component = $this->getById($componentId);
 
-	// 		$component = new ComponentsModel();
+			$component['apps'] = Json::decode($component['apps'], true);
 
-	// 		$component->setTransaction($transaction);
+			if ($status === true) {
+				$component['apps'][$data['id']]['enabled'] = true;
 
-	// 		$component->assign($data);
+				$component['dependencies'] = Json::decode($component['dependencies'], true);
 
-	// 		if (!$component->update()) {
-	// 			$transaction->rollback('Could not update component.');
-	// 		}
+				if (isset($component['dependencies']['packages']) && count($component['dependencies']['packages']) > 0) {
 
-	// 		if ($transaction->commit()) {
-	// 			//Delete Old cache if exists and generate new cache
-	// 			$this->updateCache($data['id']);
+					foreach ($component['dependencies']['packages'] as $key => $dependencyPackage) {
 
-	// 			$this->packagesData->responseCode = 0;
+						$package = $this->modules->packages->getNamedPackageForRepo($dependencyPackage['name'], $dependencyPackage['repo']);
 
-	// 			$this->packagesData->responseMessage = 'Component Updated!';
+						if ($package) {
+							$package['apps'] = Json::decode($package['apps'], true);
 
-	// 			return true;
-	// 		}
-	// 	} catch (\Exception $e) {
-	// 		throw $e;
-	// 	}
-	// }
+							$package['apps'][$data['id']]['enabled'] = true;
 
-	// public function remove(int $id)
-	// {
-	// 	//Need to solve dependencies for removal
-	// 	// $this->get($id);
+							$package['apps'] = Json::encode($package['apps']);
 
-	// 	// if ($this->model->count() === 1) {
-	// 	// 	if ($this->model->delete()) {
+							$this->modules->packages->update($package);
+						}
+					}
+				}
 
-	// 	// 		$this->resetCache($id);
+				$component['dependencies'] = Json::encode($component['dependencies'], JSON_UNESCAPED_SLASHES);
 
-	// 	// 		$this->packagesData->responseCode = 0;
-	// 	// 		$this->packagesData->responseMessage = 'Component Deleted!';
-	// 	// 		return true;
-	// 	// 	} else {
-	// 	// 		$this->packagesData->responseCode = 1;
-	// 	// 		$this->packagesData->responseMessage = 'Could not delete component.';
-	// 	// 	}
-	// 	// } else if ($this->model->count() > 1) {
-	// 	// 	$this->packagesData->responseCode = 1;
-	// 	// 	$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
-	// 	// } else if ($this->model->count() === 0) {
-	// 	// 	$this->packagesData->responseCode = 1;
-	// 	// 	$this->packagesData->responseMessage = 'No Record Found with that ID!';
-	// 	// }
-	// }
+			} else if ($status === false) {
+				$component['apps'][$data['id']]['enabled'] = false;
+			}
+
+			$component['apps'] = Json::encode($component['apps']);
+
+			$this->update($component);
+		}
+
+		return true;
+	}
 }

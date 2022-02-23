@@ -1,0 +1,117 @@
+{{adminltetags.useTag('content',
+    [
+        'component'             : table['component'],
+        'componentName'         : componentName,
+        'componentId'           : componentId,
+        'parentComponentId'     : parent,
+        'sectionId'             : 'listing',
+        'contentType'           : 'sectionWithListing',
+        'cardHeader'            : true,
+        'cardType'              : 'primary',
+        'cardIcon'              : 'tasks',
+        'cardTitle'             : 'Tasks',
+        'cardAdditionalClass'   : 'rounded-0',
+        'cardShowTools'         : ['maximize'],
+        'dtFixedHeader'         : true,
+        'dtFilter'              : true,
+        'dtFilterButtons'       : ['edit', 'delete', 'add', 'clone', 'reset'],
+        'dtFilters'             : table['filters'],
+        'dtPrimaryButtons'      :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'add-business' : {
+                            'title'                   : 'Add New Task',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'plus',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/workers/tasks/q/id/0')
+                        }
+                    }
+            },
+        'dtTable'               : table,
+        'dtColumns'             : table['columns'],
+        'dtPostUrl'             : table['postUrl'],
+        'dtPostUrlParams'       : table['postUrlParams'],
+        'dtStriped'             : true,
+        'dtStateSave'           : false,
+        'dtBordered'            : false,
+        'dtHideIdColumn'        : true,
+        'dtNoOfColumnsToShow'   : 9,
+        'dtTableCompact'        : true,
+        'dtZeroRecords'         : 'No task available. Add by clicking the Add new task button.'
+    ]
+)}}
+<script>
+/* globals Swal PNotify BazContentLoader BazNotifications */
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
+    initFuncs();
+    BazContentLoader.init();
+}
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterRedraw"] = function() {
+    initFuncs();
+    BazContentLoader.init();
+}
+
+function initFuncs() {
+    $('.rowForceNextRun').each(function(index,row) {
+        if ($(row).parents('td').siblings('.data-force_next_run').text() === 'Yes' ||
+            ($(row).parents('td').siblings('.data-force_next_run').text() === 'No' &&
+             $(row).parents('td').siblings('.data-enabled').text() === 'Yes')
+        ) {
+            $(row).children().first().remove();
+            $(row).prepend(
+                '<span class="fa-stack"><i class="fas fa-fw fa-xs fa-forward fa-stack-1x"></i><i class="fas fa-fw fa-sm fa-ban fa-stack-2x text-danger"></i></span>'
+            );
+            $(row).children().last().html('CANCEL FORCE NEXT RUN');
+        }
+
+        $(row).off();
+        $(row).click(function(e) {
+            e.preventDefault();
+
+            var thisButton = this;
+            var url = $(this).attr('href');
+
+            var dataToSend = { };
+            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+            dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
+
+            if ($(row).parents('td').siblings('.data-force_next_run').text() === 'Yes' ||
+                ($(row).parents('td').siblings('.data-force_next_run').text() === 'No' &&
+                 $(row).parents('td').siblings('.data-enabled').text() === 'Yes')
+            ) {
+                dataToSend.cancel = true;
+            }
+
+            $.ajax({
+                url         : url,
+                method      : 'post',
+                dataType    : 'json',
+                data        : dataToSend,
+                success     : function(response) {
+                    if (response.responseCode === 0) {
+                        window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+                        PNotify.success({
+                            title           : response.responseMessage,
+                        });
+                    } else {
+                        PNotify.error({
+                            title           : response.responseMessage,
+                        });
+                    }
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                }
+            });
+        });
+    });
+}
+</script>

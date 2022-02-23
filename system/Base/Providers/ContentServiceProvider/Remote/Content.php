@@ -6,13 +6,12 @@ use GuzzleHttp\Client;
 
 class Content
 {
-	public function __construct()
-	{
-		include (__DIR__ . '/vendor/autoload.php');
-	}
+    public function __construct()
+    {
+    }
 
-	public function init()
-	{
-		return new Client();
-	}
+    public function init()
+    {
+        return new Client();
+    }
 }

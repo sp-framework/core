@@ -2,12 +2,13 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\ModulesServiceProvider\Modules\Model\Middlewares as MiddlewaresModel;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesMiddlewares;
 
 class Middlewares extends BasePackage
 {
-	protected $modelToUse = MiddlewaresModel::class;
+	protected $modelToUse = ModulesMiddlewares::class;
 
 	public $middlewares;
 
@@ -18,158 +19,141 @@ class Middlewares extends BasePackage
 		return $this;
 	}
 
-	public function getNamedMiddlewareForApplication($name, $applicationId)
+	public function getNamedMiddlewareForApp($name, $appId)
 	{
-		$filter =
-			$this->model->filter(
-				function($middleware) use ($name, $applicationId) {
-					if ($middleware->name === ucfirst($name) &&
-						$middleware->application_id === $applicationId
-					) {
-						return $middleware;
-					}
-				}
-			);
+		foreach($this->middlewares as $middleware) {
+			$middleware['apps'] = Json::decode($middleware['apps'], true);
 
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate middleware name found for middleware ' . $name);
-		} else if (count($filter) === 1) {
-			return $filter[0]->toArray();
-		} else {
-			return false;
+			if ($middleware['apps'][$appId]['enabled'] === true &&
+				strtolower($middleware['name']) === strtolower($name)
+			) {
+				return $middleware;
+			}
 		}
+
+		return false;
 	}
 
-	// public function getAll($params = [], bool $resetCache = false)
-	// {
-	// 	if ($this->cacheKey) {
-	// 		$parameters = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
-	// 	}
+	public function getMiddlewaresForApp($appId)
+	{
+		$middlewares = [];
 
-	// 	if (!$this->middlewares || $resetCache) {
+		foreach($this->middlewares as $middleware) {
+			$middleware['apps'] = Json::decode($middleware['apps'], true);
 
-	// 		$this->model = MiddlewaresModel::find($parameters);
+			if (isset($middleware['apps'][$appId]['enabled']) &&
+				$middleware['apps'][$appId]['enabled'] == true
+			) {
+				$middlewares[$middleware['id']] = $middleware;
+				$middlewares[$middleware['id']]['sequence'] = $middleware['apps'][$appId]['sequence'];
+				$middlewares[$middleware['id']]['enabled'] = $middleware['apps'][$appId]['enabled'];
+			}
+		}
 
-	// 		$this->middlewares = $this->model->toArray();
-	// 	}
+		return $middlewares;
+	}
 
-	// 	return $this;
-	// }
+	public function getMiddlewaresForCategoryAndSubcategory($category, $subCategory, $appId = null)
+	{
+		$middlewares = [];
 
-	// public function get(int $id, bool $resetCache = false)
-	// {
-	// 	$parameters = $this->paramsWithCache($this->getIdParams($id));
+		foreach($this->middlewares as $middleware) {
 
-	// 	$this->model = MiddlewaresModel::find($parameters);
+			if ($middleware['category'] === $category && $middleware['sub_category'] === $subCategory) {
+				$middlewares[$middleware['id']] = $middleware;
 
-	// 	if ($this->model->count() === 1) {
-	// 		$this->packagesData->responseCode = 0;
-	// 		$this->packagesData->responseMessage = 'Found';
+				if ($appId) {
+					$middleware['apps'] = Json::decode($middleware['apps'], true);
+					if (isset($middleware['apps'][$appId])) {
+						if (isset($middleware['apps'][$appId]['sequence'])) {
+							$middlewares[$middleware['id']]['sequence'] = $middleware['apps'][$appId]['sequence'];
+						} else {
+							$middlewares[$middleware['id']]['sequence'] = 0;
+						}
+						if ($middleware['apps'][$appId]['enabled']) {
+							$middlewares[$middleware['id']]['enabled'] = $middleware['apps'][$appId]['enabled'];
+						} else {
+							$middlewares[$middleware['id']]['enabled'] = false;
+						}
+					} else {
+						$middlewares[$middleware['id']]['sequence'] = 0;
+						$middlewares[$middleware['id']]['enabled'] = false;
+					}
+				}
+			}
+		}
 
-	// 		array_push($this->cacheKeys, $parameters['cache']['key']);
+		return $middlewares;
+	}
 
-	// 		return $this->model->toArray()[0];
+	public function getMiddlewaresForAppType(string $type, $appId = null)
+	{
+		$middlewares = [];
 
-	// 	} else if ($this->model->count() > 1) {
-	// 		$this->packagesData->responseCode = 1;
-	// 		$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
+		foreach($this->middlewares as $middleware) {
+			if ($middleware['app_type'] == $type) {
+				$middlewares[$middleware['id']] = $middleware;
 
-	// 	} else if ($this->model->count() === 0) {
-	// 		$this->packagesData->responseCode = 1;
-	// 		$this->packagesData->responseMessage = 'No Record Found with that ID!';
-	// 	}
+				if ($appId) {
+					$middleware['apps'] = Json::decode($middleware['apps'], true);
+					if (isset($middleware['apps'][$appId])) {
+						if (isset($middleware['apps'][$appId]['sequence'])) {
+							$middlewares[$middleware['id']]['sequence'] = $middleware['apps'][$appId]['sequence'];
+						} else {
+							$middlewares[$middleware['id']]['sequence'] = 0;
+						}
+						if ($middleware['apps'][$appId]['enabled']) {
+							$middlewares[$middleware['id']]['enabled'] = $middleware['apps'][$appId]['enabled'];
+						} else {
+							$middlewares[$middleware['id']]['enabled'] = false;
+						}
+					} else {
+						$middlewares[$middleware['id']]['sequence'] = 0;
+						$middlewares[$middleware['id']]['enabled'] = false;
+					}
+				}
+			}
+		}
 
-	// 	$this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
+		return $middlewares;
+	}
 
-	// 	return false;
-	// }
+	public function updateMiddlewares(array $data)
+	{
+		$middlewares = Json::decode($data['middlewares'], true);
 
-	// public function add(array $data)
-	// {
-	// 	try {
-	// 		$txManager = new Manager();
-	// 		$transaction = $txManager->get();
+		foreach ($middlewares['middlewares'] as $middlewareId => $status) {
+			$middleware = $this->getById($middlewareId);
 
-	// 		$middleware = new MiddlewaresModel();
+			$middleware['apps'] = Json::decode($middleware['apps'], true);
 
-	// 		$middleware->setTransaction($transaction);
+			if ($status === true) {
+				$middleware['apps'][$data['id']]['enabled'] = true;
+			} else if ($status === false) {
+				$middleware['apps'][$data['id']]['enabled'] = false;
+			}
 
-	// 		$middleware->assign($data);
+			$middleware['apps'] = Json::encode($middleware['apps']);
 
-	// 		$create = $middleware->create();
+			$this->update($middleware);
+		}
 
-	// 		if (!$create) {
-	// 			$transaction->rollback('Could not add middleware.');
-	// 		}
+		foreach ($middlewares['sequence'] as $sequence => $middlewareId) {
+			$middleware = $this->getById($middlewareId);
 
-	// 		if ($transaction->commit()) {
-	// 			$this->resetCache();
+			$middleware['apps'] = Json::decode($middleware['apps'], true);
 
-	// 			$this->packagesData->responseCode = 0;
+			if ($status === true) {
+				$middleware['apps'][$data['id']]['sequence'] = $sequence;
+			} else if ($status === false) {
+				$middleware['apps'][$data['id']]['sequence'] = $sequence;
+			}
 
-	// 			$this->packagesData->responseMessage = 'Added middleware!';
+			$middleware['apps'] = Json::encode($middleware['apps']);
 
-	// 			return true;
-	// 		}
-	// 	} catch (\Exception $e) {
-	// 		throw $e;
-	// 	}
-	// }
+			$this->update($middleware);
+		}
 
-	// public function update(array $data)
-	// {
-	// 	try {
-	// 		$txManager = new Manager();
-	// 		$transaction = $txManager->get();
-
-	// 		$middleware = new MiddlewaresModel();
-
-	// 		$middleware->setTransaction($transaction);
-
-	// 		$middleware->assign($data);
-
-	// 		if (!$middleware->update()) {
-	// 			$transaction->rollback('Could not update middleware.');
-	// 		}
-
-	// 		if ($transaction->commit()) {
-	// 			//Delete Old cache if exists and generate new cache
-	// 			$this->updateCache($data['id']);
-
-	// 			$this->packagesData->responseCode = 0;
-
-	// 			$this->packagesData->responseMessage = 'Middleware Updated!';
-
-	// 			return true;
-	// 		}
-	// 	} catch (\Exception $e) {
-	// 		throw $e;
-	// 	}
-	// }
-
-	// public function remove(int $id)
-	// {
-	// 	//Need to solve dependencies for removal
-	// 	// $this->get($id);
-
-	// 	// if ($this->model->count() === 1) {
-	// 	// 	if ($this->model->delete()) {
-
-	// 	// 		$this->resetCache($id);
-
-	// 	// 		$this->packagesData->responseCode = 0;
-	// 	// 		$this->packagesData->responseMessage = 'Middleware Deleted!';
-	// 	// 		return true;
-	// 	// 	} else {
-	// 	// 		$this->packagesData->responseCode = 1;
-	// 	// 		$this->packagesData->responseMessage = 'Could not delete middleware.';
-	// 	// 	}
-	// 	// } else if ($this->model->count() > 1) {
-	// 	// 	$this->packagesData->responseCode = 1;
-	// 	// 	$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
-	// 	// } else if ($this->model->count() === 0) {
-	// 	// 	$this->packagesData->responseCode = 1;
-	// 	// 	$this->packagesData->responseMessage = 'No Record Found with that ID!';
-	// 	// }
-	// }
+		return true;
+	}
 }

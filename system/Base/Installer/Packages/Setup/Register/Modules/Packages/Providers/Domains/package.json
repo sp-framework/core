@@ -1,0 +1,12 @@
+{
+    "name"          : "Domains",
+    "display_name"  : "Domains",
+    "description"   : "Basepackage Domains",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "tools",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\DomainsServiceProvider\\Domains",
+    "settings"      : {"componentRoute":"domains"}
+}

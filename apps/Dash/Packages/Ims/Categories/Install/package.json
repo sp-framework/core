@@ -1,0 +1,12 @@
+{
+    "name"          : "Categories",
+    "display_name"  : "Categories",
+    "description"   : "Package for Categories component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "ims",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-ims-categories",
+    "class"         : "Apps\\Dash\\Packages\\Ims\\Categories\\Categories",
+    "settings"      : {"componentRoute":"ims/categories"}
+}

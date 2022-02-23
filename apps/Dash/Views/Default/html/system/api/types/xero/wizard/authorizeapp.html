@@ -1,0 +1,156 @@
+<h5>Click the button below to start authorization process.</h5>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'componentId'           : componentId,
+                'sectionId'             : sectionId,
+                'buttonType'            : 'button',
+                'buttons'               :
+                    [
+                        'begin-autho' : [
+                            'title'                   : 'Begin Authorization',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'external-link-alt'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<script>
+/* globals eModal PNotify */
+$('#{{componentId}}-{{sectionId}}-begin-autho').click(function(e) {
+    e.preventDefault();
+
+    window.name = "bazaari-api";
+
+    $(this).html(
+        '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> RUNNING AUTHORIZATION IN ANOTHER WINDOW...'
+    );
+
+    $(this).attr('disabled', true);
+
+    $(this).children().attr('hidden', false);
+
+    var registerFormId;
+
+    if ($('#{{componentId}}-{{sectionId}}-id').val() != '') {
+        registerFormId = $('#{{componentId}}-{{sectionId}}-id').val();
+    } else {
+        registerFormId = window['dataCollection']["{{componentId}}"]["{{componentId}}-{{sectionId}}"]["steps"]['1']['responseData']['id'];
+    }
+
+    var postData = { };
+    postData['api_id'] = registerFormId;
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+    $.post('{{links.url("system/api/getXeroUserTokenUrl")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == '0') {
+            window.open(response.responseData);
+            $('body').off('xero-api-success');
+            $('body').on('xero-api-success', function(e, response) {
+                if (response.tokenKey && response.token) {
+                    $('#security-token').attr('name', response.tokenKey);
+                    $('#security-token').val(response.token);
+                }
+                $('#{{componentId}}-{{sectionId}}-begin-autho').removeClass('btn-primary').addClass('btn-success');
+                $('#{{componentId}}-{{sectionId}}-next').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-previous').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-cancel').addClass('disabled');
+                $('#{{componentId}}-{{sectionId}}-begin-autho').html(
+                    'AUTHORIZED!'
+                );
+
+                window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['steps']['2']['onNext'] =
+                    function(resolve, reject) {
+                        var registerFormId;
+
+                        if ($('#{{componentId}}-{{sectionId}}-id').val() != '') {
+                            registerFormId = $('#{{componentId}}-{{sectionId}}-id').val();
+                        } else {
+                            registerFormId = window['dataCollection']["{{componentId}}"]["{{componentId}}-{{sectionId}}"]["steps"]['1']['responseData']['id'];
+                        }
+
+                        var postData = { };
+                        postData['api_id'] = registerFormId;
+                        postData['available_tenants'] = true;
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                        $.post('{{links.url("system/api/getxerotenants")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+
+                            if (response.responseCode == '0') {
+                                if ($(response.responseData['tenants']).length > 0) {
+
+                                    resolve(true);
+
+                                    $(response.responseData['tenants']).each(function(index, tenant) {
+                                        var newOption = new Option(tenant.tenantName, tenant.tenantId, false, false);
+                                        $('#{{componentId}}-{{sectionId}}-tenant_id').append(newOption).trigger('change');
+                                        var lastOption = $('#{{componentId}}-{{sectionId}}-tenant_id').children('option').last();
+                                        $(lastOption).data('tenant-auth-event-id', tenant.authEventId);
+                                        $(lastOption).attr('data-tenant-auth-event-id', tenant.authEventId);
+                                        $(lastOption).attr('data-tenant-type', tenant.tenantType);
+                                    });
+
+                                    $('#{{componentId}}-{{sectionId}}-id').val(response.responseData['apiConfig']['id']);
+
+                                    $('#{{componentId}}-{{sectionId}}-setup').val('4');
+
+                                    if ($(response.responseData['tenants']).length > 1) {
+                                        $('#{{componentId}}-{{sectionId}}-tenant_id').on('select2:select', function(e) {
+                                            $('#{{componentId}}-{{sectionId}}-tenant_type').val($(e.params.data.element).data('tenant-type'));
+                                            $('#{{componentId}}-{{sectionId}}-auth_event_id').val($(e.params.data.element).data('tenant-auth-event-id'));
+                                            $('#{{componentId}}-{{sectionId}}-tenant_name').val(e.params.data.text);
+                                        });
+                                    } else if ($(response.responseData['tenants']).length === 1) {
+                                        $('#{{componentId}}-{{sectionId}}-tenant_id').val(response.responseData['tenants'][0]['tenantId']).trigger('change');
+                                        $('#{{componentId}}-{{sectionId}}-tenant_id').attr('disabled', true);
+                                        $('#{{componentId}}-{{sectionId}}-tenant_type').val(response.responseData['tenants'][0]['tenantType']);
+                                        $('#{{componentId}}-{{sectionId}}-auth_event_id').val(response.responseData['tenants'][0]['authEventId']);
+                                        $('#{{componentId}}-{{sectionId}}-tenant_name').val(response.responseData['tenants'][0]['tenantName']);
+                                    }
+                                } else {
+                                    PNotify.error({
+                                        title   : response.responseMessage,
+                                    });
+                                    //Enable previous button
+                                    resolve(false);
+                                }
+                            }
+                        }, 'json');
+                    }
+            });
+
+            $('body').off('xero-api-error');
+            $('body').on('xero-api-error', function(e, response) {
+                if (response.tokenKey && response.token) {
+                    $('#security-token').attr('name', response.tokenKey);
+                    $('#security-token').val(response.token);
+                }
+                $('#{{componentId}}-{{sectionId}}-begin-autho').attr('hidden', false);
+                $('#{{componentId}}-{{sectionId}}-begin-autho').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-begin-autho').html(
+                    '<i class="fas fa-fw fa-external-link-alt"></i> AUTHORIZATION ERROR! TRY AGAIN?'
+                );
+                $('#{{componentId}}-{{sectionId}}-check-autho').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-check-autho').children().attr('hidden', true);
+            });
+        } else {
+            PNotify.error({
+                title   : response.responseMessage,
+            });
+        }
+    }, 'json');
+});
+</script>

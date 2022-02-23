@@ -1,0 +1,11 @@
+{% if thisApp['route'] or thisApp['route'] != '' %}
+    {% set route = thisApp['route']|lower %}
+{% else %}
+    {% set route = thisApp['name']|lower %}
+{% endif %}
+
+{% if type == 'core' %}
+    {% include 'settings/core.html' %}
+{% elseif type == 'apps' %}
+    {% include 'settings/apps.html' %}
+{% endif %}

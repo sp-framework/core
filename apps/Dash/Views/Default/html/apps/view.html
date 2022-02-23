@@ -1,0 +1,179 @@
+{% if app['id'] is defined %}
+    {% set appId = app['id'] %}
+    {% set title = 'App (' ~ app['name'] ~ ')' %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'th-large',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'apps/form',
+            'formButtons'                   :
+            [
+                'updateButtonId'                : appId,
+                'updateActionUrl'               : 'apps/update',
+                'updateSuccessRedirectUrl'      : 'apps',
+                'cancelActionUrl'               : 'apps',
+                'closeActionUrl'                : 'apps'
+            ]
+        ]
+    )}}
+{% else %}
+    {% set appId = '' %}
+    {% set title = 'New App' %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'wizard',
+            'contentType'                   : 'sectionWithWizard',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'magic',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'wizardType'                    : 'triangle',
+            'wizardCanCancel'               : false,
+            'wizardCancelUrl'               : 'apps',
+            'wizardDoneUrl'                 : 'apps',
+            'wizardStartAtStep'             : 0,
+            'wizardSteps'                   :
+                [
+                    '0' :
+                        [
+                            'title'             : 'Information',
+                            'content'           : view.getPartial('apps/wizard/info')
+                        ],
+                    '1' :
+                        [
+                            'title'             : 'Register App',
+                            'content'           : view.getPartial('apps/wizard/register',
+                                                    [
+                                                        'wizard'                : true,
+                                                        'title'                 : title,
+                                                        'wizardComponentId'     : componentId,
+                                                        'wizardSectionId'       : componentId ~ '-wizard'
+                                                    ]
+                                                ),
+                            'description'       : 'Step 1: Register App information with this system.',
+                            'submitOnNext'      : true
+                        ],
+                    '2' :
+                        [
+                            'title'             : 'Modules for App',
+                            'content'           : view.getPartial('apps/wizard/modules',
+                                                    [
+                                                        'wizard'                : true,
+                                                        'title'                 : title,
+                                                        'wizardComponentId'     : componentId,
+                                                        'wizardSectionId'       : componentId ~ '-wizard'
+                                                    ]
+                                                ),
+                            'description'       : 'Step 2: Enable modules for this App.',
+                            'submitOnNext'      : true
+                        ],
+                    '3' :
+                        [
+                            'title'             : 'Assign to Domain',
+                            'content'           : view.getPartial('apps/wizard/assign',
+                                                    [
+                                                        'componentId'       : componentId,
+                                                        'sectionId'         : 'main',
+                                                        'parentComponentId' : parent
+                                                    ]
+                                                ),
+                            'description'       : 'Step 4: Assign App to channel.',
+                            'goBack'            : false
+                        ]
+                ]
+        ]
+    )}}
+{% endif %}
+{# {% if modules is defined and modules === true %}
+{% set appId = app['id'] %}
+{% set title = 'Modules for App (' ~ app['name'] ~ ')' %}
+{% if components|length === 0 %}
+    {% set formButtonsArr =
+        [
+            'closeActionUrl'                : 'apps'
+        ]
+    %}
+{% else %}
+    {% set formButtonsArr =
+        [
+            'updateButtonId'                : appId,
+            'addActionUrl'                  : 'apps/add',
+            'addSuccessRedirectUrl'         : 'apps',
+            'updateActionUrl'               : 'apps/update',
+            'updateSuccessRedirectUrl'      : 'apps',
+            'cancelActionUrl'               : 'apps',
+            'closeActionUrl'                : 'apps'
+        ]
+    %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'th',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'apps/modules',
+        'formButtons'                   : formButtonsArr
+
+    ]
+)}}
+{% else %}
+{% if app['id'] is defined %}
+    {% set appId = app['id'] %}
+    {% set title = 'App (' ~ app['name'] ~ ')' %}
+{% else %}
+    {% set appId = '' %}
+    {% set title = 'New App' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'th-large',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'apps/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : appId,
+            'addActionUrl'                  : 'apps/add',
+            'addSuccessRedirectUrl'         : 'apps',
+            'updateActionUrl'               : 'apps/update',
+            'updateSuccessRedirectUrl'      : 'apps',
+            'cancelActionUrl'               : 'apps',
+            'closeActionUrl'                : 'apps'
+        ]
+    ]
+)}}
+{% endif %} #}

@@ -1,0 +1,56 @@
+{
+	"route"			: "devtools/api/enums",
+	"name"			: "Devtools Enums",
+	"description"	: "Enums generate enums constants for a contract",
+	"app_type"      : "dash",
+	"category"      : "system",
+	"sub_category"  : "devtools",
+	"version"		: "0.0.1",
+	"repo"			: "https://.../dash-component-system-devtools-api-enums",
+	"class"			: "Apps\\Dash\\Components\\Devtools\\Api\\Enums\\EnumsComponent",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://.../core"
+		},
+		"components"	: [],
+		"packages"		:
+		[
+			{
+				"name"      : "Enums",
+				"version"   : "0.0.1",
+				"repo"      : "https://.../dash-package-system-devtools-api-enums"
+			}
+		],
+		"middlewares"	: [],
+		"views"			:
+		[
+			{
+				"name"      : "Default",
+				"version"   : "0.0.1",
+				"repo"      : "https://.../dash-view-default"
+			}
+		]
+	},
+	"menu"				: {
+		"seq"			: 99,
+		"devtools"			: {
+			"title"		: "devtools",
+			"icon"		: "code",
+			"childs"	: {
+				"api"	: {
+					"title"     : "Api",
+					"childs"	: {
+						"enums"		: {
+							"title"		: "enums",
+							"link"		: "devtools/api/enums"
+						}
+					}
+				}
+			}
+		}
+	},
+	"settings"          : {
+	}
+}

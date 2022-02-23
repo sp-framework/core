@@ -1,0 +1,25 @@
+{% if replaceKeys is not defined %}
+    {% set replaceKeys = [] %}
+{% endif %}
+{% if replaceValues is not defined %}
+    {% set replaceValues = [] %}
+{% endif %}
+{% if disableKeys is not defined %}
+    {% set disableKeys = [] %}
+{% endif %}
+<div class="row">
+    <div class="col" id="activity-logs">
+        {{adminltetags.useTag('activitylogs',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : 'main',
+                'activityLogs'                  : activityLogs,
+                'replaceKeys'                   : replaceKeys,
+                'replaceValues'                 : replaceValues,
+                'disableKeys'                   : disableKeys
+            ]
+        )}}
+    </div>
+</div>

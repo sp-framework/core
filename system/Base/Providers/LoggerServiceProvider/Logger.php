@@ -15,6 +15,8 @@ class Logger
 {
     public $log;
 
+    public $logExceptions;
+
     public $logEmail;
 
     protected $logsConfig;
@@ -46,23 +48,32 @@ class Logger
 
     public function init()
     {
+        if ($this->checkLogPath()) {
+            $savePath = base_path('var/log/');
+        } else {
+            $savePath = '/tmp/';
+        }
+
+        $this->customFormatter =
+            new CustomFormat(
+                'c',
+                $this->session->getId(),
+                $this->connection->getId(),
+                $this->request->getClientAddress()
+            );
+
+        $streamAdapter = new Stream($savePath . 'exceptions.log');
+        $streamAdapter->setFormatter($this->customFormatter);
+
+        $this->logExceptions = new PhalconLogger(
+            'messages',
+            ['stream'        => $streamAdapter]
+        );
+
+        $this->logExceptions->getAdapter('stream')->begin();
+
         if ($this->logsConfig->enabled) {
-
-            $this->customFormatter =
-                new CustomFormat(
-                    'c',
-                    $this->session->getId(),
-                    $this->connection->getId(),
-                    $this->request->getClientAddress()
-                );
-
             if ($this->logsConfig->service === 'streamLogs') {
-                if ($this->checkLogPath()) {
-                    $savePath = base_path('var/log/');
-                } else {
-                    $savePath = '/tmp/';
-                }
-
                 $streamAdapter = new Stream($savePath . 'debug.log');
                 $streamAdapter->setFormatter($this->customFormatter);
 
@@ -85,6 +96,7 @@ class Logger
 
                 $this->log->getAdapter('db')->begin();
             }
+
             $this->setLogLevel();
 
             if ($this->logsConfig->email) {

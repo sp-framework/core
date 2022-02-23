@@ -1,0 +1,12 @@
+{
+    "name"          : "Entities",
+    "display_name"   : "Business Entities",
+    "description"   : "Package to register business entity information via entities component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-admin-entities",
+    "class"         : "Apps\\Dash\\Packages\\Business\\Entities\\Entities",
+    "settings"      : {"componentRoute":"business/entities"}
+}

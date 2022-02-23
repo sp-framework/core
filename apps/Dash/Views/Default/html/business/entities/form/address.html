@@ -1,0 +1,79 @@
+{% if entity['id'] is defined and entity['address']|length > 0 %}
+    {% set entityAddressId = entity['address']['id'] %}
+    {% set entityStreetAddress = entity['address']['street_address'] %}
+    {% set entityStreetAddress2 = entity['address']['street_address_2'] %}
+    {% set entityCityId = entity['address']['city_id'] %}
+    {% set entityCity = entity['address']['city_name'] %}
+    {% set entityPostCode = entity['address']['post_code'] %}
+    {% set entityStateId = entity['address']['state_id'] %}
+    {% set entityState = entity['address']['state_name'] %}
+    {% set entityCountryId = entity['address']['country_id'] %}
+    {% set entityCountry = entity['address']['country_name'] %}
+{% else %}
+    {% set entityAddressId = '' %}
+    {% set entityStreetAddress = '' %}
+    {% set entityStreetAddress2 = '' %}
+    {% set entityCityId = '' %}
+    {% set entityCity = '' %}
+    {% set entityPostCode = '' %}
+    {% set entityStateId = '' %}
+    {% set entityState = '' %}
+    {% set entityCountryId = '' %}
+    {% set entityCountry = '' %}
+{% endif %}
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'address_id',
+                'fieldLabel'                     : 'Business Address ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Business Address ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : entityAddressId
+            ]
+        )}}
+        {{adminltetags.useTag('addresses',
+            [
+                'component'                                   : component,
+                'componentName'                               : componentName,
+                'componentId'                                 : componentId,
+                'sectionId'                                   : sectionId,
+                'addressFieldType'                            : 'single',
+                'includeStreet'                               : true,
+                'searchType'                                  : 'city',
+                'streetAddress'                               : entityStreetAddress,
+                'streetAddressFieldBazPostOnCreate'           : true,
+                'streetAddressFieldBazPostOnUpdate'           : true,
+                'streetAddress2'                              : entityStreetAddress2,
+                'streetAddress2FieldBazPostOnCreate'          : true,
+                'streetAddress2FieldBazPostOnUpdate'          : true,
+                'cityId'                                      : entityCityId,
+                'cityName'                                    : entityCity,
+                'cityFieldBazPostOnCreate'                    : true,
+                'cityFieldBazPostOnUpdate'                    : true,
+                'postCode'                                    : entityPostCode,
+                'postCodeFieldBazPostOnCreate'                : true,
+                'postCodeFieldBazPostOnUpdate'                : true,
+                'stateId'                                     : entityStateId,
+                'stateName'                                   : entityState,
+                'stateFieldBazPostOnCreate'                   : true,
+                'stateFieldBazPostOnUpdate'                   : true,
+                'countryId'                                   : entityCountryId,
+                'countryName'                                 : entityCountry,
+                'countryFieldBazPostOnCreate'                 : true,
+                'countryFieldBazPostOnUpdate'                 : true
+            ]
+        )}}
+    </div>
+</div>

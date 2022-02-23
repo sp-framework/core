@@ -1,0 +1,722 @@
+{% set account = auth.account() %}
+{% set profile = auth.account()['profile'] %}
+
+{#     {% set profileSkills = profile['skills'] %}
+{% set profileSkillsAttachments = profile['skills_attachments'] %} #}
+
+<div class="row vdivide">
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'form-fields',
+                'fieldLabel'                                : 'Form Fields',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Form Fields',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldJstreeDataSrcArr'                     : [],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeToggleAllChildren'              : false,
+                'fieldJstreeIncludeRootInPath'              : false,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : false,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                'fieldJstreeHideJstreeIcons'                : false
+            ]
+        )}}
+    </div>
+    <div class="col-md-10">
+        <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : 'main',
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                            [
+                                'info'   :
+                                [
+                                    'tabTitle'          : 'Info',
+                                    'tabInclude'        : 'profile/form/info',
+                                    'tabIncludeParams'  : ['profile' : profile, 'account' : account]
+                                ],
+                                'contactdetails'   :
+                                [
+                                    'tabTitle'          : 'Contact Details',
+                                    'tabInclude'        : 'profile/form/contactdetails',
+                                    'tabIncludeParams'  : ['profile' : profile, 'account' : account]
+                                ],
+                                'address'   :
+                                [
+                                    'tabTitle'          : 'Address',
+                                    'tabInclude'        : 'profile/form/address',
+                                    'tabIncludeParams'  : ['profile' : profile, 'account' : account]
+                                ],
+                                'security'   :
+                                [
+                                    'tabTitle'          : 'Security',
+                                    'tabInclude'        : 'profile/form/security',
+                                    'tabIncludeParams'  : ['profile' : profile, 'account' : account]
+                                ],
+                                'sessions'   :
+                                [
+                                    'tabTitle'          : 'Sessions',
+                                    'tabInclude'        : 'profile/form/sessions',
+                                    'tabIncludeParams'  : ['profile' : profile, 'account' : account]
+                                ],
+                                'notifications'   :
+                                [
+                                    'tabTitle'          : 'Notifications',
+                                    'tabInclude'        : 'profile/form/notifications'
+                                ]
+                            ]
+                    ]
+                )}}
+            </fieldset>
+        </form>
+    </div>
+</div>
+<script>
+/* globals BazContentFieldsValidator PNotify autoComplete fixGrid Inputmask */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+var subscriptions = JSON.parse('{{subscriptions}}');
+var gridColumns = [];
+gridColumns.push(
+    {
+        header          :   '<p class="text-center mb-0">' +
+                                '<span class="cursor-pointer">' +
+                                    '<i id="{{componentId}}-{{sectionId}}-subscriptions-packages-unsubscribeall" ' +
+                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                        'data-original-title="Unsubscribe All" class="fas fa-fw fa-times-circle ' +
+                                        'mr-1 text-danger helper packages">' +
+                                    '</i>' +
+                                '</span>' +
+                                    ' Packages ' +
+                                '<span class="cursor-pointer">' +
+                                    '<i id="{{componentId}}-{{sectionId}}-subscriptions-packages-subscribeall" ' +
+                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                        'data-original-title="Subscribe All" class="fas fa-fw fa-check-circle ' +
+                                        'ml-1 text-success helper packages">' +
+                                    '</i>' +
+                                '</span>' +
+                            '</p>',
+        wideCellClass   : 'text-center packages',
+        title           : "_DATA_",
+        width           : 300
+    }
+);
+
+for (var subscription in subscriptions) {
+    gridColumns.push(
+        {
+            header          :   '<p class="text-center mb-0">' +
+                                    '<span class="cursor-pointer">' +
+                                        '<i id="{{componentId}}-{{sectionId}}-subscriptions-' + subscriptions[subscription] + '-unsubscribeall" ' +
+                                            'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                            'data-original-title="Unsubscribe all ' + subscriptions[subscription] + '" class="fas fa-fw fa-times-circle ' +
+                                            'mr-1 text-danger helper ' + subscriptions[subscription] + '">' +
+                                        '</i>' +
+                                    '</span> ' +
+                                        subscriptions[subscription].toUpperCase() +
+                                    ' <span class="cursor-pointer">' +
+                                        '<i id="{{componentId}}-{{sectionId}}-subscriptions-' + subscriptions[subscription] + '-subscribeall" ' +
+                                            'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                            'data-original-title="Subscribe all ' + subscriptions[subscription] + '" class="fas fa-fw fa-check-circle ' +
+                                            'ml-1 text-success helper ' + subscriptions[subscription] + '">' +
+                                        '</i>' +
+                                    '</span>' +
+                                '</p>',
+            wideCellClass   : 'text-center NOTIFICATION-' + subscriptions[subscription],
+            cellClass       : 'empty NOTIFICATION-' + subscriptions[subscription]
+        }
+    );
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                              : { },
+        '{{componentId}}-{{sectionId}}-account_id'                      : { },
+        '{{componentId}}-{{sectionId}}-account_email'                   : { },
+        '{{componentId}}-{{sectionId}}-account_role'                    : { },
+        '{{componentId}}-{{sectionId}}-first_name'                      : { },
+        '{{componentId}}-{{sectionId}}-last_name'                       : { },
+        '{{componentId}}-{{sectionId}}-contact_phone'                   : {
+            afterInit: function() {
+                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                    .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_phone'));
+            }
+        },
+        '{{componentId}}-{{sectionId}}-contact_phone_ext'               : { },
+        '{{componentId}}-{{sectionId}}-contact_fax'                     : {
+            afterInit: function() {
+                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                    .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_fax'));
+            }
+        },
+        '{{componentId}}-{{sectionId}}-contact_mobile'                  : {
+            afterInit: function() {
+                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                    .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_mobile'));
+            }
+        },
+        '{{componentId}}-{{sectionId}}-contact_other'                   : { },
+        '{{componentId}}-{{sectionId}}-secondary_email'                 : { },
+        '{{componentId}}-{{sectionId}}-cc_emails_to_secondary_email'    : { },
+        '{{componentId}}-{{sectionId}}-contact_notes'                   : { },
+        '{{componentId}}-{{sectionId}}-address_id'                      : { },
+        '{{componentId}}-{{sectionId}}-current_password'                : { },
+        '{{componentId}}-{{sectionId}}-new_password'                    : { },
+        '{{componentId}}-{{sectionId}}-strength-meter'                  : { },
+        '{{componentId}}-{{sectionId}}-generated_password'              : { },
+        '{{componentId}}-{{sectionId}}-confirm_password'                : { },
+        '{{componentId}}-{{sectionId}}-subscriptions'                   :
+        $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-subscriptions'], {
+            plugins: [
+                        "search",
+                        "types",
+                        "dnd",
+                        "grid"
+            ],
+            grid: {
+                columns: gridColumns,
+                resizable   : true
+            },
+            afterInit : function(dataCollection) {
+                //Fix Grid Width
+                function fixGrid() {
+                    var gridCount = $('.jstree-grid-column').length - 1;
+                    var gridWidth = $('.jstree-grid-wrapper').width();
+                    var colWidth = (gridWidth - 300) / gridCount;
+
+                    $('.jstree-grid-column').each(function(index,grid) {
+                        if (index !== 0) {
+                            $(grid).css({
+                                width: colWidth
+                            });
+                        }
+                    });
+                }
+
+                $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
+                    if (e.target.hash === '#admin-profile-main-tabs-notifications') {
+                        fixGrid();
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-form-fields').on('select_node.jstree', function(e, data) {
+                    if (data.node.li_attr["data-tabid"] === 'admin-profile-main-tabs-notifications') {
+                        fixGrid();
+                    }
+                });
+
+                var allIds, gridData, notifications, parents, children, jstreeId;
+
+                allIds =
+                    $(dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-subscriptions']['jstree'])
+                        .jstree(true).get_json('#', {flat: true});
+
+                // Make a data object
+                if (!dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-subscriptions']['data']) {
+                    dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-subscriptions']['data'] = { };
+                }
+
+                gridData = dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-subscriptions']['data'];
+
+                notifications = JSON.parse('{{notifications}}');//Parse DB Data
+
+                for (var app in notifications) {
+                    for (var pkg in notifications[app]) {
+                        jstreeId =
+                            $($('#{{componentId}}-{{sectionId}}-subscriptions ul.jstree-children')
+                                .find('[data-id="' + app + '"]'))
+                            .find('[data-id="' + pkg + '"]');
+
+                        if (jstreeId.length > 0) {
+                            gridData[jstreeId[0].id] = { };
+                            gridData[jstreeId[0].id]['app_id'] = app;
+                            gridData[jstreeId[0].id]['package_id'] = pkg;
+                            gridData[jstreeId[0].id]['subscriptions'] = notifications[app][pkg];
+                            // gridData[jstreeId[0].id]['parents'] = [];
+                            // gridData[jstreeId[0].id]['children'] = [];
+                        }
+                    }
+                }
+
+                $.each(allIds, function(index, obj) {
+                    if (gridData[obj.id]) {
+                        var jstreeIdStructure =
+                            $(dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-subscriptions']['jstree'])
+                                .jstree(true).get_json(obj.id, {flat: true})
+
+                        // $.each(jstreeIdStructure, function(index, childrenObj) {
+                        //     if (childrenObj.id !== obj.id) {
+                        //         gridData[obj.id]['children'].push(childrenObj.id);
+                        //     }
+                        // });
+
+                        // $.each(gridData[obj.id]['children'], function(index, childrenId) {
+                        //     gridData[childrenId]['parents'].push(obj.id);
+                        // });
+                    }
+                });
+
+                //Build Permissions grid
+                function buildPermissionsGrid(gridData) {
+                    for (var jstreeGridId in gridData) {
+                        $('.jstree-grid-wrapper')
+                            .find('[data-jstreegrid="' + jstreeGridId + '"]')
+                            .each(function(index, column) {
+                                var permission, spanClass, spanData;
+                                var spanClasses = $(this).children('span').attr("class").split(/\s+/);
+                                $(spanClasses).each(function(index, sclass) {
+                                    if (sclass.search(/NOTIFICATION-.*/) === 0) {
+                                        permission = sclass.replace('NOTIFICATION-', '');
+                                        spanClass = permission + ' ';
+                                    }
+                                });
+
+                                if (gridData[jstreeGridId]['subscriptions'][permission] == '0') {
+                                    spanClass += 'text-danger cursor-pointer';
+                                    spanData = '<i class="fa fa-fw fa-times-circle"></i>';
+                                    $(this).children('span').removeClass('empty');
+                                } else if (gridData[jstreeGridId]['subscriptions'][permission] == '1') {
+                                    spanClass += 'text-success cursor-pointer';
+                                    spanData = '<i class="fa fa-fw fa-check-circle"></i>';
+                                    $(this).children('span').removeClass('empty');
+                                } else {
+                                    spanClass = 'na';
+                                    spanData = '<p class="text-secondary">-</p>';
+                                }
+                                $(this).children('span').addClass(spanClass).html(spanData);
+                            }
+                        );
+                    }
+                    extractData();
+                }
+                buildPermissionsGrid(gridData);
+
+                //Search
+                $(dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-subscriptions']['jstree'])
+                    .on('search.jstree after_open.jstree after_close.jstree close_all.jstree open_all.jstree', function(e, data) {
+                        var notHidden = $('#{{componentId}}-{{sectionId}}-subscriptions').find('.jstree-node').not('.jstree-hidden');
+
+                        $('#{{componentId}}-{{sectionId}}-subscriptions-tree-search-input').keyup(function() {
+                            if ($('#{{componentId}}-{{sectionId}}-subscriptions-tree-search-input').val() === '') {
+                                $('#{{componentId}}-{{sectionId}}-subscriptions .bg-info').removeClass('bg-info');
+                                $('.jstree-grid-wrapper .bg-info').removeClass('bg-info');
+                                buildPermissionsGrid(gridData);
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-subscriptions .bg-info').removeClass('bg-info');
+                                $('.jstree-grid-wrapper .bg-info').removeClass('bg-info');
+                                $('.jstree-search').addClass('bg-info');
+                            }
+                        });
+
+                        buildPermissionsGrid(gridData);
+                });
+
+                function findSiblings(id) {
+                    return $('.jstree-grid-wrapper').find('[data-jstreegrid="' + id + '"]');
+                }
+
+                //Click Toggle
+                $(dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-subscriptions']['jstree'])
+                    .on('select_cell.jstree-grid', function(e, data) {
+                        toggleGridCell($(data.grid)[0].id, $(data.node)[0].id, false, null);
+                    }
+                );
+
+                function toggleGridCell(dataGridId, dataNodeId, bulk, bulkState) {
+                    // Only run on columns that have data and are not empty or na (N/A)
+                    if (!$('#' + dataGridId).children('span').hasClass('empty') && !$('#' + dataGridId).children('span').hasClass('na')) {
+                        // parents = gridData[dataNodeId]['parents'];
+                        // children = gridData[dataNodeId]['children'];
+                        // var siblings = findSiblings(dataNodeId);
+                        // var viewId, viewState, myState;
+
+                        // viewId = $(siblings)[0].id;
+
+                        // if ($('#' + viewId).children('span').hasClass('text-danger')) {
+                        //     viewState = 'deny';
+                        // } else if ($('#' + viewId).children('span').hasClass('text-success')) {
+                        //     viewState = 'permit';
+                        // }
+
+                        // We only need this to store data at the moment. If the array is going to be named array like view => 0, then we dont need this.
+                        var subscription, spanClass, spanData;
+                        var spanClasses = $('#' + dataGridId).children('span').attr("class").split(/\s+/);
+                        $(spanClasses).each(function(index, sclass) {
+                            if (sclass.search(/NOTIFICATION-.*/) === 0) {
+                                subscription = sclass.replace('NOTIFICATION-', '');
+                                spanClass = subscription + ' ';
+                            }
+                        });
+
+                        if (bulkState !== null) {
+                            if ($('#' + dataGridId).children('span').hasClass('text-danger') && bulkState === true) {
+                                // myState = 'deny';
+                                $('#' + dataGridId).children('span').removeClass('text-danger').addClass('text-success');
+                                $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
+                                gridData[dataNodeId]['subscriptions'][subscription] = 1;
+                            } else if ($('#' + dataGridId).children('span').hasClass('text-success') && bulkState === false) {
+                                // myState = 'permit'
+                                $('#' + dataGridId).children('span').removeClass('text-success').addClass('text-danger');
+                                $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
+                                gridData[dataNodeId]['subscriptions'][subscription] = 0;
+                            }
+                        } else {
+                            if ($('#' + dataGridId).children('span').hasClass('text-danger')) {
+                                // myState = 'deny';
+                                $('#' + dataGridId).children('span').removeClass('text-danger').addClass('text-success');
+                                $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
+                                gridData[dataNodeId]['subscriptions'][subscription] = 1;
+                            } else if ($('#' + dataGridId).children('span').hasClass('text-success')) {
+                                // myState = 'permit'
+                                $('#' + dataGridId).children('span').removeClass('text-success').addClass('text-danger');
+                                $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
+                                gridData[dataNodeId]['subscriptions'][subscription] = 0;
+                            }
+                        }
+
+                        // if (bulkState === true) {
+                        //     viewState = 'deny';
+                        // } else if (bulkState === false) {
+                        //     viewState = 'permit';
+                        // }
+                        //We only need this to store data at the moment. If the array is going to be named array like view => 0, then we dont need this.
+                        // var permission, spanClass, spanData;
+                        // var spanClasses = $('#' + dataGridId).children('span').attr("class").split(/\s+/);
+                        // $(spanClasses).each(function(index, sclass) {
+                        //     if (sclass.search(/NOTIFICATION-.*/) === 0) {
+                        //         permission = sclass.replace('NOTIFICATION-', '');
+                        //         spanClass = permission + ' ';
+                        //     }
+                        // });
+                        // if (viewState === 'deny' && myState === 'deny') {
+                        //     $('#' + dataGridId).children('span').removeClass('text-danger').addClass('text-success');
+                        //     $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
+                        //     $('#' + viewId).children('span').removeClass('text-danger').addClass('text-success');
+                        //     $('#' + viewId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
+                        //     // gridData[dataNodeId]['subscriptions']['view'] = 1;
+                        //     gridData[dataNodeId]['subscriptions'][permission] = 1;
+                        // } else if (viewState === 'permit' && myState === 'permit') {
+                        //     $('#' + dataGridId).children('span').removeClass('text-success').addClass('text-danger');
+                        //     $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
+                        //     gridData[dataNodeId]['subscriptions'][permission] = 0;
+                        // } else if (viewState === 'permit' && myState === 'deny') {
+                        //     $('#' + dataGridId).children('span').removeClass('text-danger').addClass('text-success');
+                        //     $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
+                        //     gridData[dataNodeId]['subscriptions'][permission] = 1;
+                        // }
+
+                        // Disable all siblings if view is disabled
+                        // if ($('#' + dataGridId)[0].id === viewId) {
+                        //     if (children.length === 0) {
+                        //         if (!bulk) {
+                        //             if (viewState === 'permit') {
+                        //                 $.each(siblings, function(index, sibl) {
+                        //                     if (index > 0) {
+                        //                         if (!$(sibl).children('span').hasClass('empty') && !$(sibl).children('span').hasClass('na')) {
+                        //                             var permission, spanClass, spanData;
+                        //                             var spanClasses = $(sibl).children('span').attr("class").split(/\s+/);
+                        //                             $(spanClasses).each(function(index, sclass) {
+                        //                                 if (sclass.search(/NOTIFICATION-.*/) === 0) {
+                        //                                     permission = sclass.replace('NOTIFICATION-', '');
+                        //                                     spanClass = permission + ' ';
+                        //                                 }
+                        //                                 gridData[dataNodeId]['subscriptions'][permission] = 0;
+                        //                             });
+                        //                             $(sibl).children('span').removeClass('text-success').addClass('text-danger');
+                        //                             $(sibl).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
+                        //                         }
+                        //                     }
+                        //                 });
+                        //             } else if (viewState === 'deny') {
+                        //                 $.each(siblings, function(index, sibl) {
+                        //                     if (index > 0) {
+                        //                         if (!$(sibl).children('span').hasClass('empty') && !$(sibl).children('span').hasClass('na')) {
+                        //                             var permission, spanClass, spanData;
+                        //                             var spanClasses = $(sibl).children('span').attr("class").split(/\s+/);
+                        //                             $(spanClasses).each(function(index, sclass) {
+                        //                                 if (sclass.search(/NOTIFICATION-.*/) === 0) {
+                        //                                     permission = sclass.replace('NOTIFICATION-', '');
+                        //                                     spanClass = permission + ' ';
+                        //                                 }
+                        //                                 gridData[dataNodeId]['subscriptions'][permission] = 0;
+                        //                             });
+                        //                             $(sibl).children('span').removeClass('text-success').addClass('text-danger');
+                        //                             $(sibl).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
+                        //                         }
+                        //                     }
+                        //                 });
+                        //             }
+                        //         } else {
+                        //             //
+                        //         }
+                        //     }
+                        // }
+                    }
+                    extractData();
+                }
+
+                (function registerBulkButtons() {
+                    // Bulk deny/permit (All)
+                    $('#{{componentId}}-{{sectionId}}-subscriptions-packages-unsubscribeall').click(function(e) {
+                        e.preventDefault();
+                        denyPermitAll(null, null, false, null);
+                    });
+                    $('#{{componentId}}-{{sectionId}}-subscriptions-packages-subscribeall').click(function(e) {
+                        e.preventDefault();
+                        denyPermitAll(null, null, true, null);
+                    });
+
+                    for (var subscriptionAll in subscriptions) {
+                        $('#{{componentId}}-{{sectionId}}-subscriptions-' + subscriptions[subscriptionAll] + '-unsubscribeall').click(function(e) {
+                            e.preventDefault();
+
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-subscriptions-view-unsubscribeall') {
+                                denyPermitAll(null, null, false, true);
+                            } else {
+                                denyPermitAll(this, false, null, null);
+                            }
+                        });
+                        $('#{{componentId}}-{{sectionId}}-subscriptions-' + subscriptions[subscriptionAll] + '-subscribeall').click(function(e) {
+                            e.preventDefault();
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-subscriptions-view-subscribeall') {
+                                denyPermitAll(this, true, null, true);
+                            } else {
+                                denyPermitAll(this, true, null, null);
+                            }
+                        });
+                    }
+                })();
+
+                // Function to make bulk changes
+                function denyPermitAll(denyPermitPermissionIconId, permit, pkg, view) {
+                    if (denyPermitPermissionIconId) {
+                        var colNum, column;
+                        column = $(denyPermitPermissionIconId).parents('div').next('div')[0].id.split('col');
+                        colNum = column[1] - 1;
+                    }
+                    // Deny All in that Column
+                    $.each(allIds, function(index, child) {
+                        if (denyPermitPermissionIconId) {
+                            toggleGridCell(
+                                $('.jstree-grid-wrapper')
+                                .find('[data-jstreegrid="' + child.id + '"]')[colNum].id, child.id, true, permit
+                            );
+                        } else {
+                            $('.jstree-grid-wrapper').find('[data-jstreegrid="' + child.id + '"]')
+                                .children('span')
+                                .each(function(index,span) {
+                                    if (!$(span).hasClass('empty') && !$(span).hasClass('na')) {
+                                        var subscription, spanClass, spanData;
+                                        var spanClasses = $(span).attr("class").split(/\s+/);
+                                        $(spanClasses).each(function(index, sclass) {
+                                            if (sclass.search(/NOTIFICATION-.*/) === 0) {
+                                                subscription = sclass.replace('NOTIFICATION-', '');
+                                                spanClass = subscription + ' ';
+                                            }
+                                            if (pkg) {
+                                                $(span).removeClass('text-danger').addClass('text-success');
+                                                $(span).html('<i class="fas fa-fw fa-check-circle"></i>');
+                                                gridData[child.id]['subscriptions'][subscription] = 1;
+                                            } else {
+                                                $(span).removeClass('text-success').addClass('text-danger');
+                                                $(span).html('<i class="fas fa-fw fa-times-circle"></i>');
+                                                gridData[child.id]['subscriptions'][subscription] = 0;
+                                            }
+                                        });
+                                    }
+                            });
+                        }
+                    });
+
+                    extractData();
+                }
+
+                //Extract data to post;
+                function extractData() {
+                    // Make a data object
+                    if (!dataCollectionSectionForm['data']) {
+                        dataCollectionSectionForm['data'] = { };
+                    }
+                    if (!dataCollectionSection['data']['subscriptions']) {
+                        dataCollectionSection['data']['subscriptions'] = { };
+                    }
+                    var data = dataCollectionSection['data']['subscriptions'];
+
+                    for (var app in notifications) {
+                        data[app] = { };
+                    }
+
+                    for (var nodeId in gridData) {
+                        data[gridData[nodeId]['app_id']][gridData[nodeId]['package_id']] =
+                            gridData[nodeId]['subscriptions'];
+                    }
+                }
+            }
+        }),
+        // '{{componentId}}-{{sectionId}}-form-fields'                   :
+        // $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-form-fields'], {
+        //     afterInit : function() {
+        //         //Fix Grid Width
+        //         function fixGrid() {
+        //             var gridCount = $('.jstree-grid-column').length - 1;
+        //             var gridWidth = $('.jstree-grid-wrapper').width();
+        //             var colWidth = (gridWidth - 300) / gridCount;
+
+        //             $('.jstree-grid-column').each(function(index,grid) {
+        //                 if (index !== 0) {
+        //                     $(grid).css({
+        //                         width: colWidth
+        //                     });
+        //                 }
+        //             });
+        //         }
+
+        //         $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
+        //             if (e.target.hash === '#admin-profile-main-tabs-notifications') {
+        //                 fixGrid();
+        //             }
+        //         });
+        //     }
+        // }),
+        '{{componentId}}-{{sectionId}}-form'                            : {
+            ignore      : ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
+            rules       : {
+                '{{componentId}}-{{sectionId}}-account_email'               : 'required',
+                '{{componentId}}-{{sectionId}}-status'                      : 'required',
+                '{{componentId}}-{{sectionId}}-first_name'                  : 'required',
+                '{{componentId}}-{{sectionId}}-last_name'                   : 'required',
+                '{{componentId}}-{{sectionId}}-designation'                 : 'required',
+                '{{componentId}}-{{sectionId}}-manager_full_name'           : 'required',
+                '{{componentId}}-{{sectionId}}-type_id'                     : 'required',
+                '{{componentId}}-{{sectionId}}-hire_date'                   : 'required',
+                '{{componentId}}-{{sectionId}}-work_type_id'                : 'required',
+                '{{componentId}}-{{sectionId}}-contact_location_id'         : 'required',
+                '{{componentId}}-{{sectionId}}-contact_phone'               : 'required',
+                '{{componentId}}-{{sectionId}}-contact_mobile'              : 'required'
+            },
+            messages    : {
+                '{{componentId}}-{{sectionId}}-account_email'               : 'Please select an account',
+                '{{componentId}}-{{sectionId}}-status'                      : 'Please select a status',
+                '{{componentId}}-{{sectionId}}-first_name'                  : 'Please enter first name',
+                '{{componentId}}-{{sectionId}}-last_name'                   : 'Please enter last name',
+                '{{componentId}}-{{sectionId}}-designation'                 : 'Please select a designation',
+                '{{componentId}}-{{sectionId}}-manager_full_name'           : 'Please select a manager',
+                '{{componentId}}-{{sectionId}}-type_id'                     : 'Please select employee type',
+                '{{componentId}}-{{sectionId}}-hire_date'                   : 'Please select hiring date',
+                '{{componentId}}-{{sectionId}}-work_type_id'                : 'Please select work type',
+                '{{componentId}}-{{sectionId}}-contact_location_id'         : 'Please select a location',
+                '{{componentId}}-{{sectionId}}-contact_phone'               : 'Please enter phone number',
+                '{{componentId}}-{{sectionId}}-contact_mobile'              : 'Please enter mobile number'
+            }
+        }
+    });
+</script>
+{#
+    Skills will be added by the Employee himself. There will be a verification process of each skill, example if someone says they are CCIE, they should be able to upload a certificate and that should be processed by the HR department to confirm. Once confirmed a verified tick can show next to their skill.
+    If its a non certified skill, example Juggling, they should get one of their peers to confirm/vouch for them.
+                            'skills'   :
+                                [
+                                    'tabTitle'          : 'Skills',
+                                    'tabInclude'        : 'profile/form/skills',
+                                    'tabIncludeParams'  :
+                                    [
+                                        'profileSkills'                : profileSkills,
+                                        'profileSkillsAttachments'     : profileSkillsAttachments
+                                    ]
+                                ],
+                        'employmentdetails'   :
+                        [
+                            'tabTitle'          : 'Employment Details',
+                            'tabInclude'        : 'profile/form/employmentdetails',
+                            'tabIncludeParams'  :
+                            [
+                                'profileDesignation'          : profileDesignation,
+                                'profileManagerId'            : profileManagerId,
+                                'profileManager'              : profileManager,
+                                'profileType'                 : profileType,
+                                'profileHireDate'             : profileHireDate,
+                                'profileTerminateDate'        : profileTerminateDate,
+                                'profileHireManagerId'        : profileHireManagerId,
+                                'profileHireManager'          : profileHireManager,
+                                'profileHireReferrerId'       : profileHireReferrerId,
+                                'profileHireReferrer'         : profileHireReferrer,
+                                'profileEmploymentAttachments': profileEmploymentAttachments,
+                                'profileEmploymentNotes'      : profileEmploymentNotes
+                            ]
+                        ],
+                        'contactdetails'   :
+                        [
+                            'tabTitle'          : 'Contact Details',
+                            'tabInclude'        : 'profile/form/contactdetails',
+                            'tabIncludeParams'  :
+                            [
+                                'profileContactPhone'              : profileContactPhone,
+                                'profileContactPhoneExt'           : profileContactPhoneExt,
+                                'profileContactMobile'             : profileContactMobile,
+                                'profileContactFax'                : profileContactFax,
+                                'profileContactOther'              : profileContactOther,
+                                'profileWorkType'                  : profileWorkType,
+                                'profileContactLocationId'         : profileContactLocationId,
+                                'profileContactAddressId'          : profileContactAddressId,
+                                'profileContactStreetAddress'      : profileContactStreetAddress,
+                                'profileContactStreetAddress2'     : profileContactStreetAddress2,
+                                'profileContactCityId'             : profileContactCityId,
+                                'profileContactCity'               : profileContactCity,
+                                'profileContactPostCode'           : profileContactPostCode,
+                                'profileContactStateId'            : profileContactStateId,
+                                'profileContactState'              : profileContactState,
+                                'profileContactCountryId'          : profileContactCountryId,
+                                'profileContactCountry'            : profileContactCountry,
+                                'profileContactNotes'              : profileContactNotes
+                            ]
+                        ]
+
+                                #}

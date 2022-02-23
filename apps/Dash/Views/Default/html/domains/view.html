@@ -1,0 +1,34 @@
+{% if domain['id'] is defined %}
+    {% set domainId = domain['id'] %}
+    {% set title = 'Domain (' ~ domain['name'] ~ ')' %}
+{% else %}
+    {% set domainId = '' %}
+    {% set title = 'New Domain' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'globe-asia',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'domains/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : domainId,
+            'addActionUrl'                  : 'domains/add',
+            'addSuccessRedirectUrl'         : 'domains',
+            'updateActionUrl'               : 'domains/update',
+            'updateSuccessRedirectUrl'      : 'domains',
+            'cancelActionUrl'               : 'domains',
+            'closeActionUrl'                : 'domains'
+        ]
+    ]
+)}}

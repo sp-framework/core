@@ -25,12 +25,12 @@ class Core
 				'description' 			=> $baseConfig['description'],
 				'version'	 			=> $baseConfig['version'],
 				'repo'					=> $baseConfig['repo'],
-				'installed'				=> 1,
 				'settings'			 	=>
 					isset($baseConfig['settings']) ?
 					json_encode($baseConfig['settings']) :
 					null,
-				'files'					=> json_encode($installedFiles)
+				'files'					=> json_encode($installedFiles),
+				'updated_by'			=> 0
 			]
 		);
 	}

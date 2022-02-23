@@ -1,0 +1,53 @@
+{% if vendor['id'] is defined %}
+    {% set vendorId = vendor['id'] %}
+    {% set title = 'Vendor (' ~ vendor['business_name'] ~ ')' %}
+{% else %}
+    {% set vendorId = '' %}
+    {% set title = 'New Vendor' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'handshake',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'vendors/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : vendorId,
+            'addActionUrl'                  : 'business/directory/vendors/add',
+            'addSuccessRedirectUrl'         : 'business/directory/vendors',
+            'updateActionUrl'               : 'business/directory/vendors/update',
+            'updateSuccessRedirectUrl'      : 'business/directory/vendors',
+            'cancelActionUrl'               : 'business/directory/vendors',
+            'closeActionUrl'                : 'business/directory/vendors'
+        ],
+        'dataDependencies'     :
+        [
+            [
+                'componentName'      : 'Geo Locations (Countries)',
+                'componentVar'       : geo,
+                'componentRoute'     : false
+            ],
+            [
+                'componentName'      : 'Currency',
+                'componentVar'       : currency,
+                'componentRoute'     : 'business/finances/currencies'
+            ],
+            [
+                'componentName'      : 'Storages',
+                'componentVar'       : storages,
+                'componentRoute'     : false
+            ]
+        ]
+    ]
+)}}

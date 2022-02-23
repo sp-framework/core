@@ -1,0 +1,52 @@
+{{adminltetags.useTag('content',
+    [
+        'component'             : table['component'],
+        'componentName'         : componentName,
+        'componentId'           : componentId,
+        'parentComponentId'     : parent,
+        'sectionId'             : 'listing',
+        'contentType'           : 'sectionWithListing',
+        'cardHeader'            : true,
+        'cardType'              : 'primary',
+        'cardIcon'              : 'boxes',
+        'cardTitle'             : componentName,
+        'cardAdditionalClass'   : 'rounded-0',
+        'cardShowTools'         : ['maximize'],
+        'dtFilter'              : false,
+        'dtFilters'             : table['filters'],
+        'dtFilterColumns'       : table['filterColumns'],
+        'dtFixedHeader'         : true,
+        'dtPrimaryButtons'      :
+            {
+                'componentId'                       : componentId,
+                'sectionId'                         : 'listing',
+                'buttonType'                        : 'DropdownSplitButtons',
+                'dropdownButtonId'                  : 'main',
+                'dropdownButtonTitle'               : 'Add New Storage',
+                'dropdownButtonIcon'                : 'plus',
+                'dropdownButtonAdditionalClass'     : 'text-uppercase',
+                'buttonPosition'                    : 'right',
+                'dropdownAlign'                     : 'right',
+                'buttons'                           :
+                    {
+                        'local-storage' : {
+                            'title'                   : 'Local Storage',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : links.url('system/storages/q/type/local/id/0')
+                        }
+                    }
+            },
+        'dtTable'               : table,
+        'dtColumns'             : table['columns'],
+        'dtPostUrl'             : table['postUrl'],
+        'dtPostUrlParams'       : table['postUrlParams'],
+        'dtStriped'             : true,
+        'dtStateSave'           : false,
+        'dtBordered'            : false,
+        'dtHideIdColumn'        : true,
+        'dtNoOfColumnsToShow'   : 6,
+        'dtTableCompact'        : true,
+        'dtZeroRecords'         : 'No storages data available. Add storage by clicking the Add new storage button.'
+    ]
+)}}

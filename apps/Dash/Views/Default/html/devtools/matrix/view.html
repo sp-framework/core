@@ -1,0 +1,45 @@
+{% if module is defined %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : type,
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'random',
+            'cardTitle'                     : 'Matrix : ' ~ module['name'] ~ ' (' ~ type ~ ')',
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'matrix/module/' ~ type,
+            'formButtons'                   :
+            [
+                'updateButtonId'                : module['id'],
+                'updateActionUrl'               : 'devtools/matrix/update',
+                'updateSuccessRedirectUrl'      : 'devtools/matrix',
+                'cancelActionUrl'               : 'devtools/matrix',
+                'closeActionUrl'                : 'devtools/matrix'
+            ]
+        ]
+    )}}
+{% else %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'section',
+            'cardHeader'                    : true,
+            'cardFooter'                    : false,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'random',
+            'cardTitle'                     : 'Matrix',
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'matrix/select'
+        ]
+    )}}
+{% endif %}

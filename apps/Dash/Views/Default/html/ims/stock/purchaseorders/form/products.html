@@ -1,0 +1,432 @@
+{% if purchaseOrder['id'] is defined %}
+    {% set productsFormHidden = 'hidden' %}
+    {% set productsFormButtonIcon = 'eye' %}
+    {% set productsFormButtonsHidden = true %}
+    {% set tq = purchaseOrder['total_quantity'] %}
+    {% set tt = purchaseOrder['total_tax'] %}
+    {% set td = purchaseOrder['total_discount'] %}
+    {% set ta = purchaseOrder['total_amount'] %}
+{% else %}
+    {% set productsFormHidden = '' %}
+    {% set productsFormButtonIcon = 'eye-slash' %}
+    {% set productsFormButtonsHidden = false %}
+    {% set tq = 0 %}
+    {% set tt = 0 %}
+    {% set td = 0 %}
+    {% set ta = 0 %}
+{% endif %}
+<div>
+    <div id="products-form" {{productsFormHidden}}>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'use_vendor_tax',
+                        'fieldLabel'                     : 'Use Vendor Purchase Orders Tax?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Use tax configured in vendor purchase order settings.',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldBazJstreeSearch'           : false,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+            <div class="col-md-3">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'product_tax_rate',
+                        'fieldLabel'                           : 'Product Tax Group',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select a tax group for the product.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : false,
+                        'fieldBazPostOnUpdate'                 : false,
+                        'fieldBazJstreeSearch'                 : false,
+                        'fieldDataSelect2Options'              : taxGroups,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : ''
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'use_vendor_discount',
+                        'fieldLabel'                     : 'Use Vendor Bills Discount?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Use bills discount configured in vendor settings.',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldBazJstreeSearch'           : false,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'product_discount',
+                        'fieldLabel'                     : 'Product Discount',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Enter Product Discount.',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : false,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldInputTypeTextFilter'       : 'positivePercentMax',
+                        'fieldGroupPostAddonIcon'        : 'percent',
+                        'fieldDataInputMinNumber'        : 0,
+                        'fieldDataInputMaxNumber'        : 100,
+                        'fieldValue'                     : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'product_mpn',
+                        'fieldLabel'                     : 'Search/Enter Product MPN',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Search/Enter product MPN. If MPN does not exist, a new product will be created with that MPN.',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : false,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : ''
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'product_title',
+                        'fieldLabel'                     : 'Product Title',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Enter Product Title.',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : false,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 80,
+                        'fieldValue'                     : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'product_qty',
+                        'fieldLabel'                     : 'Product Quantity',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Enter product Quantity.',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : false,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldInputTypeTextFilter'       : 'positiveFloat',
+                        'fieldDataInputMinNumber'        : 0,
+                        'fieldValue'                     : ''
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'product_unit_price',
+                        'fieldLabel'                     : 'Product Unit Price',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Enter Product Unit Price.',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : false,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldInputTypeTextFilter'       : 'positiveFloat',
+                        'fieldDataInputMinNumber'        : 0,
+                        'fieldValue'                     : ''
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'product_unit_price_incl_tax',
+                        'fieldLabel'                     : 'Unit Price Incl Tax?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Is entered unit price includes tax?',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : true,
+                        'fieldBazJstreeSearch'           : false,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('buttons',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'buttonType'                     : 'button',
+                    'buttons'                        :
+                        [
+                            'show-hide'          : [
+                                'title'                    : 'Form',
+                                'size'                     : 'xs',
+                                'type'                     : 'info',
+                                'icon'                     : productsFormButtonIcon
+                            ],
+                            'add-product'        : [
+                                'title'                    : 'Add',
+                                'size'                     : 'xs',
+                                'hidden'                   : productsFormButtonsHidden,
+                                'type'                     : 'primary',
+                                'icon'                     : 'plus',
+                                'position'                 : 'right'
+                            ],
+                            'cancel-product'     : [
+                                'title'                    : 'Cancel',
+                                'size'                     : 'xs',
+                                'hidden'                   : productsFormButtonsHidden,
+                                'type'                     : 'secondary',
+                                'icon'                     : 'times',
+                                'position'                 : 'right'
+                            ]
+                        ]
+                ]
+            )}}
+        </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'products_counters',
+                'fieldLabel'                     : false,
+                'fieldType'                      : 'counters',
+                'fieldHelp'                      : false,
+                'fieldHelpTooltipContent'        : 'Products',
+                'fieldAdditionalClass'           : 'mb-0',
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldCountersPlacementType'     : 'horizontal',
+                'fieldCounters'                  :
+                    [
+                        'tq'            : [
+                            'id'        : 'tq',
+                            'title'     : 'Total Quantity:',
+                            'type'      : 'primary',
+                            'value'     : tq
+                        ],
+                        'tt'            : [
+                            'id'        : 'tt',
+                            'title'     : 'Total Tax:',
+                            'type'      : 'danger',
+                            'value'     : tt
+                        ],
+                        'td'            : [
+                            'id'        : 'td',
+                            'title'     : 'Total Discount:',
+                            'type'      : 'success',
+                            'value'     : td
+                        ],
+                        'ta'            : [
+                            'id'        : 'ta',
+                            'title'     : 'Total Amount:',
+                            'type'      : 'info',
+                            'value'     : ta
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'products_remove_mpns',
+                'fieldLabel'                     : 'Remove Products',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Remove Products.',
+                'fieldRequired'                  : false,
+                'fieldHidden'                    : true,
+                'fieldBazScan'                   : false,
+                'fieldBazJstreeSearch'           : false,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldValue'                     : ''
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'products',
+                'fieldLabel'                     : 'Products',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Products.',
+                'fieldRequired'                  : false,
+                'fieldHidden'                    : true,
+                'fieldBazScan'                   : false,
+                'fieldBazJstreeSearch'           : false,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldValue'                     : ''
+            ]
+        )}}
+        <div class="table-responsive p-0" style="height:300px">
+            <table class="table table-head-fixed table-hover table-striped table-sm text-nowrap">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>MPN</th>
+                        <th>TITLE</th>
+                        <th>TAX RATE</th>
+                        <th>DISCOUNT</th>
+                        <th>QUANTITY</th>
+                        <th>UNIT PRICE</th>
+                        <th class="d-none">INCL TAX</th>
+                        <th>AMOUNT (INCL TAX)</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="{{componentId}}-{{sectionId}}-sortable-products">
+                    {% if purchaseOrder['products'] is defined and purchaseOrder['products']|length > 0 %}
+                        {% for productKey, product in purchaseOrder['products'] %}
+                            <tr id="{{product['mpn']}}" data-id="{{product['id']}}" class="product">
+                                <td>
+                                    <i class="fa fa-sort fa-fw handle"></i>
+                                </td>
+                                <td class="mpn" style="max-width: 150px;text-overflow: ellipsis;overflow: hidden;">
+                                    {{product['mpn']}}
+                                </td>
+                                <td class="product_title" style="max-width: 450px;text-overflow: ellipsis;overflow: hidden;">
+                                    {{product['product_title']}}
+                                </td>
+                                <td class="tax_rate" data-usevendortax="{{product['use_vendor_tax']}}" data-taxRate="{{product['tax_rate']}}">
+                                    {{product['tax']}}
+                                </td>
+                                <td class="product_discount" data-usevendordiscount="{{product['use_vendor_discount']}}" data-discountRate="{{product['product_discount_rate']}}">
+                                    {{product['product_discount']}}
+                                </td>
+                                <td class="product_qty">
+                                    {{product['product_qty']}}
+                                </td>
+                                <td class="product_unit_price">
+                                    {{product['product_unit_price']}}
+                                </td>
+                                <td class="d-none product_unit_price_incl_tax">
+                                    {{product['product_unit_price_incl_tax']}}
+                                </td>
+                                <td class="product_amount">
+                                    {{product['product_amount']}}
+                                </td>
+                                <td>
+                                    <button data-sort-id="" type="button" class="btn btn-xs btn-danger float-right ml-1 productDeleteButton">
+                                        <i class="fa fas fa-fw text-xs fa-trash"></i>
+                                    </button>
+                                    <button data-sort-id="" type="button" class="btn btn-xs btn-primary float-right ml-1 productEditButton">
+                                        <i class="fa fas fa-fw text-xs fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr class="add-products">
+                            <td colspan="9" class="text-center">
+                                Add Products...
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

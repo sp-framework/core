@@ -2,44 +2,54 @@
 
 namespace System\Base\Providers;
 
-use League\Container\ServiceProvider\AbstractServiceProvider;
-use League\Container\ServiceProvider\BootableServiceProviderInterface;
-use League\Route\Router;
-use System\Base\Providers\ModulesServiceProvider\Applications;
-use System\Base\Providers\ModulesServiceProvider\Model\Middlewares;
+use Phalcon\Di\Injectable;
+use Phalcon\Events\Event;
+use Phalcon\Mvc\DispatcherInterface;
 
-class MiddlewaresServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
+class MiddlewaresServiceProvider extends Injectable
 {
-    protected $provides = [];
+    public function beforeExecuteRoute(
+        Event $event,
+        DispatcherInterface $dispatcher,
+        $data
+    ) {
+        $app = $this->apps->getAppInfo();
 
-    public function register()
-    {
-        //
-    }
+        if ($app) {
+            $middlewares =
+                msort($this->modules->middlewares->getMiddlewaresForApp($app['id']), 'sequence');
 
-    public function boot()
-    {
-        $container = $this->getContainer();
+            foreach ($middlewares as $middleware) {
+                if ($middleware['enabled'] == true) {
+                    try {
+                        $mw = (new $middleware['class']())->process();
+                    } catch (\Exception $e) {
+                        if ($this->config->logs->exceptions) {
+                            $this->logger->logExceptions->debug($e);
+                        }
 
-        $route = $container->get(Router::class);
+                        throw $e;
+                    }
 
-        $db = $container->get('db');
+                    //If there is a redirect or null returned from process
+                    if ($mw && $mw instanceof \Phalcon\Http\Response) {
+                        if ($mw->getHeaders()->toArray()['Status'] === '302 Found') {
+                            $notFound = true;
+                            break;
+                        }
+                    }
 
-        $applications = new Applications($container);
-
-        if ($applications->getApplicationInfo()) {
-            $applicationId = $applications->getApplicationInfo()['id'];
-        } else {
-            $applicationId = null;
-        }
-
-        $middlewares =
-            $db->getByData(Middlewares::class, ['application_id' => $applicationId], ['sequence' => 'ASC']);
-
-        foreach ($middlewares as $middlewareKey => $middleware) {
-            if ($middleware->get('enabled') == 1) {
-                $route->middleware($container->get($middleware->get('class')));
+                    if ($mw === false) {
+                        break;
+                    }
+                }
             }
+
+            if (isset($notFound) && $notFound) {
+                return false;
+            }
+
+            return true;
         }
     }
 }

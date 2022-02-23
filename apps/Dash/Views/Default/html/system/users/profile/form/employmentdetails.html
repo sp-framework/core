@@ -1,0 +1,67 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'designation',
+                'fieldLabel'                           : 'Designation',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Profile Designation',
+                'fieldRequired'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldBazJstreeSearch'                 : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldDataSelect2Options'              : designations,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsSelected'      : profileDesignation
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'manager_id',
+                'fieldLabel'                            : 'Manager ID',
+                'fieldHidden'                           : true,
+                'fieldType'                             : 'input',
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldValue'                            : profileManagerId
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'manager_full_name',
+                'fieldLabel'                            : 'Manager',
+                'fieldType'                             : 'input',
+                'fieldPlaceholder'                      : 'Search Manager',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Search Manager. If Profile is top level manager who doesnt report to anyone, enter field value - <strong>self</strong>',
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldRequired'                         : true,
+                'fieldDataInputMinLength'               : 1,
+                'fieldDataInputMaxLength'               : 100,
+                'fieldValue'                            : profileManager
+            ]
+        )}}
+    </div>
+</div>

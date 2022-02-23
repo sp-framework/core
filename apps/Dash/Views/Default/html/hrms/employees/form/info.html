@@ -1,0 +1,337 @@
+{% if employee['id'] is defined %}
+    {% set employeeId = employee['id'] %}
+    {% set employeePortrait = employee['portrait'] %}
+    {% set employeeEntityId = employee['entity_id'] %}
+    {% set employeeAccountId = employee['account_id'] %}
+    {% set employeeAccountEmail = employee['account_email'] %}
+    {% set employeeStatus = employee['status'] %}
+    {% set employeeFirstName = employee['first_name'] %}
+    {% set employeeLastName = employee['last_name'] %}
+    {% set employeeDesignation = employee['designation'] %}
+    {% set employeeManagerId = employee['manager_id'] %}
+    {% set employeeManager = employee['manager_full_name'] %}
+{% else %}
+    {% set employeeId = '' %}
+    {% set employeePortrait = '' %}
+    {% set employeeEntityId = '' %}
+    {% set employeeAccountId = '0' %}
+    {% set employeeAccountEmail = '' %}
+    {% set employeeStatus = '' %}
+    {% set employeeFirstName = '' %}
+    {% set employeeLastName = '' %}
+    {% set employeeDesignation = '' %}
+    {% set employeeManagerId = '0' %}
+    {% set employeeManager = 'SELF' %}
+{% endif %}
+<div class="row vdivide">
+    <div class="col-md-3 col-sm-12">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'portrait',
+                'fieldLabel'                     : false,
+                'fieldType'                      : 'files/croppie',
+                'fieldValue'                     : employeePortrait,
+                'imageType'                      : 'portrait',
+                'storageType'                    : 'private',
+                'upload'                         : true,
+                'remove'                         : true,
+                'portraitLink'                   : portraitLink
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Employee ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Employee ID (Auto Generated)',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : employeeId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_email',
+                        'fieldLabel'                            : 'Email',
+                        'fieldType'                             : 'input',
+                        'fieldPlaceholder'                      : 'Email',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Contact Email address. If field is disabled, it means employee has an account on this system. Only Systems Administrators can change the email address.',
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldRequired'                         : true,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 50,
+                        'fieldValue'                            : employeeAccountEmail
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'status',
+                        'fieldLabel'                           : 'Status',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Status',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : statuses,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : employeeStatus
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {% if employeeAccountId is defined and employeeAccountId !== '' and employeeAccountId != '0' %}
+                    {% set linkHidden = false %}
+                    {% set createLink =
+                        '<a href="' ~ links.url('system/users/accounts/q/id/' ~ employeeAccountId) ~ '" type="button" data-id="' ~ employeeAccountId ~ '" class="text-white btn btn-primary btn-xs text-uppercase contentAjaxLink">
+                            <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
+                        </a>'
+                    %}
+                    {% set createHidden = true %}
+                {% else %}
+                    {% set createLink = '' %}
+                    {% set linkHidden = true %}
+                    {% set createHidden = false %}
+                    {% set employeeAccountId = '0' %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_id',
+                        'fieldLabel'                            : 'Account ID',
+                        'fieldHidden'                           : true,
+                        'fieldType'                             : 'input',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldValue'                            : employeeAccountId
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'create_account',
+                        'fieldLabel'                            : 'Create User Account?',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Create user account for this customer?',
+                        'fieldRequired'                         : false,
+                        'fieldHidden'                           : createHidden,
+                        'fieldType'                             : 'checkbox',
+                        'fieldCheckboxType'                     : 'info',
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldBazScan'                          : true
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_link',
+                        'fieldLabel'                            : 'User Account',
+                        'fieldType'                             : 'html',
+                        'fieldHelp'                             : true,
+                        'fieldHidden'                           : linkHidden,
+                        'fieldHelpTooltipContent'               : 'User account link',
+                        'fieldAdditionalClass'                  : 'mb-0',
+                        'fieldHtmlContent'                      : createLink,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'entity_id',
+                        'fieldLabel'                           : 'Business Entity',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select a business entity that is placing the purchase order.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldDataSelect2Options'              : entities,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'business_name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : employeeEntityId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'first_name',
+                        'fieldLabel'                     : 'First Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'First Name',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : employeeFirstName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'last_name',
+                        'fieldLabel'                     : 'Last Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Last Name',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : employeeLastName
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'designation',
+                        'fieldLabel'                           : 'Designation',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Employee Designation',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : designations,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : employeeDesignation
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'manager_id',
+                        'fieldLabel'                            : 'Manager ID',
+                        'fieldHidden'                           : true,
+                        'fieldType'                             : 'input',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldValue'                            : employeeManagerId
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'manager_full_name',
+                        'fieldLabel'                            : 'Manager',
+                        'fieldType'                             : 'input',
+                        'fieldPlaceholder'                      : 'Search Manager',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Search Manager. If Employee does not report to anyone, enter field value - <strong>SELF</strong>',
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldRequired'                         : true,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 100,
+                        'fieldValue'                            : employeeManager
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>

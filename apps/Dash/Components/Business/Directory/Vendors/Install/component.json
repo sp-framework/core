@@ -1,0 +1,57 @@
+{
+    "route"         : "business/directory/vendors",
+    "name"          : "Business Vendors",
+    "description"   : "List business vendors via this component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-admin-vendors",
+    "class"         : "Apps\\Dash\\Components\\Business\\Directory\\Vendors\\VendorsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Vendors",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-admin-vendors"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 4,
+        "business"      : {
+            "icon"      : "suitcase",
+            "title"     : "business",
+            "childs"    : {
+                "directory" : {
+                "title"     : "directory",
+                "icon"      : "address-book",
+                "childs"    : {
+                    "vendors" : {
+                        "title"     : "vendors",
+                        "link"      : "business/directory/vendors"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

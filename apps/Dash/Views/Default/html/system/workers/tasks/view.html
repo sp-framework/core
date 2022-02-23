@@ -1,0 +1,34 @@
+{% if task['id'] is defined %}
+    {% set taskId = task['id'] %}
+    {% set title = 'Task (' ~ task['name'] ~ ')' %}
+{% else %}
+    {% set taskId = '' %}
+    {% set title = 'New Task' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'tasks',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'tasks/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : taskId,
+            'addActionUrl'                  : 'system/workers/tasks/add',
+            'addSuccessRedirectUrl'         : 'system/workers/tasks',
+            'updateActionUrl'               : 'system/workers/tasks/update',
+            'updateSuccessRedirectUrl'      : 'system/workers/tasks',
+            'cancelActionUrl'               : 'system/workers/tasks',
+            'closeActionUrl'                : 'system/workers/tasks'
+        ]
+    ]
+)}}

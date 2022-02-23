@@ -1,0 +1,35 @@
+{% if country['id'] is defined %}
+    {% set countryId = country['id'] %}
+    {% set title = 'Currency (' ~ country['name'] ~ ')' %}
+{% else %}
+    {% set countryId = '' %}
+    {% set title = 'New Currency' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'dollar-sign',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'currencies/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : countryId,
+            'addActionUrl'                  : 'business/finances/currencies/add',
+            'addSuccessRedirectUrl'         : 'business/finances/currencies',
+            'updateActionUrl'               : 'business/finances/currencies/update',
+            'updateSuccessRedirectUrl'      : 'business/finances/currencies',
+            'cancelActionUrl'               : 'business/finances/currencies',
+            'closeActionUrl'                : 'business/finances/currencies'
+        ]
+    ]
+)}}

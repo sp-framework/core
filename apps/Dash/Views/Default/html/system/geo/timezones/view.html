@@ -1,0 +1,35 @@
+{% if timezone['id'] is defined %}
+    {% set timezoneId = timezone['id'] %}
+    {% set title = 'Timezone (' ~ timezone['zone_name'] ~ ')' %}
+{% else %}
+    {% set timezoneId = '' %}
+    {% set title = 'New Timezone' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'globe',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'timezones/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : timezoneId,
+            'addActionUrl'                  : 'system/geo/timezones/add',
+            'addSuccessRedirectUrl'         : 'system/geo/timezones',
+            'updateActionUrl'               : 'system/geo/timezones/update',
+            'updateSuccessRedirectUrl'      : 'system/geo/timezones',
+            'cancelActionUrl'               : 'system/geo/timezones',
+            'closeActionUrl'                : 'system/geo/timezones'
+        ]
+    ]
+)}}

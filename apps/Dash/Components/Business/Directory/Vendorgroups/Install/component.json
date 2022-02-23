@@ -1,0 +1,57 @@
+{
+    "route"         : "business/directory/vendorgroups",
+    "name"          : "Business Vendor Groups",
+    "description"   : "List business vendor groups via this component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-admin-vendorgroups",
+    "class"         : "Apps\\Dash\\Components\\Business\\Directory\\Vendorgroups\\VendorgroupsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Vendorgroups",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-admin-vendorgroups"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 4,
+        "business"      : {
+            "icon"      : "suitcase",
+            "title"     : "business",
+            "childs"    : {
+                "directory" : {
+                "title"     : "directory",
+                "icon"      : "address-book",
+                "childs"    : {
+                    "vendorgroups" : {
+                        "title"     : "vendor groups",
+                        "link"      : "business/directory/vendorgroups"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

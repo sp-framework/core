@@ -1,0 +1,34 @@
+{% if schedule['id'] is defined %}
+    {% set scheduleId = schedule['id'] %}
+    {% set title = 'Schedule (' ~ schedule['name'] ~ ')' %}
+{% else %}
+    {% set scheduleId = '' %}
+    {% set title = 'New Schedule' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'clock',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'schedules/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : scheduleId,
+            'addActionUrl'                  : 'system/workers/schedules/add',
+            'addSuccessRedirectUrl'         : 'system/workers/schedules',
+            'updateActionUrl'               : 'system/workers/schedules/update',
+            'updateSuccessRedirectUrl'      : 'system/workers/schedules',
+            'cancelActionUrl'               : 'system/workers/schedules',
+            'closeActionUrl'                : 'system/workers/schedules'
+        ]
+    ]
+)}}

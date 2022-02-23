@@ -1,0 +1,86 @@
+{
+    "name"          : "Qrcodes",
+    "display_name"   : "Qrcodes Package",
+    "description"   : "Package for generating and validating Qrcodes",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-system-admin-tools-qrcodes",
+    "class"         : "Apps\\Dash\\Packages\\System\\Tools\\Qrcodes\\Qrcodes",
+    "settings"      : {
+        "availableEncodings"    : {
+            "ISO-8859-1"        : "ISO-8859-1",
+            "ISO-8859-2"        : "ISO-8859-2",
+            "ISO-8859-3"        : "ISO-8859-3",
+            "ISO-8859-4"        : "ISO-8859-4",
+            "ISO-8859-5"        : "ISO-8859-5",
+            "ISO-8859-6"        : "ISO-8859-6",
+            "ISO-8859-7"        : "ISO-8859-7",
+            "ISO-8859-8"        : "ISO-8859-8",
+            "ISO-8859-9"        : "ISO-8859-9",
+            "ISO-8859-10"       : "ISO-8859-10",
+            "ISO-8859-11"       : "ISO-8859-11",
+            "ISO-8859-12"       : "ISO-8859-12",
+            "ISO-8859-13"       : "ISO-8859-13",
+            "ISO-8859-14"       : "ISO-8859-14",
+            "ISO-8859-15"       : "ISO-8859-15",
+            "ISO-8859-16"       : "ISO-8859-16",
+            "Shift_JIS"         : "Shift_JIS",
+            "windows-1250"      : "windows-1250",
+            "windows-1251"      : "windows-1251",
+            "windows-1252"      : "windows-1252",
+            "windows-1256"      : "windows-1256",
+            "UTF-16BE"          : "UTF-16BE",
+            "UTF-8"             : "UTF-8",
+            "US-ASCII"          : "US-ASCII",
+            "GBK"               : "GBK",
+            "EUC-KR"            : "EUC-KR"
+        },
+        "defaultEncoding"       : "UTF-8",
+        "availableWriters"      : {
+            "png"               : "PNG",
+            "svg"               : "SVG"
+        },
+        "defaultWriter"         : "png",
+        "availableECLs"         : {
+            "low"               : "LOW",
+            "medium"            : "MEDIUM",
+            "quartile"          : "QUARTILE",
+            "high"              : "HIGH"
+        },
+        "defaultECL"            : "low",
+        "defaultSize"           : 200,
+        "defaultMargin"         : 5,
+        "codeForegroundColor"   : {
+            "r" : 0,
+            "g" : 0,
+            "b" : 0,
+            "a" : 1
+        },
+        "codeBackgroundColor"   : {
+            "r" : 255,
+            "g" : 255,
+            "b" : 255,
+            "a" : 0
+        },
+        "showLabel"             : false,
+        "labelAlignments"       : {
+            "left"      : "LEFT",
+            "center"    : "CENTER",
+            "right"     : "RIGHT"
+        },
+        "defaultLabelAlignment" : "center",
+        "labelFontSize"         : "16",
+        "labelText"             : "SCAN THE CODE",
+        "labelColor"            : {
+            "r" : 0,
+            "g" : 0,
+            "b" : 0,
+            "a" : 1
+        },
+        "showLogo"              : false,
+        "logo"                  : "",
+        "logoWidth"             : 30
+    }
+}

@@ -1,0 +1,213 @@
+{% if specification['id'] is defined %}
+    {% set specificationId = specification['id'] %}
+    {% set specificationName = specification['name'] %}
+    {% set specificationIsGroup = specification['is_group'] %}
+    {% set specificationGroupId = specification['group_id'] %}
+    {% set specificationDescription = specification['description'] %}
+    {% set specificationProductCount = specification['product_count'] %}
+{% else %}
+    {% set specificationId = '' %}
+    {% set specificationName = '' %}
+    {% set specificationIsGroup = '' %}
+    {% set specificationGroupId = '' %}
+    {% set specificationDescription = '' %}
+    {% set specificationProductCount = '' %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Specification ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Specification ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : specificationId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'Specification Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Specification Name Example: If is specificaion group: Metal. If is specificaion: Iron',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : specificationName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {% if specificationIsGroup is defined %}
+                    {% if specificationIsGroup == 1 %}
+                        {% set specificationIsGroupChecked = true %}
+                        {% set specificationGroupsDisabled = true %}
+                        {% set specificationGroupsHidden = true %}
+                    {% else %}
+                        {% set specificationIsGroupChecked = false %}
+                        {% set specificationGroupsDisabled = false %}
+                        {% set specificationGroupsHidden = false %}
+                    {% endif %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'is_group',
+                        'fieldLabel'                     : 'Specification Is Group?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Is this specificaion group or specification?',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : specificationIsGroupChecked,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'group_id',
+                        'fieldLabel'                           : 'Select Specification Group',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select a specificaion group',
+                        'fieldRequired'                        : true,
+                        'fieldDisabled'                        : specificationGroupsDisabled,
+                        'fieldHidden'                          : specificationGroupsHidden,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : specifications,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : specificationGroupId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'description',
+                        'fieldLabel'                     : 'Specification Description',
+                        'fieldType'                      : 'textarea',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Specification Description',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 2048,
+                        'fieldTextareaRows'              : 2,
+                        'fieldValue'                     : specificationDescription
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals BazContentFieldsValidator PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                      : { },
+        '{{componentId}}-{{sectionId}}-name'                    : { },
+        '{{componentId}}-{{sectionId}}-is_group'                : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-is_group').click(function() {
+                    if ($(this)[0].checked === true) {
+                        $('#{{componentId}}-{{sectionId}}-group_id').parent('.form-group').addClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-group_id').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-group_id').val(null).trigger('change');
+                    } else if ($(this)[0].checked === false) {
+                        $('#{{componentId}}-{{sectionId}}-group_id').parent('.form-group').removeClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-group_id').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-group_id').val(0).trigger('change');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-group_id'                : {
+            'placeholder' : 'SELECT SPECIFICATION GROUP'
+        },
+        '{{componentId}}-{{sectionId}}-description'             : { },
+        '{{componentId}}-{{sectionId}}-form'                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                   : 'required',
+                '{{componentId}}-{{sectionId}}-group_id'               : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                   : 'Please enter brand name',
+                '{{componentId}}-{{sectionId}}-group_id'               : 'Please select specification group'
+            }
+        }
+    });
+</script>

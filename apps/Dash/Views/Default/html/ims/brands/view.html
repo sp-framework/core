@@ -1,0 +1,43 @@
+{% if brand['id'] is defined %}
+    {% set brandId = brand['id'] %}
+    {% set title = 'Brand (' ~ brand['name'] ~ ')' %}
+{% else %}
+    {% set brandId = '' %}
+    {% set title = 'New Brand' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'dot-circle',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'brands/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : brandId,
+            'addActionUrl'                  : 'ims/brands/add',
+            'addSuccessRedirectUrl'         : 'ims/brands',
+            'updateActionUrl'               : 'ims/brands/update',
+            'updateSuccessRedirectUrl'      : 'ims/brands',
+            'cancelActionUrl'               : 'ims/brands',
+            'closeActionUrl'                : 'ims/brands'
+        ],
+        'dataDependencies'     :
+        [
+            [
+                'componentName'      : 'Storages',
+                'componentVar'       : storages,
+                'componentRoute'     : false
+            ]
+        ]
+    ]
+)}}

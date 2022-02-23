@@ -1,0 +1,60 @@
+{
+    "route"         : "business/finances/taxes",
+    "name"          : "Taxes",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "admin",
+    "description"   : "List taxes via this component",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-admin-taxes",
+    "class"         : "Apps\\Dash\\Components\\Business\\Finances\\Taxes\\TaxesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Taxes",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-admin-taxes"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 4,
+        "business"      : {
+            "title"     : "business",
+            "icon"      : "suitcase",
+            "childs"    : {
+                "finances"       : {
+                    "title"     : "finances",
+                    "icon"      : "dollar-sign",
+                    "childs"    : {
+                        "taxes" : {
+                            "title"     : "taxes",
+                            "link"      : "business/finances/taxes"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+        "mandatory"     : {
+            "admin"     : true
+        }
+    }
+}

@@ -1,0 +1,34 @@
+{% if note['id'] is defined %}
+    {% set noteId = note['id'] %}
+    {% set title = 'Note (' ~ note['id'] ~ ')' %}
+{% else %}
+    {% set noteId = '' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'map',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'countries/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : noteId,
+            'addActionUrl'                  : 'system/geo/countries/add',
+            'addSuccessRedirectUrl'         : 'system/geo/countries',
+            'updateActionUrl'               : 'system/geo/countries/update',
+            'updateSuccessRedirectUrl'      : 'system/geo/countries',
+            'cancelActionUrl'               : 'system/geo/countries',
+            'closeActionUrl'                : 'system/geo/countries'
+        ]
+    ]
+)}}

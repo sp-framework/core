@@ -1,0 +1,12 @@
+{
+    "name"          : "Skills",
+    "display_name"  : "Skills Package",
+    "description"   : "Package for Skills component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "hrms",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-hrms-skills",
+    "class"         : "Apps\\Dash\\Packages\\Hrms\\Skills\\Skills",
+    "settings"      : {"componentRoute":"hrms/skills"}
+}

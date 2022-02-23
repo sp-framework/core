@@ -1,0 +1,35 @@
+{% if job['id'] is defined %}
+    {% set jobId = job['id'] %}
+    {% set title = 'Job ID: (' ~ jobId ~ ')' %}
+    {% if job['status'] == 4 %}
+        {% set cardType = 'danger' %}
+    {% elseif job['status'] == 3 %}
+        {% set cardType = 'success' %}
+    {% elseif job['status'] == 5 %}
+        {% set cardType = 'warning' %}
+    {% else %}
+        {% set cardType = 'secondary' %}
+    {% endif %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : cardType,
+            'cardIcon'                      : 'clipboard-list',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'jobs/form',
+            'formButtons'                   :
+            [
+                'updateButtonId'                : jobId,
+                'closeActionUrl'                : 'system/workers/jobs'
+            ]
+        ]
+    )}}
+{% endif %}

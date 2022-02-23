@@ -1,0 +1,54 @@
+{% if entity['id'] is defined %}
+    {% set entityId = entity['id'] %}
+    {% set title = 'Entity (' ~ entity['business_name'] ~ ')' %}
+{% else %}
+    {% set entityId = '' %}
+    {% set title = 'New Entity' %}
+{% endif %}
+{% set dataDependencies =
+    [
+        [
+            'componentName'      : 'Geo Locations (Countries)',
+            'componentVar'       : geo,
+            'componentRoute'     : false
+        ],
+        [
+            'componentName'      : 'Currency',
+            'componentVar'       : currency,
+            'componentRoute'     : 'business/finances/currencies'
+        ],
+        [
+            'componentName'      : 'Storages',
+            'componentVar'       : storages,
+            'componentRoute'     : false
+        ]
+    ]
+%}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'suitcase',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'entities/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : entityId,
+            'addActionUrl'                  : 'business/entities/add',
+            'addSuccessRedirectUrl'         : 'business/entities',
+            'updateActionUrl'               : 'business/entities/update',
+            'updateSuccessRedirectUrl'      : 'business/entities',
+            'cancelActionUrl'               : 'business/entities',
+            'closeActionUrl'                : 'business/entities'
+        ],
+        'dataDependencies'              : dataDependencies
+    ]
+)}}

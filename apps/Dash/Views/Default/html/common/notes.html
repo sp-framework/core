@@ -1,0 +1,21 @@
+{% if packageName is not defined %}
+    {% set packageName = null %}
+{% endif %}
+{% if allowedUploads is not defined %}
+    {% set allowedUploads = true %}
+{% endif %}
+<div class="row">
+    <div class="col" id="notes">
+        {{adminltetags.useTag('notes',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : 'main',
+                'notes'                         : notes,
+                'packageName'                   : packageName,
+                'allowedUploads'                : allowedUploads
+            ]
+        )}}
+    </div>
+</div>

@@ -10,6 +10,8 @@ class Service
 
 	protected static $base;
 
+	public static $loader;
+
 	/**
 	 * @var null|\System\Base\Service Singleton instance.
 	 */
@@ -29,10 +31,8 @@ class Service
 
 	public function load()
 	{
-		include('../system/Base/Helpers.php');
-
 		try {
-			$config = include('../system/Configs/Base.php');
+			$config = include(__DIR__ . '/../../../system/Configs/Base.php');
 		} catch (\ErrorException $e) {
 			throw new \Exception("Base.php file in configs directory missing");
 		}
@@ -43,52 +43,68 @@ class Service
 			self::$mode = true;
 		}
 
-		$files = include(self::$base . 'system/Base/Loader/Files.php');
+		self::$loader = new Loader();
 
-		$loader = new Loader();
+		self::$loader->registerNamespaces($this->getNamespaces());
 
-		$loader->registerNamespaces($this->getNamespaces());
+		self::$loader->registerClasses($this->getClasses());
 
-		$loader->registerFiles($this->getFiles());
+		self::$loader->registerFiles($this->getFiles());
 
-		$loader->register();
+		self::$loader->register();
 	}
 
 	protected function getNamespaces()
 	{
 		if (self::$mode) {
-			$dev = include(self::$base . 'system/Base/Loader/Dev.php');
 			return
 				array_merge(
 					include(self::$base . 'system/Base/Loader/Namespaces.php'),
-					$dev['namespaces']
+					include(self::$base . 'system/Base/Loader/ThirdParty/Namespaces.php'),
+					include(self::$base . 'system/Base/Loader/Dev/Namespaces.php')
 				);
 		} else {
-			return include(self::$base . 'system/Base/Loader/Namespaces.php');
+			return
+				array_merge(
+					include(self::$base . 'system/Base/Loader/Namespaces.php'),
+					include(self::$base . 'system/Base/Loader/ThirdParty/Namespaces.php')
+				);
+		}
+	}
+
+	protected function getClasses()
+	{
+		if (self::$mode) {
+			return
+				array_merge(
+					include(self::$base . 'system/Base/Loader/Classes.php'),
+					include(self::$base . 'system/Base/Loader/ThirdParty/Classes.php'),
+					include(self::$base . 'system/Base/Loader/Dev/Classes.php')
+				);
+		} else {
+			return
+				array_merge(
+					include(self::$base . 'system/Base/Loader/Classes.php'),
+					include(self::$base . 'system/Base/Loader/ThirdParty/Classes.php')
+				);
 		}
 	}
 
 	protected function getFiles()
 	{
 		if (self::$mode) {
-			$dev = include(self::$base . 'system/Base/Loader/Dev.php');
 			return
 				array_merge(
 					include(self::$base . 'system/Base/Loader/Files.php'),
-					$dev['files']
+					include(self::$base . 'system/Base/Loader/ThirdParty/Files.php'),
+					include(self::$base . 'system/Base/Loader/Dev/Files.php')
 				);
 		} else {
-			return include(self::$base . 'system/Base/Loader/Files.php');
+			return
+				array_merge(
+					include(self::$base . 'system/Base/Loader/Files.php'),
+					include(self::$base . 'system/Base/Loader/ThirdParty/Files.php')
+				);
 		}
-	}
-
-	public function addNamespaces(array $namespaces = [])
-	{
-		//
-	}
-
-	public function addFiles(array $files = [])
-	{
-		//
 	}
 }

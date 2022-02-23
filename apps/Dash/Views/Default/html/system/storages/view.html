@@ -1,0 +1,35 @@
+{% if storage['id'] is defined %}
+    {% set storageId = storage['id'] %}
+    {% set title = storageType ~ ' Storage (' ~ storage['name'] ~ ')' %}
+{% else %}
+    {% set storageId = '' %}
+    {% set title = 'New ' ~ storageType ~ ' Storage' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'boxes',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'storages/types/' ~ storageType ~ '/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : storageId,
+            'addActionUrl'                  : 'system/storages/add',
+            'addSuccessRedirectUrl'         : 'system/storages',
+            'updateActionUrl'               : 'system/storages/update',
+            'updateSuccessRedirectUrl'      : 'system/storages',
+            'cancelActionUrl'               : 'system/storages',
+            'closeActionUrl'                : 'system/storages'
+        ]
+    ]
+)}}

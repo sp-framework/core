@@ -1,0 +1,239 @@
+{% if contract['id'] is defined %}
+    {% set contractId = contract['id'] %}
+    {% set contractName = contract['name'] %}
+    {% set contractApiType = contract['api_type'] %}
+    {% set contractWSDLConvert = contract['wsdl_convert'] %}
+    {% set contractLink = contract['link'] %}
+    {% set contractContent = contract['content'] %}
+    {% set linkDisabled = true %}
+{% else %}
+    {% set contractId = '' %}
+    {% set contractName = '' %}
+    {% set contractApiType = '' %}
+    {% set contractWSDLConvert = '' %}
+    {% set contractLink = '' %}
+    {% set contractContent = '' %}
+    {% set linkDisabled = false %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Contract ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Contract ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : contractId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'Contract Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Contract Name Example: Ebay Identity Api',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : contractName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'api_type',
+                        'fieldLabel'                           : 'Api Type',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select api type',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : apiTypes,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : contractApiType
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {% if contractWSDLConvert is defined %}
+                    {% if contractWSDLConvert == 1 %}
+                        {% set WSDLConvertChecked = true %}
+                    {% else %}
+                        {% set WSDLConvertChecked = false %}
+                    {% endif %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'wsdl_convert',
+                        'fieldLabel'                     : 'WSDL Convert?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Is Json converted from WSDL(for eBay)?',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : WSDLConvertChecked,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'link',
+                        'fieldLabel'                     : 'Contract Link',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Contract Link. Contract will be automatically downloaded and stored in Contracts folder.',
+                        'fieldRequired'                  : true,
+                        'fieldDisabled'                  : linkDisabled,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldValue'                     : contractLink
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'content',
+                        'fieldLabel'                     : 'Contract Json/Yaml Content',
+                        'fieldType'                      : 'textarea',
+                        'fieldHelp'                      : true,
+                        'fieldRequired'                  : true,
+                        'fieldHelpTooltipContent'        : 'Contract Json/Yaml Content',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldTextareaRows'              : 8,
+                        'fieldValue'                     : contractContent
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                      : { },
+        '{{componentId}}-{{sectionId}}-name'                    : { },
+        '{{componentId}}-{{sectionId}}-api_type'                : {
+            placeholder: "SELECT API TYPE"
+        },
+        '{{componentId}}-{{sectionId}}-wsdl_convert'            : { },
+        '{{componentId}}-{{sectionId}}-link'                    : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-link').keyup(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-link').val().length !== 0) {
+                        $('#{{componentId}}-{{sectionId}}-content').attr('disabled', true);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-content').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-content'                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-content').keyup(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-content').val().length !== 0) {
+                        $('#{{componentId}}-{{sectionId}}-link').attr('disabled', true);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-link').attr('disabled', false);
+                    }
+                });
+            }
+
+        },
+        '{{componentId}}-{{sectionId}}-form'                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'required',
+                '{{componentId}}-{{sectionId}}-link'                    : 'required',
+                '{{componentId}}-{{sectionId}}-content'                 : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'Please enter contract name',
+                '{{componentId}}-{{sectionId}}-link'                    : 'Please enter contract link',
+                '{{componentId}}-{{sectionId}}-content'                 : 'Please enter contract'
+            }
+        }
+    });
+</script>

@@ -1,0 +1,28 @@
+{% set sectionId = '502' %}
+<div id="{{componentId}}-{{sectionId}}" hidden>
+    <div class="row">
+        <div class="col">
+            <div class="jumbotron text-center bg-danger">
+                <h1>
+                    <span class="text-white"><i class="fas fa-fw fa-bolt"></i> Bad Gateway! (Error:502)</span>
+                </h1>
+                <p class="lead">The web server is returning an unexpected networking error.</p>
+                <a href="" class="btn btn-primary btn-lg text-center contentAjaxLink">
+                    <span class="text-uppercase">Try Again</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h2>What happened?</h2>
+            <p class="lead">A 502 error status implies that that the server received an invalid response from an upstream server it accessed to fulfill the request.</p>
+        </div>
+        <div class="col">
+            <h2>What can I do?</h2>
+            <p class="lead">Try the page again after clearing your browser cache and refreshing the page. It may clear this issue. If the problem persists and you need immediate assistance, please
+                <a href="mailto:dev@bazaari.com.au?Subject=Bad%20Gateway%20Error" class="font-weight-bold">contact</a> us.
+            </p>
+        </div>
+    </div>
+</div>

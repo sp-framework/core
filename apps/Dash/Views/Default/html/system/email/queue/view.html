@@ -1,0 +1,24 @@
+{% if email['id'] is defined %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'envelope',
+            'cardTitle'                     : 'Email ID: ' ~ email['id'],
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'queue/form',
+            'formButtons'                   :
+            [
+                'updateButtonId'                : email['id'],
+                'closeActionUrl'                : 'system/email/queue'
+            ]
+        ]
+    )}}
+{% endif %}

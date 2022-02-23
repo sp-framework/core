@@ -2,21 +2,16 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
-use System\Base\Providers\ModulesServiceProvider\Modules\Applications;
 use System\Base\Providers\ModulesServiceProvider\Modules\Components;
-use System\Base\Providers\ModulesServiceProvider\Modules\Core;
-use System\Base\Providers\ModulesServiceProvider\Modules\Domains;
 use System\Base\Providers\ModulesServiceProvider\Modules\Middlewares;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages;
 use System\Base\Providers\ModulesServiceProvider\Modules\Repositories;
 use System\Base\Providers\ModulesServiceProvider\Modules\Views;
+use System\Base\Providers\ModulesServiceProvider\Manager;
+use System\Base\Providers\ModulesServiceProvider\Installer;
 
 class Modules
 {
-	protected $core;
-
-	protected $applications;
-
 	protected $components;
 
 	protected $packages;
@@ -27,7 +22,9 @@ class Modules
 
 	protected $repositories;
 
-	protected $domains;
+	protected $manager;
+
+	protected $installer;
 
 	public function __construct()
 	{
@@ -37,27 +34,11 @@ class Modules
 	{
 		if (!isset($this->{$name})) {
 			if (method_exists($this, $method = "init" . ucfirst("{$name}"))) {
-				return $this->{$method}();
+				$this->{$name} = $this->{$method}();
 			}
 		}
 
 		return $this->{$name};
-	}
-
-	protected function initCore()
-	{
-		$this->core = (new Core())->init();
-
-		$this->core->getAll();
-
-		return $this->core;
-	}
-
-	protected function initApplications()
-	{
-		$this->applications = (new Applications())->init();
-
-		return $this->applications;
 	}
 
 	protected function initComponents()
@@ -95,10 +76,17 @@ class Modules
 		return $this->repositories;
 	}
 
-	protected function initDomains()
+	protected function initManager()
 	{
-		$this->domains = (new Domains())->init();
+		$this->manager = (new Manager())->init();
 
-		return $this->domains;
+		return $this->manager;
+	}
+
+	protected function initInstaller()
+	{
+		$this->installer = (new Installer())->init();
+
+		return $this->installer;
 	}
 }

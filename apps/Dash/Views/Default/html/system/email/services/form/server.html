@@ -1,0 +1,231 @@
+{% if emailservice['id'] is defined %}
+    {% set emailserviceHost = emailservice['host'] %}
+    {% set emailservicePort = emailservice['port'] %}
+    {% set emailserviceAuth = emailservice['auth'] %}
+    {% set emailserviceUsername = emailservice['username'] %}
+    {% set emailservicePassword = emailservice['password'] %}
+    {% set emailserviceFromAddress = emailservice['from_address'] %}
+    {% set emailserviceEncryption = emailservice['encryption'] %}
+    {% set emailserviceAllowHtmlBody = emailservice['allow_html_body'] %}
+{% else %}
+    {% set emailserviceHost = '' %}
+    {% set emailservicePort = '' %}
+    {% set emailserviceAuth = 0 %}
+    {% set emailserviceUsername = '' %}
+    {% set emailservicePassword = '' %}
+    {% set emailserviceFromAddress = '' %}
+    {% set emailserviceEncryption = 0 %}
+    {% set emailserviceAllowHtmlBody = 0 %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'host',
+                'fieldLabel'                     : 'Host',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Host Example: smtp.google.com',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 100,
+                'fieldValue'                     : emailserviceHost
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'port',
+                'fieldLabel'                     : 'Port',
+                'fieldType'                      : 'input',
+                'fieldInputTypeTextFilter'       : 'positiveInt',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Port Example: 465',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 5,
+                'fieldDataInputMinNumber'        : 1,
+                'fieldDataInputMaxNumber'        : 65535,
+                'fieldValue'                     : emailservicePort
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {% if emailserviceAuth is defined %}
+            {% if emailserviceAuth == 1 %}
+                {% set authChecked = true %}
+            {% else %}
+                {% set authChecked = false %}
+            {% endif %}
+        {% endif %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'auth',
+                'fieldLabel'                     : 'Needs authentication?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Does this service require username and password to send emails?',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'info',
+                'fieldCheckboxChecked'           : authChecked,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {% if emailserviceEncryption is defined %}
+            {% if emailserviceEncryption == 1 %}
+                {% set encryptionChecked = true %}
+            {% else %}
+                {% set encryptionChecked = false %}
+            {% endif %}
+        {% endif %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'encryption',
+                'fieldLabel'                     : 'Needs encryption?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Does this service require encryption to send emails?',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'info',
+                'fieldCheckboxChecked'           : encryptionChecked,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {% if emailserviceAllowHtmlBody is defined %}
+            {% if emailserviceAllowHtmlBody == 1 %}
+                {% set htmlChecked = true %}
+            {% else %}
+                {% set htmlChecked = false %}
+            {% endif %}
+        {% endif %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'allow_html_body',
+                'fieldLabel'                     : 'Allow HTML Body',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Allow email body to have HTML code?',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'info',
+                'fieldCheckboxChecked'           : htmlChecked,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'username',
+                'fieldLabel'                     : 'Username',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Host username',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldDisabled'                  : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldValue'                     : emailserviceUsername
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'password',
+                'fieldLabel'                     : 'Password',
+                'fieldType'                      : 'input',
+                'fieldInputType'                 : 'password',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Host password',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDisabled'                  : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldValue'                     : emailservicePassword
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'from_address',
+                'fieldLabel'                     : 'From Address',
+                'fieldType'                      : 'input',
+                'fieldInputType'                 : 'text',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Email From Address.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldBazJstreeSearch'           : true,
+                'fieldValue'                     : emailserviceFromAddress
+            ]
+        )}}
+    </div>
+</div>

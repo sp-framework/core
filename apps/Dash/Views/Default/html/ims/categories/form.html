@@ -1,0 +1,412 @@
+{% if category['id'] is defined %}
+    {% set categoryId = category['id'] %}
+    {% set categoryImage = category['image'] %}
+    {% set categoryName = category['name'] %}
+    {% set categoryParentId = category['parent_id'] %}
+    {% set categoryParentHierarchy = category['hierarchy_str'] %}
+    {% set categoryDescription = category['description'] %}
+    {% set categoryNeedAuth = category['need_auth'] %}
+    {% set categoryVisibleToRoleIds = category['visible_to_role_ids'] %}
+    {% set categoryVisibleOnChannelIds = category['visible_on_channel_ids'] %}
+    {% set categorySequence = category['sequence'] %}
+{% else %}
+    {% set categoryId = '' %}
+    {% set categoryImage = '' %}
+    {% set categoryName = '' %}
+    {% set categoryParentId = '' %}
+    {% set categoryParentHierarchy = '' %}
+    {% set categoryDescription = '' %}
+    {% set categoryNeedAuth = 0 %}
+    {% set categoryVisibleToRoleIds = [] %}
+    {% set categoryVisibleOnChannelIds = [] %}
+    {% set categorySequence = '' %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row vdivide">
+            <div class="col-md-3 col-sm-12">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'image',
+                        'fieldLabel'                     : false,
+                        'fieldType'                      : 'files/croppie',
+                        'fieldValue'                     : categoryImage,
+                        'imageType'                      : 'image',
+                        'upload'                         : true,
+                        'imageLink'                      : imageLink
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'id',
+                                'fieldLabel'                     : 'Category ID',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Category ID',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldHidden'                    : true,
+                                'fieldDisabled'                  : true,
+                                'fieldValue'                     : categoryId
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'name',
+                                'fieldLabel'                     : 'Category Name',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Category Name Example: Phones',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 100,
+                                'fieldValue'                     : categoryName
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'parent_id',
+                                'fieldLabel'                            : 'Parent ID',
+                                'fieldHidden'                           : true,
+                                'fieldType'                             : 'input',
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldValue'                            : categoryParentId
+                            ]
+                        )}}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                            : component,
+                                'componentName'                        : componentName,
+                                'componentId'                          : componentId,
+                                'sectionId'                            : sectionId,
+                                'fieldId'                              : 'hierarchy_str',
+                                'fieldLabel'                           : 'Parent Category',
+                                'fieldType'                            : 'input',
+                                'fieldHelp'                            : true,
+                                'fieldPlaceholder'                     : 'Search Parent Category',
+                                'fieldHelpTooltipContent'              : 'Search a Parent Category',
+                                'fieldRequired'                        : false,
+                                'fieldBazScan'                         : true,
+                                'fieldBazPostOnCreate'                 : true,
+                                'fieldBazPostOnUpdate'                 : true,
+                                'fieldValue'                           : categoryParentHierarchy
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'description',
+                                'fieldLabel'                     : 'Description',
+                                'fieldType'                      : 'textarea',
+                                'fieldDataMaxLength'             : 1024,
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Description',
+                                'fieldRequired'                  : false,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMaxLength'        : 1024,
+                                'fieldTextareaRows'              : 2,
+                                'fieldValue'                     : categoryDescription
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {% if categoryNeedAuth is defined %}
+                    {% if categoryNeedAuth == 1 %}
+                        {% set categoryNeedAuthChecked = true %}
+                    {% else %}
+                        {% set categoryNeedAuthChecked = false %}
+                    {% endif %}
+                {% else %}
+                    {% set categoryNeedAuthChecked = false %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'need_auth',
+                        'fieldLabel'                     : 'Category Needs Authentication?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Does category needs user to authenticate to view its content?',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : categoryNeedAuthChecked,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'visible_to_role_ids',
+                        'fieldLabel'                     : 'Visible to role ids',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select roles that can view this category. Example: Customer Role, Guest Role. Note: Default is All Roles',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldRequired'                  : false,
+                        'fieldDisabled'                  : false,
+                        'fieldDataSelect2Multiple'       : true,
+                        'fieldDataSelect2Options'        : roles,
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': categoryVisibleToRoleIds
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'visible_on_channel_ids',
+                        'fieldLabel'                           : 'Visible On Channel(s)',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select channel(s). Note: Default is All Channels',
+                        'fieldRequired'                        : false,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Multiple'             : true,
+                        'fieldDataSelect2Options'              : localChannels,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : categoryVisibleOnChannelIds
+                    ]
+                )}}
+            </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'sequence',
+                                'fieldLabel'                            : 'Sequence',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Sequence. Default ordering is alphabetical. You can override it by giving it a sequence number.',
+                                'fieldRequired'                         : false,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 9999,
+                                'fieldValue'                            : categorySequence
+                            ]
+                        )}}
+                    </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals BazContentFieldsValidator PNotify autoComplete */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                      : { },
+        '{{componentId}}-{{sectionId}}-name'                    : { },
+        '{{componentId}}-{{sectionId}}-description'             : { },
+        '{{componentId}}-{{sectionId}}-type'                    : { },
+        '{{componentId}}-{{sectionId}}-parent_id'               : { },
+        '{{componentId}}-{{sectionId}}-hierarchy_str'           : {
+            afterInit   : function() {
+                dataCollectionSectionForm['autoCompleteAccounts'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = '{{links.url("ims/categories/searchCategory")}}';
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-hierarchy_str").value);
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const responseData = await fetch(url, requestOptions);
+
+                                const response = await responseData.json();
+
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+                                if (response.categories) {
+                                    return response.categories;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["hierarchy_str"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-hierarchy_str",
+                        threshold : 4,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-hierarchy_list_str");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-hierarchy_str",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 10,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match;
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                            const result = document.createElement("li");
+                            result.setAttribute("class", "autoComplete_result text-danger");
+                            result.setAttribute("tabindex", "1");
+                            result.innerHTML = "No search results. Click field help for more information.";
+                            if (document.querySelector("#{{componentId}}-{{sectionId}}-hierarchy_list_str")) {
+                                $("#{{componentId}}-{{sectionId}}-hierarchy_list_str").empty().append(result);
+                            } else {
+                                $("#{{componentId}}-{{sectionId}}-hierarchy_str").parent(".form-group").append(
+                                    '<div id="{{componentId}}-{{sectionId}}-hierarchy_list_str" class="autoComplete_results"></div>'
+                                );
+                                document.querySelector("#{{componentId}}-{{sectionId}}-hierarchy_list_str").appendChild(result);
+                            }
+                        },
+                        onSelection: feedback => {
+                            $('#{{componentId}}-{{sectionId}}-parent_id').val(feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-parent_id').attr('value', feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-hierarchy_str').blur();
+                            $('#{{componentId}}-{{sectionId}}-hierarchy_str').val(feedback.selection.value.hierarchy_str);
+                            $('#{{componentId}}-{{sectionId}}-hierarchy_str').attr('value', feedback.selection.value.hierarchy_str);
+                        }
+                });
+                // On delete
+                $('#{{componentId}}-{{sectionId}}-hierarchy_str').on('input propertychange', function() {
+                    $('#{{componentId}}-{{sectionId}}-parent_id').val(0);
+                    $('#{{componentId}}-{{sectionId}}-parent_id').attr('value', 0);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-hierarchy_str').focusout(function() {
+                    $('#{{componentId}}-{{sectionId}}-hierarchy_list_str').children('li').remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-need_auth'               : { },
+        '{{componentId}}-{{sectionId}}-visible_to_role_ids'     : {
+            'placeholder' : 'SELECT ROLES'
+        },
+        '{{componentId}}-{{sectionId}}-visible_on_channel_ids'  : {
+            'placeholder' : 'SELECT CHANNELS'
+        },
+        '{{componentId}}-{{sectionId}}-sequence'                : { },
+        '{{componentId}}-{{sectionId}}-form'                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                   : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                   : 'Please enter supplier name',
+            }
+        }
+    });
+</script>

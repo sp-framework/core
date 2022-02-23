@@ -61,14 +61,6 @@ class Core
 						]
 					),
 					new Column(
-						'installed',
-						[
-							'type'    => Column::TYPE_TINYINTEGER,
-							'size'    => 1,
-							'notNull' => true,
-						]
-					),
-					new Column(
 						'settings',
 						[
 							'type'    => Column::TYPE_TEXT,
@@ -78,7 +70,7 @@ class Core
 					new Column(
 						'files',
 						[
-							'type'    => Column::TYPE_TEXT,
+							'type'    => Column::TYPE_MEDIUMTEXT,
 							'notNull' => false,
 						]
 					),
@@ -98,6 +90,21 @@ class Core
 							'notNull' => false,
 						]
 					),
+					new Column(
+						'updated_by',
+						[
+							'type'    => Column::TYPE_INTEGER,
+							'notNull' => true,
+						]
+					),
+					new Column(
+						'updated_on',
+						[
+							'type'    => Column::TYPE_TIMESTAMP,
+							'notNull' => true,
+							'default' => 'CURRENT_TIMESTAMP',
+						]
+					)
 				]
 			];
 	}

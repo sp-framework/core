@@ -1,0 +1,39 @@
+{
+    "name": "Notes",
+    "display_name": "Notes",
+    "description": "Basepackage Notes",
+    "app_type": "dash",
+    "category": "system",
+    "sub_category": "tools",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../",
+    "class": "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Notes",
+    "settings":
+    {
+        "noteTypes":
+        [
+            {
+                "id": "1",
+                "name": "General"
+            },
+            {
+                "id": "2",
+                "name": "Phone In"
+            },
+            {
+                "id": "3",
+                "name": "Phone Out"
+            },
+            {
+                "id": "4",
+                "name": "Email In"
+            },
+            {
+                "id": "5",
+                "name": "Email Out"
+            }
+        ],
+        "useStorage": "private",
+        "allowedUploads": true
+    }
+}

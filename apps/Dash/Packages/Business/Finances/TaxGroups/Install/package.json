@@ -1,0 +1,12 @@
+{
+    "name"          : "TaxGroups",
+    "display_name"  : "Business Tax Groups",
+    "description"   : "Package for Business Directory Tax Groups component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-admin-taxgroups",
+    "class"         : "Apps\\Dash\\Packages\\Business\\Finances\\TaxGroups\\TaxGroups",
+    "settings"      : {"componentRoute":"business/finances/taxegroups"}
+}

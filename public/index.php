@@ -1,5 +1,4 @@
 <?php
-
 // require_once "../vendor/autoload.php";
 
 // $config = array(
@@ -65,7 +64,16 @@
 // }
 
 try {
-	require_once "../system/bootstrap.php";
+	require_once (__DIR__ . '/../system/Bootstrap.php');
+
+	$bootstrap = new \System\Bootstrap;
+
+	if (PHP_SAPI === 'cli') {
+		$bootstrap->cli($argv);
+	} else if (PHP_SAPI !== 'cli') {
+		$bootstrap->mvc();
+	}
+
 } catch (Exception $exception) {
 	if (isset($error)) {
 		$error->handle($exception);
@@ -79,7 +87,8 @@ try {
 				'Class: ' . $trace['function'] . ' - Function: ' . $trace['function'];
 		}
 
-		echo 	'<style type="text/css">
+		echo
+			'<style type="text/css">
 				.tg  {border-collapse:collapse;border-spacing:0;width:100%;}
 				.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
 				  overflow:hidden;padding:10px 5px;word-break:normal;}

@@ -1,0 +1,138 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'manage_stock',
+                'fieldLabel'                     : 'Stock Management?',
+                'fieldType'                      : 'radio',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Manage stock for this product.',
+                'fieldRequired'                  : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioButtons'              :
+                    [
+                        'disabled' :
+                            [
+                                'title'                           : 'DISABLED',
+                                'type'                            : 'secondary',
+                                'dataValue'                       : '1'
+                            ],
+                        'dropship' :
+                            [
+                                'title'                           : 'DROPSHIP',
+                                'type'                            : 'primary',
+                                'dataValue'                       : '2'
+                            ],
+                        'enabled' :
+                            [
+                                'title'                           : 'ENABLED',
+                                'type'                            : 'info',
+                                'dataValue'                       : '3'
+                            ]
+                    ],
+                'fieldRadioPlacementType'        : 'horizontal',
+                'fieldRadioChecked'              : '3'
+            ]
+        )}}
+    </div>
+    <div id="stock-tabs">
+        {{adminltetags.useTag('tabs',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : 'main',
+                'tabsId'                        : 'tabs',
+                'tabsStyle'                     : 'card-outline-tabs',
+                'tabsType'                      : 'info',
+                'tabsData'                      :
+                    [
+                        'assign'   :
+                        [
+                            'tabTitle'          : 'Assign',
+                            'tabInclude'        : 'products/types/stock/form/stock/assign'
+                        ],
+                        'rules'   :
+                        [
+                            'tabTitle'          : 'Rules',
+                            'tabInclude'        : 'products/types/stock/form/stock/rules'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<script>
+/* globals BazHelpers PNotify autoComplete Sortable getStokInfo */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-manage_stock'                : { },
+        '{{componentId}}-{{sectionId}}-stock_counters'              : {
+            afterInit: function() {
+                var value = $('input[name={{componentId}}-{{sectionId}}-manage_stock]:checked').data('value');
+
+                $('input[name={{componentId}}-{{sectionId}}-manage_stock]').change(function(){
+                    value = $('input[name={{componentId}}-{{sectionId}}-manage_stock]:checked').data('value');
+                    showHideStockTabs(value);
+                });
+
+                function showHideStockTabs(value) {
+                    if (value == 1) {
+                        $('#stock-tabs').attr('hidden', true);
+                    } else if (value == 2) {
+                        $('#stock-tabs').attr('hidden', false);
+
+                    } else if (value == 3) {
+                        $('#stock-tabs').attr('hidden', false);
+                        getStockInfo();
+                    }
+                }
+
+                showHideStockTabs(value);
+
+                function getStockInfo() {
+                    //eslint-disable-next-line
+                    console.log('getStockInfo');
+                }
+
+                $('#{{componentId}}-{{sectionId}}-refresh-stock-counters').click(function(e) {
+                    e.preventDefault();
+
+                    //
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-refresh-stock-counters'      : { }
+    });
+</script>

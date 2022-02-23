@@ -1,0 +1,84 @@
+{% if profile['address']|length > 0  %}
+    {% set profileAddressId = profile['address']['id'] %}
+    {% set profileStreetAddress = profile['address']['street_address'] %}
+    {% set profileStreetAddress2 = profile['address']['street_address_2'] %}
+    {% set profileCityId = profile['address']['city_id'] %}
+    {% set profileCity = profile['address']['city_name'] %}
+    {% set profilePostCode = profile['address']['post_code'] %}
+    {% set profileStateId = profile['address']['state_id'] %}
+    {% set profileState = profile['address']['state_name'] %}
+    {% set profileCountryId = profile['address']['country_id'] %}
+    {% set profileCountry = profile['address']['country_name'] %}
+{% else %}
+    {% set profileAddressId = '' %}
+    {% set profileStreetAddress = '' %}
+    {% set profileStreetAddress2 = '' %}
+    {% set profileCityId = '' %}
+    {% set profileCity = '' %}
+    {% set profilePostCode = '' %}
+    {% set profileStateId = '' %}
+    {% set profileState = '' %}
+    {% set profileCountryId = '' %}
+    {% set profileCountry = '' %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'address_id',
+                'fieldLabel'                     : 'Profile Address ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Profile Address ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : profileAddressId
+            ]
+        )}}
+        {{adminltetags.useTag('addresses',
+            [
+                'component'                                   : component,
+                'componentName'                               : componentName,
+                'componentId'                                 : componentId,
+                'sectionId'                                   : sectionId,
+                'addressFieldType'                            : 'single',
+                'includeStreet'                               : true,
+                'searchType'                                  : 'city',
+                'streetAddress'                               : profileStreetAddress,
+                'streetAddressFieldRequired'                  : false,
+                'streetAddressFieldBazPostOnCreate'           : true,
+                'streetAddressFieldBazPostOnUpdate'           : true,
+                'streetAddress2'                              : profileStreetAddress2,
+                'streetAddress2FieldBazPostOnCreate'          : true,
+                'streetAddress2FieldBazPostOnUpdate'          : true,
+                'cityId'                                      : profileCityId,
+                'cityName'                                    : profileCity,
+                'cityFieldRequired'                           : false,
+                'cityFieldBazPostOnCreate'                    : true,
+                'cityFieldBazPostOnUpdate'                    : true,
+                'postCode'                                    : profilePostCode,
+                'postCodeFieldRequired'                       : false,
+                'postCodeFieldBazPostOnCreate'                : true,
+                'postCodeFieldBazPostOnUpdate'                : true,
+                'stateId'                                     : profileStateId,
+                'stateName'                                   : profileState,
+                'stateFieldRequired'                          : false,
+                'stateFieldBazPostOnCreate'                   : true,
+                'stateFieldBazPostOnUpdate'                   : true,
+                'countryId'                                   : profileCountryId,
+                'countryName'                                 : profileCountry,
+                'countryFieldRequired'                        : false,
+                'countryFieldBazPostOnCreate'                 : true,
+                'countryFieldBazPostOnUpdate'                 : true
+            ]
+        )}}
+    </div>
+</div>

@@ -1,0 +1,618 @@
+<form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row vdivide">
+            <div class="col-md-3 col-sm-12">
+                <div class="row">
+                    <div class="col">
+                        {% if qrcodesSettings['showLogo'] === true %}
+                            {% set showLogoCheckbox = true %}
+                        {% else %}
+                            {% set showLogoCheckbox = false %}
+                        {% endif %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'showLogo',
+                                'fieldLabel'                     : 'Show Logo?',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Show logo on qrcode?',
+                                'fieldRequired'                  : false,
+                                'fieldType'                      : 'checkbox',
+                                'fieldCheckboxType'              : 'primary',
+                                'fieldCheckboxChecked'           : showLogoCheckbox,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : true
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'logoWidth',
+                                'fieldLabel'                            : 'Logo Size',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Size of logo (width)',
+                                'fieldRequired'                         : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 3,
+                                'fieldValue'                            : qrcodesSettings['logoWidth']
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'logo',
+                                'fieldLabel'                     : 'Logo',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Set logo to be displayed over the qrcode.',
+                                'fieldType'                      : 'files/croppie',
+                                'fieldCroppieFormat'             : 'png',
+                                'fieldValue'                     : qrcodesSettings['logo'],
+                                'imageType'                      : 'logo',
+                                'upload'                         : true,
+                                'logoLink'                       : logoLink
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {% set encodings = [] %}
+                        {% for encodingKey, encoding in qrcodesSettings['availableEncodings'] %}
+                            {% set encodings[encodingKey] =
+                                [
+                                    'id'    : encodingKey,
+                                    'name'  : encoding
+                                ]
+                            %}
+                        {% endfor %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'defaultEncoding',
+                                'fieldLabel'                     : 'Code Encoder',
+                                'fieldType'                      : 'select2',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Select Code Encoder.',
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldRequired'                  : true,
+                                'fieldDataSelect2Options'        : encodings,
+                                'fieldDataSelect2OptionsKey'     : 'id',
+                                'fieldDataSelect2OptionsValue'   : 'name',
+                                'fieldDataSelect2OptionsArray'   : true,
+                                'fieldDataSelect2OptionsSelected': qrcodesSettings['defaultEncoding']
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {% set writers = [] %}
+                        {% for writerKey, writer in qrcodesSettings['availableWriters'] %}
+                            {% set writers[writerKey] =
+                                [
+                                    'id'    : writerKey,
+                                    'name'  : writer
+                                ]
+                            %}
+                        {% endfor %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'defaultWriter',
+                                'fieldLabel'                     : 'Code Writer',
+                                'fieldType'                      : 'select2',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Select Code Writer (Output format of the QrCode).',
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldRequired'                  : true,
+                                'fieldDataSelect2Options'        : writers,
+                                'fieldDataSelect2OptionsKey'     : 'id',
+                                'fieldDataSelect2OptionsValue'   : 'name',
+                                'fieldDataSelect2OptionsArray'   : true,
+                                'fieldDataSelect2OptionsSelected': qrcodesSettings['defaultWriter']
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {% set ecls = [] %}
+                        {% for eclKey, ecl in qrcodesSettings['availableECLs'] %}
+                            {% set ecls[eclKey] =
+                                [
+                                    'id'    : eclKey,
+                                    'name'  : ecl
+                                ]
+                            %}
+                        {% endfor %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'defaultECL',
+                                'fieldLabel'                     : 'Error Correction Level',
+                                'fieldType'                      : 'select2',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Select Error Correction Level.',
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldRequired'                  : true,
+                                'fieldDataSelect2Options'        : ecls,
+                                'fieldDataSelect2OptionsKey'     : 'id',
+                                'fieldDataSelect2OptionsValue'   : 'name',
+                                'fieldDataSelect2OptionsArray'   : true,
+                                'fieldDataSelect2OptionsSelected': qrcodesSettings['defaultECL']
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'defaultSize',
+                                'fieldLabel'                            : 'Code Size',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Size of qrcode',
+                                'fieldRequired'                         : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 3,
+                                'fieldValue'                            : qrcodesSettings['defaultSize']
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'defaultMargin',
+                                'fieldLabel'                            : 'Code Margin',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Margin pixels to leave on each sides of the qrcode.',
+                                'fieldRequired'                         : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 3,
+                                'fieldValue'                            : qrcodesSettings['defaultMargin']
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'codeForegroundColor',
+                                'fieldLabel'                            : 'Code Color',
+                                'fieldType'                             : 'colorpicker',
+                                'fieldColorpickerPreAddonColorSquare'   : true,
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Color of the qrcode',
+                                'fieldRequired'                         : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 10,
+                                'fieldValue'                            : qrcodesSettings['codeForegroundColor']
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'codeBackgroundColor',
+                                'fieldLabel'                            : 'Code Background Color',
+                                'fieldType'                             : 'colorpicker',
+                                'fieldColorpickerPreAddonColorSquare'   : true,
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Background color of the qrcode',
+                                'fieldRequired'                         : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 10,
+                                'fieldValue'                            : qrcodesSettings['codeBackgroundColor']
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col">
+                        {% if qrcodesSettings['showLabel'] === true %}
+                            {% set showLabelCheckbox = true %}
+                        {% else %}
+                            {% set showLabelCheckbox = false %}
+                        {% endif %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'showLabel',
+                                'fieldLabel'                     : 'Show Label?',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Show Label under the code?',
+                                'fieldRequired'                  : false,
+                                'fieldType'                      : 'checkbox',
+                                'fieldCheckboxType'              : 'primary',
+                                'fieldCheckboxChecked'           : showLabelCheckbox,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : true
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {% set alignments = [] %}
+                        {% for alignmentKey, alignment in qrcodesSettings['labelAlignments'] %}
+                            {% set alignments[alignmentKey] =
+                                [
+                                    'id'    : alignmentKey,
+                                    'name'  : alignment
+                                ]
+                            %}
+                        {% endfor %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'defaultLabelAlignment',
+                                'fieldLabel'                     : 'Label Alignment',
+                                'fieldType'                      : 'select2',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Select label alignment.',
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldRequired'                  : true,
+                                'fieldDataSelect2Options'        : alignments,
+                                'fieldDataSelect2OptionsKey'     : 'id',
+                                'fieldDataSelect2OptionsValue'   : 'name',
+                                'fieldDataSelect2OptionsArray'   : true,
+                                'fieldDataSelect2OptionsSelected': qrcodesSettings['defaultLabelAlignment']
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'labelFontSize',
+                                'fieldLabel'                            : 'Label Font Size',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Size of qrcode label',
+                                'fieldRequired'                         : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 2,
+                                'fieldValue'                            : qrcodesSettings['labelFontSize']
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'labelColor',
+                                'fieldLabel'                            : 'Label Color',
+                                'fieldType'                             : 'colorpicker',
+                                'fieldColorpickerPreAddonColorSquare'   : true,
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Color of the qrcode',
+                                'fieldRequired'                         : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 10,
+                                'fieldValue'                            : qrcodesSettings['labelColor']
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'labelText',
+                                'fieldLabel'                            : 'Label Text',
+                                'fieldType'                             : 'input',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Qrcode label text',
+                                'fieldRequired'                         : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 50,
+                                'fieldValue'                            : qrcodesSettings['labelText']
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row vdivide">
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'test-qrcode-text',
+                                'fieldLabel'                            : 'Test qrcode text',
+                                'fieldType'                             : 'input',
+                                'fieldGroupPostAddonButtonId'           : 'testbutton',
+                                'fieldGroupPostAddonButtonValue'        : 'Test',
+                                'fieldGroupPostAddonButtonTooltipTitle' : 'Test Qrcode',
+                                'fieldGroupPostAddonButtonIcon'         : 'cog fa-spin',
+                                'fieldGroupPostAddonButtonIconHidden'   : true,
+                                'fieldGroupPostAddonButtonDisabled'     : true,
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Test Qrcode Settings with this text',
+                                'fieldBazScan'                          : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 1024
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'test-qrcode-image',
+                                'fieldLabel'                     : 'Qrcode',
+                                'fieldHelp'                      : true,
+                                'fieldAdditionalClass'           : 'mb-1',
+                                'fieldHelpTooltipContent'        : 'Generated Qrcode Image',
+                                'fieldRequired'                  : false,
+                                'fieldType'                      : 'html',
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : false,
+                                'fieldBazScan'                   : true
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <div id="qrcode-image"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-showLogo'                                : { },
+        '{{componentId}}-{{sectionId}}-logoWidth'                               : { },
+        '{{componentId}}-{{sectionId}}-defaultEncoding'                         : {
+            'placeholder'   : 'SELECT ENCODING',
+        },
+        '{{componentId}}-{{sectionId}}-defaultWriter'                           : {
+            'placeholder'   : 'SELECT WRITER',
+        },
+        '{{componentId}}-{{sectionId}}-defaultECL'                              : {
+            'placeholder'   : 'SELECT WRITER',
+        },
+        '{{componentId}}-{{sectionId}}-validateResult'                          : { },
+        '{{componentId}}-{{sectionId}}-defaultSize'                             : { },
+        '{{componentId}}-{{sectionId}}-defaultMargin'                           : { },
+        '{{componentId}}-{{sectionId}}-codeForegroundColor'                     : {
+            'format'    : 'rgb',
+            'useAlpha'  : false
+        },
+        '{{componentId}}-{{sectionId}}-codeBackgroundColor'                     : {
+            'format'    : 'rgb',
+            'useAlpha'  : false
+        },
+        '{{componentId}}-{{sectionId}}-showLabel'                               : { },
+        '{{componentId}}-{{sectionId}}-defaultLabelAlignment'                   : {
+            placeholder : 'SELECT LABEL ALIGNMENT'
+        },
+        '{{componentId}}-{{sectionId}}-labelFontSize'                           : { },
+        '{{componentId}}-{{sectionId}}-labelText'                               : { },
+        '{{componentId}}-{{sectionId}}-labelColor'                              : {
+            'format'    : 'rgb',
+            'useAlpha'  : false
+        },
+        '{{componentId}}-{{sectionId}}-test-qrcode-text'                        : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-test-qrcode-text').keyup(function() {
+                    if ($(this).val() !== '') {
+                        $('#{{componentId}}-{{sectionId}}-test-qrcode-text-testbutton').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-test-qrcode-text-testbutton').attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-test-qrcode-text-testbutton').click(function(e) {
+                    e.preventDefault();
+
+                    $('#qrcode-image').empty();
+
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+
+                    var postData = { };
+                    postData['qrcode'] = $('#{{componentId}}-{{sectionId}}-test-qrcode-text').val();
+                    postData['showLogo'] = $('#{{componentId}}-{{sectionId}}-showLogo')[0].checked;
+                    postData['logoWidth'] = $('#{{componentId}}-{{sectionId}}-logoWidth').val();
+                    postData['logo'] = $('#{{componentId}}-{{sectionId}}-logo').val();
+                    postData['defaultEncoding'] = $('#{{componentId}}-{{sectionId}}-defaultEncoding').select2('data')[0].id;
+                    postData['defaultWriter'] = $('#{{componentId}}-{{sectionId}}-defaultWriter').select2('data')[0].id;
+                    postData['defaultECL'] = $('#{{componentId}}-{{sectionId}}-defaultECL').select2('data')[0].id;
+                    postData['defaultSize'] = $('#{{componentId}}-{{sectionId}}-defaultSize').val();
+                    postData['defaultMargin'] = $('#{{componentId}}-{{sectionId}}-defaultMargin').val();
+                    postData['codeForegroundColor'] = $('#{{componentId}}-{{sectionId}}-codeForegroundColor').val();
+                    postData['codeBackgroundColor'] = $('#{{componentId}}-{{sectionId}}-codeBackgroundColor').val();
+                    postData['showLabel'] = $('#{{componentId}}-{{sectionId}}-showLabel')[0].checked;
+                    postData['defaultLabelAlignment'] = $('#{{componentId}}-{{sectionId}}-defaultLabelAlignment').select2('data')[0].id;
+                    postData['labelFontSize'] = $('#{{componentId}}-{{sectionId}}-labelFontSize').val();
+                    postData['labelText'] = $('#{{componentId}}-{{sectionId}}-labelText').val();
+                    postData['labelColor'] = $('#{{componentId}}-{{sectionId}}-labelColor').val();
+
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    var url = '{{links.url("system/tools/qrcodes/testqrcode")}}';
+
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode === 0) {
+                            $('#qrcode-image').append(
+                                '<img src="' + response.qrcode + '" />'
+                            );
+                        } else {
+                            PNotify.error({
+                                'title' : response.responseMessage
+                            });
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+                        $('#{{componentId}}-{{sectionId}}-test-qrcode-text-testbutton').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-test-qrcode-text-testbutton').children('i').attr('hidden', true);
+
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-test-qrcode-image'                      : { },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-height'                            : 'required',
+                '{{componentId}}-{{sectionId}}-foreground'                        : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-height'                            : 'Please enter qrcode height',
+                '{{componentId}}-{{sectionId}}-foreground'                        : 'Please enter qrcode color'
+            }
+        }
+    });
+</script>

@@ -1,0 +1,55 @@
+{{adminltetags.useTag('content',
+    [
+        'component'                 : table['component'],
+        'componentName'             : componentName,
+        'componentId'               : componentId,
+        'parentComponentId'         : parent,
+        'sectionId'                 : 'listing',
+        'contentType'               : 'sectionWithListing',
+        'cardHeader'                : true,
+        'cardType'                  : 'primary',
+        'cardIcon'                  : 'handshake',
+        'cardTitle'                 : componentName,
+        'cardAdditionalClass'       : 'rounded-0',
+        'cardShowTools'             : ['maximize'],
+        'dtFilter'                  : true,
+        'dtFilterShowQuickFilter'   : true,
+        'dtFilters'                 : table['filters'],
+        'dtFilterColumns'           : table['filterColumns'],
+        'dtFixedHeader'             : false,
+        'dtPrimaryButtons'          :
+            {
+                'componentId'                       : componentId,
+                'sectionId'                         : 'listing',
+                'buttonType'                        : 'DropdownSplitButtons',
+                'dropdownSplitButtonsSplit'         : true,
+                'splitMainButtonId'                 : 'add-vendor',
+                'splitMainButtonTitle'              : 'Add Vendor',
+                'splitMainButtonAdditionalClass'    : 'contentAjaxLink',
+                'splitMainButtonUrl'                : links.url('business/directory/vendors/q/id/0'),
+                'splitMainButtonIcon'               : 'plus',
+                'buttonPosition'                    : 'right',
+                'dropdownAlign'                     : 'right',
+                'buttons'                           :
+                    {
+                        'via-token' : {
+                            'title'                   : 'Add Via Token',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : links.url('business/directory/vendors/q/type/viatoken/id/0')
+                        }
+                    }
+            },
+        'dtTable'                   : table,
+        'dtColumns'                 : table['columns'],
+        'dtPostUrl'                 : table['postUrl'],
+        'dtPostUrlParams'           : table['postUrlParams'],
+        'dtStriped'                 : true,
+        'dtStateSave'               : false,
+        'dtBordered'                : false,
+        'dtHideIdColumn'            : true,
+        'dtNoOfColumnsToShow'       : 6,
+        'dtTableCompact'            : true,
+        'dtZeroRecords'             : 'No vendors data available. Add vendor by clicking the Add new vendor button.'
+    ]
+)}}

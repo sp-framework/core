@@ -1,0 +1,46 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                   : component,
+                'componentName'                               : componentName,
+                'componentId'                                 : componentId,
+                'sectionId'                                   : sectionId,
+                'fieldId'                                     : 'subscriptions',
+                'fieldLabel'                                  : 'Subscriptions',
+                'fieldType'                                   : 'jstree',
+                'fieldHelp'                                   : true,
+                'fieldHelpTooltipContent'                     : 'Notification subscriptions',
+                'fieldRequired'                               : false,
+                'fieldBazScan'                                : true,
+                'fieldBazJstreeSearch'                        : true,
+                'fieldBazPostOnCreate'                        : true,
+                'fieldBazPostOnUpdate'                        : true,
+                'fieldJstreeAdd'                              : false,
+                'fieldJstreeEdit'                             : false,
+                'fieldJstreeExpand'                           : true,
+                'fieldJstreeCollapse'                         : true,
+                'fieldJstreeFirstOpen'                        : true,
+                'fieldJstreeAllOpen'                          : true,
+                'fieldJstreeToggleAllChildren'                : false,
+                'fieldJstreeIncludeRootInPath'                : false,
+                'fieldJstreeRootIcon'                         : 'lock',
+                'fieldJstreeSelectEndNodeOnly'                : false,
+                'fieldJstreeShowDots'                         : true,
+                'fieldJstreeDoubleClickToggle'                : true,
+                'fieldJstreeMultiple'                         : false,
+                'fieldJstreeSearchCaseSensitive'              : false,
+                'fieldJstreeSearchShowOnlyMatches'            : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'    : false,
+                'fieldJstreeHideJstreeIcons'                  : false,
+                'fieldJstreeDataSrcArr'                       :
+                    [
+                        'packages'   :
+                            [
+                                'srcArr'                : packages
+                            ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>

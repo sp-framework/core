@@ -2,20 +2,18 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
+use Phalcon\Helper\Arr;
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\ModulesServiceProvider\Modules\Model\Views as ViewsModel;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesViews;
 
 class Views extends BasePackage
 {
-    protected $modelToUse = ViewsModel::class;
+    protected $modelToUse = ModulesViews::class;
 
     public $views;
 
     protected $view;
-
-    protected $applications;
-
-    protected $applicationInfo;
 
     protected $voltCompiledPath;
 
@@ -25,147 +23,17 @@ class Views extends BasePackage
 
     protected $phalconViewLayoutFile;
 
+    protected $viewSettings;
+
     protected $cache;
 
-    // public function getAll($params = [], bool $resetCache = false)
-    // {
-    //     if ($this->cacheKey) {
-    //         $parameters = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
-    //     }
+    protected $tags;
 
-    //     if (!$this->views || $resetCache) {
-
-    //         $this->model = ViewsModel::find($parameters);
-
-    //         $this->views = $this->model->toArray();
-    //     }
-
-    //     return $this;
-    // }
-
-    // public function get(int $id, bool $resetCache = false)
-    // {
-    //     $parameters = $this->paramsWithCache($this->getIdParams($id));
-
-    //     $this->model = ViewsModel::find($parameters);
-
-    //     if ($this->model->count() === 1) {
-    //         $this->packagesData->responseCode = 0;
-    //         $this->packagesData->responseMessage = 'Found';
-
-    //         array_push($this->cacheKeys, $parameters['cache']['key']);
-
-    //         return $this->model->toArray()[0];
-
-    //     } else if ($this->model->count() > 1) {
-    //         $this->packagesData->responseCode = 1;
-    //         $this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
-
-    //     } else if ($this->model->count() === 0) {
-    //         $this->packagesData->responseCode = 1;
-    //         $this->packagesData->responseMessage = 'No Record Found with that ID!';
-    //     }
-
-    //     $this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
-
-    //     return false;
-    // }
-
-    // public function add(array $data)
-    // {
-    //     try {
-    //         $txManager = new Manager();
-    //         $transaction = $txManager->get();
-
-    //         $view = new ViewsModel();
-
-    //         $view->setTransaction($transaction);
-
-    //         $view->assign($data);
-
-    //         $create = $view->create();
-
-    //         if (!$create) {
-    //             $transaction->rollback('Could not add view.');
-    //         }
-
-    //         if ($transaction->commit()) {
-    //             $this->resetCache();
-
-    //             $this->packagesData->responseCode = 0;
-
-    //             $this->packagesData->responseMessage = 'Added view!';
-
-    //             return true;
-    //         }
-    //     } catch (\Exception $e) {
-    //         throw $e;
-    //     }
-    // }
-
-    // public function update(array $data)
-    // {
-    //     try {
-    //         $txManager = new Manager();
-    //         $transaction = $txManager->get();
-
-    //         $view = new ViewsModel();
-
-    //         $view->setTransaction($transaction);
-
-    //         $view->assign($data);
-
-    //         if (!$view->update()) {
-    //             $transaction->rollback('Could not update view.');
-    //         }
-
-    //         if ($transaction->commit()) {
-    //             //Delete Old cache if exists and generate new cache
-    //             $this->updateCache($data['id']);
-
-    //             $this->packagesData->responseCode = 0;
-
-    //             $this->packagesData->responseMessage = 'View Updated!';
-
-    //             return true;
-    //         }
-    //     } catch (\Exception $e) {
-    //         throw $e;
-    //     }
-    // }
-
-    // public function remove(int $id)
-    // {
-    //     //Need to solve dependencies for removal
-    //     // $this->get($id);
-
-    //     // if ($this->model->count() === 1) {
-    //     //  if ($this->model->delete()) {
-
-    //     //      $this->resetCache($id);
-
-    //     //      $this->packagesData->responseCode = 0;
-    //     //      $this->packagesData->responseMessage = 'View Deleted!';
-    //     //      return true;
-    //     //  } else {
-    //     //      $this->packagesData->responseCode = 1;
-    //     //      $this->packagesData->responseMessage = 'Could not delete application.';
-    //     //  }
-    //     // } else if ($this->model->count() > 1) {
-    //     //  $this->packagesData->responseCode = 1;
-    //     //  $this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
-    //     // } else if ($this->model->count() === 0) {
-    //     //  $this->packagesData->responseCode = 1;
-    //     //  $this->packagesData->responseMessage = 'No Record Found with that ID!';
-    //     // }
-    // }
     public function init(bool $resetCache = false)
     {
         $this->getAll($resetCache);
 
-        $this->applications = $this->modules->applications;
-
-        $this->setApplicationInfo();
+        $this->setApp();
 
         $this->setVoltCompiledPath();
 
@@ -178,17 +46,23 @@ class Views extends BasePackage
         return $this;
     }
 
-    protected function setVoltCompiledPath()
+    public function setVoltCompiledPath($path = null)
     {
+        if ($path) {
+            $this->voltCompiledPath = $path;
+            return;
+        }
+
         if (!isset($this->voltCompiledPath)) {
-            if ($this->applicationInfo && $this->view) {
+            if ($this->app && $this->view) {
                 $this->voltCompiledPath =
-                    base_path('applications/' . $this->applicationInfo['name'] .
-                              '/Views/' . $this->view['name'] .
-                              '/html_compiled/');
+                    base_path('apps/' .
+                              ucfirst($this->app['app_type']) .
+                              '/Views/Html_compiled/' . ucfirst($this->app['route']) . '/' . $this->view['name'] . '/'
+                          );
             } else {
                 $this->voltCompiledPath =
-                    base_path('applications/Admin/Views/Default/html_compiled/');
+                    base_path('system/Base/Providers/ErrorServiceProvider/View/Html_compiled/');
             }
 
             if (!is_dir($this->voltCompiledPath)) {
@@ -201,45 +75,59 @@ class Views extends BasePackage
         }
     }
 
-    protected function setPhalconViewPath()
+    public function setPhalconViewPath($path = null)
     {
+        if ($path) {
+            $this->phalconViewPath = $path;
+            return;
+        }
+
         if (!isset($this->phalconViewPath)) {
-            if ($this->applicationInfo && $this->view) {
+            if ($this->app && $this->view) {
                 $this->phalconViewPath =
-                    base_path('applications/' . $this->applicationInfo['name'] .
+                    base_path('apps/' .
+                              ucfirst($this->app['app_type']) .
                               '/Views/' . $this->view['name'] .
                               '/html/');
             } else {
                 $this->phalconViewPath =
-                    base_path('applications/Admin/Views/Default/html/');
+                    base_path('system/Base/Providers/ErrorServiceProvider/View/');
             }
         }
     }
 
-    protected function setPhalconViewLayoutPath()
+    public function setPhalconViewLayoutPath($path = null)
     {
+        if ($path) {
+            $this->phalconViewLayoutPath = $path;
+            return;
+        }
+
         if (!isset($this->phalconViewLayoutPath)) {
-            if ($this->applicationInfo && $this->view) {
+            if ($this->app && $this->view) {
                 $this->phalconViewLayoutPath =
-                    base_path('applications/' . $this->applicationInfo['name'] .
+                    base_path('apps/' .
+                              ucfirst($this->app['app_type']) .
                               '/Views/' . $this->view['name'] .
                               '/html/layouts/');
             } else {
                 $this->phalconViewLayoutPath =
-                    base_path('applications/Admin/Views/Default/html/layouts/');
+                    base_path('system/Base/Providers/ErrorServiceProvider/View/layouts/');
             }
         }
     }
 
-    protected function setPhalconViewLayoutFile()
+    public function setPhalconViewLayoutFile()
     {
         if (!isset($this->phalconViewLayoutFile)) {
             if ($this->view) {
                 $this->phalconViewLayoutFile =
-                    json_decode($this->view['settings'], true)['layout'];
+                    $this->viewSettings['layout'];
             } else {
                 $this->phalconViewLayoutFile = 'default';
             }
+        } else {
+            $this->phalconViewLayoutFile = 'default';
         }
     }
 
@@ -273,73 +161,188 @@ class Views extends BasePackage
         return $this->view;
     }
 
-    protected function setApplicationInfo()
+    public function getViewTags()
     {
-        if (!$this->applicationInfo) {
-            $this->applicationInfo = $this->applications->getApplicationInfo();
+        return $this->tags;
+    }
 
-            if ($this->applicationInfo) {
+    protected function setApp()
+    {
+        if (!$this->app) {
+            $this->app = $this->apps->getAppInfo();
 
-                $applicationDefaults = $this->applications->getApplicationDefaults($this->applicationInfo['name']);
+            $this->domain = $this->domains->getDomain();
+
+            if ($this->app &&
+                isset($this->domain['apps'][$this->app['id']]['view'])
+            ) {
+                $viewsName = $this->getIdViews($this->domain['apps'][$this->app['id']]['view'])['name'];
             } else {
-                $applicationDefaults = null;
+                $viewsName =  'Default';
             }
-            if ($this->applicationInfo && $applicationDefaults) {
 
-                $applicationName = $applicationDefaults['application'];
-
-                $viewsName = $applicationDefaults['view'];
-
-                if (!$this->view) {
-                    $this->view = $this->getApplicationView($this->applicationInfo['id'], $viewsName);
+            if (!$this->view) {
+                //Make sure view has proper app ID.
+                if ($this->app) {
+                    $this->view = $this->getAppView($this->app['id'], $viewsName);
                 }
+            }
+            if ($this->view) {
+                $this->viewSettings = Json::decode($this->view['settings'], true);
 
-                if ($this->view) {
-                    $this->cache = json_decode($this->view['settings'], true)['cache'];
-                } else {
-                    $this->cache = false;
+                $this->cache = $this->viewSettings['cache'];
+
+                if (isset($this->viewSettings['tags']) && $this->viewSettings['tags']) {
+                    $this->tags = $this->checkTagsPackage($this->viewSettings['tags']);
                 }
+            } else {
+                $this->cache = false;
+                $this->tags = false;
             }
         }
     }
 
-    public function getApplicationView($id, $name)
+    protected function checkTagsPackage($packageName)
     {
-        $filter =
-            $this->model->filter(
-                function($view) use ($id, $name) {
-                    if ($view->application_id === $id && $view->name === ucfirst($name)) {
-                        return $view;
-                    }
-                }
+        return
+            $this->modules->packages->getNamedPackageForApp(
+                Arr::last(explode('\\', $packageName)),
+                $this->apps->getAppInfo()['id']
             );
-
-        if (count($filter) > 1) {
-            throw new \Exception('Duplicate default view for application ' . $name);
-        } else if (count($filter) === 1) {
-            return $filter[0]->toArray();
-        } else {
-            return false;
-        }
     }
 
-    public function getViewsForApplication($id)
+    public function getAppView($appId, $name)
+    {
+        foreach($this->views as $view) {
+            $view['apps'] = Json::decode($view['apps'], true);
+
+            if ((isset($view['apps'][$appId]['enabled']) &&
+                $view['apps'][$appId]['enabled'] == true) &&
+                strtolower($view['name']) == strtolower($name)
+            ) {
+                return $view;
+            }
+        }
+
+        return false;
+    }
+
+    public function getViewsForApp($appId)
+    {
+        foreach($this->views as $view) {
+            $view['apps'] = Json::decode($view['apps'], true);
+
+            if (isset($view['apps'][$appId]['enabled']) &&
+                $view['apps'][$appId]['enabled'] == 'true'
+            ) {
+                return $view;
+            }
+        }
+
+        return false;
+    }
+
+    public function getIdViews($id)
+    {
+        foreach($this->views as $view) {
+            if ($view['id'] == $id) {
+                return $view;
+            }
+        }
+
+        return false;
+    }
+
+    public function getNameViews($name)
+    {
+        foreach($this->views as $view) {
+            if ($view['name'] == $name) {
+                return $view;
+            }
+        }
+
+        return false;
+    }
+
+    public function getViewsForCategoryAndSubcategory($category, $subCategory)
     {
         $views = [];
 
-        $filter =
-            $this->model->filter(
-                function($view) use ($id) {
-                    if ($view->application_id === $id && !$view->view_id) {
-                        return $view;
-                    }
-                }
-            );
-
-        foreach ($filter as $key => $value) {
-            array_push($views, $value->toArray());
+        foreach($this->views as $view) {
+            if ($view['category'] === $category &&
+                $view['sub_category'] === $subCategory
+            ) {
+                $views[$view['id']] = $view;
+            }
         }
 
         return $views;
+    }
+
+    public function getViewsForAppType(string $type)
+    {
+        $views = [];
+
+        foreach($this->views as $view) {
+            if ($view['app_type'] === $type) {
+                $views[$view['id']] = $view;
+            }
+        }
+
+        return $views;
+    }
+
+    public function getDefaultViewForAppType(string $type)
+    {
+        foreach($this->views as $view) {
+            if ($view['app_type'] === $type &&
+                $view['name'] === 'Default'
+            ) {
+                return $view;
+            }
+        }
+
+        return false;
+    }
+
+    public function updateViews(array $data)
+    {
+        $views = Json::decode($data['views'], true);
+
+        foreach ($views as $viewId => $status) {
+            $view = $this->getById($viewId);
+
+            $view['apps'] = Json::decode($view['apps'], true);
+
+            if ($status === true) {
+                $view['apps'][$data['id']]['enabled'] = true;
+            } else if ($status === false) {
+                $view['apps'][$data['id']]['enabled'] = false;
+            }
+
+            $view['apps'] = Json::encode($view['apps']);
+
+            $view['settings'] = Json::decode($view['settings'], true);
+
+            if (isset($view['settings']['tags'])) {
+                $package = $this->modules->packages->getNamePackage($view['settings']['tags']);
+
+                if ($package) {
+                    $package['apps'] = Json::decode($package['apps'], true);
+
+                    $package['apps'][$data['id']]['enabled'] = true;
+
+                    $package['apps'] = Json::encode($package['apps']);
+
+                    $this->modules->packages->update($package);
+                }
+            }
+
+            $view['settings'] = Json::encode($view['settings']);
+
+            $this->update($view);
+        }
+
+        return true;
     }
 }

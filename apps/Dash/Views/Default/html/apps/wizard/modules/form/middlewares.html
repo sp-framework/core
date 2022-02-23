@@ -1,0 +1,164 @@
+<div class="row">
+    <div class="col" id="{{componentId}}-{{sectionId}}-middlewares-checkboxes">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'middlewares',
+                'fieldLabel'                     : 'Middlewares',
+                'fieldHelp'                      : true,
+                'fieldAdditionalClass'           : 'mb-1',
+                'fieldHelpTooltipContent'        : 'Middlewares are piece of software that are run before the main content.<br> Example: Auth Middleware. It makes sure that users are authenticated before they can access the main content.',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'html',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true
+            ]
+        )}}
+        {% if middlewares is defined and middlewares|length > 0 and components|length > 0 %}
+            {% for middleware in middlewares %}
+                {% set middlewareIds[componentId ~ '-' ~ sectionId ~ '-middleware-' ~ middleware['name']] = middleware['id'] %}
+                {% if middleware['enabled'] == 1 %}
+                    {% set middlewareChecked = true %}
+                {% elseif middleware['enabled'] == 0 %}
+                    {% set middlewareChecked = false %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'middleware-' ~ middleware['name'],
+                        'fieldLabel'                     : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'success',
+                        'fieldCheckboxLabel'             : middleware['display_name'],
+                        'fieldCheckboxChecked'           : middlewareChecked,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazScan'                   : false,
+                        'fieldDataAttributes'            :
+                        [
+                            'middleware'    : middleware['id'],
+                            'type'          : 'middleware'
+                        ]
+                    ]
+                )}}
+            {% endfor %}
+            {% set middlewareIds = json_encode(middlewareIds, 16) %}
+        {% else %}
+            <label>No middlewares available for this app type. Go to <a href="{{links.url('modules')}}" class="contentAjaxLink">modules</a> and download components that have middlewares.</label>
+            {% set middlewareIds = json_encode([]) %}
+        {% endif %}
+    </div>
+    <div class="col">
+        {% if middlewares is defined and middlewares|length > 0 and components|length > 0 %}
+            <label>Middleware Sequence (Drag and drop to change sequence)</label>
+            <ul class="list-group" id="{{componentId}}-{{sectionId}}-sortable-middlewares">
+                {% for middleware in middlewares %}
+                    {% if middleware['enabled'] == 1 %}
+                        {% set disabled = '' %}
+                        {% set area = 'false' %}
+                    {% elseif middleware['enabled'] == 0 %}
+                        {% set disabled = 'disabled' %}
+                        {% set area = 'true' %}
+                    {% endif %}
+                    <li class="list-group-item list-group-item-secondary {{disabled}}" area-disabled="{{area}}" style="cursor: pointer" data-id="{{middleware['id']}}" data-type="middleware" data-middleware="{{componentId}}-{{sectionId}}-middleware-{{middleware['name']}}">
+                        <i class="fa fa-sort fa-fw handle"></i> {{middleware['display_name']}}
+                        <small class="form-text text-muted">{{middleware['description']}}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</div>
+<script>
+/* globals Sortable */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-middlewares'                     : {
+            afterInit: function() {
+                var sortable;
+                var middlewareIds = { };
+                middlewareIds = JSON.parse('{{middlewareIds}}');
+
+                if (Object.keys(middlewareIds).length === 0) {//if not able to parse json properly during wizard
+                    $('#{{componentId}}-{{sectionId}}-middlewares-checkboxes input').each(function(index, input) {
+                        if ($(input).data('type') === 'middleware') {
+                            middlewareIds[$(input)[0].id] = $(input).data('id');
+                        }
+                    });
+
+                    if (Object.keys(middlewareIds).length > 0) {
+                        initCheckboxes();
+                    }
+                } else if (Object.keys(middlewareIds).length > 0) {
+                    initCheckboxes();
+                }
+
+                function initCheckboxes() {
+                    var el = document.getElementById("{{componentId}}-{{sectionId}}-sortable-middlewares");
+                    sortable = Sortable.create(el, {
+                        onEnd: function() {
+                            window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['middlewares']['sequence'] = sortable.toArray();
+                        }
+                    });
+
+                    window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['middlewares'] = { };
+                    window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['middlewares']['middlewares'] = { };
+
+                    for (var middlewareCheckbox in middlewareIds) {
+                        $('#' + middlewareCheckbox).click(function() {
+                            var id = $(this)[0].id;
+                            extractMiddlewareCheckboxData(id, middlewareIds[middlewareCheckbox], true);
+                        });
+                        extractMiddlewareCheckboxData(middlewareCheckbox, middlewareIds[middlewareCheckbox]);
+                    }
+                }
+
+                function extractMiddlewareCheckboxData(middlewareCheckbox, middleware) {
+                    window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['middlewares']['sequence'] = sortable.toArray();
+
+                    if ($('#' + middlewareCheckbox)[0].checked === true) {
+
+                        window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['middlewares']['middlewares'][$('#' + middlewareCheckbox).data('middleware')] = true;
+                        $('#{{componentId}}-{{sectionId}}-sortable-middlewares').
+                            find('[data-middleware="' + middlewareCheckbox + '"]').removeClass('disabled').attr('area-disabled', 'false');
+                    } else {
+                        window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['middlewares']['middlewares'][$('#' + middlewareCheckbox).data('middleware')] = false;
+                        $('#{{componentId}}-{{sectionId}}-sortable-middlewares').
+                            find('[data-middleware="' + middlewareCheckbox + '"]').addClass('disabled').attr('area-disabled', 'true');
+                    }
+                }
+            }
+        }
+    });
+</script>
