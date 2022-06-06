@@ -275,7 +275,7 @@ class Local extends BasePackage
         $createdBy = 0;
         $updatedBy = 0;
 
-        if (isset($this->auth)) {
+        if (isset($this->auth) && $this->auth->account()) {
             $createdBy = $this->auth->account()['id'];
             $updatedBy = $this->auth->account()['id'];
         }
