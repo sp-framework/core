@@ -1349,6 +1349,10 @@ abstract class BasePackage extends Controller
 					}
 					if ($rmdKey === 'columns') {
 						if (count($rmd) > 0) {
+							foreach ($md['columns'] as $mdc) {
+								$md['model'][$mdc] = $this->modelToUse;
+							}
+
 							$md['columns'] = array_merge($md['columns'], $rmd);
 						}
 					}

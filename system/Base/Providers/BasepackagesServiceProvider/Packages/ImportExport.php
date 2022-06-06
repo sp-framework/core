@@ -438,6 +438,16 @@ class ImportExport extends BasePackage
                     if ($packageObj) {
                         $modelToUse = $packageObj->getModelToUse();
 
+                        foreach ($fields['columnUnique'] as $columnUniqueKey => $columnUniqueValue) {
+                            if (isset($fields['model'][$columnUniqueKey]) &&
+                                $fields['model'][$columnUniqueKey] !== $modelToUse
+                            ) {
+                                unset($fields['columnUnique'][$columnUniqueKey]);
+                            } else if (!isset($fields['model'][$columnUniqueKey])) {
+                                unset($fields['columnUnique'][$columnUniqueKey]);
+                            }
+                        }
+
                         $uniqueColumnsDataArr = $this->getByParams(['columns'=>$fields['columnUnique'], 'conditions'=>''], true, false, $modelToUse);
 
                         foreach ($uniqueColumnsDataArr as $columnsData) {
