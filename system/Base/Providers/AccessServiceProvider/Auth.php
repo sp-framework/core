@@ -8,6 +8,7 @@ use ParagonIE\ConstantTime\Base32;
 use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Confirmation;
 use Phalcon\Validation\Validator\PresenceOf;
+use System\Base\Providers\AccessServiceProvider\BlackWhiteList;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
@@ -38,6 +39,8 @@ class Auth
 
     protected $account = null;
 
+    protected $apps;
+
     protected $app;
 
     protected $secTools;
@@ -59,6 +62,10 @@ class Auth
     protected $domains;
 
     public $packagesData;
+
+    public $agent;
+
+    public $blackWhiteList;
 
     protected $cookieTimeout = 0;
 
@@ -89,6 +96,8 @@ class Auth
         $this->sessionTools = $sessionTools;
 
         $this->cookies = $cookies;
+
+        $this->apps = $apps;
 
         $this->app = $apps->getAppInfo();
 
@@ -241,6 +250,8 @@ class Auth
         }
 
         if (!$this->checkAccount($data)) {
+            $this->apps->ipBlackList->bumpIpBlacklistCounter();
+
             return false;
         }
 

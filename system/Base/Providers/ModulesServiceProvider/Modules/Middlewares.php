@@ -24,9 +24,13 @@ class Middlewares extends BasePackage
 		foreach($this->middlewares as $middleware) {
 			$middleware['apps'] = Json::decode($middleware['apps'], true);
 
-			if ($middleware['apps'][$appId]['enabled'] === true &&
+			if (isset($middleware['apps'][$appId]) &&
+				$middleware['apps'][$appId]['enabled'] === true &&
 				strtolower($middleware['name']) === strtolower($name)
 			) {
+				$middleware['sequence'] = $middleware['apps'][$appId]['sequence'];
+				$middleware['enabled'] = $middleware['apps'][$appId]['enabled'];
+
 				return $middleware;
 			}
 		}
@@ -34,16 +38,22 @@ class Middlewares extends BasePackage
 		return false;
 	}
 
-	public function getMiddlewaresForApp($appId)
+	public function getMiddlewaresForApp($appId, $excludeBlackWhite = false)
 	{
 		$middlewares = [];
 
 		foreach($this->middlewares as $middleware) {
 			$middleware['apps'] = Json::decode($middleware['apps'], true);
 
-			if (isset($middleware['apps'][$appId]['enabled']) &&
+			if (isset($middleware['apps'][$appId]) &&
 				$middleware['apps'][$appId]['enabled'] == true
 			) {
+				if ($excludeBlackWhite &&
+					strtolower($middleware['name']) === 'blackwhitelist'
+				) {
+					continue;
+				}
+
 				$middlewares[$middleware['id']] = $middleware;
 				$middlewares[$middleware['id']]['sequence'] = $middleware['apps'][$appId]['sequence'];
 				$middlewares[$middleware['id']]['enabled'] = $middleware['apps'][$appId]['enabled'];

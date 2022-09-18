@@ -92,15 +92,22 @@ class Apps
 				new Column(
 					'can_login_role_ids',
 					[
-						'type'    => Column::TYPE_VARCHAR,
+						'type'    => Column::TYPE_JSON,
 						'size'    => 4096,
 						'notNull' => false,
 					]
 				),
 				new Column(
-					'settings',
+					'ip_black_list',
 					[
-						'type'    => Column::TYPE_TEXT,
+						'type'    => Column::TYPE_JSON,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'incorrect_login_attempt_blacklist',
+					[
+						'type'    => Column::TYPE_TINYINTEGER,
 						'notNull' => false,
 					]
 				)

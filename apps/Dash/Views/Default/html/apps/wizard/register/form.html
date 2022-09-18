@@ -18,6 +18,8 @@
     {% set appRegistrationRoleId = app['registration_role_id'] %}
     {% set appGuestRoleId = app['guest_role_id'] %}
     {% set appCanLoginRoleIds = app['can_login_role_ids'] %}
+    {% set appIpBlackList = app['ip_black_list'] %}
+    {% set appIncorrectLoginAttemptBlacklist = app['incorrect_login_attempt_blacklist'] %}
     {% set wizard = false %}
 {% else %}
     {% set appId = '' %}
@@ -33,6 +35,8 @@
     {% set appRegistrationRoleId = '' %}
     {% set appGuestRoleId = '' %}
     {% set appCanLoginRoleIds = [] %}
+    {% set appIpBlackList = [] %}
+    {% set appIncorrectLoginAttemptBlacklist = '' %}
     {% set wizard = true %}
 {% endif %}
 {% if wizard === true %}
@@ -164,110 +168,6 @@
                 )}}
             </div>
         </div>
-        <hr>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'registration_allowed',
-                        'fieldLabel'                     : 'Allow Registration?',
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'success',
-                        'fieldCheckboxChecked'           : registrationAllowed,
-                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                        'fieldBazScan'                   : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'registration_role_id',
-                        'fieldLabel'                     : 'Registration Role',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select default role applied to a user after registration. Example: Customers Role.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : true,
-                        'fieldDisabled'                  : registrationRoleDisabled,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldDataSelect2Options'        : roles,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': appRegistrationRoleId
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'guest_role_id',
-                        'fieldLabel'                     : 'Guest Role',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select default role applied to a guest users. Example: Guests Role.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : true,
-                        'fieldDisabled'                  : guestRoleDisabled,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldDataSelect2Options'        : roles,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': appGuestRoleId
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'can_login_role_ids',
-                        'fieldLabel'                     : 'Allow Roles to login',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select roles that can login into this app. Example: Customer Role, Sales Role.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : false,
-                        'fieldDisabled'                  : false,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldDataSelect2Multiple'       : true,
-                        'fieldDataSelect2Options'        : roles,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': appCanLoginRoleIds
-                    ]
-                )}}
-            </div>
-        </div>
 {% if wizard === true %}
     </fieldset>
 </form>
@@ -299,14 +199,14 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-id'                              : { },
-        '{{componentId}}-{{sectionId}}-name'                            : { },
-        '{{componentId}}-{{sectionId}}-app_type'                        : {
+        '{{componentId}}-{{sectionId}}-id'                                  : { },
+        '{{componentId}}-{{sectionId}}-name'                                : { },
+        '{{componentId}}-{{sectionId}}-app_type'                            : {
             'placeholder'   : 'SELECT APP TYPE'
         },
-        '{{componentId}}-{{sectionId}}-route'                           : { },
-        '{{componentId}}-{{sectionId}}-description'                     : { },
-        '{{componentId}}-{{sectionId}}-registration_allowed'            : {
+        '{{componentId}}-{{sectionId}}-route'                               : { },
+        '{{componentId}}-{{sectionId}}-description'                         : { },
+        '{{componentId}}-{{sectionId}}-registration_allowed'                : {
             afterInit: function() {
 
                 $('#{{componentId}}-{{sectionId}}-registration_allowed').click(function() {
@@ -322,29 +222,31 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-registration_role_id'            : {
+        '{{componentId}}-{{sectionId}}-registration_role_id'                : {
             'placeholder'   : 'SELECT REGISTRATION ROLE',
         },
-        '{{componentId}}-{{sectionId}}-guest_role_id'                   : {
+        '{{componentId}}-{{sectionId}}-guest_role_id'                       : {
             'placeholder'   : 'SELECT GUEST ROLE',
         },
-        '{{componentId}}-{{sectionId}}-can_login_role_ids'              : {
+        '{{componentId}}-{{sectionId}}-can_login_role_ids'                  : {
             'placeholder'   : 'SELECT ROLES'
         },
-        '{{componentId}}-{{sectionId}}-form'                            : {
+        '{{componentId}}-{{sectionId}}-ip_black_list'                       : { },
+        '{{componentId}}-{{sectionId}}-incorrect_login_attempt_blacklist'   : { },
+        '{{componentId}}-{{sectionId}}-form'                                : {
             rules: {
-                '{{componentId}}-{{sectionId}}-name'                    : 'required',
-                '{{componentId}}-{{sectionId}}-route'                   : 'required',
-                '{{componentId}}-{{sectionId}}-app_type'                : 'required',
-                '{{componentId}}-{{sectionId}}-registration_role_id'    : 'required',
-                '{{componentId}}-{{sectionId}}-guest_role_id'           : 'required'
+                '{{componentId}}-{{sectionId}}-name'                        : 'required',
+                '{{componentId}}-{{sectionId}}-route'                       : 'required',
+                '{{componentId}}-{{sectionId}}-app_type'                    : 'required',
+                '{{componentId}}-{{sectionId}}-registration_role_id'        : 'required',
+                '{{componentId}}-{{sectionId}}-guest_role_id'               : 'required'
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-name'                    : 'Please enter app name',
-                '{{componentId}}-{{sectionId}}-route'                   : 'Please enter app route',
-                '{{componentId}}-{{sectionId}}-app_type'                : 'Please select app type',
-                '{{componentId}}-{{sectionId}}-registration_role_id'    : 'Please select registration role',
-                '{{componentId}}-{{sectionId}}-guest_role_id'           : 'Please select guest role'
+                '{{componentId}}-{{sectionId}}-name'                        : 'Please enter app name',
+                '{{componentId}}-{{sectionId}}-route'                       : 'Please enter app route',
+                '{{componentId}}-{{sectionId}}-app_type'                    : 'Please select app type',
+                '{{componentId}}-{{sectionId}}-registration_role_id'        : 'Please select registration role',
+                '{{componentId}}-{{sectionId}}-guest_role_id'               : 'Please select guest role'
             }
         }
     });

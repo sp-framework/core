@@ -5,6 +5,7 @@ namespace System\Base\Providers\AppsServiceProvider;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\AppsServiceProvider\Apps\Types;
+use System\Base\Providers\AppsServiceProvider\IpBlackList;
 use System\Base\Providers\AppsServiceProvider\Model\Apps as AppsModel;
 
 class Apps extends BasePackage
@@ -16,6 +17,8 @@ class Apps extends BasePackage
 	public $apps;
 
 	public $types;
+
+	public $ipBlackList;
 
 	protected $reservedRoutes;
 
@@ -30,6 +33,8 @@ class Apps extends BasePackage
 		$this->getAll($resetCache);
 
 		$this->app = $this->getAppInfo();
+
+		$this->ipBlackList = new IpBlackList;
 
 		return $this;
 	}
@@ -203,6 +208,8 @@ class Apps extends BasePackage
 			$this->modules->views->updateViews($app);
 		}
 
+		$app = $this->processBlacklist($app);
+
 		if ($this->update($app)) {
 			$this->addActivityLog($data, $app);
 
@@ -212,6 +219,38 @@ class Apps extends BasePackage
 		} else {
 			$this->addResponse('Error updating app.', 1);
 		}
+	}
+
+	public function processBlacklist($app, $newIp = null)
+	{
+		if ($app['ip_black_list'] !== '' || is_null($app['ip_black_list'])) {
+			$app['ip_black_list'] = trim($app['ip_black_list']);
+			$app['ip_black_list'] = trim($app['ip_black_list'], ',');
+
+			$app['ip_black_list'] = str_replace(' ', '', $app['ip_black_list']);
+
+			$app['ip_black_list'] = explode(',', $app['ip_black_list']);
+
+			if (count($app['ip_black_list']) > 0) {
+				$ipBlackList = new IpBlackList;
+
+				foreach ($app['ip_black_list'] as $ipBlackListKey => $ipBlackListValue) {
+					if ($ipBlackList->validateIp($ipBlackListValue) !== true) {
+						unset($app['ip_black_list'][$ipBlackListKey]);
+					}
+				}
+			}
+
+			if ($newIp) {
+				$app['ip_black_list'] = array_merge($app['ip_black_list'], [$newIp]);
+			}
+
+			$app['ip_black_list'] = Json::encode($app['ip_black_list']);
+		} elseif (isset($app['ip_black_list']) && $app['ip_black_list'] === '') {
+			$app['ip_black_list'] = Json::encode([]);
+		}
+
+		return $app;
 	}
 
 	protected function checkType($data)

@@ -1,0 +1,157 @@
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'registration_allowed',
+                        'fieldLabel'                     : 'Allow Registration?',
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'success',
+                        'fieldCheckboxChecked'           : registrationAllowed,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'registration_role_id',
+                        'fieldLabel'                     : 'Registration Role',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select default role applied to a user after registration. Example: Customers Role.',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldRequired'                  : true,
+                        'fieldDisabled'                  : registrationRoleDisabled,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldDataSelect2Options'        : roles,
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': appRegistrationRoleId
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'guest_role_id',
+                        'fieldLabel'                     : 'Guest Role',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select default role applied to a guest users. Example: Guests Role.',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldRequired'                  : true,
+                        'fieldDisabled'                  : guestRoleDisabled,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldDataSelect2Options'        : roles,
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': appGuestRoleId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'can_login_role_ids',
+                        'fieldLabel'                     : 'Allow Roles to login',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select roles that can login into this app. Example: Customer Role, Sales Role.',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldRequired'                  : false,
+                        'fieldDisabled'                  : false,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldDataSelect2Multiple'       : true,
+                        'fieldDataSelect2Options'        : roles,
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': appCanLoginRoleIds
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'ip_black_list',
+                        'fieldLabel'                     : 'IP BlackList',
+                        'fieldType'                      : 'textarea',
+                        'fieldDataMaxLength'             : 4096,
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'List of blacklisted IP addressed. Comman separated. Only works if Blacklist middleware is enabled.',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMaxLength'        : 4096,
+                        'fieldTextareaRows'              : 4,
+                        'fieldValue'                     : appIpBlackList
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'incorrect_login_attempt_blacklist',
+                        'fieldLabel'                            : 'Incorrect Login Attempt Blacklist',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Blacklist IP after # of incorrect login attempts. Only works if authentication and blacklist middlewares are enabled.',
+                        'fieldInputTypeTextFilter'              : 'positiveInt',
+                        'fieldRequired'                         : false,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataInputMaxLength'               : 2,
+                        'fieldValue'                            : appIncorrectLoginAttemptBlacklist
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>

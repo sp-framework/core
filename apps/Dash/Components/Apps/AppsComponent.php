@@ -5,6 +5,7 @@ namespace Apps\Dash\Components\Apps;
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
+use System\Base\Installer\Packages\Setup\Schema\Apps\IpBlackList;
 
 class AppsComponent extends BaseComponent
 {
@@ -88,6 +89,11 @@ class AppsComponent extends BaseComponent
                             $app['app_type'],
                             $app['id']
                         ), 'sequence');
+
+                if ($app['ip_black_list'] && $app['ip_black_list'] !== '') {
+                    $app['ip_black_list'] = Json::decode($app['ip_black_list'], true);
+                    $app['ip_black_list'] = implode(',', $app['ip_black_list']);
+                }
 
                 $this->view->app = $app;
 

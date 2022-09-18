@@ -1,0 +1,12 @@
+{
+    "name": "IpBlackList",
+    "display_name": "IP Black List",
+    "description": "This middleware is used to block IP based access to an app.",
+    "app_type": "dash",
+    "category": "system",
+    "sub_category": "tools",
+    "version": "0.0.1",
+    "repo": "https://.../dash-middleware-system-tools-blacklist",
+    "class": "Apps\\Dash\\Middlewares\\IpBlackList\\IpBlackList",
+    "settings": "[]"
+}
