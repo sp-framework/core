@@ -31,7 +31,7 @@ class Acl extends BaseMiddleware
 
     protected $found = false;
 
-    public function process()
+    public function process($data)
     {
         $rolesArr = $this->basepackages->roles->getAll()->roles;
         $roles = [];
