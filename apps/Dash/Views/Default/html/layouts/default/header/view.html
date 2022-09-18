@@ -6,58 +6,58 @@
                 <a id="push-menu" data-widget="pushmenu" class="nav-link" role="button" href="#"><i class="fas fa-bars"></i></a>
             </li>
         </ul>
-        <ul class="navbar-nav ml-auto">
-            {% if modules.components.getNamedComponentForApp('Messenger', apps.getAppInfo()['id']) %}
+        {% if auth.account() %}
+            <ul class="navbar-nav ml-auto">
+                {% if modules.components.getNamedComponentForApp('Messenger', apps.getAppInfo()['id']) %}
+                    <li class="nav-item">
+                        {% set statusIcon = 'comment' %}
+                        {% set messengerSettings = basepackages.profile.getMessengerSettings() %}
+                        {% if messengerSettings['mute'] is defined %}
+                            {% if messengerSettings['mute'] == true %}
+                                {% set statusIcon = 'comment-slash' %}
+                            {% elseif messengerSettings['mute'] == false %}
+                                {% set statusIcon = 'comment' %}
+                            {% else %}
+                                {% set statusIcon = 'comment' %}
+                            {% endif %}
+                        {% endif %}
+                        {% set statusIconTextColor = 'secondary' %}
+                        {% if messengerSettings['status'] is defined %}
+                            {% if messengerSettings['status'] == 1 %}
+                                {% set statusIconTextColor = 'success' %}
+                            {% elseif messengerSettings['status'] == 2 %}
+                                {% set statusIconTextColor = 'warning' %}
+                            {% elseif messengerSettings['status'] == 3 %}
+                                {% set statusIconTextColor = 'danger' %}
+                            {% elseif messengerSettings['status'] == 4 %}
+                                {% set statusIconTextColor = 'secondary' %}
+                            {% endif %}
+                        {% endif %}
+                        <a id="messenger-button" class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+                            <i id="messenger-button-icon" class="fa fa-fw fa-{{statusIcon}} text-{{statusIconTextColor}}" data-iconcolor="{{statusIconTextColor}}"></i>
+                            <span id="messenger-button-counter" class="badge badge-info navbar-badge"></span>
+                            <i id="messenger-offline-icon" class="fa fa-fw fa-circle text-danger" style="font-size: 8px;position: absolute;top: 8px;left: 25px;"></i>
+                        </a>
+                    </li>
+                {% endif %}
                 <li class="nav-item">
-                    {% set statusIcon = 'comment' %}
-                    {% set messengerSettings = basepackages.profile.getMessengerSettings() %}
-                    {% if messengerSettings['mute'] is defined %}
-                        {% if messengerSettings['mute'] == true %}
-                            {% set statusIcon = 'comment-slash' %}
-                        {% elseif messengerSettings['mute'] == false %}
-                            {% set statusIcon = 'comment' %}
+                    {% if auth.account()['profile']['settings']['notifications']['mute'] is defined %}
+                        {% if auth.account()['profile']['settings']['notifications']['mute'] == true %}
+                            {% set notificationIcon = 'bell-slash' %}
+                        {% elseif auth.account()['profile']['settings']['notifications']['mute'] == false %}
+                            {% set notificationIcon = 'bell' %}
                         {% else %}
-                            {% set statusIcon = 'comment' %}
+                            {% set notificationIcon = 'bell' %}
                         {% endif %}
-                    {% endif %}
-                    {% set statusIconTextColor = 'secondary' %}
-                    {% if messengerSettings['status'] is defined %}
-                        {% if messengerSettings['status'] == 1 %}
-                            {% set statusIconTextColor = 'success' %}
-                        {% elseif messengerSettings['status'] == 2 %}
-                            {% set statusIconTextColor = 'warning' %}
-                        {% elseif messengerSettings['status'] == 3 %}
-                            {% set statusIconTextColor = 'danger' %}
-                        {% elseif messengerSettings['status'] == 4 %}
-                            {% set statusIconTextColor = 'secondary' %}
-                        {% endif %}
-                    {% endif %}
-                    <a id="messenger-button" class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-                        <i id="messenger-button-icon" class="fa fa-fw fa-{{statusIcon}} text-{{statusIconTextColor}}" data-iconcolor="{{statusIconTextColor}}"></i>
-                        <span id="messenger-button-counter" class="badge badge-info navbar-badge"></span>
-                        <i id="messenger-offline-icon" class="fa fa-fw fa-circle text-danger" style="font-size: 8px;position: absolute;top: 8px;left: 25px;"></i>
-                    </a>
-                </li>
-            {% endif %}
-            <li class="nav-item">
-                {% if auth.account()['profile']['settings']['notifications']['mute'] is defined %}
-                    {% if auth.account()['profile']['settings']['notifications']['mute'] == true %}
-                        {% set notificationIcon = 'bell-slash' %}
-                    {% elseif auth.account()['profile']['settings']['notifications']['mute'] == false %}
-                        {% set notificationIcon = 'bell' %}
                     {% else %}
                         {% set notificationIcon = 'bell' %}
                     {% endif %}
-                {% else %}
-                    {% set notificationIcon = 'bell' %}
-                {% endif %}
-                <a id="notifications-button" class="nav-link contentAjaxLink" href="{{links.url('system/notifications')}}" role="button">
-                    <i class="fa fa-fw fa-{{notificationIcon}}"></i>
-                    <span id="notifications-button-counter" class="badge badge-info navbar-badge"></span>
-                </a>
-            </li>
-            <li id="profile-dropdown" class="nav-item dropdown text-uppercase">
-                {% if auth.account() %}
+                    <a id="notifications-button" class="nav-link contentAjaxLink" href="{{links.url('system/notifications')}}" role="button">
+                        <i class="fa fa-fw fa-{{notificationIcon}}"></i>
+                        <span id="notifications-button-counter" class="badge badge-info navbar-badge"></span>
+                    </a>
+                </li>
+                <li id="profile-dropdown" class="nav-item dropdown text-uppercase">
                     {% set profile = auth.account()['profile'] %}
                     <a id="profile-portrait" class="nav-link" data-toggle="dropdown" href="#" aria-expanded="true">
                         {% if profile['portrait'] is defined and profile['portrait'] !== '' %}
@@ -79,12 +79,13 @@
                             <i class="fa fa-fw fa-sign-out-alt mr-2"></i> Logout
                         </a>
                     </div>
-                {% endif %}
-            </li>
-        </ul>
+                </li>
+            </ul>
+        {% endif %}
     </div>
 </nav>
-<script>
+{% if auth.account() %}
+    <script>
 /* globals BazCore */
 window.dataCollection.env.profile = { };
 window.dataCollection.env.profile.email = "{{auth.account()['email']}}";
@@ -110,3 +111,4 @@ $('#logout').click(function(e) {
     }, 'json');
 });
 </script>
+{% endif %}
