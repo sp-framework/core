@@ -7,7 +7,7 @@ use System\Base\BaseMiddleware;
 
 class Maintenance extends BaseMiddleware
 {
-    public function process()
+    public function process($data)
     {
         //
     }

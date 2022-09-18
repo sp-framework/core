@@ -41,10 +41,6 @@ class Acl extends BaseMiddleware
 
         $this->account = $this->auth->account();
 
-        if (!$this->account) {
-            $this->checkAuthAclMiddlewareSequence();
-        }
-
         $this->accountPermissions = Json::decode($this->account['permissions'], true);
 
         //System Admin bypasses the ACL if they don't have any permissions defined.
@@ -260,30 +256,6 @@ class Acl extends BaseMiddleware
                     }
                 }
             }
-        }
-    }
-
-    protected function checkAuthAclMiddlewareSequence()
-    {
-        $appId = $this->apps->getAppInfo()['id'];
-
-        $acl = $this->modules->middlewares->getNamedMiddlewareForApp('Acl', $appId);
-        $aclSequence = (int) $acl['apps'][$appId]['sequence'];
-
-        $auth = $this->modules->middlewares->getNamedMiddlewareForApp('Auth', $appId);
-        $authSequence = (int) $auth['apps'][$appId]['sequence'];
-
-        $agentCheck = $this->modules->middlewares->getNamedMiddlewareForApp('AgentCheck', $appId);
-        $agentCheckSequence = (int) $agentCheck['apps'][$appId]['sequence'];
-
-        if ($aclSequence < $authSequence ||
-            $aclSequence < $agentCheck
-        ) {
-            $acl['apps'][$appId]['sequence'] = 99;
-            $acl['apps'] = Json::encode($acl['apps']);
-            $this->modules->middlewares->update($acl);
-
-            throw new \Exception('ACL middleware sequence is lower then Auth/AgentCheck middleware sequence, which is wrong. You need to authenticate before we can apply ACL. I have fixed the problem by changing the ACL middleware sequence to 99.');
         }
     }
 }

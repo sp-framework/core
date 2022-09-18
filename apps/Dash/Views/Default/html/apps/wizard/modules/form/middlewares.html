@@ -73,6 +73,7 @@
                     </li>
                 {% endfor %}
             </ul>
+            <small>Note: Some middlewares sequence is set by system and will reset on submit.</small>
         {% endif %}
     </div>
 </div>
@@ -129,7 +130,8 @@ dataCollectionSection =
                     sortable = Sortable.create(el, {
                         onEnd: function() {
                             window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['middlewares']['sequence'] = sortable.toArray();
-                        }
+                        },
+                        filter: '.filtered'
                     });
 
                     window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['middlewares'] = { };
@@ -148,7 +150,6 @@ dataCollectionSection =
                     window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['middlewares']['sequence'] = sortable.toArray();
 
                     if ($('#' + middlewareCheckbox)[0].checked === true) {
-
                         window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['middlewares']['middlewares'][$('#' + middlewareCheckbox).data('middleware')] = true;
                         $('#{{componentId}}-{{sectionId}}-sortable-middlewares').
                             find('[data-middleware="' + middlewareCheckbox + '"]').removeClass('disabled').attr('area-disabled', 'false');
@@ -157,6 +158,9 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-sortable-middlewares').
                             find('[data-middleware="' + middlewareCheckbox + '"]').addClass('disabled').attr('area-disabled', 'true');
                     }
+                    
+                    $('#{{componentId}}-{{sectionId}}-sortable-middlewares').
+                        find('.filtered').addClass('disabled').attr('area-disabled', 'true');
                 }
             }
         }

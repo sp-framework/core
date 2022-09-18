@@ -148,15 +148,30 @@ class Middlewares extends BasePackage
 			$this->update($middleware);
 		}
 
+		//For middlewars that are not system based.
+		//Change this number to reflect the number of system middlewares in future.
+		$nonSystemMiddlewaresSeqStart = 5;
+
 		foreach ($middlewares['sequence'] as $sequence => $middlewareId) {
 			$middleware = $this->getById($middlewareId);
 
 			$middleware['apps'] = Json::decode($middleware['apps'], true);
 
-			if ($status === true) {
-				$middleware['apps'][$data['id']]['sequence'] = $sequence;
-			} else if ($status === false) {
-				$middleware['apps'][$data['id']]['sequence'] = $sequence;
+			//System Middlewares
+			if ($middleware['name'] === 'Maintenance') {
+				$middleware['apps'][$data['id']]['sequence'] = 0;
+			} else if ($middleware['name'] === 'IpBlackList') {
+				$middleware['apps'][$data['id']]['sequence'] = 1;
+			} else if ($middleware['name'] === 'Auth') {
+				$middleware['apps'][$data['id']]['sequence'] = 2;
+			} else if ($middleware['name'] === 'AgentCheck') {
+				$middleware['apps'][$data['id']]['sequence'] = 3;
+			} else if ($middleware['name'] === 'Acl') {
+				$middleware['apps'][$data['id']]['sequence'] = 4;
+			} else {
+				//Non System Middlewares
+				$middleware['apps'][$data['id']]['sequence'] = $nonSystemMiddlewaresSeqStart;
+				$nonSystemMiddlewaresSeqStart++;
 			}
 
 			$middleware['apps'] = Json::encode($middleware['apps']);
