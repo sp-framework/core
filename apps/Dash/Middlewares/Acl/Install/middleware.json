@@ -8,5 +8,5 @@
     "version": "0.0.1",
     "repo": "https://.../dash-middleware-acl",
     "class": "Apps\\Dash\\Middlewares\\Acl\\Acl",
-    "settings": "[]"
+    "settings": {"dependencies":["Auth"]}
 }

@@ -151,7 +151,7 @@ abstract class BasePackage extends Controller
 		throw new \Exception('getById needs id parameter to be set.');
 	}
 
-	public function getFirst($by = null, $value = null, bool $resetCache = false, bool $enableCache = true, $model = null, $params = [])
+	public function getFirst($by = null, $value = null, bool $resetCache = false, bool $enableCache = true, $model = null, $params = [], $returnArray = false)
 	{
 		if (!$model) {
 			$modelToUse = new $this->modelToUse;
@@ -184,7 +184,12 @@ abstract class BasePackage extends Controller
 				$this->model
 			);
 
-			return $this->model;
+			if (!$returnArray) {
+				return $this->model;
+			} else {
+				return $this->model->toArray();
+			}
+
 		} catch (\Exception $e) {
 			throw $e;
 		}

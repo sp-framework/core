@@ -130,6 +130,8 @@ class Middlewares extends BasePackage
 
 	public function updateMiddlewares(array $data)
 	{
+		$dependencyArray = [];
+
 		$middlewares = Json::decode($data['middlewares'], true);
 
 		foreach ($middlewares['middlewares'] as $middlewareId => $status) {
@@ -139,8 +141,15 @@ class Middlewares extends BasePackage
 
 			if ($status === true) {
 				$middleware['apps'][$data['id']]['enabled'] = true;
+				
+				$dependencyArray = 
+					array_merge($dependencyArray, $this->checkMiddlewareDependencies($data, $middlewares, $middleware));
 			} else if ($status === false) {
 				$middleware['apps'][$data['id']]['enabled'] = false;
+			}
+			
+			if (in_array($middlewareId, $dependencyArray)) {
+				$middleware['apps'][$data['id']]['enabled'] = true;				
 			}
 
 			$middleware['apps'] = Json::encode($middleware['apps']);
@@ -180,5 +189,36 @@ class Middlewares extends BasePackage
 		}
 
 		return true;
+	}
+
+	protected function checkMiddlewareDependencies($data, &$middlewares, &$middleware)
+	{
+		$dependencyArray = [];
+
+		$middleware['settings'] = Json::decode($middleware['settings'], true);
+
+		if (!isset($middleware['settings']['dependencies'])) {
+			return;
+		}
+
+		foreach ($middleware['settings']['dependencies'] as $key => $dependency) {
+			$dependencyMiddleware = $this->getFirst('name', $dependency, false, true, null, [], true);
+
+			if ($dependencyMiddleware) {
+				$dependencyMiddleware['apps'] = Json::decode($dependencyMiddleware['apps'], true);
+	
+				$dependencyMiddleware['apps'][$data['id']]['enabled'] = true;
+				
+				$dependencyMiddleware['apps'] = Json::encode($dependencyMiddleware['apps']);
+
+				$middlewares['middlewares'][$dependencyMiddleware['id']] = true;
+
+				array_push($dependencyArray, $dependencyMiddleware['id']);
+
+				$this->update($dependencyMiddleware);				
+			}
+		}
+
+		return $dependencyArray;
 	}
 }

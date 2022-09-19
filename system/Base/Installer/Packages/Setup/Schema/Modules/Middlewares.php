@@ -95,7 +95,7 @@ class Middlewares
 					new Column(
 						'settings',
 						[
-							'type'    => Column::TYPE_TEXT,
+							'type'    => Column::TYPE_JSON,
 							'notNull' => true,
 						]
 					),
