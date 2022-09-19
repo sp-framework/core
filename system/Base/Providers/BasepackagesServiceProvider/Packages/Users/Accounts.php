@@ -273,6 +273,11 @@ class Accounts extends BasePackage
     public function removeAccount(array $data)
     {
         if (isset($data['id']) && $data['id'] != 1) {
+            if ($this->auth->account()['id'] === $data['id']) {
+                $this->addResponse('Cannot remove own account!', 1);
+
+                return;
+            }
             $accountObj = $this->getFirst('id', $data['id']);
 
             if ($accountObj) {
