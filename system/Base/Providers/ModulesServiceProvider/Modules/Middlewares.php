@@ -187,18 +187,22 @@ class Middlewares extends BasePackage
 
 			$this->update($middleware);
 		}
-
-		return true;
 	}
 
 	protected function checkMiddlewareDependencies($data, &$middlewares, &$middleware)
 	{
 		$dependencyArray = [];
 
-		$middleware['settings'] = Json::decode($middleware['settings'], true);
+		if (is_string($middleware['settings'])) {
+			$middleware['settings'] = Json::decode($middleware['settings'], true);
+		}
 
 		if (!isset($middleware['settings']['dependencies'])) {
-			return;
+			return $dependencyArray;
+		} 
+
+		if (is_array($middleware['settings']['dependencies']) && count($middleware['settings']['dependencies']) === 0) {
+			return $dependencyArray;
 		}
 
 		foreach ($middleware['settings']['dependencies'] as $key => $dependency) {
