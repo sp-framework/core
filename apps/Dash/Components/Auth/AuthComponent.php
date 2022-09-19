@@ -10,6 +10,12 @@ class AuthComponent extends BaseComponent
     {
         $this->view->setLayout('auth');
 
+        $this->view->canRegister = false;
+        
+        if ($this->app['registration_allowed'] && $this->app['registration_allowed'] == '1') {
+            $this->view->canRegister = true;
+        }
+
         if (isset($this->session->needAgentAuth) && $this->session->needAgentAuth === true) {
 
             $this->setNeedAuthHeader();

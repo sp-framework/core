@@ -149,7 +149,7 @@ class Accounts extends BasePackage
             return;
         }
 
-        if ($this->validateData($data)) {
+        if ($this->validateData($data) === true) {
             $password = $this->generateNewPassword();
 
             $data['password'] = $this->secTools->hashPassword($password);
@@ -232,7 +232,9 @@ class Accounts extends BasePackage
             $data['two_fa_secret'] = null;
         }
 
-        if ($data['package_name'] === '') {
+        if (!isset($data['package_name']) || 
+            $data['package_name'] === ''
+        ) {
             $data['package_name'] = 'profiles';
         }
 
@@ -278,6 +280,7 @@ class Accounts extends BasePackage
 
                 return;
             }
+
             $accountObj = $this->getFirst('id', $data['id']);
 
             if ($accountObj) {
@@ -356,13 +359,13 @@ class Accounts extends BasePackage
     protected function addUpdateSecurity($id, $data)
     {
         $securityModel = new BasepackagesUsersAccountsSecurity;
-
+        
         $account = $securityModel::findFirst(['account_id = ' . $id]);
-
+        
         $data['account_id'] = $id;
-
+        
         unset($data['id']);
-
+        
         if ($account) {
             $account->assign($data);
 
@@ -561,8 +564,10 @@ class Accounts extends BasePackage
         }
     }
 
-    protected function validateData(array $data)
+    public function validateData(array $data)
     {
+        $this->validation->add('first_name', PresenceOf::class, ["message" => "Enter valid first name."]);
+        $this->validation->add('last_name', PresenceOf::class, ["message" => "Enter valid last name."]);
         $this->validation->add('email', PresenceOf::class, ["message" => "Enter valid username."]);
         $this->validation->add('email', Email::class, ["message" => "Enter valid username."]);
 

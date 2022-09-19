@@ -85,7 +85,9 @@ class MiddlewaresServiceProvider extends Injectable
             $this->data['appRoute'] . '/auth/forgot',
             $this->data['appRoute'] . '/auth/pwreset',
             $this->data['appRoute'] . '/auth/logout',
-            $this->data['appRoute'] . '/auth/sendverification'
+            $this->data['appRoute'] . '/auth/sendverification',
+            $this->data['appRoute'] . '/register',
+            $this->data['appRoute'] . '/register/registernewaccount'
         ];
 
         if (in_array($givenRoute, $guestAccess)) {

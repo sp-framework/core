@@ -70,11 +70,24 @@ class Apps
 				new Column(
 					'registration_allowed',
 					[
-						'type'    => Column::TYPE_TINYINTEGER,
-						'size'    => 1,
+						'type'    => Column::TYPE_BOOLEAN,
 						'notNull' => false,
 					]
 				),
+				new Column(
+					'approve_accounts_manually',
+					[
+						'type'    => Column::TYPE_BOOLEAN,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'enforce_2fa',
+					[
+						'type'    => Column::TYPE_BOOLEAN,
+						'notNull' => false,
+					]
+				),								
 				new Column(
 					'registration_role_id',
 					[

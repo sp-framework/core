@@ -1,0 +1,209 @@
+<script>
+/*global BazCore */
+BazCore.header({
+    loadHeaderAt : 'login'
+});
+</script>
+<div class="pace-loading-text ml-1 fixed-top text-orange" hidden>
+    <span>Loading... </span>
+    <span></span>
+</div>
+<div id="{{componentId}}" class="login-box">
+    <div class="card m-0">
+        <div class="card-body login-card-body">
+            <div class="login-logo">
+                <img src="{{links.images('/baz/logo/fulllogo168x30.png')}}" data-rjs="3" alt="Bazaari Logo">
+            </div>
+            <div id="{{componentId}}-regular" hidden>
+                <p class="login-box-msg text-sm font-weight-bold">Register new account for application {{appName|lower}}</p>
+                <div id="{{componentId}}-form">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'componentId'                           : componentId,
+                            'sectionId'                             : 'form',
+                            'fieldId'                               : 'first_name',
+                            'fieldLabel'                            : false,
+                            'fieldType'                             : 'input',
+                            'fieldInputType'                        : 'text',
+                            'fieldPlaceholder'                      : 'First Name',
+                            'fieldGroupPostAddonIcon'               : 'user'
+                        ]
+                    )}}
+                    {{adminltetags.useTag('fields',
+                        [
+                            'componentId'                           : componentId,
+                            'sectionId'                             : 'form',
+                            'fieldId'                               : 'last_name',
+                            'fieldLabel'                            : false,
+                            'fieldType'                             : 'input',
+                            'fieldInputType'                        : 'text',
+                            'fieldPlaceholder'                      : 'Last Name',
+                            'fieldGroupPostAddonIcon'               : 'user'
+                        ]
+                    )}}                    
+                    {{adminltetags.useTag('fields',
+                        [
+                            'componentId'                           : componentId,
+                            'sectionId'                             : 'form',
+                            'fieldId'                               : 'email',
+                            'fieldLabel'                            : false,
+                            'fieldType'                             : 'input',
+                            'fieldInputType'                        : 'text',
+                            'fieldPlaceholder'                      : 'Email/Username',
+                            'fieldGroupPostAddonIcon'               : 'envelope'
+                        ]
+                    )}}
+                    <div class="row mt-2">
+                        <div class="col mt-2">
+                            <a class="text-info" href="{{links.url('auth')}}">
+                                <span>Back to login</span>
+                            </a>
+                        </div>
+                        <div class="col">
+                            <button id="{{componentId}}-form-register" type="button" class="btn btn-info float-right">
+                                <i class="fa fa-cog fa-spin login-spinner" hidden></i>
+                                <span class="text-uppercase">Register</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="login-footer text-sm text-center">
+                    <b>
+                        <a class="text-teal" href="https://www.bazaari.com.au">Bazaari E Trade Pty. Ltd.</a>
+                    </b>
+                    <br>
+                    Copyright © 2014-{{date("Y")}}. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+/*global BazCore */
+$(document).ready(function(){
+
+    $('#{{componentId}}-regular').attr('hidden', false).addClass('animated fadeIn');
+    $('#{{componentId}}-form-first_name').focus();
+
+    BazCore.footer({
+        loadFooterAt : 'register'
+    });
+
+    // Slideshow
+    $('body').vegas({
+        delay: 300000,
+        timer: false,
+        shuffle: true,
+        slides: [
+        { src: '{{links.images("/vegas/2.4.4/images/wp1.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp2.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp3.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp4.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp5.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp6.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp7.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp8.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp9.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp10.jpg")}}' }
+        ],
+        overlay: '{{links.images("/vegas/2.4.4/overlays/01.png")}}'
+    });
+
+    var url, thisButton;
+    var postData = { };
+    function getAjaxUrlData() {
+        $('#{{componentId}}-form-register')
+            .attr('disabled', true);
+
+        $('.login-spinner').attr('hidden', false);
+
+        url = '{{links.url("register/registerNewAccount")}}';
+        postData = {
+            'first_name'      : $('#{{componentId}}-form-first_name').val().trim(),
+            'last_name'       : $('#{{componentId}}-form-last_name').val().trim(),
+            'email'           : $('#{{componentId}}-form-email').val().trim()
+        };
+
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+    }
+
+    $('#{{componentId}}-form-register')
+        .click(function(e) {
+            e.preventDefault();
+            thisButton = this;
+            getAjaxUrlData();
+            runAjax();
+        });
+
+    function runAjax() {
+        $.ajax({
+            url             : url,
+            data            : postData,
+            method          : 'post',
+            dataType        : 'json',
+            beforeSend      : function() {
+                                    $("#{{componentId}}-form :input").prop("disabled", true);
+                                },
+            error           : function(response) {
+                                    if (response.getResponseHeader('redirect_url')) {
+                                        window.location = response.getResponseHeader('redirect_url');
+                                    }
+                                    $('.login-box-msg').text('Error! Please contact administrator.');
+                                    failed();
+                                },
+            success         : function(response) {
+                                if (response.responseCode == '0') {
+                                    $('.login-box-msg').text(response.responseMessage);
+                                    if (response.redirectUrl) {
+                                        success(response.redirectUrl);
+                                    } else {
+                                        success();
+                                    }
+                                } else if (response.responseCode == '1') {
+                                    $('.login-box-msg').text(response.responseMessage);
+                                    if (response.redirectUrl) {
+                                        failed(response.redirectUrl);
+                                    } else {
+                                        failed();
+                                    }
+                                }
+
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+                            }
+        });
+    }
+
+    function failed(redirectUrl = null) {
+        if (redirectUrl) {
+            window.location = redirectUrl;
+        }
+        $('.login-spinner').attr('hidden', true);
+        $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+        $('#{{componentId}}-form :input').prop('disabled', false);
+        $('#{{componentId}}-form :input').not('.token').val('');
+        $('#{{componentId}}-form-first_name').focus();
+        $('#{{componentId}}-form-register').attr('disabled', false);
+        setTimeout(function () {
+            $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
+
+            $('.login-box-msg').text('Register new account for application {{appName|lower}}');
+
+            $('.login-box-msg').addClass('animated fadeIn');
+        }, 5000);
+    }
+
+    function success(redirectUrl = null) {
+        $('.login-spinner').attr('hidden', true);
+        $('.login-box-msg').removeClass('text-danger').addClass('text-success font-weight-bold');
+
+        if (redirectUrl) {
+            window.location = redirectUrl;
+        } else {
+            window.location = '/{{appRoute}}/';
+        }
+    }
+});
+</script>

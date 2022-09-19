@@ -8,12 +8,24 @@
     {% set appDescription = app['description'] %}
     {% if app['registration_allowed'] == true %}
         {% set registrationAllowed = true %}
+        {% set registrationApproveAccountsManuallyDisabled = false %}
+        {% set registrationEnforce2FADisabled = false %}
         {% set registrationRoleDisabled = false %}
         {% set guestRoleDisabled = false %}
-    {% else %}
+        {% else %}
         {% set registrationAllowed = false %}
+        {% set registrationApproveAccountsManuallyDisabled = true %}
+        {% set registrationEnforce2FADisabled = true %}
         {% set registrationRoleDisabled = true %}
         {% set guestRoleDisabled = true %}
+    {% endif %}
+    {% set approveAccountsManually = false %}
+    {% if app['approve_accounts_manually'] == true %}
+        {% set approveAccountsManually = true %}
+    {% endif %}
+    {% set enforce2FA = false %}
+    {% if app['enforce_2fa'] == true %}
+        {% set enforce2FA = true %}
     {% endif %}
     {% set appRegistrationRoleId = app['registration_role_id'] %}
     {% set appGuestRoleId = app['guest_role_id'] %}

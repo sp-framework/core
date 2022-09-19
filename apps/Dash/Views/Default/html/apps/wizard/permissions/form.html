@@ -28,6 +28,52 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
+                        'fieldId'                        : 'approve_accounts_manually',
+                        'fieldLabel'                     : 'Approve new Accounts Manually?',
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'success',
+                        'fieldCheckboxChecked'           : approveAccountsManually,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldDisabled'                  : registrationApproveAccountsManuallyDisabled,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>  
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'enforce_2fa',
+                        'fieldLabel'                     : 'Enforce 2FA?',
+                        'fieldType'                      : 'checkbox',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Enforce new user accounts to enable 2FA.',
+                        'fieldCheckboxType'              : 'success',
+                        'fieldCheckboxChecked'           : enforce2FA,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldDisabled'                  : registrationEnforce2FADisabled,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>                
+        </div>
+        <div class="row">     
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
                         'fieldId'                        : 'registration_role_id',
                         'fieldLabel'                     : 'Registration Role',
                         'fieldType'                      : 'select2',

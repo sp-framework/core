@@ -18,7 +18,7 @@ use System\Base\Installer\Packages\Setup\Register\Basepackages\Menu as RegisterM
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Storages\Storages as RegisterStorages;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Account as RegisterRootAdminAccount;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Profile as RegisterRootAdminProfile;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Role as RegisterRootAdminRole;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Role as RegisterRole;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Schedules as RegisterSchedules;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Tasks as RegisterTasks;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Workers as RegisterWorkers;
@@ -139,19 +139,15 @@ class Setup
 
 	public function cleanVar()
 	{
-		$sessionId = $this->session->getId();
-
 		$files = $this->getInstalledFiles('var/');
 
 		foreach ($files['files'] as $key => $file) {
-			if (str_contains($file, $sessionId)) {
-				try {
-					$this->localContent->delete($file);
-				} catch (FilesystemException | UnableToDeleteFile $exception) {
-					throw $exception;
-				}
+			try {
+				$this->localContent->delete($file);
+			} catch (FilesystemException | UnableToDeleteFile $exception) {
+				throw $exception;
 			}
-		}
+		}		
 	}
 
 	public function checkDbEmpty()
@@ -411,7 +407,12 @@ class Setup
 
 	public function registerRootAdminRole()
 	{
-		return (new RegisterRootAdminRole())->register($this->db);
+		return (new RegisterRole())->registerAdminRole($this->db);
+	}
+
+	public function registerRegisteredUserAndGuestRoles()
+	{
+		return (new RegisterRole())->registerRegisteredUserAndGuestRoles($this->db);
 	}
 
 	public function registerAdminAccount($adminRoleId, $workFactor = 12)
