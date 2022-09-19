@@ -308,14 +308,18 @@ class Api extends BasePackage
                 }
             }
 
-        } else if (!isset($data['api_id'])) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'API Id missing.';
-
         } else if (isset($data['api_id'])) {
 
             $this->apiConfig = $this->getApiById($data['api_id']);
+
+        } else if (isset($data['config'])) {
+
+            $this->apiConfig = $data['config'];
+
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'API Id/Config missing.';
         }
 
         if ($this->apiConfig) {
@@ -338,17 +342,17 @@ class Api extends BasePackage
 
         $this->packagesData->responseCode = 1;
 
-        $this->packagesData->responseMessage = 'API Id Wrong.';
+        $this->packagesData->responseMessage = 'API Id/Config missing...';
 
         return false;
     }
 
-    protected function initApi($apiConfig)
+    protected function initApi()
     {
         try {
-            $apiClass = 'Apps\\Dash\\Packages\\System\\Api\\Apis' . $this->getApiClass($apiConfig['api_type']);
+            $apiClass = 'Apps\\Dash\\Packages\\System\\Api\\Apis' . $this->getApiClass($this->apiConfig['api_type']);
 
-            return (new $apiClass($apiConfig, $this))->init();
+            return (new $apiClass($this->apiConfig, $this))->init();
 
         } catch (\Exception $e) {
             throw $e;

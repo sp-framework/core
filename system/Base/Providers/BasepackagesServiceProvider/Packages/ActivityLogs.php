@@ -40,7 +40,7 @@ class ActivityLogs extends BasePackage
             if (isset($oldData['package_name'])) {
                 unset($oldData['package_name']);
             }
-            $data = $this->getDifference($data, $oldData);
+            $data = $this->getDifference($this->jsonData($data), $this->jsonData($oldData));
 
             $log['activity_type'] = self::ACTIVITY_TYPE_UPDATE;
         } else {

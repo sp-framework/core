@@ -10,15 +10,15 @@ class Repository
 			'modules_repositories',
 			[
 				'name' 					=> 'Bazaari Core (SP)',
-				'description' 			=> 'Bazaari Core Repository v3',
-				'repo_url'				=> 'https://repo.bazaari.com.au/api/v1/orgs/sp-core/repos',
-				'site_url'				=> 'https://repo.bazaari.com.au/',
+				'description' 			=> 'Bazaari Core Repository',
+				'repo_url'				=> 'https://dev.bazaari.com.au/api/v1/orgs/sp-core/repos',
+				'site_url'				=> 'https://dev.bazaari.com.au/',
 				'branch'				=> 'master',
-				'repo_provider'			=> 1,
+				'repo_provider'			=> 1,//Gitea
 				'auth_token'			=> 2,
 				'username'				=> '',
 				'password'				=> '',
-				'token'					=> ''
+				'token'					=> 'a782b559b0d5f5b747a6b67bd576f84b2e3fbde7'//bcust Token
 			]
 		);
 
@@ -26,17 +26,16 @@ class Repository
 			'modules_repositories',
 			[
 				'name' 					=> 'Bazaari Modules (SP)',
-				'description' 			=> 'Bazaari Modules Repository v3',
-				'repo_url'				=> 'https://repo.bazaari.com.au/api/v1/orgs/sp-modules/repos',
-				'site_url'				=> 'https://repo.bazaari.com.au/',
+				'description' 			=> 'Bazaari Modules Repository',
+				'repo_url'				=> 'https://dev.bazaari.com.au/api/v1/orgs/sp-modules/repos',
+				'site_url'				=> 'https://dev.bazaari.com.au/',
 				'branch'				=> 'master',
 				'repo_provider'			=> 1,
 				'auth_token'			=> 2,
 				'username'				=> '',
 				'password'				=> '',
-				'token'					=> ''
+				'token'					=> 'a782b559b0d5f5b747a6b67bd576f84b2e3fbde7'//bcust Token
 			]
 		);
 	}
 }
-// 4bfbfa9b98358693d6057b1e056a5f422f78a2c0
