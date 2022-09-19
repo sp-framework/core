@@ -232,6 +232,10 @@ class Accounts extends BasePackage
             $data['two_fa_secret'] = null;
         }
 
+        if ($data['package_name'] === '') {
+            $data['package_name'] = 'profiles';
+        }
+
         if ($this->update($data)) {
             if (isset($data['can_login'])) {
                 $this->addUpdateCanLogin($data['id'], $data['can_login']);
