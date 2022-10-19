@@ -31,5 +31,11 @@ return
 			"service"			=> "streamLogs", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
 			"email"				=> false,
 			"emergencyEmails"	=> "support@bazaari.com.au",
+		],
+		"websocket"		=>
+		[
+			"protocol"			=> "tcp",
+			"host"				=> "localhost",
+			"port"				=> 5555
 		]
 	];

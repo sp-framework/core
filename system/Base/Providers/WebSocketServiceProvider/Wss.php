@@ -8,11 +8,18 @@ use ZMQContext;
 
 class Wss
 {
+    protected $config;
+
     protected $connector = null;
 
     protected $context;
 
     protected $socket;
+
+    public function __construct($config)
+    {
+        $this->config = $config;
+    }
 
     public function init()
     {
@@ -27,7 +34,12 @@ class Wss
             return;
         }
 
-        $this->connector = 'tcp://localhost:5555';
+        $this->connector = 
+            $this->config->websocket->protocol . 
+            '://' . 
+            $this->config->websocket->host . 
+            ':' . 
+            $this->config->websocket->port;
     }
 
     public function getConnector()

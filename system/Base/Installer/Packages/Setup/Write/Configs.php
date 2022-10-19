@@ -102,6 +102,12 @@ return
 			"service"			=> "' . $this->coreJson['settings']['logs']['service'] . '", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
 			"email"				=> false,
 			"emergencyEmails"	=> "' . $this->coreJson['settings']['logs']['emergencyEmails'] . '",
+		],
+		"websocket"		=>
+		[
+			"protocol"			=> "tcp",
+			"host"				=> "localhost",
+			"port"				=> 5555
 		]
 	];';
 
