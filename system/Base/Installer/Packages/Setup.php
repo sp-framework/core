@@ -2,6 +2,12 @@
 
 namespace System\Base\Installer\Packages;
 
+use Apps\Dash\Packages\Devtools\Api\Contracts\Install\Schema\DevtoolsApiContracts;
+use Apps\Dash\Packages\Devtools\Api\Enums\Install\Schema\DevtoolsApiEnums;
+use Apps\Dash\Packages\System\Api\Install\Schema\SystemApi;
+use Apps\Dash\Packages\System\Api\Install\Schema\SystemApiCalls;
+use Apps\Dash\Packages\System\Api\Install\Schema\SystemApiGeneric;
+use Apps\Dash\Packages\System\Messenger\Install\Schema\SystemMessenger;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
 use League\Flysystem\UnableToDeleteFile;
@@ -147,7 +153,7 @@ class Setup
 			} catch (FilesystemException | UnableToDeleteFile $exception) {
 				throw $exception;
 			}
-		}		
+		}
 	}
 
 	public function checkDbEmpty()
@@ -216,6 +222,15 @@ class Setup
 		$this->db->createTable('basepackages_workers_jobs', $dbName, (new Jobs)->columns());
 		$this->db->createTable('basepackages_import_export', $dbName, (new ImportExport)->columns());
 		$this->db->createTable('basepackages_templates', $dbName, (new Templates)->columns());
+		$this->db->createTable('system_api_generic', $dbName, (new SystemApiGeneric)->columns());
+		$this->db->createTable('system_api_calls', $dbName, (new SystemApiCalls)->columns());
+		$this->db->createTable('system_api', $dbName, (new SystemApi)->columns());
+		$this->db->createTable('system_messenger', $dbName, (new SystemMessenger)->columns());
+
+		if ($this->postData['development-tools'] == 'true') {
+			$this->db->createTable('devtools_api_contracts', $dbName, (new DevtoolsApiContracts)->columns());
+			$this->db->createTable('devtools_api_enums', $dbName, (new DevtoolsApiEnums)->columns());
+		}
 	}
 
 	public function registerRepository()
@@ -272,6 +287,12 @@ class Setup
 						throw new \Exception('Problem reading component.json at location ' . $adminComponent);
 					}
 
+					if ($jsonFile['sub_category'] === 'devtools' &&
+						$this->postData['development-tools'] == 'false'
+					) {
+						continue;
+					}
+
 					if ($jsonFile['menu'] && $jsonFile['menu'] !== 'false') {
 						$menuId = $this->registerAdminMenu($jsonFile['menu']);
 					} else {
@@ -307,6 +328,12 @@ class Setup
 						throw new \Exception('Problem reading package.json at location ' . $adminPackage);
 					}
 
+					if ($jsonFile['sub_category'] === 'devtools' &&
+						$this->postData['development-tools'] == 'false'
+					) {
+						continue;
+					}
+
 					$this->registerAdminPackage($jsonFile);
 				}
 			}
@@ -326,6 +353,12 @@ class Setup
 						throw new \Exception('Problem reading middleware.json at location ' . $adminMiddleware);
 					}
 
+					if ($jsonFile['sub_category'] === 'devtools' &&
+						$this->postData['development-tools'] == 'false'
+					) {
+						continue;
+					}
+
 					$this->registerAdminMiddleware($jsonFile);
 				}
 			}
@@ -339,6 +372,12 @@ class Setup
 
 			if (!$jsonFile) {
 				throw new \Exception('Problem reading view.json');
+			}
+
+			if ($jsonFile['sub_category'] === 'devtools' &&
+				$this->postData['development-tools'] == 'false'
+			) {
+				return;
 			}
 
 			$this->registerAdminView($jsonFile);
