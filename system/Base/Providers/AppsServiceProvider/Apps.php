@@ -154,8 +154,6 @@ class Apps extends BasePackage
 
 		$data['default_component'] = 0;
 		$data['errors_component'] = 0;
-		$data['can_login_role_ids'] = Json::decode($data['can_login_role_ids'], true);
-		$data['can_login_role_ids'] = Json::encode($data['can_login_role_ids']['data']);
 
 		if ($this->add($data)) {
 
