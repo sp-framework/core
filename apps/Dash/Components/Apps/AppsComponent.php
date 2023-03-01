@@ -28,7 +28,15 @@ class AppsComponent extends BaseComponent
                     return $this->throwIdNotFound();
                 }
 
-                $app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
+                if (isset($app['can_login_role_ids'])) {
+                    $app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
+
+                    if (isset($app['can_login_role_ids']['data'])) {
+                        $app['can_login_role_ids'] = Json::encode($app['can_login_role_ids']['data']);
+                    } else {
+                        $app['can_login_role_ids'] = Json::encode($app['can_login_role_ids']);
+                    }
+                }
 
                 $components = [];
                 $views = [];
