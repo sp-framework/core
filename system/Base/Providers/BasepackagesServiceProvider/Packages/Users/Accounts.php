@@ -359,13 +359,13 @@ class Accounts extends BasePackage
     protected function addUpdateSecurity($id, $data)
     {
         $securityModel = new BasepackagesUsersAccountsSecurity;
-        
+
         $account = $securityModel::findFirst(['account_id = ' . $id]);
-        
+
         $data['account_id'] = $id;
-        
+
         unset($data['id']);
-        
+
         if ($account) {
             $account->assign($data);
 
@@ -479,17 +479,17 @@ class Accounts extends BasePackage
         }
     }
 
-    public function canLogin($id, $app)
+    public function canLogin($id, $appID)
     {
         $this->getById($id);
 
         $canLogin =
             $this->model->canlogin->filter(
-                function($allowed) use ($id, $app) {
+                function($allowed) use ($id, $appID) {
                     $allowed = $allowed->toArray();
 
                     if ($allowed['account_id'] == $id &&
-                        $allowed['app'] === $app &&
+                        $allowed['app_id'] === $appID &&
                         $allowed['allowed'] == true
                     ) {
                         return $allowed;

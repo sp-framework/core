@@ -319,7 +319,7 @@ class Auth
             }
 
             //New App OR New account via rego
-            if (!$this->accounts->canLogin($this->account['id'], $this->app['route'])) {
+            if (!$this->accounts->canLogin($this->account['id'], $this->app['id'])) {
 
                 if ($this->app['can_login_role_ids']) {
 
@@ -330,7 +330,7 @@ class Auth
                         $canloginModel = new BasepackagesUsersAccountsCanlogin;
 
                         $newLogin['account_id'] = $this->account['id'];
-                        $newLogin['app'] = $this->app['route'];
+                        $newLogin['app_id'] = $this->app['id'];
                         $newLogin['allowed'] = '1';
 
                         $canloginModel->assign($newLogin);

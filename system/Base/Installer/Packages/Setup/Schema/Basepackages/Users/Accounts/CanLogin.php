@@ -28,10 +28,9 @@ class CanLogin
                         ]
                     ),
                     new Column(
-                        'app',
+                        'app_id',
                         [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 50,
+                            'type'          => Column::TYPE_SMALLINTEGER,
                             'notNull'       => true,
                         ]
                     ),
