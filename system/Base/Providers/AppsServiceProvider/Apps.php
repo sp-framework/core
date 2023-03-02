@@ -178,8 +178,6 @@ class Apps extends BasePackage
 
 		$app = array_merge($app, $data);
 
-		unset($app['route']);
-
 		if (isset($app['can_login_role_ids'])) {
 			$app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
 

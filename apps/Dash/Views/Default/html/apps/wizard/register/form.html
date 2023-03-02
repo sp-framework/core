@@ -2,7 +2,6 @@
     {% set appId = app['id'] %}
     {% set appName = app['name'] %}
     {% set appRoute = app['route'] %}
-    {% set appRouteDisabled = true %}
     {% set appType = app['app_type'] %}
     {% set appTypeDisabled = true %}
     {% set appDescription = app['description'] %}
@@ -37,7 +36,6 @@
     {% set appId = '' %}
     {% set appName = '' %}
     {% set appRoute = '' %}
-    {% set appRouteDisabled = false %}
     {% set appType = '' %}
     {% set appTypeDisabled = false %}
     {% set appDescription = '' %}
@@ -117,7 +115,6 @@
                         'fieldHelpTooltipContent'        : 'App Route Example: mysite.com/dashboard/ "dashboard" is the route to access this app.',
                         'fieldRequired'                  : true,
                         'fieldBazJstreeSearch'           : true,
-                        'fieldDisabled'                  : appRouteDisabled,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
@@ -140,7 +137,6 @@
                         'fieldHelp'                            : true,
                         'fieldHelpTooltipContent'              : 'App type.',
                         'fieldRequired'                        : true,
-                        'fieldDisabled'                        : appTypeDisabled,
                         'fieldBazScan'                         : true,
                         'fieldBazJstreeSearch'                 : true,
                         'fieldBazPostOnCreate'                 : true,
