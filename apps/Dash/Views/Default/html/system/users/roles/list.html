@@ -1,3 +1,24 @@
+{% set canAddButton = null %}
+{% if canAdd %}
+{% set canAddButton = {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'add-business' : {
+                            'title'                   : 'Add New Role',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'plus',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/users/roles/q/id/0')
+                        }
+                    }
+            }
+%}
+{% endif %}
 {{adminltetags.useTag('content',
     [
         'component'             : table['component'],
@@ -16,24 +37,7 @@
         'dtFilters'             : table['filters'],
         'dtFilterColumns'       : table['filterColumns'],
         'dtFixedHeader'         : true,
-        'dtPrimaryButtons'      :
-            {
-                'componentId'           : componentId,
-                'sectionId'             : 'listing',
-                'buttonType'            : 'button',
-                'buttons'               :
-                    {
-                        'add-business' : {
-                            'title'                   : 'Add New Role',
-                            'size'                    : 'sm',
-                            'type'                    : 'primary',
-                            'icon'                    : 'plus',
-                            'buttonAdditionalClass'   : 'contentAjaxLink',
-                            'position'                : 'right',
-                            'url'                     : links.url('system/users/roles/q/id/0')
-                        }
-                    }
-            },
+        'dtPrimaryButtons'      : canAddButton,
         'dtTable'               : table,
         'dtColumns'             : table['columns'],
         'dtPostUrl'             : table['postUrl'],
