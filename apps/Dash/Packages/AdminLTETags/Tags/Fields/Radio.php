@@ -104,9 +104,16 @@ class Radio
                 $this->content .= '</div>';
             }
         }
-        $this->content .=
-                '</div>
-            </div>
-        </div>';
+
+        if ($this->fieldParams['fieldRadioPlacementType'] === 'horizontal') {
+            $this->content .=
+                    '</div>
+                </div>';
+        } else {
+            $this->content .=
+                    '</div>
+                </div>
+            </div>';
+        }
     }
 }
