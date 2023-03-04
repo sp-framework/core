@@ -383,9 +383,9 @@ class Accounts extends BasePackage
             $canLogin = Json::decode($canLogin, true);
 
             if (count($canLogin) > 0) {
-                foreach ($canLogin as $app => $allowed) {
+                foreach ($canLogin as $appId => $allowed) {
                     $canloginModel = new BasepackagesUsersAccountsCanlogin;
-                    $permission = $canloginModel::findFirst(['account_id = ' . $id . ' AND app = "' . $app . '"']);
+                    $permission = $canloginModel::findFirst(['account_id = ' . $id . ' AND app_id = "' . $appId . '"']);
 
                     if ($permission) {
                         if ($allowed === true) {
@@ -399,7 +399,7 @@ class Accounts extends BasePackage
                         $permission->update();
                     } else {
                         $newPermission['account_id'] = $id;
-                        $newPermission['app'] = $app;
+                        $newPermission['app_id'] = $appId;
 
                         if ($allowed === true) {
                             $newPermission['allowed'] = '1';

@@ -262,9 +262,9 @@ dataCollectionSection =
                 for (var checkbox in checkboxIds) {
                     $('#' + checkbox).click(function() {
                         var id = $(this)[0].id;
-                        extractCheckboxData(id, $('#' + id).parents('.app').data('route'))
+                        extractCheckboxData(id, $('#' + id).parents('.app').data('id'))
                     });
-                    extractCheckboxData(checkbox, $('#' + checkbox).parents('.app').data('route'))
+                    extractCheckboxData(checkbox, $('#' + checkbox).parents('.app').data('id'))
                 }
                 function extractCheckboxData(checkbox, app) {
                     if ($('#' + checkbox)[0].checked === true) {
