@@ -766,7 +766,7 @@ class Accounts extends BasePackage
 
                 if ($canLoginArr > 0) {
                     foreach ($canLoginArr as $key => $value) {
-                        $account['can_login'][$value['app']] = $value['allowed'];
+                        $account['can_login'][$value['app_id']] = $value['allowed'];
                     }
                 } else {
                     $account['can_login'] = [];
