@@ -29,6 +29,15 @@ class ProfileComponent extends BaseComponent
         $profile = $this->profile->generateViewData();
 
         if ($profile) {
+            $app = $this->apps->getAppInfo();
+
+            $this->view->middlewares =
+                msort(
+                    $this->modules->middlewares->getMiddlewaresForAppType(
+                        $app['app_type'],
+                        $app['id']
+                    ), 'sequence');
+
             $this->view->packages = $this->profile->packagesData->packages;
 
             $this->view->subscriptions = $this->profile->packagesData->subscriptions;

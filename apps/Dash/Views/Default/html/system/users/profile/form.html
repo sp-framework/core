@@ -42,6 +42,12 @@
             ]
         )}}
     </div>
+    {% set sessionsTabHidden = true %}
+    {% for middleware in middlewares %}
+        {% if middleware['name'] == 'AgentCheck' and middleware['enabled'] == true %}
+            {% set sessionsTabHidden = false %}
+        {% endif %}
+    {% endfor %}
     <div class="col-md-10">
         <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -83,7 +89,8 @@
                                 [
                                     'tabTitle'          : 'Sessions',
                                     'tabInclude'        : 'profile/form/sessions',
-                                    'tabIncludeParams'  : ['profile' : profile, 'account' : account]
+                                    'tabIncludeParams'  : ['profile' : profile, 'account' : account],
+                                    'tabHidden'         : sessionsTabHidden
                                 ],
                                 'notifications'   :
                                 [
