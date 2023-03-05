@@ -119,9 +119,26 @@ abstract class BaseComponent extends Controller
 			$this->view->canUpdate = false;
 			$this->view->canRemove = false;
 
+			$middlewares =
+				msort(
+					$this->modules->middlewares->getMiddlewaresForAppType(
+						$this->app['app_type'],
+						$this->app['id']
+					), 'sequence');
+
+			foreach ($middlewares as $key => $middleware) {
+				if ($middleware['name'] === 'Acl' && $middleware['enabled'] === false) {
+					$this->view->canView = true;
+					$this->view->canAdd = true;
+					$this->view->canUpdate = true;
+					$this->view->canRemove = true;
+					return;
+				}
+			}
+
 			$permissions = $this->checkPermissions();
 
-			if ($permissions) {
+			if (is_array($permissions)) {
 				if (isset($permissions['view']) && $permissions['view'] == 1) {
 					$this->view->canView = true;
 				}
@@ -134,6 +151,12 @@ abstract class BaseComponent extends Controller
 				if (isset($permissions['remove']) && $permissions['remove'] == 1) {
 					$this->view->canRemove = true;
 				}
+			} else if ($permissions === 'sysAdmin') {
+				$this->view->canView = true;
+				$this->view->canAdd = true;
+				$this->view->canUpdate = true;
+				$this->view->canRemove = true;
+				return;
 			}
 		}
 	}
@@ -146,6 +169,10 @@ abstract class BaseComponent extends Controller
 			}
 
 			if (is_array($permissions) && count($permissions) === 0) {
+				if ($this->auth->account()['role']['id'] == '1') {
+					return 'sysAdmin';
+				}
+
 				if ($this->auth->account()['role']['permissions'] !== '') {
 					$permissions = Json::decode($this->auth->account()['role']['permissions'], true);
 				}

@@ -19,6 +19,11 @@
     {% set permissionsinfohidden = 'hidden' %}
 {% endif %}
 {% set rolePermissions = role['permissions'] %}
+{% for middleware in middlewares %}
+    {% if middleware['name'] == 'Acl' and middleware['enabled'] == false %}
+        {% set permissionshidden = 'hidden' %}
+    {% endif %}
+{% endfor %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row">
@@ -587,12 +592,10 @@ dataCollectionSection =
         //Validation
         '{{componentId}}-{{sectionId}}-form' : {
             rules: {
-                '{{componentId}}-{{sectionId}}-name'     : 'required',
-                '{{componentId}}-{{sectionId}}-parent_id': 'required',
+                '{{componentId}}-{{sectionId}}-name'     : 'required'
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-name'     : 'Please enter role name',
-                '{{componentId}}-{{sectionId}}-parent_id': 'Please select parent role',
+                '{{componentId}}-{{sectionId}}-name'     : 'Please enter role name'
             }
         }
 });

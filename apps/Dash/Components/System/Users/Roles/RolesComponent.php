@@ -33,6 +33,15 @@ class RolesComponent extends BaseComponent
             }
 
             if ($role) {
+                $app = $this->apps->getAppInfo();
+
+                $this->view->middlewares =
+                    msort(
+                        $this->modules->middlewares->getMiddlewaresForAppType(
+                            $app['app_type'],
+                            $app['id']
+                        ), 'sequence');
+
                 $this->view->components = $this->roles->packagesData->components;
 
                 $this->view->acls = $this->roles->packagesData->acls;
