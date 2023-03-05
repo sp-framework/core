@@ -289,7 +289,7 @@ class Profile extends BasePackage
 
         if ($canLoginArr > 0) {
             foreach ($canLoginArr as $key => $value) {
-                $account['can_login'][$value['app']] = $value['allowed'];
+                $account['can_login'][$value['app_id']] = $value['allowed'];
             }
         } else {
             $account['can_login'] = [];
@@ -309,7 +309,7 @@ class Profile extends BasePackage
         $appsArr = $this->apps->apps;
 
         foreach ($appsArr as $appKey => $app) {
-            if (isset($account['can_login'][$app['route']])) {
+            if (isset($account['can_login'][$app['id']])) {
                 $packagesArr = $this->modules->packages->getPackagesForApp($app['id']);
 
                 if (count($packagesArr) > 0) {
@@ -343,7 +343,7 @@ class Profile extends BasePackage
         $notifications = [];
 
         foreach ($appsArr as $appKey => $app) {
-            if (isset($account['can_login'][$app['route']])) {
+            if (isset($account['can_login'][$app['id']])) {
 
                 $packagesArr = $this->modules->packages->getPackagesForApp($app['id']);
 
