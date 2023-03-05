@@ -29,8 +29,8 @@
     {% set appRegistrationRoleId = app['registration_role_id'] %}
     {% set appGuestRoleId = app['guest_role_id'] %}
     {% set appCanLoginRoleIds = app['can_login_role_ids'] %}
-    {% set appIpBlackList = app['ip_black_list'] %}
-    {% set appIncorrectLoginAttemptBlacklist = app['incorrect_login_attempt_blacklist'] %}
+    {% set appIncorrectLoginAttemptBlockIp = app['incorrect_login_attempt_block_ip'] %}
+    {% set appIpFilterDefaultAction = app['ip_filter_default_action'] %}
     {% set wizard = false %}
 {% else %}
     {% set appId = '' %}
@@ -45,8 +45,8 @@
     {% set appRegistrationRoleId = '' %}
     {% set appGuestRoleId = '' %}
     {% set appCanLoginRoleIds = [] %}
-    {% set appIpBlackList = [] %}
-    {% set appIncorrectLoginAttemptBlacklist = '' %}
+    {% set appIncorrectLoginAttemptBlockIp = '' %}
+    {% set appIpFilterDefaultAction = '1' %}
     {% set wizard = true %}
 {% endif %}
 {% if wizard === true %}
@@ -239,8 +239,6 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-can_login_role_ids'                  : {
             'placeholder'   : 'SELECT ROLES'
         },
-        '{{componentId}}-{{sectionId}}-ip_black_list'                       : { },
-        '{{componentId}}-{{sectionId}}-incorrect_login_attempt_blacklist'   : { },
         '{{componentId}}-{{sectionId}}-form'                                : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                        : 'required',

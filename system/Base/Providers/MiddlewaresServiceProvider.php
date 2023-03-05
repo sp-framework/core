@@ -20,17 +20,17 @@ class MiddlewaresServiceProvider extends Injectable
         if ($app) {
             $middlewares = [];
 
-            $blackWhiteListMiddleware = $this->modules->middlewares->getNamedMiddlewareForApp('BlackWhiteList', $app['id']);
+            $ipFilterMiddleware = $this->modules->middlewares->getNamedMiddlewareForApp('IpFilter', $app['id']);
 
-            if ($blackWhiteListMiddleware) {
-                $middlewares[] = $blackWhiteListMiddleware;
+            if ($ipFilterMiddleware) {
+                $middlewares[] = $ipFilterMiddleware;
                 $middlewares = array_merge($middlewares, msort($this->modules->middlewares->getMiddlewaresForApp($app['id'], true), 'sequence'));
             } else {
                 $middlewares = msort($this->modules->middlewares->getMiddlewaresForApp($app['id'], true), 'sequence');
             }
 
             foreach ($middlewares as $middleware) {
-                if ($middleware['name'] !== 'IpBlackList') {
+                if ($middleware['name'] !== 'IpFilter') {
                     if ($this->checkRoute($app)) {
                         return true;
                     };

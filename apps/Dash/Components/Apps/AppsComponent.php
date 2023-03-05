@@ -98,11 +98,6 @@ class AppsComponent extends BaseComponent
                             $app['id']
                         ), 'sequence');
 
-                if ($app['ip_black_list'] && $app['ip_black_list'] !== '') {
-                    $app['ip_black_list'] = Json::decode($app['ip_black_list'], true);
-                    $app['ip_black_list'] = implode(',', $app['ip_black_list']);
-                }
-
                 $this->view->app = $app;
 
                 if (isset($this->getData()['modules'])) {
@@ -210,7 +205,132 @@ class AppsComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
             $this->apps->removeApp($this->postData());
+
+            $this->addResponse(
+                $this->apps->packagesData->responseMessage,
+                $this->apps->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function getFiltersAction()
+    {
+        if ($this->request->isPost()) {
+
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $filters = $this->apps->getFilters($this->postData());
+
+            foreach ($filters as $key => &$filter) {
+                unset ($filter['app_id']);
+                if ($filter['address_type'] == '1') {
+                    $filter['address_type'] = 'host';
+                } else if ($filter['address_type'] == '2') {
+                    $filter['address_type'] = 'network';
+                }
+
+                if ($filter['filter_type'] == '1') {
+                    $filter['filter_type'] = "allow";
+                } else if ($filter['filter_type'] == '2') {
+                    $filter['filter_type'] = "block";
+                } else if ($filter['filter_type'] == '3') {
+                    $filter['filter_type'] = "monitor";
+                }
+
+                if ($filter['added_by'] == '0') {
+                    $filter['added_by'] = "System";
+                } else {
+                    $user = $this->basepackages->accounts->getAccountById($filter['added_by'],false,false,false,false,false,false,true);
+
+                    if ($user && isset($user['full_name'])) {
+                        $filter['added_by'] = $user['full_name'];
+                    } else {
+                        $filter['added_by'] = "System";
+                    }
+                }
+
+                $filter['actions'] = '';
+            }
+
+            $this->view->data = $filters;
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function addFilterAction()
+    {
+        if ($this->request->isPost()) {
+
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->apps->addFilter($this->postData());
+
+            $this->addResponse(
+                $this->apps->packagesData->responseMessage,
+                $this->apps->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function removeFilterAction()
+    {
+        if ($this->request->isPost()) {
+
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->apps->removeFilter($this->postData());
+
+            $this->addResponse(
+                $this->apps->packagesData->responseMessage,
+                $this->apps->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function blockMonitorFilterAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->apps->blockMonitorFilter($this->postData());
+
+            $this->addResponse(
+                $this->apps->packagesData->responseMessage,
+                $this->apps->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function resetAppFiltersAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->apps->resetAppFilters($this->postData());
 
             $this->addResponse(
                 $this->apps->packagesData->responseMessage,

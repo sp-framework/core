@@ -36,7 +36,7 @@ use System\Base\Installer\Packages\Setup\Register\Modules\Package as RegisterPac
 use System\Base\Installer\Packages\Setup\Register\Modules\Repository as RegisterRepository;
 use System\Base\Installer\Packages\Setup\Register\Modules\View as RegisterView;
 use System\Base\Installer\Packages\Setup\Schema\Apps;
-use System\Base\Installer\Packages\Setup\Schema\Apps\IpBlackList;
+use System\Base\Installer\Packages\Setup\Schema\Apps\IpFilter;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ActivityLogs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\AddressBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailQueue;
@@ -180,7 +180,7 @@ class Setup
 
 		$this->db->createTable('core', $dbName, (new Core)->columns());
 		$this->db->createTable('apps', $dbName, (new Apps)->columns());
-		$this->db->createTable('apps_ip_black_list', $dbName, (new IpBlackList)->columns());
+		$this->db->createTable('apps_ip_filter', $dbName, (new IpFilter)->columns());
 		$this->db->createTable('domains', $dbName, (new Domains)->columns());
 		$this->db->createTable('modules_components', $dbName, (new Components)->columns());
 		$this->db->createTable('modules_packages', $dbName, (new Packages)->columns());

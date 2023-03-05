@@ -111,14 +111,14 @@ class Apps
 					]
 				),
 				new Column(
-					'ip_black_list',
+					'ip_filter_default_action',
 					[
-						'type'    => Column::TYPE_JSON,
-						'notNull' => false,
+						'type'    => Column::TYPE_BOOLEAN,
+						'notNull' => true,
 					]
 				),
 				new Column(
-					'incorrect_login_attempt_blacklist',
+					'incorrect_login_attempt_block_ip',
 					[
 						'type'    => Column::TYPE_TINYINTEGER,
 						'notNull' => false,

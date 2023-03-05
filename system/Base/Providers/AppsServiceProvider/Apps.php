@@ -5,8 +5,9 @@ namespace System\Base\Providers\AppsServiceProvider;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\AppsServiceProvider\Apps\Types;
-use System\Base\Providers\AppsServiceProvider\IpBlackList;
+use System\Base\Providers\AppsServiceProvider\IpFilter;
 use System\Base\Providers\AppsServiceProvider\Model\Apps as AppsModel;
+use System\Base\Providers\AppsServiceProvider\Model\AppsIpFilter;
 
 class Apps extends BasePackage
 {
@@ -18,7 +19,7 @@ class Apps extends BasePackage
 
 	public $types;
 
-	public $ipBlackList;
+	public $ipFilter;
 
 	protected $reservedRoutes;
 
@@ -34,7 +35,7 @@ class Apps extends BasePackage
 
 		$this->app = $this->getAppInfo();
 
-		$this->ipBlackList = new IpBlackList;
+		$this->ipFilter = new IpFilter;
 
 		return $this;
 	}
@@ -52,6 +53,7 @@ class Apps extends BasePackage
 				return $this->appInfo;
 			}
 		}
+
 		return null;
 	}
 
@@ -154,6 +156,7 @@ class Apps extends BasePackage
 
 		$data['default_component'] = 0;
 		$data['errors_component'] = 0;
+		$data['ip_filter_default_action'] = 0;
 
 		if ($this->add($data)) {
 
@@ -204,7 +207,7 @@ class Apps extends BasePackage
 			$this->modules->views->updateViews($app);
 		}
 
-		$app = $this->processBlacklist($app);
+		// $app = $this->processBlacklist($app);
 
 		if ($this->update($app)) {
 			$this->addActivityLog($data, $app);
@@ -217,36 +220,154 @@ class Apps extends BasePackage
 		}
 	}
 
-	public function processBlacklist($app, $newIp = null)
+	public function getFilters(array $data)
 	{
-		if ($app['ip_black_list'] !== '' || is_null($app['ip_black_list'])) {
-			$app['ip_black_list'] = trim($app['ip_black_list']);
-			$app['ip_black_list'] = trim($app['ip_black_list'], ',');
-
-			$app['ip_black_list'] = str_replace(' ', '', $app['ip_black_list']);
-
-			$app['ip_black_list'] = explode(',', $app['ip_black_list']);
-
-			if (count($app['ip_black_list']) > 0) {
-				$ipBlackList = new IpBlackList;
-
-				foreach ($app['ip_black_list'] as $ipBlackListKey => $ipBlackListValue) {
-					if ($ipBlackList->validateIp($ipBlackListValue) !== true) {
-						unset($app['ip_black_list'][$ipBlackListKey]);
-					}
-				}
-			}
-
-			if ($newIp) {
-				$app['ip_black_list'] = array_merge($app['ip_black_list'], [$newIp]);
-			}
-
-			$app['ip_black_list'] = Json::encode($app['ip_black_list']);
-		} elseif (isset($app['ip_black_list']) && $app['ip_black_list'] === '') {
-			$app['ip_black_list'] = Json::encode([]);
+		if (!isset($data['app_id'])) {
+			return Json::encode([]);//blank array
 		}
 
-		return $app;
+		$app = $this->getFirst('id', $data['app_id']);
+
+		$filtersObj = $app->getIpFilters();
+
+		if ($filtersObj && $filtersObj->count() > 0) {
+			$filters = $filtersObj->toArray();
+		} else {
+			$filters = [];
+		}
+
+		return $filters;
+	}
+
+	public function addFilter(array $data)
+	{
+		if (!isset($data['filter_type']) || !isset($data['ip_address'])) {
+			$this->addResponse('Please provide correct address and filter type', 1);
+
+			return false;
+		}
+
+		if ($data['filter_type'] !== 'allow' && $data['filter_type'] !== 'block') {
+			$this->addResponse('Please provide correct filter type', 1);
+
+			return false;
+		}
+
+		$address = explode('/', $data['ip_address']);
+
+		if (count($address) === 2 || count($address) === 1) {
+			//validate address
+			$ipFilter = new IpFilter;
+
+			$validateIP = $ipFilter->validateIp($address[0]);
+
+			if ($validateIP !== true) {
+				$this->addResponse($validateIP, 1);
+
+				return;
+			}
+			if (count($address) === 2) {
+				$data['address_type'] = 2;
+			} else if (count($address) === 1) {
+				$data['address_type'] = 1;
+			}
+		} else {
+			$this->addResponse('Please enter correct address', 1);
+
+			return false;
+		}
+
+		$filtersObj = new AppsIpFilter();
+
+		$newFilter['app_id'] = $data['app_id'];
+		$newFilter['ip_address'] = $data['ip_address'];
+		$newFilter['address_type'] = $data['address_type'];
+		$newFilter['filter_type'] = $data['filter_type'] === 'allow' ? 1 : 2;
+		$newFilter['added_by'] = $this->auth->account()['id'];
+
+		$filtersObj->assign($newFilter);
+
+		try {
+			$filtersObj->create();
+		} catch (\Exception $e) {
+			if (strpos($e->getMessage(), 'UNIQUE') !== false) {
+				$this->addResponse('Duplicate Entry!', 3);
+
+				return false;
+			}
+
+			throw $e;
+		}
+	}
+
+	public function removeFilter(array $data)
+	{
+		if (!isset($data['id'])) {
+			$this->addResponse('Please provide correct filter ID', 1);
+
+			return false;
+		}
+
+		$filtersObj = new AppsIpFilter();
+
+		$filter = $filtersObj->findFirst('id = ' . $data['id']);
+
+		if ($filter) {
+			if ($filter->delete() !== false) {
+				$this->addResponse('Filter removed.', 0);
+			} else {
+				$this->addResponse('Error removing filter.', 1);
+			}
+		}
+	}
+
+	public function blockMonitorFilter(array $data)
+	{
+		if (!isset($data['id'])) {
+			$this->addResponse('Please provide correct filter ID', 1);
+
+			return false;
+		}
+
+		$filtersObj = new AppsIpFilter();
+
+		$monitorFilterObj = $filtersObj->findFirst('id = ' . $data['id']);
+
+		if ($monitorFilterObj) {
+			$monitorFilter = $monitorFilterObj->toArray();
+			$monitorFilter['filter_type'] = 2;
+			$monitorFilter['added_by'] = $this->auth->account()['id'];
+			$monitorFilter['incorrect_attempts'] = null;
+
+			$monitorFilterObj->assign($monitorFilter);
+
+			if ($monitorFilterObj->update() !== false) {
+				$this->addResponse('Filter moved from monitor to block.', 0);
+			} else {
+				$this->addResponse('Error blocking filter.', 1);
+			}
+		}
+	}
+
+	public function resetAppFilters(array $data)
+	{
+		if (!isset($data['app_id'])) {
+			$this->addResponse('Incorrect App ID', 1);
+
+			return;
+		}
+
+		$app = $this->getFirst('id', $data['app_id']);
+
+		$filtersObj = $app->getIpFilters();
+
+		if ($filtersObj && $filtersObj->count() > 0) {
+			$filtersObj->delete();
+		}
+
+		$app->assign(['incorrect_login_attempt_block_ip' => 0, 'ip_filter_default_action' => 0]);
+
+		$app->update();
 	}
 
 	protected function checkType($data)

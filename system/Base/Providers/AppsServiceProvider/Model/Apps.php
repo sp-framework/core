@@ -3,7 +3,7 @@
 namespace System\Base\Providers\AppsServiceProvider\Model;
 
 use System\Base\BaseModel;
-use System\Base\Providers\AppsServiceProvider\Model\AppsIpBlackList;
+use System\Base\Providers\AppsServiceProvider\Model\AppsIpFilter;
 
 class Apps extends BaseModel
 {
@@ -31,17 +31,26 @@ class Apps extends BaseModel
 
     public $can_login_role_ids;
 
-    public $ip_black_list;
+    public $ip_filter_default_action;
 
-    public $incorrect_login_attempt_blacklist;
+    public $incorrect_login_attempt_block_ip;
 
     public function initialize()
     {
         $clientAddress = $this->getDi()->getRequest()->getClientAddress();
 
-        $this->modelRelations['blacklist']['relationObj'] = $this->hasMany(
+        $this->modelRelations['ipFilters']['relationObj'] = $this->hasMany(
             'id',
-            AppsIpBlackList::class,
+            AppsIpFilter::class,
+            'app_id',
+            [
+                'alias'         => 'ipFilters'
+            ]
+        );
+
+        $this->modelRelations['blacklist']['relationObj'] = $this->hasOne(
+            'id',
+            AppsIpFilter::class,
             'app_id',
             [
                 'alias'         => 'blacklist',

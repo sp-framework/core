@@ -1,16 +1,16 @@
 <?php
 
-namespace Apps\Dash\Middlewares\IpBlackList;
+namespace Apps\Dash\Middlewares\IpFilter;
 
 use Phalcon\Helper\Json;
 use Phalcon\Mvc\View;
 use System\Base\BaseMiddleware;
 
-class IpBlackList extends BaseMiddleware
+class IpFilter extends BaseMiddleware
 {
     public function process($data)
     {
-        if ($this->apps->ipBlackList->checkList()) {
+        if ($this->apps->ipFilter->checkList()) {
             return true;
         }
 

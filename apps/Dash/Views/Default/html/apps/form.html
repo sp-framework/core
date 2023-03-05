@@ -36,6 +36,14 @@
             ]
         )}}
     </div>
+    {% set middlewareIpFilterEnabled = false %}
+    {% set ipFilterTabHidden = true %}
+    {% for middleware in middlewares %}
+        {% if middleware['name'] == 'IpFilter' and middleware['enabled'] == true %}
+            {% set middlewareIpFilterEnabled = true %}
+            {% set ipFilterTabHidden = false %}
+        {% endif %}
+    {% endfor %}
     <div class="col">
         <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -48,23 +56,29 @@
                         'tabsId'                        : 'tabs',
                         'tabsStyle'                     : 'card-outline-tabs',
                         'tabsData'                      :
+                        [
+                            'info'   :
                             [
-                                'info'   :
-                                [
-                                    'tabTitle'          : 'Info',
-                                    'tabInclude'        : 'apps/wizard/register/form'
-                                ],
-                                'modules'   :
-                                [
-                                    'tabTitle'          : 'Modules',
-                                    'tabInclude'        : 'apps/wizard/modules/form'
-                                ],
-                                'permissions'   :
-                                [
-                                    'tabTitle'          : 'Permissions',
-                                    'tabInclude'        : 'apps/wizard/permissions/form'
-                                ]
+                                'tabTitle'          : 'Info',
+                                'tabInclude'        : 'apps/wizard/register/form'
+                            ],
+                            'modules'   :
+                            [
+                                'tabTitle'          : 'Modules',
+                                'tabInclude'        : 'apps/wizard/modules/form'
+                            ],
+                            'permissions'   :
+                            [
+                                'tabTitle'          : 'Permissions',
+                                'tabInclude'        : 'apps/wizard/permissions/form'
+                            ],
+                            'filters'   :
+                            [
+                                'tabTitle'          : 'IP Filters',
+                                'tabInclude'        : 'apps/wizard/filters/form',
+                                'tabHidden'         : ipFilterTabHidden
                             ]
+                        ]
                     ]
                 )}}
             </fieldset>

@@ -8,7 +8,6 @@ use ParagonIE\ConstantTime\Base32;
 use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Confirmation;
 use Phalcon\Validation\Validator\PresenceOf;
-use System\Base\Providers\AccessServiceProvider\BlackWhiteList;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
@@ -250,7 +249,7 @@ class Auth
         }
 
         if (!$this->checkAccount($data)) {
-            $this->apps->ipBlackList->bumpIpBlacklistCounter();
+            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
 
             return false;
         }
