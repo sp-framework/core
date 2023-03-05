@@ -74,9 +74,11 @@ BazCore.header({
                                 <span>Forgot password?</span>
                             </a>
                             <br>
-                            <a class="text-info" href="{{links.url('register')}}">
-                                <span>Register new account</span>
-                            </a>
+                            {% if apps.getappinfo()['registration_allowed'] == '1' %}
+                                <a class="text-info" href="{{links.url('register')}}">
+                                    <span>Register new account</span>
+                                </a>
+                            {% endif %}
                         </div>
                         <div class="col">
                             <button id="{{componentId}}-form-auth" type="button" class="btn btn-info float-right">
