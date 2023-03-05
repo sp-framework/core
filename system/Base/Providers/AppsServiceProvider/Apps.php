@@ -207,8 +207,6 @@ class Apps extends BasePackage
 			$this->modules->views->updateViews($app);
 		}
 
-		// $app = $this->processBlacklist($app);
-
 		if ($this->update($app)) {
 			$this->addActivityLog($data, $app);
 

@@ -1,153 +1,149 @@
-<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
-    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'registration_allowed',
-                        'fieldLabel'                     : 'Allow Registration?',
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'success',
-                        'fieldCheckboxChecked'           : registrationAllowed,
-                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                        'fieldBazScan'                   : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'approve_accounts_manually',
-                        'fieldLabel'                     : 'Approve new Accounts Manually?',
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'success',
-                        'fieldCheckboxChecked'           : approveAccountsManually,
-                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                        'fieldDisabled'                  : registrationApproveAccountsManuallyDisabled,
-                        'fieldBazScan'                   : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true
-                    ]
-                )}}
-            </div>  
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'enforce_2fa',
-                        'fieldLabel'                     : 'Enforce 2FA?',
-                        'fieldType'                      : 'checkbox',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Enforce new user accounts to enable 2FA.',
-                        'fieldCheckboxType'              : 'success',
-                        'fieldCheckboxChecked'           : enforce2FA,
-                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                        'fieldDisabled'                  : registrationEnforce2FADisabled,
-                        'fieldBazScan'                   : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true
-                    ]
-                )}}
-            </div>                
-        </div>
-        <div class="row">     
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'registration_role_id',
-                        'fieldLabel'                     : 'Registration Role',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select default role applied to a user after registration. Example: Customers Role.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : true,
-                        'fieldDisabled'                  : registrationRoleDisabled,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldDataSelect2Options'        : roles,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': appRegistrationRoleId
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'guest_role_id',
-                        'fieldLabel'                     : 'Guest Role',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select default role applied to a guest users. Example: Guests Role.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : true,
-                        'fieldDisabled'                  : guestRoleDisabled,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldDataSelect2Options'        : roles,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': appGuestRoleId
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'can_login_role_ids',
-                        'fieldLabel'                     : 'Allow Roles to login',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select roles that can login into this app. Example: Customer Role, Sales Role.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : false,
-                        'fieldDisabled'                  : false,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldDataSelect2Multiple'       : true,
-                        'fieldDataSelect2Options'        : roles,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': appCanLoginRoleIds
-                    ]
-                )}}
-            </div>
-        </div>
-    </fieldset>
-</form>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'registration_allowed',
+                'fieldLabel'                     : 'Allow Registration?',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : registrationAllowed,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'approve_accounts_manually',
+                'fieldLabel'                     : 'Approve new Accounts Manually?',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : approveAccountsManually,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldDisabled'                  : registrationApproveAccountsManuallyDisabled,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'enforce_2fa',
+                'fieldLabel'                     : 'Enforce 2FA?',
+                'fieldType'                      : 'checkbox',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Enforce new user accounts to enable 2FA.',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : enforce2FA,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldDisabled'                  : registrationEnforce2FADisabled,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'registration_role_id',
+                'fieldLabel'                     : 'Registration Role',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select default role applied to a user after registration. Example: Customers Role.',
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : registrationRoleDisabled,
+                'fieldBazJstreeSearch'           : true,
+                'fieldDataSelect2Options'        : roles,
+                'fieldDataSelect2OptionsKey'     : 'id',
+                'fieldDataSelect2OptionsValue'   : 'name',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': appRegistrationRoleId
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'guest_role_id',
+                'fieldLabel'                     : 'Guest Role',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select default role applied to a guest users. Example: Guests Role.',
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : guestRoleDisabled,
+                'fieldBazJstreeSearch'           : true,
+                'fieldDataSelect2Options'        : roles,
+                'fieldDataSelect2OptionsKey'     : 'id',
+                'fieldDataSelect2OptionsValue'   : 'name',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': appGuestRoleId
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'can_login_role_ids',
+                'fieldLabel'                     : 'Allow Roles to login',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select roles that can login into this app. Example: Customer Role, Sales Role.',
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldRequired'                  : false,
+                'fieldDisabled'                  : false,
+                'fieldBazJstreeSearch'           : true,
+                'fieldDataSelect2Multiple'       : true,
+                'fieldDataSelect2Options'        : roles,
+                'fieldDataSelect2OptionsKey'     : 'id',
+                'fieldDataSelect2OptionsValue'   : 'name',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': appCanLoginRoleIds
+            ]
+        )}}
+    </div>
+</div>
