@@ -36,11 +36,9 @@
             ]
         )}}
     </div>
-    {% set middlewareIpFilterEnabled = false %}
     {% set ipFilterTabHidden = true %}
     {% for middleware in middlewares %}
         {% if middleware['name'] == 'IpFilter' and middleware['enabled'] == true %}
-            {% set middlewareIpFilterEnabled = true %}
             {% set ipFilterTabHidden = false %}
         {% endif %}
     {% endfor %}
