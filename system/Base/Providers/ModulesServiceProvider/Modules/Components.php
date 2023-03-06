@@ -30,6 +30,17 @@ class Components extends BasePackage
 		return false;
 	}
 
+	public function getComponentByRoute($route)
+	{
+		foreach($this->components as $component) {
+			if (strtolower($component['route']) === strtolower($route)) {
+				return $component;
+			}
+		}
+
+		return false;
+	}
+
 	public function getRouteComponentForApp($route, $appId)
 	{
 		foreach($this->components as $component) {

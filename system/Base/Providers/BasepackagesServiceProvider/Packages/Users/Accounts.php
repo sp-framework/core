@@ -214,6 +214,20 @@ class Accounts extends BasePackage
             $data['override_role'] == 0
         ) {
             $data['permissions'] = Json::encode([]);
+        } else if (isset($data['override_role']) && $data['override_role'] == 1) {
+            //Prevent lockout of logged in user
+            if ($data['id'] == $this->auth->account()['id']) {
+                if (is_string($data['permissions'])) {
+                    $data['permissions'] = Json::decode($data['permissions'], true);
+                }
+
+                $component = $this->modules->components->getComponentByRoute('system/users/accounts');
+
+                $data['permissions'][$this->apps->getAppInfo()['id']][$component['id']]['view'] = 1;
+                $data['permissions'][$this->apps->getAppInfo()['id']][$component['id']]['update'] = 1;
+
+                $data['permissions'] = Json::encode($data['permissions']);
+            }
         }
 
         $data['email'] = strtolower($data['email']);
