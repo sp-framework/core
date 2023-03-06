@@ -77,6 +77,10 @@ class ExceptionHandlers extends BaseComponent
 	{
 		$this->view->setViewsDir(base_path($this->baseErrorDir));
 
-		return $this->view->partial($partial);
+		return $this->view->partial($partial,
+			[
+				'route' => $this->apps->getAppInfo()['route']
+			]
+		);
 	}
 }

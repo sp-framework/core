@@ -73,10 +73,9 @@ try {
 	} else if (PHP_SAPI !== 'cli') {
 		$bootstrap->mvc();
 	}
-
 } catch (Exception $exception) {
-	if (isset($error)) {
-		$error->handle($exception);
+	if (isset($bootstrap->error)) {
+		$bootstrap->error->handle($exception);
 	} else {
 		$traces = [];
 
