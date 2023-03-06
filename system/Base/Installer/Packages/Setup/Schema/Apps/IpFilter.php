@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Apps;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class IpFilter
 {
