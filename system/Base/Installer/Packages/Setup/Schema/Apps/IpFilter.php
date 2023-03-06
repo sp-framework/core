@@ -53,7 +53,7 @@ class IpFilter
                     'added_by',//0 - Auth_Service, account_id
                     [
                         'type'    => Column::TYPE_INTEGER,
-                        'notNull' => ture,
+                        'notNull' => true,
                     ]
                 ),
                 new Column(
