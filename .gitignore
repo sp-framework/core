@@ -18,3 +18,4 @@ ignore/*
 composer.json
 apps/Dash/Packages/System/Api/CallStats/*
 system/.keys
+composer
