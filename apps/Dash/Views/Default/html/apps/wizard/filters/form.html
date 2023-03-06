@@ -423,7 +423,8 @@ dataCollectionSection =
 
                 $("#{{componentId}}-{{sectionId}}-middleware-IpFilter").click(function() {
                     if ($(this).is(':checked') === true) {
-                        $("a.nav-link:contains('IP Filters')").parent('li').show();
+                        $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', false);
+                        $("#{{componentId}}-{{sectionId}}-tabs-filters").attr('hidden', false);
                     } else {
                         Swal.fire({
                             title                       : '<span class="text-danger"> This will reset all app filters. Are you sure?</span>',
@@ -445,7 +446,7 @@ dataCollectionSection =
                             }
                         }).then((result) => {
                             if (result.value) {
-                                $("a.nav-link:contains('IP Filters')").parent('li').hide();
+                                $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', true);
                                     var url = "{{links.url('apps/resetAppFilters')}}";
                                     var postData = { };
                                     postData[$('#security-token').attr('name')] = $('#security-token').val();
