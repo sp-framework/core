@@ -206,6 +206,12 @@ class Accounts extends BasePackage
             $data['status'] = '0';
         }
 
+        if ($data['id'] == $this->auth->account()['id']) {
+            if ($data['status'] == '0') {
+                $data['status'] = 1;//Cannot disable own account
+            }
+        }
+
         $accountObj = $this->getFirst('id', $data['id']);
 
         $account = $this->getAccountById($data['id'], true);

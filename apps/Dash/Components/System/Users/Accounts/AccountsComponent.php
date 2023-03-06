@@ -313,6 +313,10 @@ class AccountsComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
             $this->accounts->removeAccount($this->postData());
 
             $this->addResponse(
