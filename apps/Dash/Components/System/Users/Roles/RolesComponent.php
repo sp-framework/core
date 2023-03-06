@@ -3,6 +3,7 @@
 namespace Apps\Dash\Components\System\Users\Roles;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
+use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class RolesComponent extends BaseComponent
@@ -35,14 +36,38 @@ class RolesComponent extends BaseComponent
             if ($role) {
                 $app = $this->apps->getAppInfo();
 
-                $this->view->middlewares =
-                    msort(
-                        $this->modules->middlewares->getMiddlewaresForAppType(
-                            $app['app_type'],
-                            $app['id']
-                        ), 'sequence');
+                $middlewares = $this->modules->middlewares->getMiddlewaresForAppType($app['app_type'],null);
 
-                $this->view->components = $this->roles->packagesData->components;
+                $middlewareEnabledForApps = [];
+
+                $this->view->aclMiddlewareEnabled = false;
+
+                foreach ($middlewares as $key => &$middleware) {
+                    if ($middleware['name'] === 'Acl') {
+                        if (isset($middleware['apps']) && is_string($middleware['apps'])) {
+                            $middleware['apps'] = Json::decode($middleware['apps'], true);
+
+                            foreach ($middleware['apps'] as $appId => $value) {
+                                if (isset($value['enabled']) && $value['enabled'] === true) {
+                                    array_push($middlewareEnabledForApps, $appId);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                $components = $this->roles->packagesData->components;
+
+                if (count($middlewareEnabledForApps) > 0) {
+                    $this->view->aclMiddlewareEnabled = true;
+                    foreach ($components as $key => $component) {
+                        if (!in_array($component['id'], $middlewareEnabledForApps)) {
+                            unset($components[$key]);
+                        }
+                    }
+                }
+
+                $this->view->components = $components;
 
                 $this->view->acls = $this->roles->packagesData->acls;
 

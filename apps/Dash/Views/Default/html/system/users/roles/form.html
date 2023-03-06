@@ -19,11 +19,9 @@
     {% set permissionsinfohidden = 'hidden' %}
 {% endif %}
 {% set rolePermissions = role['permissions'] %}
-{% for middleware in middlewares %}
-    {% if middleware['name'] == 'Acl' and middleware['enabled'] == false %}
-        {% set permissionshidden = 'hidden' %}
-    {% endif %}
-{% endfor %}
+{% if aclMiddlewareEnabled == false %}
+    {% set permissionshidden = 'hidden' %}
+{% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row">

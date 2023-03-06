@@ -6,6 +6,7 @@ use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Business\Directory\Contacts\Contacts;
 use Apps\Dash\Packages\Crms\Customers\Customers;
 use Apps\Dash\Packages\Hrms\Employees\Employees;
+use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class AccountsComponent extends BaseComponent
@@ -52,7 +53,40 @@ class AccountsComponent extends BaseComponent
             }
 
             if ($account) {
-                $this->view->components = $this->accounts->packagesData->components;
+                $app = $this->apps->getAppInfo();
+
+                $middlewares = $this->modules->middlewares->getMiddlewaresForAppType($app['app_type'],null);
+
+                $middlewareEnabledForApps = [];
+
+                $this->view->aclMiddlewareEnabled = false;
+
+                foreach ($middlewares as $key => &$middleware) {
+                    if ($middleware['name'] === 'Acl') {
+                        if (isset($middleware['apps']) && is_string($middleware['apps'])) {
+                            $middleware['apps'] = Json::decode($middleware['apps'], true);
+
+                            foreach ($middleware['apps'] as $appId => $value) {
+                                if (isset($value['enabled']) && $value['enabled'] === true) {
+                                    array_push($middlewareEnabledForApps, $appId);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                $components = $this->accounts->packagesData->components;
+
+                if (count($middlewareEnabledForApps) > 0) {
+                    $this->view->aclMiddlewareEnabled = true;
+                    foreach ($components as $key => $component) {
+                        if (!in_array($component['id'], $middlewareEnabledForApps)) {
+                            unset($components[$key]);
+                        }
+                    }
+                }
+
+                $this->view->components = $components;
 
                 $this->view->acls = $this->accounts->packagesData->acls;
 
