@@ -1,20 +1,15 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Install;
+namespace Apps\Dash\Packages\System\Api\Apis\Simplify\Install;
 
-use Apps\Dash\Packages\System\Api\Api;
-use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Package as XeroSyncPackages;
-use Apps\Dash\Packages\System\Api\Install\Schema\SystemApi;
-use Apps\Dash\Packages\System\Api\Install\Schema\SystemApiCalls;
-use Apps\Dash\Packages\System\Api\Install\Schema\SystemApiEbay;
-use Apps\Dash\Packages\System\Api\Install\Schema\SystemApiGeneric;
-use Apps\Dash\Packages\System\Api\Install\Schema\SystemApiXero;
+use Apps\Dash\Packages\System\Api\Apis\Simplify;
+use Apps\Dash\Packages\System\Api\Apis\Simplify\Install\Schema\SystemApiSimplify;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Package extends BasePackage
 {
-    protected $packageToUse = Api::class;
+    protected $packageToUse = Simplify::class;
 
     public $api;
 
@@ -34,20 +29,12 @@ class Package extends BasePackage
         try {
             if ($dropTables) {
                 try {
-                    $this->createTable('system_api_generic', '', (new SystemApiGeneric)->columns(), $dropTables);
-                    $this->createTable('system_api_ebay', '', (new SystemApiEbay)->columns(), $dropTables);
-                    $this->createTable('system_api_xero', '', (new SystemApiXero)->columns(), $dropTables);
-                    $this->createTable('system_api_calls', '', (new SystemApiCalls)->columns(), $dropTables);
-                    $this->createTable('system_api', '', (new SystemApi)->columns(), $dropTables);
+                    $this->createTable('system_api_simplify', '', (new SystemApiSimplify)->columns(), $dropTables);
                 } catch (\Exception $e) {
                     var_dump($e);die();
                 }
             } else {
-                $this->createTable('system_api_generic', '', (new SystemApiGeneric)->columns());
-                $this->createTable('system_api_ebay', '', (new SystemApiEbay)->columns());
-                $this->createTable('system_api_xero', '', (new SystemApiEbay)->columns());
-                $this->createTable('system_api_calls', '', (new SystemApiCalls)->columns());
-                $this->createTable('system_api', '', (new SystemApi)->columns());
+                $this->createTable('system_api_simplify', '', (new SystemApiSimplify)->columns());
             }
 
             // $this->registerPackage();
@@ -65,7 +52,7 @@ class Package extends BasePackage
 
     protected function registerPackage()
     {
-        $packagePath = '/apps/Dash/Packages/System/Api';
+        $packagePath = '/apps/Dash/Packages/System/Api/Apis/Simplify';
 
         $jsonFile =
             Json::decode($this->localContent->read($packagePath . '/Install/package.json'), true);
@@ -83,29 +70,5 @@ class Package extends BasePackage
 
         $this->modules->packages->add($jsonFile);
         $this->logger->log->info('Package ' . $jsonFile['display_name'] . ' installed successfully on app ' . $this->app['name']);
-    }
-
-    public function updatePackage()
-    {
-        //
-    }
-
-    public function deletePackage()
-    {
-
-    }
-
-    public function reInstallPackage()
-    {
-        $this->deletePackage();
-
-        $this->installPackage();
-    }
-
-    protected function installSyncPackages($dropTables = false)
-    {
-        $xeroSyncPackage = new XeroSyncPackages;
-
-        $xeroSyncPackage->installPackage($dropTables);
     }
 }

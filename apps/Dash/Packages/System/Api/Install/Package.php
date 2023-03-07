@@ -3,12 +3,8 @@
 namespace Apps\Dash\Packages\System\Api\Install;
 
 use Apps\Dash\Packages\System\Api\Api;
-use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Package as XeroSyncPackages;
 use Apps\Dash\Packages\System\Api\Install\Schema\SystemApi;
 use Apps\Dash\Packages\System\Api\Install\Schema\SystemApiCalls;
-use Apps\Dash\Packages\System\Api\Install\Schema\SystemApiEbay;
-use Apps\Dash\Packages\System\Api\Install\Schema\SystemApiGeneric;
-use Apps\Dash\Packages\System\Api\Install\Schema\SystemApiXero;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
@@ -34,18 +30,18 @@ class Package extends BasePackage
         try {
             if ($dropTables) {
                 try {
-                    $this->createTable('system_api_generic', '', (new SystemApiGeneric)->columns(), $dropTables);
-                    $this->createTable('system_api_ebay', '', (new SystemApiEbay)->columns(), $dropTables);
-                    $this->createTable('system_api_xero', '', (new SystemApiXero)->columns(), $dropTables);
+                    // $this->createTable('system_api_generic', '', (new SystemApiGeneric)->columns(), $dropTables);
+                    // $this->createTable('system_api_ebay', '', (new SystemApiEbay)->columns(), $dropTables);
+                    // $this->createTable('system_api_xero', '', (new SystemApiXero)->columns(), $dropTables);
                     $this->createTable('system_api_calls', '', (new SystemApiCalls)->columns(), $dropTables);
                     $this->createTable('system_api', '', (new SystemApi)->columns(), $dropTables);
                 } catch (\Exception $e) {
                     var_dump($e);die();
                 }
             } else {
-                $this->createTable('system_api_generic', '', (new SystemApiGeneric)->columns());
-                $this->createTable('system_api_ebay', '', (new SystemApiEbay)->columns());
-                $this->createTable('system_api_xero', '', (new SystemApiEbay)->columns());
+                // $this->createTable('system_api_generic', '', (new SystemApiGeneric)->columns());
+                // $this->createTable('system_api_ebay', '', (new SystemApiEbay)->columns());
+                // $this->createTable('system_api_xero', '', (new SystemApiEbay)->columns());
                 $this->createTable('system_api_calls', '', (new SystemApiCalls)->columns());
                 $this->createTable('system_api', '', (new SystemApi)->columns());
             }
@@ -102,10 +98,10 @@ class Package extends BasePackage
         $this->installPackage();
     }
 
-    protected function installSyncPackages($dropTables = false)
-    {
-        $xeroSyncPackage = new XeroSyncPackages;
+    // protected function installSyncPackages($dropTables = false)
+    // {
+    //     $xeroSyncPackage = new XeroSyncPackages;
 
-        $xeroSyncPackage->installPackage($dropTables);
-    }
+    //     $xeroSyncPackage->installPackage($dropTables);
+    // }
 }

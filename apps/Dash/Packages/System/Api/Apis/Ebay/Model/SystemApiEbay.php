@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Model;
+namespace Apps\Dash\Packages\System\Api\Apis\Ebay\Model;
 
 use System\Base\BaseModel;
 

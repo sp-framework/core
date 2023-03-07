@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Install;
+namespace Apps\Dash\Packages\System\Api\Apis\Xero\Install;
 
 use Apps\Dash\Packages\System\Api\Api;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Package as XeroSyncPackages;

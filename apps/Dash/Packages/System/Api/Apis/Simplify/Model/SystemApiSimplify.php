@@ -1,22 +1,12 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Model;
+namespace Apps\Dash\Packages\System\Api\Apis\Simplify\Model;
 
 use System\Base\BaseModel;
 
-class SystemApiXero extends BaseModel
+class SystemApiSimplify extends BaseModel
 {
     public $id;
-
-    public $tenant_id;
-
-    public $tenant_type;
-
-    public $tenant_name;
-
-    public $tenants;
-
-    public $auth_event_id;
 
     public $use_systems_credentials;
 

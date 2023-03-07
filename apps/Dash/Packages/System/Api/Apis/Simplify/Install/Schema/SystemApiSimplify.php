@@ -1,10 +1,10 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Install\Schema;
+namespace Apps\Dash\Packages\System\Api\Apis\Simplify\Install\Schema;
 
 use Phalcon\Db\Column;
 
-class SystemApiGeneric
+class SystemApiSimplify
 {
     public function columns()
     {
@@ -21,23 +21,67 @@ class SystemApiGeneric
                     ]
                 ),
                 new Column(
-                    'api_url',
+                    'use_systems_credentials',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 1024,
+                        'type'    => Column::TYPE_TINYINTEGER,
                         'notNull' => true,
                     ]
                 ),
                 new Column(
-                    'auth_type',
+                    'user_credentials_client_id',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 15,
+                        'size'    => 512,
                         'notNull' => false,
                     ]
                 ),
                 new Column(
-                    'username',
+                    'user_credentials_client_secret',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 512,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'user_credentials_redirect_uri',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 1024,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'user_credentials_scopes',
+                    [
+                        'type'    => Column::TYPE_TEXT,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'user_id_token',
+                    [
+                        'type'    => Column::TYPE_TEXT,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'identifier',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 1024,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'user_access_token',
+                    [
+                        'type'    => Column::TYPE_TEXT,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'user_access_token_valid_until',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 50,
@@ -45,46 +89,22 @@ class SystemApiGeneric
                     ]
                 ),
                 new Column(
-                    'password',
+                    'refresh_token',
+                    [
+                        'type'    => Column::TYPE_TEXT,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'refresh_token_valid_until',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 50,
                         'notNull' => false,
                     ]
-                ),
-                new Column(
-                    'authorization',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 4096,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
-                    'token',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 4096,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
-                    'token_status',
-                    [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
-                    'token_valid_until',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 50,
-                        'notNull' => false,
-                    ]
-                ),
+                )
             ],
-            'options' => [
+            'options'   => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'
             ]
         ];

@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Install\Schema;
+namespace Apps\Dash\Packages\System\Api\Apis\Ebay\Install\Schema;
 
 use Phalcon\Db\Column;
 
