@@ -6,6 +6,7 @@ use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\System\Api\Api;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
+use System\Base\Exceptions\ControllerNotFoundException;
 
 class ApiComponent extends BaseComponent
 {
@@ -23,29 +24,29 @@ class ApiComponent extends BaseComponent
      */
     public function viewAction()
     {
-        if (isset($this->getData()['action']) &&
-            $this->getData()['action'] === 'addebaytoken'
-        ) {
-            $this->addEbayTokenAction();
+        // if (isset($this->getData()['action']) &&
+        //     $this->getData()['action'] === 'addebaytoken'
+        // ) {
+        //     $this->addEbayTokenAction();
 
-            $this->view->setLayout('auth');
+        //     $this->view->setLayout('auth');
 
-            $this->view->pick('api/types/ebay/wizard/addtoken');
+        //     $this->view->pick('api/types/ebay/wizard/addtoken');
 
-            return;
-        }
+        //     return;
+        // }
 
-        if (isset($this->getData()['action']) &&
-            $this->getData()['action'] === 'addxerotoken'
-        ) {
-            $this->addXeroTokenAction();
+        // if (isset($this->getData()['action']) &&
+        //     $this->getData()['action'] === 'addxerotoken'
+        // ) {
+        //     $this->addXeroTokenAction();
 
-            $this->view->setLayout('auth');
+        //     $this->view->setLayout('auth');
 
-            $this->view->pick('api/types/xero/wizard/addtoken');
+        //     $this->view->pick('api/types/xero/wizard/addtoken');
 
-            return;
-        }
+        //     return;
+        // }
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
@@ -59,22 +60,26 @@ class ApiComponent extends BaseComponent
                     $this->includeEbayIds();
                 }
             } else {
-                if ((isset($this->getData()['type']) && $this->getData()['type'] === 'ebay')) {
-                    $this->includeEbayIds();
-                }
+                // if ((isset($this->getData()['type']) && $this->getData()['type'] === 'ebay')) {
+                //     $this->includeEbayIds();
+                // }
 
                 $api = [];
 
                 $api['setup'] = 0;
 
                 $api['api_type'] = $this->getData()['type'];
+
+                $apiClass = $this->apiPackage->getApiClass($api['api_type']);
+
+                try {
+                    $api = (new $apiClass($api, $this->apiPackage))->init()->view();
+                } catch (\Exception $e) {
+                    throw new ControllerNotFoundException;
+                }
             }
 
             $this->view->api = $api;
-
-            $this->view->responseCode = $this->apiPackage->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->apiPackage->packagesData->responseMessage;
 
             $this->view->pick('api/view');
 

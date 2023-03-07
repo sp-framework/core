@@ -6,7 +6,6 @@ use Apps\Dash\Packages\Devtools\Api\Contracts\Install\Schema\DevtoolsApiContract
 use Apps\Dash\Packages\Devtools\Api\Enums\Install\Schema\DevtoolsApiEnums;
 use Apps\Dash\Packages\System\Api\Install\Schema\SystemApi;
 use Apps\Dash\Packages\System\Api\Install\Schema\SystemApiCalls;
-use Apps\Dash\Packages\System\Api\Install\Schema\SystemApiGeneric;
 use Apps\Dash\Packages\System\Messenger\Install\Schema\SystemMessenger;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
@@ -222,7 +221,6 @@ class Setup
 		$this->db->createTable('basepackages_workers_jobs', $dbName, (new Jobs)->columns());
 		$this->db->createTable('basepackages_import_export', $dbName, (new ImportExport)->columns());
 		$this->db->createTable('basepackages_templates', $dbName, (new Templates)->columns());
-		$this->db->createTable('system_api_generic', $dbName, (new SystemApiGeneric)->columns());
 		$this->db->createTable('system_api_calls', $dbName, (new SystemApiCalls)->columns());
 		$this->db->createTable('system_api', $dbName, (new SystemApi)->columns());
 		$this->db->createTable('system_messenger', $dbName, (new SystemMessenger)->columns());

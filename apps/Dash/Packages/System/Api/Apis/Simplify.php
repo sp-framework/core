@@ -23,7 +23,7 @@ class Simplify
 
     public $packagesData;
 
-    public function __construct($apiConfig, $api)
+    public function __construct($apiConfig = [], $api)
     {
         $this->apiConfig = $apiConfig;
 
@@ -52,7 +52,9 @@ class Simplify
 
     protected function mergeSimplifyConfigs()
     {
-        if ($this->apiConfig['use_systems_credentials'] == 1) {
+        if (isset($this->apiConfig['use_systems_credentials']) &&
+            $this->apiConfig['use_systems_credentials'] == 1
+        ) {
             try {
                 $config = include(base_path('apps/Dash/Packages/System/Api/Configs/Simplify/Config.php'));
 
@@ -66,16 +68,26 @@ class Simplify
                 [
                     'credentials'   =>
                     [
-                        'clientId'          => $this->apiConfig['user_credentials_client_id'],
-                        'clientSecret'      => $this->apiConfig['user_credentials_client_secret'],
-                        'redirectUri'       => $this->apiConfig['user_credentials_redirect_uri'],
-                        'authToken'         => $this->apiConfig['app_access_token'],
-                        'scopes'            => $this->apiConfig['user_credentials_scopes']
+                        'clientId'          =>
+                            isset($this->apiConfig['user_credentials_client_id']) ? $this->apiConfig['user_credentials_client_id'] : '',
+                        'clientSecret'      =>
+                            isset($this->apiConfig['user_credentials_client_secret']) ? $this->apiConfig['user_credentials_client_secret'] : '',
+                        'redirectUri'       =>
+                            isset($this->apiConfig['user_credentials_redirect_uri']) ? $this->apiConfig['user_credentials_redirect_uri'] : '',
+                        'authToken'         =>
+                            isset($this->apiConfig['app_access_token']) ? $this->apiConfig['app_access_token'] : '',
+                        'scopes'            =>
+                            isset($this->apiConfig['user_credentials_scopes']) ? $this->apiConfig['user_credentials_scopes'] : ''
                     ],
                 ];
 
             $this->apiConfig = BaseFunctions::arrayMergeDeep($this->apiConfig, $userCredentials);
         }
+    }
+
+    public function view()
+    {
+        return $this->apiConfig;
     }
 
     public function useService($serviceName)

@@ -2,7 +2,7 @@
 
 namespace System\Base\Exceptions;
 
-class controllerNotFoundException extends \Exception
+class ControllerNotFoundException extends \Exception
 {
     //If controller is not found.
 }

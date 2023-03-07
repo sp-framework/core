@@ -367,7 +367,7 @@ class Api extends BasePackage
         }
     }
 
-    protected function getApiClass($api)
+    public function getApiClass($api)
     {
         $path = explode('/', $api);
 
