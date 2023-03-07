@@ -5,8 +5,8 @@
     {% set apiId = '' %}
     {% set title = 'New ' ~ api['api_type'] ~ ' API' %}
 {% endif %}
-
-{% if api['api_type'] === 'repo' %}
+{{view.getPartial('api/apis/' ~ api['api_type'] ~ '/view')}}
+{# {% if api['api_type'] === 'repo' %}
     {{adminltetags.useTag('content',
         [
             'component'                     : component,
@@ -62,4 +62,4 @@
             ]
         ]
     )}}
-{% endif %}
+{% endif %} #}

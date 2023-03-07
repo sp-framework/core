@@ -1,0 +1,116 @@
+{% if api['id'] is not defined or api['setup'] != 4 %}
+    {% if api['id'] is defined %}
+        {% set apiStep = 2 %}
+    {% else %}
+        {% set apiStep = api['setup'] %}
+    {% endif %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'sectionWithWizard',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'magic',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'wizardType'                    : 'triangle',
+            'wizardCanCancel'               : true,
+            'wizardCancelUrl'               : 'system/api',
+            'wizardDoneUrl'                 : 'system/api',
+            'wizardStartAtStep'             : apiStep,
+            'wizardSteps'                   :
+                [
+                    '0' :
+                        [
+                            'title'             : 'Information',
+                            'content'           : view.getPartial('api/types/xero/wizard/info')
+                        ],
+                    '1' :
+                        [
+                            'title'             : 'Register API',
+                            'content'           : view.getPartial('api/types/xero/wizard/register',
+                                                    [
+                                                        'wizard'    : true,
+                                                        'register'  : true,
+                                                        'title'     : title
+                                                    ]
+                                                ),
+                            'description'       : 'Step 1: Register API information with this system.',
+                            'submitOnNext'      : true
+                        ],
+                    '2' :
+                        [
+                            'title'             : 'Authorize App & Get Tokens',
+                            'content'           : view.getPartial('api/types/xero/wizard/authorizeapp',
+                                                    [
+                                                        'componentId'       : componentId,
+                                                        'sectionId'         : 'main',
+                                                        'parentComponentId' : parent
+                                                    ]
+                                                ),
+                            'description'       : 'Step 2: Authorize this system using systems/your Xero dev account credentials to obtain tokens.',
+                            'nextDisabled'      : true
+                        ],
+                    '3' :
+                        [
+                            'title'             : 'Select Organization',
+                            'content'           : view.getPartial('api/types/xero/wizard/register',
+                                                    [
+                                                        'wizard'    : true,
+                                                        'selectOrg' : true,
+                                                        'title'     : title
+                                                    ]
+                                                ),
+                            'description'       : 'Step 3: Select Xero Organization.',
+                            'submitOnNext'      : true
+                        ],
+                    '4' :
+                        [
+                            'title'             : 'Assign',
+                            'content'           : view.getPartial('api/types/xero/wizard/assign',
+                                                    [
+                                                        'componentId'       : componentId,
+                                                        'sectionId'         : 'main',
+                                                        'parentComponentId' : parent
+                                                    ]
+                                                ),
+                            'description'       : 'Step 4: Assign Xero API to a business entity.',
+                            'goBack'            : false
+                        ]
+                ]
+        ]
+    )}}
+{% else %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'exchange-alt',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'api/types/xero/wizard/register/form',
+            'formButtons'                   :
+            [
+                'updateButtonId'                : apiId,
+                'addActionUrl'                  : 'system/api/add',
+                'addSuccessRedirectUrl'         : 'system/api',
+                'updateActionUrl'               : 'system/api/update',
+                'updateSuccessRedirectUrl'      : 'system/api',
+                'cancelActionUrl'               : 'system/api',
+                'closeActionUrl'                : 'system/api'
+            ]
+        ]
+    )}}
+{% endif %}
