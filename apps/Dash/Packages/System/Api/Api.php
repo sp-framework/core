@@ -7,6 +7,7 @@ use Apps\Dash\Packages\System\Api\Model\SystemApiCalls;
 use Apps\Dash\Packages\System\Api\Model\SystemApiEbay;
 use Apps\Dash\Packages\System\Api\Model\SystemApiGeneric;
 use Apps\Dash\Packages\System\Api\Model\SystemApiXero;
+use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
@@ -21,6 +22,8 @@ class Api extends BasePackage
     public $api;
 
     public $apiConfig;
+
+    public $apiTypes = null;
 
     public function getApiById(int $id, bool $resetCache = false, bool $enableCache = true)
     {
@@ -59,7 +62,32 @@ class Api extends BasePackage
 
         $this->packageName = 'api';
 
+        if (!$this->apiTypes) {
+            $this->registerApiTypes();
+        }
+
         return $this;
+    }
+
+    protected function registerApiTypes()
+    {
+        try {
+            $this->apiTypes = [];
+
+            $types = $this->localContent->listContents('apps/Dash/Packages/System/Api/Apis/');
+
+            foreach ($types as $item) {
+                if ($item instanceof \League\Flysystem\FileAttributes) {
+                    $path = explode('/', $item->path());
+
+                    $fileName = Arr::last($path);
+
+                    array_push($this->apiTypes, strtolower(explode('.php', $fileName)[0]));
+                }
+            }
+        } catch (FilesystemException $exception) {
+            throw $exception;
+        }
     }
 
     protected function initAPIType($data)
@@ -307,19 +335,10 @@ class Api extends BasePackage
                     $this->apiConfig = $this->getApiById($apiApi[0]['id']);
                 }
             }
-
         } else if (isset($data['api_id'])) {
-
             $this->apiConfig = $this->getApiById($data['api_id']);
-
         } else if (isset($data['config'])) {
-
             $this->apiConfig = $data['config'];
-
-        } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'API Id/Config missing.';
         }
 
         if ($this->apiConfig) {

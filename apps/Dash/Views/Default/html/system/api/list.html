@@ -1,3 +1,20 @@
+{% set apiButtons = '' %}
+{% if apiTypes|length > 0 %}
+    {% set apiButtons = apiButtons ~ '{' %}
+    {% for apiType in apiTypes %}
+        {% set link = links.url('system/api/q/type/' ~ apiType ~ '/id/0') %}
+        {% set apiButtons =
+            apiButtons ~ '"' ~ apiType ~ '-api" : {"title" : "' ~ apiType ~ '","type" : "primary","additionalClass" : "contentAjaxLink","url" : "' ~ link ~ '"}'
+        %}
+        {% if not loop.last %}
+            {% set apiButtons = apiButtons ~ ',' %}
+        {% endif %}
+    {% endfor %}
+    {% set apiButtons = apiButtons ~ '}' %}
+    {% set apiButtons = json_decode(apiButtons, true) %}
+{% else %}
+    {% set apiButtons = [] %}
+{% endif %}
 {{adminltetags.useTag('content',
     [
         'component'             : table['component'],
@@ -27,21 +44,7 @@
                 'dropdownButtonAdditionalClass'     : 'text-uppercase',
                 'buttonPosition'                    : 'right',
                 'dropdownAlign'                     : 'right',
-                'buttons'                           :
-                    {
-                        'generic-api' : {
-                            'title'                   : 'Generic',
-                            'type'                    : 'primary',
-                            'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : links.url('system/api/q/type/generic/id/0')
-                        },
-                        'repo-api' : {
-                            'title'                   : 'Repository',
-                            'type'                    : 'primary',
-                            'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : links.url('system/api/q/type/repo/id/0')
-                        }
-                    }
+                'buttons'                           : apiButtons
             },
         'dtTable'               : table,
         'dtColumns'             : table['columns'],

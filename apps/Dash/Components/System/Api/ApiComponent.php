@@ -81,7 +81,7 @@ class ApiComponent extends BaseComponent
             return;
         }
 
-        $this->view->apiType = '';
+        $this->view->apiTypes = $this->apiPackage->apiTypes;
 
         if ($this->request->isPost()) {
             $replaceColumns =
