@@ -36,7 +36,7 @@ class Api extends BasePackage
                 return false;
             }
 
-            $api = $this->initAPIType($api);
+            $this->initAPIType($api);
 
             $apiData = $this->getById($api['api_id'], false, false);
 
@@ -92,26 +92,9 @@ class Api extends BasePackage
 
     protected function initAPIType($data)
     {
-        if ($data['api_type'] === 'generic') {
-            $this->modelToUse = SystemApiGeneric::class;
+        $this->modelToUse = 'Apps\\Dash\\Packages\\System\\Api\\Model\\SystemApi' . ucfirst($data['api_type']);
 
-            $this->packageName = 'apiGeneric';
-
-            $data['setup'] = 3;
-
-        } else if ($data['api_type'] === 'ebay') {
-            $this->modelToUse = SystemApiEbay::class;
-
-            $this->packageName = 'apiEbay';
-
-        } else if ($data['api_type'] === 'xero') {
-
-            $this->modelToUse = SystemApiXero::class;
-
-            $this->packageName = 'apiXero';
-        }
-
-        return $data;
+        $this->packageName = 'api' . ucfirst($data['api_type']);
     }
 
     /**
@@ -123,9 +106,11 @@ class Api extends BasePackage
 
         $data['setup'] = 1;
 
-        $data = $this->initAPIType($data);
+        $this->initAPIType($data);
 
-        $apiData = $data;
+        $api = $this->initApi($data);
+        var_dump($api);die();
+        $data = $api->add($data);
 
         if ($apiData['api_type'] === 'ebay' ||
             $apiData['api_type'] === 'xero'
@@ -150,7 +135,7 @@ class Api extends BasePackage
             }
         }
 
-        if ($this->add($apiData)) {
+        if ($this->add($data)) {
             $data['api_id'] = $this->packagesData->last['id'];
 
             $this->init();
@@ -342,7 +327,7 @@ class Api extends BasePackage
         }
 
         if ($this->apiConfig) {
-            $api = $this->initApi($this->apiConfig);
+            $api = $this->initApi();
 
             if (isset($data['service'])) {
                 try {
@@ -366,12 +351,16 @@ class Api extends BasePackage
         return false;
     }
 
-    protected function initApi()
+    protected function initApi($config = null)
     {
-        try {
-            $apiClass = 'Apps\\Dash\\Packages\\System\\Api\\Apis' . $this->getApiClass($this->apiConfig['api_type']);
+        if (!$config) {
+            $config = $this->apiConfig;
+        }
 
-            return (new $apiClass($this->apiConfig, $this))->init();
+        try {
+            $apiClass = $this->getApiClass($config['api_type']);
+
+            return (new $apiClass($config, $this))->init();
 
         } catch (\Exception $e) {
             throw $e;
@@ -392,7 +381,7 @@ class Api extends BasePackage
             $apiClass .= '\\' . ucfirst($api);
         }
 
-        return $apiClass;
+        return 'Apps\\Dash\\Packages\\System\\Api\\Apis' . $apiClass;
     }
 
     public function getApiByType($type, $inuse = null)
