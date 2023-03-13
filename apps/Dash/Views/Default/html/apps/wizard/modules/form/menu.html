@@ -503,6 +503,13 @@ dataCollectionSection =
                             newStructure[structureId]['data']['custom_menu'] = true;
                         }
 
+                        if (structureArr[structure]['data']['sub_menu']) {
+                            if (!newStructure[structureId]['data']) {
+                                newStructure[structureId]['data'] = { };
+                            }
+                            newStructure[structureId]['data']['sub_menu'] = true;
+                        }
+
                         if (structureArr[structure]['children'].length > 0) {
                             newStructure[structureId]['childs'] = { };
 
@@ -620,10 +627,13 @@ dataCollectionSection =
 
                 if (data.node.data && data.node.data.link) {
                     $('#{{componentId}}-{{sectionId}}-menu_link').val(data.node.data.link);
-                    $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked = false;
                 } else {
                     $('#{{componentId}}-{{sectionId}}-menu_link').val('');
+                }
+                if (data.node.data && data.node.data.sub_menu) {
                     $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked = true;
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked = false;
                 }
 
                 $('#{{componentId}}-{{sectionId}}-menu_title').attr('disabled', false);
@@ -785,21 +795,25 @@ dataCollectionSection =
                             return;
                         }
 
-                        var rename = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('rename_node', nodeId, title);
+                        if (nodeData['text'] !== title) {
+                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('rename_node', nodeId, title);
+                        }
 
                         nodeData['icon'] = 'fa ' + isBrand + ' fa-fw fa-' + iconId + ' text-sm';
                         if (nodeData['data'] && nodeData['data']['link']) {
                             nodeData['data']['link'] = link;
                         }
 
-                        $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('move_node',
-                            nodeId,
-                            parentId,
-                            'last',
-                            function() {
-                                getMenuStructureData();
-                                cleanMenuForm();
-                            });
+                        if (nodeData['parent'] !== parentId) {
+                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('move_node',
+                                nodeId,
+                                parentId,
+                                'last',
+                                function() {
+                                    getMenuStructureData();
+                                    cleanMenuForm();
+                                });
+                        }
                     } else {
                         if (checkDuplicate(nodeId, parent, title)) {
                             PNotify.notice({
@@ -827,6 +841,7 @@ dataCollectionSection =
                     }
                 }
             });
+
             function checkDuplicate(nodeId, parent, title) {
                 if (parent['children'] && parent['children'].length > 0) {
                     for (var children in parent['children']) {
