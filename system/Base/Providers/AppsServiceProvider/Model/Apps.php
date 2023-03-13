@@ -35,6 +35,8 @@ class Apps extends BaseModel
 
     public $incorrect_login_attempt_block_ip;
 
+    public $menu_structure;
+
     public function initialize()
     {
         $clientAddress = $this->getDi()->getRequest()->getClientAddress();

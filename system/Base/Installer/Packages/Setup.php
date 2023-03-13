@@ -292,7 +292,7 @@ class Setup
 					}
 
 					if ($jsonFile['menu'] && $jsonFile['menu'] !== 'false') {
-						$menuId = $this->registerAdminMenu($jsonFile['menu']);
+						$menuId = $this->registerAdminMenu($jsonFile['app_type'], $jsonFile['menu']);
 					} else {
 						$menuId = null;
 					}
@@ -394,9 +394,9 @@ class Setup
 		return (new RegisterApp())->update($this->db);
 	}
 
-	protected function registerAdminMenu(array $menu)
+	protected function registerAdminMenu($appType, array $menu)
 	{
-		return (new RegisterMenu())->register($this->db, $menu);
+		return (new RegisterMenu())->register($this->db, $appType, $menu);
 	}
 
 	protected function registerAdminPackage(array $packageFile)

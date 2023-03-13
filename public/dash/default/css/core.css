@@ -42237,3 +42237,164 @@ a.disabled {
 }
 
 /* croppie images */
+.sidebar-mini .main-sidebar .nav-child-indent .nav-treeview .nav-treeview .nav-treeview .nav-link {
+  width: calc(250px - 0.5rem * 2 - 1.5rem);
+}
+
+/*
+* General: Miscellaneous
+* ----------------------
+*/
+.height-control-100 {
+  max-height: 100px;
+  overflow: auto;
+}
+
+.height-control-200 {
+  max-height: 200px;
+  overflow: auto;
+}
+
+.height-control-300 {
+  max-height: 300px;
+  overflow: auto;
+}
+
+.height-control-400 {
+  max-height: 400px;
+  overflow: auto;
+}
+
+.height-control-500 {
+  max-height: 500px;
+  overflow: auto;
+}
+
+.height-control-600 {
+  max-height: 600px;
+  overflow: auto;
+}
+
+.height-control-700 {
+  max-height: 700px;
+  overflow: auto;
+}
+
+.height-control-800 {
+  max-height: 800px;
+  overflow: auto;
+}
+
+.width-control-50 {
+  width: 50% !important;
+  overflow: auto;
+}
+
+.width-control-100 {
+  width: 100% !important;
+  overflow: auto;
+}
+
+.overflow-scroll {
+  overflow: hidden;
+  overflow-x: scroll;
+  overflow-y: scroll;
+}
+
+.overflow-x-scroll {
+  overflow: hidden;
+  overflow-x: scroll;
+}
+
+.overflow-y-scroll {
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
+.caps {
+  text-transform: uppercase;
+}
+
+.pad {
+  padding: 10px;
+}
+
+.padding-top-5 {
+  padding-top: 5px;
+}
+
+.padding-top-10 {
+  padding-top: 10px;
+}
+
+.padding-top-20 {
+  padding-top: 20px;
+}
+
+.padding-bottoms-5 {
+  padding-bottoms: 5px;
+}
+
+.padding-bottoms-10 {
+  padding-bottoms: 10px;
+}
+
+.padding-bottoms-20 {
+  padding-bottoms: 20px;
+}
+
+.margin {
+  margin: 10px;
+}
+
+.no-margin {
+  margin: 0;
+}
+
+.margin-right-5 {
+  margin-right: 5px;
+}
+
+.margin-right-10 {
+  margin-right: 10px;
+}
+
+.margin-left-5 {
+  margin-left: 5px;
+}
+
+.margin-left-10 {
+  margin-left: 10px;
+}
+
+.margin-top-5 {
+  margin-top: 5px;
+}
+
+.margin-top-10 {
+  margin-top: 10px;
+}
+
+.margin-top-20 {
+  margin-top: 20px;
+}
+
+.margin-bottom-none {
+  margin-bottom: 0;
+}
+
+.margin-bottom-5 {
+  margin-bottom: 5px;
+}
+
+.margin-bottom-10 {
+  margin-bottom: 10px;
+}
+
+.margin-bottom-20 {
+  margin-bottom: 20px;
+}
+
+.inline {
+  display: inline;
+}

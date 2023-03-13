@@ -3244,6 +3244,63 @@ var BazHelpers = function() {
         }
     }
 
+    function findPath(obj, key, array = true) {
+        const path = [];
+        const keyExists = (obj) => {
+            if (!obj || (typeof obj !== "object" && !Array.isArray(obj))) {
+                return false;
+            }
+            else if (obj.hasOwnProperty(key)) {
+                return true;
+            }
+            else if (Array.isArray(obj)) {
+                let parentKey = path.length ? path.pop() : "";
+
+                for (let i = 0; i < obj.length; i++) {
+                    path.push(`${parentKey}[${i}]`);
+                    const result = keyExists(obj[i], key);
+                    if (result) {
+                        return result;
+                    }
+                    path.pop();
+                }
+            }
+            else {
+                for (const k in obj) {
+                    path.push(k);
+                    const result = keyExists(obj[k], key);
+                    if (result) {
+                        return result;
+                    }
+                    path.pop();
+                }
+            }
+            return false;
+        };
+
+        keyExists(obj);
+
+        if (array) {
+            return path;
+        }
+
+        return path.join(".");
+    }
+
+    function fetchFromObject(obj, key) {
+        if (typeof obj === 'undefined') {
+            return false;
+        }
+
+        var _index = key.indexOf('.')
+
+        if (_index > -1) {
+            return fetchFromObject(obj[key.substring(0, _index)], key.substr(_index + 1));
+        }
+
+        return obj[key];
+    }
+
     function setup(BazHelpersConstructor) {
         BazHelpers = BazHelpersConstructor;
 
@@ -3309,6 +3366,14 @@ var BazHelpers = function() {
 
         BazHelpers.interval = function(func, intervalLength, options = { }) {
             return interval(func, intervalLength, options);
+        }
+
+        BazHelpers.findPath = function(obj, key, array) {
+            return findPath(obj, key, array);
+        }
+
+        BazHelpers.fetchFromObject = function(obj, key) {
+            return fetchFromObject(obj, key);
         }
     }
 
@@ -3881,6 +3946,15 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                                 $(bazScanField).data('bazdevpost') === true) {
                                 if (!dataCollection[componentId][sectionId]['data'][extractComponentId]) {
                                     dataCollection[componentId][sectionId]['data'][extractComponentId] = $(bazScanField).html();
+                                }
+                            }
+                        } else if ($(bazScanField).data('bazscantype') === 'jstree') {//jstree, only object is created, data is generated in the html file.
+                            thatV = bazScanField;
+                            if ($(bazScanField).data('bazpostoncreate') === true ||
+                                $(bazScanField).data('bazpostonupdate') === true ||
+                                $(bazScanField).data('bazdevpost') === true) {
+                                if (!dataCollection[componentId][sectionId]['data'][extractComponentId]) {
+                                    dataCollection[componentId][sectionId]['data'][extractComponentId] = { };
                                 }
                             }
                         }
@@ -8799,7 +8873,7 @@ var BazContentFields = function() {
         dataCollection[componentId][sectionId][thisFieldId]['jstree'] = $(fieldId).jstree(options);
         // Search
         if (options.bazJstreeOptions.search == null || options.bazJstreeOptions.search) {
-            $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', false);
+            $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().removeClass('d-none');
             $('#' + thisFieldId + '-tree-search-input').on('keyup', function() {
                 $(fieldId).jstree(true).search($(this).val());
             });
@@ -8810,10 +8884,11 @@ var BazContentFields = function() {
             $('#' + thisFieldId + '-tools-add').attr('hidden', false);
             $('#' + thisFieldId + '-tools-add').click(function(e) {
                 e.preventDefault();
+                var thisFieldId = $(fieldId)[0].id;
                 selectedNode = $(fieldId).jstree('get_selected', true);
                 // Check if node are selected and only 1 is selected
                 if ($(selectedNode).length !== 1) {
-                    PNotify.removeAll();
+                    $('.ui-pnotify').remove();
                     PNotify.notice({
                         title: 'None or Multiple ' + options.bazJstreeOptions.treeName + ' selected!',
                         text: 'Please select only 1 ' + options.bazJstreeOptions.treeName + ' to create a new node under it'
@@ -8821,14 +8896,14 @@ var BazContentFields = function() {
                     pnotifySound.play();
                     return false;
                 } else {
-                    $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', true);
-                    $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().attr('hidden', true);
-                    $('#' + thisFieldId + '-tree-add-input').parents('.form-group').first().attr('hidden', false);
+                    $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().addClass('d-none');
+                    $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().addClass('d-none');
+                    $('#' + thisFieldId + '-tree-add-input').parents('.form-group').first().removeClass('d-none');
                     $('#' + thisFieldId + '-tree-add-input').focus();
                     $('#' + thisFieldId + '-tree-add-input-cancel').click(function() {
                         $('#' + thisFieldId + '-tree-add-input').val(null);
-                        $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', false);
-                        $('#' + thisFieldId + '-tree-add-input').parents('.form-group').first().attr('hidden', true);
+                        $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().removeClass('d-none');
+                        $('#' + thisFieldId + '-tree-add-input').parents('.form-group').first().addClass('d-none');
                         $('#' + thisFieldId + '-tree-add-input-success').off();
                     });
                     $('#' + thisFieldId + '-tree-add-input-success').click(function() {
@@ -8846,11 +8921,13 @@ var BazContentFields = function() {
         // Edit Selected Node
         if (options.bazJstreeOptions.edit == null || options.bazJstreeOptions.edit) {
             $('#' + thisFieldId + '-tools-edit').attr('hidden', false);
-            $('#' + thisFieldId + '-tools-edit').click(function() {
-            selectedNode = $(fieldId).jstree('get_selected', true);
+            $('#' + thisFieldId + '-tools-edit').click(function(e) {
+                e.preventDefault();
+                selectedNode = $(fieldId).jstree('get_selected', true);
+                var thisFieldId = $(fieldId)[0].id;
             // Check if node are selected and only 1 is selected
                 if ($(selectedNode).length !== 1) {
-                    PNotify.removeAll();
+                    $('.ui-pnotify').remove();
                     PNotify.notice({
                         title: 'None or Multiple ' + options.bazJstreeOptions.treeName + ' selected!',
                         text: 'Please select only 1 ' + options.bazJstreeOptions.treeName + ' to rename',
@@ -8858,13 +8935,14 @@ var BazContentFields = function() {
                     pnotifySound.play();
                     return false;
                 } else {
-                    $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', true);
-                    $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().attr('hidden', false);
+                    $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().addClass('d-none');
+                    $('#' + thisFieldId + '-tree-add-input').parents('.form-group').first().addClass('d-none');
+                    $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().removeClass('d-none');
                     $('#' + thisFieldId + '-tree-edit-input').val(selectedNode[0].text).focus();
                     $('#' + thisFieldId + '-tree-edit-input-cancel').click(function() {
                         $('#' + thisFieldId + '-tree-edit-input').val(null);
-                        $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', false);
-                        $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().attr('hidden', true);
+                        $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().removeClass('d-none');
+                        $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().addClass('d-none');
                         $('#' + thisFieldId + '-tree-edit-input-success').off();
                     });
                     $('#' + thisFieldId + '-tree-edit-input-success').click(function() {
@@ -8948,6 +9026,7 @@ var BazContentFields = function() {
         }
         // ModifyJsTree
         function modifyJsTree(tree, optionsId, task, elthis, elthat, selectedNode, runFunction) {
+            var thisFieldId = optionsId;
             if (task === 'addNode') {
                 tree.jstree('create_node',
                     $('#' + selectedNode[0].id),
@@ -8957,8 +9036,8 @@ var BazContentFields = function() {
                         tree.jstree('open_node', $('#' + selectedNode[0].id));
                     }
                 );
-                $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', false);
-                $('#' + thisFieldId + '-tree-add-input').parents('.form-group').first().attr('hidden', true);
+                $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().removeClass('d-none');
+                $('#' + thisFieldId + '-tree-add-input').parents('.form-group').first().addClass('d-none');
                 $('#' + optionsId + '-tree-add-input').val(null);
                 $(elthis).off();
                 $(elthat).off();
@@ -8968,8 +9047,8 @@ var BazContentFields = function() {
                     $('#' + selectedNode[0].id),
                     $('#' + optionsId + '-tree-edit-input').val()
                 );
-                $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', false);
-                $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().attr('hidden', true);
+                $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().removeClass('d-none');
+                $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().addClass('d-none');
                 $('#' + optionsId + '-tree-edit-input').val(null);
                 $(elthis).off();
                 $(elthat).off();

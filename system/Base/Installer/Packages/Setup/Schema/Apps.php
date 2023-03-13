@@ -123,7 +123,14 @@ class Apps
 						'type'    => Column::TYPE_TINYINTEGER,
 						'notNull' => false,
 					]
-				)
+				),
+				new Column(
+					'menu_structure',
+					[
+						'type'    => Column::TYPE_JSON,
+						'notNull' => false,
+					]
+				),
 			],
 			'indexes' => [
 				new Index(

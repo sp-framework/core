@@ -1,9 +1,20 @@
-{% if app['default_component'] is defined and app['default_component'] == '0' %}
+{% if app is not defined or app['menu_structure'] is defined and app['menu_structure'] == null %}
     {% set wizard = true %}
 {% else %}
     {% set wizard = false %}
 {% endif %}
+{% set menuTabHidden = false %}
+{% set menuTabContent =
+    [
+        'tabTitle'          : 'Menu',
+        'tabInclude'        : 'apps/wizard/modules/form/menu',
+        'tabHidden'         : menuTabHidden,
+        'tabDataAttributes' : {'jstree' : 'false'}
+    ]
+%}
 {% if wizard === true %}
+{% set menuTabHidden = true %}
+{% set menuTabContent = [] %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
 {% endif %}
@@ -62,7 +73,8 @@
                                     'tabTitle'          : 'Middlewares',
                                     'tabInclude'        : 'apps/wizard/modules/form/middlewares',
                                     'tabDataAttributes' : {'jstree' : 'false'}
-                                ]
+                                ],
+                                'menu'          : menuTabContent
                             ]
                     ]
                 )}}

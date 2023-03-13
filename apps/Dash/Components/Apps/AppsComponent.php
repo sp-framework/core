@@ -41,6 +41,21 @@ class AppsComponent extends BaseComponent
                 $mandatoryComponents = [];
                 $mandatoryViews = [];
 
+                $baseMenuStructure = $this->basepackages->menus->getMenusForAppType($app['app_type']);
+
+                $this->view->menuBaseStructure = $baseMenuStructure;
+
+                if ($app['menu_structure']) {
+                    $app['menu_structure'] = Json::decode($app['menu_structure'], true);
+
+                    if (count($app['menu_structure']) > 0) {
+                        $this->view->menuBaseStructure =
+                            array_replace_recursive($this->view->menuBaseStructure, $app['menu_structure']);
+                    } else {
+                        $app['menu_structure'] = null;
+                    }
+                }
+
                 $this->view->modulesMenus = $this->basepackages->menus->getMenusForApp($app['id']);
 
                 $componentsArr = $this->modules->components->getComponentsForAppType($app['app_type']);
@@ -99,7 +114,6 @@ class AppsComponent extends BaseComponent
                 $this->view->app = $app;
 
                 if (isset($this->getData()['modules'])) {
-
                     $this->view->modules = true;
 
                     $this->disableViewLevel();

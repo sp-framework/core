@@ -164,6 +164,7 @@ dataCollectionSection =
             'placeholder'   : 'SELECT ROLES'
         },
         '{{componentId}}-{{sectionId}}-form'                            : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                        : 'required',
                 '{{componentId}}-{{sectionId}}-route'                       : 'required',

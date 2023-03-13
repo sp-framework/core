@@ -23,13 +23,18 @@ class Menus extends BasePackage
 
     public function buildMenusForApp($appId)
     {
-        $cachedMenu = $this->cacheTools->getCache('menus');
-
-        if ($cachedMenu) {
-            return $cachedMenu;
-        }
-
         $menus = $this->getMenusForApp($appId);
+
+        $buildMenu = $this->buildMenus($menus);
+
+        return $buildMenu;
+    }
+
+    public function buildMenus($menus = null)
+    {
+        if ($menus === null) {
+            $menus = $this->menus;
+        }
 
         $buildMenu = [];
 
@@ -39,10 +44,6 @@ class Menus extends BasePackage
             if ($menu) {
                 $buildMenu = array_replace_recursive($buildMenu, $menu);
             }
-        }
-
-        if ($this->config->cache->enabled) {
-            $this->cacheTools->setCache('menus_' . $appId, $buildMenu);
         }
 
         return $buildMenu;
@@ -68,6 +69,18 @@ class Menus extends BasePackage
         return $menus;
     }
 
+    public function getMenusForAppType($appType)
+    {
+        $menus = [];
+
+        foreach($this->menus as $menu) {
+            if ($menu['app_type'] === $appType) {
+                $menus[$menu['id']] = $menu;
+            }
+        }
+
+        return $this->buildMenus($menus);
+    }
 
     public function updateMenus($data)
     {
@@ -90,10 +103,6 @@ class Menus extends BasePackage
             }
         }
 
-        if ($this->cacheTools->getCache('menus')) {
-            $this->cacheTools->deleteCache('menus');
-        }
-
-        $this->basepackages->menus->init(true);
+        $this->init(true);
     }
 }

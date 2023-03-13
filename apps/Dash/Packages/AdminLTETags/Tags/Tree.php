@@ -68,6 +68,12 @@ class Tree extends AdminLTETags
     protected function treeGroup($key, $items, $groupIcon, $itemIcon, $children = null)
     {
         if ($this->treeMode === 'jstree') {
+            if (isset($items['icon'])) {
+                $groupIcon = '{"icon" : "fa fa-fw fa-' . $items['icon'] . ' text-sm"}';
+            } else {
+                $groupIcon = '{"icon" : "fa fa-fw fa-plus text-sm"}';
+            }
+
             $groupAdditionalClass =
                 isset($items['groupAdditionalClass']) ?
                 'class="' . $items['groupAdditionalClass'] . '"' :
@@ -174,48 +180,16 @@ class Tree extends AdminLTETags
 
         if ($this->treeMode === 'jstree') {
             if (is_array($items)) {
-                foreach ($items as $itemKey => $itemValue) {
-
-                    if (isset($itemValue['childs'])) {
-                        $this->content .= $this->treeGroup($itemKey, $itemValue, '{"icon" : "fa fa-fw fa-plus text-sm"}', '{"icon" : "fa fa-fw fa-circle text-sm"}', null);
-
-                    } else {
-                        $itemId =
-                            isset($itemValue['id']) ?
-                            $itemValue['id'] :
-                            '';
-
-                        if (isset($itemValue['type']) &&
-                            $itemValue['type'] === 'pdf'
-                        ) {
-
-                            $itemType = $itemValue['type'];
-                            $itemIcon = "{'icon' : 'fa fa-fw fa-file-pdf text-sm'}";
-
-                        } else if ((isset($itemValue['type']) && $itemValue['type'] === 'jpg') ||
-                                   (isset($itemValue['type']) && $itemValue['type'] === 'png')
-                        ) {
-
-                            $itemType = $itemValue['type'];
-                            $itemIcon = "{'icon' : 'fa fa-fw fa-file-image text-sm'}";
-
+                if (isset($items['title'])) {
+                    $this->generateItemContent($items, $itemAdditionalClass);
+                } else {
+                    foreach ($items as $itemKey => $itemValue) {
+                        if (isset($itemValue['childs'])) {
+                            $this->content .=
+                                $this->treeGroup($itemKey, $itemValue, '{"icon" : "fa fa-fw fa-plus text-sm"}', '{"icon" : "fa fa-fw fa-circle text-sm"}', null);
                         } else {
-
-                            $itemType = '';
+                            $this->generateItemContent($itemValue, $itemAdditionalClass);
                         }
-
-                        $this->content .=
-                            '<li class="' . $itemAdditionalClass . '" data-id="' . $itemId . '" data-file-type="' . $itemType . '" data-jstree=\'' . $itemIcon . '\'>';
-
-                            if (isset($itemValue['title'])) {
-                                $this->content .= $itemValue['title'];
-                            } else if (isset($itemValue['name'])) {
-                                $this->content .= $itemValue['name'];
-                            } else if (isset($itemValue['entry'])) {
-                                $this->content .= $itemValue['entry'];
-                            }
-
-                        $this->content .= '</li>';
                     }
                 }
             }
@@ -359,6 +333,64 @@ class Tree extends AdminLTETags
                 }
             }
         }
+    }
+
+    protected function generateItemContent(array $item, $itemAdditionalClass)
+    {
+        $itemId =
+            isset($item['id']) ?
+            $item['id'] :
+            '';
+
+        if (isset($item['type']) &&
+            $item['type'] === 'pdf'
+        ) {
+            $itemType = $item['type'];
+            $itemIcon = "{'icon' : 'fa fa-fw fa-file-pdf text-sm'}";
+
+        } else if ((isset($item['type']) && $item['type'] === 'jpg') ||
+                   (isset($item['type']) && $item['type'] === 'png')
+        ) {
+            $itemType = $item['type'];
+            $itemIcon = "{'icon' : 'fa fa-fw fa-file-image text-sm'}";
+
+        } else {
+            $itemType = '';
+        }
+
+        if (isset($item['icon'])) {
+            $itemIcon = '{"icon" : "fa fa-fw fa-' . $item["icon"] . ' text-sm"}';
+        } else {
+            $itemIcon = '{"icon" : "fa fa-fw fa-circle text-sm"}';
+        }
+
+        if (isset($item['link'])) {
+            $itemLink = $item['link'];
+        } else {
+            $itemLink = '#';
+        }
+
+        if (isset($item['data'])) {
+            $dataAttr = '';
+            foreach ($item['data'] as $dataKey => $dataValue) {
+                $dataAttr .= 'data-' . $dataKey . '="' . $dataValue . '" ';
+            }
+        } else {
+            $dataAttr = '';
+        }
+
+        $this->content .=
+            '<li class="' . $itemAdditionalClass . '" ' . $dataAttr . ' data-link="' . $itemLink . '" data-id="' . $itemId . '" data-file-type="' . $itemType . '" data-jstree=\'' . $itemIcon . '\'>';
+
+            if (isset($item['title'])) {
+                $this->content .= $item['title'];
+            } else if (isset($item['name'])) {
+                $this->content .= $item['name'];
+            } else if (isset($item['entry'])) {
+                $this->content .= $item['entry'];
+            }
+
+        $this->content .= '</li>';
     }
 }
 // 3 layer Menu Example

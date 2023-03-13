@@ -181,6 +181,10 @@ class Apps extends BasePackage
 
 		$app = array_merge($app, $data);
 
+		if (isset($app['reset_structure']) && $app['reset_structure'] == '1') {
+			$app['menu_structure'] = null;
+		}
+
 		if (isset($app['can_login_role_ids'])) {
 			$app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
 

@@ -6,7 +6,7 @@ use Phalcon\Helper\Json;
 
 class Menu
 {
-    public function register($db, array $menu)
+    public function register($db, $appType, array $menu)
     {
         if (isset($menu['seq'])) {
             $sequence = $menu['seq'];
@@ -20,6 +20,7 @@ class Menu
             [
                 'menu'                  => Json::encode($menu),
                 'apps'                  => Json::encode(['1' => ['enabled'  => true]]),
+                'app_type'              => $appType,
                 'sequence'              => $sequence
             ]
         );

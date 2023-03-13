@@ -496,6 +496,15 @@
                                     dataCollection[componentId][sectionId]['data'][extractComponentId] = $(bazScanField).html();
                                 }
                             }
+                        } else if ($(bazScanField).data('bazscantype') === 'jstree') {//jstree, only object is created, data is generated in the html file.
+                            thatV = bazScanField;
+                            if ($(bazScanField).data('bazpostoncreate') === true ||
+                                $(bazScanField).data('bazpostonupdate') === true ||
+                                $(bazScanField).data('bazdevpost') === true) {
+                                if (!dataCollection[componentId][sectionId]['data'][extractComponentId]) {
+                                    dataCollection[componentId][sectionId]['data'][extractComponentId] = { };
+                                }
+                            }
                         }
 
                         if (dataCollection[componentId][sectionId][$(bazScanField)[0].id] &&

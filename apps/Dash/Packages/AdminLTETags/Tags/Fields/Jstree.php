@@ -55,17 +55,17 @@ class Jstree
         $this->content .=
             '<input type="text" class="form-control form-control-sm jstreevalidate rounded-0" ' . $this->fieldParams['fieldId'] . '-validate" ' . $this->fieldParams['fieldName'] . '-tree-validate" placeholder="' . strtoupper($this->fieldParams['fieldPlaceholder']) . '" hidden />
             <div ' . $this->fieldParams['fieldId'] . '-tree-tools" class="mb-2 float-right">
-                <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-add" class="text-primary" data-container="body" data-placement="left" data-toggle="tooltip" data-html="true" title="Add new ' . $this->params['fieldId'] . '" hidden>
-                    <i class="fa fa-fw fa-plus"></i>
+                <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-add" class="text-primary" data-container="body" data-placement="left" data-toggle="tooltip" data-html="true" title="Add new ' . $this->params['fieldLabel'] . '" hidden>
+                    <i class="fa fa-fw fa-plus text-success"></i>
                 </a>
-                <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-edit" class="text-primary ml-1" data-container="body" data-placement="left" data-toggle="tooltip" data-html="true" title="Edit selected ' . $this->params['fieldId'] . '" hidden>
-                    <i class="fa fa-fw fa-edit"></i>
+                <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-edit" class="text-primary ml-1" data-container="body" data-placement="left" data-toggle="tooltip" data-html="true" title="Edit selected ' . $this->params['fieldLabel'] . '" hidden>
+                    <i class="fa fa-fw fa-edit text-warning"></i>
                 </a>
                 <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-collapse" class="text-primary ml-1" data-container="body" data-placement="left" data-toggle="tooltip" data-html="true" title="Collapse All" hidden>
-                    <i class="fa fa-fw fa-compress-arrows-alt"></i>
+                    <i class="fa fa-fw fa-compress-arrows-alt text-primary"></i>
                 </a>
                 <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-expand" class="text-primary ml-1" data-container="body" data-placement="left" data-toggle="tooltip" data-html="true" title="Expand All" hidden>
-                    <i class="fa fa-fw fa-expand-arrows-alt"></i>
+                    <i class="fa fa-fw fa-expand-arrows-alt text-primary"></i>
                 </a>
             </div>';
 
@@ -111,10 +111,10 @@ class Jstree
                         'fieldPlaceholder'                         => 'Add...',
                         'fieldBazScan'                             => false,
                         'fieldHidden'                              => true,
-                        'fieldGroupPreAddonButtonId'               => $this->params['fieldId'] . '-cancel',
+                        'fieldGroupPreAddonButtonId'               => 'cancel',
                         'fieldGroupPreAddonButtonValue'            => '<i class="fa fa-fw fa-times"></i>',
                         'fieldGroupPreAddonButtonClass'            => 'danger',
-                        'fieldGroupPostAddonButtonId'              => $this->params['fieldId'] . '-success',
+                        'fieldGroupPostAddonButtonId'              => 'success',
                         'fieldGroupPostAddonButtonValue'           => '<i class="fa fa-fw fa-plus"></i>',
                         'fieldGroupPostAddonButtonClass'           => 'success'
                     ]
@@ -135,20 +135,24 @@ class Jstree
                         'fieldAdditionalClass'                     => 'mb-1',
                         'fieldGroupSize'                           => 'sm',
                         'fieldRequired'                            => false,
-                        'fieldPlaceholder'                         => 'Add...',
+                        'fieldPlaceholder'                         => 'Edit...',
                         'fieldBazScan'                             => false,
                         'fieldHidden'                              => true,
-                        'fieldGroupPreAddonButtonId'               => $this->params['fieldId'] . '-cancel',
+                        'fieldGroupPreAddonButtonId'               => 'cancel',
                         'fieldGroupPreAddonButtonValue'            => '<i class="fa fa-fw fa-times"></i>',
                         'fieldGroupPreAddonButtonClass'            => 'danger',
-                        'fieldGroupPostAddonButtonId'              => $this->params['fieldId'] . '-success',
-                        'fieldGroupPostAddonButtonValue'           => '<i class="fa fa-fw fa-plus"></i>',
+                        'fieldGroupPostAddonButtonId'              => 'success',
+                        'fieldGroupPostAddonButtonValue'           => '<i class="fa fa-fw fa-edit"></i>',
                         'fieldGroupPostAddonButtonClass'           => 'success'
                     ]
                 );
 
+            if (!isset($this->fieldParams['fieldJstreeAdditionalClass'])) {
+                $this->fieldParams['fieldJstreeAdditionalClass'] = 'height-control-400';
+            }
+
             $this->content .=
-                '<div class="height-control-200 p-1 border mt-1 text-uppercase" ' . $this->fieldParams['fieldId'] . '-tree-div" style="overflow-x: scroll;font-size: 0.75rem !important;">
+                '<div class="' . $this->fieldParams['fieldJstreeAdditionalClass'] . ' p-1 border mt-1 text-uppercase" ' . $this->fieldParams['fieldId'] . '-tree-div" style="font-size: 0.75rem !important;">
                     <div '. $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' ' . $this->fieldParams['fieldId'] . '">';
 
                         $this->fieldParams['fieldJstreeRootIcon'] =
