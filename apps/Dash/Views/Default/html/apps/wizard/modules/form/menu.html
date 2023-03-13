@@ -533,7 +533,9 @@ dataCollectionSection =
                     if (!structureArr[structure]['state']['hidden'] ||
                         (structureArr[structure]['state']['hidden'] && structureArr[structure]['state']['hidden'] === false)
                     ) {
-                        if (!structureArr[structure]['data']['link'] && structureArr[structure]['id'] !== selectedNode) {
+                        if ((!structureArr[structure]['data']['link'] || structureArr[structure]['data']['sub_menu']) &&
+                            structureArr[structure]['id'] !== selectedNode
+                        ) {
                             parentItem = { };
                             parentItem['id'] = structureArr[structure]['id'];
                             parentItem['text'] = $("#{{componentId}}-{{sectionId}}-menu_structure").jstree().get_path(structureArr[structure]['id'], ' > ').toUpperCase();
@@ -634,6 +636,10 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}-is_submenu').attr('disabled', false);
                     $('#{{componentId}}-{{sectionId}}-menu_link').attr('disabled', false);
                     $('#{{componentId}}-{{sectionId}}-delete-menu-item').removeClass('disabled');
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-is_submenu').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-menu_link').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-delete-menu-item').addClass('disabled');
                 }
 
                 extractSturctureParentsData(data.node.parent, data.node.id);
@@ -802,9 +808,16 @@ dataCollectionSection =
                             return;
                         }
 
+                        var data = { };
+                        data['link'] = link;
+                        data['custom_menu'] = true;
+                        if (isSubmenu) {
+                            data['sub_menu'] = true;
+                        }
+
                         $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('create_node',
                             parentId,
-                            {'text' : title, 'icon' : 'fa ' + isBrand + ' fa-fw fa-' + iconId + ' text-sm', 'data' : {'link' : link, 'custom_menu': true}},
+                            {'text' : title, 'icon' : 'fa ' + isBrand + ' fa-fw fa-' + iconId + ' text-sm', 'data' : data},
                             'last',
                             function() {
                                 getMenuStructureData();

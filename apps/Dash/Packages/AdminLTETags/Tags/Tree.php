@@ -84,8 +84,17 @@ class Tree extends AdminLTETags
                 $items['id'] :
                 '';
 
+            if (isset($items['data'])) {
+                $dataAttr = '';
+                foreach ($items['data'] as $dataKey => $dataValue) {
+                    $dataAttr .= 'data-' . $dataKey . '="' . $dataValue . '" ';
+                }
+            } else {
+                $dataAttr = '';
+            }
+
             $this->content .=
-                '<li ' . $groupAdditionalClass . ' data-id="' . $itemsId . '" data-jstree=\'' . $groupIcon . '\'>';
+                '<li ' . $groupAdditionalClass . ' ' . $dataAttr . ' data-id="' . $itemsId . '" data-jstree=\'' . $groupIcon . '\'>';
 
                 if (isset($items['title'])) {
                     $this->content .= $items['title'];
