@@ -184,6 +184,9 @@ class Tabs extends AdminLTETags
         $content = '';
 
         foreach ($this->params['tabsData'] as $tabTitleKey => $tabTitle) {
+            if ($tabTitle === null) {
+                continue;
+            }
 
             if (isset($tabTitle['tabDataAttributes']) &&
                 is_array($tabTitle['tabDataAttributes'])
@@ -240,6 +243,10 @@ class Tabs extends AdminLTETags
         $content = '';
 
         foreach ($this->params['tabsData'] as $tabLinkKey => $tabLinkData) {
+            if ($tabLinkData === null) {
+                continue;
+            }
+
             if (isset($tabLinkData['tabInclude']) || isset($tabLinkData['tabContent'])) {
                 if (isset($this->params['tabActiveOnInit'])) {
                     if ($tabLinkKey === $this->params['tabActiveOnInit']) {

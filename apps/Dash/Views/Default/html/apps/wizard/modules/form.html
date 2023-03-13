@@ -1,4 +1,4 @@
-{% if app is not defined or app['menu_structure'] is defined and app['menu_structure'] == null %}
+{% if modules is defined and modules == true %}
     {% set wizard = true %}
 {% else %}
     {% set wizard = false %}
@@ -14,7 +14,7 @@
 %}
 {% if wizard === true %}
 {% set menuTabHidden = true %}
-{% set menuTabContent = [] %}
+{% set menuTabContent = null %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
 {% endif %}
