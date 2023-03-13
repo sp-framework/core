@@ -521,7 +521,7 @@ dataCollectionSection =
 
             function extractSturctureParentsData(selectParent = '', selectedNode = '') {
                 var menuItemsParents = [];
-                var structureArr = $("#admin-apps-main-menu_structure").jstree().get_json('#', { 'flat': true });
+                var structureArr = $("#{{componentId}}-{{sectionId}}-menu_structure").jstree().get_json('#', { 'flat': true });
                 var parentItem = { };
 
                 parentItem['id'] = '#';
@@ -536,7 +536,7 @@ dataCollectionSection =
                         if (!structureArr[structure]['data']['link'] && structureArr[structure]['id'] !== selectedNode) {
                             parentItem = { };
                             parentItem['id'] = structureArr[structure]['id'];
-                            parentItem['text'] = $("#admin-apps-main-menu_structure").jstree().get_path(structureArr[structure]['id'], ' > ').toUpperCase();
+                            parentItem['text'] = $("#{{componentId}}-{{sectionId}}-menu_structure").jstree().get_path(structureArr[structure]['id'], ' > ').toUpperCase();
 
                             menuItemsParents.push(parentItem);
                         }
