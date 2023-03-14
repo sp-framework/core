@@ -41893,6 +41893,10 @@ a.text-muted:hover {
   left: -12px;
 }
 
+.has-error .select2-selection {
+  border-color: #E74C3C;
+}
+
 /* VERTICAL DIVIDER */
 .vdivide > div[class*='col']:not(:last-child):after {
   background: #ccd4d5;

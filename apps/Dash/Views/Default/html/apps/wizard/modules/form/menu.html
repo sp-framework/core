@@ -252,7 +252,7 @@
                         'fieldId'                        : 'reset_structure',
                         'fieldLabel'                     : 'Reset Structure?',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Reset structure to system generated structure?',
+                        'fieldHelpTooltipContent'        : 'Reset structure to system generated structure? Note: This will remove any custom menu item(s) you have added to the menu tree.',
                         'fieldRequired'                  : false,
                         'fieldType'                      : 'checkbox',
                         'fieldCheckboxType'              : 'danger',
@@ -700,7 +700,11 @@ dataCollectionSection =
 
                 if (data.node.data.custom_menu && data.node.data.custom_menu == true) {
                     $('#{{componentId}}-{{sectionId}}-is_submenu').attr('disabled', false);
-                    $('#{{componentId}}-{{sectionId}}-menu_link').attr('disabled', false);
+                    if (data.node.data && data.node.data.sub_menu) {
+                        $('#{{componentId}}-{{sectionId}}-menu_link').attr('disabled', true);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-menu_link').attr('disabled', false);
+                    }
                     $('#{{componentId}}-{{sectionId}}-delete-menu-item').removeClass('disabled');
                 } else {
                     $('#{{componentId}}-{{sectionId}}-is_submenu').attr('disabled', true);
@@ -742,10 +746,11 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-is_submenu').attr('disabled', false);
                 $('#{{componentId}}-{{sectionId}}-menu_parent').attr('disabled', false);
                 $('#{{componentId}}-{{sectionId}}-menu_icon').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-menu_icon').val('circle').trigger('change');
                 $('#{{componentId}}-{{sectionId}}-menu_link').attr('disabled', false);
                 $('#{{componentId}}-{{sectionId}}-save-menu-item').removeClass('disabled');
                 $('#{{componentId}}-{{sectionId}}-cancel-menu-item').removeClass('disabled');
-                extractSturctureParentsData();
+                extractSturctureParentsData('#');
             });
 
             $('#{{componentId}}-{{sectionId}}-delete-menu-item').click(function(e) {
@@ -771,13 +776,21 @@ dataCollectionSection =
                     }
                 }).then((result) => {
                     if (result.value) {
-                        var selectedNode = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_selected();
+                        var selectedNode = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_selected(true);
 
-                        var deleteNode = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().delete_node(selectedNode);
+                        if (selectedNode[0].children.length > 0) {
+                            PNotify.notice({
+                                title: 'Menu item cannot deleted as it has sub menu items. Delete them first.'
+                            });
+                        } else {
+                            var selectedNodeId = selectedNode[0].id;
 
-                        if (deleteNode) {
-                            cleanMenuForm();
-                            getMenuStructureData();
+                            var deleteNode = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().delete_node(selectedNodeId);
+
+                            if (deleteNode) {
+                                cleanMenuForm();
+                                getMenuStructureData();
+                            }
                         }
                     }
                 });
@@ -815,94 +828,127 @@ dataCollectionSection =
                 }
 
                 if (id === "{{componentId}}-{{sectionId}}-save-menu-item") {
-                    var nodeId, nodeData, title, isSubmenu, parentId, parent, icon, iconId, iconType, isBrand, link, duplicate;
-
-                    nodeId = $('#{{componentId}}-{{sectionId}}-menu_id').val();
-                    parentId = $('#{{componentId}}-{{sectionId}}-menu_parent').select2('data')[0].id;
-                    parent = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(parentId);
-                    title = $('#{{componentId}}-{{sectionId}}-menu_title').val();
-                    isSubmenu = $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked;
-                    icon = $('#{{componentId}}-{{sectionId}}-menu_icon').select2('data');
-                    iconId = $('#{{componentId}}-{{sectionId}}-menu_icon').select2('data')[0].id;
-                    iconType = $(icon[0].element).data('type');
-                    link = $('#{{componentId}}-{{sectionId}}-menu_link').val();
-
-                    if (isSubmenu) {
-                        link = null;
-                    }
-
-                    if (link === '') {
-                        link = '#';
-                    }
-
-                    if (iconType === 'brands') {
-                        isBrand = 'fab';
+                    if ($('#{{componentId}}-{{sectionId}}-menu_title').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-menu_title').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-menu_title').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if (!$('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked &&
+                               $('#{{componentId}}-{{sectionId}}-menu_link').val() === ''
+                    ) {
+                        $('#{{componentId}}-{{sectionId}}-menu_link').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-menu_link').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
                     } else {
-                        isBrand = '';
-                    }
+                        var nodeId, nodeData, title, isSubmenu, parentId, parent, icon, iconId, iconType, isBrand, link;
 
-                    if (nodeId !== '') {
-                        nodeData = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(nodeId);
+                        nodeId = $('#{{componentId}}-{{sectionId}}-menu_id').val();
+                        parentId = $('#{{componentId}}-{{sectionId}}-menu_parent').select2('data')[0].id;
+                        parent = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(parentId);
+                        title = $('#{{componentId}}-{{sectionId}}-menu_title').val();
+                        isSubmenu = $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked;
+                        icon = $('#{{componentId}}-{{sectionId}}-menu_icon').select2('data');
+                        iconId = $('#{{componentId}}-{{sectionId}}-menu_icon').select2('data')[0].id;
+                        iconType = $(icon[0].element).data('type');
+                        link = $('#{{componentId}}-{{sectionId}}-menu_link').val();
 
-                        if (!nodeData['data']) {
-                            nodeData['data'] = { };
-                        }
-
-                        if (checkDuplicate(nodeId, parent, title)) {
-                            PNotify.notice({
-                                title: 'Duplicate title!'
-                            });
-                            return;
-                        }
-
-                        if (nodeData['text'] !== title) {
-                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('rename_node', nodeId, title);
-                            nodeData['data']['renamed'] = true;
-                        }
-
-                        nodeData['icon'] = 'fa ' + isBrand + ' fa-fw fa-' + iconId + ' text-sm';
-                        if (nodeData['data'] && nodeData['data']['link']) {
-                            nodeData['data']['link'] = link;
-                        }
-
-                        if (nodeData['parent'] !== parentId) {
-                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('move_node',
-                                nodeId,
-                                parentId,
-                                'last',
-                                function() {
-                                    nodeData['data']['moved'] = true;
-                                    getMenuStructureData();
-                                    cleanMenuForm();
-                                });
-                        } else {
-                            getMenuStructureData();
-                            cleanMenuForm();
-                        }
-                    } else {
-                        if (checkDuplicate(nodeId, parent, title)) {
-                            PNotify.notice({
-                                title: 'Duplicate title!'
-                            });
-                            return;
-                        }
-
-                        var data = { };
-                        data['link'] = link;
-                        data['custom_menu'] = true;
                         if (isSubmenu) {
-                            data['sub_menu'] = true;
+                            link = null;
                         }
 
-                        $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('create_node',
-                            parentId,
-                            {'text' : title, 'icon' : 'fa ' + isBrand + ' fa-fw fa-' + iconId + ' text-sm', 'data' : data},
-                            'last',
-                            function() {
+                        if (link === '') {
+                            link = '#';
+                        }
+
+                        if (iconType === 'brands') {
+                            isBrand = 'fab';
+                        } else {
+                            isBrand = 'fa';
+                        }
+
+                        if (nodeId !== '') {
+                            nodeData = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(nodeId);
+
+                            if (!nodeData['data']) {
+                                nodeData['data'] = { };
+                            }
+
+                            if (nodeData['data']['sub_menu'] && nodeData['data']['sub_menu'] === true) {
+                                if (!isSubmenu && nodeData.children.length > 0) {
+                                    PNotify.notice({
+                                        title: 'Menu item cannot be converted to link as its a sub menu.'
+                                    });
+                                    return;
+                                }
+                            }
+
+                            if (checkDuplicate(nodeId, parent, title)) {
+                                PNotify.notice({
+                                    title: 'Duplicate title!'
+                                });
+                                return;
+                            }
+
+                            if (nodeData['text'] !== title) {
+                                $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('rename_node', nodeId, title);
+                                nodeData['data']['renamed'] = true;
+                            }
+
+                            var newIcon = isBrand + ' fa-fw fa-' + iconId + ' text-sm';
+                            if (nodeData['icon'] !== newIcon) {
+                                $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('set_icon', nodeId, newIcon);
+                            }
+
+                            nodeData['data']['link'] = link;
+
+                            if (isSubmenu) {
+                                nodeData['data']['sub_menu'] = true;
+                            } else {
+                                nodeData['data']['sub_menu'] = false;
+                            }
+
+                            if (nodeData['parent'] !== parentId) {
+                                $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('move_node',
+                                    nodeId,
+                                    parentId,
+                                    'last',
+                                    function() {
+                                        nodeData['data']['moved'] = true;
+                                        getMenuStructureData();
+                                        cleanMenuForm();
+                                    });
+                            } else {
                                 getMenuStructureData();
                                 cleanMenuForm();
                             }
-                        );
+                        } else {
+                            if (checkDuplicate(nodeId, parent, title)) {
+                                PNotify.notice({
+                                    title: 'Duplicate title!'
+                                });
+                                return;
+                            }
+
+                            var data = { };
+                            data['link'] = link;
+                            data['custom_menu'] = true;
+                            if (isSubmenu) {
+                                data['sub_menu'] = true;
+                            } else {
+                                data['sub_menu'] = false;
+                            }
+
+                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('create_node',
+                                parentId,
+                                {'text' : title, 'icon' : isBrand + ' fa-fw fa-' + iconId + ' text-sm', 'data' : data},
+                                'last',
+                                function() {
+                                    getMenuStructureData();
+                                    cleanMenuForm();
+                                }
+                            );
+                        }
                     }
                 }
             });
