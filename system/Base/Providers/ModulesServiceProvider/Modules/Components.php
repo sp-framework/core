@@ -204,14 +204,30 @@ class Components extends BasePackage
 	public function updateComponents(array $data)
 	{
 		$components = Json::decode($data['components'], true);
+		$needAuths = Json::decode($data['need_auths'], true);
 
 		foreach ($components as $componentId => $status) {
 			$component = $this->getById($componentId);
 
 			$component['apps'] = Json::decode($component['apps'], true);
+			$component['settings'] = Json::decode($component['settings'], true);
 
 			if ($status === true) {
 				$component['apps'][$data['id']]['enabled'] = true;
+
+				if (isset($needAuths[$componentId])) {
+					if (isset($component['settings']['needAuth'])) {
+						if ($component['settings']['needAuth'] === 'mandatory') {
+							$component['apps'][$data['id']]['needAuth'] = 'mandatory';
+						} else if ($component['settings']['needAuth'] === 'disabled') {
+							$component['apps'][$data['id']]['needAuth'] = 'disabled';
+						}
+					} else {
+						$component['apps'][$data['id']]['needAuth'] = $needAuths[$componentId];
+					}
+				} else {
+					$component['apps'][$data['id']]['needAuth'] = 'disabled';
+				}
 
 				$component['dependencies'] = Json::decode($component['dependencies'], true);
 

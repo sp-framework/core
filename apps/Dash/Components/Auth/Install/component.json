@@ -40,6 +40,7 @@
     },
     "menu"              : false,
     "settings"          : {
-        "mandatory"     : true
+        "mandatory"     : true,
+        "needAuth"      : "disabled"
     }
 }

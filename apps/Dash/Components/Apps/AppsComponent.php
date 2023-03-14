@@ -63,6 +63,10 @@ class AppsComponent extends BaseComponent
                 foreach ($componentsArr as $key => &$componentValue) {
                     if ($componentValue['apps']) {
                         $componentValue['apps'] = Json::decode($componentValue['apps'], true);
+
+                        if (!isset($componentValue['apps'][$app['id']]['needAuth'])) {
+                            $componentValue['apps'][$app['id']]['needAuth'] = false;
+                        }
                     }
 
                     if ($componentValue['settings']) {
@@ -76,6 +80,16 @@ class AppsComponent extends BaseComponent
                              $componentValue['settings']['mandatory'][$app['route']] === true
                         ) {
                             array_push($mandatoryComponents, $componentValue['name']);
+                        }
+
+                        if (isset($componentValue['settings']['needAuth']) &&
+                             $componentValue['settings']['needAuth'] === 'disabled'
+                        ) {
+                            $componentValue['apps'][$app['id']]['needAuth'] = 'disabled';
+                        } else if (isset($componentValue['settings']['needAuth']) &&
+                             $componentValue['settings']['needAuth'] === 'mandatory'
+                        ) {
+                            $componentValue['apps'][$app['id']]['needAuth'] = 'mandatory';
                         }
                     }
                     $components[$key] = $componentValue;

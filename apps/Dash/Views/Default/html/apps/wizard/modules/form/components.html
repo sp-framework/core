@@ -103,15 +103,18 @@
             {% for component in components %}
                 {% set componentIds[componentId ~ '-' ~ sectionId ~ '-component-' ~ component['id']] = component['id'] %}
                 {% set menuIds[componentId ~ '-' ~ sectionId ~ '-component-menu-' ~ component['id']] = component['menu_id'] %}
+                {% set needAuthIds[componentId ~ '-' ~ sectionId ~ '-component-need_auth-' ~ component['id']] = component['id'] %}
             {% endfor %}
             {% set componentIds = json_encode(componentIds, 16) %}
             {% set menuIds = json_encode(menuIds, 16) %}
+            {% set needAuthIds = json_encode(needAuthIds, 16) %}
         </div>
     </div>
 {% else %}
     <label>No components available for this app type. Go to <a href="{{links.url('modules')}}" class="contentAjaxLink">modules</a> and download components.</label>
     {% set componentIds = json_encode([]) %}
     {% set menuIds = json_encode([]) %}
+    {% set needAuthIds = json_encode([]) %}
 {% endif %}
 <script>
 /* globals Sortable */
@@ -189,12 +192,14 @@ dataCollectionSection =
                             Object.keys($('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)).length > 0
                         ) {
                             $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId).attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId).attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)[0].checked = true;
                             window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = true;
                         } else {
                             //matched during onload extractComponentCheckboxData
                             if (Object.keys($('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)).length > 0) {
                                 $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId).attr('disabled', false);
+                                $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId).attr('disabled', false);
                                 // $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)[0].checked = true;
                                 // window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = true;
                             }
@@ -210,8 +215,11 @@ dataCollectionSection =
                             Object.keys($('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)).length > 0
                         ) {
                             $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId).attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId).attr('disabled', true);
                             $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)[0].checked = false;
                             window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = false;
+                            $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId)[0].checked = false;
+                            window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['need_auths'][componentId] = false;
                         }
                         $('#{{componentId}}-{{sectionId}}-default_component').find('[value="' + componentId + '"]').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-default_component').trigger('change');
@@ -283,6 +291,50 @@ dataCollectionSection =
                         } else {
                             window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = false;
                         }
+                    }
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-need_auths'                      : {
+            afterInit: function() {
+                var needAuthIds = { };
+                needAuthIds = JSON.parse('{{needAuthIds}}');
+
+                if (Object.keys(needAuthIds).length === 0) {//if not able to parse json properly during wizard
+                    $('#{{componentId}}-{{sectionId}}-component-table input').each(function(index, input) {
+                        if ($(input).data('type') === 'needauth') {
+                            needAuthIds[$(input)[0].id] = $(input).data('id');
+                        }
+                    });
+
+                    if (Object.keys(needAuthIds).length > 0) {
+                        initCheckboxes();
+                    }
+                } else if (Object.keys(needAuthIds).length > 0) {
+                    initCheckboxes();
+                }
+
+                function initCheckboxes() {
+                    window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['need_auths'] = { };
+
+                    for (var noAuthCheckbox in needAuthIds) {
+                        if ($('#' + noAuthCheckbox).length > 0) {
+                            $('#' + noAuthCheckbox).click(function() {
+                                var id = $(this)[0].id;
+                                extractComponentCheckboxData(id);
+                            });
+                            extractComponentCheckboxData(noAuthCheckbox);
+                        }
+                    }
+                }
+
+                function extractComponentCheckboxData(noAuthCheckbox) {
+                    var componentId = $('#' + noAuthCheckbox).data('component_id');
+
+                    if ($('#' + noAuthCheckbox)[0].checked === true) {
+                        window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['need_auths'][componentId] = true;
+                    } else {
+                        window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['need_auths'][componentId] = false;
                     }
                 }
             }

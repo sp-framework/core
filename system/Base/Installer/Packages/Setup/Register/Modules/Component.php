@@ -8,6 +8,18 @@ class Component
 {
 	public function register($db, $componentFile, $installedFiles, $menuId)
 	{
+		$componentApp = ['1'=>['enabled'=>true]];
+
+		if (isset($componentFile['settings']['needAuth'])) {
+			if ($componentFile['settings']['needAuth'] === 'mandatory') {
+				$componentApp['1']['needAuth'] = 'mandatory';
+			} else if ($componentFile['settings']['needAuth'] === 'disabled') {
+				$componentApp['1']['needAuth'] = 'disabled';
+			}
+		} else {
+			$componentApp['1']['needAuth'] = true;
+		}
+
 		$db->insertAsDict(
 			'modules_components',
 			[
@@ -31,7 +43,7 @@ class Component
 				'menu_id'				=> $menuId,
 				'installed'				=> 1,
 				'apps'					=>
-					Json::encode(['1'=>['enabled'=>true]]),
+					Json::encode($componentApp),
 				'files'					=> Json::encode($installedFiles),
 				'settings'				=>
 					isset($componentFile['settings']) ?

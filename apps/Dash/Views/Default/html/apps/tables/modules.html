@@ -24,12 +24,32 @@
                         ]
                     )}}
                 </th>
+                <th class="text-uppercase">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'need_auths',
+                            'fieldLabel'                     : 'Need Auth?',
+                            'fieldLabelClass'                : 'mb-0',
+                            'fieldType'                      : 'html',
+                            'fieldAdditionalClass'           : 'mb-0',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : "Needs user to be authenticated to access this component?",
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true
+                        ]
+                    )}}
+                </th>
             {% endif %}
             <th class="text-uppercase">Name</th>
             <th class="text-uppercase">Description</th>
             <th class="text-uppercase">Category</th>
             <th class="text-uppercase">Sub Category</th>
-            <th class="text-uppercase">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -48,7 +68,7 @@
                             {% set appErrorsComponent = module['id'] %}
                         {% endif %}
                     {% endif %}
-                    {% if module['apps'][app['id']] is defined and module['apps'][app['id']]['enabled'] === true %}
+                    {% if module['apps'][app['id']]['enabled'] is defined and module['apps'][app['id']]['enabled'] === true %}
                         {% set checked = true %}
                     {% else %}
                         {% set checked = false %}
@@ -141,6 +161,51 @@
                             )}}
                         {% endif %}
                     </td>
+                    <td>
+                        {% if module['apps'][app['id']]['needAuth'] is defined and module['apps'][app['id']]['needAuth'] !== 'disabled' %}
+                            {% if module['apps'][app['id']]['needAuth'] is defined and module['apps'][app['id']]['needAuth'] === true %}
+                                {% set needAuthChecked = true %}
+                            {% else %}
+                                {% set needAuthChecked = false %}
+                            {% endif %}
+                            {% if module['apps'][app['id']]['enabled'] is defined and module['apps'][app['id']]['enabled'] === true %}
+                                {% set needAuthDisabled = false %}
+                            {% else %}
+                                {% set needAuthDisabled = true %}
+                            {% endif %}
+                            {% if module['apps'][app['id']]['needAuth'] is defined and module['apps'][app['id']]['needAuth'] === 'mandatory' %}
+                                {% set needAuthChecked = true %}
+                                {% set needAuthDisabled = true %}
+                            {% endif %}
+
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : moduleType ~ '-need_auth-' ~ module['id'],
+                                    'fieldLabel'                     : false,
+                                    'fieldHelp'                      : false,
+                                    'fieldDisabled'                  : needAuthDisabled,
+                                    'fieldHelpTooltipContent'        : '',
+                                    'fieldAdditionalClass'           : 'mb-0',
+                                    'fieldType'                      : 'checkbox',
+                                    'fieldCheckboxType'              : 'warning',
+                                    'fieldCheckboxChecked'           : needAuthChecked,
+                                    'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase m-0',
+                                    'fieldBazScan'                   : false,
+                                    'fieldDataAttributes'            :
+                                    [
+                                        'component_id'               : module['id'],
+                                        'app_id'                     : app['id'],
+                                        'type'                       : 'needauth',
+                                        'needauth'                   : module['id']
+                                    ]
+                                ]
+                            )}}
+                        {% endif %}
+                    </td>
                 {% endif %}
                 <td>
                     {% if moduleType === 'view' %}
@@ -157,9 +222,6 @@
                 </td>
                 <td>
                     {{module['sub_category']|capitalize}}
-                </td>
-                <td>
-                    <button type="button" class="btn btn-info btn-xs"><i class="fa fa-fw fa-info-circle"></i></button>
                 </td>
             </tr>
         {% endfor %}
