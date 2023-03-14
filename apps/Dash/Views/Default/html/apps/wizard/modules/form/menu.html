@@ -388,13 +388,27 @@ dataCollectionSection =
                     var searchCheckboxMenuItem = document.querySelectorAll('[data-route="' + menuItem + '"]');
 
                     if (!enabledMenuItems.includes(menuItem)) {
-                        if (searchJsTreeMenuItem.length > 0 &&
-                            (searchCheckboxMenuItem.length > 0 && searchCheckboxMenuItem[0].checked === false)
+                        if (searchJsTreeMenuItem.length === 1 &&
+                            (searchCheckboxMenuItem.length === 1 && searchCheckboxMenuItem[0].checked === false)
                         ) {
                             var menuJstreeId = searchJsTreeMenuItem[0].id
                             $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().hide_node(menuJstreeId);
                             var parent = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_parent(menuJstreeId);
-                            showHideNodeParent(parent, 'hide')
+                            showHideNodeParent(parent, 'hide');
+                        }
+                    } else {
+                        //when nodes are moves, this would cause duplicate node to show up as in component we recursive merge default menu with app menu.
+                        //so we need to hide the default menu item. This will basically override the structure of the app on next save.
+                        //data attr moved has to be set to true.
+                        if (searchJsTreeMenuItem.length > 1) {
+                            searchJsTreeMenuItem.forEach(function(item, index) {
+                                if (!$(item).data('moved')) {
+                                    var menuJstreeId = item.id
+                                    $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().hide_node(menuJstreeId);
+                                    var parent = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_parent(menuJstreeId);
+                                    showHideNodeParent(parent, 'hide');
+                                }
+                            });
                         }
                     }
                 });
@@ -475,8 +489,13 @@ dataCollectionSection =
                     if (!structureArr[structure]['state']['hidden'] ||
                         (structureArr[structure]['state']['hidden'] && structureArr[structure]['state']['hidden'] === false)
                     ) {
-                        var structureId = structureArr[structure]['text'].toLowerCase();
-                        structureId = structureId.replace(/[^a-z0-9]/g, "")
+                        var structureId;
+                        if (structureArr[structure]['data']['id']) {
+                            structureId = structureArr[structure]['data']['id'];
+                        } else {
+                            structureId = structureArr[structure]['text'].toLowerCase();
+                            structureId = structureId.replace(/[^a-z0-9]/g, "")
+                        }
 
                         if (!newStructure[structureId]) {
                             newStructure[structureId] = { };
@@ -508,6 +527,20 @@ dataCollectionSection =
                                 newStructure[structureId]['data'] = { };
                             }
                             newStructure[structureId]['data']['sub_menu'] = true;
+                        }
+
+                        if (structureArr[structure]['data']['renamed']) {
+                            if (!newStructure[structureId]['data']) {
+                                newStructure[structureId]['data'] = { };
+                            }
+                            newStructure[structureId]['data']['renamed'] = true;
+                        }
+
+                        if (structureArr[structure]['data']['moved']) {
+                            if (!newStructure[structureId]['data']) {
+                                newStructure[structureId]['data'] = { };
+                            }
+                            newStructure[structureId]['data']['moved'] = true;
                         }
 
                         if (structureArr[structure]['children'].length > 0) {
@@ -588,16 +621,39 @@ dataCollectionSection =
             function modifyStructure(checkbox) {
                 var id = $(checkbox)[0].id;
                 var route = $(checkbox).data('route');
-                var menuJstreeId = document.querySelectorAll('[data-link="' + route + '"]')[0].id
-                var parent = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_parent(menuJstreeId);
+                var menuJstreeIds = document.querySelectorAll('[data-link="' + route + '"]')
 
-                if ($('#' + id)[0].checked === true) {
-                    $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().show_node(menuJstreeId);
-                    showHideNodeParent(parent, 'show');
+                if (menuJstreeIds.length === 1) {
+                    var menuJstreeId = menuJstreeIds[0].id;
+                    var parent = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_parent(menuJstreeId);
+
+                    if ($('#' + id)[0].checked === true) {
+                        $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().show_node(menuJstreeId);
+                        showHideNodeParent(parent, 'show');
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().hide_node(menuJstreeId);
+                        showHideNodeParent(parent, 'hide');
+                    }
                 } else {
-                    $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().hide_node(menuJstreeId);
-                    showHideNodeParent(parent, 'hide');
+                    menuJstreeIds.forEach(function(item, index) {
+                        var menuJstreeId = item.id
+                        var parent = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_parent(menuJstreeId);
+
+                        if (!$(item).data('moved')) {
+                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().hide_node(menuJstreeId);
+                            showHideNodeParent(parent, 'hide');
+                        } else {
+                            if ($('#' + id)[0].checked === true) {
+                                $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().show_node(menuJstreeId);
+                                showHideNodeParent(parent, 'show');
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().hide_node(menuJstreeId);
+                                showHideNodeParent(parent, 'hide');
+                            }
+                        }
+                    });
                 }
+
                 getMenuStructureData();
             }
 
@@ -788,6 +844,10 @@ dataCollectionSection =
                     if (nodeId !== '') {
                         nodeData = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(nodeId);
 
+                        if (!nodeData['data']) {
+                            nodeData['data'] = { };
+                        }
+
                         if (checkDuplicate(nodeId, parent, title)) {
                             PNotify.notice({
                                 title: 'Duplicate title!'
@@ -797,6 +857,7 @@ dataCollectionSection =
 
                         if (nodeData['text'] !== title) {
                             $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('rename_node', nodeId, title);
+                            nodeData['data']['renamed'] = true;
                         }
 
                         nodeData['icon'] = 'fa ' + isBrand + ' fa-fw fa-' + iconId + ' text-sm';
@@ -810,9 +871,13 @@ dataCollectionSection =
                                 parentId,
                                 'last',
                                 function() {
+                                    nodeData['data']['moved'] = true;
                                     getMenuStructureData();
                                     cleanMenuForm();
                                 });
+                        } else {
+                            getMenuStructureData();
+                            cleanMenuForm();
                         }
                     } else {
                         if (checkDuplicate(nodeId, parent, title)) {

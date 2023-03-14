@@ -82,7 +82,7 @@ class Tree extends AdminLTETags
             $itemsId =
                 isset($items['id']) ?
                 $items['id'] :
-                '';
+                $key;
 
             if (isset($items['data'])) {
                 $dataAttr = '';
@@ -190,14 +190,14 @@ class Tree extends AdminLTETags
         if ($this->treeMode === 'jstree') {
             if (is_array($items)) {
                 if (isset($items['title'])) {
-                    $this->generateItemContent($items, $itemAdditionalClass);
+                    $this->generateItemContent($key, $items, $itemAdditionalClass);
                 } else {
                     foreach ($items as $itemKey => $itemValue) {
                         if (isset($itemValue['childs'])) {
                             $this->content .=
                                 $this->treeGroup($itemKey, $itemValue, '{"icon" : "fa fa-fw fa-plus text-sm"}', '{"icon" : "fa fa-fw fa-circle text-sm"}', null);
                         } else {
-                            $this->generateItemContent($itemValue, $itemAdditionalClass);
+                            $this->generateItemContent($itemKey, $itemValue, $itemAdditionalClass);
                         }
                     }
                 }
@@ -344,12 +344,12 @@ class Tree extends AdminLTETags
         }
     }
 
-    protected function generateItemContent(array $item, $itemAdditionalClass)
+    protected function generateItemContent($key, array $item, $itemAdditionalClass)
     {
         $itemId =
             isset($item['id']) ?
             $item['id'] :
-            '';
+            $key;
 
         if (isset($item['type']) &&
             $item['type'] === 'pdf'
