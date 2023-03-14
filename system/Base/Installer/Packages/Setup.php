@@ -110,6 +110,8 @@ class Setup
 
 		$this->security = $this->container->getShared('security');
 
+		$this->cookies = $this->container->getShared('cookies');
+
 		if ($this->request->isPost()) {
 			$this->dbConfig =
 					[
@@ -153,6 +155,36 @@ class Setup
 				throw $exception;
 			}
 		}
+	}
+
+	public function cleanOldCookies()
+	{
+		$cookieKey = 'Bazaari';
+
+		//Set cookies to 1 second so browser removes them.
+		$this->cookies->set(
+			$cookieKey,
+			'0',
+			1,
+			'/',
+			null,
+			null,
+			true
+		);
+
+		$this->cookies->get($cookieKey)->setOptions(['samesite'=>'strict']);
+
+		$this->cookies->set(
+			'id',
+			'0',
+			1,
+			'/',
+			null,
+			null,
+			true
+		);
+
+		$this->cookies->send();
 	}
 
 	public function checkDbEmpty()
