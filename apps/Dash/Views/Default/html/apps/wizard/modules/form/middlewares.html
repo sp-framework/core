@@ -146,19 +146,33 @@ dataCollectionSection =
                     }
                 }
 
-                function extractMiddlewareCheckboxData(middlewareCheckbox, middleware) {
+                function extractMiddlewareCheckboxData(middlewareCheckbox, middleware, switchMiddleware = false) {
                     window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['middlewares']['sequence'] = sortable.toArray();
 
                     if ($('#' + middlewareCheckbox)[0].checked === true) {
                         window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['middlewares']['middlewares'][$('#' + middlewareCheckbox).data('middleware')] = true;
                         $('#{{componentId}}-{{sectionId}}-sortable-middlewares').
                             find('[data-middleware="' + middlewareCheckbox + '"]').removeClass('disabled').attr('area-disabled', 'false');
+
+                        if (switchMiddleware && middlewareCheckbox.toLowerCase() === '{{componentId}}-{{sectionId}}-middleware-auth') {
+                            $('#{{componentId}}-{{sectionId}}-registration_allowed').attr('disabled', false);
+                        }
                     } else {
                         window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['middlewares']['middlewares'][$('#' + middlewareCheckbox).data('middleware')] = false;
                         $('#{{componentId}}-{{sectionId}}-sortable-middlewares').
                             find('[data-middleware="' + middlewareCheckbox + '"]').addClass('disabled').attr('area-disabled', 'true');
+                        if (switchMiddleware && middlewareCheckbox.toLowerCase() === '{{componentId}}-{{sectionId}}-middleware-auth') {
+                            $('#{{componentId}}-{{sectionId}}-registration_allowed').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-registration_allowed')[0].checked = false;
+                            $('#{{componentId}}-{{sectionId}}-approve_accounts_manually').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-approve_accounts_manually')[0].checked = false;
+                            $('#{{componentId}}-{{sectionId}}-enforce_2fa').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-enforce_2fa')[0].checked = false;
+                            $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-registration_role_id').val(null).trigger('change');
+                        }
                     }
-                    
+
                     $('#{{componentId}}-{{sectionId}}-sortable-middlewares').
                         find('.filtered').addClass('disabled').attr('area-disabled', 'true');
                 }

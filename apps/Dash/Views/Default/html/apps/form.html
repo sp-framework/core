@@ -120,13 +120,11 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-description'                     : { },
         '{{componentId}}-{{sectionId}}-registration_allowed'            : {
             afterInit: function() {
-
                 $('#{{componentId}}-{{sectionId}}-registration_allowed').click(function() {
                     if ($(this)[0].checked === true) {
                         $('#{{componentId}}-{{sectionId}}-approve_accounts_manually').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-enforce_2fa').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-guest_role_id').attr('disabled', false);
                     } else {
                         $('#{{componentId}}-{{sectionId}}-approve_accounts_manually').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-approve_accounts_manually')[0].checked = false;
@@ -134,8 +132,6 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-enforce_2fa')[0].checked = false;
                         $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-registration_role_id').val(null).trigger('change');
-                        $('#{{componentId}}-{{sectionId}}-guest_role_id').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-guest_role_id').val(null).trigger('change');
                     }
                 });
             }
@@ -143,22 +139,10 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-approve_accounts_manually'       : { },
         '{{componentId}}-{{sectionId}}-enforce_2fa'                     : { },
         '{{componentId}}-{{sectionId}}-registration_role_id'            : {
-            'placeholder'   : 'SELECT REGISTRATION ROLE',
-            afterInit: function() {
-                if ($('#{{componentId}}-{{sectionId}}-registration_allowed')[0].checked === true) {
-                    $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', false);
-                    $('#{{componentId}}-{{sectionId}}-guest_role_id').attr('disabled', false);
-                }
-            }
+            'placeholder'   : 'SELECT REGISTRATION ROLE'
         },
         '{{componentId}}-{{sectionId}}-guest_role_id'                   : {
-            'placeholder'   : 'SELECT GUEST ROLE',
-            afterInit: function() {
-                if ($('#{{componentId}}-{{sectionId}}-registration_allowed')[0].checked === true) {
-                    $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', false);
-                    $('#{{componentId}}-{{sectionId}}-guest_role_id').attr('disabled', false);
-                }
-            }
+            'placeholder'   : 'SELECT GUEST ROLE'
         },
         '{{componentId}}-{{sectionId}}-can_login_role_ids'              : {
             'placeholder'   : 'SELECT ROLES'

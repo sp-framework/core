@@ -32,7 +32,7 @@ class MiddlewaresServiceProvider extends Injectable
 
             foreach ($middlewares as $middleware) {
                 if ($middleware['name'] !== 'IpFilter') {
-                    if ($this->checkRoute()) {
+                    if ($this->checkRoute($middleware)) {
                         return true;
                     };
                 }
@@ -65,7 +65,7 @@ class MiddlewaresServiceProvider extends Injectable
         }
     }
 
-    protected function checkRoute()
+    protected function checkRoute($middleware)
     {
         $this->data['domain'] = $this->domains->getDomain();
 
@@ -100,7 +100,7 @@ class MiddlewaresServiceProvider extends Injectable
 
         if (in_array($this->data['givenRoute'], $this->data['guestAccess'])) {
             return true;
-        } else if (!$this->componentsNeedsAuth()) {
+        } else if ($middleware['name'] === 'Auth' && !$this->componentsNeedsAuth()) {
             return true;
         }
 
@@ -112,7 +112,21 @@ class MiddlewaresServiceProvider extends Injectable
         $componentsArr = $this->modules->components->getComponentsForAppType($this->data['app']['app_type']);
 
         foreach ($componentsArr as $key => $componentValue) {
-            if ($this->data['givenRoute'] === $this->data['appRoute'] . '/' . $componentValue['route']) {
+            $match = false;
+
+            $methods = (new \ReflectionClass($componentValue['class']))->getMethods();
+
+            foreach ($methods as $key => $method) {
+                if ($method->class === $componentValue['class'] && str_contains($method->name, 'Action')) {
+                    if ($this->data['givenRoute'] ===
+                        $this->data['appRoute'] . '/' . $componentValue['route'] . '/' . str_replace('Action', '', $method->name)
+                    ) {
+                        $match = true;
+                    }
+                }
+            }
+
+            if ($this->data['givenRoute'] === $this->data['appRoute'] . '/' . $componentValue['route'] || $match === true) {
                 if ($componentValue['apps']) {
                     $componentValue['apps'] = Json::decode($componentValue['apps'], true);
 
