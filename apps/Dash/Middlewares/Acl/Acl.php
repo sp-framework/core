@@ -39,112 +39,117 @@ class Acl extends BaseMiddleware
             $roles[$value['id']] = $value;
         }
 
-        $this->account = $this->auth->account();
-
-        $this->accountPermissions = Json::decode($this->account['permissions'], true);
-
-        //System Admin bypasses the ACL if they don't have any permissions defined.
-        if ($this->account['id'] === '1' &&
-            $this->account['role_id'] === '1' &&
-            count($this->accountPermissions) === 0
-        ) {
-            return;
-        }
-
         $this->checkCachePath();
         $aclFileDir =
             'var/storage/cache/' .
             $this->app['app_type'] . '/' .
             $this->app['route'] . '/acls/';
-
         if (!$this->setControllerAndAction()) {
             return true;
         }
 
-        if ($this->account && $this->account['override_role'] === '1') {
-            $this->accountEmail = str_replace('.', '', str_replace('@', '', $this->account['email']));
+        if ($this->auth->account()) {
+            $this->account = $this->auth->account();
 
-            if ($this->localContent->fileExists($aclFileDir . $this->accountEmail . $this->account['id'])) {
+            $this->accountPermissions = Json::decode($this->account['permissions'], true);
 
-                $this->acl = unserialize($this->localContent->read($aclFileDir . $this->accountEmail . $this->account['id']));
-            } else {
-                $this->acl->addRole(
-                    new Role($this->accountEmail, 'User Override Role')
-                );
+            //System Admin bypasses the ACL if they don't have any permissions defined.
+            if ($this->account['id'] === '1' &&
+                $this->account['role_id'] === '1' &&
+                count($this->accountPermissions) === 0
+            ) {
+                return;
+            }
 
-                $permissions = Json::decode($this->account['permissions'], true);
+            if ($this->account['override_role'] === '1') {
+                $this->accountEmail = str_replace('.', '', str_replace('@', '', $this->account['email']));
 
-                $this->generateComponentsArr();
+                if ($this->localContent->fileExists($aclFileDir . $this->accountEmail . $this->account['id'])) {
 
-                foreach ($this->accountPermissions as $appKey => $app) {
-                    foreach ($app as $componentKey => $permission) {
-                        if ($this->app['id'] == $appKey) {
-                            if ($this->components[$componentKey]['route'] === $this->controllerRoute) {
-                                $this->buildAndTestAcl($this->accountEmail, $componentKey, $permission);
-                                break 2;
+                    $this->acl = unserialize($this->localContent->read($aclFileDir . $this->accountEmail . $this->account['id']));
+                } else {
+                    $this->acl->addRole(
+                        new Role($this->accountEmail, 'User Override Role')
+                    );
+
+                    $permissions = Json::decode($this->account['permissions'], true);
+
+                    $this->generateComponentsArr();
+
+                    foreach ($this->accountPermissions as $appKey => $app) {
+                        foreach ($app as $componentKey => $permission) {
+                            if ($this->app['id'] == $appKey) {
+                                if ($this->components[$componentKey]['route'] === $this->controllerRoute) {
+                                    $this->buildAndTestAcl($this->accountEmail, $componentKey, $permission);
+                                    break 2;
+                                }
                             }
                         }
                     }
+
+                    if ($this->config->cache->enabled) {
+                        $this->localContent->write($aclFileDir . $this->accountEmail . $this->account['id'], serialize($this->acl));
+                    }
                 }
 
-                if ($this->config->cache->enabled) {
-                    $this->localContent->write($aclFileDir . $this->accountEmail . $this->account['id'], serialize($this->acl));
+                if (!$this->acl->isAllowed($this->accountEmail, $this->controllerRoute, $this->action)) {
+                    throw new PermissionDeniedException();
                 }
-            }
 
-            if (!$this->acl->isAllowed($this->accountEmail, $this->controllerRoute, $this->action)) {
-                throw new PermissionDeniedException();
+                return;
+            } else {
+                $this->role = $roles[$this->account['role_id']];
             }
         } else {
-            $this->role = $roles[$this->account['role_id']];
+            $this->role = $roles[$this->app['guest_role_id']];
+        }
 
-            $this->roleName = strtolower(str_replace(' ', '', $this->role['name']));
+        $this->roleName = strtolower(str_replace(' ', '', $this->role['name']));
 
-            if ($this->localContent->fileExists(
+        if ($this->localContent->fileExists(
+                    $aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action
+                )
+        ) {
+            $this->acl =
+                unserialize(
+                    $this->localContent->read(
                         $aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action
                     )
-            ) {
-                $this->acl =
-                    unserialize(
-                        $this->localContent->read(
-                            $aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action
-                        )
-                    );
-            } else {
-                $this->generateComponentsArr();
-
-                $this->acl->addRole(
-                    new Role($this->roleName, $this->role['description'])
                 );
+        } else {
+            $this->generateComponentsArr();
 
-                $this->rolePermissions = Json::decode($this->role['permissions'], true);
+            $this->acl->addRole(
+                new Role($this->roleName, $this->role['description'])
+            );
 
-                foreach ($this->rolePermissions as $appKey => $app) {
-                    foreach ($app as $componentKey => $permission) {
-                        if ($this->app['id'] == $appKey) {
-                            if ($this->components[$componentKey]['route'] === $this->controllerRoute &&
-                                Arr::has($this->components[$componentKey]['acls'], $this->action)
-                            ) {
-                                $this->found = true;
-                                $this->buildAndTestAcl($this->roleName, $componentKey, $permission);
-                                break 2;
-                            }
+            $this->rolePermissions = Json::decode($this->role['permissions'], true);
+
+            foreach ($this->rolePermissions as $appKey => $app) {
+                foreach ($app as $componentKey => $permission) {
+                    if ($this->app['id'] == $appKey) {
+                        if ($this->components[$componentKey]['route'] === $this->controllerRoute &&
+                            Arr::has($this->components[$componentKey]['acls'], $this->action)
+                        ) {
+                            $this->found = true;
+                            $this->buildAndTestAcl($this->roleName, $componentKey, $permission);
+                            break 2;
                         }
                     }
                 }
-
-                if ($this->config->cache->enabled) {
-                    $this->localContent->write(
-                        $aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action, serialize($this->acl)
-                    );
-                }
             }
 
-            if ($this->found &&
-                !$this->acl->isAllowed($this->roleName, $this->controllerRoute, $this->action)
-            ) {
-                throw new PermissionDeniedException();
+            if ($this->config->cache->enabled) {
+                $this->localContent->write(
+                    $aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action, serialize($this->acl)
+                );
             }
+        }
+
+        if ($this->found &&
+            !$this->acl->isAllowed($this->roleName, $this->controllerRoute, $this->action)
+        ) {
+            throw new PermissionDeniedException();
         }
     }
 

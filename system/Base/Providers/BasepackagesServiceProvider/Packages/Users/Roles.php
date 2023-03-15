@@ -64,7 +64,9 @@ class Roles extends BasePackage
      */
     public function removeRole(array $data)
     {
-        if (isset($data['id']) && $data['id'] != 1) {
+        if (isset($data['id']) &&
+            ($data['id'] != 1 && $data['id'] != 2 && $data['id'] != 3)
+        ) {
             $roleObj = $this->getFirst('id', $data['id']);
 
             if ($roleObj->getAccounts() && $roleObj->getAccounts()->count() > 0) {
