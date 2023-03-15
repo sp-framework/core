@@ -154,6 +154,7 @@ $(document).ready(function(){
             success         : function(response) {
                                 if (response.responseCode == '0') {
                                     $('.login-box-msg').text(response.responseMessage);
+                                    $('.login-box-msg').removeClass('text-danger').addClass('text-success font-weight-bold');
                                     if (response.redirectUrl) {
                                         success(response.redirectUrl);
                                     } else {
@@ -196,14 +197,15 @@ $(document).ready(function(){
     }
 
     function success(redirectUrl = null) {
-        $('.login-spinner').attr('hidden', true);
-        $('.login-box-msg').removeClass('text-danger').addClass('text-success font-weight-bold');
+        setTimeout(function() {
+            $('.login-spinner').attr('hidden', true);
 
-        if (redirectUrl) {
-            window.location = redirectUrl;
-        } else {
-            window.location = '/{{appRoute}}/';
-        }
+            if (redirectUrl) {
+                window.location = redirectUrl;
+            } else {
+                window.location = '/{{appRoute}}/';
+            }
+        }, 1500)
     }
 });
 </script>

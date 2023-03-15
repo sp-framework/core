@@ -5,18 +5,25 @@
     {% set appType = app['app_type'] %}
     {% set appTypeDisabled = true %}
     {% set appDescription = app['description'] %}
+    {% for middleware in middlewares %}
+        {% if middleware['name'] === 'Auth' %}
+            {% if middleware['enabled'] == 1 %}
+                {% set registrationEnabled = false %}
+            {% elseif middleware['enabled'] == 0 %}
+                {% set registrationEnabled = true %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
     {% if app['registration_allowed'] == true %}
         {% set registrationAllowed = true %}
         {% set registrationApproveAccountsManuallyDisabled = false %}
         {% set registrationEnforce2FADisabled = false %}
         {% set registrationRoleDisabled = false %}
-        {% set guestRoleDisabled = false %}
     {% else %}
         {% set registrationAllowed = false %}
         {% set registrationApproveAccountsManuallyDisabled = true %}
         {% set registrationEnforce2FADisabled = true %}
         {% set registrationRoleDisabled = true %}
-        {% set guestRoleDisabled = true %}
     {% endif %}
     {% set approveAccountsManually = false %}
     {% if app['approve_accounts_manually'] == true %}
@@ -41,7 +48,6 @@
     {% set appDescription = '' %}
     {% set registrationAllowed = '' %}
     {% set registrationRoleDisabled = true %}
-    {% set guestRoleDisabled = true %}
     {% set appRegistrationRoleId = '' %}
     {% set appGuestRoleId = '' %}
     {% set appCanLoginRoleIds = [] %}
@@ -214,22 +220,7 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-route'                               : { },
         '{{componentId}}-{{sectionId}}-description'                         : { },
-        '{{componentId}}-{{sectionId}}-registration_allowed'                : {
-            afterInit: function() {
-
-                $('#{{componentId}}-{{sectionId}}-registration_allowed').click(function() {
-                    if ($(this)[0].checked === true) {
-                        $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-guest_role_id').attr('disabled', false);
-                    } else {
-                        $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-registration_role_id').val(null).trigger('change');
-                        $('#{{componentId}}-{{sectionId}}-guest_role_id').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-guest_role_id').val(null).trigger('change');
-                    }
-                });
-            }
-        },
+        '{{componentId}}-{{sectionId}}-registration_allowed'                : { },
         '{{componentId}}-{{sectionId}}-registration_role_id'                : {
             'placeholder'   : 'SELECT REGISTRATION ROLE',
         },

@@ -295,6 +295,7 @@ class Accounts extends BasePackage
     public function removeAccount(array $data)
     {
         if (isset($data['id']) && $data['id'] != 1) {
+
             if ($this->auth->account()['id'] === $data['id']) {
                 $this->addResponse('Cannot remove own account!', 1);
 
@@ -326,6 +327,47 @@ class Accounts extends BasePackage
             }
         } else {
             $this->addResponse('Cannot remove default account.', 1);
+        }
+    }
+
+    public function registerAccount(array $data)
+    {
+        if (!$this->app['registration_allowed'] || $this->app['registration_allowed'] == '0') {
+            $this->addResponse('Registration for this application is disabled. Please contact administrator.', 1);
+
+            return;
+        }
+
+        $data['role_id'] = $this->app['registration_role_id'];
+        $data['email_new_password'] = '1';
+        $data['override_role'] = '0';
+        $data['permissions'] = Json::encode([]);
+        $data['force_pwreset'] = '1';
+        $data['status'] = '1';
+
+        $canLogin = true;
+
+        if ($this->app['approve_accounts_manually'] == '1') {
+            $canLogin = false;
+            $data['status'] = '0';
+        }
+
+        $data['can_login'] = Json::encode(
+            [
+                strtolower($this->app['name']) => $canLogin
+            ]
+        );
+
+        $validation = $this->validateData($data);
+
+        if ($validation === true) {
+            $this->addAccount($data);
+
+            $this->packagesData->redirectUrl = $this->links->url('auth');
+        } else {
+            $this->addResponse($validation, 1);
+
+            return;
         }
     }
 
