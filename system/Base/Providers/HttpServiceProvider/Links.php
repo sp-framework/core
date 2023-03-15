@@ -45,9 +45,9 @@ class Links
 	public function url($link = null, $excludeApp = null)
 	{
 		if ($link) {
-			if ($link === '/') {
-				return '/';
-			}
+			// if ($link === '/') {
+			// 	return '/';
+			// }
 
 			$link = ltrim($link, '/');
 

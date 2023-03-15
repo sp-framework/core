@@ -4,6 +4,7 @@ namespace System\Base\Providers;
 
 use Phalcon\Di\Injectable;
 use Phalcon\Events\Event;
+use Phalcon\Helper\Json;
 use Phalcon\Mvc\DispatcherInterface;
 
 class MiddlewaresServiceProvider extends Injectable
@@ -15,23 +16,23 @@ class MiddlewaresServiceProvider extends Injectable
         DispatcherInterface $dispatcher,
         $data
     ) {
-        $app = $this->apps->getAppInfo();
+        $this->data['app'] = $this->apps->getAppInfo();
 
-        if ($app) {
+        if ($this->data['app']) {
             $middlewares = [];
 
-            $ipFilterMiddleware = $this->modules->middlewares->getNamedMiddlewareForApp('IpFilter', $app['id']);
+            $ipFilterMiddleware = $this->modules->middlewares->getNamedMiddlewareForApp('IpFilter', $this->data['app']['id']);
 
             if ($ipFilterMiddleware) {
                 $middlewares[] = $ipFilterMiddleware;
-                $middlewares = array_merge($middlewares, msort($this->modules->middlewares->getMiddlewaresForApp($app['id'], true), 'sequence'));
+                $middlewares = array_merge($middlewares, msort($this->modules->middlewares->getMiddlewaresForApp($this->data['app']['id'], true), 'sequence'));
             } else {
-                $middlewares = msort($this->modules->middlewares->getMiddlewaresForApp($app['id'], true), 'sequence');
+                $middlewares = msort($this->modules->middlewares->getMiddlewaresForApp($this->data['app']['id'], true), 'sequence');
             }
 
             foreach ($middlewares as $middleware) {
                 if ($middleware['name'] !== 'IpFilter') {
-                    if ($this->checkRoute($app)) {
+                    if ($this->checkRoute()) {
                         return true;
                     };
                 }
@@ -64,7 +65,7 @@ class MiddlewaresServiceProvider extends Injectable
         }
     }
 
-    protected function checkRoute($app)
+    protected function checkRoute()
     {
         $this->data['domain'] = $this->domains->getDomain();
 
@@ -73,12 +74,19 @@ class MiddlewaresServiceProvider extends Injectable
         ) {
             $this->data['appRoute'] = '';
         } else {
-            $this->data['appRoute'] = '/' . strtolower($app['route']);
+            $this->data['appRoute'] = '/' . strtolower($this->data['app']['route']);
         }
 
-        $givenRoute = strtolower(rtrim(explode('/q/', $this->request->getUri())[0], '/'));
+        $this->data['givenRoute'] = strtolower(rtrim(explode('/q/', $this->request->getUri())[0], '/'));
 
-        $guestAccess =
+        if ($this->data['givenRoute'] === $this->data['appRoute']) {
+            $this->data['givenRoute'] = $this->data['appRoute'] . '/home';
+        }
+        if ($this->data['givenRoute'] === '') {
+            $this->data['givenRoute'] = $this->data['appRoute'] . '/home';
+        }
+
+        $this->data['guestAccess'] =
         [
             $this->data['appRoute'] . '/auth',
             $this->data['appRoute'] . '/auth/login',
@@ -90,8 +98,41 @@ class MiddlewaresServiceProvider extends Injectable
             $this->data['appRoute'] . '/register/registernewaccount'
         ];
 
-        if (in_array($givenRoute, $guestAccess)) {
+        if (in_array($this->data['givenRoute'], $this->data['guestAccess'])) {
+            return true;
+        } else if (!$this->componentsNeedsAuth()) {
             return true;
         }
+
+        return false;
+    }
+
+    protected function componentsNeedsAuth()
+    {
+        $componentsArr = $this->modules->components->getComponentsForAppType($this->data['app']['app_type']);
+
+        foreach ($componentsArr as $key => $componentValue) {
+            if ($this->data['givenRoute'] === $this->data['appRoute'] . '/' . $componentValue['route']) {
+                if ($componentValue['apps']) {
+                    $componentValue['apps'] = Json::decode($componentValue['apps'], true);
+
+                    if (!isset($componentValue['apps'][$this->data['app']['id']]['needAuth'])) {
+                        return false;
+                    } else {
+                        if ($componentValue['apps'][$this->data['app']['id']]['needAuth'] == true ||
+                            $componentValue['apps'][$this->data['app']['id']]['needAuth'] == 'mandatory'
+                        ) {
+                            return true;
+                        } else if ($componentValue['apps'][$this->data['app']['id']]['needAuth'] == false ||
+                                   $componentValue['apps'][$this->data['app']['id']]['needAuth'] == 'disabled'
+                        ) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

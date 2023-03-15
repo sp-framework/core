@@ -158,6 +158,7 @@ class Apps extends BasePackage
 		$data['default_component'] = 0;
 		$data['errors_component'] = 0;
 		$data['ip_filter_default_action'] = 0;
+		$data['can_login_role_ids'] = Json::encode(['1']);
 
 		if ($this->add($data)) {
 

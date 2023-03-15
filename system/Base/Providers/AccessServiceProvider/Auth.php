@@ -162,7 +162,7 @@ class Auth
 
         $this->session->redirectUrl = '/';
 
-        $this->packagesData->redirectUrl = $this->links->url('auth');
+        $this->packagesData->redirectUrl = $this->links->url('/');
 
         $this->logger->log->debug($this->account['email'] . ' logged out successfully from app: ' . $this->app['name']);
 
