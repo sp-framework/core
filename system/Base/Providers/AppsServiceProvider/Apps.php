@@ -5,6 +5,7 @@ namespace System\Base\Providers\AppsServiceProvider;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\AppsServiceProvider\Apps\Types;
+use System\Base\Providers\AppsServiceProvider\Exceptions\AppNotFoundException;
 use System\Base\Providers\AppsServiceProvider\IpFilter;
 use System\Base\Providers\AppsServiceProvider\Model\Apps as AppsModel;
 use System\Base\Providers\AppsServiceProvider\Model\AppsIpFilter;
@@ -54,7 +55,7 @@ class Apps extends BasePackage
 			}
 		}
 
-		return null;
+		throw new AppNotFoundException();
 	}
 
 	protected function getAppRoute()

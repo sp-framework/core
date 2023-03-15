@@ -11,8 +11,8 @@ use Phalcon\Helper\Json;
 use Phalcon\Mvc\Controller;
 use Phalcon\Mvc\View;
 use Phalcon\Tag;
+use System\Base\Exceptions\ControllerNotFoundException;
 use System\Base\Exceptions\IdNotFoundException;
-use System\Base\Exceptions\controllerNotFoundException;
 
 abstract class BaseComponent extends Controller
 {
@@ -110,7 +110,7 @@ abstract class BaseComponent extends Controller
 
 			return false;
 		} else if (!$this->component) {
-			throw new controllerNotFoundException('Component Not Found!');
+			throw new ControllerNotFoundException('Component Not Found!');
 		}
 
 		if (!$this->isJson()) {
