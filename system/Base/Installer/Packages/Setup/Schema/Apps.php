@@ -127,7 +127,7 @@ class Apps
 				new Column(
 					'menu_structure',
 					[
-						'type'    => Column::TYPE_JSON,
+						'type'    => Column::TYPE_TEXT,
 						'notNull' => false,
 					]
 				),
