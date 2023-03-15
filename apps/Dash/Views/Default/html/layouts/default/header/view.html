@@ -81,6 +81,28 @@
                     </div>
                 </li>
             </ul>
+        {% else %}
+            {% if view.getParamsToView()['appAuth'] %}
+                <ul class="navbar-nav ml-auto">
+                    <li id="profile-dropdown" class="nav-item dropdown text-uppercase">
+                        <a id="profile-portrait" class="nav-link" data-toggle="dropdown" href="#" aria-expanded="true">
+                            <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="rounded-sm" style="position:relative;top: -3px; width:25px;" alt="User Image" hidden>
+                            <i class="fa fa-fw fa-user"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a href="{{links.url('system/users/profile')}}" id="profile" class="dropdown-item contentAjaxLink">
+                                <i class="fa fa-fw fa-id-card mr-2"></i> Profile
+                            </a>
+                            {% if auth.account() %}
+                                <div class="dropdown-divider"></div>
+                                <a href="{{links.url('auth/logout')}}" id="logout" class="dropdown-item text-danger">
+                                    <i class="fa fa-fw fa-sign-out-alt mr-2"></i> Logout
+                                </a>
+                            {% endif %}
+                        </div>
+                    </li>
+                </ul>
+            {% endif %}
         {% endif %}
     </div>
 </nav>

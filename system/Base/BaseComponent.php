@@ -126,7 +126,13 @@ abstract class BaseComponent extends Controller
 						$this->app['id']
 					), 'sequence');
 
+			$this->view->appAuth = false;
+
 			foreach ($middlewares as $key => $middleware) {
+				if ($middleware['name'] === 'Auth' && $middleware['enabled'] === true) {
+					$this->view->appAuth = true;
+				}
+
 				if ($middleware['name'] === 'Acl' && $middleware['enabled'] === false) {
 					$this->view->canView = true;
 					$this->view->canAdd = true;
@@ -219,6 +225,10 @@ abstract class BaseComponent extends Controller
 		} else {
 			$this->view->route = strtolower($this->app['name']);
 		}
+
+		$this->view->app = $this->app;
+
+		$this->view->app = $this->app;
 
 		$this->view->component = $this->component;
 
