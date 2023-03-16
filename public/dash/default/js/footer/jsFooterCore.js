@@ -6445,10 +6445,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                                 }
                                         },
                                         buttons         : {
-                                            selectAll   : '<i class="fas fa-fw fa-xs fa-check-double"></i>',
+                                            selectAll   : '<i class="fas fa-fw fa-check-double"></i>',
                                             selectNone  : '<span class="fa-stack">' +
-                                                          '<i class="fas fa-fw fa-xs fa-check-double fa-stack-1x"></i>' +
-                                                          '<i class="fas fa-fw fa-sm fa-ban fa-stack-2x text-danger"></i>' +
+                                                          '<i class="fas fa-fw fa-check-double fa-stack-1x"></i>' +
+                                                          '<i class="fas fa-fw fa-ban fa-stack-2x text-danger"></i>' +
                                                           '</span>'
                                         }
                                     },
