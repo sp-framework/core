@@ -5,9 +5,8 @@ namespace Apps\Dash\Components\System\Filters;
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Hrms\Employees\Employees;
 use System\Base\BaseComponent;
-use System\Base\Interfaces\ComponentInterface;
 
-class FiltersComponent extends BaseComponent implements ComponentInterface
+class FiltersComponent extends BaseComponent
 {
     use DynamicTable;
 
@@ -98,11 +97,7 @@ class FiltersComponent extends BaseComponent implements ComponentInterface
             );
 
             $this->view->pick('filters/list');
-
-            return;
         }
-
-        return false;
     }
 
     /**

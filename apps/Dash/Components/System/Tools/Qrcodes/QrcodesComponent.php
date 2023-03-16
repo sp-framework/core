@@ -4,9 +4,8 @@ namespace Apps\Dash\Components\System\Tools\Qrcodes;
 
 use Apps\Dash\Packages\System\Tools\Qrcodes\Qrcodes;
 use System\Base\BaseComponent;
-use System\Base\Interfaces\ComponentInterface;
 
-class QrcodesComponent extends BaseComponent implements ComponentInterface
+class QrcodesComponent extends BaseComponent
 {
     protected $qrcodes;
 
@@ -95,15 +94,5 @@ class QrcodesComponent extends BaseComponent implements ComponentInterface
             $this->qrcodes->packagesData->responseMessage,
             $this->qrcodes->packagesData->responseCode
         );
-    }
-
-    public function addAction()
-    {
-        //
-    }
-
-    public function removeAction()
-    {
-        //
     }
 }

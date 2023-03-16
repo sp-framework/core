@@ -3,9 +3,8 @@
 namespace Apps\Dash\Components\System\Users\Profile;
 
 use System\Base\BaseComponent;
-use System\Base\Interfaces\ComponentInterface;
 
-class ProfileComponent extends BaseComponent implements ComponentInterface
+class ProfileComponent extends BaseComponent
 {
     protected $profile;
 
@@ -253,15 +252,5 @@ class ProfileComponent extends BaseComponent implements ComponentInterface
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }
-    }
-
-    public function addAction()
-    {
-        //
-    }
-
-    public function removeAction()
-    {
-        //
     }
 }

@@ -2,9 +2,9 @@
 
 namespace System\Base\Providers\ErrorServiceProvider;
 
-use System\Base\BaseExceptions;
+use System\Base\BaseComponent;
 
-class ExceptionHandlers extends BaseExceptions
+class ExceptionHandlers extends BaseComponent
 {
 	protected $baseErrorDir = 'system/Base/Providers/ErrorServiceProvider/View/errors/';
 

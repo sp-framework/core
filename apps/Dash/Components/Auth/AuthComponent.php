@@ -3,9 +3,8 @@
 namespace Apps\Dash\Components\Auth;
 
 use System\Base\BaseComponent;
-use System\Base\Interfaces\ComponentInterface;
 
-class AuthComponent extends BaseComponent implements ComponentInterface
+class AuthComponent extends BaseComponent
 {
     public function viewAction()
     {
@@ -155,20 +154,5 @@ class AuthComponent extends BaseComponent implements ComponentInterface
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }
-    }
-
-    public function addAction()
-    {
-        //
-    }
-
-    public function updateAction()
-    {
-        //
-    }
-
-    public function removeAction()
-    {
-        //
     }
 }

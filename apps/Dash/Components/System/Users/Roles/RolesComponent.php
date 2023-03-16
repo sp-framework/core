@@ -5,9 +5,8 @@ namespace Apps\Dash\Components\System\Users\Roles;
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
-use System\Base\Interfaces\ComponentInterface;
 
-class RolesComponent extends BaseComponent implements ComponentInterface
+class RolesComponent extends BaseComponent
 {
     use DynamicTable;
 

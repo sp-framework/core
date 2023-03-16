@@ -4,9 +4,8 @@ namespace Apps\Dash\Components\System\Geo\Cities;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use System\Base\BaseComponent;
-use System\Base\Interfaces\ComponentInterface;
 
-class CitiesComponent extends BaseComponent implements ComponentInterface
+class CitiesComponent extends BaseComponent
 {
     use DynamicTable;
 
@@ -164,10 +163,5 @@ class CitiesComponent extends BaseComponent implements ComponentInterface
                 $this->addResponse('Search Query Missing', 1);
             }
         }
-    }
-
-    public function removeAction()
-    {
-        //
     }
 }

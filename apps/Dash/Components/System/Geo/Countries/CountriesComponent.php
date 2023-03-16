@@ -4,10 +4,9 @@ namespace Apps\Dash\Components\System\Geo\Countries;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use System\Base\BaseComponent;
-use System\Base\Interfaces\ComponentInterface;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoExtractData;
 
-class CountriesComponent extends BaseComponent implements ComponentInterface
+class CountriesComponent extends BaseComponent
 {
     use DynamicTable;
 
@@ -232,10 +231,5 @@ class CountriesComponent extends BaseComponent implements ComponentInterface
         } else {
             throw new \Exception('Source file missing in url. Example URL: admin/system/geo/countries/q/extractdata/true/srcFile/src');
         }
-    }
-
-    public function removeAction()
-    {
-        //
     }
 }

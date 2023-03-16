@@ -4,9 +4,8 @@ namespace Apps\Dash\Components\System\Email\Services;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use System\Base\BaseComponent;
-use System\Base\Interfaces\ComponentInterface;
 
-class ServicesComponent extends BaseComponent implements ComponentInterface
+class ServicesComponent extends BaseComponent
 {
     use DynamicTable;
 
