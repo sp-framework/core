@@ -7,6 +7,6 @@
     "sub_category": "admin",
     "version": "0.0.1",
     "repo": "https://.../dash-package-system-admin-api-simplify",
-    "class": "Apps\\Dash\\Packages\\System\\Api\\Apis\\Simplify\\",
+    "class": "Apps\\Dash\\Packages\\System\\Api\\Apis\\Simplify",
     "settings": {"componentRoute":"system/api"}
 }

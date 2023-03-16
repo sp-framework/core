@@ -1,12 +1,12 @@
 {
-    "name": "Api",
-    "display_name": "Api Package",
-    "description": "Package for connecting to external resources using API",
+    "name": "ApiXero",
+    "display_name": "Xero Api Package",
+    "description": "Package for connecting to Xero using API",
     "app_type": "dash",
     "category": "system",
     "sub_category": "admin",
     "version": "0.0.1",
-    "repo": "https://.../dash-package-system-admin-apiS",
-    "class": "Apps\\Dash\\Packages\\System\\Api\\Api",
+    "repo": "https://.../dash-package-system-admin-api-xero",
+    "class": "Apps\\Dash\\Packages\\System\\Api\\Apis\\Xero",
     "settings": {"componentRoute":"system/api"}
 }

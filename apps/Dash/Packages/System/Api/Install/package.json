@@ -6,7 +6,7 @@
     "category": "system",
     "sub_category": "admin",
     "version": "0.0.1",
-    "repo": "https://.../dash-package-system-admin-apiS",
+    "repo": "https://.../dash-package-system-admin-api",
     "class": "Apps\\Dash\\Packages\\System\\Api\\Api",
     "settings": {"componentRoute":"system/api"}
 }
