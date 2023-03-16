@@ -5,8 +5,9 @@ namespace Apps\Dash\Components\System\Templates;
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
+use System\Base\Interfaces\ComponentInterface;
 
-class TemplatesComponent extends BaseComponent
+class TemplatesComponent extends BaseComponent implements ComponentInterface
 {
     use DynamicTable;
 

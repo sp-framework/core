@@ -7,8 +7,9 @@ use Apps\Dash\Packages\System\Api\Api;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 use System\Base\Exceptions\ControllerNotFoundException;
+use System\Base\Interfaces\ComponentInterface;
 
-class ApiComponent extends BaseComponent
+class ApiComponent extends BaseComponent implements ComponentInterface
 {
     use DynamicTable;
 

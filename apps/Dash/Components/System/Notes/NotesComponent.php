@@ -4,8 +4,9 @@ namespace Apps\Dash\Components\System\Notes;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use System\Base\BaseComponent;
+use System\Base\Interfaces\ComponentInterface;
 
-class NotesComponent extends BaseComponent
+class NotesComponent extends BaseComponent implements ComponentInterface
 {
     use DynamicTable;
 

@@ -2,9 +2,9 @@
 
 namespace System\Base\Providers\ErrorServiceProvider;
 
-use System\Base\BaseComponent;
+use System\Base\BaseExceptions;
 
-class ErrorsComponent extends BaseComponent
+class ErrorsComponent extends BaseExceptions
 {
     public function routeNotFoundAction()
     {

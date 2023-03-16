@@ -47,14 +47,21 @@ use Apps\Dash\Packages\System\Messenger\Install\Package as MessengerPackage;
 use Apps\Dash\Packages\System\Tools\ImportExport\Install\Package as ImportExportPackage;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
+use System\Base\Interfaces\ComponentInterface;
 
-class HomeComponent extends BaseComponent
+class HomeComponent extends BaseComponent implements ComponentInterface
 {
     /**
      * @acl(name=view)
      */
     public function viewAction()
     {
+        // $this->basepackages->emailServices->errorEmailService(
+        //                     'Email was added to the queue but, there is no email service associated with this app. Please add a new service ' .
+        //                     'and assign it to the app via domains.'
+        //                 );
+        // $apiPackage = new ApiPackage();
+        // $apiPackage->installPackage(true);
         // var_dump($this->auth->account());die();
         // $this->resetTemp();return;
 
@@ -353,5 +360,20 @@ class HomeComponent extends BaseComponent
 
         var_dump($response->toArray());
         return false;
+    }
+
+    public function addAction()
+    {
+        //
+    }
+
+    public function updateAction()
+    {
+        //
+    }
+
+    public function removeAction()
+    {
+        //
     }
 }

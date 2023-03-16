@@ -4,8 +4,9 @@ namespace Apps\Dash\Components\Modules;
 
 use Apps\Dash\Packages\Modules\Modules as ModulesPackage;
 use System\Base\BaseComponent;
+use System\Base\Interfaces\ComponentInterface;
 
-class ModulesComponent extends BaseComponent
+class ModulesComponent extends BaseComponent implements ComponentInterface
 {
 	/**
 	 * @acl(name=view)
@@ -168,5 +169,10 @@ class ModulesComponent extends BaseComponent
 
 			return $this->generateView();
 		}
+	}
+
+	public function removeAction()
+	{
+		//
 	}
 }

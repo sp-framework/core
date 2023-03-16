@@ -6,8 +6,9 @@ use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\System\Tools\ImportExport\ImportExport;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
+use System\Base\Interfaces\ComponentInterface;
 
-class ImportexportComponent extends BaseComponent
+class ImportexportComponent extends BaseComponent implements ComponentInterface
 {
     use DynamicTable;
 
@@ -323,5 +324,10 @@ class ImportexportComponent extends BaseComponent
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }
+    }
+
+    public function removeAction()
+    {
+        //
     }
 }

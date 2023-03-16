@@ -5,8 +5,9 @@ namespace Apps\Dash\Components\System\Storages;
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
+use System\Base\Interfaces\ComponentInterface;
 
-class StoragesComponent extends BaseComponent
+class StoragesComponent extends BaseComponent implements ComponentInterface
 {
     use DynamicTable;
 

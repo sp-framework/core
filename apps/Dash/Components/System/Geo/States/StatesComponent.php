@@ -4,8 +4,9 @@ namespace Apps\Dash\Components\System\Geo\States;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use System\Base\BaseComponent;
+use System\Base\Interfaces\ComponentInterface;
 
-class StatesComponent extends BaseComponent
+class StatesComponent extends BaseComponent implements ComponentInterface
 {
     use DynamicTable;
 
@@ -150,5 +151,10 @@ class StatesComponent extends BaseComponent
                 $this->addResponse('Search Query Missing', 1);
             }
         }
+    }
+
+    public function removeAction()
+    {
+        //
     }
 }

@@ -2,7 +2,6 @@
 
 namespace System\Base;
 
-use Apps\Ecom\Admin\Packages\AdminLTETags\AdminLTETags;
 use Phalcon\Assets\Collection;
 use Phalcon\Assets\Inline;
 use Phalcon\Di\DiInterface;
@@ -13,6 +12,8 @@ use Phalcon\Mvc\View;
 use Phalcon\Tag;
 use System\Base\Exceptions\ControllerNotFoundException;
 use System\Base\Exceptions\IdNotFoundException;
+use System\Base\Exceptions\InterfaceNotImplemented;
+use System\Base\Interfaces\ComponentInterface;
 
 abstract class BaseComponent extends Controller
 {
@@ -77,6 +78,12 @@ abstract class BaseComponent extends Controller
 
 		$this->componentName =
 			str_replace('Component', '', $this->reflection->getShortName());
+
+		if (!$this instanceOf ComponentInterface) {
+			throw new InterfaceNotImplemented(
+				$this->componentName . 'Component should be an instance of ComponentInterface.'
+			);
+		}
 
 		$this->component =
 			$this->modules->components->getNamedComponentForApp(

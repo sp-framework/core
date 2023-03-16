@@ -8,8 +8,9 @@ use Apps\Dash\Packages\Crms\Customers\Customers;
 use Apps\Dash\Packages\Hrms\Employees\Employees;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
+use System\Base\Interfaces\ComponentInterface;
 
-class AccountsComponent extends BaseComponent
+class AccountsComponent extends BaseComponent implements ComponentInterface
 {
     use DynamicTable;
 

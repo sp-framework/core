@@ -5,8 +5,9 @@ namespace Apps\Dash\Components\System\Workers\Jobs;
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
+use System\Base\Interfaces\ComponentInterface;
 
-class JobsComponent extends BaseComponent
+class JobsComponent extends BaseComponent implements ComponentInterface
 {
     use DynamicTable;
 
@@ -135,63 +136,19 @@ class JobsComponent extends BaseComponent
 
         return $data;
     }
-    // /**
-    //  * @acl(name="add")
-    //  */
-    // public function addAction()
-    // {
-    //     if ($this->request->isPost()) {
-    //         if (!$this->checkCSRF()) {
-    //             return;
-    //         }
 
-    //         $this->jobs->addSchedule($this->postData());
+    public function addAction()
+    {
+        //
+    }
 
-    //         $this->addResponse(
-    //             $this->jobs->packagesData->responseMessage,
-    //             $this->jobs->packagesData->responseCode
-    //         );
-    //     } else {
-    //         $this->addResponse('Method Not Allowed', 1);
-    //     }
-    // }
+    public function updateAction()
+    {
+        //
+    }
 
-    // /**
-    //  * @acl(name="update")
-    //  */
-    // public function updateAction()
-    // {
-    //     if ($this->request->isPost()) {
-    //         if (!$this->checkCSRF()) {
-    //             return;
-    //         }
-
-    //         $this->jobs->updateSchedule($this->postData());
-
-    //         $this->addResponse(
-    //             $this->jobs->packagesData->responseMessage,
-    //             $this->jobs->packagesData->responseCode
-    //         );
-    //     } else {
-    //         $this->addResponse('Method Not Allowed', 1);
-    //     }
-    // }
-
-    // /**
-    //  * @acl(name="remove")
-    //  */
-    // public function removeAction()
-    // {
-    //     if ($this->request->isPost()) {
-
-    //         $this->jobs->removeSchedule($this->postData());
-
-    //         $this->addResponse(
-    //             $this->jobs->packagesData->responseMessage,
-    //             $this->jobs->packagesData->responseCode
-    //         );
-    //     } else {
-    //         $this->addResponse('Method Not Allowed', 1);
-    //     }
-    // }
+    public function removeAction()
+    {
+        //
+    }
 }

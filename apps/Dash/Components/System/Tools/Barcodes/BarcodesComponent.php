@@ -4,8 +4,9 @@ namespace Apps\Dash\Components\System\Tools\Barcodes;
 
 use Apps\Dash\Packages\System\Tools\Barcodes\Barcodes;
 use System\Base\BaseComponent;
+use System\Base\Interfaces\ComponentInterface;
 
-class BarcodesComponent extends BaseComponent
+class BarcodesComponent extends BaseComponent implements ComponentInterface
 {
     protected $barcodes;
 
@@ -80,5 +81,15 @@ class BarcodesComponent extends BaseComponent
             $this->barcodes->packagesData->responseMessage,
             $this->barcodes->packagesData->responseCode
         );
+    }
+
+    public function addAction()
+    {
+        //
+    }
+
+    public function removeAction()
+    {
+        //
     }
 }

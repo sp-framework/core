@@ -5,8 +5,9 @@ namespace Apps\Dash\Components\System\Email\Queue;
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
+use System\Base\Interfaces\ComponentInterface;
 
-class QueueComponent extends BaseComponent
+class QueueComponent extends BaseComponent implements ComponentInterface
 {
     use DynamicTable;
 
@@ -239,5 +240,15 @@ class QueueComponent extends BaseComponent
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }
+    }
+
+    public function addAction()
+    {
+        //
+    }
+
+    public function updateAction()
+    {
+        //
     }
 }

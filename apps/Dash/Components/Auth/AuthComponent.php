@@ -3,15 +3,16 @@
 namespace Apps\Dash\Components\Auth;
 
 use System\Base\BaseComponent;
+use System\Base\Interfaces\ComponentInterface;
 
-class AuthComponent extends BaseComponent
+class AuthComponent extends BaseComponent implements ComponentInterface
 {
     public function viewAction()
     {
         $this->view->setLayout('auth');
 
         $this->view->canRegister = false;
-        
+
         if ($this->app['registration_allowed'] && $this->app['registration_allowed'] == '1') {
             $this->view->canRegister = true;
         }
@@ -154,5 +155,20 @@ class AuthComponent extends BaseComponent
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }
+    }
+
+    public function addAction()
+    {
+        //
+    }
+
+    public function updateAction()
+    {
+        //
+    }
+
+    public function removeAction()
+    {
+        //
     }
 }

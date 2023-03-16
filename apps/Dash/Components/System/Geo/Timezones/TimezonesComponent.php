@@ -4,9 +4,10 @@ namespace Apps\Dash\Components\System\Geo\Timezones;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use System\Base\BaseComponent;
+use System\Base\Interfaces\ComponentInterface;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoExtractData;
 
-class TimezonesComponent extends BaseComponent
+class TimezonesComponent extends BaseComponent implements ComponentInterface
 {
     use DynamicTable;
 
@@ -183,5 +184,10 @@ class TimezonesComponent extends BaseComponent
         } else {
             $this->addResponse('Only super admin allowed to extract geo data', 1);
         }
+    }
+
+    public function removeAction()
+    {
+        //
     }
 }
