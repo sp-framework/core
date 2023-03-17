@@ -32,9 +32,9 @@ class IpFilter extends BasePackage
     {
         $this->getClientAddress();
 
-        // if ($this->clientAddress === "127.0.0.1") {
-        //     return true;
-        // }
+        if ($this->clientAddress === "127.0.0.1") {
+            return true;
+        }
 
         $app = $this->apps->getFirst('id', $this->apps->app['id']);
 
