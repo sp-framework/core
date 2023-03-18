@@ -104,6 +104,19 @@ class EmailServices extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=error)
+     * @notification_allowed_methods(email, sms)
+     */
+    public function errorEmailService($messageTitle = null, $messageDetails = null, $id = null)
+    {
+        if (!$messageTitle) {
+            $messageTitle = 'Email Service has errors, contact administrator!';
+        }
+
+        $this->addToNotification('error', $messageTitle, $messageDetails, 'EmailServices', $id);
+    }
+
     protected function validateServiceData(array $data)
     {
         $this->validation->add('from_address', PresenceOf::class, ["message" => "Enter valid from email address."]);
