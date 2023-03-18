@@ -16,6 +16,8 @@ class Apps extends BasePackage
 
 	protected $packageName = 'apps';
 
+	protected $packageNameS = 'app';
+
 	public $apps;
 
 	public $types;
@@ -36,7 +38,7 @@ class Apps extends BasePackage
 
 		$this->app = $this->getAppInfo();
 
-		$this->ipFilter = new IpFilter;
+		$this->ipFilter = (new IpFilter())->init($this);
 
 		return $this;
 	}

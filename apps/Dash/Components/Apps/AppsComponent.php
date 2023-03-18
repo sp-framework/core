@@ -256,7 +256,7 @@ class AppsComponent extends BaseComponent
                 return;
             }
 
-            $filters = $this->apps->getFilters($this->postData());
+            $filters = $this->apps->ipFilter->getFilters($this->postData());
 
             foreach ($filters as $key => &$filter) {
                 unset ($filter['app_id']);
@@ -303,7 +303,7 @@ class AppsComponent extends BaseComponent
                 return;
             }
 
-            $this->apps->addFilter($this->postData());
+            $this->apps->ipFilter->addFilter($this->postData());
 
             $this->addResponse(
                 $this->apps->packagesData->responseMessage,
@@ -322,7 +322,7 @@ class AppsComponent extends BaseComponent
                 return;
             }
 
-            $this->apps->removeFilter($this->postData());
+            $this->apps->ipFilter->removeFilter($this->postData());
 
             $this->addResponse(
                 $this->apps->packagesData->responseMessage,
@@ -340,7 +340,7 @@ class AppsComponent extends BaseComponent
                 return;
             }
 
-            $this->apps->blockMonitorFilter($this->postData());
+            $this->apps->ipFilter->blockMonitorFilter($this->postData());
 
             $this->addResponse(
                 $this->apps->packagesData->responseMessage,
@@ -358,7 +358,7 @@ class AppsComponent extends BaseComponent
                 return;
             }
 
-            $this->apps->resetAppFilters($this->postData());
+            $this->apps->ipFilter->resetAppFilters($this->postData());
 
             $this->addResponse(
                 $this->apps->packagesData->responseMessage,
