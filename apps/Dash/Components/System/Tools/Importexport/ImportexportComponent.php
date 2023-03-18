@@ -24,9 +24,9 @@ class ImportexportComponent extends BaseComponent
             }
 
             if ($importexport['type'] === 'export') {
-                $this->view->components = $this->modules->components->getExportComponents();
+                $this->view->components = $this->modules->components->get(['type' => 'export']);
             } else if ($importexport['type'] === 'import') {
-                $this->view->components = $this->modules->components->getImportComponents();
+                $this->view->components = $this->modules->components->get(['type' => 'import']);
             }
 
             $this->view->fields = [];
@@ -146,20 +146,20 @@ class ImportexportComponent extends BaseComponent
             $data['status'] = '<span class="badge badge-' . $badge . ' text-uppercase">' . $status . '</span>';
             $data['type'] = '<span class="badge badge-primary text-uppercase">' . $data['type'] . '</span>';
 
-            $component = $this->modules->components->getComponentById($data['component_id']);
+            $component = $this->modules->components->get(['id' => $data['component_id']]);
 
             if ($component) {
                 $data['component_id'] = $component['name'] . ' (' . $data['component_id'] . ')';
             }
 
-            $app = $this->apps->getIdApp($data['app_id']);
+            $app = $this->apps->get(['id' => $data['app_id']]);
 
             if ($app) {
                 $data['app_id'] = $app['name'] . ' (' . $data['app_id'] . ')';
             }
 
             if ($data['account_id'] != '0') {
-                $account = $this->basepackages->accounts->getAccountById($data['account_id'], false, false, false, false, false, false, true);
+                $account = $this->basepackages->accounts->get(['id' => $data['account_id'], 'getprofiles' => true]);
 
                 if ($account) {
                     $data['account_id'] = $account['full_name'] . ' (' . $data['account_id'] . ')';
@@ -227,6 +227,11 @@ class ImportexportComponent extends BaseComponent
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }
+    }
+
+    public function removeAction()
+    {
+        return;
     }
 
     public function getPackageFieldsAction($componentId = null)

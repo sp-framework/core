@@ -83,4 +83,24 @@ class ExceptionHandlers extends BaseComponent
 			]
 		);
 	}
+
+	public function ViewAction()
+	{
+		return;
+	}
+
+	public function addAction()
+	{
+		return;
+	}
+
+	public function updateAction()
+	{
+		return;
+	}
+
+	public function removeAction()
+	{
+		return;
+	}
 }

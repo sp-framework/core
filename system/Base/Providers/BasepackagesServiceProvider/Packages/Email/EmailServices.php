@@ -25,12 +25,17 @@ class EmailServices extends BasePackage
         return $this;
     }
 
+    public function get(array $data = [], bool $resetCache = false)
+    {
+        return;
+    }
+
     /**
      * @notification(name=add)
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function addEmailService(array $data)
+    public function add(array $data)
     {
         $data = $this->encryptPass($data);
 
@@ -42,7 +47,7 @@ class EmailServices extends BasePackage
             return false;
         }
 
-        if ($this->add($data)){
+        if ($this->addToDb($data)){
             $this->addActivityLog($data);
 
             $this->addResponse('Added new email service ' . $data['name'], 0, null, true);
@@ -58,7 +63,7 @@ class EmailServices extends BasePackage
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function updateEmailService(array $data)
+    public function update(array $data)
     {
         $data = $this->encryptPass($data);
 
@@ -74,7 +79,7 @@ class EmailServices extends BasePackage
 
         $emailService = array_merge($emailService, $data);
 
-        if ($this->update($emailService)) {
+        if ($this->updateToDb($emailService)) {
             $this->addActivityLog($data, $emailService);
 
             $this->addToNotification('update', 'Updated email service ' . $data['name']);
@@ -90,12 +95,12 @@ class EmailServices extends BasePackage
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function removeEmailService(array $data)
+    public function remove(array $data)
     {
         $emailService = $this->getById($data['id']);
 
         //Check relations before removing.
-        if ($this->remove($emailService['id'])) {
+        if ($this->removeFromDb($emailService['id'])) {
             $this->addToNotification('remove', 'Removed email service ' . $emailService['name']);
 
             $this->addResponse('Removed email service ' . $emailService['name']);

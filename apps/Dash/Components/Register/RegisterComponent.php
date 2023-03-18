@@ -25,6 +25,21 @@ class RegisterComponent extends BaseComponent
         }
     }
 
+    public function addAction()
+    {
+        return;
+    }
+
+    public function updateAction()
+    {
+        return;
+    }
+
+    public function removeAction()
+    {
+        return;
+    }
+
     public function registerNewAccountAction()
     {
         if ($this->request->isPost()) {

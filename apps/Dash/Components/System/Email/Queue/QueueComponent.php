@@ -82,6 +82,16 @@ class QueueComponent extends BaseComponent
         $this->view->pick('queue/list');
     }
 
+    public function addAction()
+    {
+        return;
+    }
+
+    public function updateAction()
+    {
+        return;
+    }
+
     protected function replaceColumns($dataArr)
     {
         foreach ($dataArr as $dataKey => &$data) {
@@ -192,7 +202,7 @@ class QueueComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->emailqueue->removeEmailService($this->postData());
+            $this->emailqueue->remove($this->postData());
 
             $this->view->responseCode = $this->emailqueue->packagesData->responseCode;
 

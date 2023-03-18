@@ -36,7 +36,7 @@ class RolesComponent extends BaseComponent
             if ($role) {
                 $app = $this->apps->getAppInfo();
 
-                $middlewares = $this->modules->middlewares->getMiddlewaresForAppType($app['app_type'],null);
+                $middlewares = $this->modules->middlewares->get(['app_type' => $app['app_type']]);
 
                 $middlewareEnabledForApps = [];
 
@@ -128,7 +128,7 @@ class RolesComponent extends BaseComponent
                 return;
             }
 
-            $this->roles->addRole($this->postData());
+            $this->roles->add($this->postData());
 
             $this->addResponse(
                 $this->roles->packagesData->responseMessage,
@@ -149,7 +149,7 @@ class RolesComponent extends BaseComponent
                 return;
             }
 
-            $this->roles->updateRole($this->postData());
+            $this->roles->update($this->postData());
 
             $this->addResponse(
                 $this->roles->packagesData->responseMessage,
@@ -167,7 +167,7 @@ class RolesComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->roles->removeRole($this->postData());
+            $this->roles->remove($this->postData());
 
             $this->addResponse(
                 $this->roles->packagesData->responseMessage,

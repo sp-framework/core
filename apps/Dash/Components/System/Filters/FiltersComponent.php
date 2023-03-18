@@ -112,7 +112,7 @@ class FiltersComponent extends BaseComponent
             }
 
             if ($this->app['id'] === 1) {
-                $this->filters->addFilter($this->postData());
+                $this->filters->add($this->postData());
 
                 $this->view->filters = $this->filters->packagesData->filters;
             } else {
@@ -120,7 +120,7 @@ class FiltersComponent extends BaseComponent
                 if (isset($this->postData()['clone']) && $this->postData()['clone']) {
                     $this->filters->cloneFilter($this->postData());
                 } else {
-                    $this->filters->addFilter($this->postData());
+                    $this->filters->add($this->postData());
                 }
 
                 if (isset($this->postData()['component_id'])) {
@@ -149,7 +149,7 @@ class FiltersComponent extends BaseComponent
                 return;
             }
 
-            $this->filters->updateFilter($this->postData());
+            $this->filters->update($this->postData());
 
             $this->view->responseCode = $this->filters->packagesData->responseCode;
 
@@ -204,7 +204,7 @@ class FiltersComponent extends BaseComponent
                 return;
             }
 
-            $removeFilter = $this->filters->removeFilter($this->postData());
+            $removeFilter = $this->filters->remove($this->postData());
 
             $this->view->responseCode = $this->filters->packagesData->responseCode;
 

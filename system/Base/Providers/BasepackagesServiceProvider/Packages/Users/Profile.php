@@ -15,6 +15,8 @@ class Profile extends BasePackage
 
     protected $packageName = 'profile';
 
+    protected $packageNameS = 'profile';
+
     protected $maleAvatarDir;
 
     protected $femaleAvatarDir;
@@ -27,22 +29,13 @@ class Profile extends BasePackage
 
     public $profile;
 
-    public function profile(int $accountId = null)
+    public function get(array $data = [], bool $resetCache = false)
     {
-        if (!$accountId) {
-            $accountId = $this->auth->account()['id'];
+        if (!isset($data['account_id'])) {
+            $data['account_id'] = $this->auth->account()['id'];
         }
 
-        if (!$this->profile) {
-            $this->profile = $this->getProfile($accountId);
-        }
-
-        return $this->profile;
-    }
-
-    public function getProfile(int $accountId)
-    {
-        $profileObj = $this->getFirst('account_id', $accountId);
+        $profileObj = $this->getFirst('account_id', $data['account_id'], $resetCache);
 
         if ($profileObj) {
             $profile = $profileObj->toArray();
@@ -68,7 +61,9 @@ class Profile extends BasePackage
                 $profile['role'] = $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
             }
 
-            return $profile;
+            $this->profile = $profile;
+
+            return $this->profile;
         }
     }
 
@@ -77,7 +72,7 @@ class Profile extends BasePackage
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function addProfile(array $data)
+    public function add(array $data)
     {
         $accountId = $data['id'];
         unset($data['id']);
@@ -87,7 +82,7 @@ class Profile extends BasePackage
         $data['contact_phone'] = '0';
         $data['contact_mobile'] = '0';
 
-        if ($this->add($data)) {
+        if ($this->addToDb($data)) {
             $this->addResponse('Profile added');
         } else {
             $this->addResponse('Error adding profile.', 1);
@@ -101,7 +96,7 @@ class Profile extends BasePackage
      */
     public function updateProfileViaAccount(array $data)
     {
-        $profile = $this->getProfile($data['id']);
+        $profile = $this->get(['id' => $data['id']]);
 
         unset($data['id']);
 
@@ -122,14 +117,14 @@ class Profile extends BasePackage
             $profile['settings'] = Json::encode($profile['settings']);
         }
 
-        if ($this->update($profile)) {
+        if ($this->updateToDb($profile)) {
             $this->addResponse('Profile updated');
         } else {
             $this->addResponse('Error updating profile.', 1);
         }
     }
 
-    public function updateProfile(array $data)
+    public function update(array $data)
     {
         if (!$this->auth->account()) {
             return;
@@ -141,7 +136,7 @@ class Profile extends BasePackage
             unset($data['subscriptions']);
         }
 
-        $profile = $this->getProfile($this->auth->account()['id']);
+        $profile = $this->get(['account_id' => $this->auth->account()['id']]);
 
         $profile = array_merge($profile, $data);
 
@@ -171,19 +166,24 @@ class Profile extends BasePackage
             $this->basepackages->addressbook->addAddress($address);
         }
 
-        $portrait = $this->getProfile($this->auth->account()['id'])['portrait'];
+        $portrait = $this->get(['account_id' => $this->auth->account()['id']])['portrait'];
 
         if (is_array($profile['settings'])) {
             $profile['settings'] = Json::encode($profile['settings']);
         }
 
-        if ($this->update($profile)) {
+        if ($this->updateToDB($profile)) {
             $this->basepackages->storages->changeOrphanStatus($data['portrait'], $portrait);
 
             $this->addResponse('Profile updated');
         } else {
             $this->addResponse('Error updating profile.', 1);
         }
+    }
+
+    public function remove(array $data)
+    {
+        return;
     }
 
     public function generateAvatar(string $regenerateUsingFile = null, string $gender = 'M')
@@ -310,7 +310,7 @@ class Profile extends BasePackage
 
         foreach ($appsArr as $appKey => $app) {
             if (isset($account['can_login'][$app['id']])) {
-                $packagesArr = $this->modules->packages->getPackagesForApp($app['id']);
+                $packagesArr = $this->modules->packages->get(['app_id' => $app['id']]);
 
                 if (count($packagesArr) > 0) {
                     $packages[$app['id']] =
@@ -345,7 +345,7 @@ class Profile extends BasePackage
         foreach ($appsArr as $appKey => $app) {
             if (isset($account['can_login'][$app['id']])) {
 
-                $packagesArr = $this->modules->packages->getPackagesForApp($app['id']);
+                $packagesArr = $this->modules->packages->get(['app_id' => $app['id']]);
 
                 foreach ($packagesArr as $key => $package) {
                     if ($package['class'] && $package['class'] !== '') {
@@ -463,7 +463,7 @@ class Profile extends BasePackage
                             $messengerSettings['members']['users'][$accountKey] = [];
                             $messengerSettings['members']['users'][$accountKey]['id'] = $account['id'];
                             $messengerSettings['members']['users'][$accountKey]['email'] = $account['email'];
-                            $profile = $this->getProfile($account['id']);
+                            $profile = $this->get(['account_id' => $account['id']]);
 
                             if ($profile) {
                                 $messengerSettings['members']['users'][$accountKey]['full_name'] = $profile['full_name'];

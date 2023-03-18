@@ -11,10 +11,11 @@ use Phalcon\Paginator\Adapter\Model;
 use Phalcon\Paginator\Adapter\NativeArray;
 use Phalcon\Paginator\Exception;
 use System\Base\Exceptions\IdNotFoundException;
+use System\Base\Interfaces\PackageInterface;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ActivityLogs;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
-abstract class BasePackage extends Controller
+abstract class BasePackage extends Controller implements PackageInterface
 {
 	protected $getQueryArr = [];
 
@@ -790,7 +791,7 @@ abstract class BasePackage extends Controller
 		return false;
 	}
 
-	public function add(array $data, $resetCache = true)
+	public function addToDb(array $data, $resetCache = true)
 	{
 		if ($data) {
 			$data = $this->jsonData($data);
@@ -832,7 +833,7 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	public function update(array $data, $resetCache = true)
+	public function updateToDb(array $data, $resetCache = true)
 	{
 		if ($data) {
 			$data = $this->jsonData($data);
@@ -891,7 +892,7 @@ abstract class BasePackage extends Controller
 		return $data;
 	}
 
-	public function remove(int $id, $resetCache = true, $removeRelated = true, $removeRelatedAliases = [])
+	public function removeFromDb(int $id, $resetCache = true, $removeRelated = true, $removeRelatedAliases = [])
 	{
 		$this->getFirst('id', $id);
 
@@ -1102,11 +1103,23 @@ abstract class BasePackage extends Controller
 
 	protected function checkPackage($packageClass)
 	{
-		return
-			$this->modules->packages->getNamedPackageForApp(
-				Arr::last(explode('\\', $packageClass)),
-				$this->app['id']
-			);
+		$package =
+			$this->modules->packages->get([
+				'name' 		=> Arr::last(explode('\\', $packageClass)),
+				'app_id' 	=> $this->app['id']
+			]);
+
+		// if (!$package) {
+		// 	try {
+		// 		if ($this->basepackages->$packageClass) {
+		// 			$package = $this->modules->packages->getNamePackage($packageClass);
+		// 		}
+		// 	} catch (\Exception $e) {
+		// 		$package = null;
+		// 	}
+		// }
+
+		return $package;
 	}
 
 	public function getPackagesData()
@@ -1569,16 +1582,22 @@ abstract class BasePackage extends Controller
 			}
 		}
 
-		return $this->basepackages->activityLogs->addLog($this->packageName, $data, $oldData);
+		return $this->basepackages->activityLogs->add([
+			'package_name' => $this->packageName, 'data' => $data, 'old_data' => $oldData
+		]);
 	}
 
 	public function getActivityLogs(int $id, $newFirst = true, $page = 1, $packageName = null)
 	{
 		if ($packageName) {
-			return $this->basepackages->activityLogs->getLogs($packageName, $id, $newFirst, $page);
+			return $this->basepackages->activityLogs->get([
+				'package_name' => $packageName, 'package_row_id' => $id, 'new_first' => $newFirst, 'page' => $page
+			]);
 		}
 
-		return $this->basepackages->activityLogs->getLogs($this->packageName, $id, $newFirst, $page);
+		return $this->basepackages->activityLogs->get([
+			'package_name' => $this->packageName, 'package_row_id' => $id, 'new_first' => $newFirst, 'page' => $page
+		]);
 	}
 
 	public function getNoteLogs(int $id, $newFirst = true, $page = 1, $packageName = null)

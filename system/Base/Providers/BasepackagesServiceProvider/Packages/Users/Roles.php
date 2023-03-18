@@ -21,14 +21,31 @@ class Roles extends BasePackage
         return $this;
     }
 
+    public function get(array $data = [], bool $resetCache = false)
+    {
+        if (count($data) === 0) {
+            return $this->packages;
+        }
+
+        if (isset($data['id'])) {
+            $role = $this->getById($data['id']);
+
+            if ($role) {
+                return $role;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @notification(name=add)
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function addRole(array $data)
+    public function add(array $data)
     {
-        if ($this->add($data)) {
+        if ($this->addToDb($data)) {
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' role';
@@ -44,9 +61,9 @@ class Roles extends BasePackage
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function updateRole(array $data)
+    public function update(array $data)
     {
-        if ($this->update($data)) {
+        if ($this->updateToDb($data)) {
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' role';
@@ -62,7 +79,7 @@ class Roles extends BasePackage
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function removeRole(array $data)
+    public function remove(array $data)
     {
         if (isset($data['id']) &&
             ($data['id'] != 1 && $data['id'] != 2 && $data['id'] != 3)
@@ -77,7 +94,7 @@ class Roles extends BasePackage
                 return false;
             }
 
-            if ($this->remove($data['id'], true, false)) {
+            if ($this->removeFromDb($data['id'], true, false)) {
                 $this->packagesData->responseCode = 0;
 
                 $this->packagesData->responseMessage = 'Removed role';
@@ -100,7 +117,7 @@ class Roles extends BasePackage
         $appsArr = $this->apps->apps;
 
         foreach ($appsArr as $appKey => $app) {
-            $componentsArr = $this->modules->components->getComponentsForApp($app['id']);
+            $componentsArr = $this->modules->components->get(['app_id' => $app['id']]);
 
             if (count($componentsArr) > 0) {
                 $components[strtolower($app['id'])] =
@@ -122,7 +139,7 @@ class Roles extends BasePackage
 
         $this->packagesData->components = $components;
 
-        $rolesArr = $this->getAll()->roles;
+        $rolesArr = $this->get();
         $roles = [];
         foreach ($rolesArr as $roleKey => $roleValue) {
             $roles[$roleValue['id']] =
@@ -133,7 +150,7 @@ class Roles extends BasePackage
         }
 
         if ($rid) {
-            $role = $this->getById($rid);
+            $role = $this->get(['id' => $rid]);
 
             if ($role) {
                 if ($role['permissions'] && $role['permissions'] !== '') {
@@ -144,7 +161,7 @@ class Roles extends BasePackage
                 $permissions = [];
 
                 foreach ($appsArr as $appKey => $app) {
-                    $componentsArr = $this->modules->components->getComponentsForApp($app['id']);
+                    $componentsArr = $this->modules->components->get(['app_id' => $app['id']]);
                     foreach ($componentsArr as $key => $component) {
                         if ($component['class'] && $component['class'] !== '') {
                             $reflector = $this->annotations->get($component['class']);
@@ -183,7 +200,7 @@ class Roles extends BasePackage
             $permissions = [];
 
             foreach ($appsArr as $appKey => $app) {
-                $componentsArr = $this->modules->components->getComponentsForApp($app['id']);
+                $componentsArr = $this->modules->components->get(['app_id' => $app['id']]);
                 foreach ($componentsArr as $key => $component) {
                     //Build ACL Columns
                     if ($component['class'] && $component['class'] !== '') {

@@ -155,4 +155,19 @@ class AuthComponent extends BaseComponent
             $this->addResponse('Method Not Allowed', 1);
         }
     }
+
+    public function addAction()
+    {
+        return;
+    }
+
+    public function updateAction()
+    {
+        return;
+    }
+
+    public function removeAction()
+    {
+        return;
+    }
 }

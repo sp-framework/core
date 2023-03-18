@@ -135,63 +135,19 @@ class JobsComponent extends BaseComponent
 
         return $data;
     }
-    // /**
-    //  * @acl(name="add")
-    //  */
-    // public function addAction()
-    // {
-    //     if ($this->request->isPost()) {
-    //         if (!$this->checkCSRF()) {
-    //             return;
-    //         }
 
-    //         $this->jobs->addSchedule($this->postData());
+    public function addAction()
+    {
+        return;
+    }
 
-    //         $this->addResponse(
-    //             $this->jobs->packagesData->responseMessage,
-    //             $this->jobs->packagesData->responseCode
-    //         );
-    //     } else {
-    //         $this->addResponse('Method Not Allowed', 1);
-    //     }
-    // }
+    public function updateAction()
+    {
+        return;
+    }
 
-    // /**
-    //  * @acl(name="update")
-    //  */
-    // public function updateAction()
-    // {
-    //     if ($this->request->isPost()) {
-    //         if (!$this->checkCSRF()) {
-    //             return;
-    //         }
-
-    //         $this->jobs->updateSchedule($this->postData());
-
-    //         $this->addResponse(
-    //             $this->jobs->packagesData->responseMessage,
-    //             $this->jobs->packagesData->responseCode
-    //         );
-    //     } else {
-    //         $this->addResponse('Method Not Allowed', 1);
-    //     }
-    // }
-
-    // /**
-    //  * @acl(name="remove")
-    //  */
-    // public function removeAction()
-    // {
-    //     if ($this->request->isPost()) {
-
-    //         $this->jobs->removeSchedule($this->postData());
-
-    //         $this->addResponse(
-    //             $this->jobs->packagesData->responseMessage,
-    //             $this->jobs->packagesData->responseCode
-    //         );
-    //     } else {
-    //         $this->addResponse('Method Not Allowed', 1);
-    //     }
-    // }
+    public function removeAction()
+    {
+        return;
+    }
 }

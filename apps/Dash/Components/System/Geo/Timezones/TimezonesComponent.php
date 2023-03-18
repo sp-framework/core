@@ -165,6 +165,10 @@ class TimezonesComponent extends BaseComponent
         }
     }
 
+    public function removeAction()
+    {
+        return;
+    }
     //To update get table from wikipedia link - https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
     //Timezone data is placed in /system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/ folder.
     protected function extractData()

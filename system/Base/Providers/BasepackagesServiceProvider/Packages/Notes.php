@@ -18,7 +18,7 @@ class Notes extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $notesSettings = $this->modules->packages->getNamePackage($this->packageName);
+        $notesSettings = $this->modules->packages->get(['name' => $this->packageName]);
 
         if ($notesSettings) {
             $this->notesSettings = Json::decode($notesSettings['settings'], true);
@@ -219,7 +219,7 @@ class Notes extends BasePackage
 
                     if (is_array($note['note_app_visibility']) && count($note['note_app_visibility']) > 0) {
                         foreach ($note['note_app_visibility'] as $appKey => $app) {
-                            $appInfo = $this->apps->getIdApp($app);
+                            $appInfo = $this->apps->get(['id' => $app]);
                             $note['note_app_visibility'][$appKey] = $appInfo['name'];
                         }
                     }

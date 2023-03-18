@@ -11,6 +11,10 @@ class Views extends BasePackage
 {
     protected $modelToUse = ModulesViews::class;
 
+    protected $packageName = 'views';
+
+    protected $packageNameS = 'view';
+
     public $views;
 
     protected $view;
@@ -176,7 +180,13 @@ class Views extends BasePackage
             if ($this->app &&
                 isset($this->domain['apps'][$this->app['id']]['view'])
             ) {
-                $viewsName = $this->getIdViews($this->domain['apps'][$this->app['id']]['view'])['name'];
+                $domainView = $this->get(['id' => $this->domain['apps'][$this->app['id']]['view']]);
+
+                if ($domainView) {
+                    $viewsName = $domainView['name'];
+                } else {
+                    $viewsName =  'Default';
+                }
             } else {
                 $viewsName =  'Default';
             }
@@ -184,7 +194,7 @@ class Views extends BasePackage
             if (!$this->view) {
                 //Make sure view has proper app ID.
                 if ($this->app) {
-                    $this->view = $this->getAppView($this->app['id'], $viewsName);
+                    $this->view = $this->get(['app_id' => $this->app['id'], 'name' => $viewsName]);
                 }
             }
             if ($this->view) {
@@ -202,117 +212,174 @@ class Views extends BasePackage
         }
     }
 
-    protected function checkTagsPackage($packageName)
+    protected function checkTagsPackage($packageClass)
     {
         return
-            $this->modules->packages->getNamedPackageForApp(
-                Arr::last(explode('\\', $packageName)),
-                $this->apps->getAppInfo()['id']
-            );
+            $this->modules->packages->get([
+                'name'      => Arr::last(explode('\\', $packageClass)),
+                'app_id'    => $this->apps->getAppInfo()['id']
+            ]);
     }
 
-    public function getAppView($appId, $name)
+    public function add(array $data)
     {
-        foreach($this->views as $view) {
-            $view['apps'] = Json::decode($view['apps'], true);
+        return;
+    }
 
-            if ((isset($view['apps'][$appId]['enabled']) &&
-                $view['apps'][$appId]['enabled'] == true) &&
-                strtolower($view['name']) == strtolower($name)
-            ) {
-                return $view;
-            }
+    public function get(array $data = [], bool $resetCache = false)
+    {
+        if (count($data) === 0) {
+            return $this->views;
         }
 
-        return false;
-    }
-
-    public function getViewsForApp($appId)
-    {
-        foreach($this->views as $view) {
-            $view['apps'] = Json::decode($view['apps'], true);
-
-            if (isset($view['apps'][$appId]['enabled']) &&
-                $view['apps'][$appId]['enabled'] == 'true'
-            ) {
-                return $view;
-            }
-        }
-
-        return false;
-    }
-
-    public function getIdViews($id)
-    {
-        foreach($this->views as $view) {
-            if ($view['id'] == $id) {
-                return $view;
-            }
-        }
-
-        return false;
-    }
-
-    public function getNameViews($name)
-    {
-        foreach($this->views as $view) {
-            if ($view['name'] == $name) {
-                return $view;
-            }
-        }
-
-        return false;
-    }
-
-    public function getViewsForCategoryAndSubcategory($category, $subCategory)
-    {
         $views = [];
 
         foreach($this->views as $view) {
-            if ($view['category'] === $category &&
-                $view['sub_category'] === $subCategory
-            ) {
-                $views[$view['id']] = $view;
+            $view['apps'] = Json::decode($view['apps'], true);
+
+            if (isset($data['app_id']) && isset($data['name'])) {
+                if ((isset($view['apps'][$data['app_id']]['enabled']) &&
+                    $view['apps'][$data['app_id']]['enabled'] == true) &&
+                    strtolower($view['name']) == strtolower($data['name'])
+                ) {
+                    return $view;
+                }
+            } else if (isset($data['app_id'])) {
+                if (isset($view['apps'][$data['app_id']]['enabled']) &&
+                    $view['apps'][$data['app_id']]['enabled'] == true
+                ) {
+                    return $view;
+                }
+            } else if (isset($data['id'])) {
+                if ($view['id'] == $data['id']) {
+                    return $view;
+                }
+            } else if (isset($data['name'])) {
+                if ($view['name'] === $data['name']) {
+                    return $view;
+                }
+            } else if (isset($data['app_type']) && isset($data['name'])) {
+                if ($view['app_type'] === $data['type'] &&
+                    $view['name'] === $data['name']
+                ) {
+                    return $view;
+                }
+            } else if (isset($data['category']) && isset($data['sub_category'])) {
+                if ($view['category'] === $data['category'] &&
+                    $view['sub_category'] === $data['sub_category']
+                ) {
+                    $views[$view['id']] = $view;
+                }
+            } else if (isset($data['app_type'])) {
+                if ($view['app_type'] === $data['app_type']) {
+                    $views[$view['id']] = $view;
+                }
             }
         }
 
         return $views;
     }
 
-    public function getViewsForAppType(string $type)
-    {
-        $views = [];
+    // public function getAppView($appId, $name)
+    // {
+    //     foreach($this->views as $view) {
+    //         $view['apps'] = Json::decode($view['apps'], true);
 
-        foreach($this->views as $view) {
-            if ($view['app_type'] === $type) {
-                $views[$view['id']] = $view;
-            }
-        }
+    //         if ((isset($view['apps'][$appId]['enabled']) &&
+    //             $view['apps'][$appId]['enabled'] == true) &&
+    //             strtolower($view['name']) == strtolower($name)
+    //         ) {
+    //             return $view;
+    //         }
+    //     }
 
-        return $views;
-    }
+    //     return false;
+    // }
 
-    public function getDefaultViewForAppType(string $type)
-    {
-        foreach($this->views as $view) {
-            if ($view['app_type'] === $type &&
-                $view['name'] === 'Default'
-            ) {
-                return $view;
-            }
-        }
+    // public function getViewsForApp($appId)
+    // {
+    //     foreach($this->views as $view) {
+    //         $view['apps'] = Json::decode($view['apps'], true);
 
-        return false;
-    }
+    //         if (isset($view['apps'][$appId]['enabled']) &&
+    //             $view['apps'][$appId]['enabled'] == 'true'
+    //         ) {
+    //             return $view;
+    //         }
+    //     }
+
+    //     return false;
+    // }
+
+    // public function getIdViews($id)
+    // {
+    //     foreach($this->views as $view) {
+    //         if ($view['id'] == $id) {
+    //             return $view;
+    //         }
+    //     }
+
+    //     return false;
+    // }
+
+    // public function getNameViews($name)
+    // {
+    //     foreach($this->views as $view) {
+    //         if ($view['name'] == $name) {
+    //             return $view;
+    //         }
+    //     }
+
+    //     return false;
+    // }
+
+    // public function getViewsForCategoryAndSubcategory($category, $subCategory)
+    // {
+    //     $views = [];
+
+    //     foreach($this->views as $view) {
+    //         if ($view['category'] === $category &&
+    //             $view['sub_category'] === $subCategory
+    //         ) {
+    //             $views[$view['id']] = $view;
+    //         }
+    //     }
+
+    //     return $views;
+    // }
+
+    // public function getViewsForAppType(string $type)
+    // {
+    //     $views = [];
+
+    //     foreach($this->views as $view) {
+    //         if ($view['app_type'] === $type) {
+    //             $views[$view['id']] = $view;
+    //         }
+    //     }
+
+    //     return $views;
+    // }
+
+    // public function getDefaultViewForAppType(string $type)
+    // {
+    //     foreach($this->views as $view) {
+    //         if ($view['app_type'] === $type &&
+    //             $view['name'] === 'Default'
+    //         ) {
+    //             return $view;
+    //         }
+    //     }
+
+    //     return false;
+    // }
 
     public function updateViews(array $data)
     {
         $views = Json::decode($data['views'], true);
 
         foreach ($views as $viewId => $status) {
-            $view = $this->getById($viewId);
-
-            $view['apps'] = Json::decode($view['apps'], true);
+            $view = $this->get(['id' => $viewId]);
 
             if ($status === true) {
                 $view['apps'][$data['id']]['enabled'] = true;
@@ -325,11 +392,9 @@ class Views extends BasePackage
             $view['settings'] = Json::decode($view['settings'], true);
 
             if (isset($view['settings']['tags'])) {
-                $package = $this->modules->packages->getNamePackage($view['settings']['tags']);
+                $package = $this->modules->packages->get(['name' => $view['settings']['tags']]);
 
                 if ($package) {
-                    $package['apps'] = Json::decode($package['apps'], true);
-
                     $package['apps'][$data['id']]['enabled'] = true;
 
                     $package['apps'] = Json::encode($package['apps']);
@@ -340,9 +405,19 @@ class Views extends BasePackage
 
             $view['settings'] = Json::encode($view['settings']);
 
-            $this->update($view);
+            $this->updateToDb($view);
         }
 
         return true;
+    }
+
+    public function update(array $data)
+    {
+        return;
+    }
+
+    public function remove(array $data)
+    {
+        return;
     }
 }

@@ -28,6 +28,11 @@ class BarcodesComponent extends BaseComponent
         $this->getNewToken();
     }
 
+    public function addAction()
+    {
+        return;
+    }
+
     /**
      * @acl(name=update)
      */
@@ -47,6 +52,11 @@ class BarcodesComponent extends BaseComponent
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }
+    }
+
+    public function removeAction()
+    {
+        return;
     }
 
     public function testBarcodeAction()

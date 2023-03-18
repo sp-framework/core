@@ -272,7 +272,7 @@ class Router
 		if (isset($this->domain['exclusive_to_default_app']) &&
 			$this->domain['exclusive_to_default_app'] == 1
 		) {
-			$this->appInfo = $this->apps->getIdApp($this->domain['default_app_id']);
+			$this->appInfo = $this->apps->get(['id' => $this->domain['default_app_id']]);
 
 			$this->domainAppExclusive = true;
 
@@ -300,13 +300,18 @@ class Router
 		$this->appDefaults['app'] = $this->appInfo['route'];
 		$this->appDefaults['app_type'] = $this->appInfo['app_type'];
 		$this->appDefaults['component'] =
-			$this->components->getComponentById($this->appInfo['default_component'])['route'];
+			$this->components->get(['id' => $this->appInfo['default_component']])['route'];
 		$this->appDefaults['errorComponent'] =
 			isset($this->appInfo['errors_component']) && $this->appInfo['errors_component'] != 0 ?
-			$this->components->getComponentById($this->appInfo['errors_component'])['route'] :
+			$this->components->get(['id' => $this->appInfo['errors_component']])['route'] :
 			null;
-		$this->appDefaults['view'] =
-			$this->views->getIdViews($this->domain['apps'][$this->appInfo['id']]['view'])['name'];
+
+		$domainView = $this->views->get(['id' => $this->domain['apps'][$this->appInfo['id']]['view']]);
+		if ($domainView) {
+			$this->appDefaults['view'] = $domainView['name'];
+		} else {
+			$this->appDefaults['view'] = 'Default';
+		}
 
 		return true;
 	}

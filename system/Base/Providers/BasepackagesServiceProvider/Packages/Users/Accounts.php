@@ -20,24 +20,27 @@ class Accounts extends BasePackage
 
     protected $packageName = 'accounts';
 
+    protected $packageNameS = 'account';
+
     public $accounts;
 
-    public function getAccountById(
-        int $id,
-        $getsecurity = false,
-        $getcanlogin = false,
-        $getsessions = false,
-        $getidentifiers = false,
-        $getagents = false,
-        $gettunnels = false,
-        $getprofiles = false
-    ) {
-        $this->getFirst('id', $id);
+    /* id,
+       getsecurity,
+       getcanlogin,
+       getsessions,
+       getidentifiers,
+       getagents,
+       gettunnels,
+       getprofiles
+    */
+    public function get(array $data = [], bool $resetCache = false)
+    {
+        $this->getFirst('id', $data['id']);
 
         if ($this->model) {
             $account = $this->model->toArray();
 
-            if ($getsecurity) {
+            if (isset($data['getsecurity']) && $data['getsecurity'] === true) {
                 if ($this->model->getsecurity()) {
                     $relationData = $this->model->getsecurity()->toArray();
 
@@ -47,7 +50,7 @@ class Accounts extends BasePackage
                 }
             }
 
-            if ($getcanlogin) {
+            if (isset($data['getcanlogin']) && $data['getcanlogin'] === true) {
                 if ($this->model->getcanlogin()) {
                     $relationData = $this->model->getcanlogin()->toArray();
 
@@ -57,7 +60,7 @@ class Accounts extends BasePackage
                 }
             }
 
-            if ($getsessions) {
+            if (isset($data['getsessions']) && $data['getsessions'] === true) {
                 if ($this->model->getsessions()) {
                     $relationData = $this->model->getsessions()->toArray();
 
@@ -67,7 +70,7 @@ class Accounts extends BasePackage
                 }
             }
 
-            if ($getidentifiers) {
+            if (isset($data['getidentifiers']) && $data['getidentifiers'] === true) {
                 if ($this->model->getidentifiers()) {
                     $relationData = $this->model->getidentifiers()->toArray();
 
@@ -77,7 +80,7 @@ class Accounts extends BasePackage
                 }
             }
 
-            if ($getagents) {
+            if (isset($data['getagents']) && $data['getagents'] === true) {
                 if ($this->model->getagents()) {
                     $relationData = $this->model->getagents()->toArray();
 
@@ -87,7 +90,7 @@ class Accounts extends BasePackage
                 }
             }
 
-            if ($gettunnels) {
+            if (isset($data['gettunnels']) && $data['gettunnels'] === true) {
                 if ($this->model->gettunnels()) {
                     $relationData = $this->model->gettunnels()->toArray();
 
@@ -97,7 +100,7 @@ class Accounts extends BasePackage
                 }
             }
 
-            if ($getprofiles) {
+            if (isset($data['getprofiles']) && $data['getprofiles'] === true) {
                 if ($this->model->getProfiles()) {
                     $relationData = $this->model->getProfiles()->toArray();
 
@@ -118,7 +121,7 @@ class Accounts extends BasePackage
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function addAccount(array $data)
+    public function add(array $data)
     {
         if (!isset($data['status'])) {
             $data['status'] = '0';
@@ -137,7 +140,7 @@ class Accounts extends BasePackage
 
                 $account['account_id'] = $account['id'];
 
-                $this->updateAccount($account);
+                $this->update($account);
 
                 $this->packagesData->last = $account;
 
@@ -161,7 +164,7 @@ class Accounts extends BasePackage
                 $data['package_row_id'] = '0';
             }
 
-            if ($this->add($data)) {
+            if ($this->addToDb($data)) {
                 $id = $this->packagesData->last['id'];
 
                 $this->addUpdateCanLogin($id, $data['can_login']);
@@ -170,7 +173,7 @@ class Accounts extends BasePackage
 
                 $this->addUpdateSecurity($id, $data);
 
-                $this->basepackages->profile->addProfile($data);
+                $this->basepackages->profile->add($data);
 
                 if ($data['package_name'] === 'profiles') {
                     $data['package_row_id'] = $this->basepackages->profile->packagesData->responseData['id'];
@@ -200,7 +203,7 @@ class Accounts extends BasePackage
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function updateAccount(array $data)
+    public function update(array $data)
     {
         if (!isset($data['status'])) {
             $data['status'] = '0';
@@ -214,7 +217,7 @@ class Accounts extends BasePackage
 
         $accountObj = $this->getFirst('id', $data['id']);
 
-        $account = $this->getAccountById($data['id'], true);
+        $account = $this->get(['id' => $data['id'], 'getsecurity' => true]);
 
         if (!isset($data['override_role']) ||
             $data['override_role'] == 0
@@ -227,7 +230,7 @@ class Accounts extends BasePackage
                     $data['permissions'] = Json::decode($data['permissions'], true);
                 }
 
-                $component = $this->modules->components->getComponentByRoute('system/users/accounts');
+                $component = $this->modules->components->get(['route' => 'system/users/accounts']);
 
                 $data['permissions'][$this->apps->getAppInfo()['id']][$component['id']]['view'] = 1;
                 $data['permissions'][$this->apps->getAppInfo()['id']][$component['id']]['update'] = 1;
@@ -258,7 +261,7 @@ class Accounts extends BasePackage
             $data['package_name'] = 'profiles';
         }
 
-        if ($this->update($data)) {
+        if ($this->updateToDb($data)) {
             if (isset($data['can_login'])) {
                 $this->addUpdateCanLogin($data['id'], $data['can_login']);
             }
@@ -292,7 +295,7 @@ class Accounts extends BasePackage
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function removeAccount(array $data)
+    public function remove(array $data)
     {
         if (isset($data['id']) && $data['id'] != 1) {
 
@@ -313,7 +316,7 @@ class Accounts extends BasePackage
 
                 $account = array_merge($account, $relationData);
 
-                if ($this->remove($data['id'])) {
+                if ($this->removeFromDb($data['id'])) {
                     $this->removeRelatedData($accountObj);
 
                     $this->addToNotification('remove', 'Removed account for ID: ' . $account['email']);
@@ -361,7 +364,7 @@ class Accounts extends BasePackage
         $validation = $this->validateData($data);
 
         if ($validation === true) {
-            $this->addAccount($data);
+            $this->add($data);
 
             $this->packagesData->redirectUrl = $this->links->url('auth');
         } else {
@@ -663,7 +666,7 @@ class Accounts extends BasePackage
         $emailData['subject'] = 'OTP for ' . $this->domains->getDomain()['name'];
         $emailData['body'] = $password;
 
-        return $this->basepackages->emailqueue->addToQueue($emailData);
+        return $this->basepackages->emailqueue->add($emailData);
     }
 
     public function removeAccountAgents(array $data)
@@ -784,7 +787,7 @@ class Accounts extends BasePackage
         $appsArr = $this->apps->apps;
 
         foreach ($appsArr as $appKey => $app) {
-            $componentsArr = $this->modules->components->getComponentsForApp($app['id']);
+            $componentsArr = $this->modules->components->get(['app_id' => $app['id']]);
 
             if (count($componentsArr) > 0) {
                 $components[strtolower($app['id'])] =
@@ -822,7 +825,7 @@ class Accounts extends BasePackage
             $accountObj = $this->modelToUse::findFirstById($uid);
 
             if ($accountObj) {
-                $account = $this->getAccountById($uid, true);
+                $account = $this->get(['id' => $uid, 'getSecurity' => true]);
 
                 $canLoginArr = $accountObj->canlogin->toArray();
 
@@ -842,7 +845,7 @@ class Accounts extends BasePackage
                 $permissions = [];
 
                 foreach ($appsArr as $appKey => $app) {
-                    $componentsArr = $this->modules->components->getComponentsForApp($app['id']);
+                    $componentsArr = $this->modules->components->get(['app_id' => $app['id']]);
                     foreach ($componentsArr as $key => $component) {
                         if ($component['class'] && $component['class'] !== '') {
                             $reflector = $this->annotations->get($component['class']);
@@ -883,7 +886,7 @@ class Accounts extends BasePackage
             $permissions = [];
 
             foreach ($appsArr as $appKey => $app) {
-                $componentsArr = $this->modules->components->getComponentsForApp($app['id']);
+                $componentsArr = $this->modules->components->get(['app_id' => $app['id']]);
                 foreach ($componentsArr as $key => $component) {
                     //Build ACL Columns
                     if ($component['class'] && $component['class'] !== '') {

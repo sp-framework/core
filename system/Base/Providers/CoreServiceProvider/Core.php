@@ -72,4 +72,24 @@ class Core extends BasePackage
 		$this->core['settings']['sigText'] = $keys['sigText'];
 		$this->core['settings']['cookiesSig'] = $keys['cookiesSig'];
 	}
+
+	public function get(array $data = [], bool $resetCache = false)
+	{
+		return;
+	}
+
+	public function add(array $data)
+	{
+		return;
+	}
+
+	public function update(array $data)
+	{
+		return;
+	}
+
+	public function remove(array $data)
+	{
+		return;
+	}
 }

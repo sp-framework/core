@@ -142,6 +142,11 @@ class CitiesComponent extends BaseComponent
         }
     }
 
+    public function removeAction()
+    {
+        return;
+    }
+
     public function searchCityAction()
     {
         if ($this->request->isPost()) {

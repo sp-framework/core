@@ -4,8 +4,9 @@ namespace System\Base;
 
 use Phalcon\Helper\Arr;
 use Phalcon\Mvc\Model;
+use System\Base\Interfaces\ModelInterface;
 
-abstract class BaseModel extends Model
+abstract class BaseModel extends Model implements ModelInterface
 {
 	protected $app;
 
@@ -33,9 +34,9 @@ abstract class BaseModel extends Model
 	protected function checkPackage($packageClass)
 	{
 		return
-			$this->modules->packages->getNamedPackageForApp(
-				Arr::last(explode('\\', $packageClass)),
-				$this->app['id']
-			);
+			$this->modules->packages->get([
+				'name' 		=> Arr::last(explode('\\', $packageClass)),
+				'app_id' 	=> $this->app['id']
+			]);
 	}
 }

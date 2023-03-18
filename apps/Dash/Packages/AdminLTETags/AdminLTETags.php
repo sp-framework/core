@@ -26,4 +26,24 @@ class AdminLTETags extends BasePackage
             throw $e;
         }
     }
+
+    public function get(array $data = [], bool $resetCache = false)
+    {
+        return;
+    }
+
+    public function add(array $data)
+    {
+        return;
+    }
+
+    public function update(array $data)
+    {
+        return;
+    }
+
+    public function remove(array $data)
+    {
+        return;
+    }
 }

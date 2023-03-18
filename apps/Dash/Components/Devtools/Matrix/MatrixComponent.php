@@ -115,4 +115,14 @@ class MatrixComponent extends BaseComponent
 			$this->addResponse('Method Not Allowed', 1);
 		}
 	}
+
+	public function addAction()
+	{
+		return;
+	}
+
+	public function removeAction()
+	{
+		return;
+	}
 }

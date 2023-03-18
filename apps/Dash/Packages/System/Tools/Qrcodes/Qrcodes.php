@@ -22,7 +22,7 @@ class Qrcodes extends BasePackage
 
     public function init()
     {
-        $this->qrcodesPackage = $this->modules->packages->getNamePackage('Qrcodes');
+        $this->qrcodesPackage = $this->modules->packages->get(['name' => 'Qrcodes']);
 
         if ($this->qrcodesPackage) {
 

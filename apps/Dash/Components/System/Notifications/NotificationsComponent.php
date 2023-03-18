@@ -161,6 +161,16 @@ class NotificationsComponent extends BaseComponent
         $this->view->pick('notifications/list');
     }
 
+    public function addAction()
+    {
+        return;
+    }
+
+    public function updateAction()
+    {
+        return;
+    }
+
     /**
      * @acl(name=remove)
      */

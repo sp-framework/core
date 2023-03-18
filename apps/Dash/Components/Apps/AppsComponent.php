@@ -22,7 +22,7 @@ class AppsComponent extends BaseComponent
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $app = $this->apps->getIdApp($this->getData()['id']);
+                $app = $this->apps->get($this->getData());
 
                 if (!$app) {
                     return $this->throwIdNotFound();
@@ -58,12 +58,10 @@ class AppsComponent extends BaseComponent
 
                 $this->view->modulesMenus = $this->basepackages->menus->getMenusForApp($app['id']);
 
-                $componentsArr = $this->modules->components->getComponentsForAppType($app['app_type']);
+                $componentsArr = $this->modules->components->get(['app_type' => $app['app_type']]);
 
                 foreach ($componentsArr as $key => &$componentValue) {
                     if ($componentValue['apps']) {
-                        $componentValue['apps'] = Json::decode($componentValue['apps'], true);
-
                         if (!isset($componentValue['apps'][$app['id']]['needAuth'])) {
                             $componentValue['apps'][$app['id']]['needAuth'] = false;
                         }
@@ -95,13 +93,9 @@ class AppsComponent extends BaseComponent
                     $components[$key] = $componentValue;
                 }
 
-                $viewsArr = $this->modules->views->getViewsForAppType($app['app_type']);
+                $viewsArr = $this->modules->views->get(['app_type' => $app['app_type']]);
 
                 foreach ($viewsArr as $key => &$viewValue) {
-                    if ($viewValue['apps']) {
-                        $viewValue['apps'] = Json::decode($viewValue['apps'], true);
-                    }
-
                     if ($viewValue['settings']) {
                         $viewValue['settings'] = Json::decode($viewValue['settings'], true);
 
@@ -120,10 +114,10 @@ class AppsComponent extends BaseComponent
 
                 $this->view->middlewares =
                     msort(
-                        $this->modules->middlewares->getMiddlewaresForAppType(
-                            $app['app_type'],
-                            $app['id']
-                        ), 'sequence');
+                        $this->modules->middlewares->get([
+                            'app_type'  => $app['app_type'],
+                            'app_id'    => $app['id']
+                        ]), 'sequence');
 
                 $this->view->app = $app;
 
@@ -192,7 +186,7 @@ class AppsComponent extends BaseComponent
                 return;
             }
 
-            $this->apps->addApp($this->postData());
+            $this->apps->add($this->postData());
 
             $this->addResponse(
                 $this->apps->packagesData->responseMessage,
@@ -215,7 +209,7 @@ class AppsComponent extends BaseComponent
                 return;
             }
 
-            $this->apps->updateApp($this->postData());
+            $this->apps->update($this->postData());
 
             $this->addResponse(
                 $this->apps->packagesData->responseMessage,
@@ -237,7 +231,7 @@ class AppsComponent extends BaseComponent
                 return;
             }
 
-            $this->apps->removeApp($this->postData());
+            $this->apps->remove($this->postData());
 
             $this->addResponse(
                 $this->apps->packagesData->responseMessage,
@@ -277,7 +271,7 @@ class AppsComponent extends BaseComponent
                 if ($filter['added_by'] == '0') {
                     $filter['added_by'] = "System";
                 } else {
-                    $user = $this->basepackages->accounts->getAccountById($filter['added_by'],false,false,false,false,false,false,true);
+                    $user = $this->basepackages->accounts->get(['id' => $filter['added_by'], 'getprofiles' => true]);
 
                     if ($user && isset($user['full_name'])) {
                         $filter['added_by'] = $user['full_name'];

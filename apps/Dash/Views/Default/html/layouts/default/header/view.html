@@ -8,7 +8,7 @@
         </ul>
         {% if auth.account() %}
             <ul class="navbar-nav ml-auto">
-                {% if modules.components.getNamedComponentForApp('Messenger', apps.getAppInfo()['id']) %}
+                {% if modules.components.get({'name' : 'Messenger', 'app_id' : apps.getAppInfo()['id']}) %}
                     <li class="nav-item">
                         {% set statusIcon = 'comment' %}
                         {% set messengerSettings = basepackages.profile.getMessengerSettings() %}

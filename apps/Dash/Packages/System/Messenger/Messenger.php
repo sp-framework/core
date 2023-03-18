@@ -415,7 +415,7 @@ class Messenger extends BasePackage implements MessageComponentInterface
 
     public function changeSettings(array $data)
     {
-        $profile = $this->basepackages->profile->profile();
+        $profile = $this->basepackages->profile->get();
 
         if (isset($profile['settings']['messenger']['mute'])) {
             if ($data['changestate'] == 1) {
@@ -433,7 +433,7 @@ class Messenger extends BasePackage implements MessageComponentInterface
 
         $profile['settings'] = Json::encode($profile['settings']);
 
-        $this->basepackages->profile->updateProfile($profile);
+        $this->basepackages->profile->update($profile);
 
         $this->addResponse('Changed');
     }

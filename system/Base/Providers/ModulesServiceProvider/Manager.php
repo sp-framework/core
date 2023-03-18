@@ -190,42 +190,42 @@ class Manager extends BasePackage
                 $this->components =
                     $this->modules->components->init(true)
                     // ->getComponentsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getComponentsForAppType($app['app_type']);
+                    ->get(['app_type' => $app['app_type']]);
 
                 $this->packages =
                     $this->modules->packages->init(true)
                     // ->getPackagesForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getPackagesForAppType($app['app_type']);
+                    ->get(['app_type' => $app['app_type']]);
 
                 $this->middlewares =
                     $this->modules->middlewares->init(true)
                     // ->getMiddlewaresForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getMiddlewaresForAppType($app['app_type']);
+                    ->get(['app_type' => $app['app_type']]);
 
                 $this->views =
                     $this->modules->views->init(true)
                     // ->getViewsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getViewsForAppType($app['app_type']);
+                    ->get(['app_type' => $app['app_type']]);
             } else {
                 $this->components =
                     $this->modules->components
                     // ->getComponentsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getComponentsForAppType($app['app_type']);
+                    ->get(['app_type' => $app['app_type']]);
 
                 $this->packages =
                     $this->modules->packages
                     // ->getPackagesForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getPackagesForAppType($app['app_type']);
+                    ->get(['app_type' => $app['app_type']]);
 
                 $this->middlewares =
                     $this->modules->middlewares
                     // ->getMiddlewaresForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getMiddlewaresForAppType($app['app_type']);
+                    ->get(['app_type' => $app['app_type']]);
 
                 $this->views =
                     $this->modules->views
                     // ->getViewsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getViewsForAppType($app['app_type']);
+                    ->get(['app_type' => $app['app_type']]);
             }
         } else {
             $this->components = $this->modules->components->components;

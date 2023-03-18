@@ -46,7 +46,7 @@ class Apps extends BasePackage
 	public function getAppInfo()
 	{
 		if (PHP_SAPI === 'cli') {
-			$this->appInfo = $this->getRouteApp('admin');
+			$this->appInfo = $this->get(['id' => '1']);
 		}
 
 		if (isset($this->appInfo)) {
@@ -70,14 +70,14 @@ class Apps extends BasePackage
 
 		if ($uri[0] === '/') {
 			if ($domain) {
-				return $this->getIdApp($domain['default_app_id'])['route'];
+				return $this->get(['id' => $domain['default_app_id']])['route'];
 			}
 			return null;
 		} else {
 			if (isset($domain['exclusive_to_default_app']) &&
 				$domain['exclusive_to_default_app'] == 1
 			) {
-				return $this->getIdApp($domain['default_app_id'])['route'];
+				return $this->get(['id' => $domain['default_app_id']])['route'];
 			}
 			return explode('/', $uri[0])[1];
 		}
@@ -85,7 +85,7 @@ class Apps extends BasePackage
 
 	protected function checkAppRegistration($route)
 	{
-		$app = $this->getRouteApp($route);
+		$app = $this->get(['route' => $route]);
 
 		if ($app) {
 			$this->appInfo = $app;
@@ -96,43 +96,24 @@ class Apps extends BasePackage
 		}
 	}
 
-	public function getIdApp($id)
+	public function get(array $data = [], bool $resetCache = false)
 	{
-		foreach($this->apps as $app) {
-			if ($app['id'] == $id) {
-				return $app;
-			}
+		if (count($data) === 0) {
+			return $this->apps;
 		}
 
-		return false;
-	}
-
-	public function getNamedApp($name)
-	{
 		foreach($this->apps as $app) {
-			if (strtolower($app['name']) === strtolower($name)) {
+			if (isset($data['id']) &&
+				$app['id'] == $data['id']
+			) {
 				return $app;
-			}
-		}
-
-		return false;
-	}
-
-	public function getRouteApp($route)
-	{
-		foreach($this->apps as $app) {
-			if (strtolower($app['route']) == strtolower($route)) {
+			} else if (isset($data['name']) &&
+				strtolower($app['name']) == strtolower($data['name'])
+			) {
 				return $app;
-			}
-		}
-
-		return false;
-	}
-
-	public function getDefaultApp()
-	{
-		foreach($this->apps as $app) {
-			if ($app['is_default'] == '1') {
+			} else if (isset($data['route']) &&
+				strtolower($app['route']) == strtolower($data['route'])
+			) {
 				return $app;
 			}
 		}
@@ -145,13 +126,13 @@ class Apps extends BasePackage
 	 * notification_allowed_methods(email, sms)//Example
 	 * @notification_allowed_methods(email, sms)
 	 */
-	public function addApp(array $data)
+	public function add(array $data)
 	{
 		if (!$this->checkType($data)) {
 			return;
 		}
 
-		if ($this->getRouteApp($data['route'])) {
+		if ($this->get(['route' => $data['route']])) {
 			$this->addResponse('App route ' . strtolower($data['route']) . ' is used by another app. Please use different route.', 1, []);
 
 			return false;
@@ -162,7 +143,7 @@ class Apps extends BasePackage
 		$data['ip_filter_default_action'] = 0;
 		$data['can_login_role_ids'] = Json::encode(['1']);
 
-		if ($this->add($data)) {
+		if ($this->addToDb($data)) {
 
 			$this->addActivityLog($data);
 
@@ -179,9 +160,9 @@ class Apps extends BasePackage
 	 * notification_allowed_methods(email, sms)//Example
 	 * @notification_allowed_methods(email, sms)
 	 */
-	public function updateApp(array $data)
+	public function update(array $data)
 	{
-		$app = $this->getById($data['id']);
+		$app = $this->get(['id' => $data['id']]);
 
 		$app = array_merge($app, $data);
 
@@ -215,7 +196,7 @@ class Apps extends BasePackage
 			$this->modules->views->updateViews($app);
 		}
 
-		if ($this->update($app)) {
+		if ($this->updateToDb($app)) {
 			$this->addActivityLog($data, $app);
 
 			$this->addToNotification('update', 'Updated app ' . $app['name']);
@@ -226,154 +207,32 @@ class Apps extends BasePackage
 		}
 	}
 
-	public function getFilters(array $data)
+	/**
+	 * @notification(name=remove)
+	 * notification_allowed_methods(email, sms)//Example
+	 * @notification_allowed_methods(email, sms)
+	 */
+	public function remove(array $data)
 	{
-		if (!isset($data['app_id'])) {
-			return Json::encode([]);//blank array
+		if ($data['id'] == 1) {
+			$this->addResponse('Cannot remove Admin App. Error removing app.', 1);
+
+			return false;
 		}
 
-		$app = $this->getFirst('id', $data['app_id']);
+		$app = $this->get(['id' => $data['id']]);
 
-		$filtersObj = $app->getIpFilters();
+		//Check relations before removing.
+		if ($this->removeFromDb($data['id'])) {
 
-		if ($filtersObj && $filtersObj->count() > 0) {
-			$filters = $filtersObj->toArray();
+			$this->domains->removeAppFromApps($data['id']);
+
+			$this->addToNotification('remove', 'Removed app ' . $app['name']);
+
+			$this->addResponse('Removed App ' . $app['name']);
 		} else {
-			$filters = [];
+			$this->addResponse('Error removing app.', 1);
 		}
-
-		return $filters;
-	}
-
-	public function addFilter(array $data)
-	{
-		if (!isset($data['filter_type']) || !isset($data['ip_address'])) {
-			$this->addResponse('Please provide correct address and filter type', 1);
-
-			return false;
-		}
-
-		if ($data['filter_type'] !== 'allow' && $data['filter_type'] !== 'block') {
-			$this->addResponse('Please provide correct filter type', 1);
-
-			return false;
-		}
-
-		$address = explode('/', $data['ip_address']);
-
-		if (count($address) === 2 || count($address) === 1) {
-			//validate address
-			$ipFilter = new IpFilter;
-
-			$validateIP = $ipFilter->validateIp($address[0]);
-
-			if ($validateIP !== true) {
-				$this->addResponse($validateIP, 1);
-
-				return;
-			}
-			if (count($address) === 2) {
-				$data['address_type'] = 2;
-			} else if (count($address) === 1) {
-				$data['address_type'] = 1;
-			}
-		} else {
-			$this->addResponse('Please enter correct address', 1);
-
-			return false;
-		}
-
-		$filtersObj = new AppsIpFilter();
-
-		$newFilter['app_id'] = $data['app_id'];
-		$newFilter['ip_address'] = $data['ip_address'];
-		$newFilter['address_type'] = $data['address_type'];
-		$newFilter['filter_type'] = $data['filter_type'] === 'allow' ? 1 : 2;
-		$newFilter['added_by'] = $this->auth->account()['id'];
-
-		$filtersObj->assign($newFilter);
-
-		try {
-			$filtersObj->create();
-		} catch (\Exception $e) {
-			if (strpos($e->getMessage(), 'UNIQUE') !== false) {
-				$this->addResponse('Duplicate Entry!', 3);
-
-				return false;
-			}
-
-			throw $e;
-		}
-	}
-
-	public function removeFilter(array $data)
-	{
-		if (!isset($data['id'])) {
-			$this->addResponse('Please provide correct filter ID', 1);
-
-			return false;
-		}
-
-		$filtersObj = new AppsIpFilter();
-
-		$filter = $filtersObj->findFirst('id = ' . $data['id']);
-
-		if ($filter) {
-			if ($filter->delete() !== false) {
-				$this->addResponse('Filter removed.', 0);
-			} else {
-				$this->addResponse('Error removing filter.', 1);
-			}
-		}
-	}
-
-	public function blockMonitorFilter(array $data)
-	{
-		if (!isset($data['id'])) {
-			$this->addResponse('Please provide correct filter ID', 1);
-
-			return false;
-		}
-
-		$filtersObj = new AppsIpFilter();
-
-		$monitorFilterObj = $filtersObj->findFirst('id = ' . $data['id']);
-
-		if ($monitorFilterObj) {
-			$monitorFilter = $monitorFilterObj->toArray();
-			$monitorFilter['filter_type'] = 2;
-			$monitorFilter['added_by'] = $this->auth->account()['id'];
-			$monitorFilter['incorrect_attempts'] = null;
-
-			$monitorFilterObj->assign($monitorFilter);
-
-			if ($monitorFilterObj->update() !== false) {
-				$this->addResponse('Filter moved from monitor to block.', 0);
-			} else {
-				$this->addResponse('Error blocking filter.', 1);
-			}
-		}
-	}
-
-	public function resetAppFilters(array $data)
-	{
-		if (!isset($data['app_id'])) {
-			$this->addResponse('Incorrect App ID', 1);
-
-			return;
-		}
-
-		$app = $this->getFirst('id', $data['app_id']);
-
-		$filtersObj = $app->getIpFilters();
-
-		if ($filtersObj && $filtersObj->count() > 0) {
-			$filtersObj->delete();
-		}
-
-		$app->assign(['incorrect_login_attempt_block_ip' => 0, 'ip_filter_default_action' => 0]);
-
-		$app->update();
 	}
 
 	protected function checkType($data)
@@ -391,34 +250,6 @@ class Apps extends BasePackage
 		}
 
 		return true;
-	}
-
-	/**
-	 * @notification(name=remove)
-	 * notification_allowed_methods(email, sms)//Example
-	 * @notification_allowed_methods(email, sms)
-	 */
-	public function removeApp(array $data)
-	{
-		if ($data['id'] == 1) {
-			$this->addResponse('Cannot remove Admin App. Error removing app.', 1);
-
-			return false;
-		}
-
-		$app = $this->getById($data['id']);
-
-		//Check relations before removing.
-		if ($this->remove($data['id'])) {
-
-			$this->domains->removeAppFromApps($data['id']);
-
-			$this->addToNotification('remove', 'Removed app ' . $app['name']);
-
-			$this->addResponse('Removed App ' . $app['name']);
-		} else {
-			$this->addResponse('Error removing app.', 1);
-		}
 	}
 
 	protected function getReservedRoutes()

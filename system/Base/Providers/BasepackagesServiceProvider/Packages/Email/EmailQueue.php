@@ -34,13 +34,24 @@ class EmailQueue extends BasePackage
         return $this;
     }
 
-    public function addToQueue(array $data)
+    public function get(array $data = [], $resetCache = false)
+    {
+        if (isset($data['id'])) {
+            return $this->getById($data['id'], $resetCache);
+        } else if (isset($data['conditions'])) {
+            return $this->getByParams($data['conditions'], $resetCache);
+        }
+
+        return false;
+    }
+
+    public function add(array $data)
     {
         if (isset($data['confidential']) && $data['confidential'] == 1) {
             $data = $this->encryptBody($data);
         }
 
-        if ($this->add($data)){
+        if ($this->addToDb($data)){
             $this->addResponse('Added email to queue with ID ' . $this->packagesData->last['id'], 0, null, true);
 
             $task = $this->basepackages->workers->tasks->findByParameter($data['priority'], "priority", 'processemailqueue');
@@ -97,7 +108,7 @@ class EmailQueue extends BasePackage
                     ]
             ];
 
-        $queue = $this->getByParams($conditions, true, false);
+        $queue = $this->get(['conditions' => $conditions, true]);
 
         if ($queue && is_array($queue) && count($queue) > 0) {
             foreach ($queue as $key => $queueEmail) {
@@ -105,7 +116,7 @@ class EmailQueue extends BasePackage
                     $queueEmail['status'] = self::STATUS_ERROR;
                     $queueEmail['logs'] = 'Email Service is not configured or assigned to a domain, please configure email service and try again.';
 
-                    $this->update($queueEmail);
+                    $this->updateToDb($queueEmail);
 
                     $hadErrors = true;
                 } else {
@@ -140,7 +151,7 @@ class EmailQueue extends BasePackage
                         $queueEmail['logs'] = 'Sent';
                         $queueEmail['sent_on'] = date("F j, Y, g:i a");
 
-                        $this->update($queueEmail);
+                        $this->updateToDb($queueEmail);
                     }
                 }
             }
@@ -157,12 +168,12 @@ class EmailQueue extends BasePackage
 
     public function requeue(array $data)
     {
-        $email = $this->getById($data['id']);
+        $email = $this->get(['id' => $data['id']]);
 
         $email['status'] = 1;
         $email['logs'] = '';
 
-        if ($this->update($email)) {
+        if ($this->updateToDb($email)) {
             $task = $this->basepackages->workers->tasks->findByParameter($email['priority'], "priority", 'processemailqueue');
 
             if ($task && $task['force_next_run'] === null) {
@@ -177,9 +188,14 @@ class EmailQueue extends BasePackage
         $this->addResponse('Error re-queuing message');
     }
 
-    public function removeFromQueue(array $data)
+    public function update(array $data)
     {
-        //
+        return;
+    }
+
+    public function remove(array $data)
+    {
+        return;
     }
 
     public function changePriority(array $data)

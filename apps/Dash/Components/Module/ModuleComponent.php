@@ -92,4 +92,14 @@ class ModuleComponent extends BaseComponent
 			return $this->generateView();
 		}
 	}
+
+	public function addAction()
+	{
+		return;
+	}
+
+	public function removeAction()
+	{
+		return;
+	}
 }

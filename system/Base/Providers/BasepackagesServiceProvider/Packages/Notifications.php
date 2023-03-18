@@ -158,7 +158,7 @@ class Notifications extends BasePackage
         }
 
         if ($domainId) {
-            $domain = $this->domains->getIdDomain($domainId);
+            $domain = $this->domains->get(['id' => $domainId]);
         } else {
             $domain = $this->domains->getDomain();
         }
@@ -175,7 +175,7 @@ class Notifications extends BasePackage
         }
         $email['body'] = $body;
 
-        $this->basepackages->emailqueue->addToQueue($email);
+        $this->basepackages->emailqueue->add($email);
     }
 
     public function fetchNewNotificationsCount($type = 0)
@@ -250,7 +250,7 @@ class Notifications extends BasePackage
 
     public function changeNotificationState(array $data)
     {
-        $profile = $this->basepackages->profile->profile();
+        $profile = $this->basepackages->profile->get();
 
         if (isset($profile['settings']['notifications']['mute'])) {
             if ($data['changestate'] == 1) {
@@ -268,7 +268,7 @@ class Notifications extends BasePackage
 
         $profile['settings'] = Json::encode($profile['settings']);
 
-        $this->basepackages->profile->updateProfile($profile);
+        $this->basepackages->profile->update($profile);
 
         $this->addResponse('Changed');
     }

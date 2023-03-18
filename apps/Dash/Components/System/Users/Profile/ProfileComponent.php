@@ -33,10 +33,10 @@ class ProfileComponent extends BaseComponent
 
             $this->view->middlewares =
                 msort(
-                    $this->modules->middlewares->getMiddlewaresForAppType(
-                        $app['app_type'],
-                        $app['id']
-                    ), 'sequence');
+                    $this->modules->middlewares->get([
+                        'app_type'  => $app['app_type'],
+                        'app_id'    => $app['id']
+                    ]), 'sequence');
 
             $this->view->packages = $this->profile->packagesData->packages;
 
@@ -63,7 +63,7 @@ class ProfileComponent extends BaseComponent
                 return;
             }
 
-            $this->profile->updateProfile($this->postData());
+            $this->profile->update($this->postData());
 
             $this->addResponse(
                 $this->profile->packagesData->responseMessage,
@@ -252,5 +252,15 @@ class ProfileComponent extends BaseComponent
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }
+    }
+
+    public function addAction()
+    {
+        return;
+    }
+
+    public function removeAction()
+    {
+        return;
     }
 }

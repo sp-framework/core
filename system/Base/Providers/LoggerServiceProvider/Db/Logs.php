@@ -18,6 +18,6 @@ class Logs extends BasePackage
 	{
 		$this->packagesData = new PackagesData;
 
-		${$this->packageName} = new $this->modelToUse();
+		${$this->packageName} = new $this->modelToUse;
 	}
 }

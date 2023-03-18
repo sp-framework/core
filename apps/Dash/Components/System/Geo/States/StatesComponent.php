@@ -151,4 +151,9 @@ class StatesComponent extends BaseComponent
             }
         }
     }
+
+    public function removeAction()
+    {
+        return;
+    }
 }

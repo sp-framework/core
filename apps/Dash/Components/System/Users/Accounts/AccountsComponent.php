@@ -55,7 +55,7 @@ class AccountsComponent extends BaseComponent
             if ($account) {
                 $app = $this->apps->getAppInfo();
 
-                $middlewares = $this->modules->middlewares->getMiddlewaresForAppType($app['app_type'],null);
+                $middlewares = $this->modules->middlewares->get(['app_type' => $app['app_type']]);
 
                 $middlewareEnabledForApps = [];
 
@@ -273,7 +273,7 @@ class AccountsComponent extends BaseComponent
                 return;
             }
 
-            $this->accounts->addAccount($this->postData());
+            $this->accounts->add($this->postData());
 
             $this->addResponse(
                 $this->accounts->packagesData->responseMessage,
@@ -295,7 +295,7 @@ class AccountsComponent extends BaseComponent
                 return;
             }
 
-            $this->accounts->updateAccount($this->postData());
+            $this->accounts->update($this->postData());
 
             $this->addResponse(
                 $this->accounts->packagesData->responseMessage,
@@ -317,7 +317,7 @@ class AccountsComponent extends BaseComponent
                 return;
             }
 
-            $this->accounts->removeAccount($this->postData());
+            $this->accounts->remove($this->postData());
 
             $this->addResponse(
                 $this->accounts->packagesData->responseMessage,

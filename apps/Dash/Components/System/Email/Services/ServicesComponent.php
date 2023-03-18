@@ -90,7 +90,7 @@ class ServicesComponent extends BaseComponent
                 return;
             }
 
-            $this->emailservices->addEmailService($this->postData());
+            $this->emailservices->add($this->postData());
 
             $this->view->responseCode = $this->emailservices->packagesData->responseCode;
 
@@ -113,7 +113,7 @@ class ServicesComponent extends BaseComponent
                 return;
             }
 
-            $this->emailservices->updateEmailService($this->postData());
+            $this->emailservices->update($this->postData());
 
             $this->view->responseCode = $this->emailservices->packagesData->responseCode;
 
@@ -133,7 +133,7 @@ class ServicesComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->emailservices->removeEmailService($this->postData());
+            $this->emailservices->remove($this->postData());
 
             $this->view->responseCode = $this->emailservices->packagesData->responseCode;
 

@@ -60,7 +60,7 @@ class Filters extends BasePackage
 
     protected function getFilters(int $componentId, array $account = null)
     {
-        $component = $this->modules->components->getComponentById($componentId);
+        $component = $this->modules->components->get(['id' => $componentId]);
 
         $employeesPackage = $this->init()->checkPackage('Apps\Dash\Packages\Hrms\Employees\Employees');
 
@@ -290,7 +290,7 @@ class Filters extends BasePackage
         }
 
 
-        $this->addFilter(
+        $this->add(
             [
                 'name'              => 'Show All ' . $component['name'],
                 'conditions'        => '',
@@ -338,7 +338,7 @@ class Filters extends BasePackage
                     $default = 0;
                 }
 
-                $this->addFilter(
+                $this->add(
                     [
                         'name'              => $name,
                         'conditions'        => $condition,
@@ -391,7 +391,7 @@ class Filters extends BasePackage
                     $default = 0;
                 }
 
-                $this->addFilter(
+                $this->add(
                     [
                         'name'              => $name,
                         'conditions'        => $condition,
@@ -444,7 +444,7 @@ class Filters extends BasePackage
                     $default = 0;
                 }
 
-                $this->addFilter(
+                $this->add(
                     [
                         'name'              => $name,
                         'conditions'        => $condition,
@@ -459,12 +459,17 @@ class Filters extends BasePackage
         }
     }
 
+    public function get(array $data = [], bool $resetCache = false)
+    {
+        return;
+    }
+
     /**
      * @notification(name=add)
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function addFilter(array $data)
+    public function add(array $data)
     {
         if (!isset($data['filter_type'])) {
             $data['filter_type'] = 0;
@@ -490,7 +495,7 @@ class Filters extends BasePackage
         }
 
         if ($this->checkDefaultFilter($data)) {
-            $add = $this->add($data);
+            $add = $this->addToDb($data);
 
             if ($add) {
                 $account = $this->auth->account();
@@ -520,7 +525,7 @@ class Filters extends BasePackage
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function updateFilter(array $data)
+    public function update(array $data)
     {
         $component = $this->modules->components->getById($data['component_id']);
 
@@ -547,7 +552,7 @@ class Filters extends BasePackage
                 $data['shared_ids'] = Json::encode($data['shared_ids']);
             }
 
-            $update = $this->update($data);
+            $update = $this->updateToDb($data);
 
             if ($update) {
                 $account = $this->auth->account();
@@ -578,7 +583,7 @@ class Filters extends BasePackage
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function removeFilter(array $data)
+    public function remove(array $data)
     {
         $filter = $this->getById($data['id']);
 
@@ -590,7 +595,7 @@ class Filters extends BasePackage
             return false;
         }
 
-        $remove = $this->remove($data['id']);
+        $remove = $this->removeFromDb($data['id']);
 
         if ($remove) {
 

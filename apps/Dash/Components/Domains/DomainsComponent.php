@@ -94,7 +94,7 @@ class DomainsComponent extends BaseComponent
             if (!$this->checkCSRF()) {
                 return;
             }
-            $this->domains->addDomain($this->postData());
+            $this->domains->add($this->postData());
 
             $this->view->responseCode = $this->domains->packagesData->responseCode;
 
@@ -116,7 +116,7 @@ class DomainsComponent extends BaseComponent
             if (!$this->checkCSRF()) {
                 return;
             }
-            $this->domains->updateDomain($this->postData());
+            $this->domains->update($this->postData());
 
             $this->view->responseCode = $this->domains->packagesData->responseCode;
 
@@ -136,7 +136,7 @@ class DomainsComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->domains->removeDomain($this->postData());
+            $this->domains->remove($this->postData());
 
             $this->view->responseCode = $this->domains->packagesData->responseCode;
 

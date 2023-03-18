@@ -16,7 +16,7 @@ class Barcodes extends BasePackage
 
     public function init()
     {
-        $this->barcodesPackage = $this->modules->packages->getNamePackage('Barcodes');
+        $this->barcodesPackage = $this->modules->packages->get(['name' => 'Barcodes']);
 
         if ($this->barcodesPackage) {
 

@@ -12,6 +12,10 @@ class Packages extends BasePackage
 
 	public $packages;
 
+	protected $packageName = 'packages';
+
+	protected $packageNameS = 'package';
+
 	public function init(bool $resetCache = false)
 	{
 		$this->getAll($resetCache);
@@ -19,122 +23,182 @@ class Packages extends BasePackage
 		return $this;
 	}
 
-	public function getNamedPackageForApp($name, $appId)
+	public function get(array $data = [], bool $resetCache = false)
 	{
+		if (count($data) === 0) {
+			return $this->packages;
+		}
+
+		$packages = [];
+
 		foreach($this->packages as $package) {
 			$package['apps'] = Json::decode($package['apps'], true);
 
-			if (isset($package['apps'][$appId])) {
-				if (strtolower($package['name']) === strtolower($name) &&
-					$package['apps'][$appId]['enabled'] === true
+			if (isset($data['app_id']) && isset($data['name'])) {
+				if ((isset($package['apps'][$data['app_id']]['enabled']) &&
+					$package['apps'][$data['app_id']]['enabled'] == true) &&
+					strtolower($package['name']) == strtolower($data['name'])
+				) {
+					return $package;
+				}
+			} else if (isset($data['name']) && isset($data['repo'])) {
+				if (strtolower($package['name']) === strtolower($data['name']) &&
+					strtolower($package['repo']) === strtolower($data['repo'])
+				) {
+					return $package;
+				}
+			} else if (isset($data['id'])) {
+				if ($package['id'] == $data['id']) {
+					return $package;
+				}
+			} else if (isset($data['name'])) {
+				if (strtolower($package['name']) === strtolower($data['name'])) {
+					return $package;
+				}
+			} else if (isset($data['category']) && isset($data['sub_category'])) {
+				if ($package['category'] === $data['category'] &&
+					$package['sub_category'] === $data['sub_category']
+				) {
+					$packages[$package['id']] = $package;
+				}
+			} else if (isset($data['app_type'])) {
+				if ($package['app_type'] === $data['app_type']) {
+					$packages[$package['id']] = $package;
+				}
+			} else if (isset($data['app_id'])) {
+				if (isset($package['apps'][$data['app_id']]['enabled']) &&
+					$package['apps'][$data['app_id']]['enabled'] == true
+				) {
+					return $package;
+				}
+			} else if (isset($data['app_type']) && isset($data['name'])) {
+				if ($package['app_type'] === $data['type'] &&
+					$package['name'] === $data['name']
 				) {
 					return $package;
 				}
 			}
 		}
 
-		return false;
-	}
-
-	public function getNamedPackageForRepo($name, $repo)
-	{
-		foreach($this->packages as $package) {
-			if (strtolower($package['name']) === strtolower($name) &&
-				strtolower($package['repo']) === strtolower($repo)
-			) {
-				return $package;
-			}
-		}
-
-		return false;
-	}
-
-	public function getIdPackage($id)
-	{
-		foreach($this->packages as $package) {
-			if ($package['id'] == $id) {
-				return $package;
-			}
-		}
-
-		return false;
-	}
-
-	public function getNamePackage($name)
-	{
-		foreach($this->packages as $package) {
-			if (strtolower($package['name']) === strtolower($name)) {
-				return $package;
-			}
-		}
-
-		return false;
-	}
-
-	public function getPackagesForCategoryAndSubcategory($category, $subCategory)
-	{
-		$packages = [];
-
-		foreach($this->packages as $package) {
-			if ($package['category'] === $category && $package['sub_category'] === $subCategory) {
-				$packages[$package['id']] = $package;
-			}
-		}
-
 		return $packages;
 	}
 
-	public function getPackagesForAppType(string $type)
+	// public function getNamedPackageForApp($name, $appId)
+	// {
+	// 	foreach($this->packages as $package) {
+	// 		$package['apps'] = Json::decode($package['apps'], true);
+
+	// 		if (isset($package['apps'][$appId])) {
+	// 			if (strtolower($package['name']) === strtolower($name) &&
+	// 				$package['apps'][$appId]['enabled'] === true
+	// 			) {
+	// 				return $package;
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return false;
+	// }
+
+	// public function getNamedPackageForRepo($name, $repo)
+	// {
+	// 	foreach($this->packages as $package) {
+	// 		if (strtolower($package['name']) === strtolower($name) &&
+	// 			strtolower($package['repo']) === strtolower($repo)
+	// 		) {
+	// 			return $package;
+	// 		}
+	// 	}
+
+	// 	return false;
+	// }
+
+	// public function getIdPackage($id)
+	// {
+	// 	foreach($this->packages as $package) {
+	// 		if ($package['id'] == $id) {
+	// 			return $package;
+	// 		}
+	// 	}
+
+	// 	return false;
+	// }
+
+	// public function getNamePackage($name)
+	// {
+	// 	foreach($this->packages as $package) {
+	// 		if (strtolower($package['name']) === strtolower($name)) {
+	// 			return $package;
+	// 		}
+	// 	}
+
+	// 	return false;
+	// }
+
+	// public function getPackagesForCategoryAndSubcategory($category, $subCategory)
+	// {
+	// 	$packages = [];
+
+	// 	foreach($this->packages as $package) {
+	// 		if ($package['category'] === $category && $package['sub_category'] === $subCategory) {
+	// 			$packages[$package['id']] = $package;
+	// 		}
+	// 	}
+
+	// 	return $packages;
+	// }
+
+	// public function getPackagesForAppType(string $type)
+	// {
+	// 	$packages = [];
+
+	// 	foreach($this->packages as $package) {
+	// 		if ($package['app_type'] === $type) {
+	// 			$packages[$package['id']] = $package;
+	// 		}
+	// 	}
+
+	// 	return $packages;
+	// }
+
+	// public function getPackagesForApp($appId)
+	// {
+	// 	$packages = [];
+
+	// 	foreach($this->packages as $package) {
+	// 		$package['apps'] = Json::decode($package['apps'], true);
+
+	// 		if (isset($package['apps'][$appId]['enabled']) &&
+	// 			$package['apps'][$appId]['enabled'] == 'true'
+	// 		) {
+	// 			$packages[$package['id']] = $package;
+	// 		}
+	// 	}
+
+	// 	return $packages;
+	// }
+
+	public function add(array $data)
 	{
-		$packages = [];
-
-		foreach($this->packages as $package) {
-			if ($package['app_type'] === $type) {
-				$packages[$package['id']] = $package;
-			}
-		}
-
-		return $packages;
-	}
-
-	public function getPackagesForApp($appId)
-	{
-		$packages = [];
-
-		foreach($this->packages as $package) {
-			$package['apps'] = Json::decode($package['apps'], true);
-
-			if (isset($package['apps'][$appId]['enabled']) &&
-				$package['apps'][$appId]['enabled'] == 'true'
-			) {
-				$packages[$package['id']] = $package;
-			}
-		}
-
-		return $packages;
-	}
-
-	public function addPackage(array $data)
-	{
-		if ($this->add($data)) {
+		if ($this->addToDb($data)) {
 			$this->addResponse('Added ' . $data['name'] . ' package');
 		} else {
 			$this->addResponse('Error adding new package.', 1);
 		}
 	}
 
-	public function updatePackage(array $data)
+	public function update(array $data)
 	{
-		if ($this->update($data)) {
+		if ($this->updateToDb($data)) {
 			$this->addResponse('Updated ' . $data['name'] . ' package');
 		} else {
 			$this->addResponse('Error updating package.', 1);
 		}
 	}
 
-	public function removePackage(array $data)
+	public function remove(array $data)
 	{
-		if ($this->remove($data['id'])) {
+		if ($this->removeFromDb($data['id'])) {
 			$this->addResponse('Removed package');
 		} else {
 			$this->addResponse('Error removing package.',1);

@@ -443,7 +443,7 @@ class Auth
             throw new \Exception('Cannot set account from cookie');
         }
 
-        $this->account = $this->accounts->getAccountById($hasIdentifier['account_id'], true);
+        $this->account = $this->accounts->get(['id' => $hasIdentifier['account_id'], 'getsecurity' => true]);
 
         if ($this->account) {
             $this->updateSessionIdForSessionAndIdentifier($hasIdentifier);
@@ -602,7 +602,7 @@ class Auth
     public function setUserFromSession()
     {
         if ($this->session->get($this->getKey())) {
-            $this->account = $this->accounts->getAccountById($this->session->get($this->getKey()), true);
+            $this->account = $this->accounts->get(['id' => $this->session->get($this->getKey()), 'getsecurity' => true]);
 
             if (!$this->account) {
                 $this->logger->log->debug($this->account['email'] . ' not found in session for app: ' . $this->app['name']);
@@ -628,7 +628,7 @@ class Auth
 
     protected function setAccountProfile()
     {
-        $this->account['profile'] = $this->profile->profile($this->account['id']);
+        $this->account['profile'] = $this->profile->get(['account_id' => $this->account['id']]);
     }
 
     protected function setAccountRole()
@@ -695,7 +695,7 @@ class Auth
 
             $this->account['email_new_password'] = '1';
 
-            $this->accounts->updateAccount($this->account);
+            $this->accounts->update($this->account);
 
             $this->logger->log->info('New password requested for account ' . $this->account['email'] . ' via forgot password. New password was emailed to the account.');
         }
@@ -726,7 +726,7 @@ class Auth
         $this->account['password'] = $this->secTools->hashPassword($data['newpass'], $this->config->security->passwordWorkFactor);
         $this->account['force_pwreset'] = null;
         // $this->setSessionAndRecaller($data);
-        $this->accounts->updateAccount($this->account);
+        $this->accounts->update($this->account);
 
         $this->logger->log->info('Password reset successful for account ' . $this->account['email'] . ' via pwreset.');
 
@@ -1120,7 +1120,7 @@ class Auth
         $emailData['subject'] = 'Verification Code for ' . $this->domains->getDomain()['name'];
         $emailData['body'] = $verificationCode;
 
-        return $this->emailQueue->addToQueue($emailData);
+        return $this->emailQueue->add($emailData);
     }
 
     public function verifyVerficationCode(array $data)

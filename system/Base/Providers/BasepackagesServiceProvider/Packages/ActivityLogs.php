@@ -23,68 +23,11 @@ class ActivityLogs extends BasePackage
         return $this;
     }
 
-    public function addLog($packageName, array $data, array $oldData = null)
-    {
-        $dataId = $data['id'];
-        unset($data['id']);
-
-        $data = $this->removeSessionToken($data);
-        if (isset($data['package_name'])) {
-            unset($data['package_name']);
-        }
-
-        if ($oldData) {
-            if (isset($oldData['id'])) {
-                unset($oldData['id']);
-            }
-            if (isset($oldData['package_name'])) {
-                unset($oldData['package_name']);
-            }
-            $data = $this->getDifference($this->jsonData($data), $this->jsonData($oldData));
-
-            $log['activity_type'] = self::ACTIVITY_TYPE_UPDATE;
-        } else {
-            $log['activity_type'] = self::ACTIVITY_TYPE_ADD;
-        }
-
-        if (PHP_SAPI === 'cli') {
-            $log['account_id'] = 0;//System
-        } else {
-            $account = $this->auth->account();
-
-            if ($account) {
-                $log['account_id'] = $account['id'];//User
-            } else {
-                $log['account_id'] = 0;//System
-            }
-        }
-
-        $log['package_name'] = $packageName;
-
-        $log['package_row_id'] = $dataId;
-
-        if (isset($data['created_at'])) {
-            $log['created_at'] = $data['created_at'];
-        }
-
-        $log['log'] = Json::encode($data);
-
-        if ($this->add($log, false)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Activity Log Added';
-        } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error Adding Activity Log';
-        }
-    }
-
-    public function getLogs($packageName, int $packageRowId, bool $newFirst, $page = 1)
+    public function get(array $data = [], $resetCache = false)
     {
         $logsArr = [];
 
-        if ($newFirst) {
+        if (isset($data['new_first']) && $data['new_first'] === true) {
             $order = 'id desc';
         } else {
             $order = 'id asc';
@@ -92,10 +35,11 @@ class ActivityLogs extends BasePackage
 
         $pagedLogs = $this->getPaged(
             [
-                'conditions'    => '-|package_name|equals|' . $packageName . '&and|package_row_id|equals|' . $packageRowId . '&',
+                'conditions'    =>
+                    '-|package_name|equals|' . $data['package_name'] . '&and|package_row_id|equals|' . $data['package_row_id'] . '&',
                 'order'         => $order,
                 'limit'         => 10,
-                'page'          => $page
+                'page'          => $data['page']
             ]
         );
 
@@ -110,10 +54,10 @@ class ActivityLogs extends BasePackage
                 unset($log['package_row_id']);
 
                 if ($log['account_id'] != 0) {
-                    $account = $this->basepackages->accounts->getById($log['account_id']);
+                    $account = $this->basepackages->accounts->get(['id' => $log['account_id']]);
                     $log['account_email'] = $account['email'];
 
-                    $profile = $this->basepackages->profile->getProfile($log['account_id']);
+                    $profile = $this->basepackages->profile->get(['account_id' => $log['account_id']]);
                     $log['account_full_name'] = $profile['full_name'];
 
                     unset($log['account_id']);
@@ -135,6 +79,75 @@ class ActivityLogs extends BasePackage
         }
 
         return [];
+    }
+
+    public function add(array $data)
+    {
+        $newData = $data['data'];
+        $dataId = $newData['id'];
+        unset($newData['id']);
+
+        $newData = $this->removeSessionToken($newData);
+        if (isset($newData['package_name'])) {
+            unset($newData['package_name']);
+        }
+
+        if (isset($data['old_data'])) {
+            $oldData = $data['old_data'];
+            if (isset($oldData['id'])) {
+                unset($oldData['id']);
+            }
+            if (isset($oldData['package_name'])) {
+                unset($oldData['package_name']);
+            }
+            $newData = $this->getDifference($this->jsonData($newData), $this->jsonData($oldData));
+
+            $log['activity_type'] = self::ACTIVITY_TYPE_UPDATE;
+        } else {
+            $log['activity_type'] = self::ACTIVITY_TYPE_ADD;
+        }
+
+        if (PHP_SAPI === 'cli') {
+            $log['account_id'] = 0;//System
+        } else {
+            $account = $this->auth->account();
+
+            if ($account) {
+                $log['account_id'] = $account['id'];//User
+            } else {
+                $log['account_id'] = 0;//System
+            }
+        }
+
+        $log['package_name'] = $data['package_name'];
+
+        $log['package_row_id'] = $dataId;
+
+        if (isset($data['created_at'])) {
+            $log['created_at'] = $newData['created_at'];
+        }
+
+        $log['log'] = Json::encode($newData);
+
+        if ($this->addtoDb($log, false)) {
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseMessage = 'Activity Log Added';
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Error Adding Activity Log';
+        }
+    }
+
+    public function update(array $data)
+    {
+        return;
+    }
+
+    public function remove(array $data)
+    {
+        return;
     }
 
     protected function getDifference(array $data, array $oldData)

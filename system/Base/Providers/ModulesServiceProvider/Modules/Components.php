@@ -12,6 +12,10 @@ class Components extends BasePackage
 
 	public $components;
 
+	protected $packageName = 'components';
+
+	protected $packageNameS = 'component';
+
 	public function init(bool $resetCache = false)
 	{
 		$this->getAll($resetCache);
@@ -19,156 +23,91 @@ class Components extends BasePackage
 		return $this;
 	}
 
-	public function getComponentByName($name)
+	public function get(array $data = [], bool $resetCache = false)
 	{
-		foreach($this->components as $component) {
-			if (strtolower($component['name']) === strtolower($name)) {
-				return $component;
-			}
+		if (count($data) === 0) {
+			return $this->components;
 		}
 
-		return false;
-	}
+		$components = [];
 
-	public function getComponentByRoute($route)
-	{
-		foreach($this->components as $component) {
-			if (strtolower($component['route']) === strtolower($route)) {
-				return $component;
-			}
-		}
-
-		return false;
-	}
-
-	public function getRouteComponentForApp($route, $appId)
-	{
 		foreach($this->components as $component) {
 			$component['apps'] = Json::decode($component['apps'], true);
 
-			if (isset($component['apps'][$appId])) {
-				if (isset($component['apps'][$appId]['enabled']) &&
-					$component['apps'][$appId]['enabled'] === true &&
-					$component['route'] === $route
+			if (isset($data['app_id']) && isset($data['route'])) {
+				if ((isset($component['apps'][$data['app_id']]['enabled']) &&
+					$component['apps'][$data['app_id']]['enabled'] == true) &&
+					strtolower($component['route']) == strtolower($data['route'])
 				) {
 					return $component;
 				}
-			}
-		}
-
-		return false;
-	}
-
-	public function getNamedComponentForApp($name, $appId)
-	{
-		foreach($this->components as $component) {
-			$component['apps'] = Json::decode($component['apps'], true);
-
-			if (isset($component['apps'][$appId])) {
-				if (isset($component['apps'][$appId]['enabled']) &&
-					$component['apps'][$appId]['enabled'] === true &&
-					strtolower($component['name']) === strtolower($name)
+			} else if (isset($data['app_id']) && isset($data['name'])) {
+				if ((isset($component['apps'][$data['app_id']]['enabled']) &&
+					$component['apps'][$data['app_id']]['enabled'] == true) &&
+					strtolower($component['name']) == strtolower($data['name'])
 				) {
 					return $component;
 				}
-			}
-		}
-
-		return false;
-	}
-
-	public function getComponentsForApp($appId)
-	{
-		$components = [];
-
-		foreach($this->components as $component) {
-			$component['apps'] = Json::decode($component['apps'], true);
-
-			if (isset($component['apps'][$appId]['enabled']) &&
-				$component['apps'][$appId]['enabled'] === true
-			) {
-				$components[$component['id']] = $component;
-			}
-		}
-
-		return $components;
-	}
-
-	public function getComponentsForAppAndType($appId, $type)
-	{
-		$components = [];
-
-		foreach($this->components as $component) {
-			if ($component['app_id'] == $appId &&
-				$component['type'] == $type
-			) {
-				$components[$component['id']] = $component;
-			}
-		}
-
-		return $components;
-	}
-
-	public function getComponentById($id)
-	{
-		foreach($this->components as $component) {
-			if ($component['id'] == $id) {
-				return $component;
-			}
-		}
-	}
-
-	public function getComponentsForCategoryAndSubcategory($category, $subCategory)
-	{
-		$components = [];
-
-		foreach($this->components as $component) {
-			if ($component['category'] === $category &&
-				$component['sub_category'] === $subCategory
-			) {
-				$components[$component['id']] = $component;
-			}
-		}
-
-		return $components;
-	}
-
-	public function getComponentsForAppType(string $type)
-	{
-		$components = [];
-
-		foreach($this->components as $component) {
-			if ($component['app_type'] === $type) {
-				$components[$component['id']] = $component;
-			}
-		}
-
-		return $components;
-	}
-
-	public function getImportComponents()
-	{
-		$components = [];
-
-		foreach($this->components as $component) {
-			$component['settings'] = Json::decode($component['settings'], true);
-
-			if (isset($component['settings']['import']) &&
-				$component['settings']['import'] == 'true' &&
-				isset($component['settings']['importexportPackage']) &&
-				isset($component['settings']['importMethod'])
-			) {
-				$package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
-
-				if ($package &&
-					$this->usePackage($package['class']) &&
-					(method_exists($package['class'], 'add' . $component['settings']['importMethod']) &&
-					 method_exists($package['class'], 'update' . $component['settings']['importMethod']))
+			} else if (isset($data['app_id'])) {
+				if (isset($component['apps'][$data['app_id']]['enabled']) &&
+					$component['apps'][$data['app_id']]['enabled'] == true
 				) {
-					$availableComponent['id'] = $component['id'];
-					$availableComponent['name'] = $component['name'];
+					$components[$component['id']] = $component;
+				}
+			} else if (isset($data['id'])) {
+				if ($component['id'] == $data['id']) {
+					return $component;
+				}
+			} else if (isset($data['name'])) {
+				if ($component['name'] === $data['name']) {
+					return $component;
+				}
+			} else if (isset($data['route'])) {
+				if ($component['route'] === $data['route']) {
+					return $component;
+				}
+			} else if (isset($data['category']) && isset($data['sub_category'])) {
+				if ($component['category'] === $data['category'] &&
+					$component['sub_category'] === $data['sub_category']
+				) {
+					$components[$component['id']] = $component;
+				}
+			} else if (isset($data['app_type'])) {
+				if ($component['app_type'] === $data['app_type']) {
+					$components[$component['id']] = $component;
+				}
+			} else if (isset($data['app_type']) && isset($data['name'])) {
+				if ($component['app_type'] === $data['type'] &&
+					$component['name'] === $data['name']
+				) {
+					return $component;
+				}
+			} else if (isset($data['type'])) {//type = import OR export (lowercase)
+				$component['settings'] = Json::decode($component['settings'], true);
 
-					array_push($components, $availableComponent);
+				if (isset($component['settings'][$data['type']]) &&
+					$component['settings'][$data['type']] == 'true' &&
+					isset($component['settings']['importexportPackage'])
+				) {
+					if ($data['type'] === 'import' && !isset($component['settings']['importMethod'])) {
+						continue;
+					}
+
+					$package = $this->modules->packages->get(['name' => $component['settings']['importexportPackage']]);
+
+					if ($package && $this->usePackage($package['class'])) {
+						if ($data['type'] === 'import' &&
+							(!method_exists($package['class'], 'add' . $component['settings']['importMethod']) &&
+							 !method_exists($package['class'], 'update' . $component['settings']['importMethod']))
+						) {
+							continue;
+						}
+
+						$availableComponent['id'] = $component['id'];
+						$availableComponent['name'] = $component['name'];
+
+						array_push($components, $availableComponent);
+					}
 				}
 			}
 		}
@@ -176,30 +115,202 @@ class Components extends BasePackage
 		return $components;
 	}
 
-	public function getExportComponents()
+	public function add(array $data)
 	{
-		$components = [];
-
-		foreach($this->components as $component) {
-			$component['settings'] = Json::decode($component['settings'], true);
-
-			if (isset($component['settings']['export']) &&
-				$component['settings']['export'] == 'true' &&
-				isset($component['settings']['importexportPackage'])
-			) {
-				$package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
-
-				if ($package && $this->usePackage($package['class'])) {
-					$availableComponent['id'] = $component['id'];
-					$availableComponent['name'] = $component['name'];
-
-					array_push($components, $availableComponent);
-				}
-			}
-		}
-
-		return $components;
+		return;
 	}
+
+	public function update(array $data)
+	{
+		return;
+	}
+
+	public function remove(array $data)
+	{
+		return;
+	}
+
+	// public function getComponentByName($name)
+	// {
+	// 	foreach($this->components as $component) {
+	// 		if (strtolower($component['name']) === strtolower($name)) {
+	// 			return $component;
+	// 		}
+	// 	}
+
+	// 	return false;
+	// }
+
+	// public function getComponentByRoute($route)
+	// {
+	// 	foreach($this->components as $component) {
+	// 		if (strtolower($component['route']) === strtolower($route)) {
+	// 			return $component;
+	// 		}
+	// 	}
+
+	// 	return false;
+	// }
+
+	// public function getRouteComponentForApp($route, $appId)
+	// {
+	// 	foreach($this->components as $component) {
+	// 		$component['apps'] = Json::decode($component['apps'], true);
+
+	// 		if (isset($component['apps'][$appId])) {
+	// 			if (isset($component['apps'][$appId]['enabled']) &&
+	// 				$component['apps'][$appId]['enabled'] === true &&
+	// 				$component['route'] === $route
+	// 			) {
+	// 				return $component;
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return false;
+	// }
+
+	// public function getNamedComponentForApp($name, $appId)
+	// {
+	// 	foreach($this->components as $component) {
+	// 		$component['apps'] = Json::decode($component['apps'], true);
+
+	// 		if (isset($component['apps'][$appId])) {
+	// 			if (isset($component['apps'][$appId]['enabled']) &&
+	// 				$component['apps'][$appId]['enabled'] === true &&
+	// 				strtolower($component['name']) === strtolower($name)
+	// 			) {
+	// 				return $component;
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return false;
+	// }
+
+	// public function getComponentsForApp($appId)
+	// {
+	// 	$components = [];
+
+	// 	foreach($this->components as $component) {
+	// 		$component['apps'] = Json::decode($component['apps'], true);
+
+	// 		if (isset($component['apps'][$appId]['enabled']) &&
+	// 			$component['apps'][$appId]['enabled'] === true
+	// 		) {
+	// 			$components[$component['id']] = $component;
+	// 		}
+	// 	}
+
+	// 	return $components;
+	// }
+
+	// public function getComponentsForAppAndType($appId, $type)
+	// {
+	// 	$components = [];
+
+	// 	foreach($this->components as $component) {
+	// 		if ($component['app_id'] == $appId &&
+	// 			$component['type'] == $type
+	// 		) {
+	// 			$components[$component['id']] = $component;
+	// 		}
+	// 	}
+
+	// 	return $components;
+	// }
+
+	// public function getComponentById($id)
+	// {
+	// 	foreach($this->components as $component) {
+	// 		if ($component['id'] == $id) {
+	// 			return $component;
+	// 		}
+	// 	}
+	// }
+
+	// public function getComponentsForCategoryAndSubcategory($category, $subCategory)
+	// {
+	// 	$components = [];
+
+	// 	foreach($this->components as $component) {
+	// 		if ($component['category'] === $category &&
+	// 			$component['sub_category'] === $subCategory
+	// 		) {
+	// 			$components[$component['id']] = $component;
+	// 		}
+	// 	}
+
+	// 	return $components;
+	// }
+
+	// public function getComponentsForAppType(string $type)
+	// {
+	// 	$components = [];
+
+	// 	foreach($this->components as $component) {
+	// 		if ($component['app_type'] === $type) {
+	// 			$components[$component['id']] = $component;
+	// 		}
+	// 	}
+
+	// 	return $components;
+	// }
+
+	// public function getImportComponents()
+	// {
+	// 	$components = [];
+
+	// 	foreach($this->components as $component) {
+	// 		$component['settings'] = Json::decode($component['settings'], true);
+
+	// 		if (isset($component['settings']['import']) &&
+	// 			$component['settings']['import'] == 'true' &&
+	// 			isset($component['settings']['importexportPackage']) &&
+	// 			isset($component['settings']['importMethod'])
+	// 		) {
+	// 			$package = $this->modules->packages->get(['name' => $component['settings']['importexportPackage']]);
+
+	// 			if ($package &&
+	// 				$this->usePackage($package['class']) &&
+	// 				(method_exists($package['class'], 'add' . $component['settings']['importMethod']) &&
+	// 				 method_exists($package['class'], 'update' . $component['settings']['importMethod']))
+	// 			) {
+	// 				$availableComponent['id'] = $component['id'];
+	// 				$availableComponent['name'] = $component['name'];
+
+	// 				array_push($components, $availableComponent);
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return $components;
+	// }
+
+	// public function getExportComponents()
+	// {
+	// 	$components = [];
+
+	// 	foreach($this->components as $component) {
+	// 		$component['settings'] = Json::decode($component['settings'], true);
+
+	// 		if (isset($component['settings']['export']) &&
+	// 			$component['settings']['export'] == 'true' &&
+	// 			isset($component['settings']['importexportPackage'])
+	// 		) {
+	// 			$package = $this->modules->packages->get(['name' => $component['settings']['importexportPackage']]);
+
+	// 			if ($package && $this->usePackage($package['class'])) {
+	// 				$availableComponent['id'] = $component['id'];
+	// 				$availableComponent['name'] = $component['name'];
+
+	// 				array_push($components, $availableComponent);
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return $components;
+	// }
 
 	public function updateComponents(array $data)
 	{
@@ -207,9 +318,8 @@ class Components extends BasePackage
 		$needAuths = Json::decode($data['need_auths'], true);
 
 		foreach ($components as $componentId => $status) {
-			$component = $this->getById($componentId);
+			$component = $this->get(['id' => $componentId]);
 
-			$component['apps'] = Json::decode($component['apps'], true);
 			$component['settings'] = Json::decode($component['settings'], true);
 
 			if ($status === true) {
@@ -235,11 +345,9 @@ class Components extends BasePackage
 
 					foreach ($component['dependencies']['packages'] as $key => $dependencyPackage) {
 
-						$package = $this->modules->packages->getNamedPackageForRepo($dependencyPackage['name'], $dependencyPackage['repo']);
+						$package = $this->modules->packages->get(['name' => $dependencyPackage['name'], 'repo' => $dependencyPackage['repo']]);
 
 						if ($package) {
-							$package['apps'] = Json::decode($package['apps'], true);
-
 							$package['apps'][$data['id']]['enabled'] = true;
 
 							$package['apps'] = Json::encode($package['apps']);
@@ -257,7 +365,7 @@ class Components extends BasePackage
 
 			$component['apps'] = Json::encode($component['apps']);
 
-			$this->update($component);
+			$this->updateToDb($component);
 		}
 
 		return true;

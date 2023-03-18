@@ -44,7 +44,7 @@ class ImportExport extends BasePackage
             }
         } else {
             if ($data['domain_id'] != 0) {
-                $data['email_to'] = 'no-reply@' . $this->domains->getIdDomain($data['domain_id'])['name'];
+                $data['email_to'] = 'no-reply@' . $this->domains->get(['id' => $data['domain_id']])['name'];
             } else {
                 $data['email_to'] = 'no-reply@' . $this->domains->domains[0]['name'];
             }
@@ -97,12 +97,12 @@ class ImportExport extends BasePackage
 
     public function getPackageFields($id, $structure = false, $getPackageFields = false)
     {
-        $component = $this->modules->components->getComponentById($id);
+        $component = $this->modules->components->get(['id' => $id]);
 
         if ($component) {
             $component['settings'] = Json::decode($component['settings'], true);
 
-            $package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
+            $package = $this->modules->packages->get(['name' => $component['settings']['importexportPackage']]);
 
             $packageObj = $this->usePackage($package['class']);
 
@@ -192,12 +192,12 @@ class ImportExport extends BasePackage
 
         $header = Json::decode($export['fields']);
 
-        $component = $this->modules->components->getComponentById($export['component_id']);
+        $component = $this->modules->components->get(['id' => $export['component_id']]);
 
         if ($component) {
             $component['settings'] = Json::decode($component['settings'], true);
 
-            $package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
+            $package = $this->modules->packages->get(['name' => $component['settings']['importexportPackage']]);
 
             if ($package) {
                 $packageObj = $this->usePackage($package['class']);
@@ -305,7 +305,7 @@ class ImportExport extends BasePackage
             return;
         }
 
-        $component = $this->modules->components->getComponentById($data['component_id']);
+        $component = $this->modules->components->get(['id' => $data['component_id']]);
 
         if ($component) {
             $component['settings'] = Json::decode($component['settings'], true);
@@ -426,12 +426,12 @@ class ImportExport extends BasePackage
             $uniqueColumnsData = [];
 
             if (isset($fields['columnUnique']) && count($fields['columnUnique']) > 0) {
-                $component = $this->modules->components->getComponentById($data['component_id']);
+                $component = $this->modules->components->get(['id' => $data['component_id']]);
 
                 if ($component) {
                     $component['settings'] = Json::decode($component['settings'], true);
 
-                    $package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
+                    $package = $this->modules->packages->get(['name' => $component['settings']['importexportPackage']]);
 
                     $packageObj = $this->usePackage($package['class']);
 
@@ -577,7 +577,7 @@ class ImportExport extends BasePackage
 
     public function processImport($import, $jobId)
     {
-        $component = $this->modules->components->getComponentById($import['component_id']);
+        $component = $this->modules->components->get(['id' => $import['component_id']]);
 
         if (!$component) {
             return false;
@@ -599,7 +599,7 @@ class ImportExport extends BasePackage
             throw new \Exception("Component import method missing");
         }
 
-        $package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
+        $package = $this->modules->packages->get(['name' => $component['settings']['importexportPackage']]);
 
         if ($package) {
             $packageObj = $this->usePackage($package['class']);
@@ -678,13 +678,13 @@ class ImportExport extends BasePackage
         $emailData['subject'] = ucfirst($task['type']) . ' request complete.';
 
         if ($task['app_id'] != 0) {
-            $route = $this->apps->getIdApp($task['app_id'])['route'];
+            $route = $this->apps->get(['id' => $task['app_id']])['route'];
         } else {
             $route = 'admin';
         }
 
         if ($task['domain_id'] != 0) {
-            $domain = $this->domains->getIdDomain($task['domain_id'])['name'];
+            $domain = $this->domains->get(['id' => $task['domain_id']])['name'];
         } else {
             $domain = $this->domains->domains[0]['name'];
         }
@@ -699,6 +699,6 @@ class ImportExport extends BasePackage
             $emailData['body'] = ucfirst($task['type']) . ' request ID:' . $task['id'] . ' execution complete.';
         }
 
-        $this->basepackages->emailqueue->addToQueue($emailData);
+        $this->basepackages->emailqueue->add($emailData);
     }
 }

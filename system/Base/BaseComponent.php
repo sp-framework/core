@@ -12,8 +12,9 @@ use Phalcon\Mvc\View;
 use Phalcon\Tag;
 use System\Base\Exceptions\ControllerNotFoundException;
 use System\Base\Exceptions\IdNotFoundException;
+use System\Base\Interfaces\ComponentInterface;
 
-abstract class BaseComponent extends Controller
+abstract class BaseComponent extends Controller implements ComponentInterface
 {
 	protected $getQueryArr = [];
 
@@ -78,9 +79,10 @@ abstract class BaseComponent extends Controller
 			str_replace('Component', '', $this->reflection->getShortName());
 
 		$this->component =
-			$this->modules->components->getNamedComponentForApp(
-				$this->componentName, $this->app['id']
-			);
+			$this->modules->components->get([
+				'name' 		=> $this->componentName,
+				'app_id' 	=> $this->app['id']
+			]);
 
 		$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
 
@@ -96,9 +98,10 @@ abstract class BaseComponent extends Controller
 
 		if (!$this->component) {
 			$this->component =
-				$this->modules->components->getRouteComponentForApp(
-					strtolower($this->componentRoute), $this->app['id']
-				);
+				$this->modules->components->get([
+					'route' 	=> strtolower($this->componentRoute),
+					'app_id'	=> $this->app['id']
+				]);
 		}
 	}
 
@@ -120,10 +123,10 @@ abstract class BaseComponent extends Controller
 
 			$middlewares =
 				msort(
-					$this->modules->middlewares->getMiddlewaresForAppType(
-						$this->app['app_type'],
-						$this->app['id']
-					), 'sequence');
+					$this->modules->middlewares->get([
+						'app_type' 	=> $this->app['app_type'],
+						'app_id' 	=> $this->app['id']
+					]), 'sequence');
 
 			$this->view->appAuth = false;
 
@@ -659,10 +662,10 @@ abstract class BaseComponent extends Controller
 	protected function checkPackage($packageClass)
 	{
 		return
-			$this->modules->packages->getNamedPackageForApp(
-				Arr::last(explode('\\', $packageClass)),
-				$this->app['id']
-			);
+			$this->modules->packages->get([
+				'name' 		=> Arr::last(explode('\\', $packageClass)),
+				'app_id' 	=> $this->app['id']
+			]);
 	}
 
 	protected function useComponent($componentClass)
@@ -682,10 +685,10 @@ abstract class BaseComponent extends Controller
 	protected function checkComponent($componentClass)
 	{
 		return
-			$this->modules->components->getNamedComponentForApp(
-				str_replace('Component', '', Arr::last(explode('\\', $componentClass))),
-				$this->app['id']
-			);
+			$this->modules->components->get([
+				'name' 		=> str_replace('Component', '', Arr::last(explode('\\', $componentClass))),
+				'app_id' 	=> $this->app['id']
+			]);
 	}
 
 	protected function useComponentWithView($componentClass, $action = 'view')
@@ -763,7 +766,7 @@ abstract class BaseComponent extends Controller
 	protected function setErrorDispatcher($action)
 	{
 		if ($this->app) {
-			$component = $this->modules->components->getComponentById($this->app['errors_component']);
+			$component = $this->modules->components->get(['id' => $this->app['errors_component']]);
 
 			if (isset($this->app['errors_component']) &&
 				$this->app['errors_component'] != 0

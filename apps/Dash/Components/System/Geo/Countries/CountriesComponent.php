@@ -157,6 +157,11 @@ class CountriesComponent extends BaseComponent
         }
     }
 
+    public function removeAction()
+    {
+        return;
+    }
+
     public function installAction()
     {
         if ($this->request->isPost()) {

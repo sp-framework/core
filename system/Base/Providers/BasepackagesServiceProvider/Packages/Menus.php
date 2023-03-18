@@ -45,6 +45,7 @@ class Menus extends BasePackage
                 $buildMenu = array_replace_recursive($buildMenu, $menu);
             }
         }
+        // var_dump($buildMenu);die();
 
         return $buildMenu;
     }
@@ -88,7 +89,7 @@ class Menus extends BasePackage
 
         if (count($menus) > 0) {
             foreach ($menus as $menuId => $value) {
-                $menu = $this->getById($menuId);
+                $menu = $this->get(['id' => $menuId]);
 
                 $menu['apps'] = Json::decode($menu['apps'], true);
 
@@ -104,5 +105,35 @@ class Menus extends BasePackage
         }
 
         $this->init(true);
+    }
+
+    public function get(array $data = [], bool $resetCache = false)
+    {
+        if (count($data) === 0) {
+            return $this->menus;
+        }
+
+        if (isset($data['id'])) {
+            return $this->getById($data['id']);
+        }
+    }
+
+    public function add(array $data)
+    {
+        return;
+    }
+
+    public function update(array $data)
+    {
+        if ($this->updateToDb($data)) {
+            $this->addResponse('Updated menu');
+        } else {
+            $this->addResponse('Error updating menu.', 1);
+        }
+    }
+
+    public function remove(array $data)
+    {
+        return;
     }
 }

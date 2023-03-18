@@ -94,7 +94,7 @@ if (localStorage.getItem('bazDevMode') === null) {
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/header/view') %}
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/sidebar/view') %}
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/content/view') %}
-            {% if modules.components.getNamedComponentForApp('Messenger', apps.getAppInfo()['id']) %}
+            {% if modules.components.get({'name' : 'Messenger', 'app_id' : apps.getAppInfo()['id']}) %}
                 {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/messenger/view') %}
             {% endif %}
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/footer/view') %}

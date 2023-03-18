@@ -15,10 +15,10 @@ class Apps extends BasePackage
 		$components = $this->modules->components->components;
 
 		$this->packagesData->components =
-			$this->modules->components->getComponentsForApp($getData['id']);
+			$this->modules->components->get(['app_id' => $getData['id']]);
 
 		$this->packagesData->views =
-			$this->modules->views->getViewsForApp($getData['id']);
+			$this->modules->views->get(['app_id' => $getData['id']]);
 
 		$this->packagesData->app =
 			$this->apps->getById($getData['id']);
@@ -144,7 +144,7 @@ class Apps extends BasePackage
 	}
 	protected function checkDefaultApp($postData)
 	{
-		$defaultApp = $this->apps->getDefaultApp();
+		$defaultApp = $this->apps->get(['id' => '1']);
 
 		// Checking if same app is default
 		if ($defaultApp) {
@@ -167,8 +167,8 @@ class Apps extends BasePackage
 
 	protected function checkDuplicateRoute($postData)
 	{
-		$duplicateAppRoute = $this->apps->getRouteApp($postData['route']);
-		$duplicateAppName = $this->apps->getNamedApp($postData['route']);
+		$duplicateAppRoute = $this->apps->get(['route' => $postData['route']]);
+		$duplicateAppName = $this->apps->get(['name' => $postData['route']]);
 
 		if (is_array($duplicateAppRoute) || is_array($duplicateAppName)) {
 			if (is_array($duplicateAppRoute)) {

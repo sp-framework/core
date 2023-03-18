@@ -32,4 +32,24 @@ class ErrorsComponent extends BaseComponent
     {
         $this->view->pick('common/errors/idnotfound');
     }
+
+    public function ViewAction()
+    {
+        return;
+    }
+
+    public function addAction()
+    {
+        return;
+    }
+
+    public function updateAction()
+    {
+        return;
+    }
+
+    public function removeAction()
+    {
+        return;
+    }
 }

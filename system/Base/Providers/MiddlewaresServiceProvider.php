@@ -21,13 +21,14 @@ class MiddlewaresServiceProvider extends Injectable
         if ($this->data['app']) {
             $middlewares = [];
 
-            $ipFilterMiddleware = $this->modules->middlewares->getNamedMiddlewareForApp('IpFilter', $this->data['app']['id']);
+            $ipFilterMiddleware = $this->modules->middlewares->get(['name' => 'IpFilter', 'app_id' => $this->data['app']['id']]);
 
             if ($ipFilterMiddleware) {
                 $middlewares[] = $ipFilterMiddleware;
-                $middlewares = array_merge($middlewares, msort($this->modules->middlewares->getMiddlewaresForApp($this->data['app']['id'], true), 'sequence'));
+
+                $middlewares = array_merge($middlewares, msort($this->modules->middlewares->get(['app_id' => $this->data['app']['id']]), 'sequence'));
             } else {
-                $middlewares = msort($this->modules->middlewares->getMiddlewaresForApp($this->data['app']['id'], true), 'sequence');
+                $middlewares = msort($this->modules->middlewares->get(['app_id' => $this->data['app']['id']]), 'sequence');
             }
 
             foreach ($middlewares as $middleware) {
@@ -109,7 +110,7 @@ class MiddlewaresServiceProvider extends Injectable
 
     protected function componentsNeedsAuth()
     {
-        $componentsArr = $this->modules->components->getComponentsForAppType($this->data['app']['app_type']);
+        $componentsArr = $this->modules->components->get(['app_type' => $this->data['app']['app_type']]);
 
         foreach ($componentsArr as $key => $componentValue) {
             $match = false;
@@ -128,7 +129,6 @@ class MiddlewaresServiceProvider extends Injectable
 
             if ($this->data['givenRoute'] === $this->data['appRoute'] . '/' . $componentValue['route'] || $match === true) {
                 if ($componentValue['apps']) {
-                    $componentValue['apps'] = Json::decode($componentValue['apps'], true);
 
                     if (!isset($componentValue['apps'][$this->data['app']['id']]['needAuth'])) {
                         return false;

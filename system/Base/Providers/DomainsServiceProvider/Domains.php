@@ -10,6 +10,10 @@ class Domains extends BasePackage
 {
 	protected $modelToUse = DomainsModel::class;
 
+	protected $packageName = 'domains';
+
+	protected $packageNameS = 'domain';
+
 	public $domains;
 
 	public $domain;
@@ -39,7 +43,7 @@ class Domains extends BasePackage
 
 	protected function setDomain()
 	{
-		$this->domain = $this->getNamedDomain($this->request->getHttpHost());
+		$this->domain = $this->get(['name' => $this->request->getHttpHost()]);
 
 		if ($this->domain) {
 			if ($this->domain['apps'] !== '') {
@@ -48,15 +52,38 @@ class Domains extends BasePackage
 		}
 	}
 
+	public function get(array $data = [], bool $resetCache = false)
+	{
+		if (count($data) === 0) {
+			return $this->domains;
+		}
+
+		foreach($this->domains as $domain) {
+			if (isset($data['id'])) {
+				if ($domain['id'] === $data['id']) {
+					return $domain;
+				}
+			}
+
+			if (isset($data['name'])) {
+				if ($domain['name'] === $data['name']) {
+					return $domain;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * @notification(name=add)
 	 * notification_allowed_methods(email, sms)//Example
 	 * @notification_allowed_methods(email, sms)
 	 */
-	public function addDomain(array $data)
+	public function add(array $data)
 	{
 		try {
-			$add = $this->add($data);
+			$add = $this->addToDb($data);
 		} catch (\Exception $e) {
 			if ($e->getCode() == '23000') {
 				$this->addResponse('Domain name already in use.', 1);
@@ -70,7 +97,7 @@ class Domains extends BasePackage
 
 			$this->addResponse('Added ' . $data['name'] . ' domain', 0, null, true);
 
-			$this->addToNotification('add', 'Added new domain ' . $data['name'], null, $this->modules->packages->getNamePackage('Domains'));
+			$this->addToNotification('add', 'Added new domain ' . $data['name'], null, $this->modules->packages->get(['name' => 'Domains']));
 		} else {
 			$this->addResponse('Error adding new domain.', 1, []);
 		}
@@ -81,14 +108,14 @@ class Domains extends BasePackage
 	 * notification_allowed_methods(email, sms)//Example
 	 * @notification_allowed_methods(email, sms)
 	 */
-	public function updateDomain(array $data)
+	public function update(array $data)
 	{
-		$domain = $this->getById($data['id']);
+		$domain = $this->get(['id' => $data['id']]);
 
 		$domain = array_merge($domain, $data);
 
 		try {
-			$update = $this->update($domain);
+			$update = $this->updateToDb($domain);
 		} catch (\Exception $e) {
 			if ($e->getCode() == '23000') {
 				$this->addResponse('Domain name ' . $data['name'] . ' already in use.', 1);
@@ -102,7 +129,7 @@ class Domains extends BasePackage
 
 			$this->addResponse('Updated domain ' . $data['name']);
 
-			$this->addToNotification('update', 'Updated domain ' . $data['name'], null, $this->modules->packages->getNamePackage('Domains'));
+			$this->addToNotification('update', 'Updated domain ' . $data['name'], null, $this->modules->packages->get(['name' => 'Domains']));
 		} else {
 			$this->addResponse('Error adding new domain.', 1);
 		}
@@ -113,48 +140,48 @@ class Domains extends BasePackage
 	 * notification_allowed_methods(email, sms)//Example
 	 * @notification_allowed_methods(email, sms)
 	 */
-	public function removeDomain(array $data)
+	public function remove(array $data)
 	{
-		$domain = $this->getById($data['id']);
+		$domain = $this->get(['id' => $data['id']]);
 
-		if ($this->remove($domain['id'])) {
+		if ($this->removeFromDb($domain['id'])) {
 			$this->addResponse('Removed domain ' . $domain['name']);
 
-			$this->addToNotification('remove', 'Removed domain ' . $domain['name'], null, $this->modules->packages->getNamePackage('Domains'));
+			$this->addToNotification('remove', 'Removed domain ' . $domain['name'], null, $this->modules->packages->get(['name' => 'Domains']));
 		} else {
 			$this->addResponse('Error removing domain.', 1);
 		}
 	}
 
-	public function getNamedDomain($name)
-	{
-		if (!$this->domains) {
-			$this->init();
-		}
+	// public function getNamedDomain($name)
+	// {
+	// 	if (!$this->domains) {
+	// 		$this->init();
+	// 	}
 
-		foreach($this->domains as $domain) {
-			if ($domain['name'] === $name) {
-				return $domain;
-			}
-		}
+	// 	foreach($this->domains as $domain) {
+	// 		if ($domain['name'] === $name) {
+	// 			return $domain;
+	// 		}
+	// 	}
 
-		return false;
-	}
+	// 	return false;
+	// }
 
-	public function getIdDomain($id)
-	{
-		if (!$this->domains) {
-			$this->init();
-		}
+	// public function getIdDomain($id)
+	// {
+	// 	if (!$this->domains) {
+	// 		$this->init();
+	// 	}
 
-		foreach($this->domains as $domain) {
-			if ($domain['id'] == $id) {
-				return $domain;
-			}
-		}
+	// 	foreach($this->domains as $domain) {
+	// 		if ($domain['id'] == $id) {
+	// 			return $domain;
+	// 		}
+	// 	}
 
-		return false;
-	}
+	// 	return false;
+	// }
 
 	public function generateViewData(int $did = null)
 	{
@@ -164,7 +191,7 @@ class Domains extends BasePackage
 		foreach ($appsArr as $key => $value) {
 			$apps[$value['id']] = $value;
 			$apps[$value['id']]['views'] =
-				$this->modules->views->getViewsForApp($value['id']);
+				$this->modules->views->get(['app_id' => $value['id']]);
 		}
 
 		$this->packagesData->apps = $apps;
@@ -174,7 +201,7 @@ class Domains extends BasePackage
 		$this->packagesData->storages = $this->basepackages->storages->storages;
 
 		if ($did) {
-			$domain = $this->getById($did);
+			$domain = $this->get(['id' => $did]);
 
 			if (!$domain) {
 				return false;
