@@ -117,16 +117,20 @@ class MiddlewaresServiceProvider extends Injectable
             $methods = (new \ReflectionClass($componentValue['class']))->getMethods();
 
             foreach ($methods as $key => $method) {
-                if ($method->class === $componentValue['class'] && str_contains($method->name, 'Action')) {
-                    if ($this->data['givenRoute'] ===
-                        $this->data['appRoute'] . '/' . $componentValue['route'] . '/' . str_replace('Action', '', $method->name)
+                if (strtolower($method->class) === strtolower($componentValue['class']) && str_contains($method->name, 'Action')) {
+                    if (strtolower($this->data['givenRoute']) ===
+                        strtolower(
+                            $this->data['appRoute'] . '/' . $componentValue['route'] . '/' . str_replace('Action', '', $method->name)
+                        )
                     ) {
                         $match = true;
                     }
                 }
             }
 
-            if ($this->data['givenRoute'] === $this->data['appRoute'] . '/' . $componentValue['route'] || $match === true) {
+            if (strtolower($this->data['givenRoute']) === strtolower($this->data['appRoute'] . '/' . $componentValue['route']) ||
+                $match === true
+            ) {
                 if ($componentValue['apps']) {
                     $componentValue['apps'] = Json::decode($componentValue['apps'], true);
 
