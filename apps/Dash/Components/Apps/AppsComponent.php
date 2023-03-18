@@ -136,6 +136,8 @@ class AppsComponent extends BaseComponent
 
                     return;
                 }
+            } else {
+                $this->view->app = null;
             }
 
             $this->view->roles = $this->basepackages->roles->init()->roles;

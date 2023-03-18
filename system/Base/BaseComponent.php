@@ -2,7 +2,6 @@
 
 namespace System\Base;
 
-use Apps\Ecom\Admin\Packages\AdminLTETags\AdminLTETags;
 use Phalcon\Assets\Collection;
 use Phalcon\Assets\Inline;
 use Phalcon\Di\DiInterface;
@@ -225,8 +224,6 @@ abstract class BaseComponent extends Controller
 		} else {
 			$this->view->route = strtolower($this->app['name']);
 		}
-
-		$this->view->app = $this->app;
 
 		$this->view->app = $this->app;
 
