@@ -658,8 +658,13 @@ dataCollectionSection =
             }
 
             $(document).on('dnd_stop.vakata', function (e, data) {
-                getMenuStructureData();
+                var children = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_children_dom(data.data.nodes[0]);
+                var parentId = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_parent(data.data.nodes[0]);
+                var nodeData = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(data.data.nodes[0]);
+
+                moveNode(data.data.nodes[0], parentId, nodeData, children);
             });
+
             $('#{{componentId}}-{{sectionId}}-menu_structure').on('create_node.jstree', function (e, data) {
                 getMenuStructureData();
             });
@@ -736,7 +741,6 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-menu_icon_display').empty().append(
                     '<i style="margin-top:1.9rem !important;" class="fa ' + isBrand + ' fa-fw fa-2x fa-' + e.params.data.id + '"></i>'
                 );
-
             });
 
             $('#{{componentId}}-{{sectionId}}-add-menu-item').click(function(e) {
@@ -909,15 +913,7 @@ dataCollectionSection =
                             }
 
                             if (nodeData['parent'] !== parentId) {
-                                $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('move_node',
-                                    nodeId,
-                                    parentId,
-                                    'last',
-                                    function() {
-                                        nodeData['data']['moved'] = true;
-                                        getMenuStructureData();
-                                        cleanMenuForm();
-                                    });
+                                moveNode(nodeId, parentId, nodeData);
                             } else {
                                 getMenuStructureData();
                                 cleanMenuForm();
@@ -952,6 +948,37 @@ dataCollectionSection =
                     }
                 }
             });
+
+            function moveNode(nodeId, parentId, nodeData, children = null) {
+                $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('move_node',
+                    nodeId,
+                    parentId,
+                    'last',
+                    function() {
+                        nodeData['data']['moved'] = true;
+
+                        if (children && children.length > 0) {
+                            for (var child in children) {
+                                if (children[child].nodeName === 'LI') {
+                                    parentId = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_parent(children[child].id);
+                                    nodeData = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(children[child].id);
+
+                                    $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('move_node',
+                                        children[child].id,
+                                        parentId,
+                                        'last',
+                                        function() {
+                                            nodeData['data']['moved'] = true;
+                                        }
+                                    );
+                                }
+                            }
+                        }
+
+                        getMenuStructureData();
+                        cleanMenuForm();
+                });
+            }
 
             function checkDuplicate(nodeId, parent, title) {
                 if (parent['children'] && parent['children'].length > 0) {
