@@ -18,10 +18,14 @@ class IpFilter extends BasePackage
 
     public $clientAddress;
 
+    protected $apps;
+
     protected $app;
 
-    public function init($app = null)
+    public function init($apps = null, $app = null)
     {
+        $this->apps = $apps;
+
         $this->app = $app;
 
         return $this;
@@ -33,7 +37,7 @@ class IpFilter extends BasePackage
             return Json::encode([]);//blank array
         }
 
-        $app = $this->app->getFirst('id', $data['app_id']);
+        $app = $this->apps->getFirst('id', $data['app_id']);
 
         $filtersObj = $app->getIpFilters();
 
@@ -54,7 +58,10 @@ class IpFilter extends BasePackage
             return false;
         }
 
-        if ($data['filter_type'] !== 'allow' && $data['filter_type'] !== 'block') {
+        if ($data['filter_type'] !== 'allow' &&
+            $data['filter_type'] !== 'block' &&
+            $data['filter_type'] !== 'monitor'
+        ) {
             $this->addResponse('Please provide correct filter type', 1);
 
             return false;
@@ -71,6 +78,7 @@ class IpFilter extends BasePackage
 
                 return;
             }
+
             if (count($address) === 2) {
                 $data['address_type'] = 2;
             } else if (count($address) === 1) {
@@ -82,15 +90,14 @@ class IpFilter extends BasePackage
             return false;
         }
 
-        // $filtersObj = new AppsIpFilter();
-
-        // $newFilter['app_id'] = $data['app_id'];
-        // $newFilter['ip_address'] = $data['ip_address'];
-        // $newFilter['address_type'] = $data['address_type'];
-        $data['filter_type'] = $data['filter_type'] === 'allow' ? 1 : 2;
+        if ($data['filter_type'] === 'allow') {
+            $data['filter_type'] = 1;
+        } else if ($data['filter_type'] === 'block') {
+            $data['filter_type'] = 2;
+        } else if ($data['filter_type'] === 'monitor') {
+            $data['filter_type'] = 3;
+        }
         $data['added_by'] = $this->auth->account()['id'];
-
-        // $filtersObj->assign($newFilter);
 
         try {
             $this->add($data);
@@ -118,13 +125,9 @@ class IpFilter extends BasePackage
             return false;
         }
 
-        // $filtersObj = new AppsIpFilter();
-
-        // $filter = $filtersObj->findFirst('id = ' . $data['id']);
-
         $filter = $this->getById($data['id']);
 
-        if ($filter->remove()) {
+        if ($this->remove($filter['id'])) {
             $this->addResponse('Filter removed.', 0);
         } else {
             $this->addResponse('Error removing filter.', 1);
@@ -139,25 +142,16 @@ class IpFilter extends BasePackage
             return false;
         }
 
-        // $filtersObj = new AppsIpFilter();
+        $monitorFilter = $this->getFirst('id', $data['id'], false, true, null, [], true);
+        $monitorFilter['filter_type'] = 2;
+        $monitorFilter['added_by'] = $this->auth->account()['id'];
+        $monitorFilter['incorrect_attempts'] = null;
 
-        // $monitorFilterObj = $filtersObj->findFirst('id = ' . $data['id']);
-
-        // if ($monitorFilterObj) {
-        //     $monitorFilter = $monitorFilterObj->toArray();
-            $monitorFilter = $this->getFirst('id', $data['id'], false, true, null, [], true);
-            $monitorFilter['filter_type'] = 2;
-            $monitorFilter['added_by'] = $this->auth->account()['id'];
-            $monitorFilter['incorrect_attempts'] = null;
-
-            // $monitorFilterObj->assign($monitorFilter);
-
-            if ($this->updateToDb($monitorFilter)) {
-                $this->addResponse('Filter moved from monitor to block.', 0);
-            } else {
-                $this->addResponse('Error blocking filter.', 1);
-            }
-        // }
+        if ($this->update($monitorFilter)) {
+            $this->addResponse('Filter moved from monitor to block.', 0);
+        } else {
+            $this->addResponse('Error blocking filter.', 1);
+        }
     }
 
     public function resetAppFilters(array $data)
@@ -168,7 +162,7 @@ class IpFilter extends BasePackage
             return;
         }
 
-        $app = $this->app->getFirst('id', $data['app_id']);
+        $app = $this->apps->getFirst('id', $data['app_id']);
 
         $filtersObj = $app->getIpFilters();
 
@@ -233,9 +227,7 @@ class IpFilter extends BasePackage
 
             foreach ($filters as $key => $filter) {
                 if (\Symfony\Component\HttpFoundation\IpUtils::checkIp($this->clientAddress, $filter['ip_address'])) {
-                    $appsIpFilter = new AppsIpFilter;
-
-                    $filterObj = $appsIpFilter->findFirst(
+                    $filterObj = $this->findFirst(
                         [
                             'ip_address = :ip_address:',
                             'bind' => [
@@ -309,16 +301,7 @@ class IpFilter extends BasePackage
 
         if ($updateIncorrectAttempts) {
             if (!$filter) {
-                $appsIpFilter = new AppsIpFilter;
-
-                $filterObj = $appsIpFilter->findFirst(
-                    [
-                        'ip_address = :ip_address:',
-                        'bind' => [
-                            'ip_address' => $this->clientAddress,
-                        ]
-                    ]
-                );
+                $filterObj = $this->getFirst('ip_address', $this->clientAddress);
 
                 if (!$filterObj) {
                     $newFilter =
@@ -326,14 +309,12 @@ class IpFilter extends BasePackage
                             'app_id'                => $this->app['id'],
                             'ip_address'            => $this->clientAddress,
                             'address_type'          => 1,
-                            'filter_type'           => 3,
+                            'filter_type'           => 'monitor',
                             'added_by'              => 0,
                             'incorrect_attempts'    => 1
                         ];
-
-                    $appsIpFilter->assign($newFilter);
-
-                    $appsIpFilter->create();
+                        var_dump($this->addFilter($newFilter));die();
+                    $this->addFilter($newFilter);
                 } else {
                     if ($filterObj->incorrect_attempts !== null) {
                         $incorrectAttempt = (int) $filterObj->incorrect_attempts;
@@ -379,7 +360,7 @@ class IpFilter extends BasePackage
 
     private function ipFilterMiddlewareEnabled()
     {
-        $middleware = $this->modules->middlewares->get(['name' => 'IpFilter', 'app_id' => $this->app['id']]);
+        $middleware = $this->modules->middlewares->getNamedMiddlewareForApp('IpFilter', $this->apps->app['id']);
 
         if (isset($middleware['apps'][$this->app['id']]['enabled']) &&
             $middleware['apps'][$this->app['id']]['enabled'] === true
