@@ -10,11 +10,12 @@ class Validation
 
     public function __construct()
     {
-        $this->validator = new PhalconValidation();
     }
 
     public function init()
     {
+        $this->validator = new PhalconValidation();
+
         return $this;
     }
 

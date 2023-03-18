@@ -119,7 +119,7 @@ class EmailServices extends BasePackage
 
     protected function validateServiceData(array $data)
     {
-        $this->validation->add('from_address', PresenceOf::class, ["message" => "Enter valid from email address."]);
+        $this->validation->init()->add('from_address', PresenceOf::class, ["message" => "Enter valid from email address."]);
         $this->validation->add('from_address', Email::class, ["message" => "Enter valid from email address."]);
         $this->validation->add('port', Between::class,
             [

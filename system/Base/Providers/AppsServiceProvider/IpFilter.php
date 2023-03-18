@@ -260,7 +260,7 @@ class IpFilter extends BasePackage
 
     public function validateIp($ip)
     {
-        $this->validation->add("ip_address", Ip::class,
+        $this->validation->init()->add("ip_address", Ip::class,
             [
                 "message"           => "Incorrect ip address.",
                 "version"           => Ip::VERSION_4 | Ip::VERSION_6,

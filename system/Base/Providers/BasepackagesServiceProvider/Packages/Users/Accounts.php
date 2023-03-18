@@ -628,7 +628,7 @@ class Accounts extends BasePackage
 
     public function validateData(array $data)
     {
-        $this->validation->add('first_name', PresenceOf::class, ["message" => "Enter valid first name."]);
+        $this->validation->init()->add('first_name', PresenceOf::class, ["message" => "Enter valid first name."]);
         $this->validation->add('last_name', PresenceOf::class, ["message" => "Enter valid last name."]);
         $this->validation->add('email', PresenceOf::class, ["message" => "Enter valid username."]);
         $this->validation->add('email', Email::class, ["message" => "Enter valid username."]);
