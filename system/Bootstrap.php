@@ -49,6 +49,14 @@ final class Bootstrap
             $container->register(new $provider());
         }
 
+        $config = $container->getShared('config');
+
+        if ($config->debug) {
+            ini_set('display_errors', 1);
+            ini_set('display_startup_errors', 1);
+            error_reporting(E_ALL);
+        }
+
         $this->error = $container->getShared('error');
         $this->logger = $container->getShared('logger');
 
