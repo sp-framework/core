@@ -20,7 +20,7 @@ class IpFilter extends BasePackage
 
     protected $app;
 
-    public function init($app)
+    public function init($app = null)
     {
         $this->app = $app;
 
