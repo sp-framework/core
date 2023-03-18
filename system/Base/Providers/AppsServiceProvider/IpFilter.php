@@ -362,6 +362,21 @@ class IpFilter extends BasePackage
         }
     }
 
+    public function removeFromMonitoring()
+    {
+        if (!$this->ipFilterMiddlewareEnabled()) {
+            return;
+        }
+
+        $app = $this->apps->getFirst('id', $this->app['id']);
+
+        $filter = $app->getMonitorlist();
+
+        if ($filter && $filter->count() > 0) {
+            $filter->delete();
+        }
+    }
+
     private function ipFilterMiddlewareEnabled()
     {
         $middleware = $this->modules->middlewares->get(['name' => 'IpFilter', 'app_id' => $this->app['id']]);

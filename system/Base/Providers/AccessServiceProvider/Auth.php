@@ -254,6 +254,8 @@ class Auth
             return false;
         }
 
+        $this->apps->ipFilter->removeFromMonitoring();
+
         $security = $this->getAccountSecurityObject();
 
         if ($security->two_fa_status == '1' && !isset($data['code'])) {

@@ -68,6 +68,24 @@ class Apps extends BaseModel
             ]
         );
 
+        $this->modelRelations['monitorlist']['relationObj'] = $this->hasOne(
+            'id',
+            AppsIpFilter::class,
+            'app_id',
+            [
+                'alias'         => 'monitorlist',
+                'params'        => function() use ($clientAddress) {
+                    return
+                    [
+                        'conditions'        => 'ip_address = :ipaddress:',
+                        'bind'              => [
+                            'ipaddress'     => $clientAddress
+                        ]
+                    ];
+                }
+            ]
+        );
+
         parent::initialize();
     }
 
