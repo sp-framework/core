@@ -45,7 +45,7 @@
                     "childs"    : {
                         "importexport" : {
                             "title"     : "Import/Export",
-                            "icon"      : "exchange-alt fa-flip-horizontal",
+                            "icon"      : "exchange-alt",
                             "link"      : "system/tools/importexport"
                         }
                     }

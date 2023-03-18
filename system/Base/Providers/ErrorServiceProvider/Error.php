@@ -81,7 +81,7 @@ class Error
 			return;
 		}
 
-		$customHandler = $this->customHandler($this->class);
+		$customHandler = $this->customHandler();
 
 		if (!$customHandler) {
 			if ($this->appDebug) {
