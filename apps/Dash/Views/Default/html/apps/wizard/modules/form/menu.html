@@ -543,7 +543,7 @@ dataCollectionSection =
                             newStructure[structureId]['data']['moved'] = true;
                         }
 
-                        newStructure[structureId]['sequence'] = structure;
+                        newStructure[structureId]['seq'] = parseInt(structure);
 
                         if (structureArr[structure]['children'].length > 0) {
                             newStructure[structureId]['childs'] = { };

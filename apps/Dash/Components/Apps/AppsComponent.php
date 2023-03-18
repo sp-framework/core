@@ -50,7 +50,7 @@ class AppsComponent extends BaseComponent
 
                     if (count($app['menu_structure']) > 0) {
                         $this->view->menuBaseStructure =
-                            array_replace_recursive($this->view->menuBaseStructure, $app['menu_structure']);
+                            $this->seqMenu(array_replace_recursive($this->view->menuBaseStructure, $app['menu_structure']));
                     } else {
                         $app['menu_structure'] = null;
                     }
@@ -365,5 +365,18 @@ class AppsComponent extends BaseComponent
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }
+    }
+
+    private function seqMenu($menu)
+    {
+        $menu = msort($menu, 'seq');
+
+        foreach ($menu as $key => &$value) {
+            if (isset($value['childs'])) {
+                $value['childs'] = $this->seqMenu($value['childs']);
+            }
+        }
+
+        return $menu;
     }
 }
