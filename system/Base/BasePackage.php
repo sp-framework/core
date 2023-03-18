@@ -24,7 +24,7 @@ abstract class BasePackage extends Controller
 
 	protected $packageName;
 
-	protected $packageNameModel;
+	protected $packageNameP;
 
 	protected $packageNameS;
 
@@ -85,8 +85,8 @@ abstract class BasePackage extends Controller
 			$this->packageName = strtolower(Arr::last($this->getClassName()));
 		}
 
-		if (!$this->packageNameModel) {
-			$this->packageNameModel = $this->packageName . 'Model';
+		if (!$this->packageNameP) {
+			$this->packageNameP = ucfirst($this->packageName);
 		}
 
 		if (!$this->packageNameS) {
@@ -153,7 +153,11 @@ abstract class BasePackage extends Controller
 
 	public function getFirst($by = null, $value = null, bool $resetCache = false, bool $enableCache = true, $model = null, $params = [], $returnArray = false)
 	{
-		$this->useModel($model);
+		if (!$model) {
+			$modelToUse = new $this->modelToUse;
+		} else {
+			$modelToUse = new $model;
+		}
 
 		if ($by && $value && !$params) {
 			$params = $this->getParams($by, $value);
@@ -170,7 +174,7 @@ abstract class BasePackage extends Controller
 		}
 
 		try {
-			$this->model = $this->modelToUse::findFirst($parameters);
+			$this->model = $modelToUse::findFirst($parameters);
 
 			$this->cacheTools->updateIndex(
 				$this->cacheName,
@@ -237,9 +241,13 @@ abstract class BasePackage extends Controller
 				$this->resetCache();
 			}
 
-			$this->useModel($model);
+			if (!$model) {
+				$modelToUse = new $this->modelToUse;
+			} else {
+				$modelToUse = new $model;
+			}
 
-			$this->model = $this->modelToUse::find($parameters);
+			$this->model = $modelToUse::find($parameters);
 
 			$data = $this->getDbData($parameters, $enableCache, 'params');
 
@@ -795,18 +803,18 @@ abstract class BasePackage extends Controller
 		if ($data) {
 			$data = $this->jsonData($data);
 
-			${$this->packageNameModel} = $this->useModel();
+			${$this->packageName} = new $this->modelToUse();
 
-			${$this->packageNameModel}->assign($data);
+			${$this->packageName}->assign($data);
 
-			$create = ${$this->packageNameModel}->create();
+			$create = ${$this->packageName}->create();
 
 			if ($create) {
 				$this->packagesData->responseCode = 0;
 
-				$this->packagesData->responseMessage = "Added {ucfirst($this->packageNameS)}!";
+				$this->packagesData->responseMessage = "Added {$this->packageNameS}!";
 
-				$this->packagesData->last = ${$this->packageNameModel}->toArray();
+				$this->packagesData->last = ${$this->packageName}->toArray();
 
 				if ($resetCache) {
 					$this->resetCache();
@@ -816,14 +824,14 @@ abstract class BasePackage extends Controller
 			} else {
 				$this->transactionErrors = [];
 
-				foreach (${$this->packageNameModel}->getMessages() as $value) {
+				foreach (${$this->packageName}->getMessages() as $value) {
 					array_push($this->transactionErrors, $value->getMessage());
 				}
 
 				array_push($this->transactionErrors, $data);
 
 				throw new \Exception(
-					"Could not add {ucfirst($this->packageNameS)}. Reasons: <br>" .
+					"Could not add {$this->packageNameS}. Reasons: <br>" .
 					join(',', $this->jsonData($this->transactionErrors))
 				);
 			}
@@ -837,9 +845,9 @@ abstract class BasePackage extends Controller
 		if ($data) {
 			$data = $this->jsonData($data);
 
-			${$this->packageNameModel} = $this->getFirst('id', $data['id'], false, false);
+			${$this->packageName} = $this->getFirst('id', $data['id'], false, false);
 
-			if (!${$this->packageNameModel}) {
+			if (!${$this->packageName}) {
 				$this->packagesData->responseCode = 1;
 
 				$this->packagesData->responseMessage = 'ID: ' . $data['id'] . " not found for package {$this->packageName}";
@@ -847,18 +855,18 @@ abstract class BasePackage extends Controller
 				return;
 			}
 
-			${$this->packageNameModel}->assign($data);
+			${$this->packageName}->assign($data);
 
-			$update = ${$this->packageNameModel}->update();
+			$update = ${$this->packageName}->update();
 
 			if ($update) {
 				$this->packagesData->responseCode = 0;
 
-				$this->packagesData->responseMessage = "{ucfirst($this->packageNameS)} Updated!";
+				$this->packagesData->responseMessage = "{$this->packageNameS} Updated!";
 
-				$this->packagesData->last = ${$this->packageNameModel}->toArray();
+				$this->packagesData->last = ${$this->packageName}->toArray();
 
-				if ($resetCache && count(${$this->packageNameModel}->getUpdatedFields()) !== 0) {//Make sure we only update when we change any fields
+				if ($resetCache && count(${$this->packageName}->getUpdatedFields()) !== 0) {//Make sure we only update when we change any fields
 					$this->resetCache($this->packagesData->last['id']);
 				}
 
@@ -866,12 +874,12 @@ abstract class BasePackage extends Controller
 			} else {
 				$this->transactionErrors = [];
 
-				foreach (${$this->packageNameModel}->getMessages() as $value) {
+				foreach (${$this->packageName}->getMessages() as $value) {
 					array_push($this->transactionErrors, $value->getMessage());
 				}
 
 				throw new \Exception(
-					"Could not update {ucfirst($this->packageNameS)}. Reasons: <br>" .
+					"Could not update {$this->packageNameS}. Reasons: <br>" .
 					join(',', $this->transactionErrors)
 				);
 			}
@@ -947,11 +955,11 @@ abstract class BasePackage extends Controller
 					$this->resetCache($id, true);
 				}
 
-				$this->addResponse("{ucfirst($this->packageNameS)} Deleted!");
+				$this->addResponse("{$this->packageNameS} Deleted!");
 
 				return true;
 			} else {
-				$this->addResponse("Could not delete {ucfirst($this->packageNameS)}.", 1);
+				$this->addResponse("Could not delete {$this->packageNameS}.", 1);
 			}
 		} else {
 			$this->addResponse("No Record Found with that ID!", 1);
@@ -1091,15 +1099,6 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	protected function useModel($model = null)
-	{
-		if (!$model) {
-			return new $this->modelToUse;
-		}
-
-		return new $model;
-	}
-
 	protected function checkPackage($packageClass)
 	{
 		return
@@ -1141,7 +1140,7 @@ abstract class BasePackage extends Controller
 	protected function getModelsMetaData()
 	{
 		if ($this->modelToUse) {
-			$model = $this->useModel();
+			$model = new $this->modelToUse;
 
 			$md = [];
 
@@ -1185,7 +1184,7 @@ abstract class BasePackage extends Controller
 	protected function getModelsRelations()
 	{
 		if ($this->modelToUse) {
-			$model = $this->useModel();
+			$model = new $this->modelToUse;
 
 			$relations = [];
 			$relations['dataTypes'] = [];
@@ -1752,7 +1751,7 @@ abstract class BasePackage extends Controller
 					if (isset($settings['prefix-seq'][$packageName])) {
 						$settings = $settings['prefix-seq'][$packageName];
 
-						$model = $this->useModel();
+						$model = new $this->modelToUse;
 
 						$table = $model->getSource();
 
