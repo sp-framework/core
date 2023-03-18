@@ -10,8 +10,8 @@ class Menu
     {
         if (isset($menu['seq'])) {
             $sequence = $menu['seq'];
-            unset($menu['seq']);
         } else {
+            $menu['seq'] = 99;
             $sequence = 99;
         }
 
