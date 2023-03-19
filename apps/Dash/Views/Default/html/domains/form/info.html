@@ -14,6 +14,11 @@
 {% else %}
     {% set exclusiveChecked = false %}
 {% endif %}
+{% if domain['is_internal'] is defined and domain['is_internal'] == 1 %}
+    {% set internalChecked = true %}
+{% else %}
+    {% set internalChecked = false %}
+{% endif %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -51,6 +56,27 @@
                 'fieldType'                      : 'input',
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'Domain Name Example: mydomain.com.au',
+                'fieldGroupPostAddonButtons'          :
+                    [
+                        'domain-validate'   : [
+                            'title'                   : 'Validate Domain',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'noMargin'                : true,
+                            'disabled'                : true,
+                            'buttonAdditionalClass'   : 'rounded-0 text-white',
+                            'position'                : 'right'
+                        ],
+                        'domain-info'   : [
+                            'title'                   : false,
+                            'type'                    : 'info',
+                            'icon'                    : 'info',
+                            'noMargin'                : true,
+                            'disabled'                : true,
+                            'buttonAdditionalClass'   : 'rounded-0',
+                            'position'                : 'right'
+                        ]
+                    ],
                 'fieldRequired'                  : true,
                 'fieldBazScan'                   : true,
                 'fieldBazJstreeSearch'           : true,
@@ -62,6 +88,30 @@
             ]
         )}}
     </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'is_internal',
+                'fieldLabel'                     : 'Domain is internal?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Is this domain not a public domain? example: localhost, bazaari.local',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'info',
+                'fieldCheckboxChecked'           : internalChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
             [

@@ -3,6 +3,7 @@
 namespace System\Base\Providers\DomainsServiceProvider;
 
 use Phalcon\Helper\Json;
+use Phalcon\Validation\Validator\Url;
 use System\Base\BasePackage;
 use System\Base\Providers\DomainsServiceProvider\Model\Domains as DomainsModel;
 
@@ -55,6 +56,8 @@ class Domains extends BasePackage
 	 */
 	public function addDomain(array $data)
 	{
+		$data['dns_record'] = $this->validateDomain($data['name']);
+
 		try {
 			$add = $this->add($data);
 		} catch (\Exception $e) {
@@ -83,6 +86,8 @@ class Domains extends BasePackage
 	 */
 	public function updateDomain(array $data)
 	{
+		$data['dns_record'] = $this->validateDomain($data['name']);
+
 		$domain = $this->getById($data['id']);
 
 		$domain = array_merge($domain, $data);
@@ -208,6 +213,60 @@ class Domains extends BasePackage
 			$domain['apps'] = Json::encode($domain['apps']);
 
 			$this->update($domain);
+		}
+	}
+
+	public function validateDomain($domain)
+	{
+		$record = [];
+		$record['internal'] = false;
+
+		try {
+			$record['AAAA'] = \dns_get_record($domain, DNS_AAAA);
+			$record['A'] = \dns_get_record($domain, DNS_A);
+			$record['CNAME'] = \dns_get_record($domain, DNS_CNAME);
+			$record['SOA'] = \dns_get_record($domain, DNS_SOA);
+
+			if (count($record['AAAA']) === 0 &&
+				count($record['A']) === 0 &&
+				count($record['CNAME']) === 0
+			) {
+				$record['internal'] = true;
+			}
+
+			$keys = [
+				'HTTP_CLIENT_IP',
+				'HTTP_X_FORWARDED_FOR',
+				'HTTP_X_FORWARDED',
+				'HTTP_X_CLUSTER_CLIENT_IP',
+				'HTTP_FORWARDED_FOR',
+				'HTTP_FORWARDED',
+				'REMOTE_ADDR'
+			];
+
+			$record['server_address'] = $_SERVER['REMOTE_ADDR'];
+
+			foreach ($keys as $key) {
+				if (array_key_exists($key, $_SERVER) === true) {
+					foreach (array_map('trim', explode(',', $_SERVER[$key])) as $ip) {
+						if ($record['internal']) {
+							$flags = FILTER_FLAG_NO_RES_RANGE;
+						} else {
+							$flags = FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
+						}
+
+						if (filter_var($ip, FILTER_VALIDATE_IP, $flags) !== false) {
+							$record['server_address'] = $ip;
+						}
+					}
+				}
+			}
+
+			$this->packagesData->domainDetails = $record;
+
+			return $record;
+		} catch (\Exception $e) {
+			return false;
 		}
 	}
 }

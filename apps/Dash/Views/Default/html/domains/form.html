@@ -66,8 +66,25 @@
         </form>
     </div>
 </div>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'info-modal',
+            'modalBodyInclude'          : 'domains/info',
+            'modalSize'                 : 'lg',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-info"></i> DOMAIN INFORMATION',
+            'modalEscClose'             : 'true'
+        ]
+    )}}
+</div>
 <script>
-/* globals BazContentFieldsValidator */
+/* globals PNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -95,7 +112,141 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                                  : { },
-        '{{componentId}}-{{sectionId}}-name'                                : { },
+        '{{componentId}}-{{sectionId}}-name'                                : {
+            afterInit: function() {
+                if ($('#{{componentId}}-{{sectionId}}-name').val() !== '' &&
+                    $('#{{componentId}}-{{sectionId}}-name').val().includes('.')
+                ) {
+                    $('#{{componentId}}-{{sectionId}}-domain-validate').attr('disabled', false);
+                }
+
+                $('#{{componentId}}-{{sectionId}}-name').on('input propertychange', function() {
+                    if ($(this).val() !== '' && $(this).val().includes('.')) {
+                        $('#{{componentId}}-{{sectionId}}-domain-validate').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-domain-validate').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-domain-info').attr('disabled', true);
+                        updateModalInfo(false);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-domain-validate').click(function(e) {
+                    e.preventDefault();
+
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+
+                    var postData = { };
+                    postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post('{{links.url("domains/validateDomain")}}', postData, function(response) {
+                        $('#{{componentId}}-{{sectionId}}-domain-validate').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-domain-validate').children('i').attr('hidden', true);
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+
+                        if (response.responseCode === 3) {
+                            $('#{{componentId}}-{{sectionId}}-is_internal')[0].checked = true;
+                            PNotify.notice({
+                                text : response.responseMessage
+                            });
+                            return;
+                        } else if (response.responseCode === 0) {
+                            $('#{{componentId}}-{{sectionId}}-is_internal')[0].checked = false;
+                            PNotify.success({
+                                text : response.responseMessage
+                            });
+                        } else if (response.responseCode === 1) {
+                            $('#{{componentId}}-{{sectionId}}-is_internal')[0].checked = false;
+                            PNotify.error({
+                                text : response.responseMessage
+                            });
+                        }
+                        updateModalInfo(response.domainDetails);
+                    }, 'json');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-domain-info').click(function(e) {
+                    e.preventDefault();
+                    $('#{{componentId}}-{{sectionId}}-info-modal').modal('show');
+                });
+
+                function updateModalInfo(domainDetails) {
+                    if (domainDetails) {
+                        var matched = false;
+
+                        $('#{{componentId}}-{{sectionId}}-domain-info').attr('disabled', false);
+
+                        if (domainDetails.CNAME.length > 0) {
+                            $('#domain-cname').html(domainDetails.CNAME[0].host);
+                            if (domainDetails.A[0]) {
+                                $('#domain-name').html(domainDetails.A[0].host);
+                            } else if (domainDetails.AAAA[0]) {
+                                $('#domain-name').html(domainDetails.AAAA[0].host);
+                            }
+                        } else {
+                            $('#domain-name').html($('#{{componentId}}-{{sectionId}}-name').val());
+                        }
+
+                        if (domainDetails.A.length > 0) {
+                            var aRecords = [];
+                            for (var aRecord in domainDetails.A) {
+                                if (domainDetails.server_address === domainDetails.A[aRecord]['ip']) {
+                                    matched = true;
+                                    aRecords.push('<span class="text-success">' + domainDetails.A[aRecord]['ip'] + '</span>');
+                                } else {
+                                    aRecords.push('<span class="text-warning">' + domainDetails.A[aRecord]['ip'] + '</span>');
+                                }
+                            }
+
+                            $('#a-addresses').html(aRecords.join(', '));
+                        }
+
+                        if (domainDetails.AAAA.length > 0) {
+                            var aaaaRecords = [];
+                            for (var aaaaRecord in domainDetails.AAAA) {
+                                if (domainDetails.server_address === domainDetails.AAAA[aaaaRecord]['ipv6']) {
+                                    matched = true;
+                                    aaaaRecords.push('<span class="text-success">' + domainDetails.AAAA[aaaaRecord]['ipv6'] + '</span>');
+                                } else {
+                                    aaaaRecords.push('<span class="text-warning">' + domainDetails.AAAA[aaaaRecord]['ipv6'] + '</span>');
+                                }
+                            }
+
+                            $('#aaaa-addresses').html(aaaaRecords.join(', '));
+                        }
+
+                        if (domainDetails.SOA.length > 0) {
+                            $('#soa-primary-ns').html(domainDetails.SOA[0]['mname']);
+                            $('#soa-responsible-party').html(domainDetails.SOA[0]['rname']);
+                        }
+
+                        if (matched) {
+                            $('#domain-alert').html('<span class="text-success">DNS matched to Server\'s IP Address: ' + domainDetails.server_address + '</span>');
+                        } else {
+                            $('#domain-alert').html(
+                                '<span class="text-warning">DNS did not match to Server\'s IP Address. Please make sure DNS A or AAAA (ipv6) is pointing to this server address : ' +
+                                domainDetails.server_address + '</span>'
+                            );
+                        }
+                    } else {
+                        $('#domain-name').html('-');
+                        $('#domain-cname').html('-');
+                        $('#a-addresses').html('-');
+                        $('#aaaa-addresses').html('-');
+                        $('#soa-primary-ns').html('-');
+                        $('#soa-responsible-party').html('-');
+                        $('#domain-alert').html('');
+                    }
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-dns_record'                          : { },
+        '{{componentId}}-{{sectionId}}-is_internal'                         : { },
         '{{componentId}}-{{sectionId}}-description'                         : { },
         '{{componentId}}-{{sectionId}}-settings'                            : { }
     });

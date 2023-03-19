@@ -69,20 +69,79 @@ class DomainsComponent extends BaseComponent
                 ]
             ];
 
+        $replaceColumns =
+            function ($dataArr) {
+                if ($dataArr && is_array($dataArr) && count($dataArr) > 0) {
+                    return $this->replaceColumns($dataArr);
+                }
+
+                return $dataArr;
+            };
+
         $this->generateDTContent(
             $this->domains,
             'domains/view',
             null,
-            ['name'],
+            ['name', 'default_app_id', 'exclusive_to_default_app', 'is_internal'],
             true,
-            ['name'],
+            ['name', 'default_app_id', 'exclusive_to_default_app', 'is_internal'],
             $controlActions,
-            null,
-            null,
+            ['default_app_id' => 'default app'],
+            $replaceColumns,
             'name'
         );
 
         $this->view->pick('domains/list');
+    }
+
+    protected function replaceColumns($dataArr)
+    {
+        foreach ($dataArr as $dataKey => &$data) {
+            $data = $this->formatDefaultAppId($dataKey, $data);
+            $data = $this->formatExclusiveToDefaultApp($dataKey, $data);
+            $data = $this->formatIsInternal($dataKey, $data);
+        }
+
+        return $dataArr;
+    }
+
+    protected function formatDefaultAppId($rowId, $data)
+    {
+        if ($data['default_app_id'] == '0') {
+            $data['default_app_id'] = '<span class="badge badge-danger text-uppercase">ERROR: NO APP</span>';
+        } else {
+            $app = $this->apps->getIdApp($data['default_app_id']);
+
+            if ($app) {
+                $data['default_app_id'] = '<span class="badge badge-primary text-uppercase">' . $app['name'] . '</span>';
+            } else {
+                $data['default_app_id'] = '<span class="badge badge-danger text-uppercase">ERROR: NO APP</span>';
+            }
+        }
+
+        return $data;
+    }
+
+    protected function formatExclusiveToDefaultApp($rowId, $data)
+    {
+        if ($data['exclusive_to_default_app'] == '0') {
+            $data['exclusive_to_default_app'] = '<span class="badge badge-secondary text-uppercase">No</span>';
+        } else if ($data['exclusive_to_default_app'] == '1') {
+            $data['exclusive_to_default_app'] = '<span class="badge badge-primary text-uppercase">Yes</span>';
+        }
+
+        return $data;
+    }
+
+    protected function formatIsInternal($rowId, $data)
+    {
+        if ($data['is_internal'] == '0') {
+            $data['is_internal'] = '<span class="badge badge-primary text-uppercase">No</span>';
+        } else if ($data['is_internal'] == '1') {
+            $data['is_internal'] = '<span class="badge badge-secondary text-uppercase">Yes</span>';
+        }
+
+        return $data;
     }
 
     /**
@@ -142,6 +201,41 @@ class DomainsComponent extends BaseComponent
 
             $this->view->responseMessage = $this->domains->packagesData->responseMessage;
 
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function validateDomainAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->postData()['name']) {
+                $domainDetails = $this->domains->validateDomain($this->postData()['name']);
+
+                if ($domainDetails) {
+                    $this->view->domainDetails = $this->domains->packagesData->domainDetails;
+
+                    if ($this->view->domainDetails['internal']) {
+                        $this->view->responseMessage = 'Domain details not found on the internet.';
+                        $this->view->responseCode = 3;
+                    } else {
+                        $this->view->responseCode = 0;
+                        $this->view->responseMessage = 'Domain details found on the internet.';
+                    }
+
+                    return;
+                }
+
+                $this->view->responseCode = 1;
+
+                $this->view->responseMessage = 'Domain details not found!';
+            }
         } else {
             $this->view->responseCode = 1;
 

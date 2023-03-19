@@ -54,15 +54,29 @@ class Domains
 					new Column(
 						'apps',
 						[
-							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 2048,
+							'type'    => Column::TYPE_JSON,
+							'notNull' => false,
+						]
+					),
+					new Column(
+						'dns_record',
+						[
+							'type'    => Column::TYPE_JSON,
+							'size'	  => 4096,
+							'notNull' => false,
+						]
+					),
+					new Column(
+						'is_internal',
+						[
+							'type'    => Column::TYPE_BOOLEAN,
 							'notNull' => false,
 						]
 					),
 					new Column(
 						'settings',
 						[
-							'type'    => Column::TYPE_TEXT,
+							'type'    => Column::TYPE_JSON,
 							'notNull' => false,
 						]
 					)
