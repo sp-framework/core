@@ -61,6 +61,10 @@ class AppsComponent extends BaseComponent
                 $componentsArr = $this->modules->components->getComponentsForAppType($app['app_type']);
 
                 foreach ($componentsArr as $key => &$componentValue) {
+                    if ($componentValue['route'] === 'home') {
+                        continue;
+                    }
+
                     if ($componentValue['apps']) {
                         $componentValue['apps'] = Json::decode($componentValue['apps'], true);
 
