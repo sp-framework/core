@@ -1,0 +1,40 @@
+{
+    "route"         : "test",
+    "name"          : "Test",
+    "description"   : "Dash test",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "tools",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-system-tools-test",
+    "class"         : "Apps\\Dash\\Components\\Test\\TestComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Test",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-system-tools-test"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"             : false,
+    "settings"      : {
+        "mandatory"     : true
+    }
+}
