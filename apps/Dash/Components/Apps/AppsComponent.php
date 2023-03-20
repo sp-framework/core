@@ -56,15 +56,15 @@ class AppsComponent extends BaseComponent
                     }
                 }
 
+                if ($app['settings']) {
+                    $app['settings'] = Json::decode($app['settings'], true);
+                }
+
                 $this->view->modulesMenus = $this->basepackages->menus->getMenusForApp($app['id']);
 
                 $componentsArr = $this->modules->components->getComponentsForAppType($app['app_type']);
 
                 foreach ($componentsArr as $key => &$componentValue) {
-                    if ($componentValue['route'] === 'home') {
-                        continue;
-                    }
-
                     if ($componentValue['apps']) {
                         $componentValue['apps'] = Json::decode($componentValue['apps'], true);
 
@@ -144,6 +144,7 @@ class AppsComponent extends BaseComponent
                 $this->view->app = null;
             }
 
+            $this->view->dashboards = $this->basepackages->dashboards->init()->dashboards;
             $this->view->roles = $this->basepackages->roles->init()->roles;
 
             $this->view->pick('apps/view');

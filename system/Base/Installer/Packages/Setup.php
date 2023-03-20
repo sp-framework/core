@@ -27,6 +27,8 @@ use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Role as Regi
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Schedules as RegisterSchedules;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Tasks as RegisterTasks;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Workers as RegisterWorkers;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Dashboard as RegisterAdminDashboard;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Widgets as RegisterAdminWidgets;
 use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
 use System\Base\Installer\Packages\Setup\Register\Domain as RegisterDomain;
 use System\Base\Installer\Packages\Setup\Register\Modules\Component as RegisterComponent;
@@ -38,6 +40,7 @@ use System\Base\Installer\Packages\Setup\Schema\Apps;
 use System\Base\Installer\Packages\Setup\Schema\Apps\IpFilter;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ActivityLogs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\AddressBook;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailQueue;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailServices;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Filters;
@@ -62,6 +65,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Sess
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Tunnels;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Profiles;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Roles;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Widgets;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Jobs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Schedules;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Tasks;
@@ -253,6 +257,8 @@ class Setup
 		$this->db->createTable('basepackages_workers_jobs', $dbName, (new Jobs)->columns());
 		$this->db->createTable('basepackages_import_export', $dbName, (new ImportExport)->columns());
 		$this->db->createTable('basepackages_templates', $dbName, (new Templates)->columns());
+		$this->db->createTable('basepackages_dashboards', $dbName, (new Dashboards)->columns());
+		$this->db->createTable('basepackages_widgets', $dbName, (new Widgets)->columns());
 		$this->db->createTable('system_api_calls', $dbName, (new SystemApiCalls)->columns());
 		$this->db->createTable('system_api', $dbName, (new SystemApi)->columns());
 		$this->db->createTable('system_messenger', $dbName, (new SystemMessenger)->columns());
@@ -329,7 +335,15 @@ class Setup
 						$menuId = null;
 					}
 
-					$this->registerAdminComponent($jsonFile, $menuId);
+					$registeredComponentId = $this->registerAdminComponent($jsonFile, $menuId);
+
+					if ($jsonFile['route'] === 'dashboards') {
+						$this->registerAdminDashboard($jsonFile);
+					}
+
+					if (isset($jsonFile['widgets']) && count($jsonFile['widgets']) > 0) {
+						$this->registerAdminWidgets($jsonFile, $registeredComponentId, $adminComponent);
+					}
 				}
 			}
 		} else if ($type === 'packages') {
@@ -368,7 +382,6 @@ class Setup
 				}
 			}
 		} else if ($type === 'middlewares') {
-
 			$adminMiddlewares = $this->getInstalledFiles('apps/Dash/Middlewares/', true);
 
 			foreach ($adminMiddlewares['files'] as $adminMiddlewareKey => $adminMiddleware) {
@@ -392,7 +405,6 @@ class Setup
 					$this->registerAdminMiddleware($jsonFile);
 				}
 			}
-
 		} else if ($type === 'views') {
 			$jsonFile =
 				json_decode(
@@ -419,6 +431,16 @@ class Setup
 		$installedFiles = $this->getInstalledFiles('apps/Dash/Components/' . $componentFile['name'], true);
 
 		return (new RegisterComponent())->register($this->db, $componentFile, $installedFiles, $menuId);
+	}
+
+	protected function registerAdminDashboard(array $componentFile)
+	{
+		return (new RegisterAdminDashboard())->register($this->db, $componentFile);
+	}
+
+	protected function registerAdminWidgets(array $componentFile, $registeredComponentId, $path)
+	{
+		return (new RegisterAdminWidgets())->register($this->db, $componentFile, $registeredComponentId, $path, $this->localContent);
 	}
 
 	public function updateAdminAppComponents()

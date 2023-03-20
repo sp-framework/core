@@ -39,6 +39,12 @@
     {% set appIncorrectLoginAttemptBlockIp = app['incorrect_login_attempt_block_ip'] %}
     {% set appIpFilterDefaultAction = app['ip_filter_default_action'] %}
     {% set wizard = false %}
+    {% if appType == 'dash' %}
+        {% set defaultDashboardHidden = '' %}
+    {% endif %}
+    {% if app['settings']['defaultDashboard'] is defined %}
+        {% set defaultDashboard = app['settings']['defaultDashboard'] %}
+    {% endif %}
 {% else %}
     {% set appId = '' %}
     {% set appName = '' %}
@@ -54,6 +60,8 @@
     {% set appIncorrectLoginAttemptBlockIp = '' %}
     {% set appIpFilterDefaultAction = '1' %}
     {% set wizard = true %}
+    {% set defaultDashboardHidden = 'hidden' %}
+    {% set defaultDashboard = '' %}
 {% endif %}
 {% if wizard === true %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
@@ -155,6 +163,31 @@
                     ]
                 )}}
             </div>
+            <div class="col" id="default_dashboard" {{defaultDashboardHidden}}>
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'default_dashboard',
+                        'fieldLabel'                           : 'Default Dashboard',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Default dashboard for this app.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : dashboards,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : defaultDashboard
+                    ]
+                )}}
+            </div>
         </div>
         <div class="row">
             <div class="col">
@@ -218,6 +251,24 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-app_type'                            : {
             'placeholder'   : 'SELECT APP TYPE'
         },
+        '{{componentId}}-{{sectionId}}-default_dashboard'                   : {
+            'placeholder'   : 'SELECT DEFAULT DASHBOARD',
+            afterInit       : function() {
+                $('#{{componentId}}-{{sectionId}}-app_type').on('select2:select', function (e) {
+                    var data = e.params.data;
+
+                    if (data.id === 'dash') {
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', false);
+                        $('#default_dashboard').attr('hidden', false);
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').val(0).trigger('change');
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', true);
+                        $('#default_dashboard').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').val(0).trigger('change');
+                    }
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-route'                               : { },
         '{{componentId}}-{{sectionId}}-description'                         : { },
         '{{componentId}}-{{sectionId}}-registration_allowed'                : { },
@@ -230,20 +281,27 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-can_login_role_ids'                  : {
             'placeholder'   : 'SELECT ROLES'
         },
-        '{{componentId}}-{{sectionId}}-form'                                : {
+        '{{componentId}}-{{sectionId}}-form'                            : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                        : 'required',
                 '{{componentId}}-{{sectionId}}-route'                       : 'required',
                 '{{componentId}}-{{sectionId}}-app_type'                    : 'required',
                 '{{componentId}}-{{sectionId}}-registration_role_id'        : 'required',
-                '{{componentId}}-{{sectionId}}-guest_role_id'               : 'required'
+                '{{componentId}}-{{sectionId}}-guest_role_id'               : 'required',
+                '{{componentId}}-{{sectionId}}-default_component'           : 'required',
+                '{{componentId}}-{{sectionId}}-errors_component'            : 'required',
+                '{{componentId}}-{{sectionId}}-default_dashboard'           : 'required'
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-name'                        : 'Please enter app name',
-                '{{componentId}}-{{sectionId}}-route'                       : 'Please enter app route',
-                '{{componentId}}-{{sectionId}}-app_type'                    : 'Please select app type',
-                '{{componentId}}-{{sectionId}}-registration_role_id'        : 'Please select registration role',
-                '{{componentId}}-{{sectionId}}-guest_role_id'               : 'Please select guest role'
+                '{{componentId}}-{{sectionId}}-name'                    : 'Please enter app name',
+                '{{componentId}}-{{sectionId}}-route'                   : 'Please enter app route',
+                '{{componentId}}-{{sectionId}}-app_type'                : 'Please select app type',
+                '{{componentId}}-{{sectionId}}-registration_role_id'    : 'Please select registration role',
+                '{{componentId}}-{{sectionId}}-guest_role_id'           : 'Please select guest role',
+                '{{componentId}}-{{sectionId}}-default_component'       : 'Please select app default component',
+                '{{componentId}}-{{sectionId}}-errors_component'        : 'Please select app errors component',
+                '{{componentId}}-{{sectionId}}-default_dashboard'       : 'Please select default dashboard'
             }
         }
     });

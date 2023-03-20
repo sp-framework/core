@@ -4,6 +4,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider;
 
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ActivityLogs;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\AddressBook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Dashboards;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\Email;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailQueue;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailServices;
@@ -22,6 +23,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Templates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profile;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Widgets;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
 class Basepackages
@@ -69,6 +71,10 @@ class Basepackages
 	protected $importexport;
 
 	protected $templates;
+
+	protected $dashboards;
+
+	protected $widgets;
 
 	public function __construct()
 	{
@@ -228,6 +234,20 @@ class Basepackages
 	protected function initTemplates()
 	{
 		$this->templates = (new Templates())->init();
+
+		return $this->templates;
+	}
+
+	protected function initDashboards()
+	{
+		$this->templates = (new Dashboards())->init();
+
+		return $this->templates;
+	}
+
+	protected function initWidgets()
+	{
+		$this->templates = (new Widgets())->init();
 
 		return $this->templates;
 	}

@@ -1,11 +1,11 @@
 <?php
 
-namespace Apps\Dash\Components\Dashboard;
+namespace Apps\Dash\Components\Dashboards;
 
 use Phalcon\Helper\Arr;
 use System\Base\BaseComponent;
 
-class DashboardComponent extends BaseComponent
+class DashboardsComponent extends BaseComponent
 {
     public function viewAction()
     {

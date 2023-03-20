@@ -39,6 +39,8 @@ abstract class BaseComponent extends Controller
 
 	protected $token = null;
 
+	protected $widgets;
+
 	protected function onConstruct()
 	{
 		$this->domain = $this->domains->getDomain();
@@ -99,6 +101,19 @@ abstract class BaseComponent extends Controller
 				$this->modules->components->getRouteComponentForApp(
 					strtolower($this->componentRoute), $this->app['id']
 				);
+		}
+
+		$this->checkComponentWidgets();
+	}
+
+	protected function checkComponentWidgets()
+	{
+		$namespace = $this->reflection->getNamespaceName();
+
+		$widgetsClass = '\\' . $namespace . '\\Widgets';
+
+		if (class_exists($widgetsClass)) {
+			$this->widgets = (new $widgetsClass())->init($this);
 		}
 	}
 

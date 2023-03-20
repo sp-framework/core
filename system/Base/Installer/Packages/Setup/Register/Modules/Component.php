@@ -20,7 +20,7 @@ class Component
 			$componentApp['1']['needAuth'] = true;
 		}
 
-		$db->insertAsDict(
+		$insertComponent = $db->insertAsDict(
 			'modules_components',
 			[
 				'name' 					=> $componentFile['name'],
@@ -52,5 +52,11 @@ class Component
 				'updated_by'			=> 0
 			]
 		);
+
+		if ($insertComponent) {
+			return $db->lastInsertId();
+		} else {
+			return null;
+		}
 	}
 }

@@ -162,6 +162,10 @@ class Apps extends BasePackage
 		$data['ip_filter_default_action'] = 0;
 		$data['can_login_role_ids'] = Json::encode(['1']);
 
+		if (isset($data['default_dashboard']) && $data['default_dashboard']) {
+			$data['settings']['defaultDashboard'] = $data['default_dashboard'];
+		}
+
 		if ($this->add($data)) {
 
 			$this->addActivityLog($data);

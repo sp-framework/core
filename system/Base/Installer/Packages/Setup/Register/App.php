@@ -20,6 +20,7 @@ class App
 				'errors_component'			=> 0,
 				'can_login_role_ids'		=> Json::encode(['1']),
 				'ip_filter_default_action'	=> 0,
+				'settings'					=> Json::encode(["defaultDashboard" => 1])
 			]
 		);
 
@@ -32,12 +33,12 @@ class App
 
 	public function update($db)
 	{
-		$homeComponent =
+		$dashboardsComponent =
 			$db->fetchAll(
 				"SELECT * FROM modules_components WHERE route LIKE :route",
 				Enum::FETCH_ASSOC,
 				[
-					"route" => "dashboard",
+					"route" => "dashboards",
 				]
 			);
 
@@ -53,7 +54,7 @@ class App
 		$db->updateAsDict(
 			'apps',
 			[
-				'default_component' 	=> $homeComponent[0]['id'],
+				'default_component' 	=> $dashboardsComponent[0]['id'],
 				'errors_component' 		=> $errorsComponent[0]['id']
 			],
 			"id = 1"

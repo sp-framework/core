@@ -131,6 +131,13 @@ class Apps
 						'notNull' => false,
 					]
 				),
+				new Column(
+					'settings',
+					[
+						'type'    => Column::TYPE_JSON,
+						'notNull' => false,
+					]
+				),
 			],
 			'indexes' => [
 				new Index(

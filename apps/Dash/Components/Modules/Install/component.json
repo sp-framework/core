@@ -27,7 +27,7 @@
 		]
 	},
 	"menu"				: {
-		"seq"			: 1,
+		"seq"			: 3,
 		"modules"		: {
 			"title"		: "modules",
 			"icon"		: "th",
