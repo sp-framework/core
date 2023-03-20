@@ -490,12 +490,8 @@ dataCollectionSection =
                         (structureArr[structure]['state']['hidden'] && structureArr[structure]['state']['hidden'] === false)
                     ) {
                         var structureId;
-                        if (structureArr[structure]['data']['id']) {
-                            structureId = structureArr[structure]['data']['id'];
-                        } else {
-                            structureId = structureArr[structure]['text'].toLowerCase();
-                            structureId = structureId.replace(/[^a-z0-9]/g, "")
-                        }
+                        structureId = structureArr[structure]['text'].toLowerCase();
+                        structureId = structureId.replace(/[^a-z0-9]/g, "");
 
                         if (!newStructure[structureId]) {
                             newStructure[structureId] = { };

@@ -32,7 +32,7 @@
             "icon"      : "cogs",
             "title"     : "system",
             "childs"    : {
-                "geo" : {
+                "geolocations" : {
                     "title"     : "Geo Locations",
                     "icon"      : "globe",
                     "childs"    : {
