@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Dash\Components\Test;
+namespace Apps\Dash\Components\Devtools\Test;
 
 use Apps\Dash\Components\Business\Directory\VendorGroups\Install\Component as VendorGroupsComponent;
 use Apps\Dash\Components\Devtools\Api\Contracts\Install\Component as ContractsComponent;
