@@ -1,0 +1,47 @@
+{
+    "route"         : "dashboard",
+    "name"          : "Dashboard",
+    "description"   : "Dash dashboard",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "tools",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-system-tools-dashboard",
+    "class"         : "Apps\\Dash\\Components\\Dashboard\\DashboardComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Dashboard",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-system-tools-dashboard"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"             : {
+        "seq"           : 1,
+        "dashboard"          : {
+            "title"     : "dashboard",
+            "icon"      : "dashboard",
+            "link"      : "dashboard"
+        }
+    },
+    "settings"      : {
+        "mandatory"     : true
+    }
+}

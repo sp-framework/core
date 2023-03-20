@@ -37,7 +37,7 @@ class App
 				"SELECT * FROM modules_components WHERE route LIKE :route",
 				Enum::FETCH_ASSOC,
 				[
-					"route" => "home",
+					"route" => "dashboard",
 				]
 			);
 
