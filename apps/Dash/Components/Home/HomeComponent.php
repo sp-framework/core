@@ -10,7 +10,15 @@ class HomeComponent extends BaseComponent
     public function viewAction()
     {
         try {
-            $defaultComponent = $this->modules->components->getById($this->app['default_component']);
+            $defaultComponentId = $this->app['default_component'];
+
+            if ($this->app['default_component'] == 0) {
+                $dashboardComponent = $this->modules->components->getComponentByRoute('dashboard');
+
+                $defaultComponentId = $dashboardComponent['id'];
+            }
+
+            $defaultComponent = $this->modules->components->getById($defaultComponentId);
             $controller = Arr::last(explode('/', $defaultComponent['route']));
             $routeArr = explode('/', $defaultComponent['route']);
             unset($routeArr[Arr::lastKey($routeArr)]);
@@ -30,7 +38,6 @@ class HomeComponent extends BaseComponent
                 ]
             );
         } catch (\Exception $e) {
-            dump($e);die();
             throw $e;
         }
     }
