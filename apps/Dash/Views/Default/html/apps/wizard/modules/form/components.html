@@ -9,6 +9,12 @@
     {% else %}
         {% set appErrorsComponent = 0 %}
     {% endif %}
+    {% set selectComponents = [] %}
+    {% for key, selectComponent in components %}
+        {% if selectComponent['route'] != 'home' %}
+            {% set selectComponents[key] = selectComponent %}
+        {% endif %}
+    {% endfor %}
     <div class="row">
         <div class="col">
             {{adminltetags.useTag('fields',
@@ -27,7 +33,7 @@
                     'fieldBazPostOnCreate'           : true,
                     'fieldBazPostOnUpdate'           : true,
                     'fieldRequired'                  : true,
-                    'fieldDataSelect2Options'        : components,
+                    'fieldDataSelect2Options'        : selectComponents,
                     'fieldDataSelect2OptionsKey'     : 'id',
                     'fieldDataSelect2OptionsValue'   : 'name',
                     'fieldDataSelect2OptionsArray'   : true,
@@ -52,7 +58,7 @@
                     'fieldBazPostOnCreate'           : true,
                     'fieldBazPostOnUpdate'           : true,
                     'fieldRequired'                  : true,
-                    'fieldDataSelect2Options'        : components,
+                    'fieldDataSelect2Options'        : selectComponents,
                     'fieldDataSelect2OptionsKey'     : 'id',
                     'fieldDataSelect2OptionsValue'   : 'name',
                     'fieldDataSelect2OptionsArray'   : true,
