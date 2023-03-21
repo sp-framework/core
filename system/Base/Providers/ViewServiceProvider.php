@@ -6,6 +6,7 @@ use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
 use Phalcon\Mvc\ViewBaseInterface;
 use System\Base\Providers\ViewServiceProvider\Escaper;
+use System\Base\Providers\ViewServiceProvider\SimpleView;
 use System\Base\Providers\ViewServiceProvider\Tag;
 use System\Base\Providers\ViewServiceProvider\View;
 use System\Base\Providers\ViewServiceProvider\Volt;
@@ -32,6 +33,14 @@ class ViewServiceProvider implements ServiceProviderInterface
 				$views = $container->getShared('modules')->views->init();
 				$events = $container->getShared('events');
 				return (new View($views, $events))->init();
+			}
+		);
+
+		$container->setShared(
+			'viewSimple',
+			function () use ($container) {
+				$views = $container->getShared('modules')->views->init();
+				return (new SimpleView($views))->init();
 			}
 		);
 

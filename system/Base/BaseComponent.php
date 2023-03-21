@@ -68,6 +68,8 @@ abstract class BaseComponent extends Controller
 				}
 
 				$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
+
+				$this->viewSimple->setViewsDir($this->view->getViewsDir() . $this->getURI());
 			}
 		}
 	}
