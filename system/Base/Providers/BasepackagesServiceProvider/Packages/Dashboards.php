@@ -17,4 +17,27 @@ class Dashboards extends BasePackage
 
         return $this;
     }
+
+    public function getDashboardById(int $id, $getwidgets = true)
+    {
+        $this->getFirst('id', $id);
+
+        if ($this->model) {
+            $dashboard = $this->model->toArray();
+
+            if ($getwidgets) {
+                if ($this->model->getwidgets()) {
+                    $relationData = $this->model->getwidgets()->toArray();
+
+                    unset($relationData['id']);
+
+                    $dashboard = array_merge($dashboard, $relationData);
+                }
+            }
+
+            return $dashboard;
+        }
+
+        return false;
+    }
 }

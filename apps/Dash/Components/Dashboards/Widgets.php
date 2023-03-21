@@ -2,16 +2,11 @@
 
 namespace Apps\Dash\Components\Dashboards;
 
-class Widgets
+use Apps\Dash\Components\Dashboards\WidgetsComponent;
+
+class Widgets extends WidgetsComponent
 {
-    protected $component;
-
-    public function init($component)
-    {
-        $this->component = $component;
-    }
-
-    public function worldClockWidget()
+    public function worldClock()
     {
         //
     }

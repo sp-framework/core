@@ -41,6 +41,7 @@ use System\Base\Installer\Packages\Setup\Schema\Apps\IpFilter;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ActivityLogs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\AddressBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards\Widgets as DashboardsWidgets;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailQueue;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailServices;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Filters;
@@ -258,6 +259,7 @@ class Setup
 		$this->db->createTable('basepackages_import_export', $dbName, (new ImportExport)->columns());
 		$this->db->createTable('basepackages_templates', $dbName, (new Templates)->columns());
 		$this->db->createTable('basepackages_dashboards', $dbName, (new Dashboards)->columns());
+		$this->db->createTable('basepackages_dashboards_widgets', $dbName, (new DashboardsWidgets)->columns());
 		$this->db->createTable('basepackages_widgets', $dbName, (new Widgets)->columns());
 		$this->db->createTable('system_api_calls', $dbName, (new SystemApiCalls)->columns());
 		$this->db->createTable('system_api', $dbName, (new SystemApi)->columns());

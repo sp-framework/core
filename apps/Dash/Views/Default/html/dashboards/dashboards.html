@@ -1,0 +1,138 @@
+<div class="row">
+    <div id="{{componentId}}-{{sectionId}}-dashboards-list" class="col">
+        {% include 'dashboards/dashboards/list.html' %}
+    </div>
+    <div id="{{componentId}}-{{sectionId}}-widgets-buttons" class="col">
+        {% include 'dashboards/widgets/buttons.html' %}
+    </div>
+</div>
+<hr class="no-margin">
+{% if dashboard['widgets'] is not defined %}
+    {% set dashboardLoaderHidden = 'hidden' %}
+    {% set noWidgetsHidden = '' %}
+{% else %}
+    {% set dashboardLoaderHidden = '' %}
+    {% set noWidgetsHidden = 'hidden' %}
+{% endif %}
+<div class="row text-center" id="{{componentId}}-{{sectionId}}-dashboard-loader" {{dashboardLoaderHidden}}>
+    <div class="col">
+        <div class="fa-2x">
+            <i class="fa fa-cog fa-spin"></i> Loading...
+        </div>
+    </div>
+</div>
+<div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-no-widgets" {{noWidgetsHidden}}>
+    <div class="col">
+        <h6><i class="fa fa-fw fa-info-circle text-info"></i> No widgets added to this dashboard.</h6>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="grid-stack"></div>
+    </div>
+</div>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'widget-modal',
+            'modalBodyInclude'          : 'dashboards/widgets/view',
+            'modalSize'                 : 'xl',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-grip"></i> WIDGETS',
+            'modalFooterButtons'        :
+                [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'parentComponentId'             : parent,
+                'sectionId'                     : 'widgets-modal',
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                        [
+                            'modal-button-add' : [
+                                'title'                   : 'Add',
+                                'type'                    : 'primary',
+                                'position'                : 'right',
+                                'disabled'                : true
+                            ]
+                        ]
+                ]
+        ]
+    )}}
+</div>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'share-modal',
+            'modalBodyInclude'          : 'dashboards/dashboards/share',
+            'modalSize'                 : 'lg',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-share"></i> SHARE DASHBOARD'
+        ]
+    )}}
+</div>
+<script>
+/* globals */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+    });
+
+dataCollectionSection =
+    $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-available_widgets'], {
+        afterInit: function() {
+            $('#{{componentId}}-{{sectionId}}-available_widgets').on('select_node.jstree', function (e, data) {
+
+                if (data.node.children.length !== 0) {
+                    $('#{{componentId}}-{{sectionId}}-available_widgets').jstree().deselect_node(data.node.id, true);
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-widget-no-widgets').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-widget-error').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-widget-loader').attr('hidden', false);
+                    var url = '{{links.url("dashboards/q/widgets/true/id/' + data.node.data.id + '")}}';
+
+                    $.get(url, function(response) {
+                        if (response) {
+                            $('#{{componentId}}-{{sectionId}}-widget-info').empty().html(response);
+                            $('#{{componentId}}-{{sectionId}}-widget-loader').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-widget-info').attr('hidden', false);
+                        }
+                    });
+                }
+            });
+        }
+    });
+</script>

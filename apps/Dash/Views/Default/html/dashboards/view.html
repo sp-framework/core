@@ -1,69 +1,17 @@
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('buttons',
-            [
-            'component'                     : component,
-            'componentName'                 : componentName,
-            'componentId'                   : componentId,
-            'parentComponentId'             : parent,
-            'sectionId'                     : 'main',
-            'buttonType'                    : 'button',
-            'buttons'                       :
-                    [
-                        'add-widget' : [
-                            'title'                   : 'Add Widget',
-                            'size'                    : 'xs',
-                            'type'                    : 'primary',
-                            'position'                : 'right',
-                            'icon'                    : 'plus'
-                        ]
-                    ]
-            ]
-        )}}
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        <div class="grid-stack"></div>
-    </div>
-</div>
-<div>
-    {{adminltetags.useTag('modal',
-        [
-            'component'                 : component,
-            'componentName'             : componentName,
-            'componentId'               : componentId,
-            'sectionId'                 : 'modal',
-            'modalId'                   : 'widget-modal',
-            'modalBodyInclude'          : 'domains/info',
-            'modalSize'                 : 'xl',
-            'modalHeader'               : true,
-            'modalFooter'               : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-grip"></i> ADD WIDGET'
-        ]
-    )}}
-</div>
-<div>
-    {{adminltetags.useTag('modal',
-        [
-            'component'                 : component,
-            'componentName'             : componentName,
-            'componentId'               : componentId,
-            'sectionId'                 : 'modal',
-            'modalId'                   : 'share-modal',
-            'modalBodyInclude'          : 'domains/info',
-            'modalSize'                 : 'lg',
-            'modalHeader'               : true,
-            'modalFooter'               : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-share"></i> SHARE DASHBOARD'
-        ]
-    )}}
-</div>
-<script>
-/* globals */
-$('#{{componentId}}-main-add-widget').click(function(e) {
-    e.preventDefault();
-
-    $('#{{componentId}}-modal-widget-modal').modal('show');
-});
-</script>
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'section',
+        'cardHeader'                    : false,
+        'cardFooter'                    : false,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'barcode',
+        'cardTitle'                     : 'Barcodes',
+        'cardAdditionalClass'           : 'rounded-0 ',
+        'cardBodyInclude'               : 'dashboards/dashboards'
+    ]
+)}}

@@ -39,7 +39,7 @@
     [
         {
             "name"      : "World Clock",
-            "method"    : "worldClockWidget"
+            "method"    : "worldClock"
         }
     ]
 }

@@ -39,7 +39,7 @@ abstract class BaseComponent extends Controller
 
 	protected $token = null;
 
-	protected $widgets;
+	public $widgets;
 
 	protected function onConstruct()
 	{
@@ -112,8 +112,12 @@ abstract class BaseComponent extends Controller
 
 		$widgetsClass = '\\' . $namespace . '\\Widgets';
 
-		if (class_exists($widgetsClass)) {
-			$this->widgets = (new $widgetsClass())->init($this);
+		try {
+			if (class_exists($widgetsClass)) {
+				$this->widgets = (new $widgetsClass())->init($this, $this->component);
+			}
+		} catch (\Exception $e) {
+			throw $e;
 		}
 	}
 
