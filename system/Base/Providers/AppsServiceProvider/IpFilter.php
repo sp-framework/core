@@ -313,7 +313,7 @@ class IpFilter extends BasePackage
                             'added_by'              => 0,
                             'incorrect_attempts'    => 1
                         ];
-                        var_dump($this->addFilter($newFilter));die();
+
                     $this->addFilter($newFilter);
                 } else {
                     if ($filterObj->incorrect_attempts !== null) {
