@@ -160,6 +160,11 @@ class Card extends AdminLTETags
                         '<button type="button" class="btn btn-tool btn-tool-remove" ' . $cardAnimationSpeed . ' data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Remove" data-card-widget="remove">
                             <i class="fas fa-fw fa-times"></i>
                         </button>';
+                } else if ($tool === "widgetRemove") {
+                    $tools .=
+                        '<button type="button" class="btn btn-tool btn-tool-widgetRemove" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Remove" data-card-widget="widgetRemove">
+                            <i class="fas fa-fw fa-times"></i>
+                        </button>';
                 }
             }
         } else {

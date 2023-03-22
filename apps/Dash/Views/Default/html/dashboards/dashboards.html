@@ -109,16 +109,15 @@ dataCollectionSection =
 dataCollectionSection =
     $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-available_widgets'], {
         afterInit: function() {
+            var widgetsToRemove = [];
             var grid = dataCollectionComponent['{{componentId}}-{{sectionId}}']['grid'] = GridStack.init({
-                'draggable'  : {
-                    'handle'            : '[data-card-widget="move"]'
+                'draggable'     : {
+                    'handle'    : '[data-card-widget="move"]'
                 }
             });
 
             grid.on('added', function(e, items) {
                 items.forEach(function(item) {
-                    //eslint-disable-next-line
-                    console.log(item);
                     var itemHeight = $(item.el).find('.card')[0].offsetHeight + 20;//20 for padding
 
                     grid.cellHeight(itemHeight);
@@ -151,39 +150,87 @@ dataCollectionSection =
                             PNotify.error({'title' : 'Error loading widgets for dashboard. Please contact administrator.'});
                         }
                     } else if (response.responseCode === 1) {
-                        //
+                        PNotify.error({'title' : 'Error loading widgets for dashboard. Please contact administrator.'});
                     } else if (response.responseCode === 2) {
                         $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
                     }
                     $('#{{componentId}}-{{sectionId}}-dashboard-loader').attr('hidden', true);
 
-                    $('.btn-tool-remove').click(function() {
-                        var widgetId = $(this).parents('.grid-stack-item').attr('gs-id');
-
-                        //
-                    });
+                    initRemoveButtons();
                 }, 'json');
             }
 
             populateGrid();
 
+            function initRemoveButtons() {
+                $('.btn-tool-widgetRemove').off();
+                $('.btn-tool-widgetRemove').click(function() {
+                    var gridWidget = $(this).parents('.grid-stack-item')[0];
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = $(this).parents('.grid-stack-item').attr('gs-id');
+                    postData['dashboard_id'] = $('#{{componentId}}-{{sectionId}}-dashboards').select2().val();
+
+                    $.post('{{links.url("dashboards/removeWidgetFromDashboard")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+
+                        if (response.responseCode === 0) {
+                            PNotify.success({'title' : response.responseMessage});
+
+                            grid.removeWidget(gridWidget);
+                            grid.compact();
+
+                            if (grid.save().length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
+                                $('#{{componentId}}-{{sectionId}}-save-widgets').attr('hidden', true);
+                                $('#{{componentId}}-{{sectionId}}-save-widgets').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-add-widgets').attr('disabled', false);
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
+                            }
+                        }
+                    }, 'json');
+                });
+
+                $('.btn-tool-settings').off();
+                $('.btn-tool-settings').click(function() {
+                    $(this).parents('.card').first().find('.widgets-setting-modal').modal('show');
+                });
+            }
+
             function addWidgetToGrid(widgetsData) {
-                var gridWidth = 6;//50% of the screen
-                var gridMinWidth = 6;//50% of the screen
-                //Widget Settings: Width , height is auto
-                if (widgetsData['settings']['width']) {
-                    gridWidth = widgetsData['settings']['width'];
+                var newWidget = { };
+                newWidget['id'] = widgetsData['id'];
+                newWidget['content'] = widgetsData['content'];
+                newWidget['w'] = 3;//25% of the screen
+                newWidget['minW'] = 3;//25% of the screen
+
+                if (widgetsData['settings']['w']) {
+                    newWidget['w'] = widgetsData['settings']['w'];
                 }
-                if (widgetsData['settings']['minWidth']) {
-                    gridMinWidth = widgetsData['settings']['minWidth'];
+                if (widgetsData['settings']['minW']) {
+                    newWidget['minW'] = widgetsData['settings']['minW'];
+                }
+                if (widgetsData['settings']['maxW']) {
+                    newWidget['maxW'] = widgetsData['settings']['maxW'];
+                }
+                if (widgetsData['settings']['h']) {
+                    newWidget['h'] = widgetsData['settings']['h'];
+                }
+                if (widgetsData['settings']['minH']) {
+                    newWidget['minH'] = widgetsData['settings']['minH'];
+                }
+                if (widgetsData['settings']['maxH']) {
+                    newWidget['maxH'] = widgetsData['settings']['maxH'];
                 }
 
-                grid.addWidget({
-                    content     : widgetsData['content'],
-                    w           : gridWidth,
-                    minW        : gridMinWidth,
-                    id          : widgetsData['id']
-                });
+                grid.addWidget(newWidget);
+
+                initRemoveButtons();
             }
 
             $('#{{componentId}}-{{sectionId}}-available_widgets').on('select_node.jstree', function (e, data) {
@@ -246,12 +293,11 @@ dataCollectionSection =
                             addWidgetToGrid(response.responseData);
                             $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', true);
                             $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
+                            $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
 
                             grid.enableMove(false);
                             grid.enableResize(false);
                         }
-                        //eslint-disable-next-line
-                        console.log(response);
                     }, 'json');
                 } else {
                     PNotify.error({
@@ -277,9 +323,9 @@ dataCollectionSection =
                 $(this).attr('disabled', true);
                 $('#{{componentId}}-{{sectionId}}-save-widgets').attr('disabled', false);
                 $('#{{componentId}}-{{sectionId}}-save-widgets').attr('hidden', false);
+                $('#{{componentId}}-{{sectionId}}-add-widgets').attr('disabled', true);
                 grid.enableMove(true);
                 grid.enableResize(true);
-
             });
 
             $('#{{componentId}}-{{sectionId}}-save-widgets').click(function(e) {
@@ -293,16 +339,35 @@ dataCollectionSection =
                 $(this).attr('disabled', true);
                 $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
                 $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
+                $('#{{componentId}}-{{sectionId}}-add-widgets').attr('disabled', false);
                 grid.enableMove(false);
                 grid.enableResize(false);
+                grid.compact();
+
+                if (grid.save().length === 0) {
+                    $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
+                    $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
+                } else {
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['dashboard_id'] = $('#{{componentId}}-{{sectionId}}-dashboards').select2().val();
+                    postData['widgets'] = grid.save(false, false);
+
+                    $.post('{{links.url("dashboards/updateWidgetToDashboard")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+
+                        if (response.responseCode === 0) {
+                            PNotify.success({'title' : response.responseMessage});
+                        } else if (response.responseCode === 1) {
+                            PNotify.error({'title' : response.responseMessage});
+                        }
+                    }, 'json');
+                }
             });
-            // $('.widgets-modal-close').click(function() {
-            //     //eslint-disable-next-line
-            //     console.log('close');
-            //     //eslint-disable-next-line
-            //     console.log(grid.getGridItems());
-            //     // grid.removeAll();
-            // });
         }
     });
 </script>

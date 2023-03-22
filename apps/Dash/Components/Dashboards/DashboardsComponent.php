@@ -76,6 +76,42 @@ class DashboardsComponent extends BaseComponent
         }
     }
 
+    public function updateWidgetToDashboardAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->basepackages->dashboards->updateWidgetToDashboard($this->postData());
+
+            $this->addResponse(
+                $this->basepackages->dashboards->packagesData->responseMessage,
+                $this->basepackages->dashboards->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function removeWidgetFromDashboardAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->basepackages->dashboards->removeWidgetFromDashboard($this->postData());
+
+            $this->addResponse(
+                $this->basepackages->dashboards->packagesData->responseMessage,
+                $this->basepackages->dashboards->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
     public function getWidgetContentAction()
     {
         if ($this->request->isPost()) {

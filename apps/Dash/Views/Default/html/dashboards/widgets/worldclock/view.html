@@ -1,8 +1,8 @@
 {{adminltetags.useTag('content',
     [
         'component'                     : component,
-        'componentName'                 : componentName,
-        'componentId'                   : componentId,
+        'componentName'                 : componentName ~ '-worldclock',
+        'componentId'                   : componentId ~ '-worldclock',
         'parentComponentId'             : parent,
         'sectionId'                     : 'main',
         'contentType'                   : 'section',
@@ -12,7 +12,7 @@
         'cardType'                      : 'primary',
         'cardIcon'                      : 'clock',
         'cardTitle'                     : 'World Clock',
-        'cardShowTools'                 : ['settings', 'move', 'remove'],
+        'cardShowTools'                 : ['settings', 'move', 'widgetRemove'],
         'cardAdditionalClass'           : 'rounded-0 border',
         'cardBodyInclude'               : 'widgets/worldclock/worldclock'
     ]
