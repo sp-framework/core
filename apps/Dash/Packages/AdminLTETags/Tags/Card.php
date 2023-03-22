@@ -53,6 +53,9 @@ class Card extends AdminLTETags
         $cardRefreshSource = "data-source=" . $this->params['cardRefreshSource'] :
         $cardRefreshSource = "";
 
+        isset($this->params['cardAnimationSpeed']) ?
+        $cardAnimationSpeed = "data-animation-speed=" . $cardAnimationSpeed :
+        $cardAnimationSpeed = "data-animation-speed=300";
 
         isset($this->params['cardRefreshParams']) ?
         $cardRefreshParams = "data-params=" . $this->params['cardRefreshParams'] :
@@ -103,40 +106,58 @@ class Card extends AdminLTETags
             '<i class="fas fa-fw fa-plus"></i></button>' :
         $cardCollapsed = '';
 
+        if (isset($this->params['cardWidgetMode']) && $this->params['cardWidgetMode'] === true) {
+            $bodyIsWidget = ' style="padding: 5px !important;"';
+            $cardIsWidget = ' style="box-shadow: 0 0 0 0;margin: 0;"';
+            $headerIsWidget = ' style="position: absolute;width: 100%;"';
+            $cardHeaderHidden = 'hidden';
+        } else {
+            $bodyIsWidget = '';
+            $cardIsWidget = '';
+            $headerIsWidget = '';
+            $cardHeaderHidden = '';
+        }
+        if (isset($this->params['cardWidgetRoot']) && $this->params['cardWidgetRoot'] === true) {
+            $bodyIsWidget = ' style="padding: 0px !important;"';
+            $cardIsWidget = ' style="box-shadow: 0 0 0 0;margin: 0;background-color: #f4f6f9;"';
+        }
+
         if (isset($this->params['cardShowTools']) && count($this->params['cardShowTools']) > 0) {
             $tools = '';
 
             foreach ($this->params['cardShowTools'] as $key => $tool) {
-                if ($tool === "navigators") {
-                    $tools .= '<div class="section-navigators"></div>';
-                } else if ($tool === "jstreeTools") {
+                if ($tool === "refresh") {
                     $tools .=
-                        '<button type="button" id="collapseTreeCards" class="btn btn-tool" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Close All">
-                            <i class="fas fa-fw fa-compress-arrows-alt"></i>
-                        </button>
-                        <button type="button" id="expandTreeCards" class="btn btn-tool" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Open All">
-                            <i class="fas fa-fw fa-expand-arrows-alt"></i>
-                        </button>';
-                } else if ($tool === "refresh") {
-                    $tools .=
-                        '<button type="button" class="btn btn-tool" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Refresh" data-card-widget="refresh"' . $cardRefreshSource . ' ' . $cardRefreshParams . ' ' . $cardRefreshDataType . ' ' . $cardRefreshMethod . ' ' . $cardRefreshSourceSelector . '>
+                        '<button type="button" class="btn btn-tool btn-tool-refresh" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Refresh" data-card-widget="refresh"' . $cardRefreshSource . ' ' . $cardRefreshParams . ' ' . $cardRefreshDataType . ' ' . $cardRefreshMethod . ' ' . $cardRefreshSourceSelector . '>
                             <i class="fas fa-fw fa-sync-alt"></i>
                         </button>';
                 } else if ($tool === "maximize") {
                     $tools .=
-                        '<button type="button" class="btn btn-tool" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Maximize" data-card-widget="maximize">
+                        '<button type="button" class="btn btn-tool btn-tool-maximize" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Maximize" data-card-widget="maximize">
                             <i class="fas fa-fw fa-expand"></i>
                         </button>';
-                } else if (!isset($this->params['cardCollapsed']) ||
-                           ($this->params['cardCollapsed'] === false && $tool === "collapse")
-                ) {
+                } else if ($tool === "collapse") {
+                    if (!isset($this->params['cardCollapsed']) ||
+                        (isset($this->params['cardCollapsed']) && $this->params['cardCollapsed'] === false)
+                    ) {
+                        $tools .=
+                            '<button type="button" class="btn btn-tool btn-tool-collapse" ' . $cardAnimationSpeed . ' data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Collapse" data-card-widget="collapse">
+                                <i class="fas fa-fw fa-minus"></i>
+                            </button>';
+                    }
+                } else if ($tool === "settings") {
                     $tools .=
-                        '<button type="button" class="btn btn-tool" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Collapse" data-card-widget="collapse">
-                            <i class="fas fa-fw fa-minus"></i>
+                        '<button type="button" class="btn btn-tool btn-tool-settings" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Settings" data-card-widget="settings">
+                            <i class="fas fa-fw fa-cog"></i>
+                        </button>';
+                } else if ($tool === "move") {
+                    $tools .=
+                        '<button type="button" class="btn btn-tool btn-tool-move" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Move" data-card-widget="move">
+                            <i class="fas fa-fw fa-up-down-left-right"></i>
                         </button>';
                 } else if ($tool === "remove") {
                     $tools .=
-                        '<button type="button" class="btn btn-tool" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Remove" data-card-widget="remove">
+                        '<button type="button" class="btn btn-tool btn-tool-remove" ' . $cardAnimationSpeed . ' data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Remove" data-card-widget="remove">
                             <i class="fas fa-fw fa-times"></i>
                         </button>';
                 }
@@ -147,7 +168,7 @@ class Card extends AdminLTETags
 
         if ($this->config->cache->enabled) {
             $tools .=
-                '<button type="button" class="btn btn-tool reset-cache" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Reset Cache">
+                '<button type="button" class="btn btn-tool btn-tool-reset-cache" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Reset Cache">
                     <i class="fas fa-fw fa-database"></i>
                 </button>';
         }
@@ -216,7 +237,7 @@ class Card extends AdminLTETags
         // card content
         $this->content .=
             '<div id="' .$hasCardId . '" class="card ' .
-                $hasCardCollapsed . ' ' . $cardAdditionalClass . '">';
+                $hasCardCollapsed . ' ' . $cardAdditionalClass . '"' . $cardIsWidget . '>';
         if ($this->params['cardType'] === 'widget') {
 
             if (isset($this->params['cardWidgetContent'])) {
@@ -227,15 +248,19 @@ class Card extends AdminLTETags
 
         } else {
             if (isset($this->params['cardHeader']) && $this->params['cardHeader'] !== false) {
+                if (isset($this->params['cardHeaderHidden']) && $this->params['cardHeaderHidden'] === true) {
+                    $cardHeaderHidden = 'hidden';
+                }
+
                 $this->content .=
-                    '<div class="card-header rounded-0 ' . $cardType . ' ' . $cardHeaderAdditionalClass . '">
+                    '<div class="card-header rounded-0 ' . $cardType . ' ' . $cardHeaderAdditionalClass . '" ' . $headerIsWidget . ' ' . $cardHeaderHidden . '>
                         <h3 class="card-title">' . $cardIcon . '<span class="title ml-1">' . $cardTitle . '</span></h3>
                         <div class="card-tools">' . $cardSpan . $cardCollapsed . $tools . '</div>' .
                     '</div>';
             }
 
             $this->content .=
-                '<div class="card-body ' . $cardBodyAdditionalClass . '">' . $cardBody . '</div>';
+                '<div class="card-body ' . $cardBodyAdditionalClass . '"' . $bodyIsWidget . '>' . $cardBody . '</div>';
 
             if ($cardFooter) {
                 $this->content .=

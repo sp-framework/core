@@ -44,22 +44,12 @@ class Widgets extends BasePackage
         return $widgetsTree;
     }
 
-    public function getWidgetById(int $id)
+    public function getWidget(int $id, $task = 'info')
     {
-        foreach($this->widgets as $widget) {
-            if ($widget['id'] == $id) {
-                return $widget;
-            }
-        }
-
-        return false;
-    }
-
-    public function getWidgetInfo(int $id)
-    {
-        $widget = $this->getWidgetById($id);
+        $widget = $this->getById($id);
 
         $widgetMethod = $widget['method'];
+
         $component = $this->modules->components->getComponentById($widget['component_id']);
 
         try {
@@ -74,16 +64,15 @@ class Widgets extends BasePackage
             $widgetsReflection = new \ReflectionClass($widgetClass);
 
             if (isset($widgetMethod) && $widgetsReflection->hasMethod($widgetMethod)) {
-                return $widgetClass->info($component['route'], $widgetMethod);
+                if ($task === 'info') {
+                    return $widgetClass->info($component['route'], $widgetMethod);
+                } else if ($task === 'content') {
+                    return $widgetClass->$widgetMethod($component['route'], $widgetMethod);
+                }
             }
         }
 
         return false;
-    }
-
-    protected function initWidget($widget)
-    {
-
     }
 
     public function getWidgetsByComponentId($componentId)
@@ -97,5 +86,23 @@ class Widgets extends BasePackage
         }
 
         return $widgets;
+    }
+
+    public function getWidgetsContent(array $data)
+    {
+        $widgetsData = [];
+
+        foreach ($data as $key => $dashboardWidget) {
+            $dashboardWidget['settings'] = Json::decode($dashboardWidget['settings'], true);
+            $widgetsData[$key] = $dashboardWidget;
+            $widgetsData[$key]['content'] =
+                $this->getWidget($dashboardWidget['widget_id'], 'content');
+        }
+
+        $widgetsData = msort($widgetsData, 'sequence');
+
+        $this->addResponse('Ok', 0, ['widgetsData' => $widgetsData]);
+
+        return $widgetsData;
     }
 }

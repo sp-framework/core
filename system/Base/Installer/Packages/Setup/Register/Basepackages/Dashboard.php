@@ -14,7 +14,7 @@ class Dashboard
                 'name'                  => 'Default',
                 'app_id'                => 1,
                 'created_by'            => 1,
-                'settings'              => Json::encode([])
+                'settings'              => Json::encode(['maxWidgets'=>10])
             ]
         );
     }

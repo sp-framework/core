@@ -21,10 +21,24 @@ class Widgets
                     ]
                 ),
                 new Column(
+                    'widget_id',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => true
+                    ]
+                ),
+                new Column(
                     'dashboard_id',
                     [
                         'type'          => Column::TYPE_SMALLINTEGER,
                         'notNull'       => true
+                    ]
+                ),
+                new Column(
+                    'sequence',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => true
                     ]
                 ),
                 new Column(
@@ -33,7 +47,7 @@ class Widgets
                         'type'    => Column::TYPE_JSON,
                         'notNull' => true
                     ]
-                )
+                ),
             ]
         ];
     }

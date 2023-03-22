@@ -1654,9 +1654,9 @@
                     });
                 });
 
-                if ($('.reset-cache').length === 1) {
-                    $('.reset-cache').off();
-                    $('.reset-cache').click(function(e) {
+                if ($('.btn-tool-reset-cache').length === 1) {
+                    $('.btn-tool-reset-cache').off();
+                    $('.btn-tool-reset-cache').click(function(e) {
                         e.preventDefault();
 
                         that._filterRunAjax(

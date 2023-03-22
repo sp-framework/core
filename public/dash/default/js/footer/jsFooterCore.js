@@ -3549,18 +3549,18 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                     this._initSectionButtonsAndActions();
                 }
 
-                if ($('.reset-cache').length === 1) {
+                if ($('.btn-tool-reset-cache').length === 1) {
                     if (dataCollection.env.currentId == '0') {
-                        $('.reset-cache').hide();
+                        $('.btn-tool-reset-cache').hide();
                     } else {
-                        $('.reset-cache').addClass('contentAjaxLink');
+                        $('.btn-tool-reset-cache').addClass('contentAjaxLink');
 
                         var url = window.location.href;
 
                         if (!url.includes('resetcache')) {
-                            $('.reset-cache').attr('href', url + '/resetcache/true');
+                            $('.btn-tool-reset-cache').attr('href', url + '/resetcache/true');
                         } else {
-                            $('.reset-cache').attr('href', url);
+                            $('.btn-tool-reset-cache').attr('href', url);
                         }
 
                         BazCore.bazContent();
@@ -6963,9 +6963,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     });
                 });
 
-                if ($('.reset-cache').length === 1) {
-                    $('.reset-cache').off();
-                    $('.reset-cache').click(function(e) {
+                if ($('.btn-tool-reset-cache').length === 1) {
+                    $('.btn-tool-reset-cache').off();
+                    $('.btn-tool-reset-cache').click(function(e) {
                         e.preventDefault();
 
                         that._filterRunAjax(

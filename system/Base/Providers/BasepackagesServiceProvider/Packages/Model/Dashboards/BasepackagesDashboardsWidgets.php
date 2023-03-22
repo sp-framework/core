@@ -11,9 +11,13 @@ class BasepackagesDashboardsWidgets extends BaseModel
 
     public $id;
 
+    public $widget_id;
+
     public $dashboard_id;
 
     public $settings;
+
+    public $sequence;
 
     public function initialize()
     {

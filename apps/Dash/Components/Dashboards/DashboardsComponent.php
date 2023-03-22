@@ -14,7 +14,9 @@ class DashboardsComponent extends BaseComponent
             $this->getData()['widgets'] == true &&
             isset($this->getData()['id'])
         ) {
-            return $this->basepackages->widgets->getWidgetInfo($this->getData()['id']);
+            $this->getNewToken();
+
+            return $this->basepackages->widgets->getWidget($this->getData()['id'], 'info');
         } else {
             if (isset($this->getData()['id'])) {
                 $dashboardId = $this->getData()['id'];
@@ -29,7 +31,7 @@ class DashboardsComponent extends BaseComponent
             }
         }
 
-        $dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId);
+        $dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, false);
 
         $dashboard['settings'] = Json::decode($dashboard['settings']);
 
@@ -53,5 +55,49 @@ class DashboardsComponent extends BaseComponent
     public function removeAction()
     {
         return;
+    }
+
+    public function addWidgetToDashboardAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->basepackages->dashboards->addWidgetToDashboard($this->postData());
+
+            $this->addResponse(
+                $this->basepackages->dashboards->packagesData->responseMessage,
+                $this->basepackages->dashboards->packagesData->responseCode,
+                $this->basepackages->dashboards->packagesData->responseData
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function getWidgetContentAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $dashboard = $this->basepackages->dashboards->getDashboardById($this->postData()['dashboard_id'], true);
+
+            if (isset($dashboard['widgets']) && count($dashboard['widgets']) > 0) {
+                $this->basepackages->widgets->getWidgetsContent($dashboard['widgets']);
+
+                $this->addResponse(
+                    $this->basepackages->widgets->packagesData->responseMessage,
+                    $this->basepackages->widgets->packagesData->responseCode,
+                    $this->basepackages->widgets->packagesData->responseData
+                );
+            } else {
+                $this->addResponse('No widgets', 2);
+            }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
     }
 }

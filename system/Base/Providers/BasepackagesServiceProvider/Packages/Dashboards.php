@@ -4,6 +4,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesDashboards;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Dashboards\BasepackagesDashboardsWidgets;
 
 class Dashboards extends BasePackage
 {
@@ -27,11 +28,7 @@ class Dashboards extends BasePackage
 
             if ($getwidgets) {
                 if ($this->model->getwidgets()) {
-                    $relationData = $this->model->getwidgets()->toArray();
-
-                    unset($relationData['id']);
-
-                    $dashboard = array_merge($dashboard, $relationData);
+                    $dashboard['widgets'] = $this->model->getwidgets()->toArray();
                 }
             }
 
@@ -39,5 +36,27 @@ class Dashboards extends BasePackage
         }
 
         return false;
+    }
+
+    public function addWidgetToDashboard(array $data)
+    {
+        $dashboardWidgets = $this->useModel(BasepackagesDashboardsWidgets::class);
+
+        $dashboardWidgets->assign($this->jsonData($data));
+
+        try {
+            if ($dashboardWidgets->create()) {
+                $newWidget = $dashboardWidgets->toArray();
+
+                $newWidget['content'] = $this->basepackages->widgets->getWidget($newWidget['widget_id'], 'content');
+
+                $this->addResponse('Widget added to dashboard.', 0, $newWidget);
+            } else {
+                $this->addResponse('Could not add widget to dashboard.', 1);
+            }
+        } catch (\Exception $e) {
+            var_dump($e);die();
+            $this->addResponse('Could not add widget to dashboard.', 1);
+        }
     }
 }

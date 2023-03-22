@@ -204,7 +204,7 @@ class Modal extends AdminLTETags
                         $this->content .=
                             '<div class="modal-header bg-' . $this->modalParams['modalType'] .' rounded-0">
                                 <h6 class="modal-title" id="' . $this->modalParams['modalId'] . '-label">' . $this->modalParams['modalTitle'] . '</h6>
-                                <button type="button" class="close modal-close text-white" data-dismiss="modal" aria-label="Close">
+                                <button type="button" class="close modal-close text-white ' . $this->params['modalId'] . '-close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>';
@@ -228,7 +228,7 @@ class Modal extends AdminLTETags
                     );
             }
             $this->content .=
-                '<button type="button" id="' . $this->modalParams['modalId'] . '-button-close" class="btn btn-secondary btn-' . $this->modalParams['modalCloseButtonSize'] . ' modal-close text-uppercase" data-dismiss="modal">' . $this->modalParams['modalCloseButtonTitle'] . '</button>';
+                '<button type="button" id="' . $this->modalParams['modalId'] . '-button-close" class="btn btn-secondary btn-' . $this->modalParams['modalCloseButtonSize'] . ' modal-close text-uppercase ' . $this->params['modalId'] . '-close" data-dismiss="modal">' . $this->modalParams['modalCloseButtonTitle'] . '</button>';
 
             $this->content .= '</div>';
         }
