@@ -7,13 +7,13 @@
     </div>
 </div>
 <hr class="mt-1 m-0">
-<div class="row text-center" id="{{componentId}}-{{sectionId}}-dashboard-loader">
+{# <div class="row text-center" id="{{componentId}}-{{sectionId}}-dashboard-loader">
     <div class="col">
         <div class="fa-2x">
             <i class="fa fa-cog fa-spin"></i> Loading...
         </div>
     </div>
-</div>
+</div> #}
 <div class="row text-center mt-4" id="{{componentId}}-{{sectionId}}-no-widgets" hidden>
     <div class="col">
         <h6><i class="fa fa-fw fa-info-circle text-info"></i> No widgets added to this dashboard.</h6>
@@ -21,7 +21,17 @@
 </div>
 <div class="row">
     <div class="col">
-        <div class="grid-stack"></div>
+        <div class="grid-stack">
+            {% if dashboard['widgets'] | length > 0 %}
+                {% for dashboardWidget in dashboard['widgets'] %}
+                {{dump(dashboardWidget)}}
+                    <div class="grid-stack-item">
+                        <div class="grid-stack-item-content">
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
     </div>
 </div>
 <div>
@@ -152,6 +162,10 @@ dataCollectionSection =
                     if (response.responseCode === 0) {
                         if (response.responseData && response.responseData.widgetsData) {
                             for (var widget in response.responseData.widgetsData) {
+                                // var el = $('<div id="widget-scripts"></div>');
+                                // el.html(response.responseData.widgetsData[widget]['widget']['content']);
+                                // //eslint-disable-next-line
+                                // console.log($(el).find('<script>'));
                                 addWidgetToGrid(response.responseData.widgetsData[widget]);
                             }
 
@@ -174,7 +188,7 @@ dataCollectionSection =
                 }, 'json');
             }
 
-            populateGrid();
+            // populateGrid();
 
             function initRemoveButtons() {
                 $('.btn-tool-widgetRemove').off();
@@ -273,10 +287,11 @@ dataCollectionSection =
                 }
 
                 grid.addWidget(newWidget);
+                dataCollectionComponent['{{componentId}}-{{sectionId}}'][widgetsData['widget']['method']] = { };
                 loadWidgetJS(widgetsData);
                 initRemoveButtons();
 
-                //Disable so that we dont add duplicates.
+                //Disable so that we dont add duplicates unless multiple is set to 1.
                 if (widgetsData['widget']['multiple'] && widgetsData['widget']['multiple'] == '0') {
                     var widgetJstreeId =  $('li').find('[data-id="' + widgetsData['widget_id'] + '"]')[0].id;
                     $('#{{componentId}}-{{sectionId}}-available_widgets').jstree().disable_node(widgetJstreeId);

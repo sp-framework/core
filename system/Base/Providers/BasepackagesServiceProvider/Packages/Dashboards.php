@@ -20,7 +20,7 @@ class Dashboards extends BasePackage
         return $this;
     }
 
-    public function getDashboardById(int $id, $getwidgets = true)
+    public function getDashboardById(int $id, $getwidgets = true, $getContent = false)
     {
         $this->getFirst('id', $id);
 
@@ -31,6 +31,9 @@ class Dashboards extends BasePackage
             if ($getwidgets) {
                 if ($this->model->getwidgets()) {
                     $dashboard['widgets'] = $this->model->getwidgets()->toArray();
+                }
+                if ($getContent) {
+                    $dashboard['widgets'] = $this->basepackages->widgets->getWidgetsContent($dashboard['widgets']);
                 }
             }
 

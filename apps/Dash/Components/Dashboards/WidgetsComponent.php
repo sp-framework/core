@@ -12,7 +12,7 @@ abstract class WidgetsComponent
 
     protected $view;
 
-    public function init($componentObj, $component)
+    public function init($componentObj, $component)//Init from Basecomponent
     {
         $this->componentObj = $componentObj;
 
@@ -22,7 +22,7 @@ abstract class WidgetsComponent
 
         $this->view->component = $component;
 
-        $this->view->componentName = strtolower(str_replace('Component', '', $this->componentObj->reflection->getShortName()));
+        $this->view->componentName = 'dashboards';
 
         $this->view->appRoute = $this->componentObj->apps->getAppInfo()['route'];
 
@@ -51,17 +51,17 @@ abstract class WidgetsComponent
 
         $this->views->setPhalconViewPath();
 
-        $this->view->setViewsDir($this->views->getPhalconViewPath());
+        $this->view->setViewsDir($this->views->getPhalconViewPath() . $this->component['route']);
 
         return $this;
     }
 
-    public function info($route, $widget)
+    public function info($widget)
     {
-        return $this->view->pick($route . '/widgets/' . strtolower($widget['method']) . '/info');
+        return $this->view->getPartial('widgets/' . strtolower($widget['method']) . '/info');
     }
 
-    public function getWidgetContent($route, $widget, $data = [])
+    public function getWidgetContent($widget, $data = [])
     {
         if (count($data) > 0) {
             $widget['data'] = $data;

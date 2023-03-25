@@ -57,7 +57,6 @@ abstract class BaseComponent extends Controller
 		$this->setComponent();
 
 		if (!$this->isJson() || $this->request->isAjax()) {
-
 			if ($this->views) {
 				$this->viewSettings = json_decode($this->views['settings'], true);
 
@@ -67,9 +66,11 @@ abstract class BaseComponent extends Controller
 					$this->setDefaultViewData();
 				}
 
-				$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
+				if ($this->modules->views->getPhalconViewPath() === $this->view->getViewsDir()) {
+					$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
 
-				$this->viewSimple->setViewsDir($this->view->getViewsDir() . $this->getURI());
+					$this->viewSimple->setViewsDir($this->view->getViewsDir() . $this->getURI());
+				}
 			}
 		}
 	}
@@ -116,7 +117,11 @@ abstract class BaseComponent extends Controller
 
 		try {
 			if (class_exists($widgetsClass)) {
-				$this->widgets = (new $widgetsClass())->init($this, $this->component);
+				$route = str_replace('apps/' . $this->app['app_type'] . '/components/', '', strtolower(str_replace('\\', '/', $namespace)));
+
+				$component = $this->modules->components->getRouteComponentForApp($route, $this->app['id']);
+
+				$this->widgets = (new $widgetsClass())->init($this, $component);
 			}
 		} catch (\Exception $e) {
 			throw $e;

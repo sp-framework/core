@@ -72,9 +72,9 @@ class Widgets extends BasePackage
 
             if (isset($widgetMethod) && $widgetsReflection->hasMethod($widgetMethod)) {
                 if ($task === 'info') {
-                    $widget['info'] = $widgetClass->info($component['route'], $widget);
+                    $widget['info'] = $widgetClass->info($widget);
                 } else if ($task === 'content') {
-                    $widget['content'] = $widgetClass->$widgetMethod($component['route'], $widget, $dashboardWidget);
+                    $widget['content'] = $widgetClass->$widgetMethod($widget, $dashboardWidget);
                 }
             }
 

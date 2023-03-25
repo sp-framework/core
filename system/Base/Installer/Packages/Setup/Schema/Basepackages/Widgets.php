@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Widgets
 {
@@ -64,6 +65,18 @@ class Widgets
                         'notNull' => false
                     ]
                 )
+            ],
+            'indexes' => [
+                new Index(
+                    'column_UNIQUE',
+                    [
+                        'method'
+                    ],
+                    'UNIQUE'
+                )
+            ],
+            'options' => [
+                'TABLE_COLLATION' => 'utf8mb4_general_ci'
             ]
         ];
     }

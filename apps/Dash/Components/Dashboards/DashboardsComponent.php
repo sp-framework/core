@@ -31,7 +31,9 @@ class DashboardsComponent extends BaseComponent
             }
         }
 
-        $dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, false);
+        $dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true, true);
+
+        $this->view->setViewsDir($this->modules->views->getPhalconViewPath() . $this->getURI());
 
         $this->view->dashboard = $dashboard;
 
