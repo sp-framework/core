@@ -1,0 +1,32 @@
+{% set selectedClocks = [] %}
+{% if widget['data']['settings']['clocks'] is defined %}
+    {% set selectedClocks = widget['data']['settings']['clocks'] %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'worldclock-' ~ widget['data']['id'] ~ '-clocks',
+                'fieldLabel'                     : 'Clocks',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select clocks to show.',
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : false,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldRequired'                  : true,
+                'fieldDataSelect2Multiple'       : true,
+                'fieldDataSelect2Options'        : widget['settings']['clocks'],
+                'fieldDataSelect2OptionsKey'     : 'id',
+                'fieldDataSelect2OptionsValue'   : 'name',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': selectedClocks
+            ]
+        )}}
+    </div>
+</div>

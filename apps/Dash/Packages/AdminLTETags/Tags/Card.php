@@ -21,12 +21,12 @@ class Card extends AdminLTETags
 
     protected function generateContent()
     {
-        if (isset($this->params['componentId']) && isset($this->params['sectionId'])) {
+        if (isset($this->params['cardId'])) {
+            $hasCardId = $this->params['cardId'];
+        } else if (isset($this->params['componentId']) && isset($this->params['sectionId'])) {
             $hasCardId = $this->params['componentId'] . '-' . $this->params['sectionId'] . '-card';
         } else if (!isset($this->params['componentId']) && isset($this->params['sectionId'])) {
             $hasCardId = $this->params['sectionId'] . '-card';
-        } else if (isset($this->params['cardId'])) {
-            $hasCardId = $this->params['cardId'] . '-card';
         } else {
             $hasCardId = null;
         }
@@ -108,8 +108,8 @@ class Card extends AdminLTETags
 
         if (isset($this->params['cardWidgetMode']) && $this->params['cardWidgetMode'] === true) {
             $bodyIsWidget = ' style="padding: 5px !important;"';
-            $cardIsWidget = ' style="box-shadow: 0 0 0 0;margin: 0;"';
-            $headerIsWidget = ' style="position: absolute;width: 100%;"';
+            $cardIsWidget = ' style="box-shadow: 0 0 0 0;margin: 0;border: 0 !important"';
+            $headerIsWidget = ' style="position: absolute;width: 100%;z-index:99;opacity: 0.8;"';
             $cardHeaderHidden = 'hidden';
         } else {
             $bodyIsWidget = '';

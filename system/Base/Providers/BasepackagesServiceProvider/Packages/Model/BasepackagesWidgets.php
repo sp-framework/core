@@ -14,5 +14,7 @@ class BasepackagesWidgets extends BaseModel
 
     public $component_id;
 
+    public $multiple;
+
     public $settings;
 }

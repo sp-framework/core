@@ -222,8 +222,25 @@ var BazContentLoader = function() {
                         $('#security-token').val(xhr.getResponseHeader('token'));
                     }
                 }
+
+                if ($('.component').length > 0) {
+                    if (dataCollection[$('.component')[0].id]) {
+                        var timers = BazHelpers.setTimeoutTimers.all();
+
+                        if (timers.length > 0) {
+                            $(timers).each(function(i, timer) {
+                                if (timer['dataCollectionObj']) {
+                                    if (timer['dataCollectionObj'] !== $('.component')[0].id) {
+                                        BazHelpers.setTimeoutTimers.stop(timer['id']);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
             });
         }, options.ajaxLoadDelay);
+
     }
 
     function loadModal(element, options) {

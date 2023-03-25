@@ -3301,6 +3301,72 @@ var BazHelpers = function() {
         return obj[key];
     }
 
+    function setTimeoutTimers() {
+        var timers = []
+
+        const getIndex = (array, attr, value) => {
+            for (let i = 0; i < array.length; i += 1) {
+                if (array[i][attr] === value) {
+                    return i
+                }
+            }
+            return -1
+        };
+
+        // add
+        const add = (func, time = 1000, dataCollectionObj = null, identifier = null) => {
+            var id = setTimeout(() => {
+                let index = getIndex(timers, 'id', id)
+                timers.splice(index, 1)
+                func()
+            }, time);
+
+            timers.push({
+                id: id,
+                dataCollectionObj : dataCollectionObj,
+                identifier : identifier,
+                time: time,
+                debug: func.toString()
+            })
+        };
+
+        // get all active timers
+        const all = () => timers
+
+        // stop timer by timer id
+        const stop = (id = null, dataCollectionObj = null, identifier = null) => {
+            let index;
+            if (dataCollectionObj) {
+                index = getIndex(timers, 'dataCollectionObj', dataCollectionObj);
+                id = timers[index]['id'];
+            } else if (identifier) {
+                index = getIndex(timers, 'identifier', identifier);
+                id = timers[index]['id'];
+            } else {
+                index = getIndex(timers, 'id', id);
+            }
+            if (index !== -1) {
+                clearTimeout(timers[index].id)
+                timers.splice(index, 1)
+            }
+        };
+
+        // stop all timers
+        const stopAll = () => {
+            for (let i = 0; i < timers.length; i++) {
+                clearTimeout(timers[i].id)
+            }
+            timers = []
+        };
+
+        return {
+            add: add,
+            all: all,
+            stop: stop,
+            stopAll: stopAll,
+        };
+    }
+
     function setup(BazHelpersConstructor) {
         BazHelpers = BazHelpersConstructor;
 
@@ -3375,6 +3441,10 @@ var BazHelpers = function() {
         BazHelpers.fetchFromObject = function(obj, key) {
             return fetchFromObject(obj, key);
         }
+
+        BazHelpers.setTimeoutTimers = (function() {
+            return setTimeoutTimers();
+        })();
     }
 
     setup(bazHelpersConstructor);
@@ -8463,6 +8533,8 @@ var BazContentFields = function() {
     function initFields(options = null) {
         var fields;
         if (options && options.fieldId) {
+            componentId = options.componentId;
+            sectionId = options.sectionId;
             fields = $('#' + sectionId).find('#' + options.fieldId);
         } else {
             fields = $('#' + sectionId).find('[data-bazscantype]');
@@ -9139,7 +9211,7 @@ var BazContentFields = function() {
         BazContentFields.defaults = { };
         BazContentFields.init = function(options) {
             if (options.fieldId) {
-                initFields(options);
+                initFields(_extends(BazContentFields.defaults, options));
             } else {
                 init(_extends(BazContentFields.defaults, options));
                 initFields();

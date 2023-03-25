@@ -44,6 +44,20 @@ class Widgets
                     ]
                 ),
                 new Column(
+                    'multiple',
+                    [
+                        'type'    => Column::TYPE_BOOLEAN,
+                        'notNull' => true
+                    ]
+                ),
+                new Column(
+                    'max_multiple',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => false
+                    ]
+                ),
+                new Column(
                     'settings',
                     [
                         'type'    => Column::TYPE_JSON,

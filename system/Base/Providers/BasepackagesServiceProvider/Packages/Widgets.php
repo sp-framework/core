@@ -44,10 +44,17 @@ class Widgets extends BasePackage
         return $widgetsTree;
     }
 
-    public function getWidget(int $id, $task = 'info')
+    public function getWidget(int $id, $task = null, $dashboardWidget = [])
     {
         $widget = $this->getById($id);
 
+        if (!$task) {
+            return $widget;
+        }
+
+        if ($widget['settings']) {
+            $widget['settings'] = JSON::decode($widget['settings'], true);
+        }
         $widgetMethod = $widget['method'];
 
         $component = $this->modules->components->getComponentById($widget['component_id']);
@@ -65,11 +72,13 @@ class Widgets extends BasePackage
 
             if (isset($widgetMethod) && $widgetsReflection->hasMethod($widgetMethod)) {
                 if ($task === 'info') {
-                    return $widgetClass->info($component['route'], $widgetMethod);
+                    $widget['info'] = $widgetClass->info($component['route'], $widget);
                 } else if ($task === 'content') {
-                    return $widgetClass->$widgetMethod($component['route'], $widgetMethod);
+                    $widget['content'] = $widgetClass->$widgetMethod($component['route'], $widget, $dashboardWidget);
                 }
             }
+
+            return $widget;
         }
 
         return false;
@@ -95,8 +104,8 @@ class Widgets extends BasePackage
         foreach ($data as $key => $dashboardWidget) {
             $dashboardWidget['settings'] = Json::decode($dashboardWidget['settings'], true);
             $widgetsData[$key] = $dashboardWidget;
-            $widgetsData[$key]['content'] =
-                $this->getWidget($dashboardWidget['widget_id'], 'content');
+            $widget = $this->getWidget($dashboardWidget['widget_id'], 'content', $dashboardWidget);
+            $widgetsData[$key]['widget'] = $widget;
         }
 
         $widgetsData = msort($widgetsData, 'sequence');

@@ -2,6 +2,8 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages;
 
+use Phalcon\Helper\Json;
+
 class Widgets
 {
     public function register($db, $componentFile, $registeredComponentId, $path, $localContent)
@@ -34,7 +36,10 @@ class Widgets
             [
                 'name'                  => $widget['name'],
                 'method'                => $widget['method'],
-                'component_id'          => $registeredComponentId
+                'component_id'          => $registeredComponentId,
+                'multiple'              => isset($widget['multiple']) && $widget['multiple'] === true ? 1 : 0,
+                'max_multiple'          => isset($widget['max_multiple']) ? $widget['max_multiple'] : 5,//Max instances of same widget
+                'settings'              => isset($widget['settings']) ? Json::encode($widget['settings']) : null
             ]
         );
     }

@@ -145,7 +145,9 @@ class Button
                 $this->buttonParams['iconPosition'] = '';
             }
 
-            if (isset($this->params['componentId']) && isset($this->params['sectionId'])) {
+            if (isset($button['buttonId'])) {
+                $this->buttonParams['id'] = $button['buttonId'];
+            } else if (isset($this->params['componentId']) && isset($this->params['sectionId'])) {
                 $this->buttonParams['id'] =
                     $this->params['componentId'] . '-' . $this->params['sectionId'] . '-' . $buttonKey;
             } else {

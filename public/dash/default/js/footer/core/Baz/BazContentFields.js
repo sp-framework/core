@@ -113,6 +113,8 @@ var BazContentFields = function() {
     function initFields(options = null) {
         var fields;
         if (options && options.fieldId) {
+            componentId = options.componentId;
+            sectionId = options.sectionId;
             fields = $('#' + sectionId).find('#' + options.fieldId);
         } else {
             fields = $('#' + sectionId).find('[data-bazscantype]');
@@ -789,7 +791,7 @@ var BazContentFields = function() {
         BazContentFields.defaults = { };
         BazContentFields.init = function(options) {
             if (options.fieldId) {
-                initFields(options);
+                initFields(_extends(BazContentFields.defaults, options));
             } else {
                 init(_extends(BazContentFields.defaults, options));
                 initFields();

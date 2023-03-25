@@ -29,6 +29,8 @@ abstract class WidgetsComponent
         $this->view->componentId =
             strtolower($this->view->appRoute) . '-' . strtolower($this->view->componentName);
 
+        $this->view->sectionId = 'main';
+
         $reflection = Arr::sliceRight(explode('\\', $this->componentObj->reflection->getName()), 3);
 
         if (count($reflection) === 1) {
@@ -54,15 +56,19 @@ abstract class WidgetsComponent
         return $this;
     }
 
-    public function info($route, $widgetMethod)
+    public function info($route, $widget)
     {
-        return $this->view->pick($route . '/widgets/' . strtolower($widgetMethod) . '/info');
+        return $this->view->pick($route . '/widgets/' . strtolower($widget['method']) . '/info');
     }
 
-    public function getWidgetContent($route, $widgetMethod, $data = [])
+    public function getWidgetContent($route, $widget, $data = [])
     {
+        if (count($data) > 0) {
+            $widget['data'] = $data;
+        }
+
         try {
-            return $this->view->getPartial('widgets/' . strtolower($widgetMethod) . '/view', $data);
+            return $this->view->getPartial('widgets/' . strtolower($widget['method']) . '/view', ['widget' => $widget]);
         } catch (\Exception $e) {
             throw $e;
         }

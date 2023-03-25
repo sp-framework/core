@@ -16,7 +16,7 @@ class DashboardsComponent extends BaseComponent
         ) {
             $this->getNewToken();
 
-            return $this->basepackages->widgets->getWidget($this->getData()['id'], 'info');
+            return $this->basepackages->widgets->getWidget($this->getData()['id'], 'info')['info'];
         } else {
             if (isset($this->getData()['id'])) {
                 $dashboardId = $this->getData()['id'];
@@ -32,8 +32,6 @@ class DashboardsComponent extends BaseComponent
         }
 
         $dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, false);
-
-        $dashboard['settings'] = Json::decode($dashboard['settings']);
 
         $this->view->dashboard = $dashboard;
 
@@ -119,19 +117,13 @@ class DashboardsComponent extends BaseComponent
                 return;
             }
 
-            $dashboard = $this->basepackages->dashboards->getDashboardById($this->postData()['dashboard_id'], true);
+            $this->basepackages->dashboards->getWidgetContent($this->postData());
 
-            if (isset($dashboard['widgets']) && count($dashboard['widgets']) > 0) {
-                $this->basepackages->widgets->getWidgetsContent($dashboard['widgets']);
-
-                $this->addResponse(
-                    $this->basepackages->widgets->packagesData->responseMessage,
-                    $this->basepackages->widgets->packagesData->responseCode,
-                    $this->basepackages->widgets->packagesData->responseData
-                );
-            } else {
-                $this->addResponse('No widgets', 2);
-            }
+            $this->addResponse(
+                $this->basepackages->dashboards->packagesData->responseMessage,
+                $this->basepackages->dashboards->packagesData->responseCode,
+                $this->basepackages->dashboards->packagesData->responseData
+            );
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }

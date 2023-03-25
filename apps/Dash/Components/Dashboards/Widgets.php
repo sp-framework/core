@@ -6,8 +6,8 @@ use Apps\Dash\Components\Dashboards\WidgetsComponent;
 
 class Widgets extends WidgetsComponent
 {
-    public function worldClock($route, $widgetMethod)
+    public function worldClock($route, $widget, $dashboardWidget)
     {
-        return $this->getWidgetContent($route, $widgetMethod, ['name' => 'Guru']);
+        return $this->getWidgetContent($route, $widget, $dashboardWidget);
     }
 }
