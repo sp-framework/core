@@ -1,23 +1,23 @@
-{{adminltetags.useTag('card',
-    [
-        'component'                     : component,
-        'componentName'                 : componentName,
-        'componentId'                   : componentId,
-        'parentComponentId'             : parent,
-        'sectionId'                     : sectionId,
-        'cardId'                        : componentId ~ '-' ~ sectionId ~ '-worldclock-' ~ widget['data']['id'],
-        'cardHeader'                    : true,
-        'cardFooter'                    : false,
-        'cardWidgetMode'                : true,
-        'cardType'                      : 'primary',
-        'cardIcon'                      : 'clock',
-        'cardTitle'                     : 'World Clock',
-        'cardShowTools'                 : ['settings', 'move', 'widgetRemove'],
-        'cardAdditionalClass'           : 'rounded-0 border',
-        'cardBodyInclude'               : 'widgets/worldclock/worldclock'
-    ]
-)}}
-<script>
-//eslint-disable-next-line
-console.log('memememememem');
-</script>
+{% if widget['data']['getWidgetData'] is not defined %}
+    {{adminltetags.useTag('card',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : sectionId,
+            'cardId'                        : componentId ~ '-' ~ sectionId ~ '-worldclock-' ~ widget['data']['id'],
+            'cardHeader'                    : true,
+            'cardFooter'                    : false,
+            'cardWidgetMode'                : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'clock',
+            'cardTitle'                     : 'World Clock',
+            'cardShowTools'                 : ['settings', 'move', 'widgetRemove'],
+            'cardAdditionalClass'           : 'rounded-0 border',
+            'cardBodyContent'               : ''
+        ]
+    )}}
+{% else %}
+    {% include 'widgets/worldclock/worldclock.html' %}
+{% endif %}

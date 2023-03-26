@@ -75,7 +75,7 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	protected function setComponent()
+	protected function setComponent($checkWidgets = true)
 	{
 		$this->reflection = new \ReflectionClass($this);
 
@@ -106,7 +106,9 @@ abstract class BaseComponent extends Controller
 				);
 		}
 
-		$this->checkComponentWidgets();
+		if ($checkWidgets) {
+			$this->checkComponentWidgets();
+		}
 	}
 
 	protected function checkComponentWidgets()

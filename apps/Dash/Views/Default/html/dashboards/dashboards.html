@@ -7,13 +7,13 @@
     </div>
 </div>
 <hr class="mt-1 m-0">
-{# <div class="row text-center" id="{{componentId}}-{{sectionId}}-dashboard-loader">
+<div class="row text-center" id="{{componentId}}-{{sectionId}}-dashboard-loader">
     <div class="col">
         <div class="fa-2x">
             <i class="fa fa-cog fa-spin"></i> Loading...
         </div>
     </div>
-</div> #}
+</div>
 <div class="row text-center mt-4" id="{{componentId}}-{{sectionId}}-no-widgets" hidden>
     <div class="col">
         <h6><i class="fa fa-fw fa-info-circle text-info"></i> No widgets added to this dashboard.</h6>
@@ -21,17 +21,7 @@
 </div>
 <div class="row">
     <div class="col">
-        <div class="grid-stack">
-            {% if dashboard['widgets'] | length > 0 %}
-                {% for dashboardWidget in dashboard['widgets'] %}
-                {{dump(dashboardWidget)}}
-                    <div class="grid-stack-item">
-                        <div class="grid-stack-item-content">
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        </div>
+        <div class="grid-stack"></div>
     </div>
 </div>
 <div>
@@ -87,7 +77,7 @@
     )}}
 </div>
 <script>
-/* globals showPaginate GridStack Swal loadWidgetJS */
+/* globals showPaginate GridStack Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -119,25 +109,33 @@ dataCollectionSection =
                 grid = dataCollectionComponent['{{componentId}}-{{sectionId}}']['grid'] = GridStack.init({
                     'draggable'     : {
                         'handle'    : '[data-card-widget="move"]'
-                    }
+                    },
+                    'margin'        : '5px',
+                    'animate'       : false
                 });
             }
 
             initGrid();
 
             grid.on('added', function(e, items) {
+                //eslint-disable-next-line
+                console.log(items);
                 items.forEach(function(item) {
-                    var itemHeight = $(item.el).find('.card')[0].offsetHeight + 20;//20 for padding
-
-                    grid.cellHeight(itemHeight);
-
-                    item.el.dataset.method = item.method;//Add method for later use.
+                    populateGridData(item);
                 });
             });
 
+            function fixHeight(item) {
+                var itemHeight = $(item.el).find('.card')[0].offsetHeight + 20;//20 for padding
+
+                grid.cellHeight(itemHeight);
+            }
+
             $('body').off('widgetUpdate');
             $('body').on('widgetUpdate', function(e, data) {
-                loadWidgetJS(data.widgetsData[0]);
+                data.items.forEach(function(item) {
+                    populateGridData(item);
+                });
             });
 
             grid.on('resizestart', function(e, el) {
@@ -148,7 +146,7 @@ dataCollectionSection =
                 $(el).find('.card-header').attr('hidden', false);
             });
 
-            function populateGrid() {
+            function populateGridStructure() {
                 var postData = { };
                 postData[$('#security-token').attr('name')] = $('#security-token').val();
                 postData['dashboard_id'] = $('#{{componentId}}-{{sectionId}}-dashboards').select2().val();
@@ -162,10 +160,6 @@ dataCollectionSection =
                     if (response.responseCode === 0) {
                         if (response.responseData && response.responseData.widgetsData) {
                             for (var widget in response.responseData.widgetsData) {
-                                // var el = $('<div id="widget-scripts"></div>');
-                                // el.html(response.responseData.widgetsData[widget]['widget']['content']);
-                                // //eslint-disable-next-line
-                                // console.log($(el).find('<script>'));
                                 addWidgetToGrid(response.responseData.widgetsData[widget]);
                             }
 
@@ -180,6 +174,7 @@ dataCollectionSection =
                     } else if (response.responseCode === 1) {
                         showPaginate('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
                     } else if (response.responseCode === 2) {
+                        showPaginate('error', {'text' : response.responseMessage});
                         $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
                     }
                     $('#{{componentId}}-{{sectionId}}-dashboard-loader').attr('hidden', true);
@@ -187,8 +182,28 @@ dataCollectionSection =
                     initRemoveButtons();
                 }, 'json');
             }
+            populateGridStructure();
 
-            // populateGrid();
+            function populateGridData(item) {
+                item.el.dataset.method = item.method;//Add method for later use.
+                $(item.el).find('.card-body').html(
+                    '<div class="row text-center">' +
+                        '<div class="col">' +
+                            '<i class="fa fa-cog fa-spin"></i> Loading...' +
+                        '</div>' +
+                    '</div>'
+                );
+
+                var url = '{{links.url("dashboards/q/widgets/content/id/' + item.id + '/did/' + item.dashboard_id + '/wid/' + item.widget_id + '")}}';
+                $(item.el).find('.card-body').load(url, null, function (response, status, xhr) {
+                    if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
+                        $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
+                        $('#security-token').val(xhr.getResponseHeader('token'));
+                    }
+                    fixHeight(item);
+                });
+            }
+
 
             function initRemoveButtons() {
                 $('.btn-tool-widgetRemove').off();
@@ -266,6 +281,8 @@ dataCollectionSection =
                 newWidget['w'] = 3;//25% of the screen
                 newWidget['minW'] = 3;//25% of the screen
                 newWidget['method'] = widgetsData['widget']['method'];
+                newWidget['widget_id'] = widgetsData['widget']['id'];
+                newWidget['dashboard_id'] = widgetsData['dashboard_id'];
 
                 if (widgetsData['settings']['w']) {
                     newWidget['w'] = widgetsData['settings']['w'];
@@ -288,7 +305,6 @@ dataCollectionSection =
 
                 grid.addWidget(newWidget);
                 dataCollectionComponent['{{componentId}}-{{sectionId}}'][widgetsData['widget']['method']] = { };
-                loadWidgetJS(widgetsData);
                 initRemoveButtons();
 
                 //Disable so that we dont add duplicates unless multiple is set to 1.
@@ -305,7 +321,7 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}-widget-no-widgets').attr('hidden', true);
                     $('#{{componentId}}-{{sectionId}}-widget-error').attr('hidden', true);
                     $('#{{componentId}}-{{sectionId}}-widget-loader').attr('hidden', false);
-                    var url = '{{links.url("dashboards/q/widgets/true/id/' + data.node.data.id + '")}}';
+                    var url = '{{links.url("dashboards/q/widgets/info/id/' + data.node.data.id + '")}}';
 
                     $('#{{componentId}}-{{sectionId}}-widget-info').load(url, null, function (response, status, xhr) {
                         if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
@@ -455,461 +471,4 @@ dataCollectionSection =
             });
         }
     });
-</script>
-<script>
-/* globals BazContentFields showPaginate BazHelpers */
-function loadWidgetJS(widgetsData) {
-    var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
-
-    if (!window['dataCollection']['{{componentId}}']) {
-        dataCollectionComponent =
-            window['dataCollection']['{{componentId}}'] = { };
-    } else {
-        dataCollectionComponent =
-            window['dataCollection']['{{componentId}}'];
-    }
-    if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
-        dataCollectionSection =
-            dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
-    } else {
-        dataCollectionSection =
-            dataCollectionComponent['{{componentId}}-{{sectionId}}'];
-    }
-
-    var fn;
-    if (widgetsData['widget']['method'] === 'worldClock') {
-        dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-' + widgetsData['id'] + '-clocks'] =
-            {
-                'placeholder'   : 'SELECT CLOCKS',
-                afterInit : function() {
-                    $('#{{componentId}}-{{sectionId}}-settings-worldclock-' + widgetsData['id'] + '-button-save').off();
-                    $('#{{componentId}}-{{sectionId}}-settings-worldclock-' + widgetsData['id'] + '-button-save').click(function(e) {
-                        e.preventDefault();
-                        var grid = dataCollectionComponent['{{componentId}}-main']['grid'];
-
-                        $(this).attr('disabled', true);
-                        $(this).children('i').attr('hidden', false);
-
-                        var gridWidgets = grid.save(false, false);
-                        var widgets = [];
-                        var el = $(this).parents('.grid-stack-item')[0];
-                        var widgetId = $(el).attr('gs-id');
-
-                        $(gridWidgets).each(function(i, widget) {
-                            if (widget['id'] === widgetId) {
-                                widgets.push(gridWidgets[i]);
-                                return false;
-                            }
-                        });
-
-                        var postData = { };
-                        postData[$('#security-token').attr('name')] = $('#security-token').val();
-                        postData['dashboard_id'] = $('#{{componentId}}-main-dashboards').select2().val();
-                        postData['widgets'] = widgets;
-                        postData['widgets'][0]['clocks'] = $('#{{componentId}}-{{sectionId}}-worldclock-' + widgetsData['id'] + '-clocks').select2().val();
-
-                        $.post('{{links.url("dashboards/updateWidgetToDashboard")}}', postData, function(response) {
-                            $('#{{componentId}}-{{sectionId}}-modal-button-save').attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-modal-button-save').children('i').attr('hidden', true);
-
-                            if (response.tokenKey && response.token) {
-                                $("#security-token").attr("name", response.tokenKey);
-                                $("#security-token").val(response.token);
-                            }
-
-                            if (response.responseCode === 0) {
-                                $('#{{componentId}}-{{sectionId}}-settings-worldclock-' + widgetsData['id'] + '-button-save').attr('disabled', false);
-                                $('#{{componentId}}-{{sectionId}}-settings-worldclock-' + widgetsData['id'] + '-button-save').children('i').attr('hidden', true);
-                                $('#{{componentId}}-{{sectionId}}-settings-worldclock-' + widgetsData['id'] + '-button-save').parents('.modal').modal('hide');
-                                var postDataGetWidget = { };
-                                postDataGetWidget[$('#security-token').attr('name')] = $('#security-token').val();
-                                postDataGetWidget['dashboard_id'] = $('#{{componentId}}-main-dashboards').select2().val();
-                                postDataGetWidget['widget_id'] = postData['widgets'][0]['id'];
-
-                                var responseMessage = response.responseMessage;
-
-                                $.post('{{links.url("dashboards/getWidgetContent")}}', postDataGetWidget, function(response) {
-                                    if (response.tokenKey && response.token) {
-                                        $("#security-token").attr("name", response.tokenKey);
-                                        $("#security-token").val(response.token);
-                                    }
-
-                                    if (response.responseCode === 0) {
-                                        showPaginate('success', {'text' : responseMessage});
-
-                                        var updateWidget = { };
-                                        updateWidget['content'] = response.responseData['widgetsData'][0]['widget']['content'];
-
-                                        dataCollectionSection['tempEl'] = $('<div></div>');
-                                        dataCollectionSection['tempEl'].html(updateWidget['content']);
-                                        $(el).find('.card-body').empty().html($(dataCollectionSection['tempEl']).find('.card-body').html());
-                                        $('.modal-backdrop').remove();
-
-                                        $('body').trigger('widgetUpdate', {'widgetsData' : response.responseData['widgetsData']});
-                                    } else {
-                                        showPaginate('error', {'text' : response.responseMessage});
-                                    }
-                                }, 'json');
-                            } else {
-                                showPaginate('error', {'text' : response.responseMessage});
-                            }
-                        }, 'json');
-                    });
-                }
-            };
-
-        fn = {
-            worldClock : function(offSet, region) {
-                var dst = 0;
-                var time, startDST, endDST, currentTime, dayDST;
-                time = new Date();
-                startDST = new Date();
-                endDST = new Date();
-                var gmtMS = time.getTime() + (time.getTimezoneOffset() * 60000);
-                var gmtTime = new Date(gmtMS);
-                var day = gmtTime.getDate();
-                var month = gmtTime.getMonth();
-                var year = gmtTime.getYear();
-                var hr = gmtTime.getHours() + offSet;
-                var min = gmtTime.getMinutes();
-                var sec = gmtTime.getSeconds();
-                var monthArray = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-                var monthDays = ["31","28","31","30","31","30","31","31","30","31","30","31"];
-
-                if (year < 1000) {
-                    year += 1900;
-                }
-
-                if (year%4 == 0) {
-                    monthDays = ["31","29","31","30","31","30","31","31","30","31","30","31"];
-                }
-
-                if (year%100 == 0 && year%400 != 0) {
-                    monthDays = ["31","28","31","30","31","30","31","31","30","31","30","31"];
-                }
-
-                if (hr >= 24) {
-                    hr = hr-24;
-                    day -= -1;
-                }
-
-                if (hr < 0) {
-                    hr -= -24;
-                    day -= 1;
-                }
-
-                if (hr < 10) {
-                    hr = " " + hr;
-                }
-
-                if (min < 10) {
-                    min = "0" + min;
-                }
-
-                if (sec < 10) {
-                    sec = "0" + sec;
-                }
-
-                if (day <= 0) {
-                    if (month == 0) {
-                        month = 11;
-                        year -= 1;
-                    } else {
-                        month = month -1;
-                    }
-                    day = monthDays[month];
-                }
-
-                if (day > monthDays[month]) {
-                    day = 1;
-                    if (month == 11) {
-                        month = 0;
-                        year -= -1;
-                    } else {
-                        month -= -1;
-                    }
-                }
-
-                if (region == "NAmerica") {
-                    startDST.setMonth(3);
-                    startDST.setHours(2);
-                    startDST.setDate(1);
-                    dayDST = startDST.getDay();
-                    if (dayDST != 0) {
-                        startDST.setDate(8 - dayDST);
-                    } else {
-                        startDST.setDate(1);
-                    }
-                    endDST.setMonth(9);
-                    endDST.setHours(1);
-                    endDST.setDate(31);
-                    dayDST = endDST.getDay();
-                    endDST.setDate(31-dayDST);
-                    currentTime = new Date();
-                    currentTime.setMonth(month);
-                    currentTime.setYear(year);
-                    currentTime.setDate(day);
-                    currentTime.setHours(hr);
-                    if (currentTime >= startDST && currentTime < endDST) {
-                        dst = 1;
-                    }
-                }
-
-                if (region == "Europe") {
-                    startDST = new Date();
-                    endDST = new Date();
-                    startDST.setMonth(2);
-                    startDST.setHours(1);
-                    startDST.setDate(31);
-                    dayDST = startDST.getDay();
-                    startDST.setDate(31-dayDST);
-                    endDST.setMonth(9);
-                    endDST.setHours(0);
-                    endDST.setDate(31);
-                    dayDST = endDST.getDay();
-                    endDST.setDate(31-dayDST);
-                    currentTime = new Date();
-                    currentTime.setMonth(month);
-                    currentTime.setYear(year);
-                    currentTime.setDate(day);
-                    currentTime.setHours(hr);
-                    if (currentTime >= startDST && currentTime < endDST) {
-                        dst = 1;
-                    }
-                }
-
-                if (region == "SAmerica") {
-                    startDST = new Date();
-                    endDST = new Date();
-                    startDST.setMonth(9);
-                    startDST.setHours(0);
-                    startDST.setDate(1);
-                    dayDST = startDST.getDay();
-                    if (dayDST != 0) {
-                        startDST.setDate(22-dayDST);
-                    } else {
-                        startDST.setDate(15);
-                    }
-                    endDST.setMonth(1);
-                    endDST.setHours(11);
-                    endDST.setDate(1);
-                    dayDST = endDST.getDay();
-                    if (dayDST != 0) {
-                        endDST.setDate(21-dayDST);
-                    } else {
-                        endDST.setDate(14);
-                    }
-                    currentTime = new Date();
-                    currentTime.setMonth(month);
-                    currentTime.setYear(year);
-                    currentTime.setDate(day);
-                    currentTime.setHours(hr);
-                    if(currentTime >= startDST || currentTime < endDST) {
-                        dst = 1;
-                    }
-                }
-
-                if (region == "Cairo") {
-                    startDST = new Date();
-                    endDST = new Date();
-                    startDST.setMonth(3);
-                    startDST.setHours(0);
-                    startDST.setDate(30);
-                    dayDST = startDST.getDay();
-                    if (dayDST < 5) {
-                        startDST.setDate(28-dayDST);
-                    } else {
-                        startDST.setDate(35-dayDST);
-                    }
-                    endDST.setMonth(8);
-                    endDST.setHours(11);
-                    endDST.setDate(30);
-                    dayDST = endDST.getDay();
-                    if (dayDST < 4) {
-                        endDST.setDate(27-dayDST);
-                    } else {
-                        endDST.setDate(34-dayDST);
-                    }
-                    currentTime = new Date();
-                    currentTime.setMonth(month);
-                    currentTime.setYear(year);
-                    currentTime.setDate(day);
-                    currentTime.setHours(hr);
-                    if (currentTime >= startDST && currentTime < endDST) {
-                        dst = 1;
-                    }
-                }
-
-                if (region == "Israel") {
-                    startDST = new Date();
-                    endDST = new Date();
-                    startDST.setMonth(3);
-                    startDST.setHours(2);
-                    startDST.setDate(1);
-                    endDST.setMonth(8);
-                    endDST.setHours(2);
-                    endDST.setDate(25);
-                    dayDST = endDST.getDay();
-                    if (dayDST != 0) {
-                        endDST.setDate(32-dayDST);
-                    } else {
-                        endDST.setDate(1);
-                        endDST.setMonth(9);
-                    }
-                    currentTime = new Date();
-                    currentTime.setMonth(month);
-                    currentTime.setYear(year);
-                    currentTime.setDate(day);
-                    currentTime.setHours(hr);
-                    if (currentTime >= startDST && currentTime < endDST) {
-                        dst = 1;
-                    }
-                }
-
-                if (region == "Beirut") {
-                    startDST = new Date();
-                    endDST = new Date();
-                    startDST.setMonth(2);
-                    startDST.setHours(0);
-                    startDST.setDate(31);
-                    dayDST = startDST.getDay();
-                    startDST.setDate(31-dayDST);
-                    endDST.setMonth(9);
-                    endDST.setHours(11);
-                    endDST.setDate(31);
-                    dayDST = endDST.getDay();
-                    endDST.setDate(30-dayDST);
-                    currentTime = new Date();
-                    currentTime.setMonth(month);
-                    currentTime.setYear(year);
-                    currentTime.setDate(day);
-                    currentTime.setHours(hr);
-                    if(currentTime >= startDST && currentTime < endDST) {
-                        dst = 1;
-                    }
-                }
-
-                if (region == "Baghdad") {
-                    startDST = new Date();
-                    endDST = new Date();
-                    startDST.setMonth(3);
-                    startDST.setHours(3);
-                    startDST.setDate(1);
-                    endDST.setMonth(9);
-                    endDST.setHours(3);
-                    endDST.setDate(1);
-                    dayDST = endDST.getDay();
-                    currentTime = new Date();
-                    currentTime.setMonth(month);
-                    currentTime.setYear(year);
-                    currentTime.setDate(day);
-                    currentTime.setHours(hr);
-                    if(currentTime >= startDST && currentTime < endDST) {
-                        dst = 1;
-                    }
-                }
-
-                if (region == "Australia") {
-                    startDST = new Date();
-                    endDST = new Date();
-                    startDST.setMonth(9);
-                    startDST.setHours(2);
-                    startDST.setDate(31);
-                    dayDST = startDST.getDay();
-                    startDST.setDate(31-dayDST);
-                    endDST.setMonth(2);
-                    endDST.setHours(2);
-                    endDST.setDate(31);
-                    dayDST = endDST.getDay();
-                    endDST.setDate(31-dayDST);
-                    currentTime = new Date();
-                    currentTime.setMonth(month);
-                    currentTime.setYear(year);
-                    currentTime.setDate(day);
-                    currentTime.setHours(hr);
-                    if (currentTime >= startDST || currentTime < endDST) {
-                        dst = 1;
-                    }
-                }
-
-                if (dst == 1) {
-                    hr -= -1;
-
-                    if (hr >= 24) {
-                        hr = hr-24;
-                        day -= -1;
-                    }
-
-                    if (hr < 10) {
-                        hr = " " + hr;
-                    }
-
-                    if (day > monthDays[month]) {
-                        day = 1;
-
-                        if (month == 11) {
-                            month = 0;
-                            year -= -1;
-                        } else {
-                            month -= -1
-                        }
-                    }
-                    return monthArray[month] + " " + day + ", " + year + " " + hr + ":" + min + ":" + sec + " DST"
-                } else {
-                    return monthArray[month] + " " + day + ", " + year + " " + hr + ":" + min + ":" + sec
-                }
-            },
-            worldClockZone : function() {
-                if (widgetsData['settings']['clocks'] && widgetsData['settings']['clocks'].length > 0) {
-                    $(widgetsData['settings']['clocks']).each(function(i, clock) {
-                        if (widgetsData['widget']['settings']['clocks'][clock]) {
-                            $('#worldclock-' + widgetsData['id'] + '-' + clock).html(
-                                fn.worldClock(
-                                widgetsData['widget']['settings']['clocks'][clock]['offset'],
-                                widgetsData['widget']['settings']['clocks'][clock]['region']
-                                )
-                            );
-                        }
-                    });
-                }
-
-                var timers = BazHelpers.setTimeoutTimers.all();
-
-                var found = false;
-                if (timers.length > 0) {
-                    $(timers).each(function(i, timer) {
-                        if (timer['identifier'] === 'worldClock' + widgetsData['id']) {
-                            found = timer['id'];
-                        }
-                    });
-                }
-
-                if (!found) {
-                    BazHelpers.setTimeoutTimers.add(function() {
-                        fn.worldClockZone();
-                    }, 1000, '{{componentId}}', 'worldClock' + widgetsData['id']);
-                } else {
-                    BazHelpers.setTimeoutTimers.stop(found);
-                    BazHelpers.setTimeoutTimers.add(function() {
-                        fn.worldClockZone();
-                    }, 1000, '{{componentId}}', 'worldClock' + widgetsData['id']);
-                }
-            }
-        }
-
-        fn.worldClockZone();
-
-        BazContentFields.init({
-            'componentId'   : "{{componentId}}",
-            'sectionId'     : "{{componentId}}-{{sectionId}}",
-            'fieldId'       : "{{componentId}}-{{sectionId}}-worldclock-" + widgetsData['id'] + "-clocks"
-        });
-
-    }
-}
-$('body').off('widgetRemove');
-$('body').on('widgetRemove', function(e, data) {
-    BazHelpers.setTimeoutTimers.stop(null, null, 'worldClock' + $($(data.gridWidget)[0]).attr('gs-id'));
-});
-
 </script>

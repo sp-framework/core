@@ -43,6 +43,24 @@ class Dashboards extends BasePackage
         return false;
     }
 
+    public function getDashboardWidgetById(int $id, int $dashboardId, $getContent = false)
+    {
+        $dashboard = $this->getDashboardById($dashboardId, true, $getContent);
+
+        if (isset($dashboard['widgets']) && count($dashboard['widgets']) > 0) {
+            foreach ($dashboard['widgets'] as $key => $widget) {
+                if ($id == $widget['id']) {
+                    if ($widget['settings']) {
+                        $widget['settings'] = Json::decode($widget['settings'], true);
+                    }
+                    return $widget;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public function addWidgetToDashboard(array $data)
     {
         $dashboard = $this->getDashboardById($data['dashboard_id']);

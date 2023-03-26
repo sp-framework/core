@@ -1,6 +1,6 @@
 {% if widget['data']['settings']['clocks'] is defined %}
     <div class="table-responsive">
-        <table class="table table-sm text-nowrap table-borderless">
+        <table class="table table-sm text-nowrap table-borderless worldclocktable" data-worldclockid="{{widget['data']['id']}}">
             <tbody>
                 <tr>
                     {% for clock in widget['data']['settings']['clocks'] %}
@@ -58,3 +58,477 @@
             ]
     ]
 )}}
+{% set widgetsData = json_encode(widget, 16) %}
+<script>
+/* globals BazContentFields showPaginate BazHelpers */
+var dataCollectionComponent, dataCollectionSection;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+
+var widgetsData = { };
+widgetsData = JSON.parse('{{widgetsData}}');
+
+dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-' + widgetsData["data"]["id"] + '-clocks'] =
+    {
+        'placeholder'   : 'SELECT CLOCKS',
+        afterInit : function() {
+            $('#{{componentId}}-{{sectionId}}-settings-worldclock-' + widgetsData["data"]["id"] + '-button-save').off();
+            $('#{{componentId}}-{{sectionId}}-settings-worldclock-' + widgetsData["data"]["id"] + '-button-save').click(function(e) {
+                e.preventDefault();
+                var grid = dataCollectionComponent['{{componentId}}-main']['grid'];
+
+                $(this).attr('disabled', true);
+                $(this).children('i').attr('hidden', false);
+
+                var gridWidgets = grid.save(false, false);
+                var widgets = [];
+                var el = $(this).parents('.grid-stack-item')[0];
+                var widgetId = $(el).attr('gs-id');
+
+                $(gridWidgets).each(function(i, widget) {
+                    if (widget['id'] === widgetId) {
+                        widgets.push(gridWidgets[i]);
+                        return false;
+                    }
+                });
+
+                var postData = { };
+                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                postData['dashboard_id'] = $('#{{componentId}}-main-dashboards').select2().val();
+                postData['widgets'] = widgets;
+                postData['widgets'][0]['clocks'] = $('#{{componentId}}-{{sectionId}}-worldclock-' + widgetsData["data"]["id"] + '-clocks').select2().val();
+
+                $.post('{{links.url("dashboards/updateWidgetToDashboard")}}', postData, function(response) {
+                    $('#{{componentId}}-{{sectionId}}-modal-button-save').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-modal-button-save').children('i').attr('hidden', true);
+
+                    if (response.tokenKey && response.token) {
+                        $("#security-token").attr("name", response.tokenKey);
+                        $("#security-token").val(response.token);
+                    }
+
+                    if (response.responseCode === 0) {
+                        $('#{{componentId}}-{{sectionId}}-settings-worldclock-' + widgetsData["data"]["id"] + '-button-save').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-settings-worldclock-' + widgetsData["data"]["id"] + '-button-save').children('i').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-settings-worldclock-' + widgetsData["data"]["id"] + '-button-save').parents('.modal').modal('hide');
+                        var postDataGetWidget = { };
+                        postDataGetWidget[$('#security-token').attr('name')] = $('#security-token').val();
+                        postDataGetWidget['dashboard_id'] = $('#{{componentId}}-main-dashboards').select2().val();
+                        postDataGetWidget['widget_id'] = postData['widgets'][0]['id'];
+
+                        var responseMessage = response.responseMessage;
+
+                        $.post('{{links.url("dashboards/getWidgetContent")}}', postDataGetWidget, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $("#security-token").attr("name", response.tokenKey);
+                                $("#security-token").val(response.token);
+                            }
+
+                            if (response.responseCode === 0) {
+                                showPaginate('success', {'text' : responseMessage});
+                                $('.modal-backdrop').remove();
+
+                                var items = [];
+                                items[0] = { };
+                                items[0]['el'] = el;
+                                items[0]['id'] = response.responseData['widgetsData'][0]['id'];
+                                items[0]['widget_id'] = response.responseData['widgetsData'][0]['widget']['id'];
+                                items[0]['dashboard_id'] = response.responseData['widgetsData'][0]['dashboard_id'];
+                                items[0]['method'] = response.responseData['widgetsData'][0]['widget']['method'];
+
+                                $('body').trigger('widgetUpdate', {'items' : items});
+                            } else {
+                                showPaginate('error', {'text' : response.responseMessage});
+                            }
+                        }, 'json');
+                    } else {
+                        showPaginate('error', {'text' : response.responseMessage});
+                    }
+                }, 'json');
+            });
+        }
+    };
+
+BazContentFields.init({
+    'componentId'   : "{{componentId}}",
+    'sectionId'     : "{{componentId}}-{{sectionId}}",
+    'fieldId'       : "{{componentId}}-{{sectionId}}-worldclock-{{widget['data']['id']}}-clocks"
+});
+
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-widgets']) {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-widgets'] = { };
+    dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-widgets'][widgetsData['data']['id']] = widgetsData;
+} else {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-widgets'][widgetsData['data']['id']] = widgetsData;
+}
+
+dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func'] =
+    {
+        worldClock : function(offSet, region) {
+            var dst = 0;
+            var time, startDST, endDST, currentTime, dayDST;
+            time = new Date();
+            startDST = new Date();
+            endDST = new Date();
+            var gmtMS = time.getTime() + (time.getTimezoneOffset() * 60000);
+            var gmtTime = new Date(gmtMS);
+            var day = gmtTime.getDate();
+            var month = gmtTime.getMonth();
+            var year = gmtTime.getYear();
+            var hr = gmtTime.getHours() + offSet;
+            var min = gmtTime.getMinutes();
+            var sec = gmtTime.getSeconds();
+            var monthArray = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+            var monthDays = ["31","28","31","30","31","30","31","31","30","31","30","31"];
+
+            if (year < 1000) {
+                year += 1900;
+            }
+
+            if (year%4 == 0) {
+                monthDays = ["31","29","31","30","31","30","31","31","30","31","30","31"];
+            }
+
+            if (year%100 == 0 && year%400 != 0) {
+                monthDays = ["31","28","31","30","31","30","31","31","30","31","30","31"];
+            }
+
+            if (hr >= 24) {
+                hr = hr-24;
+                day -= -1;
+            }
+
+            if (hr < 0) {
+                hr -= -24;
+                day -= 1;
+            }
+
+            if (hr < 10) {
+                hr = " " + hr;
+            }
+
+            if (min < 10) {
+                min = "0" + min;
+            }
+
+            if (sec < 10) {
+                sec = "0" + sec;
+            }
+
+            if (day <= 0) {
+                if (month == 0) {
+                    month = 11;
+                    year -= 1;
+                } else {
+                    month = month -1;
+                }
+                day = monthDays[month];
+            }
+
+            if (day > monthDays[month]) {
+                day = 1;
+                if (month == 11) {
+                    month = 0;
+                    year -= -1;
+                } else {
+                    month -= -1;
+                }
+            }
+
+            if (region == "NAmerica") {
+                startDST.setMonth(3);
+                startDST.setHours(2);
+                startDST.setDate(1);
+                dayDST = startDST.getDay();
+                if (dayDST != 0) {
+                    startDST.setDate(8 - dayDST);
+                } else {
+                    startDST.setDate(1);
+                }
+                endDST.setMonth(9);
+                endDST.setHours(1);
+                endDST.setDate(31);
+                dayDST = endDST.getDay();
+                endDST.setDate(31-dayDST);
+                currentTime = new Date();
+                currentTime.setMonth(month);
+                currentTime.setYear(year);
+                currentTime.setDate(day);
+                currentTime.setHours(hr);
+                if (currentTime >= startDST && currentTime < endDST) {
+                    dst = 1;
+                }
+            }
+
+            if (region == "Europe") {
+                startDST = new Date();
+                endDST = new Date();
+                startDST.setMonth(2);
+                startDST.setHours(1);
+                startDST.setDate(31);
+                dayDST = startDST.getDay();
+                startDST.setDate(31-dayDST);
+                endDST.setMonth(9);
+                endDST.setHours(0);
+                endDST.setDate(31);
+                dayDST = endDST.getDay();
+                endDST.setDate(31-dayDST);
+                currentTime = new Date();
+                currentTime.setMonth(month);
+                currentTime.setYear(year);
+                currentTime.setDate(day);
+                currentTime.setHours(hr);
+                if (currentTime >= startDST && currentTime < endDST) {
+                    dst = 1;
+                }
+            }
+
+            if (region == "SAmerica") {
+                startDST = new Date();
+                endDST = new Date();
+                startDST.setMonth(9);
+                startDST.setHours(0);
+                startDST.setDate(1);
+                dayDST = startDST.getDay();
+                if (dayDST != 0) {
+                    startDST.setDate(22-dayDST);
+                } else {
+                    startDST.setDate(15);
+                }
+                endDST.setMonth(1);
+                endDST.setHours(11);
+                endDST.setDate(1);
+                dayDST = endDST.getDay();
+                if (dayDST != 0) {
+                    endDST.setDate(21-dayDST);
+                } else {
+                    endDST.setDate(14);
+                }
+                currentTime = new Date();
+                currentTime.setMonth(month);
+                currentTime.setYear(year);
+                currentTime.setDate(day);
+                currentTime.setHours(hr);
+                if(currentTime >= startDST || currentTime < endDST) {
+                    dst = 1;
+                }
+            }
+
+            if (region == "Cairo") {
+                startDST = new Date();
+                endDST = new Date();
+                startDST.setMonth(3);
+                startDST.setHours(0);
+                startDST.setDate(30);
+                dayDST = startDST.getDay();
+                if (dayDST < 5) {
+                    startDST.setDate(28-dayDST);
+                } else {
+                    startDST.setDate(35-dayDST);
+                }
+                endDST.setMonth(8);
+                endDST.setHours(11);
+                endDST.setDate(30);
+                dayDST = endDST.getDay();
+                if (dayDST < 4) {
+                    endDST.setDate(27-dayDST);
+                } else {
+                    endDST.setDate(34-dayDST);
+                }
+                currentTime = new Date();
+                currentTime.setMonth(month);
+                currentTime.setYear(year);
+                currentTime.setDate(day);
+                currentTime.setHours(hr);
+                if (currentTime >= startDST && currentTime < endDST) {
+                    dst = 1;
+                }
+            }
+
+            if (region == "Israel") {
+                startDST = new Date();
+                endDST = new Date();
+                startDST.setMonth(3);
+                startDST.setHours(2);
+                startDST.setDate(1);
+                endDST.setMonth(8);
+                endDST.setHours(2);
+                endDST.setDate(25);
+                dayDST = endDST.getDay();
+                if (dayDST != 0) {
+                    endDST.setDate(32-dayDST);
+                } else {
+                    endDST.setDate(1);
+                    endDST.setMonth(9);
+                }
+                currentTime = new Date();
+                currentTime.setMonth(month);
+                currentTime.setYear(year);
+                currentTime.setDate(day);
+                currentTime.setHours(hr);
+                if (currentTime >= startDST && currentTime < endDST) {
+                    dst = 1;
+                }
+            }
+
+            if (region == "Beirut") {
+                startDST = new Date();
+                endDST = new Date();
+                startDST.setMonth(2);
+                startDST.setHours(0);
+                startDST.setDate(31);
+                dayDST = startDST.getDay();
+                startDST.setDate(31-dayDST);
+                endDST.setMonth(9);
+                endDST.setHours(11);
+                endDST.setDate(31);
+                dayDST = endDST.getDay();
+                endDST.setDate(30-dayDST);
+                currentTime = new Date();
+                currentTime.setMonth(month);
+                currentTime.setYear(year);
+                currentTime.setDate(day);
+                currentTime.setHours(hr);
+                if(currentTime >= startDST && currentTime < endDST) {
+                    dst = 1;
+                }
+            }
+
+            if (region == "Baghdad") {
+                startDST = new Date();
+                endDST = new Date();
+                startDST.setMonth(3);
+                startDST.setHours(3);
+                startDST.setDate(1);
+                endDST.setMonth(9);
+                endDST.setHours(3);
+                endDST.setDate(1);
+                dayDST = endDST.getDay();
+                currentTime = new Date();
+                currentTime.setMonth(month);
+                currentTime.setYear(year);
+                currentTime.setDate(day);
+                currentTime.setHours(hr);
+                if(currentTime >= startDST && currentTime < endDST) {
+                    dst = 1;
+                }
+            }
+
+            if (region == "Australia") {
+                startDST = new Date();
+                endDST = new Date();
+                startDST.setMonth(9);
+                startDST.setHours(2);
+                startDST.setDate(31);
+                dayDST = startDST.getDay();
+                startDST.setDate(31-dayDST);
+                endDST.setMonth(2);
+                endDST.setHours(2);
+                endDST.setDate(31);
+                dayDST = endDST.getDay();
+                endDST.setDate(31-dayDST);
+                currentTime = new Date();
+                currentTime.setMonth(month);
+                currentTime.setYear(year);
+                currentTime.setDate(day);
+                currentTime.setHours(hr);
+                if (currentTime >= startDST || currentTime < endDST) {
+                    dst = 1;
+                }
+            }
+
+            if (dst == 1) {
+                hr -= -1;
+
+                if (hr >= 24) {
+                    hr = hr-24;
+                    day -= -1;
+                }
+
+                if (hr < 10) {
+                    hr = " " + hr;
+                }
+
+                if (day > monthDays[month]) {
+                    day = 1;
+
+                    if (month == 11) {
+                        month = 0;
+                        year -= -1;
+                    } else {
+                        month -= -1
+                    }
+                }
+                return monthArray[month] + " " + day + ", " + year + " " + hr + ":" + min + ":" + sec + " DST"
+            } else {
+                return monthArray[month] + " " + day + ", " + year + " " + hr + ":" + min + ":" + sec
+            }
+        },
+        worldClockZone : function(widgetsData) {
+            if (widgetsData['data']['settings']['clocks'] && Object.keys(widgetsData['data']['settings']['clocks']).length > 0) {
+                for (var clock in widgetsData['data']['settings']['clocks']) {
+                    var clockId = widgetsData['data']['settings']['clocks'][clock];
+                    if (widgetsData['settings']['clocks'][clockId]) {
+                        $('#worldclock-' + widgetsData['data']['id'] + '-' + clockId).html(
+                            dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func'].worldClock(
+                                widgetsData['settings']['clocks'][clockId]['offset'],
+                                widgetsData['settings']['clocks'][clockId]['region']
+                            )
+                        );
+                    }
+                }
+            }
+
+            var timers = BazHelpers.setTimeoutTimers.all();
+
+            var found = false;
+            if (timers.length > 0) {
+                $(timers).each(function(i, timer) {
+                    if (timer['identifier'] === 'worldClock' + widgetsData['data']['id']) {
+                        found = timer['id'];
+                    }
+                });
+            }
+
+            if (!found) {
+                if (dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func']) {
+                    BazHelpers.setTimeoutTimers.add(function() {
+                        dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func']
+                            .worldClockZone(dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-widgets'][widgetsData['data']['id']]);
+                    }, 1000, '{{componentId}}', 'worldClock' + widgetsData['data']['id']);
+                }
+            } else {
+                BazHelpers.setTimeoutTimers.stop(found);
+                if (dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func']) {
+                    BazHelpers.setTimeoutTimers.add(function() {
+                        dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func']
+                            .worldClockZone(dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-widgets'][widgetsData['data']['id']]);
+                    }, 1000, '{{componentId}}', 'worldClock' + widgetsData['data']['id']);
+                }
+            }
+        }
+    };
+
+if (dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func']) {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func']
+        .worldClockZone(dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-widgets'][widgetsData['data']['id']]);
+}
+
+$('body').off('widgetRemove');
+$('body').on('widgetRemove', function(e, data) {
+    BazHelpers.setTimeoutTimers.stop(null, null, 'worldClock' + $($(data.gridWidget)[0]).attr('gs-id'));
+});
+</script>

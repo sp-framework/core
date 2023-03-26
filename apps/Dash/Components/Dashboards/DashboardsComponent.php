@@ -10,13 +10,17 @@ class DashboardsComponent extends BaseComponent
 {
     public function viewAction()
     {
-        if (isset($this->getData()['widgets']) &&
-            $this->getData()['widgets'] == true &&
-            isset($this->getData()['id'])
-        ) {
-            $this->getNewToken();
+        if (isset($this->getData()['widgets'])) {
+            if ($this->getData()['widgets'] == 'info') {
+                $this->getNewToken();
+                return $this->basepackages->widgets->getWidget($this->getData()['id'], 'info')['info'];
+            } else if ($this->getData()['widgets'] == 'content') {
+                $dashboardWidget = $this->basepackages->dashboards->getDashboardWidgetById($this->getData()['id'], $this->getData()['did']);
+                $dashboardWidget['getWidgetData'] = true;
 
-            return $this->basepackages->widgets->getWidget($this->getData()['id'], 'info')['info'];
+                $this->getNewToken();
+                return $this->basepackages->widgets->getWidget($this->getData()['wid'], 'content', $dashboardWidget)['content'];
+            }
         } else {
             if (isset($this->getData()['id'])) {
                 $dashboardId = $this->getData()['id'];
@@ -31,7 +35,7 @@ class DashboardsComponent extends BaseComponent
             }
         }
 
-        $dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true, true);
+        $dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true, false);
 
         $this->view->setViewsDir($this->modules->views->getPhalconViewPath() . $this->getURI());
 
