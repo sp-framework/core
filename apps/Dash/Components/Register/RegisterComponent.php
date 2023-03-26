@@ -16,6 +16,14 @@ class RegisterComponent extends BaseComponent
 
     public function viewAction()
     {
+        if (!$this->app || $this->app['registration_allowed'] == '0' || !$this->app['registration_allowed']) {
+            $this->response->setStatusCode(404);
+
+            $this->response->send();
+
+            exit;
+        }
+
         $this->view->setLayout('auth');
 
         $domain = $this->domains->getDomain();
