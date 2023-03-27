@@ -30,6 +30,7 @@
         "peppeocchi/php-cron-scheduler": "^4.0",
         "php-imap/php-imap": "^4.1",
         "league/csv": "^9.0",
-        "paquettg/php-html-parser": "^3.1"
+        "paquettg/php-html-parser": "^3.1",
+        "bluelibraries/dns": "^1.1"
     }
 }

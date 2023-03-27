@@ -2,6 +2,9 @@
 
 namespace System\Base\Providers\DomainsServiceProvider;
 
+use BlueLibraries\Dns\DnsRecords;
+use BlueLibraries\Dns\Handlers\Types\TCP;
+use BlueLibraries\Dns\Records\RecordTypes;
 use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Url;
 use System\Base\BasePackage;
@@ -222,10 +225,58 @@ class Domains extends BasePackage
 		$record['internal'] = false;
 
 		try {
-			$record['AAAA'] = \dns_get_record($domain, DNS_AAAA);
-			$record['A'] = \dns_get_record($domain, DNS_A);
-			$record['CNAME'] = \dns_get_record($domain, DNS_CNAME);
-			$record['SOA'] = \dns_get_record($domain, DNS_SOA);
+			$dnsHandler = (new TCP())
+				->setPort(53)
+				->setNameserver('8.8.8.8')
+				->setTimeout(3) // limit execution to 3 seconds
+				->setRetries(3); // allows 5 retries if response fails
+
+			$dnsRecordsService = new DnsRecords($dnsHandler);
+
+			$record['AAAA'] = $dnsRecordsService->get($domain, RecordTypes::AAAA);
+			$aaaa = [];
+			if (count($record['AAAA']) > 0) {
+				if (count($record['AAAA']) === 1) {
+					$aaaaRecord = $record['AAAA'][0]->toArray();
+					array_push($aaaa, $aaaaRecord['ipv6']);
+				} else {
+					foreach ($record['AAAA'] as $aaaaRecord) {
+						$aaaaRecord = $aaaaRecord->toArray();
+
+						if (isset($aaaaRecord['ipv6'])) {
+							array_push($aaaa, $aaaaRecord['ipv6']);
+						}
+					}
+				}
+			}
+			$record['AAAA'] = $aaaa;
+
+			$record['A'] = $dnsRecordsService->get($domain, RecordTypes::A);
+			$a = [];
+			if (count($record['A']) > 0) {
+				if (count($record['A']) === 1) {
+					$aRecord = $record['A'][0]->toArray();
+					array_push($a, $aRecord['ip']);
+				} else {
+					foreach ($record['A'] as $aRecord) {
+						$aRecord = $aRecord->toArray();
+
+						if (isset($aRecord['ip'])) {
+							array_push($a, $aRecord['ip']);
+						}
+					}
+				}
+			}
+			$record['A'] = $a;
+			$record['CNAME'] = $dnsRecordsService->get($domain, RecordTypes::CNAME);
+			if (count($record['CNAME']) > 0) {
+				$record['CNAME'] = $record['CNAME'][0]->toArray();
+			}
+
+			$record['SOA'] = $dnsRecordsService->get($domain, RecordTypes::SOA);
+			if (count($record['SOA']) > 0) {
+				$record['SOA'] = $record['SOA'][0]->toArray();
+			}
 
 			if (count($record['AAAA']) === 0 &&
 				count($record['A']) === 0 &&

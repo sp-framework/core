@@ -181,48 +181,48 @@ dataCollectionSection =
 
                         $('#{{componentId}}-{{sectionId}}-domain-info').attr('disabled', false);
 
-                        if (domainDetails.CNAME.length > 0) {
-                            $('#domain-cname').html(domainDetails.CNAME[0].host);
-                            if (domainDetails.A[0]) {
-                                $('#domain-name').html(domainDetails.A[0].host);
-                            } else if (domainDetails.AAAA[0]) {
-                                $('#domain-name').html(domainDetails.AAAA[0].host);
+                        if (Object.keys(domainDetails.CNAME).length > 0) {
+                            $('#domain-cname').html(domainDetails.CNAME.host);
+                            if (domainDetails.A) {
+                                $('#domain-name').html(domainDetails.CNAME.target);
+                            } else if (domainDetails.AAAA) {
+                                $('#domain-name').html(domainDetails.CNAME.target);
                             }
                         } else {
                             $('#domain-name').html($('#{{componentId}}-{{sectionId}}-name').val());
                         }
 
-                        if (domainDetails.A.length > 0) {
+                        if (Object.keys(domainDetails.A).length > 0) {
                             var aRecords = [];
                             for (var aRecord in domainDetails.A) {
-                                if (domainDetails.server_address === domainDetails.A[aRecord]['ip']) {
+                                if (domainDetails.server_address === domainDetails.A[aRecord]) {
                                     matched = true;
-                                    aRecords.push('<span class="text-success">' + domainDetails.A[aRecord]['ip'] + '</span>');
+                                    aRecords.push('<span class="text-success">' + domainDetails.A[aRecord] + '</span>');
                                 } else {
-                                    aRecords.push('<span class="text-warning">' + domainDetails.A[aRecord]['ip'] + '</span>');
+                                    aRecords.push('<span class="text-warning">' + domainDetails.A[aRecord] + '</span>');
                                 }
                             }
 
                             $('#a-addresses').html(aRecords.join(', '));
                         }
 
-                        if (domainDetails.AAAA.length > 0) {
+                        if (Object.keys(domainDetails.AAAA).length > 0) {
                             var aaaaRecords = [];
                             for (var aaaaRecord in domainDetails.AAAA) {
-                                if (domainDetails.server_address === domainDetails.AAAA[aaaaRecord]['ipv6']) {
+                                if (domainDetails.server_address === domainDetails.AAAA[aaaaRecord]) {
                                     matched = true;
-                                    aaaaRecords.push('<span class="text-success">' + domainDetails.AAAA[aaaaRecord]['ipv6'] + '</span>');
+                                    aaaaRecords.push('<span class="text-success">' + domainDetails.AAAA[aaaaRecord] + '</span>');
                                 } else {
-                                    aaaaRecords.push('<span class="text-warning">' + domainDetails.AAAA[aaaaRecord]['ipv6'] + '</span>');
+                                    aaaaRecords.push('<span class="text-warning">' + domainDetails.AAAA[aaaaRecord] + '</span>');
                                 }
                             }
 
                             $('#aaaa-addresses').html(aaaaRecords.join(', '));
                         }
 
-                        if (domainDetails.SOA.length > 0) {
-                            $('#soa-primary-ns').html(domainDetails.SOA[0]['mname']);
-                            $('#soa-responsible-party').html(domainDetails.SOA[0]['rname']);
+                        if (Object.keys(domainDetails.SOA).length > 0) {
+                            $('#soa-primary-ns').html(domainDetails.SOA['mname']);
+                            $('#soa-responsible-party').html(domainDetails.SOA['rname']);
                         }
 
                         if (matched) {
