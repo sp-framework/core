@@ -229,17 +229,19 @@ class Views extends BasePackage
 
     public function getViewsForApp($appId)
     {
+        $views = [];
+
         foreach($this->views as $view) {
             $view['apps'] = Json::decode($view['apps'], true);
 
             if (isset($view['apps'][$appId]['enabled']) &&
                 $view['apps'][$appId]['enabled'] == 'true'
             ) {
-                return $view;
+                array_push($views, $view);
             }
         }
 
-        return false;
+        return $views;
     }
 
     public function getIdViews($id)
