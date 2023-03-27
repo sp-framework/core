@@ -28,12 +28,45 @@ class AppsComponent extends BaseComponent
                     return $this->throwIdNotFound();
                 }
 
+                if (!isset($app['default_component']) ||
+                    isset($app['default_component']) && $app['default_component'] == '0'
+                ) {
+                    if ($app['app_type'] === 'dash') {
+                        $dashboard = $this->modules->components->getComponentByName('dashboards');
+
+                        if ($dashboard) {
+                            $app['default_component'] = $dashboard['id'];
+                        }
+                    }
+                }
+
+                if (!isset($app['errors_component']) ||
+                    isset($app['errors_component']) && $app['errors_component'] == '0'
+                ) {
+                    $errors = $this->modules->components->getComponentByName('errors');
+
+                    if ($errors) {
+                        $app['errors_component'] = $errors['id'];
+                    }
+                }
+
                 if (isset($app['can_login_role_ids'])) {
                     $app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
 
                     if (isset($app['can_login_role_ids']['data'])) {
                         $app['can_login_role_ids'] = $app['can_login_role_ids']['data'];
                     }
+                }
+
+                if (!isset($app['guest_role_id']) ||
+                    isset($app['guest_role_id']) && $app['guest_role_id'] == '0'
+                ) {
+                    $app['guest_role_id'] = '3';
+                }
+
+                if (isset($app['acceptable_usernames'])) {
+                    $app['acceptable_usernames'] = Json::decode($app['acceptable_usernames'], true);
+                    $app['acceptable_usernames'] = implode(',', $app['acceptable_usernames']);
                 }
 
                 $components = [];
@@ -70,6 +103,12 @@ class AppsComponent extends BaseComponent
 
                         if (!isset($componentValue['apps'][$app['id']]['needAuth'])) {
                             $componentValue['apps'][$app['id']]['needAuth'] = false;
+                        }
+                    }
+
+                    if (isset($dashboard)) {
+                        if ($dashboard['id'] == $componentValue['id']) {
+                            $componentValue['apps'][$app['id']]['enabled'] = true;
                         }
                     }
 
