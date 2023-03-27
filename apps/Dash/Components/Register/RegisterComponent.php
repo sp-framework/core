@@ -40,9 +40,9 @@ class RegisterComponent extends BaseComponent
                 return;
             }
 
-            $this->accounts->registerAccount($this->postData());
-
-            $this->view->redirectUrl = $this->accounts->packagesData->redirectUrl;
+            if ($this->accounts->registerAccount($this->postData())) {
+                $this->view->redirectUrl = $this->accounts->packagesData->redirectUrl;
+            }
 
             $this->addResponse($this->accounts->packagesData->responseMessage, $this->accounts->packagesData->responseCode);
         } else {

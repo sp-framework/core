@@ -144,9 +144,15 @@ class Accounts extends BasePackage
                 return;
             }
 
-            $this->addResponse('Account for ID: ' . $data['email'] . ' already exists!', 1);
+            $this->addResponse('Account for Email: ' . $data['email'] . ' already exists!', 1);
 
-            return;
+            return false;
+        }
+
+        if ($this->checkAccountBy($data['username'], false, 'username')) {
+            $this->addResponse('Account for Username: ' . $data['username'] . ' already exists!', 1);
+
+            return false;
         }
 
         if ($this->validateData($data) === true) {
@@ -212,6 +218,20 @@ class Accounts extends BasePackage
             }
         }
 
+        $emailAccount = $this->checkAccountBy($data['email']);
+        if ($emailAccount && $data['id'] != $emailAccount['id']) {
+            $this->addResponse('Account for Email: ' . $data['email'] . ' already exists!', 1);
+
+            return;
+        }
+
+        $usernameAccount = $this->checkAccountBy($data['username'], false, 'username');
+        if ($usernameAccount && $data['id'] != $usernameAccount['id']) {
+            $this->addResponse('Account for Username: ' . $data['username'] . ' already exists!', 1);
+
+            return;
+        }
+
         $accountObj = $this->getFirst('id', $data['id']);
 
         $account = $this->getAccountById($data['id'], true);
@@ -252,7 +272,7 @@ class Accounts extends BasePackage
             $data['two_fa_secret'] = null;
         }
 
-        if (!isset($data['package_name']) || 
+        if (!isset($data['package_name']) ||
             $data['package_name'] === ''
         ) {
             $data['package_name'] = 'profiles';
@@ -345,6 +365,9 @@ class Accounts extends BasePackage
         $data['force_pwreset'] = '1';
         $data['status'] = '1';
 
+        $data['email'] = strtolower($data['email']);
+        $data['username'] = str_replace('@', '.', $data['email']);
+
         $canLogin = true;
 
         if ($this->app['approve_accounts_manually'] == '1') {
@@ -361,9 +384,11 @@ class Accounts extends BasePackage
         $validation = $this->validateData($data);
 
         if ($validation === true) {
-            $this->addAccount($data);
+            if ($this->addAccount($data)) {
+                $this->packagesData->redirectUrl = $this->links->url('auth');
+            }
 
-            $this->packagesData->redirectUrl = $this->links->url('auth');
+            $this->logger->log->alert($this->packagesData->responseMessage);
         } else {
             $this->addResponse($validation, 1);
 
