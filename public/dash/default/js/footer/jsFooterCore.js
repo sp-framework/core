@@ -8262,6 +8262,8 @@ var BazContentSectionWithWizard = function() {
                 goNext();
             }
         });
+        $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle="popover"]').popover('enable');
     }
 
     function goNext() {
