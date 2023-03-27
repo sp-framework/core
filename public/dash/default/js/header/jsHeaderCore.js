@@ -238,6 +238,8 @@ var BazContentLoader = function() {
                         }
                     }
                 }
+                $('[data-toggle="tooltip"]').tooltip();
+                $('[data-toggle="popover"]').popover('enable');
             });
         }, options.ajaxLoadDelay);
 
@@ -317,6 +319,8 @@ var BazContentLoader = function() {
                         $('#security-token').val(xhr.getResponseHeader('token'));
                     }
                 }
+                $('[data-toggle="tooltip"]').tooltip();
+                $('[data-toggle="popover"]').popover('enable');
             });
         }, options.modalLoadDelay);
     }
