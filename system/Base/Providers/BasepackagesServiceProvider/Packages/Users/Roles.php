@@ -29,13 +29,9 @@ class Roles extends BasePackage
     public function addRole(array $data)
     {
         if ($this->add($data)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' role';
+            $this->addResponse('Added ' . $data['name'] . ' role');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error adding new role.';
+            $this->addResponse('Error adding new role.', 1);
         }
     }
 
@@ -46,14 +42,16 @@ class Roles extends BasePackage
      */
     public function updateRole(array $data)
     {
+        if (!$this->checkForSystemRole($data['id'])) {
+            $role = $this->getById($data['id']);
+
+            $data['name'] = $role['name'];
+        }
+
         if ($this->update($data)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' role';
+            $this->addResponse('Updated ' . $data['name'] . ' role');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating role.';
+            $this->addResponse('Error updating role.', 1);
         }
     }
 
@@ -64,33 +62,44 @@ class Roles extends BasePackage
      */
     public function removeRole(array $data)
     {
-        if (isset($data['id']) &&
-            ($data['id'] != 1 && $data['id'] != 2 && $data['id'] != 3)
-        ) {
+        if (!$this->checkForSystemRole($data['id'])) {
+            $this->addResponse('Cannot remove system role.', 1);
+
+            return false;
+        }
+
+        if (isset($data['id'])) {
             $roleObj = $this->getFirst('id', $data['id']);
 
             if ($roleObj->getAccounts() && $roleObj->getAccounts()->count() > 0) {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'Role has accounts assigned to it. Cannot removes role.';
+                $this->addResponse('Role has accounts assigned to it. Cannot removes role.', 1);
 
                 return false;
             }
 
             if ($this->remove($data['id'], true, false)) {
-                $this->packagesData->responseCode = 0;
-
-                $this->packagesData->responseMessage = 'Removed role';
+                $this->addResponse('Removed role');
             } else {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'Error removing role.';
+                $this->addResponse('Error removing role.', 1);
             }
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Cannot remove default role.';
+            $this->addResponse('Error removing role.', 1);
         }
+    }
+
+    protected function checkForSystemRole(int $rid)
+    {
+        $role = $this->getById($rid);
+
+        if ($role) {
+            if ($role['type'] == 0) {
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public function generateViewData(int $rid = null)
@@ -215,7 +224,6 @@ class Roles extends BasePackage
 
     public function searchRole(string $roleQueryString)
     {
-
         $searchRoles =
             $this->getByParams(
                 [

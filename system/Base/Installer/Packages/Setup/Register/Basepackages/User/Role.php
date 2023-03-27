@@ -13,6 +13,7 @@ class Role
             [
                 'name'              => 'System Administrators',
                 'description'       => 'System Administrators Role',
+                'type'              => 0,
                 'permissions'       => Json::encode([])
             ]
         );
@@ -31,6 +32,7 @@ class Role
             [
                 'name'              => 'Registered Users',
                 'description'       => 'Registered Users Role',
+                'type'              => 0,
                 'permissions'       => Json::encode([])
             ]
         );
@@ -40,6 +42,7 @@ class Role
             [
                 'name'              => 'Guests',
                 'description'       => 'Guests Role',
+                'type'              => 0,
                 'permissions'       => Json::encode([])
             ]
         );        

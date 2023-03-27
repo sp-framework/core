@@ -2,10 +2,12 @@
     {% set roleId = role['id'] %}
     {% set roleName = role['name'] %}
     {% set roleDescription = role['description'] %}
+    {% set roleType = role['type'] %}
 {% else %}
     {% set roleId = '' %}
     {% set roleName = '' %}
     {% set roleDescription = '' %}
+    {% set roleType = '1' %}
 {% endif %}
 {% if roleId === '1' %}
     {% set nameDisabled = true %}
@@ -17,6 +19,13 @@
     {% set descriptionDisabled = false %}
     {% set permissionshidden = '' %}
     {% set permissionsinfohidden = 'hidden' %}
+{% endif %}
+{% if roleId == '2' or roleId == '3' %}
+    {% set nameDisabled = true %}
+    {% set descriptionDisabled = true %}
+{% else %}
+    {% set nameDisabled = false %}
+    {% set descriptionDisabled = false %}
 {% endif %}
 {% set rolePermissions = role['permissions'] %}
 {% if aclMiddlewareEnabled == false %}
@@ -44,6 +53,28 @@
                         'fieldHidden'                    : true,
                         'fieldDisabled'                  : true,
                         'fieldValue'                     : roleId
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'type',
+                        'fieldLabel'                     : 'Role Type',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Role Type',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : roleType
                     ]
                 )}}
             </div>
@@ -239,6 +270,7 @@ dataCollectionSection =
             'placeholder'   : 'SELECT PARENT ROLE'
         },
         '{{componentId}}-{{sectionId}}-description'  : { },
+        '{{componentId}}-{{sectionId}}-type'         : { },
         '{{componentId}}-{{sectionId}}-permissions'  :
         $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-permissions'], {
             plugins: [
