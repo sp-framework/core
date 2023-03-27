@@ -167,7 +167,7 @@
                                 'fieldHelp'                      : true,
                                 'fieldHelpTooltipContent'        : 'Select public storage for this domain and app.',
                                 'fieldBazScan'                   : true,
-                                'fieldRequired'                  : false,
+                                'fieldRequired'                  : true,
                                 'fieldDisabled'                  : publicStorageServiceDisabled,
                                 'fieldDataAttributes'            :
                                     [
@@ -199,7 +199,7 @@
                                 'fieldHelp'                      : true,
                                 'fieldHelpTooltipContent'        : 'Select private storage for this domain and app.',
                                 'fieldBazScan'                   : true,
-                                'fieldRequired'                  : false,
+                                'fieldRequired'                  : true,
                                 'fieldDisabled'                  : privateStorageServiceDisabled,
                                 'fieldDataAttributes'            :
                                     [
@@ -345,9 +345,13 @@ dataCollectionSection =
                         } else {
                             dataCollectionSection['data']['apps'][appId]['allowed'] = false;
                             $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-' + appId + '-view').val(0).trigger('change');
                             $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').val(0).trigger('change');
                             $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').val(0).trigger('change');
                             $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').val(0).trigger('change');
                         }
                     } else if (select2 && select2Type) {
                         dataCollectionSection['data']['apps'][appId][select2Type] =
@@ -393,5 +397,9 @@ for (var id in appIds) {
     dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-private-storage'] = {"placeholder": "SELECT PRIVATE STORAGE"};
     dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']['{{componentId}}-{{sectionId}}-' + id + '-view'] = "required";
     dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']['{{componentId}}-{{sectionId}}-' + id + '-view'] = "please select a view (template)";
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']['{{componentId}}-{{sectionId}}-' + id + '-public-storage'] = "required";
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']['{{componentId}}-{{sectionId}}-' + id + '-public-storage'] = "please select public storage";
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']['{{componentId}}-{{sectionId}}-' + id + '-private-storage'] = "required";
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']['{{componentId}}-{{sectionId}}-' + id + '-private-storage'] = "please select private storage";
 }
 </script>
