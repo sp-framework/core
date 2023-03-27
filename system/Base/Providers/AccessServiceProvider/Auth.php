@@ -306,7 +306,7 @@ class Auth
 
     protected function checkAccount(array $data, $viaProfile = null)
     {
-        $this->account = $this->accounts->checkAccountByEmail($data['user'], true);
+        $this->account = $this->accounts->checkAccount($data['user'], true);
 
         if ($this->account) {
             if ($this->account['status'] != '1') {
@@ -690,7 +690,7 @@ class Auth
             return false;
         }
 
-        $this->account = $this->accounts->checkAccountByEmail($data['user'], true);
+        $this->account = $this->accounts->checkAccount($data['user'], true);
 
         if ($this->account) {
             $this->account['force_logout'] = '1';

@@ -101,6 +101,14 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                          : { },
         '{{componentId}}-{{sectionId}}-status'                      : { },
         '{{componentId}}-{{sectionId}}-email'                       : { },
+        '{{componentId}}-{{sectionId}}-username'                    : {
+            afterInit   : function() {
+                $('#{{componentId}}-{{sectionId}}-email').keyup(function() {
+                    var username = $('#{{componentId}}-{{sectionId}}-email').val().split('@');
+                    $('#{{componentId}}-{{sectionId}}-username').val(username[0]);
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-first_name'                  : { },
         '{{componentId}}-{{sectionId}}-last_name'                   : { },
         '{{componentId}}-{{sectionId}}-email_new_password'          : { },
@@ -116,12 +124,14 @@ dataCollectionSection =
             },
             rules: {
                 '{{componentId}}-{{sectionId}}-email'           : {'required' : true, 'email' : true},
+                '{{componentId}}-{{sectionId}}-username'        : 'required',
                 '{{componentId}}-{{sectionId}}-first_name'      : 'required',
                 '{{componentId}}-{{sectionId}}-last_name'       : 'required',
                 '{{componentId}}-{{sectionId}}-role_id'         : 'required',
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-email'           : 'Please enter correct email address',
+                '{{componentId}}-{{sectionId}}-username'        : 'Please enter username',
                 '{{componentId}}-{{sectionId}}-first_name'      : 'Please enter first name',
                 '{{componentId}}-{{sectionId}}-last_name'       : 'Please enter last name',
                 '{{componentId}}-{{sectionId}}-role_id'         : 'Please select a role',

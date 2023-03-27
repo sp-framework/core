@@ -13,6 +13,7 @@ class Account
             [
                 'status'                => '1',
                 'email'                 => $email,
+                'username'              => explode('@', $email)[0],
                 'domain'                => explode('@', $email)[1],
                 'package_name'          => 'profiles',
                 'package_row_id'        => '1'

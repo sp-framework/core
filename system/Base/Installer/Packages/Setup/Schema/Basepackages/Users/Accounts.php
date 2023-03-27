@@ -37,6 +37,14 @@ class Accounts
                         ]
                     ),
                     new Column(
+                        'username',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 50,
+                            'notNull'       => true,
+                        ]
+                    ),
+                    new Column(
                         'domain',
                         [
                             'type'          => Column::TYPE_VARCHAR,
@@ -65,6 +73,7 @@ class Accounts
                         'column_UNIQUE',
                         [
                             'email',
+                            'username'
                         ],
                         'UNIQUE'
                     )

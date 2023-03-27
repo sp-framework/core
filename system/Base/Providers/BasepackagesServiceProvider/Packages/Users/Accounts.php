@@ -128,10 +128,10 @@ class Accounts extends BasePackage
 
         $data['domain'] = explode('@', $data['email'])[1];
 
-        if ($this->checkAccountByEmail($data['email'])) {
+        if ($this->checkAccountBy($data['email'])) {
             if (isset($data['package_name']) && $data['package_name'] !== 'profiles') {
 
-                $account = $this->checkAccountByEmail($data['email']);
+                $account = $this->checkAccountBy($data['email']);
 
                 $account = array_merge($account, $data);
 
@@ -517,9 +517,52 @@ class Accounts extends BasePackage
         return false;
     }
 
-    public function checkAccountByEmail(string $email, $getSecurity = false)
+    public function checkAccount(string $username, $getSecurity = false)
     {
-        $this->getFirst('email', $email, true);
+        if ($this->app) {
+            if ($this->app['acceptable_usernames'] && $this->app['acceptable_usernames'] !== '') {
+                $this->app['acceptable_usernames'] = Json::decode($this->app['acceptable_usernames'], true);
+
+                foreach ($this->app['acceptable_usernames'] as $acceptableUsername) {
+                    if ($acceptableUsername === 'email') {
+                        $acccountEmail = $this->checkAccountBy($username, $getSecurity);
+
+                        if ($acccountEmail) {
+                            return $acccountEmail;
+                        }
+                    } else if ($acceptableUsername === 'username') {
+                        $accountUsername = $this->checkAccountBy($username, $getSecurity, 'username');
+
+                        if ($accountUsername) {
+                            return $accountUsername;
+                        }
+                    } else {
+                        $userId = str_replace($acceptableUsername, '', $username);
+
+                        if ($userId == '' || $userId == 0) {
+                            continue;
+                        } else {
+                            $accountUserId = $this->checkAccountBy($userId, $getSecurity, 'id');
+
+                            if ($accountUserId) {
+                                return $accountUserId;
+                            }
+                        }
+                    }
+                }
+
+                return false;
+            } else {
+                return $this->checkAccountBy($username, $getSecurity);
+            }
+        } else {
+            return $this->checkAccountBy($username, $getSecurity);
+        }
+    }
+
+    public function checkAccountBy(string $username, $getSecurity = false, $by = 'email')
+    {
+        $this->getFirst($by, $username, true);
 
         if ($this->model) {
             $account = $this->model->toArray();

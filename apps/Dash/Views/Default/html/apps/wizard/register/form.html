@@ -36,6 +36,7 @@
     {% set appRegistrationRoleId = app['registration_role_id'] %}
     {% set appGuestRoleId = app['guest_role_id'] %}
     {% set appCanLoginRoleIds = app['can_login_role_ids'] %}
+    {% set appAcceptableUsernames = app['acceptable_usernames'] %}
     {% set appIncorrectLoginAttemptBlockIp = app['incorrect_login_attempt_block_ip'] %}
     {% set appIpFilterDefaultAction = app['ip_filter_default_action'] %}
     {% set wizard = false %}
@@ -57,6 +58,7 @@
     {% set appRegistrationRoleId = '' %}
     {% set appGuestRoleId = '' %}
     {% set appCanLoginRoleIds = [] %}
+    {% set appAcceptableUsernames = '' %}
     {% set appIncorrectLoginAttemptBlockIp = '' %}
     {% set appIpFilterDefaultAction = '1' %}
     {% set wizard = true %}
@@ -280,6 +282,10 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-can_login_role_ids'                  : {
             'placeholder'   : 'SELECT ROLES'
+        },
+        '{{componentId}}-{{sectionId}}-acceptable_usernames'                : {
+            'placeholder'   : 'SELECT OR ENTER NEW PREFIX',
+            'tags'          : true
         },
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',

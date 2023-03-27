@@ -21,6 +21,8 @@ class BasepackagesUsersAccounts extends BaseModel
 
     public $email;
 
+    public $username;
+
     public $domain;
 
     public $package_name;

@@ -147,4 +147,31 @@
             ]
         )}}
     </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'acceptable_usernames',
+                'fieldLabel'                     : 'Acceptable Usernames',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select provided predefined field like email or username. Or create a new prefix of a-z0-9 that will be added to user ID Example: 900 prefix + user ID of 1 and username will be 9001 OR baz prefix + user ID 1 and username will be baz1.',
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldRequired'                  : false,
+                'fieldDisabled'                  : false,
+                'fieldBazJstreeSearch'           : true,
+                'fieldDataSelect2Multiple'       : true,
+                'fieldDataSelect2Options'        : acceptableUsernames,
+                'fieldDataSelect2OptionsKey'     : 'type',
+                'fieldDataSelect2OptionsValue'   : 'name',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': appAcceptableUsernames
+            ]
+        )}}
+    </div>
 </div>

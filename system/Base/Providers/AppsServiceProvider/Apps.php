@@ -161,6 +161,7 @@ class Apps extends BasePackage
 		$data['errors_component'] = 0;
 		$data['ip_filter_default_action'] = 0;
 		$data['can_login_role_ids'] = Json::encode(['1']);
+		$data['acceptable_usernames'] = Json::encode(['email']);
 
 		if (isset($data['default_dashboard']) && $data['default_dashboard']) {
 			$data['settings']['defaultDashboard'] = $data['default_dashboard'];
@@ -217,6 +218,18 @@ class Apps extends BasePackage
 
 		if (isset($app['views'])) {
 			$this->modules->views->updateViews($app);
+		}
+
+		if ($app['acceptable_usernames']) {
+			$app['acceptable_usernames'] = Json::decode($app['acceptable_usernames'], true);
+
+			if (isset($app['acceptable_usernames']['data'])) {
+				$app['acceptable_usernames'] = Json::encode($app['acceptable_usernames']['data']);
+			} else {
+				$app['acceptable_usernames'] = Json::encode($app['acceptable_usernames']);
+			}
+		} else {
+			$app['acceptable_usernames'] = Json::encode(['email']);
 		}
 
 		if ($this->update($app)) {
@@ -312,5 +325,40 @@ class Apps extends BasePackage
 						'description'   => 'App to display any web content. Like a blog.',
 					]
 			];
+	}
+
+	public function getAcceptableUsernames($id)
+	{
+		$acceptableUsernames =
+			[
+				'email'   =>
+					[
+						'type'      	=> 'email',
+						'name'          => 'email'
+					],
+				'username'    =>
+					[
+						'type'      	=> 'username',
+						'name'          => 'username',
+					]
+			];
+
+		$app = $this->getById($id);
+
+		if (isset($app['acceptable_usernames']) && $app['acceptable_usernames'] !== '') {
+			$app['acceptable_usernames'] = Json::decode($app['acceptable_usernames'], true);
+		}
+
+		foreach ($app['acceptable_usernames'] as $acceptableUsername) {
+			if (!isset($acceptableUsernames[$acceptableUsername])) {
+				$acceptableUsernames[$acceptableUsername] =
+					[
+						'type'	=> $acceptableUsername,
+						'name'	=> $acceptableUsername
+					];
+			}
+		}
+
+		return $acceptableUsernames;
 	}
 }

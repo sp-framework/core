@@ -111,6 +111,14 @@ class Apps
 					]
 				),
 				new Column(
+					'acceptable_usernames',
+					[
+						'type'    => Column::TYPE_VARCHAR,
+						'size'    => 4096,
+						'notNull' => false,
+					]
+				),
+				new Column(
 					'ip_filter_default_action',
 					[
 						'type'    => Column::TYPE_BOOLEAN,

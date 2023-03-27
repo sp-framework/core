@@ -64,9 +64,8 @@ class AppsComponent extends BaseComponent
                     $app['guest_role_id'] = '3';
                 }
 
-                if (isset($app['acceptable_usernames'])) {
+                if (isset($app['acceptable_usernames']) && $app['acceptable_usernames'] !== '') {
                     $app['acceptable_usernames'] = Json::decode($app['acceptable_usernames'], true);
-                    $app['acceptable_usernames'] = implode(',', $app['acceptable_usernames']);
                 }
 
                 $components = [];
@@ -185,7 +184,7 @@ class AppsComponent extends BaseComponent
 
             $this->view->dashboards = $this->basepackages->dashboards->init()->dashboards;
             $this->view->roles = $this->basepackages->roles->init()->roles;
-
+            $this->view->acceptableUsernames = $this->apps->getAcceptableUsernames($this->getData()['id']);
             $this->view->pick('apps/view');
 
             return;

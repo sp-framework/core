@@ -2,12 +2,14 @@
     {% set accountId = account['id'] %}
     {% set accountStatus = account['status'] %}
     {% set accountEmail = account['email'] %}
+    {% set accountUsername = account['username'] %}
     {% set accountFirstName = account['profile']['first_name'] %}
     {% set accountLastName = account['profile']['last_name'] %}
 {% else %}
     {% set accountId = '' %}
     {% set accountStatus = '' %}
     {% set accountEmail = '' %}
+    {% set accountUsername = '' %}
     {% set accountFirstName = '' %}
     {% set accountLastName = '' %}
 {% endif %}
@@ -78,7 +80,7 @@
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
                 'fieldId'                        : 'email',
-                'fieldLabel'                     : 'Account ID (Email)',
+                'fieldLabel'                     : 'Email',
                 'fieldType'                      : 'input',
                 'fieldInputType'                 : 'email',
                 'fieldHelp'                      : true,
@@ -91,6 +93,30 @@
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 100,
                 'fieldValue'                     : accountEmail
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'username',
+                'fieldLabel'                     : 'Username',
+                'fieldType'                      : 'input',
+                'fieldInputType'                 : 'username',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Account Username Address',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : accountUsername
             ]
         )}}
     </div>
