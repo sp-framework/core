@@ -178,13 +178,14 @@ class AppsComponent extends BaseComponent
 
                     return;
                 }
+                $this->view->acceptableUsernames = $this->apps->getAcceptableUsernames($this->getData()['id']);
             } else {
                 $this->view->app = null;
             }
 
             $this->view->dashboards = $this->basepackages->dashboards->init()->dashboards;
             $this->view->roles = $this->basepackages->roles->init()->roles;
-            $this->view->acceptableUsernames = $this->apps->getAcceptableUsernames($this->getData()['id']);
+            $this->view->domains = $this->domains->domains;
             $this->view->pick('apps/view');
 
             return;
