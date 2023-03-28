@@ -181,11 +181,35 @@ class AppsComponent extends BaseComponent
                 $this->view->acceptableUsernames = $this->apps->getAcceptableUsernames($this->getData()['id']);
             } else {
                 $this->view->app = null;
+                $domains = $this->domains->domains;
+
+                foreach ($domains as &$domain) {
+                    $domain = $this->domains->generateViewData();
+                }
+
+                $this->view->domains = $this->domains->domains;
+
+                $this->view->emailservices = $this->basepackages->emailservices->init()->emailServices;
+
+                $storages = $this->basepackages->storages->storages;
+                $publicStorages = [];
+                $privateStorages = [];
+
+                foreach ($storages as $key => $storage) {
+                    if ($storage['permission'] === 'public') {
+                        $publicStorages[$key] = $storage;
+                    } else if ($storage['permission'] === 'private') {
+                        $privateStorages[$key] = $storage;
+                    }
+                }
+
+                $this->view->publicStorages = $publicStorages;
+
+                $this->view->privateStorages = $privateStorages;
             }
 
             $this->view->dashboards = $this->basepackages->dashboards->init()->dashboards;
             $this->view->roles = $this->basepackages->roles->init()->roles;
-            $this->view->domains = $this->domains->domains;
             $this->view->pick('apps/view');
 
             return;
@@ -424,5 +448,27 @@ class AppsComponent extends BaseComponent
         }
 
         return $menu;
+    }
+
+    public function getViewsForAppTypeAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $views = $this->modules->views->getViewsForAppType($this->postData()['app_type']);
+
+            if ($views) {
+                $this->addResponse('Ok', 0, ['views' => $views]);
+            } else {
+                $this->addResponse(
+                    $this->modules->views->packagesData->responseMessage,
+                    $this->modules->views->packagesData->responseCode
+                );
+            }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
     }
 }

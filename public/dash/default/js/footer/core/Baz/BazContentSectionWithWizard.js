@@ -447,8 +447,13 @@ var BazContentSectionWithWizard = function() {
     }
 
     function doAjax(formUrl, formComponentId, formSectionId, step, lastStep) {
+        wizardOptions['steps'][step]['submittedData'] = $.param(dataCollection[formComponentId][formSectionId].dataToSubmit);
+
         $.post(formUrl, $.param(dataCollection[formComponentId][formSectionId].dataToSubmit), function(response) {
             var success = false;
+
+            wizardOptions['steps'][step]['responseCode'] = response.responseCode;
+            wizardOptions['steps'][step]['responseMessage'] = response.responseMessage;
 
             if (response.responseCode == 0) {
                 if (response.responseData) {

@@ -186,6 +186,30 @@ class Apps extends BasePackage
 	 */
 	public function updateApp(array $data)
 	{
+		if (isset($data['domains'])) {//Coming via app wizard.
+			$domains = Json::decode($data['domains'], true);
+
+			if (isset($domains['data'])) {
+				$domains = $domains['data'];
+			}
+
+			foreach ($domains as $domain) {
+				$domain = $this->domains->getIdDomain($domain);
+
+				$domain['apps'] = Json::decode($domain['apps'], true);
+
+				$domain['apps'][$data['id']]['allowed'] = true;
+				$domain['apps'][$data['id']]['view'] = $data['view'];
+				$domain['apps'][$data['id']]['email_service'] = $data['email'];
+				$domain['apps'][$data['id']]['publicStorage'] = $data['public'];
+				$domain['apps'][$data['id']]['privateStorage'] = $data['private'];
+
+				$this->domains->updateDomain($domain);
+			}
+
+			return true;
+		}
+
 		$app = $this->getById($data['id']);
 
 		$app = array_merge($app, $data);

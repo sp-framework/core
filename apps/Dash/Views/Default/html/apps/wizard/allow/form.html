@@ -1,0 +1,256 @@
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'App ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'App ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'domains',
+                        'fieldLabel'                     : 'Domains',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select domains to assign this app to.',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldRequired'                  : true,
+                        'fieldDisabled'                  : false,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldDataSelect2Multiple'       : true,
+                        'fieldDataSelect2Options'        : domains,
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'view',
+                        'fieldLabel'                     : 'View (Template)',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select a view for this app on this domain.',
+                        'fieldBazScan'                   : true,
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataSelect2Options'        : '',
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': ''
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'email',
+                        'fieldLabel'                     : 'Use Email Service',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select email service of this app for this domain. Email will be sent out using these service.',
+                        'fieldBazScan'                   : true,
+                        'fieldRequired'                  : false,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataSelect2Options'        : emailservices,
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'public',
+                        'fieldLabel'                     : 'Use Public Storage',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select public storage for this domain and app.',
+                        'fieldBazScan'                   : true,
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataSelect2Options'        : publicStorages,
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': ''
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'private',
+                        'fieldLabel'                     : 'Use Private Storage',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select private storage for this domain and app.',
+                        'fieldBazScan'                   : true,
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataSelect2Options'        : privateStorages,
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': ''
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                  : { },
+        '{{componentId}}-{{sectionId}}-domains'                             : {
+            'placeholder'   : 'SELECT DOMAINS'
+        },
+        '{{componentId}}-{{sectionId}}-view'                                : {
+            'placeholder'   : 'SELECT VIEW (TEMPLATE)'
+        },
+        '{{componentId}}-{{sectionId}}-email'                               : {
+            'placeholder'   : 'SELECT EMAIL SERVICE',
+            'allowClear'    : true
+        },
+        '{{componentId}}-{{sectionId}}-public'                              : {
+            'placeholder'   : 'SELECT PUBLIC STORAGE'
+        },
+        '{{componentId}}-{{sectionId}}-private'                             : {
+            'placeholder'   : 'SELECT PRIVATE STORAGE'
+        },
+        '{{componentId}}-{{sectionId}}-form'                                : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
+            rules: {
+                '{{componentId}}-{{sectionId}}-domains'                     : 'required',
+                '{{componentId}}-{{sectionId}}-view'                        : 'required',
+                '{{componentId}}-{{sectionId}}-public'                      : 'required',
+                '{{componentId}}-{{sectionId}}-private'                     : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-domains'                     : 'Please select domains',
+                '{{componentId}}-{{sectionId}}-view'                        : 'please select a view (template)',
+                '{{componentId}}-{{sectionId}}-public'                      : 'please select public storage',
+                '{{componentId}}-{{sectionId}}-private'                     : 'please select private storage',
+            }
+        }
+    });
+
+$(document).ready(function() {
+    dataCollectionSection['steps']['2']['onNext'] =
+        function(resolve, reject) {
+            var postData = { };
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+            postData['app_type'] = window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"]['1']['responseData']['app_type'];
+
+            $('#{{componentId}}-{{sectionId}}-view').on('select2:select', function() {
+                window.dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['formValidator'].valid();
+
+            });
+            $.post('{{links.url("apps/getViewsForAppType")}}', postData, function(response) {
+                if (response.tokenKey && response.token) {
+                    $("#security-token").attr("name", response.tokenKey);
+                    $("#security-token").val(response.token);
+                }
+
+                if (response.responseCode == 0) {
+                    if (response.responseData.views) {
+                        for (var view in response.responseData.views) {
+                            var newOption = new Option(
+                                response.responseData.views[view]['display_name'],
+                                response.responseData.views[view]['id'],
+                                false,
+                                false
+                            );
+
+                            $('#{{componentId}}-{{sectionId}}-view').append(newOption).trigger('change');
+                        }
+                    }
+
+                    return resolve(true);
+                }
+
+                return resolve(false);
+            }, 'json');
+        }
+});
+</script>

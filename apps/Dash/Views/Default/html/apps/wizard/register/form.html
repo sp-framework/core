@@ -263,6 +263,9 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', false);
                         $('#default_dashboard').attr('hidden', false);
                         $('#{{componentId}}-{{sectionId}}-default_dashboard').val(0).trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').on('select2:select', function() {
+                            window.dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['formValidator'].valid();
+                        });
                     } else {
                         $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', true);
                         $('#default_dashboard').attr('hidden', true);
@@ -348,6 +351,8 @@ $(document).ready(function() {
             } else {
                 registerFormId = window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"]['1']['responseData']['id'];
             }
+
+            $('#' + window['dataCollection']['env']['appRoute'] + '-{{componentName}}-allow-main-id').val(registerFormId);//Assign ID to allow
 
             var step = window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]['currentStep'] + 1;
 

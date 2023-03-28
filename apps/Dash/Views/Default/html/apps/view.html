@@ -87,16 +87,34 @@
                         ],
                     '3' :
                         [
-                            'title'             : 'Assign to Domain',
-                            'content'           : view.getPartial('apps/wizard/assign',
+                            'title'             : 'Allow on Domains',
+                            'content'           : view.getPartial('apps/wizard/allow',
                                                     [
-                                                        'componentId'       : componentId,
-                                                        'sectionId'         : 'main',
-                                                        'parentComponentId' : parent
+                                                        'componentId'           : componentId,
+                                                        'sectionId'             : 'main',
+                                                        'parentComponentId'     : parent,
+                                                        'wizardComponentId'     : componentId,
+                                                        'wizardSectionId'       : componentId ~ '-wizard'
                                                     ]
                                                 ),
-                            'description'       : 'Step 4: Assign App to channel.',
-                            'goBack'            : false
+                            'goBack'            : false,
+                            'description'       : 'Step 4: Allow App on a domains.',
+                            'submitOnNext'      : true
+                        ],
+                    '4' :
+                        [
+                            'title'             : 'Done',
+                            'description'       : 'Step 4: Done.',
+                            'goBack'            : false,
+                            'content'           : view.getPartial('apps/wizard/done',
+                                                    [
+                                                        'componentId'           : componentId,
+                                                        'sectionId'             : 'main',
+                                                        'parentComponentId'     : parent,
+                                                        'wizardComponentId'     : componentId,
+                                                        'wizardSectionId'       : componentId ~ '-wizard'
+                                                    ]
+                                                )
                         ]
                 ]
         ]

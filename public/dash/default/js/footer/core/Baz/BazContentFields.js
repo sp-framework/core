@@ -355,7 +355,7 @@ var BazContentFields = function() {
         // validation
         if (dataCollection[componentId][sectionId][sectionId + '-form'] &&
             dataCollection[componentId][sectionId][sectionId + '-form'].rules[thisFieldId] === 'required') {
-            $(fieldId).on('change.select2', function() {
+            $(fieldId).on('select2:select', function() {
                 $(this).valid();
             });
         }
