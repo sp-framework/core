@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {{get_doctype()}}
 <html lang="en">
     <head>
@@ -25,6 +25,7 @@ if (!window.dataCollection) {
     window.dataCollection = { };
     dataCollection = window.dataCollection;
     dataCollection.env = { };
+    dataCollection.env.wizard = false;
     dataCollection.env.breadcrumb = '{{breadcrumb}}';
     //Paths
     dataCollection.env.httpScheme = '{{request.getScheme()}}';
@@ -80,3 +81,4 @@ if (!window.dataCollection) {
         {{content()}}
     </body>
 </html>
+<!-- htmlmin:ignore -->

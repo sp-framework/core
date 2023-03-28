@@ -1,5 +1,5 @@
 /* exported BazContentLoader */
-/* global BazHelpers */
+/* global BazHelpers Swal */
 /*
 * @title                    : BazContentLoader
 * @description              : Make Ajax Calls and parse content
@@ -45,7 +45,36 @@ var BazContentLoader = function() {
                     $(this).closest('.dropdown').dropdown('toggle');
                 }
 
-                loadAjax($(this), options); //do the magic
+                if (window['dataCollection']['env']['wizard'] === true) {
+                    var swalSound = window.dataCollection.env.sounds.swalSound;
+                    Swal.fire({
+                        title                       : '<span class="text-warning"> Quit current wizard?</span>',
+                        icon                        : 'question',
+                        background                  : 'rgba(0,0,0,.8)',
+                        backdrop                    : 'rgba(0,0,0,.6)',
+                        buttonsStyling              : false,
+                        confirmButtonText           : 'Yes',
+                        customClass                 : {
+                            'confirmButton'             : 'btn btn-warning text-uppercase',
+                            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                        },
+                        showCancelButton            : true,
+                        keydownListenerCapture      : true,
+                        allowOutsideClick           : true,
+                        allowEscapeKey              : true,
+                        didOpen                     : function() {
+                            swalSound.play();
+                        }
+                    }).then((result) => {
+                        //eslint-disable-next-line
+                        console.log(result);
+                        if (result.value) {
+                            loadAjax($(this), options); //do the magic
+                        }
+                    });
+                } else {
+                    loadAjax($(this), options); //do the magic
+                }
 
                 return false; //also return false
             });
@@ -240,6 +269,11 @@ var BazContentLoader = function() {
                 }
                 $('[data-toggle="tooltip"]').tooltip();
                 $('[data-toggle="popover"]').popover('enable');
+                if ($('.sectionWithWizard').length > 0) {
+                    window['dataCollection']['env']['wizard'] = true;
+                } else {
+                    window['dataCollection']['env']['wizard'] = false;
+                }
             });
         }, options.ajaxLoadDelay);
 
