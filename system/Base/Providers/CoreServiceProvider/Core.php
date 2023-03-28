@@ -45,11 +45,16 @@ class Core extends BasePackage
 		}
 	}
 
+	public function refreshKeys()
+	{
+		$this->createKeys();
+	}
+
 	protected function createKeys()
 	{
-		$keys['sigKey'] = $sigKey = $this->random->base58();
-		$keys['sigText'] = $sigText = $this->random->base58(32);
-		$keys['cookiesSig'] = $cookiesSig = $this->crypt->encryptBase64($sigText, $sigKey);
+		$keys['sigKey'] = $this->random->base58();
+		$keys['sigText'] = $this->random->base58(32);
+		$keys['cookiesSig'] = $this->crypt->encryptBase64($keys['sigKey'], $keys['sigText']);
 
 		try {
 			$this->localContent->write('system/.keys', Json::encode($keys));
