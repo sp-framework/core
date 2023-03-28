@@ -141,13 +141,13 @@ class Middlewares extends BasePackage
 
 			if ($status === true) {
 				$middleware['apps'][$data['id']]['enabled'] = true;
-				
+
 				$dependencyArray = 
 					array_merge($dependencyArray, $this->checkMiddlewareDependencies($data, $middlewares, $middleware));
 			} else if ($status === false) {
 				$middleware['apps'][$data['id']]['enabled'] = false;
 			}
-			
+
 			if (in_array($middlewareId, $dependencyArray)) {
 				$middleware['apps'][$data['id']]['enabled'] = true;				
 			}
@@ -167,9 +167,9 @@ class Middlewares extends BasePackage
 			$middleware['apps'] = Json::decode($middleware['apps'], true);
 
 			//System Middlewares
-			if ($middleware['name'] === 'Maintenance') {
+			if ($middleware['name'] === 'IpFilter') {
 				$middleware['apps'][$data['id']]['sequence'] = 0;
-			} else if ($middleware['name'] === 'IpBlackList') {
+			} else if ($middleware['name'] === 'Maintenance') {
 				$middleware['apps'][$data['id']]['sequence'] = 1;
 			} else if ($middleware['name'] === 'Auth') {
 				$middleware['apps'][$data['id']]['sequence'] = 2;
@@ -210,9 +210,9 @@ class Middlewares extends BasePackage
 
 			if ($dependencyMiddleware) {
 				$dependencyMiddleware['apps'] = Json::decode($dependencyMiddleware['apps'], true);
-	
+
 				$dependencyMiddleware['apps'][$data['id']]['enabled'] = true;
-				
+
 				$dependencyMiddleware['apps'] = Json::encode($dependencyMiddleware['apps']);
 
 				$middlewares['middlewares'][$dependencyMiddleware['id']] = true;

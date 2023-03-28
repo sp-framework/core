@@ -27,6 +27,12 @@
                 {% elseif middleware['enabled'] == 0 %}
                     {% set middlewareChecked = false %}
                 {% endif %}
+                {% if middleware['name'] in mandatoryMiddlewares %}
+                    {% set disabled = true %}
+                    {% set middlewareChecked = true %}
+                {% else %}
+                    {% set disabled = false %}
+                {% endif %}
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -36,6 +42,7 @@
                         'fieldId'                        : 'middleware-' ~ middleware['name'],
                         'fieldLabel'                     : false,
                         'fieldType'                      : 'checkbox',
+                        'fieldDisabled'                  : disabled,
                         'fieldCheckboxType'              : 'success',
                         'fieldCheckboxLabel'             : middleware['display_name'],
                         'fieldCheckboxChecked'           : middlewareChecked,

@@ -69,8 +69,10 @@ class AppsComponent extends BaseComponent
                 }
 
                 $components = [];
+                $middlewares = [];
                 $views = [];
                 $mandatoryComponents = [];
+                $mandatoryMiddlewares = [];
                 $mandatoryViews = [];
 
                 $baseMenuStructure = $this->basepackages->menus->getMenusForAppType($app['app_type']);
@@ -137,6 +139,29 @@ class AppsComponent extends BaseComponent
                     $components[$key] = $componentValue;
                 }
 
+                $middlewaresArr =
+                        $this->modules->middlewares->getMiddlewaresForAppType(
+                            $app['app_type'],
+                            $app['id']
+                        );
+
+                foreach ($middlewaresArr as $key => &$middlewareValue) {
+                    if ($middlewareValue['settings']) {
+                        $middlewareValue['settings'] = Json::decode($middlewareValue['settings'], true);
+
+                        if (isset($middlewareValue['settings']['mandatory']) &&
+                             $middlewareValue['settings']['mandatory'] === true
+                        ) {
+                            array_push($mandatoryMiddlewares, $middlewareValue['name']);
+                        } else if (isset($middlewareValue['settings']['mandatory'][$app['route']]) &&
+                             $middlewareValue['settings']['mandatory'][$app['route']] === true
+                        ) {
+                            array_push($mandatoryMiddlewares, $middlewareValue['name']);
+                        }
+                    }
+                    $middlewares[$key] = $middlewareValue;
+                }
+
                 $viewsArr = $this->modules->views->getViewsForAppType($app['app_type']);
 
                 foreach ($viewsArr as $key => &$viewValue) {
@@ -156,16 +181,11 @@ class AppsComponent extends BaseComponent
                 }
 
                 $this->view->components = msort($components, 'name');
+                $this->view->middlewares = msort($middlewares, 'sequence');
                 $this->view->views = msort($views, 'name');
                 $this->view->mandatoryComponents = $mandatoryComponents;
+                $this->view->mandatoryMiddlewares = $mandatoryMiddlewares;
                 $this->view->mandatoryViews = $mandatoryViews;
-
-                $this->view->middlewares =
-                    msort(
-                        $this->modules->middlewares->getMiddlewaresForAppType(
-                            $app['app_type'],
-                            $app['id']
-                        ), 'sequence');
 
                 $this->view->app = $app;
 

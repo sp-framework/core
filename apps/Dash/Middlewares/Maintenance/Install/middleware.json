@@ -8,5 +8,5 @@
     "version": "0.0.1",
     "repo": "https://.../dash-middleware-system-tools-maintenance",
     "class": "Apps\\Dash\\Middlewares\\Maintenance\\Maintenance",
-    "settings": "[]"
+    "settings": {}
 }

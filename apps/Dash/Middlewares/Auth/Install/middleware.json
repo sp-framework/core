@@ -8,5 +8,9 @@
     "version": "0.0.1",
     "repo": "https://.../dash-middleware-system-tools-auth",
     "class": "Apps\\Dash\\Middlewares\\Auth\\Auth",
-    "settings": "[]"
+    "settings"          : {
+        "mandatory"     : {
+            "admin"     : true
+        }
+    }
 }
