@@ -28,6 +28,8 @@ class Router
 
 	protected $request;
 
+	protected $response;
+
 	protected $router;
 
 	protected $appInfo;
@@ -48,7 +50,7 @@ class Router
 
 	protected $uri;
 
-	public function __construct($domains, $apps, $components, $views, $logger, $request)
+	public function __construct($domains, $apps, $components, $views, $logger, $request, $response)
 	{
 		$this->domains = $domains;
 
@@ -61,6 +63,8 @@ class Router
 		$this->logger = $logger;
 
 		$this->request = $request;
+
+		$this->response = $response;
 
 		$this->requestUri = $this->request->getURI();
 
@@ -266,7 +270,12 @@ class Router
 				'Domain ' . $this->request->getHttpHost() . ' is not registered with system!'
 			);
 
-			throw new DomainNotRegisteredException('Domain ' . $this->request->getHttpHost() . ' is not registered with system!');
+			$this->response->setStatusCode(404, 'Not Found');
+			$this->response->send();
+			exit;
+
+			//Can enable this when debug is enabled.
+			// throw new DomainNotRegisteredException('Domain ' . $this->request->getHttpHost() . ' is not registered with system!');
 		}
 
 		if (isset($this->domain['exclusive_to_default_app']) &&
@@ -291,8 +300,14 @@ class Router
 					'Trying to access app ' . $this->appInfo['name'] .
 					' on domain ' . $this->request->getHttpHost()
 				);
-				throw new AppNotAllowedException('Trying to access app ' . $this->appInfo['name'] .
-					' on domain ' . $this->request->getHttpHost());
+
+				$this->response->setStatusCode(404, 'Not Found');
+				$this->response->send();
+				exit;
+
+				//Can enable this when debug is enabled.
+				// throw new AppNotAllowedException('Trying to access app ' . $this->appInfo['name'] .
+				// 	' on domain ' . $this->request->getHttpHost());
 			}
 		}
 
