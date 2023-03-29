@@ -99,7 +99,7 @@ class Setup
 
 	protected $localContent;
 
-	public function __construct($container)
+	public function __construct($container, $postData)
 	{
 		$this->container = $container;
 
@@ -109,7 +109,7 @@ class Setup
 
 		$this->session = $this->container->getShared('session');
 
-		$this->postData = $this->request->getPost();
+		$this->postData = $postData;
 
 		$this->validation = $this->container->getShared('validation');
 
@@ -144,6 +144,11 @@ class Setup
 									3306,
 							]
 					];
+			if (isset($this->postData['create-username']) && isset($this->postData['create-password'])) {
+				$this->dbConfig['db']['username'] = $this->postData['create-username'];
+				$this->dbConfig['db']['password'] = $this->postData['create-password'];
+				$this->dbConfig['db']['dbname'] = 'mysql';
+			}
 
 			$this->db = new Mysql($this->dbConfig['db']);
 		}
@@ -637,5 +642,34 @@ class Setup
 		} catch (\PDOException $e) {
 			throw new \Exception($e->getMessage());
 		}
+	}
+
+	public function createNewDb()
+	{
+		// var_dump($this->db);die();
+		// $db = new \PDO(
+		// 	"mysql:host=" . $this->postData['host'] . ";dbname=mysql", $this->postData['create-username'], $this->postData['create-password']
+		// );
+
+		try {
+			$this->executeSQL('CREATE DATABASE ' . $this->postData['database_name'] . ' CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci');
+			$this->checkUser();
+		} catch (\Exception $e) {
+			throw $e;
+		}
+
+		return false;
+	}
+
+	protected function checkUser()
+	{
+		$checkUser = $this->executeSQL("SELECT * FROM `user` WHERE `User` LIKE '" . $this->postData['username'] . "'");
+
+		if ($checkUser->numRows() === 0) {
+			$this->executeSQL("CREATE USER '" . $this->postData['username'] . "'@'%' IDENTIFIED WITH mysql_native_password BY '" . $this->postData['password'] . "';");
+		}
+		$this->executeSQL("GRANT ALL PRIVILEGES ON `" . $this->postData['database_name'] . "`.* TO '" . $this->postData['username'] . "'@'%' WITH GRANT OPTION;");
+
+		return true;
 	}
 }

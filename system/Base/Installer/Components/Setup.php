@@ -85,7 +85,7 @@ Class Setup
 	public function run($onlyUpdateDb = false, $message = null)
 	{
 		try {
-			$this->setupPackage = new SetupPackage($this->container);
+			$this->setupPackage = new SetupPackage($this->container, $this->postData);
 		} catch (\Exception $e) {
 			$this->view->responseCode = 1;
 			$this->view->responseMessage = $e->getMessage();
@@ -98,6 +98,28 @@ Class Setup
 		}
 
 		if ($this->request->isPost()) {
+			if (isset($this->postData['create-username']) &&
+				isset($this->postData['create-password'])
+			) {
+				try {
+					$this->setupPackage->createNewDb();
+
+					unset($this->postData['create-username']);
+					unset($this->postData['create-password']);
+
+					$this->setupPackage = new SetupPackage($this->container, $this->postData);
+				} catch (\Exception $e) {
+					$this->view->responseCode = 1;
+					$this->view->responseMessage = $e->getMessage();
+
+					if ($this->response->isSent() !== true) {
+						$this->response->setJsonContent($this->view->getParamsToView());
+
+						return $this->response->send();
+					}
+				}
+			}
+
 			if ($onlyUpdateDb) {
 				$this->setupPackage->writeConfigs();
 

@@ -101,6 +101,34 @@
 															</div>
 														</div>
 													</div>
+													<div class="col">
+														<div class="form-group">
+															<div class="checkbox icheck-success">
+																<input type="checkbox" name="create" id="create">
+																<label for="create">
+																	Create new database
+																</label>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="row" id="create-user" hidden>
+													<div class="col">
+														<div class="form-group">
+															<label for="create-username">Database Username (Create Permission) *</label>
+															<div class="input-group">
+																<input type="text" name="create-username" id="create-username" class="form-control" value="sp">
+															</div>
+														</div>
+													</div>
+													<div class="col">
+														<div class="form-group">
+															<label for="create-password">Database Password *</label>
+															<div class="input-group">
+																<input type="password" name="create-password" id="create-password" class="form-control">
+															</div>
+														</div>
+													</div>
 												</div>
 											<?php } ?>
 										</div>
@@ -209,6 +237,14 @@
 			</div>
 		</div>
 		<script type="text/javascript">
+			$('#create').click(function() {
+				if ($(this)[0].checked === true) {
+					$('#create-user').attr('hidden', false);
+				} else {
+					$('#create-user').attr('hidden', true);
+				}
+			});
+
 			$('#submit, #update').click(function(e) {
 				e.preventDefault();
 
@@ -251,6 +287,20 @@
 					});
 					$('#submit-spinner, #update-spinner').attr('hidden', true);
 					$('#submit, #update').attr('disabled', false);
+				} else if ($('#create')[0].checked === true && $('#create-username').val() === '') {
+					$('#create-username').addClass('is-invalid');
+					$('#create-username').focus(function() {
+						$(this).removeClass('is-invalid');
+					});
+					$('#submit-spinner').attr('hidden', true);
+					$('#submit').attr('disabled', false);
+				} else if ($('#create')[0].checked === true && $('#create-password').val() === '') {
+					$('#create-password').addClass('is-invalid');
+					$('#create-password').focus(function() {
+						$(this).removeClass('is-invalid');
+					});
+					$('#submit-spinner').attr('hidden', true);
+					$('#submit').attr('disabled', false);
 				} else if ($('#email').val() === '') {
 					$('#email').addClass('is-invalid');
 					$('#email').focus(function() {
@@ -287,10 +337,17 @@
 							"port"          		: $('#port').val(),
 							"database_name" 		: $('#database_name').val(),
 							"username"      		: $('#username').val(),
-							"password"      		: $('#password').val(),
+							"password"      		: $('#password').val()
 						};
+					if ($('#create')[0].checked === true) {
+						data = $.extend(data,
+						{
+							"create-username"      	: $('#create-username').val(),
+							"create-password"      	: $('#create-password').val()
+						});
+					}
 				<?php if (!$onlyUpdateDb) { ?>
-					data = $.extend($data,
+					data = $.extend(data,
 						{
 							"drop"          		: $('#drop')[0].checked,
 							"email"      			: $('#email').val(),
@@ -299,7 +356,7 @@
 							"cwf"       			: $('#cwf').val(),
 							"auto-encrypt-level"  	: $('#auto-encrypt-level')[0].checked,
 							"development-tools"  	: $('#development-tools')[0].checked,
-							"country"      			: $('#country').val();
+							"country"      			: $('#country').val()
 						});
 				<?php } ?>
 					$.ajax({
