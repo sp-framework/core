@@ -2,6 +2,7 @@
 
 return
 	[
+		"setup" 		=> false,
 		"debug"			=> true, //true - Development false - Production
 		"db" 			=>
 		[

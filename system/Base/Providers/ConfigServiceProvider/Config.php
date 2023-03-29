@@ -10,10 +10,14 @@ class Config
 {
     protected $configs = [];
 
+    protected $session;
+
     protected $configsFolder;
 
-    public function __construct()
+    public function __construct($session)
     {
+        $this->session = $session;
+
         $this->configsFolder = base_path('system/Configs/');
 
         $this->scanDirForConfigs();
@@ -21,7 +25,12 @@ class Config
 
     public function getConfigs()
     {
-        if (isset($this->getGroupedConfigs()->toArray()['debug'])) {
+        $configs = $this->getGroupedConfigs()->toArray();
+
+        if (isset($configs['debug']) &&
+            isset($configs['db']) &&
+            isset($configs['setup']) && $configs['setup'] === false
+        ) {
             return new PhalconConfig($this->getGroupedConfigs()->toArray());
         } else {
             $this->runSetup();
@@ -50,7 +59,7 @@ class Config
     {
         require_once base_path('system/Base/Installer/Components/Setup.php');
 
-        (new Setup())->run();
+        (new Setup($this->session))->run();
 
         exit;
     }

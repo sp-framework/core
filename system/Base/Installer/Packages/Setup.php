@@ -580,7 +580,7 @@ class Setup
 		(new RegisterTasks())->register($this->db);
 	}
 
-	public function writeConfigs($coreJson)
+	public function writeConfigs($coreJson = null)
 	{
 		return (new Configs($this->container, $this->postData, $coreJson))->write();
 	}

@@ -82,7 +82,7 @@ Class Setup
 		$this->localContent = $this->container->getShared('localContent');
 	}
 
-	public function run()
+	public function run($onlyUpdateDb = false, $message = null)
 	{
 		try {
 			$this->setupPackage = new SetupPackage($this->container);
@@ -98,6 +98,21 @@ Class Setup
 		}
 
 		if ($this->request->isPost()) {
+			if ($onlyUpdateDb) {
+				$this->setupPackage->writeConfigs();
+
+				$this->view->responseCode = 0;
+
+				$this->view->responseMessage = 'Configuration Updated.';
+
+				if ($this->response->isSent() !== true) {
+					$this->response->setJsonContent($this->view->getParamsToView());
+
+					return $this->response->send();
+				}
+
+				return;
+			}
 
 			$this->setupPackage->cleanVar();
 
@@ -192,8 +207,7 @@ Class Setup
 				throw $e;
 			}
 		} else {
-
-			echo $this->container->getShared('view')->render('setup');
+			echo $this->container->getShared('view')->render('setup', ['onlyUpdateDb' => $onlyUpdateDb, 'message' => $message]);
 		}
 	}
 }

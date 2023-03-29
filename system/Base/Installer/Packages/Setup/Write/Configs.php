@@ -10,7 +10,7 @@ class Configs
 
 	protected $coreJson;
 
-	public function __construct($container, $postData, $coreJson)
+	public function __construct($container, $postData, $coreJson = null)
 	{
 		$this->container = $container;
 
@@ -31,6 +31,10 @@ class Configs
 
 	protected function writeBaseConfig($revert = false)
 	{
+		if (!$this->coreJson) {
+			$this->coreJson['settings'] = include(base_path('system/Configs/Base.php'));
+		}
+
 		if (isset($this->postData['pwf']) &&
 			isset($this->postData['cwf']) &&
 			$this->postData['auto-encrypt-level'] === 'false'
@@ -73,6 +77,7 @@ class Configs
 
 return
 	[
+		"setup" 		=> false,
 		"debug"			=> ' . $debug . ', //true - Development false - Production
 		"db" 			=>
 		[

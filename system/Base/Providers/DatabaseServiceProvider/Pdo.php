@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\DatabaseServiceProvider;
 
+use PDOException;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use System\Base\Installer\Components\Setup;
 
@@ -21,7 +22,15 @@ class Pdo
 	public function init()
 	{
 		if ($this->checkDbConfig()) {
-			return new Mysql($this->dbConfig->toArray());
+			try {
+				return new Mysql($this->dbConfig->toArray());
+			} catch (PDOException $e) {
+				if ($e->getCode() === 1044 || $e->getCode() === 1049) {
+					$this->runSetup(true, $e->getMessage());
+				}
+
+				throw $e;
+			}
 		}
 	}
 
@@ -33,12 +42,17 @@ class Pdo
 			!$this->dbConfig->password 	||
 			!$this->dbConfig->port
 		) {
-			require_once base_path('system/Base/Installer/Components/Setup.php');
-
-			(new Setup($this->session))->run();
-
-			exit;
+			$this->runSetup();
 		}
 		return true;
+	}
+
+	protected function runSetup($onlyUpdateDb = false, $message = null)
+	{
+		require_once base_path('system/Base/Installer/Components/Setup.php');
+
+		(new Setup($this->session))->run($onlyUpdateDb, $message);
+
+		exit;
 	}
 }

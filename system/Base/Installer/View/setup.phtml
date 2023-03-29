@@ -27,16 +27,24 @@
 			<div class="container-fluid">
 				<div class="row">
 					<div class="col">
-						<div id="alert" class="alert mt-2 mb-2" hidden></div>
+						<?php if (!$onlyUpdateDb) { ?>
+							<div id="alert" class="alert mt-2 mb-2" hidden></div>
+						<?php } else { ?>
+							<div id="alert" class="alert mt-2 mb-2 alert-danger"><?php echo $message . ". Please update database details or fix your database server."; ?></div>
+						<?php } ?>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col">
 						<div class="card mt-2 mb-2">
 							<form autocomplete="off">
-								<div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase">Bazaari Framework Core Setup</div>
+								<?php if ($onlyUpdateDb) { ?>
+									<div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase">Bazaari Framework Database Update</div>
+								<?php } else { ?>
+									<div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase">Bazaari Framework Core Setup</div>
+								<?php } ?>
 								<div class="card-body bg-white">
-									<div class="row vdivide">
+									<div class="row vdivide justify-content-center">
 										<div class="col-6 p-3">
 											<legend>Database</legend>
 											<div class="row">
@@ -81,96 +89,109 @@
 													</div>
 												</div>
 											</div>
-											<div class="row">
-												<div class="col">
-													<div class="form-group">
-														<div class="checkbox icheck-danger">
-															<input type="checkbox" name="drop" id="drop">
-															<label for="drop">
-																Drop tables if exists
-															</label>
+											<?php if (!$onlyUpdateDb) { ?>
+												<div class="row">
+													<div class="col">
+														<div class="form-group">
+															<div class="checkbox icheck-danger">
+																<input type="checkbox" name="drop" id="drop">
+																<label for="drop">
+																	Drop tables if exists
+																</label>
+															</div>
 														</div>
 													</div>
 												</div>
-											</div>
+											<?php } ?>
 										</div>
-										<div class="col-6 p-3">
-											<legend>Admin Account</legend>
-											<div class="row">
-												<div class="col">
-													<div class="form-group">
-														<label for="email">Email *</label>
-														<div class="input-group">
-															<input type="text" name="email" id="email" class="form-control">
+										<?php if (!$onlyUpdateDb) { ?>
+											<div class="col-6 p-3">
+												<legend>Admin Account</legend>
+												<div class="row">
+													<div class="col">
+														<div class="form-group">
+															<label for="email">Email *</label>
+															<div class="input-group">
+																<input type="text" name="email" id="email" class="form-control">
+															</div>
+														</div>
+													</div>
+													<div class="col">
+														<div class="form-group">
+															<label for="pass">Password *</label>
+															<div class="input-group">
+																<input type="password" name="pass" id="pass" class="form-control">
+															</div>
 														</div>
 													</div>
 												</div>
-												<div class="col">
-													<div class="form-group">
-														<label for="pass">Password *</label>
-														<div class="input-group">
-															<input type="password" name="pass" id="pass" class="form-control">
+												<legend>Security</legend>
+												<div class="row">
+													<div class="col">
+														<div class="form-group">
+															<label for="pwf">Password Encryption Level *</label>
+															<div class="input-group">
+																<input type="number" min="4" max="16" name="pwf" id="pwf" class="form-control" value="8" disabled>
+															</div>
+														</div>
+													</div>
+													<div class="col">
+														<div class="form-group">
+															<label for="cwf">Cookies Encryption Level *</label>
+															<div class="input-group">
+																<input type="number" min="4" max="16" name="cwf" id="cwf" class="form-control" value="8" disabled>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="row">
+													<div class="col">
+														<div class="form-group">
+															<div class="checkbox icheck-info">
+																<input type="checkbox" name="auto-encrypt-level" id="auto-encrypt-level" checked>
+																<label for="auto-encrypt-level">
+																	Calculate level as per system configuration
+																</label>
+															</div>
+														</div>
+													</div>
+												</div>
+												<small>Note: Higher the number, better the security but, slower the performance. Range: 4-16</small>
+												<hr>
+												<div class="row">
+													<div class="col">
+														<div class="form-group">
+															<div class="checkbox icheck-danger">
+																<input type="checkbox" name="development-tools" id="development-tools">
+																<label for="development-tools">
+																	Install Development Tools (DEV ENV)
+																</label>
+															</div>
 														</div>
 													</div>
 												</div>
 											</div>
-											<legend>Security</legend>
-											<div class="row">
-												<div class="col">
-													<div class="form-group">
-														<label for="pwf">Password Encryption Level *</label>
-														<div class="input-group">
-															<input type="number" min="4" max="16" name="pwf" id="pwf" class="form-control" value="8" disabled>
-														</div>
-													</div>
-												</div>
-												<div class="col">
-													<div class="form-group">
-														<label for="cwf">Cookies Encryption Level *</label>
-														<div class="input-group">
-															<input type="number" min="4" max="16" name="cwf" id="cwf" class="form-control" value="8" disabled>
-														</div>
-													</div>
-												</div>
-											</div>
-											<div class="row">
-												<div class="col">
-													<div class="form-group">
-														<div class="checkbox icheck-info">
-															<input type="checkbox" name="auto-encrypt-level" id="auto-encrypt-level" checked>
-															<label for="auto-encrypt-level">
-																Calculate level as per system configuration
-															</label>
-														</div>
-													</div>
-												</div>
-											</div>
-											<small>Note: Higher the number, better the security but, slower the performance. Range: 4-16</small>
-											<hr>
-											<div class="row">
-												<div class="col">
-													<div class="form-group">
-														<div class="checkbox icheck-danger">
-															<input type="checkbox" name="development-tools" id="development-tools">
-															<label for="development-tools">
-																Install Development Tools (DEV ENV)
-															</label>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
+										<?php } ?>
 									</div>
 									<hr>
 									<div class="row text-center p-3">
-										<div class="col" id="submit-div">
-											<button id="submit" class="btn btn-primary">
-												<i id="submit-spinner" class="fa fa-cog fa-spin" hidden></i>
-												Setup
-											</button>
-										</div>
-										<div class="col" id="next-div" hidden>
-											<a href='/' id="next" class="btn btn-success" disabled=""><i class="fa fa-check"></i> Access Admin</a>
+										<?php if (!$onlyUpdateDb) { ?>
+											<div class="col" id="submit-div">
+												<button id="submit" class="btn btn-primary">
+													<i id="submit-spinner" class="fa fa-cog fa-spin" hidden></i>
+													Setup
+												</button>
+											</div>
+										<?php } else { ?>
+											<div class="col" id="update-div">
+												<button id="update" class="btn btn-primary">
+													<i id="update-spinner" class="fa fa-cog fa-spin" hidden></i>
+													Update
+												</button>
+											</div>
+										<?php } ?>
+										<div class="col" id="access-div" hidden>
+											<a href='/' id="access" class="btn btn-success" disabled=""><i class="fa fa-check"></i> Access Admin</a>
 										</div>
 									</div>
 									<hr>
@@ -188,11 +209,11 @@
 			</div>
 		</div>
 		<script type="text/javascript">
-			$('#submit').click(function(e) {
+			$('#submit, #update').click(function(e) {
 				e.preventDefault();
 
 				$(this).attr('disabled', true);
-				$('#submit-spinner').attr('hidden', false);
+				$('#submit-spinner, #update-spinner').attr('hidden', false);
 				$('#alert').attr('hidden', true);
 
 				if ($('#host').val() === '') {
@@ -200,36 +221,36 @@
 					$('#host').focus(function() {
 						$(this).removeClass('is-invalid');
 					});
-					$('#submit-spinner').attr('hidden', true);
-					$('#submit').attr('disabled', false);
+					$('#submit-spinner, #update-spinner').attr('hidden', true);
+					$('#submit, #update').attr('disabled', false);
 				} else if ($('#port').val() === '') {
 					$('#port').addClass('is-invalid');
 					$('#port').focus(function() {
 						$(this).removeClass('is-invalid');
 					});
-					$('#submit-spinner').attr('hidden', true);
-					$('#submit').attr('disabled', false);
+					$('#submit-spinner, #update-spinner').attr('hidden', true);
+					$('#submit, #update').attr('disabled', false);
 				} else if ($('#database_name').val() === '') {
 					$('#database_name').addClass('is-invalid');
 					$('#database_name').focus(function() {
 						$(this).removeClass('is-invalid');
 					});
-					$('#submit-spinner').attr('hidden', true);
-					$('#submit').attr('disabled', false);
+					$('#submit-spinner, #update-spinner').attr('hidden', true);
+					$('#submit, #update').attr('disabled', false);
 				} else if ($('#username').val() === '') {
 					$('#username').addClass('is-invalid');
 					$('#username').focus(function() {
 						$(this).removeClass('is-invalid');
 					});
-					$('#submit-spinner').attr('hidden', true);
-					$('#submit').attr('disabled', false);
+					$('#submit-spinner, #update-spinner').attr('hidden', true);
+					$('#submit, #update').attr('disabled', false);
 				} else if ($('#password').val() === '') {
 					$('#password').addClass('is-invalid');
 					$('#password').focus(function() {
 						$(this).removeClass('is-invalid');
 					});
-					$('#submit-spinner').attr('hidden', true);
-					$('#submit').attr('disabled', false);
+					$('#submit-spinner, #update-spinner').attr('hidden', true);
+					$('#submit, #update').attr('disabled', false);
 				} else if ($('#email').val() === '') {
 					$('#email').addClass('is-invalid');
 					$('#email').focus(function() {
@@ -259,45 +280,56 @@
 					$('#submit-spinner').attr('hidden', true);
 					$('#submit').attr('disabled', false);
 				} else {
+					var data;
+					data =
+						{
+							"host"          		: $('#host').val(),
+							"port"          		: $('#port').val(),
+							"database_name" 		: $('#database_name').val(),
+							"username"      		: $('#username').val(),
+							"password"      		: $('#password').val(),
+						};
+				<?php if (!$onlyUpdateDb) { ?>
+					data = $.extend($data,
+						{
+							"drop"          		: $('#drop')[0].checked,
+							"email"      			: $('#email').val(),
+							"pass"      			: $('#pass').val(),
+							"pwf"       			: $('#pwf').val(),
+							"cwf"       			: $('#cwf').val(),
+							"auto-encrypt-level"  	: $('#auto-encrypt-level')[0].checked,
+							"development-tools"  	: $('#development-tools')[0].checked,
+							"country"      			: $('#country').val();
+						});
+				<?php } ?>
 					$.ajax({
 						type    : 'POST',
 						url     : '/',
-						data    :
-							{
-								"host"          		: $('#host').val(),
-								"port"          		: $('#port').val(),
-								"database_name" 		: $('#database_name').val(),
-								"username"      		: $('#username').val(),
-								"password"      		: $('#password').val(),
-								"drop"          		: $('#drop')[0].checked,
-								"email"      			: $('#email').val(),
-								"pass"      			: $('#pass').val(),
-								"pwf"       			: $('#pwf').val(),
-								"cwf"       			: $('#cwf').val(),
-								"auto-encrypt-level"  	: $('#auto-encrypt-level')[0].checked,
-								"development-tools"  	: $('#development-tools')[0].checked,
-								"country"      			: $('#country').val()
-							},
+						data    : data,
 						dataType: 'json',
 						success: function (data) {
 							if (data && data.responseCode === 0) {
-								$('#alert').attr('hidden', false);
-								$('#alert').html('');
-								$('#alert').removeClass (function (index, className) {
-									return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
-								}).addClass('alert-success').html(data.responseMessage);
-								$('#next').attr('disabled', false);
-								$('#next-div').attr('hidden', false);
-								$('#submit-div').attr('hidden', true);
+								setTimeout(function() {
+									$('#alert').attr('hidden', false);
+									$('#alert').html('');
+									$('#alert').removeClass (function (index, className) {
+										return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
+									}).addClass('alert-success').html(data.responseMessage);
+									$('#access').attr('disabled', false);
+									$('#access-div').attr('hidden', false);
+									$('#submit-div').attr('hidden', true);
+									$('#update-div').attr('hidden', true);
+									$('#submit-spinner, #update-spinner').attr('hidden', true);
+								}, 1000);
 							} else if (data.responseCode === 1) {
 								$('#alert').attr('hidden', false);
 								$('#alert').html('');
 								$('#alert').removeClass (function (index, className) {
 									return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
 								}).addClass('alert-danger').html(data.responseMessage);
-								$('#submit').attr('disabled', false);
+								$('#submit, #update').attr('disabled', false);
+								$('#submit-spinner, #update-spinner').attr('hidden', true);
 							}
-							$('#submit-spinner').attr('hidden', true);
 						},
 						error: function (data) {
 							if (data.responseJSON && data.responseJSON.responseCode === 1) {
@@ -307,8 +339,8 @@
 									return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
 								}).addClass('alert-danger').html(data.responseJSON.responseMessage);
 							}
-							$('#submit').attr('disabled', false);
-							$('#submit-spinner').attr('hidden', true);
+							$('#submit, #update').attr('disabled', false);
+							$('#submit-spinner, #update-spinner').attr('hidden', true);
 						}
 					});
 				}
