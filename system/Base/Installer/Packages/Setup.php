@@ -635,10 +635,10 @@ class Setup
 		}
 	}
 
-	protected function executeSQL(string $sql)
+	protected function executeSQL(string $sql, $data = [])
 	{
 		try {
-			return $this->db->query($sql);
+			return $this->db->query($sql, $data);
 		} catch (\PDOException $e) {
 			throw new \Exception($e->getMessage());
 		}
@@ -646,30 +646,20 @@ class Setup
 
 	public function createNewDb()
 	{
-		// var_dump($this->db);die();
-		// $db = new \PDO(
-		// 	"mysql:host=" . $this->postData['host'] . ";dbname=mysql", $this->postData['create-username'], $this->postData['create-password']
-		// );
-
-		try {
-			$this->executeSQL('CREATE DATABASE ' . $this->postData['database_name'] . ' CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci');
-			$this->checkUser();
-		} catch (\Exception $e) {
-			throw $e;
-		}
-
-		return false;
+		$this->executeSQL("CREATE DATABASE IF NOT EXISTS " . $this->postData['database_name'] . " CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci");
 	}
 
-	protected function checkUser()
+	public function checkUser()
 	{
-		$checkUser = $this->executeSQL("SELECT * FROM `user` WHERE `User` LIKE '" . $this->postData['username'] . "'");
+		$checkUser = $this->executeSQL("SELECT * FROM `user` WHERE `User` LIKE ?", [$this->postData['username']]);
 
 		if ($checkUser->numRows() === 0) {
-			$this->executeSQL("CREATE USER '" . $this->postData['username'] . "'@'%' IDENTIFIED WITH mysql_native_password BY '" . $this->postData['password'] . "';");
+			if (!isset($this->postData['create-username']) && !isset($this->postData['create-password'])) {
+				throw new \Exception('User ' . $this->postData['username'] . ' does not exist. Please enable create new user/database.');
+			}
+			$this->executeSQL("CREATE USER ?@'%' IDENTIFIED WITH mysql_native_password BY ?;", [$this->postData['username'], $this->postData['password']]);
 		}
-		$this->executeSQL("GRANT ALL PRIVILEGES ON `" . $this->postData['database_name'] . "`.* TO '" . $this->postData['username'] . "'@'%' WITH GRANT OPTION;");
 
-		return true;
+		$this->executeSQL("GRANT ALL PRIVILEGES ON " . $this->postData['database_name'] . ".* TO ?@'%' WITH GRANT OPTION;", [$this->postData['username']]);
 	}
 }

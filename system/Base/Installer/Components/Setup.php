@@ -103,6 +103,7 @@ Class Setup
 			) {
 				try {
 					$this->setupPackage->createNewDb();
+					$this->setupPackage->checkUser();
 
 					unset($this->postData['create-username']);
 					unset($this->postData['create-password']);

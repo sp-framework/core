@@ -111,11 +111,21 @@
 															</div>
 														</div>
 													</div>
-												</div>
-												<div class="row" id="create-user" hidden>
 													<div class="col">
 														<div class="form-group">
-															<label for="create-username">Database Username (Create Permission) *</label>
+															<div class="checkbox icheck-success">
+																<input type="checkbox" name="create-grant" id="create-grant">
+																<label for="create-grant">
+																	Create new user/grant permissions
+																</label>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="row" id="create-user">
+													<div class="col">
+														<div class="form-group">
+															<label for="create-username">Database Username (With create permission) *</label>
 															<div class="input-group">
 																<input type="text" name="create-username" id="create-username" class="form-control" value="sp">
 															</div>
@@ -123,7 +133,7 @@
 													</div>
 													<div class="col">
 														<div class="form-group">
-															<label for="create-password">Database Password *</label>
+															<label for="create-password">Database Password (With create permission) *</label>
 															<div class="input-group">
 																<input type="password" name="create-password" id="create-password" class="form-control">
 															</div>
@@ -237,14 +247,6 @@
 			</div>
 		</div>
 		<script type="text/javascript">
-			$('#create').click(function() {
-				if ($(this)[0].checked === true) {
-					$('#create-user').attr('hidden', false);
-				} else {
-					$('#create-user').attr('hidden', true);
-				}
-			});
-
 			$('#submit, #update').click(function(e) {
 				e.preventDefault();
 
@@ -287,14 +289,16 @@
 					});
 					$('#submit-spinner, #update-spinner').attr('hidden', true);
 					$('#submit, #update').attr('disabled', false);
-				} else if ($('#create')[0].checked === true && $('#create-username').val() === '') {
+				} else if (($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
+						   $('#create-username').val() === '') {
 					$('#create-username').addClass('is-invalid');
 					$('#create-username').focus(function() {
 						$(this).removeClass('is-invalid');
 					});
 					$('#submit-spinner').attr('hidden', true);
 					$('#submit').attr('disabled', false);
-				} else if ($('#create')[0].checked === true && $('#create-password').val() === '') {
+				} else if (($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
+						   $('#create-password').val() === '') {
 					$('#create-password').addClass('is-invalid');
 					$('#create-password').focus(function() {
 						$(this).removeClass('is-invalid');
