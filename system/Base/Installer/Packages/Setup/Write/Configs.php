@@ -122,15 +122,15 @@ return
 
 		$this->container['localContent']->write('/system/Configs/Base.php', $baseContent);
 
-		$this->coreJson['settings']['debug'] = (bool) $debug;
-		$this->coreJson['settings']['setup'] = (bool) $setup;
-		$this->coreJson['settings']['dev'] = (bool) $dev;
+		$this->coreJson['settings']['debug'] = $debug === 'true'? true: false;
+		$this->coreJson['settings']['setup'] = $setup === 'true'? true: false;
+		$this->coreJson['settings']['dev'] = $dev === 'true'? true: false;
 		$this->coreJson['settings']['db']['host'] = $this->postData['host'];
 		$this->coreJson['settings']['db']['dbname'] = $this->postData['database_name'];
 		$this->coreJson['settings']['db']['username'] = $this->postData['username'];
 		$this->coreJson['settings']['db']['password'] = $this->postData['password'];
 		$this->coreJson['settings']['db']['port'] = $this->postData['port'];
-		$this->coreJson['settings']['cache']['enabled'] = (bool) $cache;
+		$this->coreJson['settings']['cache']['enabled'] = $cache === 'true'? true: false;
 		$this->coreJson['settings']['logs']['level'] = $logLevel;
 		$this->coreJson['settings']['security']['passwordWorkFactor'] = $pwf;
 
