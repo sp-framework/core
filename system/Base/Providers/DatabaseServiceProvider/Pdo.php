@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\DatabaseServiceProvider;
 
-use PDOException;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use System\Base\Installer\Components\Setup;
 
@@ -24,7 +23,7 @@ class Pdo
 		if ($this->checkDbConfig()) {
 			try {
 				return new Mysql($this->dbConfig->toArray());
-			} catch (PDOException $e) {
+			} catch (\PDOException $e) {
 				if ($e->getCode() === 1044 || $e->getCode() === 1049) {
 					$this->runSetup(true, $e->getMessage());
 				}

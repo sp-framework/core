@@ -270,7 +270,7 @@ class Setup
 		$this->db->createTable('system_api', $dbName, (new SystemApi)->columns());
 		$this->db->createTable('system_messenger', $dbName, (new SystemMessenger)->columns());
 
-		if ($this->postData['development-tools'] == 'true') {
+		if ($this->postData['dev'] == 'true') {
 			$this->db->createTable('devtools_api_contracts', $dbName, (new DevtoolsApiContracts)->columns());
 			$this->db->createTable('devtools_api_enums', $dbName, (new DevtoolsApiEnums)->columns());
 		}
@@ -331,7 +331,7 @@ class Setup
 					}
 
 					if ($jsonFile['sub_category'] === 'devtools' &&
-						$this->postData['development-tools'] == 'false'
+						$this->postData['dev'] == 'false'
 					) {
 						continue;
 					}
@@ -380,7 +380,7 @@ class Setup
 					}
 
 					if ($jsonFile['sub_category'] === 'devtools' &&
-						$this->postData['development-tools'] == 'false'
+						$this->postData['dev'] == 'false'
 					) {
 						continue;
 					}
@@ -404,7 +404,7 @@ class Setup
 					}
 
 					if ($jsonFile['sub_category'] === 'devtools' &&
-						$this->postData['development-tools'] == 'false'
+						$this->postData['dev'] == 'false'
 					) {
 						continue;
 					}
@@ -424,7 +424,7 @@ class Setup
 			}
 
 			if ($jsonFile['sub_category'] === 'devtools' &&
-				$this->postData['development-tools'] == 'false'
+				$this->postData['dev'] == 'false'
 			) {
 				return;
 			}

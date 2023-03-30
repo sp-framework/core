@@ -127,7 +127,7 @@
 														<div class="form-group">
 															<label for="create-username">Database Username (With create permission) *</label>
 															<div class="input-group">
-																<input type="text" name="create-username" id="create-username" class="form-control" value="sp">
+																<input type="text" name="create-username" id="create-username" class="form-control" disabled>
 															</div>
 														</div>
 													</div>
@@ -135,7 +135,7 @@
 														<div class="form-group">
 															<label for="create-password">Database Password (With create permission) *</label>
 															<div class="input-group">
-																<input type="password" name="create-password" id="create-password" class="form-control">
+																<input type="password" name="create-password" id="create-password" class="form-control" disabled>
 															</div>
 														</div>
 													</div>
@@ -199,10 +199,10 @@
 												<div class="row">
 													<div class="col">
 														<div class="form-group">
-															<div class="checkbox icheck-danger">
-																<input type="checkbox" name="development-tools" id="development-tools">
-																<label for="development-tools">
-																	Install Development Tools (DEV ENV)
+															<div class="checkbox icheck-warning">
+																<input type="checkbox" name="dev" id="dev">
+																<label for="dev">
+																	Dev Mode?
 																</label>
 															</div>
 														</div>
@@ -247,6 +247,14 @@
 			</div>
 		</div>
 		<script type="text/javascript">
+			$('#create, #create-grant').click(function() {
+				if ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) {
+					$('#create-username, #create-password').attr('disabled', false);
+				} else if ($('#create')[0].checked === false && $('#create-grant')[0].checked === false) {
+					$('#create-username, #create-password').attr('disabled', true);
+				}
+			});
+
 			$('#submit, #update').click(function(e) {
 				e.preventDefault();
 
@@ -359,7 +367,7 @@
 							"pwf"       			: $('#pwf').val(),
 							"cwf"       			: $('#cwf').val(),
 							"auto-encrypt-level"  	: $('#auto-encrypt-level')[0].checked,
-							"development-tools"  	: $('#development-tools')[0].checked,
+							"dev"  					: $('#dev')[0].checked,
 							"country"      			: $('#country').val()
 						});
 				<?php } ?>

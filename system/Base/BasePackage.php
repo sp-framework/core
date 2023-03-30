@@ -1426,10 +1426,10 @@ abstract class BasePackage extends Controller
 		return false;
 	}
 
-	protected function executeSQL(string $sql)
+	protected function executeSQL(string $sql, $data = [])
 	{
 		try {
-			return $this->db->query($sql);
+			return $this->db->query($sql, $data);
 		} catch (\PDOException $e) {
 			throw new \Exception($e->getMessage());
 		}

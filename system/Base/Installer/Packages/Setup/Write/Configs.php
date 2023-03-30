@@ -62,23 +62,27 @@ class Configs
 			$this->postData['username'] = '';
 		}
 
-		// if ($this->postData['mode'] === 'production') {
-		// 	$debug = "false";
-		// 	$cache = "true";
-		// 	$logLevel = "INFO";
-		// } else if ($this->postData['mode'] === 'development') {
+		if ($this->postData['dev'] == 'false') {
+			$debug = "false";
+			$cache = "true";
+			$logLevel = "INFO";
+			$dev = "false";
+		} else if ($this->postData['dev'] == 'true') {
 			$debug = "true";
 			$cache = "false";
 			$logLevel = "DEBUG";
-		// }
+			$dev = "true";
+		}
+		$setup = 'false';
 
 		$baseContent =
 '<?php
 
 return
 	[
-		"setup" 		=> false,
-		"debug"			=> ' . $debug . ', //true - Development false - Production
+		"setup" 		=> ' . $setup .',
+		"dev"    		=> ' . $dev . ', //true - Development false - Production
+		"debug"			=> ' . $debug . ',
 		"db" 			=>
 		[
 			"host" 				=> "' . $this->postData['host'] . '",
@@ -118,13 +122,15 @@ return
 
 		$this->container['localContent']->write('/system/Configs/Base.php', $baseContent);
 
-		$this->coreJson['settings']['debug'] = $debug;
+		$this->coreJson['settings']['debug'] = (bool) $debug;
+		$this->coreJson['settings']['setup'] = (bool) $setup;
+		$this->coreJson['settings']['dev'] = (bool) $dev;
 		$this->coreJson['settings']['db']['host'] = $this->postData['host'];
 		$this->coreJson['settings']['db']['dbname'] = $this->postData['database_name'];
 		$this->coreJson['settings']['db']['username'] = $this->postData['username'];
 		$this->coreJson['settings']['db']['password'] = $this->postData['password'];
 		$this->coreJson['settings']['db']['port'] = $this->postData['port'];
-		$this->coreJson['settings']['cache']['enabled'] = $cache;
+		$this->coreJson['settings']['cache']['enabled'] = (bool) $cache;
 		$this->coreJson['settings']['logs']['level'] = $logLevel;
 		$this->coreJson['settings']['security']['passwordWorkFactor'] = $pwf;
 

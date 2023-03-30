@@ -3,7 +3,8 @@
 return
 	[
 		"setup" 		=> false,
-		"debug"			=> true, //true - Development false - Production
+		"dev"    		=> false, //true - Development false - Production
+		"debug"			=> true,
 		"db" 			=>
 		[
 			"host" 				=> "localhost",
