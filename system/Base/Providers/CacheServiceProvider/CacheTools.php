@@ -20,6 +20,8 @@ class CacheTools
 
 	protected $index;
 
+	public $caches;
+
 	public function __construct($cacheConfig, array $caches, $localContent)
 	{
 		$this->cacheConfig = $cacheConfig;
@@ -32,9 +34,16 @@ class CacheTools
 			$this->cacheService = 'streamCache';
 		}
 
+		$this->caches = $caches;
+
 		$this->cache = $caches[$this->cacheService];
 
 		$this->localContent = $localContent;
+	}
+
+	public function getAvailableCaches()
+	{
+		return array_keys($this->caches);
 	}
 
 	public function addModelCacheParameters($parameters = null, $cacheName = null)

@@ -1,4 +1,190 @@
-
+{{var_dump(core['settings']['db'])}}
+<div class="row vdivide">
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'form-fields',
+                'fieldLabel'                                : 'Form Fields',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Form Fields',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldJstreeDataSrcArr'                     : [],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeToggleAllChildren'              : false,
+                'fieldJstreeIncludeRootInPath'              : false,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : false,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                'fieldJstreeHideJstreeIcons'                : false
+            ]
+        )}}
+    </div>
+    <div class="col-md-10">
+        <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : 'main',
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                            [
+                                'info'   :
+                                [
+                                    'tabTitle'          : 'Info',
+                                    'tabInclude'        : 'core/form/info'
+                                ],
+                                'settings'   :
+                                [
+                                    'tabTitle'          : 'Settings',
+                                    'tabInclude'        : 'core/form/settings'
+                                ],
+                                'database'   :
+                                [
+                                    'tabTitle'          : 'Database',
+                                    'tabInclude'        : 'core/form/database'
+                                ]
+                            ]
+                    ]
+                )}}
+            </fieldset>
+        </form>
+    </div>
+</div>
 <script>
+/* globals PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                          : { },
+        '{{componentId}}-{{sectionId}}-name'                        : { },
+        '{{componentId}}-{{sectionId}}-display_name'                : { },
+        '{{componentId}}-{{sectionId}}-version'                     : { },
+        '{{componentId}}-{{sectionId}}-repo'                        : { },
+        '{{componentId}}-{{sectionId}}-description'                 : { },
+        '{{componentId}}-{{sectionId}}-debug'                       : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-debug').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'debugon') {
+                        $('#{{componentId}}-{{sectionId}}-auto_off_debug').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-auto_off_debug').val('');
+                        $('#{{componentId}}-{{sectionId}}-auto_off_debug').attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-reset').click(function() {
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post('{{links.url("system/core/reset")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success({text: 'Done'});
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-auto_off_debug'              : { },
+        '{{componentId}}-{{sectionId}}-cache'                       : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-cache').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'cacheon') {
+                        $('#{{componentId}}-{{sectionId}}-cache_timeout').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-cache_timeout').val('');
+                        $('#{{componentId}}-{{sectionId}}-cache_timeout').attr('disabled', true);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-cache_timeout'               : { },
+        '{{componentId}}-{{sectionId}}-cache_service'               : {
+            placeholder : 'SELECT CACHE SERVICE'
+        },
+        '{{componentId}}-{{sectionId}}-passwordWorkFactor'          : { },
+        '{{componentId}}-{{sectionId}}-cookiesWorkFactor'           : { },
+        '{{componentId}}-{{sectionId}}-logs'                        : {
+            afterInit : function() {
+                //
+            }
+        },
+        '{{componentId}}-{{sectionId}}-level'                       : {
+            placeholder : 'SELECT LOGS LEVEL'
+        },
+        '{{componentId}}-{{sectionId}}-emergency_email_logs'        : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-emergency_email_logs').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'emergencyon') {
+                        $('#{{componentId}}-{{sectionId}}-emergency_email_logs_emails').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-emergency_email_logs_emails').val('');
+                        $('#{{componentId}}-{{sectionId}}-emergency_email_logs_emails').attr('disabled', true);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-emergency_email_logs_emails' : { },
+        '{{componentId}}-{{sectionId}}-db_host'                     : { },
+        '{{componentId}}-{{sectionId}}-form'                        : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-display_name'            : 'required',
+                '{{componentId}}-{{sectionId}}-auto_off_debug'          : 'required',
+                '{{componentId}}-{{sectionId}}-cache_timeout'           : 'required',
+                '{{componentId}}-{{sectionId}}-passwordWorkFactor'      : 'required',
+                '{{componentId}}-{{sectionId}}-cookiesWorkFactor'       : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-display_name'            : 'Please enter filter name',
+                '{{componentId}}-{{sectionId}}-auto_off_debug'          : 'Please enter minutes',
+                '{{componentId}}-{{sectionId}}-cache_timeout'           : 'Please enter seconds',
+                '{{componentId}}-{{sectionId}}-passwordWorkFactor'      : 'Please enter encryption level',
+                '{{componentId}}-{{sectionId}}-cookiesWorkFactor'       : 'Please enter encryption level',
+            }
+        }
+    });
 </script>

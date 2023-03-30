@@ -80,43 +80,43 @@ class Configs
 
 return
 	[
-		"setup" 		=> ' . $setup .',
-		"dev"    		=> ' . $dev . ', //true - Development false - Production
-		"debug"			=> ' . $debug . ',
-		"db" 			=>
+		"setup" 			=> ' . $setup .',
+		"dev"    			=> ' . $dev . ', //true - Development false - Production
+		"debug"				=> ' . $debug . ',
+		"db" 				=>
 		[
-			"host" 				=> "' . $this->postData['host'] . '",
-			"dbname" 			=> "' . $this->postData['database_name'] . '",
-			"username" 			=> "' . $this->postData['username'] . '",
-			"password" 			=> "' . $this->postData['password'] . '",
-			"port" 				=> "' . $this->postData['port'] . '",
-			"charset" 	 	    => "utf8mb4"
+			"host" 							=> "' . $this->postData['host'] . '",
+			"dbname" 						=> "' . $this->postData['database_name'] . '",
+			"username" 						=> "' . $this->postData['username'] . '",
+			"password" 						=> "' . $this->postData['password'] . '",
+			"port" 							=> "' . $this->postData['port'] . '",
+			"charset" 	 	    			=> "utf8mb4"
 		],
-		"cache"			=>
+		"cache"				=>
 		[
-			"enabled"			=> ' . $cache . ', //Global Cache value //true - Production false - Development
-			"timeout"			=> ' . $this->coreJson['settings']['cache']['timeout'] . ', //Global Cache timeout in seconds
-			"service"			=> "' . $this->coreJson['settings']['cache']['service'] . '"
+			"enabled"						=> ' . $cache . ', //Global Cache value //true - Production false - Development
+			"timeout"						=> ' . $this->coreJson['settings']['cache']['timeout'] . ', //Global Cache timeout in seconds
+			"service"						=> "' . $this->coreJson['settings']['cache']['service'] . '"
 		],
-		"security"		=>
+		"security"			=>
 		[
-			"passwordWorkFactor"=> ' . $pwf . ',
-			"cookiesWorkFactor" => ' . $cwf . ',
+			"passwordWorkFactor"			=> ' . $pwf . ',
+			"cookiesWorkFactor" 			=> ' . $cwf . ',
 		],
-		"logs"			=>
+		"logs"				=>
 		[
-			"enabled"			=> true,
-			"exceptions"		=> true,
-			"level"				=> "' . $logLevel . '",
-			"service"			=> "' . $this->coreJson['settings']['logs']['service'] . '", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
-			"email"				=> false,
-			"emergencyEmails"	=> "' . $this->coreJson['settings']['logs']['emergencyEmails'] . '",
+			"enabled"						=> true,
+			"exceptions"					=> true,
+			"level"							=> "' . $logLevel . '",
+			"service"						=> "' . $this->coreJson['settings']['logs']['service'] . '",
+			"emergencyEmailLogs"			=> false,
+			"emergencyLogsEmailAddresses"	=> "' . $this->coreJson['settings']['logs']['emergencyLogsEmailAddresses'] . '",
 		],
-		"websocket"		=>
+		"websocket"			=>
 		[
-			"protocol"			=> "tcp",
-			"host"				=> "localhost",
-			"port"				=> 5555
+			"protocol"						=> "tcp",
+			"host"							=> "localhost",
+			"port"							=> 5555
 		]
 	];';
 
@@ -125,11 +125,12 @@ return
 		$this->coreJson['settings']['debug'] = $debug === 'true'? true: false;
 		$this->coreJson['settings']['setup'] = $setup === 'true'? true: false;
 		$this->coreJson['settings']['dev'] = $dev === 'true'? true: false;
-		$this->coreJson['settings']['db']['host'] = $this->postData['host'];
-		$this->coreJson['settings']['db']['dbname'] = $this->postData['database_name'];
-		$this->coreJson['settings']['db']['username'] = $this->postData['username'];
-		$this->coreJson['settings']['db']['password'] = $this->postData['password'];
-		$this->coreJson['settings']['db']['port'] = $this->postData['port'];
+		$this->coreJson['settings']['db'][$this->postData['database_name']]['host'] = $this->postData['host'];
+		$this->coreJson['settings']['db'][$this->postData['database_name']]['dbname'] = $this->postData['database_name'];
+		$this->coreJson['settings']['db'][$this->postData['database_name']]['username'] = $this->postData['username'];
+		$this->coreJson['settings']['db'][$this->postData['database_name']]['password'] = $this->postData['password'];
+		$this->coreJson['settings']['db'][$this->postData['database_name']]['port'] = $this->postData['port'];
+		$this->coreJson['settings']['db'][$this->postData['database_name']]['charset'] = 'utf8mb4';
 		$this->coreJson['settings']['cache']['enabled'] = $cache === 'true'? true: false;
 		$this->coreJson['settings']['logs']['level'] = $logLevel;
 		$this->coreJson['settings']['security']['passwordWorkFactor'] = $pwf;

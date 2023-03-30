@@ -1,34 +1,27 @@
 {
-	"name" 								: "Core",
-	"displayName" 						: "Bazaari Core",
-	"description" 						: "Bazaari Framework Core Module",
-	"version" 							: "0.0.1",
-	"repo" 								: "https://dev.bazaari.com.au/sp-dev/core",
-	"settings"      					: {
-		"debug"							: true,
-		"db"						: {
-			"host" 						: "localhost",
-			"dbname" 					: "sp",
-			"username" 					: "sp",
-			"password" 					: "",
-			"port" 						: "3306",
-			"charset" 	 				: "utf8mb4"
-		},
+	"name" 									: "Core",
+	"displayName" 							: "Bazaari Core",
+	"description" 							: "Bazaari Framework Core Module",
+	"version" 								: "0.0.0",
+	"repo" 									: "https://repo.bazaari.com.au/sp/core",
+	"settings"      						: {
+		"debug"								: true,
+		"db"								: [],
 		"cache"						: {
-			"enabled"					: false,
-			"timeout"					: 60,
-			"service"					: "streamCache"
+			"enabled"						: false,
+			"timeout"						: 60,
+			"service"						: "streamCache"
 		},
 		"security"					: {
-			"passwordWorkFactor"		: 8,
-			"cookiesWorkFactor"	    	: 4
+			"passwordWorkFactor"			: 8,
+			"cookiesWorkFactor"	    		: 4
 		},
 		"logs"						: {
-			"enabled"					: true,
-			"level"						: "DEBUG",
-			"service"					: "streamLogs",
-			"email"						: false,
-			"emergencyEmails"			: "support@bazaari.com.au"
+			"enabled"						: true,
+			"level"							: "DEBUG",
+			"service"						: "streamLogs",
+			"emergencyEmailLogs"			: false,
+			"emergencyLogsEmailAddresses"	: ""
 		}
 	}
 }

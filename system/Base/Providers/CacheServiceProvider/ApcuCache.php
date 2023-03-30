@@ -19,7 +19,7 @@ class ApcuCache
 
     public function init()
     {
-        if ($this->cacheConfig) {
+        if ($this->cacheConfig->enabled) {
             $options = [
                 'defaultSerializer' => 'Json',
                 'lifetime'          => $this->cacheConfig->timeout

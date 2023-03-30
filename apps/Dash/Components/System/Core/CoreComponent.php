@@ -18,8 +18,17 @@ class CoreComponent extends BaseComponent
      */
     public function viewAction()
     {
-        var_dump($this->core->core);die();
-        $this->view->coreSettings = $this->coreSettings;
+        $availableCaches = [];
+
+        foreach ($this->cacheTools->getAvailableCaches() as $key => $value) {
+            $availableCaches[$value]['id'] = $value;
+            $availableCaches[$value]['name'] = $value;
+        }
+
+        $this->view->core = $this->core->core;
+        $this->view->availableCaches = $availableCaches;
+        $this->view->logLevels = $this->logger->getLogLevels();
+        $this->useStorage('public');
     }
 
     /**
@@ -32,12 +41,30 @@ class CoreComponent extends BaseComponent
                 return;
             }
 
-            $this->core->updateBarcodesSettings($this->postData());
+            $this->core->update($this->postData());
 
             $this->addResponse(
                 $this->core->packagesData->responseMessage,
                 $this->core->packagesData->responseCode
             );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function resetAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->core->reset()) {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode
+                );
+            }
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }

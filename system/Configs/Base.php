@@ -2,42 +2,42 @@
 
 return
 	[
-		"setup" 		=> false,
-		"dev"    		=> false, //true - Development false - Production
-		"debug"			=> true,
-		"db" 			=>
+		"setup" 			=> false,
+		"dev"    			=> false, //true - Development false - Production
+		"debug"				=> false,
+		"db" 				=>
 		[
-			"host" 				=> "localhost",
-			"dbname" 			=> "sp",
-			"username" 			=> "sp",
-			"password" 			=> "123",
-			"port" 				=> "3306",
-			"charset" 	 	    => "utf8mb4"
+			"host" 							=> "localhost",
+			"dbname" 						=> "sp",
+			"username" 						=> "sp",
+			"password" 						=> "123",
+			"port" 							=> "3306",
+			"charset" 	 	    			=> "utf8mb4"
 		],
-		"cache"			=>
+		"cache"				=>
 		[
-			"enabled"			=> false, //Global Cache value //true - Production false - Development
-			"timeout"			=> 60, //Global Cache timeout in seconds
-			"service"			=> "streamCache"
+			"enabled"						=> true, //Global Cache value //true - Production false - Development
+			"timeout"						=> 60, //Global Cache timeout in seconds
+			"service"						=> "streamCache"
 		],
-		"security"		=>
+		"security"			=>
 		[
-			"passwordWorkFactor"=> 8,
-			"cookiesWorkFactor" => 4,
+			"passwordWorkFactor"			=> 8,
+			"cookiesWorkFactor" 			=> 4,
 		],
-		"logs"			=>
+		"logs"				=>
 		[
-			"enabled"			=> true,
-			"exceptions"		=> true,
-			"level"				=> "DEBUG",
-			"service"			=> "streamLogs", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
-			"email"				=> false,
-			"emergencyEmails"	=> "support@bazaari.com.au",
+			"enabled"						=> true,
+			"exceptions"					=> true,
+			"level"							=> "INFO",
+			"service"						=> "streamLogs",
+			"emergencyEmailLogs"			=> false,
+			"emergencyLogsEmailAddresses"	=> "",
 		],
-		"websocket"		=>
+		"websocket"			=>
 		[
-			"protocol"			=> "tcp",
-			"host"				=> "localhost",
-			"port"				=> 5555
+			"protocol"						=> "tcp",
+			"host"							=> "localhost",
+			"port"							=> 5555
 		]
 	];

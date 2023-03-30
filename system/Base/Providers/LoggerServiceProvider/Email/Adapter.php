@@ -41,11 +41,11 @@ class Adapter extends AbstractAdapter
 
     public function sendEmail()
     {
-        if (!$this->logsConfig->enabled) {
+        if (!$this->logsConfig->emergencyEmailLogs) {
             throw new EmailException('Email not enabled');
         }
 
-        if ($this->logsConfig->emergencyEmails !== '') {
+        if ($this->logsConfig->emergencyLogsEmailAddresses !== '') {
 
             if ($this->email->setup()) {
                 $emailSettings = $this->email->getEmailSettings();
@@ -55,7 +55,7 @@ class Adapter extends AbstractAdapter
                     $emailSettings['username']
                 );
 
-                foreach (explode(',', $this->logsConfig->emergencyEmails) as $key => $emailAddress) {
+                foreach (explode(',', $this->logsConfig->emergencyLogsEmailAddresses) as $key => $emailAddress) {
                     $this->email->setRecipientTo(trim($emailAddress), trim($emailAddress));
                 }
 

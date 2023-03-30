@@ -167,7 +167,7 @@ class Logger
     public function commitEmail($message = null)
     {
         if ($this->logsConfig->enabled) {
-            if ($this->logsConfig->email) {
+            if ($this->logsConfig->emergencyEmailLogs) {
                 if ($message) {
                     $this->logEmail->emergency($message);
                 }
@@ -217,5 +217,48 @@ class Logger
                 $this->log->setLogLevel($this->log::INFO);
                 break;
         }
+    }
+
+    public function getLogLevels()
+    {
+        return
+            [
+                [
+                    'id'    => 'EMERGENCY',
+                    'name'  => 'EMERGENCY'
+                ],
+                [
+                    'id'    => 'CRITICAL',
+                    'name'  => 'CRITICAL'
+                ],
+                [
+                    'id'    => 'ALERT',
+                    'name'  => 'ALERT'
+                ],
+                [
+                    'id'    => 'ERROR',
+                    'name'  => 'ERROR'
+                ],
+                [
+                    'id'    => 'WARNING',
+                    'name'  => 'WARNING'
+                ],
+                [
+                    'id'    => 'NOTICE',
+                    'name'  => 'NOTICE'
+                ],
+                [
+                    'id'    => 'INFO',
+                    'name'  => 'INFO'
+                ],
+                [
+                    'id'    => 'DEBUG',
+                    'name'  => 'DEBUG'
+                ],
+                [
+                    'id'    => 'CUSTOM',
+                    'name'  => 'CUSTOM'
+                ],
+            ];
     }
 }

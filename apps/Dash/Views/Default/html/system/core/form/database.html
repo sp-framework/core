@@ -1,0 +1,56 @@
+<div class="row vdivide">
+    <div class="col">
+        <div class="row">
+            <div class="col">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'db_host',
+                        'fieldLabel'                     : 'Database Host',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Hostname of database server',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : ''
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : sectionId,
+                        'fieldId'                       : 'restore',
+                        'fieldType'                     : 'files/dropzone',
+                        'fieldLabel'                    : false,
+                        'fieldDropzoneLabel'            : 'Restore Backup Database',
+                        'fieldRequired'                 : false,
+                        'fieldHelp'                     : true,
+                        'fieldHelpTooltipContent'       : 'Max: 1. Upload DB backup file..',
+                        'fieldBazScan'                  : true,
+                        'fieldBazPostOnCreate'          : false,
+                        'fieldBazPostOnUpdate'          : false,
+                        'attachments'                   : [],
+                        'maxAttachments'                : 1,
+                        'storage'                       : storage,
+                        'upload'                        : true
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>

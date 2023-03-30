@@ -77,4 +77,28 @@ class Core extends BasePackage
 		$this->core['settings']['sigText'] = $keys['sigText'];
 		$this->core['settings']['cookiesSig'] = $keys['cookiesSig'];
 	}
+
+	public function reset()
+	{
+		if ($this->core['settings']['dev'] == 'true') {
+			$this->writeResetConfig();
+
+			$this->addResponse('Reset Done', 0);
+
+			return true;
+		}
+	}
+
+	private function writeResetConfig()
+	{
+		$resetContent =
+'<?php
+
+return
+	[
+		"setup" 		=> true
+	];';
+
+		$this->localContent->write('/system/Configs/Base.php', $resetContent);
+	}
 }
