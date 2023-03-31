@@ -2,6 +2,9 @@
 
 namespace System\Base\Installer\Packages\Setup\Write;
 
+use League\Flysystem\UnableToReadFile;
+use Phalcon\Helper\Json;
+
 class Configs
 {
 	protected $container;
@@ -32,7 +35,11 @@ class Configs
 	protected function writeBaseConfig($revert = false)
 	{
 		if (!$this->coreJson) {
-			$this->coreJson['settings'] = include(base_path('system/Configs/Base.php'));
+			try {
+				$this->coreJson['settings'] = include(base_path('system/Configs/Base.php'));
+			} catch (\Exception $exception) {
+				throw $exception;
+			}
 		}
 
 		if (isset($this->postData['pwf']) &&
@@ -62,18 +69,37 @@ class Configs
 			$this->postData['username'] = '';
 		}
 
-		if ($this->postData['dev'] == 'false') {
+		if (isset($this->postData['dev']) && $this->postData['dev'] == 'false') {
 			$debug = "false";
 			$cache = "true";
 			$logLevel = "INFO";
 			$dev = "false";
-		} else if ($this->postData['dev'] == 'true') {
+		} else if (isset($this->postData['dev']) && $this->postData['dev'] == 'true') {
 			$debug = "true";
 			$cache = "false";
 			$logLevel = "DEBUG";
 			$dev = "true";
+		} else {
+			$debug = $this->coreJson['settings']['debug'] === true ? 'true' : 'false';
+			$cache = $this->coreJson['settings']['cache']['enabled'] === true ? 'true' : 'false';
+			$logLevel = $this->coreJson['settings']['logs']['level'] === true ? 'true' : 'false';
+			$dev = $this->coreJson['settings']['dev'] === true ? 'true' : 'false';
 		}
 		$setup = 'false';
+
+		$this->coreJson['settings']['setup'] = $setup === 'true'? true: false;
+		$this->coreJson['settings']['debug'] = $debug === 'true'? true: false;
+		$this->coreJson['settings']['cache']['enabled'] = $cache === 'true'? true: false;
+		$this->coreJson['settings']['dev'] = $dev === 'true'? true: false;
+		$this->coreJson['settings']['db'][$this->postData['database_name']]['host'] = $this->postData['host'];
+		$this->coreJson['settings']['db'][$this->postData['database_name']]['dbname'] = $this->postData['database_name'];
+		$this->coreJson['settings']['db'][$this->postData['database_name']]['username'] = $this->postData['username'];
+		$this->postData['password'] = $this->container['crypt']->encryptBase64($this->postData['password'], $this->createDbKey());
+		$this->coreJson['settings']['db'][$this->postData['database_name']]['password'] = $this->postData['password'];
+		$this->coreJson['settings']['db'][$this->postData['database_name']]['port'] = $this->postData['port'];
+		$this->coreJson['settings']['db'][$this->postData['database_name']]['charset'] = 'utf8mb4';
+		$this->coreJson['settings']['logs']['level'] = $logLevel;
+		$this->coreJson['settings']['security']['passwordWorkFactor'] = $pwf;
 
 		$baseContent =
 '<?php
@@ -120,20 +146,11 @@ return
 		]
 	];';
 
-		$this->container['localContent']->write('/system/Configs/Base.php', $baseContent);
-
-		$this->coreJson['settings']['debug'] = $debug === 'true'? true: false;
-		$this->coreJson['settings']['setup'] = $setup === 'true'? true: false;
-		$this->coreJson['settings']['dev'] = $dev === 'true'? true: false;
-		$this->coreJson['settings']['db'][$this->postData['database_name']]['host'] = $this->postData['host'];
-		$this->coreJson['settings']['db'][$this->postData['database_name']]['dbname'] = $this->postData['database_name'];
-		$this->coreJson['settings']['db'][$this->postData['database_name']]['username'] = $this->postData['username'];
-		$this->coreJson['settings']['db'][$this->postData['database_name']]['password'] = $this->postData['password'];
-		$this->coreJson['settings']['db'][$this->postData['database_name']]['port'] = $this->postData['port'];
-		$this->coreJson['settings']['db'][$this->postData['database_name']]['charset'] = 'utf8mb4';
-		$this->coreJson['settings']['cache']['enabled'] = $cache === 'true'? true: false;
-		$this->coreJson['settings']['logs']['level'] = $logLevel;
-		$this->coreJson['settings']['security']['passwordWorkFactor'] = $pwf;
+		try {
+			$this->container['localContent']->write('/system/Configs/Base.php', $baseContent);
+		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
+			throw $exception;
+		}
 
 		return $this->coreJson;
 	}
@@ -160,5 +177,29 @@ return
 		list($usec, $sec) = explode(" ", microtime());
 
 		return ((float)$usec + (float)$sec);
+	}
+
+	private function createDbKey()
+	{
+		$keys[$this->postData['database_name']] = $this->container['random']->base58(4);
+
+		try {
+			$this->container['localContent']->write('system/.dbkeys', Json::encode($keys));
+		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
+			throw $exception;
+		}
+
+		return $keys[$this->postData['database_name']];
+	}
+
+	private function getDbKey()
+	{
+		try {
+			$keys = $this->container['localContent']->read('system/.dbkeys');
+		} catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
+			throw $exception;
+		}
+
+		return Json::decode($keys, true)[$this->postData['database_name']];
 	}
 }

@@ -297,7 +297,8 @@
 					});
 					$('#submit-spinner, #update-spinner').attr('hidden', true);
 					$('#submit, #update').attr('disabled', false);
-				} else if (($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
+				} else if (($('#create').length > 0 && $('#create-grant').length > 0) &&
+						   ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
 						   $('#create-username').val() === '') {
 					$('#create-username').addClass('is-invalid');
 					$('#create-username').focus(function() {
@@ -305,7 +306,8 @@
 					});
 					$('#submit-spinner').attr('hidden', true);
 					$('#submit').attr('disabled', false);
-				} else if (($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
+				} else if (($('#create').length > 0 && $('#create-grant').length > 0) &&
+						   ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
 						   $('#create-password').val() === '') {
 					$('#create-password').addClass('is-invalid');
 					$('#create-password').focus(function() {
@@ -351,7 +353,7 @@
 							"username"      		: $('#username').val(),
 							"password"      		: $('#password').val()
 						};
-					if ($('#create')[0].checked === true) {
+					if ($('#create').length > 0 && $('#create')[0].checked === true) {
 						data = $.extend(data,
 						{
 							"create-username"      	: $('#create-username').val(),
