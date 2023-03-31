@@ -476,8 +476,8 @@ class Setup
 
 	protected function registerAdminView(array $viewFile)
 	{
-		$appInstalledFiles = $this->getInstalledFiles('apps/Dash/Views/', true);
-		$publicInstalledFiles = $this->getInstalledFiles('public/dash/', true);
+		$appInstalledFiles = $this->getInstalledFiles('apps/Dash/Views/', true, ['Html_compiled', 'linter-backup']);
+		$publicInstalledFiles = $this->getInstalledFiles('public/dash/', true, ['linter-backup']);
 
 		$installedFiles = array_merge($appInstalledFiles, $publicInstalledFiles);
 
@@ -545,7 +545,7 @@ class Setup
 		return (new RegisterStorages())->register($this->db);
 	}
 
-	protected function getInstalledFiles($directory = null, $sub = true)
+	protected function getInstalledFiles($directory = null, $sub = true, $exclude = [])
 	{
 		$installedFiles = [];
 		$installedFiles['dirs'] = [];
@@ -563,6 +563,21 @@ class Setup
 				->filter(fn (StorageAttributes $attributes) => $attributes->isDir())
 				->map(fn (StorageAttributes $attributes) => $attributes->path())
 				->toArray();
+
+			if (count($exclude) > 0) {
+				foreach ($exclude as $excluded) {
+					foreach ($installedFiles['files'] as $key => $file) {
+						if (strpos($file, $excluded)) {
+							unset($installedFiles['files'][$key]);
+						}
+					}
+					foreach ($installedFiles['dirs'] as $key => $dir) {
+						if (strpos($dir, $excluded)) {
+							unset($installedFiles['dirs'][$key]);
+						}
+					}
+				}
+			}
 
 			return $installedFiles;
 		} else {
