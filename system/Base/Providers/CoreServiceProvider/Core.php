@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\CoreServiceProvider;
 
+use Ifsnop\Mysqldump\Mysqldump;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
@@ -26,6 +27,55 @@ class Core extends BasePackage
 		$this->checkKeys();
 
 		return $this;
+	}
+
+	public function dbbackup($data)
+	{
+		if (!isset($data['db'])) {
+			$this->addResponse('Please provide db name', 1, []);
+
+			return false;
+		}
+
+		if (!isset($this->core['settings']['dbs'][$data['db']])) {
+			$this->addResponse('Db does not exist.', 1, []);
+
+			return false;
+		}
+
+		$db = $this->core['settings']['dbs'][$data['db']];
+		$key = $this->getDbKey($db);
+		$db['password'] = $this->crypt->decryptBase64($db['password'], $this->getDbKey($db));
+
+		try {
+			$dump =
+				new Mysqldump(
+					'mysql:host=' . $db['host'] . ';dbname=' . $db['dbname'],
+					$db['username'],
+					$db['password'],
+					['compress' => Mysqldump::GZIP, 'default-character-set' => Mysqldump::UTF8MB4]
+				);
+
+			if ($this->basepackages->storages->storeFile(
+					'private',
+					'core',
+					$csvString,
+					$name,
+					null,
+					'text/csv'
+				)
+			) {
+				$this->basepackages->storages->changeOrphanStatus($this->basepackages->storages->packagesData->storageData['uuid']);
+
+				return $this->basepackages->storages->packagesData->storageData['uuid'];
+			// $dump->start(base_path('dump.gzip'));
+
+			}
+
+		} catch (\Exception $e) {
+			var_dump($e);die();
+			echo 'mysqldump-php error: ' . $e->getMessage();
+		}
 	}
 
 	protected function checkKeys()
@@ -100,5 +150,16 @@ return
 	];';
 
 		$this->localContent->write('/system/Configs/Base.php', $resetContent);
+	}
+
+	private function getDbKey($dbConfig)
+	{
+		try {
+			$keys = $this->localContent->read('system/.dbkeys');
+
+			return Json::decode($keys, true)[$dbConfig['dbname']];
+		} catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
+			return false;
+		}
 	}
 }

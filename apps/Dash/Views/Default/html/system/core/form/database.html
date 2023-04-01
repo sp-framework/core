@@ -1,9 +1,36 @@
+<div class="row">
+    <div class="col">
+        {% set activeDb = 0 %}
+        {% for dbkey, db in core['settings']['dbs'] %}
+            {% if db['active'] is defined and db['active'] == true %}
+                {% set activeDb = dbkey %}
+            {% endif %}
+        {% endfor %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'dbs',
+                'fieldLabel'                     : 'Select Database',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select database that you want to make active.',
+                'fieldBazScan'                   : true,
+                'fieldRequired'                  : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataSelect2Options'        : core['settings']['dbs'],
+                'fieldDataSelect2OptionsKey'     : 'dbname',
+                'fieldDataSelect2OptionsValue'   : 'dbname',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': activeDb
+            ]
+        )}}
+    </div>
+</div>
 <div class="row vdivide">
     <div class="col">
-        <div class="row">
-            <div class="col">
-            </div>
-        </div>
         <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
@@ -27,6 +54,38 @@
                     ]
                 )}}
             </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                {% set backupDisabled = '' %}
+                {% if activeDb == '0' %}
+                    {% set backupDisabled = 'disabled' %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'backup',
+                        'fieldLabel'                     : 'Backup Database',
+                        'fieldType'                      : 'html',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Download database backup of selected database.',
+                        'fieldAdditionalClass'           : 'mb-0',
+                        'fieldHtmlContent'               : '<div class="text-center"><a href="" class="btn btn-app bg-primary p-2 backup-btn ' ~ backupDisabled ~ '"><i class="fas fa-database mb-2"></i> Generate Backup</a></div>',
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -37,7 +96,7 @@
                         'fieldId'                       : 'restore',
                         'fieldType'                     : 'files/dropzone',
                         'fieldLabel'                    : false,
-                        'fieldDropzoneLabel'            : 'Restore Backup Database',
+                        'fieldDropzoneLabel'            : 'Restore Database',
                         'fieldRequired'                 : false,
                         'fieldHelp'                     : true,
                         'fieldHelpTooltipContent'       : 'Max: 1. Upload DB backup file..',

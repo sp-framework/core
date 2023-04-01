@@ -69,4 +69,23 @@ class CoreComponent extends BaseComponent
             $this->addResponse('Method Not Allowed', 1);
         }
     }
+
+    public function dbbackupAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->core->dbbackup($this->postData());
+
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode,
+                $this->core->packagesData->responseData
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
 }

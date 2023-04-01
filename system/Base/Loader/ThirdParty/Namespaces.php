@@ -49,5 +49,6 @@ return
         'Http\\Promise'                                 => __DIR__ . '/../../../ThirdParty/vendor/php-http/promise/src',
         'Http\\Client'                                  => __DIR__ . '/../../../ThirdParty/vendor/php-http/httplug/src',
         'MyCLabs\\Enum'                                 => __DIR__ . '/../../../ThirdParty/vendor/myclabs/php-enum/src',
-        'BlueLibraries\\Dns'                            => __DIR__ . '/../../../ThirdParty/vendor/bluelibraries/dns/src'
+        'BlueLibraries\\Dns'                            => __DIR__ . '/../../../ThirdParty/vendor/bluelibraries/dns/src',
+        'Ifsnop'                                        => __DIR__ . '/../../../ThirdParty/vendor/ifsnop/mysqldump-php/src/Ifsnop'
     ];

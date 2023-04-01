@@ -1,4 +1,4 @@
-{{var_dump(core['settings']['db'])}}
+{{var_dump(core['settings']['dbs'])}}
 <div class="row vdivide">
     <div class="col-md-2">
         {{adminltetags.useTag('fields',
@@ -169,7 +169,46 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-emergency_email_logs_emails' : { },
+        '{{componentId}}-{{sectionId}}-dbs'                         : {
+            placeholder : "SELECT DATABASE"
+        },
         '{{componentId}}-{{sectionId}}-db_host'                     : { },
+        '{{componentId}}-{{sectionId}}-backup'                      : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-dbs').on('select2:select', function(e) {
+                    generateLink(e.params.data.id);
+                });
+
+                function generateLink(id) {
+                    var postData = { };
+                    postData['db'] = id;
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post('{{links.url("system/core/dbbackup")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseData && response.responseData.link) {
+                            // $('.link').html(
+                            //     '<a href="' + response.responseData.link + '" class="btn btn-app bg-primary p-2"><i class="fas fa-download mb-2"></i> Structures File</a>'
+                            // );
+                        }
+
+                        $('.download-upload').attr('hidden', false);
+                    }, 'json');
+                }
+
+                $('#{{componentId}}-{{sectionId}}-backup').click(function(e) {
+                    e.preventDefault();
+
+                    var id = $('#{{componentId}}-{{sectionId}}-dbs').val();
+
+                    generateLink(id);
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-form'                        : {
             rules: {
                 '{{componentId}}-{{sectionId}}-display_name'            : 'required',

@@ -91,13 +91,14 @@ class Configs
 		$this->coreJson['settings']['debug'] = $debug === 'true'? true: false;
 		$this->coreJson['settings']['cache']['enabled'] = $cache === 'true'? true: false;
 		$this->coreJson['settings']['dev'] = $dev === 'true'? true: false;
-		$this->coreJson['settings']['db'][$this->postData['database_name']]['host'] = $this->postData['host'];
-		$this->coreJson['settings']['db'][$this->postData['database_name']]['dbname'] = $this->postData['database_name'];
-		$this->coreJson['settings']['db'][$this->postData['database_name']]['username'] = $this->postData['username'];
+		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['active'] = true;
+		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['host'] = $this->postData['host'];
+		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['dbname'] = $this->postData['database_name'];
+		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['username'] = $this->postData['username'];
 		$this->postData['password'] = $this->container['crypt']->encryptBase64($this->postData['password'], $this->createDbKey());
-		$this->coreJson['settings']['db'][$this->postData['database_name']]['password'] = $this->postData['password'];
-		$this->coreJson['settings']['db'][$this->postData['database_name']]['port'] = $this->postData['port'];
-		$this->coreJson['settings']['db'][$this->postData['database_name']]['charset'] = 'utf8mb4';
+		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['password'] = $this->postData['password'];
+		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['port'] = $this->postData['port'];
+		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['charset'] = 'utf8mb4';
 		$this->coreJson['settings']['logs']['level'] = $logLevel;
 		$this->coreJson['settings']['security']['passwordWorkFactor'] = $pwf;
 
