@@ -11,12 +11,21 @@ class MiddlewaresServiceProvider extends Injectable
 {
     protected $data = [];
 
+    protected function init($data)
+    {
+        if ($data) {
+            $this->data = array_merge($this->data, $data);
+        }
+
+        $this->data['app'] = $this->apps->getAppInfo();
+    }
+
     public function beforeExecuteRoute(
         Event $event,
         DispatcherInterface $dispatcher,
         $data
     ) {
-        $this->data['app'] = $this->apps->getAppInfo();
+        $this->init($data);
 
         if ($this->data['app']) {
             $middlewares = [];
@@ -62,6 +71,38 @@ class MiddlewaresServiceProvider extends Injectable
             }
 
             return true;
+        }
+    }
+
+    public function afterExecuteRoute(
+        Event $event,
+        DispatcherInterface $dispatcher,
+        $data
+    ) {
+        if (!$this->dispatcher->wasForwarded()) {
+            return;
+        }
+
+        $this->init($data);
+
+        if ($this->data['app']) {
+            $middlewares = $this->modules->middlewares->getMiddlewaresForApp($this->data['app']['id']);
+
+            foreach ($middlewares as $middleware) {
+                if ($middleware['name'] !== 'Acl' &&
+                    $middleware['enabled'] == true
+                ) {
+                    try {
+                        $mw = (new $middleware['class']())->process($this->data);
+                    } catch (\Exception $e) {
+                        if ($this->config->logs->exceptions) {
+                            $this->logger->logExceptions->debug($e);
+                        }
+
+                        throw $e;
+                    }
+                }
+            }
         }
     }
 

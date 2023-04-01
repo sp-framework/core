@@ -386,6 +386,10 @@ class Setup
 					}
 
 					$this->registerAdminPackage($jsonFile);
+
+					if ($jsonFile['name'] === 'Storages') {
+						$this->registerStorages($jsonFile);
+					}
 				}
 			}
 		} else if ($type === 'middlewares') {
@@ -540,9 +544,9 @@ class Setup
 		return (new RegisterTimezones())->register($this->db, $this->localContent);
 	}
 
-	public function registerStorages()
+	public function registerStorages(array $packageFile)
 	{
-		return (new RegisterStorages())->register($this->db);
+		return (new RegisterStorages())->register($this->db, $packageFile);
 	}
 
 	protected function getInstalledFiles($directory = null, $sub = true, $exclude = [])

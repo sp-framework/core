@@ -161,7 +161,7 @@ class Tree extends AdminLTETags
         } else if ($this->treeMode === 'select2') {
             if (isset($items['value'])) {
                 $this->content .=
-                    '<optgroup label="' . $items['value'] . '">';
+                    '<optgroup label="' . strtoupper($items['value']) . '">';
             }
 
             $this->generateContent(

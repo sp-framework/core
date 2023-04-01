@@ -1,0 +1,24 @@
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'gears',
+        'cardTitle'                     : 'Module Settings',
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'storages/ms/form',
+        'formButtons'                   :
+        [
+            'updateActionUrl'               : 'system/storages/msupdate',
+            'updateSuccessRedirectUrl'      : 'system/storages',
+            'cancelActionUrl'               : 'system/storages',
+            'closeActionUrl'                : 'system/storages'
+        ]
+    ]
+)}}

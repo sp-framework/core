@@ -8,5 +8,36 @@
     "version"       : "0.0.1",
     "repo"          : "https://.../",
     "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Storages",
-    "settings"      : {"componentRoute":"system/storages"}
+    "settings"      : {
+        "componentRoute"        : "system/storages",
+        "allowedImageMimeTypes" :
+            [
+                "image/jpeg",
+                "image/png",
+                "image/gif"
+            ],
+        "allowedImageSizes" :
+            [
+                "30",
+                "80",
+                "200",
+                "800",
+                "1200",
+                "2000"
+            ],
+        "allowedFileMimeTypes" :
+            [
+                "application/pdf",
+                "text/plain",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/vnd.ms-excel",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "application/vnd.ms-powerpoint",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "application/zip",
+                "application/gzip",
+                "text/csv"
+            ]
+    }
 }

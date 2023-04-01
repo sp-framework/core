@@ -219,8 +219,6 @@ Class Setup
 
 					$this->setupPackage->registerTimezones();
 
-					$this->setupPackage->registerStorages();
-
 					$this->setupPackage->registerWorkers();
 
 					$this->setupPackage->registerSchedules();

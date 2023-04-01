@@ -145,6 +145,8 @@ abstract class BaseComponent extends Controller
 			$this->view->canAdd = false;
 			$this->view->canUpdate = false;
 			$this->view->canRemove = false;
+			$this->view->canMsv = false;
+			$this->view->canMsu = false;
 
 			$middlewares =
 				msort(
@@ -165,6 +167,8 @@ abstract class BaseComponent extends Controller
 					$this->view->canAdd = true;
 					$this->view->canUpdate = true;
 					$this->view->canRemove = true;
+					$this->view->canMsv = true;
+					$this->view->canMsu = true;
 					return;
 				}
 			}
@@ -184,14 +188,49 @@ abstract class BaseComponent extends Controller
 				if (isset($permissions['remove']) && $permissions['remove'] == 1) {
 					$this->view->canRemove = true;
 				}
+				if (isset($permissions['msview']) && $permissions['msview'] == 1) {
+					$this->view->canMsv = true;
+				}
+				if (isset($permissions['msupdate']) && $permissions['msupdate'] == 1) {
+					$this->view->canMsu = true;
+				}
 			} else if ($permissions === 'sysAdmin') {
 				$this->view->canView = true;
 				$this->view->canAdd = true;
 				$this->view->canUpdate = true;
 				$this->view->canRemove = true;
-				return;
+				$this->view->canMsv = true;
+				$this->view->canMsu = true;
 			}
 		}
+	}
+
+	protected function checkSettingsRoute()
+	{
+		if (isset($this->getData()['settings']) && $this->getData()['settings'] == 'true') {
+			$this->dispatcher->forward(['action' => 'msview']);
+		}
+	}
+
+	/**
+	 * @acl(name=msview)
+	 */
+	public function msviewAction()
+	{
+		if ($this->view->usedModules) {
+			if (isset($this->getData()['settings']) && $this->getData()['settings'] == 'true') {
+
+				$this->view->pick(Arr::last(explode('/', $this->component['route'])) . '/msview');
+			}
+		}
+	}
+
+	/**
+	 * @acl(name=msupdate)
+	 */
+	public function msupdateAction()
+	{
+		var_dump('me');die();
 	}
 
 	protected function checkPermissions()
@@ -645,16 +684,54 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	protected function usePackage($packageClass)
+	protected function usePackage($packageClass, $getSettings = false)
 	{
-		if ($this->checkPackage($packageClass)) {
-			return (new $packageClass())->init();
+		if (strpos($packageClass, '\\') === false) {
+			$package = $this->basepackages->$packageClass;
 		} else {
-			throw new \Exception(
-				'Package class : ' . $packageClass .
-				' not available for app ' . $this->app['name']
-			);
+			if ($this->checkPackage($packageClass)) {
+				$package = (new $packageClass())->init();
+				$packageClass = Arr::last(explode('\\', $packageClass));
+			} else {
+				throw new \Exception(
+					'Package class : ' . $packageClass .
+					' not available for app ' . $this->app['name']
+				);
+			}
 		}
+
+		if ($getSettings === 'components' || $getSettings === true) {
+			$thisComponent['id'] = $this->component['id'];
+			$thisComponent['name'] = $this->component['name'];
+			$thisComponent['settings'] = Json::decode($this->component['settings'], true);
+
+			if (!isset($usedModules['components'])) {
+				$usedModules['components'] = [];
+				$usedModules['components']['value'] = 'components';
+				$usedModules['components']['childs'][$thisComponent['id']] = $thisComponent;
+			} else {
+				$usedModules['components']['childs'][$thisComponent['id']] = $thisComponent;
+			}
+		}
+
+		if ($getSettings === 'packages' || $getSettings === true) {
+			$packageInfo = $this->modules->packages->getNamePackage($packageClass);
+			$thisPackage['id'] = $packageInfo['id'];
+			$thisPackage['name'] = $packageInfo['name'];
+			$thisPackage['settings'] = Json::decode($packageInfo['settings'], true);
+
+			if (!isset($usedModules['packages'])) {
+				$usedModules['packages'] = [];
+				$usedModules['packages']['value'] = 'packages';
+				$usedModules['packages']['childs'][$thisPackage['id']] = $thisPackage;
+			} else {
+				$usedModules['packages']['childs'][$thisPackage['id']] = $thisPackage;
+			}
+		}
+		// dump($usedModules);die();
+		$this->view->usedModules = $usedModules;
+
+		return $package;
 	}
 
 	protected function useStorage($storageType, array $overrideSettings = null)

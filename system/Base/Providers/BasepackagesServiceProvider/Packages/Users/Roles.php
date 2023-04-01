@@ -121,7 +121,7 @@ class Roles extends BasePackage
                     $reflector = $this->annotations->get($component['class']);
                     $methods = $reflector->getMethodsAnnotations();
 
-                    if ($methods) {
+                    if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                         $components[strtolower($app['id'])]['childs'][$key]['id'] = $component['id'];
                         $components[strtolower($app['id'])]['childs'][$key]['title'] = $component['name'];
                     }
@@ -159,7 +159,7 @@ class Roles extends BasePackage
                             $reflector = $this->annotations->get($component['class']);
                             $methods = $reflector->getMethodsAnnotations();
 
-                            if ($methods) {
+                            if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                                 foreach ($methods as $annotation) {
                                     $action = $annotation->getAll('acl')[0]->getArguments();
                                     $acls[$action['name']] = $action['name'];
@@ -199,7 +199,7 @@ class Roles extends BasePackage
                         $reflector = $this->annotations->get($component['class']);
                         $methods = $reflector->getMethodsAnnotations();
 
-                        if ($methods) {
+                        if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                             foreach ($methods as $annotation) {
                                 $action = $annotation->getAll('acl')[0]->getArguments();
                                 $acls[$action['name']] = $action['name'];

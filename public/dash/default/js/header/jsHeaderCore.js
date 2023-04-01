@@ -267,6 +267,7 @@ var BazContentLoader = function() {
                         }
                     }
                 }
+                $('.tooltip').remove();
                 $('[data-toggle="tooltip"]').tooltip();
                 $('[data-toggle="popover"]').popover('enable');
                 if ($('.sectionWithWizard').length > 0) {
@@ -353,6 +354,7 @@ var BazContentLoader = function() {
                         $('#security-token').val(xhr.getResponseHeader('token'));
                     }
                 }
+                $('.tooltip').remove();
                 $('[data-toggle="tooltip"]').tooltip();
                 $('[data-toggle="popover"]').popover('enable');
             });

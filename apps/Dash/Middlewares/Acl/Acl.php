@@ -15,7 +15,7 @@ class Acl extends BaseMiddleware
 
     protected $controller;
 
-    protected $actions = ['view', 'add', 'update', 'remove'];
+    protected $actions;
 
     protected $action;
 
@@ -33,6 +33,9 @@ class Acl extends BaseMiddleware
 
     public function process($data)
     {
+        $this->actions =
+            ['view', 'add', 'update', 'remove', 'msview', 'msupdate'];
+
         $rolesArr = $this->basepackages->roles->getAll()->roles;
         $roles = [];
         foreach ($rolesArr as $key => $value) {
@@ -250,7 +253,7 @@ class Acl extends BaseMiddleware
                 $reflector = $this->annotations->get($component['class']);
                 $methods = $reflector->getMethodsAnnotations();
 
-                if ($methods) {
+                if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                     $this->components[$component['id']]['name'] = strtolower($component['name']);
                     $this->components[$component['id']]['route'] = strtolower($component['route']);
                     $this->components[$component['id']]['description'] = $component['description'];

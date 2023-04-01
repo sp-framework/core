@@ -8,44 +8,27 @@ class Storages
 {
     protected $db;
 
-    public function register($db)
+    public function register($db, $packageFile)
     {
         $this->db = $db;
 
-        $allowedImageMimeTypes =
-            [
-                "image/jpeg",
-                "image/png",
-                "image/gif"
-            ];
+        $this->addToDb(
+            'Public',
+            'local',
+            'public',
+                $packageFile['settings']['allowedImageMimeTypes'],
+                $packageFile['settings']['allowedImageSizes'],
+                $packageFile['settings']['allowedFileMimeTypes']
+        );
 
-        $allowedImageSizes =
-            [
-                "30",
-                "80",
-                "200",
-                "800",
-                "1200",
-                "2000"
-            ];
-
-        $allowedFileMimeTypes =
-            [
-                "application/pdf",
-                "text/plain",
-                "application/msword",
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                "application/vnd.ms-excel",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                "application/vnd.ms-powerpoint",
-                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                "application/zip",
-                "text/csv"
-            ];
-
-        $this->addToDb('Public', 'local', 'public', $allowedImageMimeTypes, $allowedImageSizes, $allowedFileMimeTypes);
-
-        $this->addToDb('Private', 'local', 'private', $allowedImageMimeTypes, $allowedImageSizes, $allowedFileMimeTypes);
+        $this->addToDb(
+            'Private',
+            'local',
+            'private',
+                $packageFile['settings']['allowedImageMimeTypes'],
+                $packageFile['settings']['allowedImageSizes'],
+                $packageFile['settings']['allowedFileMimeTypes']
+        );
     }
 
     protected function addToDb($name, $type, $permission, $allowedImageMimeTypes, $allowedImageSizes, $allowedFileMimeTypes)
