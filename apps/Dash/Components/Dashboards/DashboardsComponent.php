@@ -8,6 +8,9 @@ use System\Base\BaseComponent;
 
 class DashboardsComponent extends BaseComponent
 {
+    /**
+     * @acl(name=view)
+     */
     public function viewAction()
     {
         if (isset($this->getData()['widgets'])) {
@@ -61,6 +64,9 @@ class DashboardsComponent extends BaseComponent
         return;
     }
 
+    /**
+     * @acl(name=add)
+     */
     public function addWidgetToDashboardAction()
     {
         if ($this->request->isPost()) {
@@ -80,6 +86,9 @@ class DashboardsComponent extends BaseComponent
         }
     }
 
+    /**
+     * @acl(name=update)
+     */
     public function updateWidgetToDashboardAction()
     {
         if ($this->request->isPost()) {
@@ -98,6 +107,9 @@ class DashboardsComponent extends BaseComponent
         }
     }
 
+    /**
+     * @acl(name=remove)
+     */
     public function removeWidgetFromDashboardAction()
     {
         if ($this->request->isPost()) {
