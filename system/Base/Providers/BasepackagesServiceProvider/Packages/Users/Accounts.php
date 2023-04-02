@@ -852,7 +852,7 @@ class Accounts extends BasePackage
         $appsArr = $this->apps->apps;
 
         foreach ($appsArr as $appKey => $app) {
-            $componentsArr = $this->modules->components->getComponentsForApp($app['id']);
+            $componentsArr = msort($this->modules->components->getComponentsForApp($app['id']), 'name');
 
             if (count($componentsArr) > 0) {
                 $components[strtolower($app['id'])] =
@@ -872,7 +872,6 @@ class Accounts extends BasePackage
                 }
             }
         }
-
 
         $this->packagesData->components = $components;
 
@@ -910,7 +909,8 @@ class Accounts extends BasePackage
                 $permissions = [];
 
                 foreach ($appsArr as $appKey => $app) {
-                    $componentsArr = $this->modules->components->getComponentsForApp($app['id']);
+                    $componentsArr = msort($this->modules->components->getComponentsForApp($app['id']), 'name');
+
                     foreach ($componentsArr as $key => $component) {
                         if ($component['class'] && $component['class'] !== '') {
                             $reflector = $this->annotations->get($component['class']);
@@ -951,7 +951,8 @@ class Accounts extends BasePackage
             $permissions = [];
 
             foreach ($appsArr as $appKey => $app) {
-                $componentsArr = $this->modules->components->getComponentsForApp($app['id']);
+                $componentsArr = msort($this->modules->components->getComponentsForApp($app['id']), 'name');
+
                 foreach ($componentsArr as $key => $component) {
                     //Build ACL Columns
                     if ($component['class'] && $component['class'] !== '') {
