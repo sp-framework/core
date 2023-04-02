@@ -262,4 +262,28 @@ class Components extends BasePackage
 
 		return true;
 	}
+
+	public function msupdate(array $data)//module settings update
+	{
+		$component = $this->getById($data['module_id']);
+
+		$component['settings'] = Json::decode($component['settings'], true);
+
+		foreach ($data as $key => $settingsData) {
+			if ($key !== 'module_id' &&
+				$key !== 'module_type' &&
+				$settingsData !== $this->security->getRequestToken()
+			) {
+				if (isset($component['settings'][$key])) {
+					$settingsData = Json::decode($settingsData, true);
+
+					$component['settings'][$key] = $settingsData;
+				}
+			}
+		}
+
+		$component['settings'] = Json::encode($component['settings']);
+
+		$this->update($component);
+	}
 }

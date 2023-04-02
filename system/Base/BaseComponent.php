@@ -230,7 +230,33 @@ abstract class BaseComponent extends Controller
 	 */
 	public function msupdateAction()
 	{
-		var_dump('me');die();
+		if ($this->request->isPost()) {
+			if (!$this->checkCSRF()) {
+				return;
+			}
+
+			if (isset($this->postData()['module_id']) &&
+				$this->postData()['module_type'] === 'components'
+			) {
+				$this->modules->components->msupdate($this->postData());
+
+				$this->addResponse(
+					$this->components->packagesData->responseMessage,
+					$this->components->packagesData->responseCode
+				);
+			} else if (isset($this->postData()['module_id']) &&
+					   $this->postData()['module_type'] === 'packages'
+			) {
+				$this->modules->packages->msupdate($this->postData());
+
+				$this->addResponse(
+					$this->packages->packagesData->responseMessage,
+					$this->packages->packagesData->responseCode
+				);
+			}
+		} else {
+			$this->addResponse('Method Not Allowed', 1);
+		}
 	}
 
 	protected function checkPermissions()
@@ -728,8 +754,10 @@ abstract class BaseComponent extends Controller
 				$usedModules['packages']['childs'][$thisPackage['id']] = $thisPackage;
 			}
 		}
-		// dump($usedModules);die();
-		$this->view->usedModules = $usedModules;
+
+		if ($getSettings) {
+			$this->view->usedModules = $usedModules;
+		}
 
 		return $package;
 	}

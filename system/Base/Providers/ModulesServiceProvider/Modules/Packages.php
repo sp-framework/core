@@ -280,4 +280,28 @@ class Packages extends BasePackage
 			}
 		}
 	}
+
+	public function msupdate(array $data)//module settings update
+	{
+		$package = $this->getById($data['module_id']);
+
+		$package['settings'] = Json::decode($package['settings'], true);
+
+		foreach ($data as $key => $settingsData) {
+			if ($key !== 'module_id' &&
+				$key !== 'module_type' &&
+				$settingsData !== $this->security->getRequestToken()
+			) {
+				if (isset($package['settings'][$key])) {
+					$settingsData = Json::decode($settingsData, true);
+
+					$package['settings'][$key] = $settingsData;
+				}
+			}
+		}
+
+		$package['settings'] = Json::encode($package['settings']);
+
+		$this->update($package);
+	}
 }

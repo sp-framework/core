@@ -139,6 +139,8 @@ var BazContentFields = function() {
                         initColorpicker(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
                     } else if (bazScanField.dataset.bazscantype === 'textarea') {
                         initTextarea(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
+                    } else if (bazScanField.dataset.bazscantype === 'json') {
+                        initJson(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
                     } else if (bazScanField.dataset.bazscantype === 'trumbowyg') {
                         initTrumbowyg(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
                     } else if (bazScanField.dataset.bazscantype === 'counters') {
@@ -440,6 +442,18 @@ var BazContentFields = function() {
     }
 
     function initTextarea(fieldId, options) {
+        if (options.beforeInit) {
+            options.beforeInit(dataCollection);
+        }
+        thisFieldId = fieldId;
+        fieldId = document.getElementById(fieldId);
+        maxLength(thisFieldId, options);
+        if (options.afterInit) {
+            options.afterInit(dataCollection);
+        }
+    }
+
+    function initJson(fieldId, options) {
         if (options.beforeInit) {
             options.beforeInit(dataCollection);
         }

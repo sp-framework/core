@@ -4,7 +4,7 @@ namespace Apps\Dash\Packages\AdminLTETags\Tags\Fields;
 
 use Apps\Dash\Packages\AdminLTETags\AdminLTETags;
 
-class Textarea
+class Json
 {
     protected $view;
 
@@ -59,6 +59,6 @@ class Textarea
             '';
 
         $this->content .=
-            '<textarea ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="form-control form-control-sm rounded-0 ' . $this->fieldParams['fieldInputAdditionalClass'] .'" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" data-type="text" placeholder="' . strtoupper($this->fieldParams['fieldPlaceholder']) . '" ' . $this->fieldParams['fieldDataInputMinLength'] . ' ' . $this->fieldParams['fieldDataInputMaxLength'] . ' ' . $this->fieldParams['fieldDisabled'] . ' ' . $this->fieldParams['fieldTextareaRows'] . ' ' . $this->fieldParams['fieldTextareaCols'] . '>' . $this->fieldParams['fieldValue'] . '</textarea>';
+            '<textarea ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="form-control form-control-sm rounded-0 ' . $this->fieldParams['fieldInputAdditionalClass'] .'" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" data-type="json" placeholder="' . strtoupper($this->fieldParams['fieldPlaceholder']) . '" ' . $this->fieldParams['fieldDataInputMinLength'] . ' ' . $this->fieldParams['fieldDataInputMaxLength'] . ' ' . $this->fieldParams['fieldDisabled'] . ' ' . $this->fieldParams['fieldTextareaRows'] . ' ' . $this->fieldParams['fieldTextareaCols'] . '>' . $this->fieldParams['fieldValue'] . '</textarea>';
     }
 }
