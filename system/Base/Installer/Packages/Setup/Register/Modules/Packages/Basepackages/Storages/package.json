@@ -12,32 +12,92 @@
         "componentRoute"        : "system/storages",
         "allowedImageMimeTypes" :
             [
-                "image/jpeg",
-                "image/png",
-                "image/gif"
+                {
+                    "id"            : "image/jpeg",
+                    "name"          : "JPEG images (.jpg/.jpeg)"
+                },
+                {
+                    "id"            : "image/png",
+                    "name"          : "Portable Network Graphics (.png)"
+                },
+                {
+                    "id"            : "image/gif",
+                    "name"          : "Graphics Interchange Format (.gif)"
+                }
             ],
         "allowedImageSizes" :
             [
-                "30",
-                "80",
-                "200",
-                "800",
-                "1200",
-                "2000"
+                {
+                    "id"            : "30",
+                    "name"          : "30px"
+                },
+                {
+                    "id"            : "80",
+                    "name"          : "80px"
+                },
+                {
+                    "id"            : "200",
+                    "name"          : "200px"
+                },
+                {
+                    "id"            : "800",
+                    "name"          : "800px"
+                },
+                {
+                    "id"            : "1200",
+                    "name"          : "1200px"
+                },
+                {
+                    "id"            : "2000",
+                    "name"          : "2000px"
+                }
             ],
         "allowedFileMimeTypes" :
             [
-                "application/pdf",
-                "text/plain",
-                "application/msword",
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                "application/vnd.ms-excel",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                "application/vnd.ms-powerpoint",
-                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                "application/zip",
-                "application/gzip",
-                "text/csv"
+                {
+                    "id"            : "application/pdf",
+                    "name"          : "Adobe Portable Document Format (.pdf)"
+                },
+                {
+                    "id"            : "text/plain",
+                    "name"          : "Text (.txt)"
+                },
+                {
+                    "id"            : "application/msword",
+                    "name"          : "Microsoft Word (.doc)"
+                },
+                {
+                    "id"            : "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "name"          : "Microsoft Word (.docx)"
+                },
+                {
+                    "id"            : "application/vnd.ms-excel",
+                    "name"          : "Microsoft Excel (.xls)"
+                },
+                {
+                    "id"            : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "name"          : "Microsoft Excel (.xlsx)"
+                },
+                {
+                    "id"            : "application/vnd.ms-powerpoint",
+                    "name"          : "Microsoft PowerPoint (.ppt)"
+                },
+                {
+                    "id"            : "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                    "name"          : "Microsoft PowerPoint (.pptx)"
+                },
+                {
+                    "id"            : "application/zip",
+                    "name"          : "ZIP archive (.zip)"
+                },
+                {
+                    "id"            : "application/gzip",
+                    "name"          : "GZIP archive (.gzip)"
+                },
+                {
+                    "id"            : "text/csv",
+                    "name"          : "Comma-separated values (.csv)"
+                }
             ]
     }
 }

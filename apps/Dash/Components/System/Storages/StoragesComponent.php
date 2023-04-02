@@ -48,6 +48,14 @@ class StoragesComponent extends BaseComponent
                     $this->view->storageType = $this->getData()['type'];
                 }
 
+                $storagePackage = $this->modules->packages->getNamePackage('Storages');
+
+                $storagePackage['settings'] = Json::decode($storagePackage['settings'], true);
+
+                $this->view->allowedImageMimeTypes = $storagePackage['settings']['allowedImageMimeTypes'];
+                $this->view->allowedImageSizes = $storagePackage['settings']['allowedImageSizes'];
+                $this->view->allowedFileMimeTypes = $storagePackage['settings']['allowedFileMimeTypes'];
+
                 $this->view->responseCode = $this->storages->packagesData->responseCode;
 
                 $this->view->responseMessage = $this->storages->packagesData->responseMessage;

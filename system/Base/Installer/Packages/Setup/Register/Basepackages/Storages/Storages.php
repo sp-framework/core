@@ -12,22 +12,36 @@ class Storages
     {
         $this->db = $db;
 
+        $allowedImageMimeTypes = [];
+        $allowedImageSizes = [];
+        $allowedFileMimeTypes = [];
+
+        foreach ($packageFile['settings']['allowedImageMimeTypes'] as $imageMimeTypes) {
+            array_push($allowedImageMimeTypes, $imageMimeTypes['id']);
+        }
+        foreach ($packageFile['settings']['allowedImageSizes'] as $imageSizes) {
+            array_push($allowedImageSizes, $imageSizes['id']);
+        }
+        foreach ($packageFile['settings']['allowedFileMimeTypes'] as $fileMimeTypes) {
+            array_push($allowedFileMimeTypes, $fileMimeTypes['id']);
+        }
+
         $this->addToDb(
             'Public',
             'local',
             'public',
-                $packageFile['settings']['allowedImageMimeTypes'],
-                $packageFile['settings']['allowedImageSizes'],
-                $packageFile['settings']['allowedFileMimeTypes']
+            $allowedImageMimeTypes,
+            $allowedImageSizes,
+            $allowedFileMimeTypes
         );
 
         $this->addToDb(
             'Private',
             'local',
             'private',
-                $packageFile['settings']['allowedImageMimeTypes'],
-                $packageFile['settings']['allowedImageSizes'],
-                $packageFile['settings']['allowedFileMimeTypes']
+            $allowedImageMimeTypes,
+            $allowedImageSizes,
+            $allowedFileMimeTypes
         );
     }
 
