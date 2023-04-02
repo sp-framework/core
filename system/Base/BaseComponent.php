@@ -241,8 +241,8 @@ abstract class BaseComponent extends Controller
 				$this->modules->components->msupdate($this->postData());
 
 				$this->addResponse(
-					$this->components->packagesData->responseMessage,
-					$this->components->packagesData->responseCode
+					$this->modules->components->packagesData->responseMessage,
+					$this->modules->components->packagesData->responseCode
 				);
 			} else if (isset($this->postData()['module_id']) &&
 					   $this->postData()['module_type'] === 'packages'
@@ -250,8 +250,8 @@ abstract class BaseComponent extends Controller
 				$this->modules->packages->msupdate($this->postData());
 
 				$this->addResponse(
-					$this->packages->packagesData->responseMessage,
-					$this->packages->packagesData->responseCode
+					$this->modules->packages->packagesData->responseMessage,
+					$this->modules->packages->packagesData->responseCode
 				);
 			}
 		} else {

@@ -804,7 +804,7 @@ abstract class BasePackage extends Controller
 			if ($create) {
 				$this->packagesData->responseCode = 0;
 
-				$this->packagesData->responseMessage = "Added {ucfirst($this->packageNameS)}!";
+				$this->packagesData->responseMessage = "Added " . ucfirst($this->packageNameS) . "!";
 
 				$this->packagesData->last = ${$this->packageNameModel}->toArray();
 
@@ -823,7 +823,7 @@ abstract class BasePackage extends Controller
 				array_push($this->transactionErrors, $data);
 
 				throw new \Exception(
-					"Could not add {ucfirst($this->packageNameS)}. Reasons: <br>" .
+					"Could not add " . ucfirst($this->packageNameS) . "Reasons: <br>" .
 					join(',', $this->jsonData($this->transactionErrors))
 				);
 			}
@@ -854,7 +854,7 @@ abstract class BasePackage extends Controller
 			if ($update) {
 				$this->packagesData->responseCode = 0;
 
-				$this->packagesData->responseMessage = "{ucfirst($this->packageNameS)} Updated!";
+				$this->packagesData->responseMessage = ucfirst($this->packageNameS) . " Updated!";
 
 				$this->packagesData->last = ${$this->packageNameModel}->toArray();
 
@@ -871,7 +871,7 @@ abstract class BasePackage extends Controller
 				}
 
 				throw new \Exception(
-					"Could not update {ucfirst($this->packageNameS)}. Reasons: <br>" .
+					"Could not update " . ucfirst($this->packageNameS) . "Reasons: <br>" .
 					join(',', $this->transactionErrors)
 				);
 			}
@@ -947,11 +947,11 @@ abstract class BasePackage extends Controller
 					$this->resetCache($id, true);
 				}
 
-				$this->addResponse("{ucfirst($this->packageNameS)} Deleted!");
+				$this->addResponse(ucfirst($this->packageNameS) . " Deleted!");
 
 				return true;
 			} else {
-				$this->addResponse("Could not delete {ucfirst($this->packageNameS)}.", 1);
+				$this->addResponse("Could not delete " . ucfirst($this->packageNameS), 1);
 			}
 		} else {
 			$this->addResponse("No Record Found with that ID!", 1);
