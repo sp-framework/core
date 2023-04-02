@@ -97,24 +97,35 @@ class Storages extends BasePackage
 
     public function getAppStorages()
     {
-        if (isset($this->storages) && count($this->storages) > 0) {
-            foreach ($this->storages as $key => $storage) {
-                if ($storage['allowed_image_mime_types']) {
-                    $storage['allowed_image_mime_types'] = Json::decode($storage['allowed_image_mime_types']);
-                }
-                if ($storage['allowed_image_sizes']) {
-                    $storage['allowed_image_sizes'] = Json::decode($storage['allowed_image_sizes']);
-                }
-                if ($storage['allowed_file_mime_types']) {
-                    $storage['allowed_file_mime_types'] = Json::decode($storage['allowed_file_mime_types']);
-                }
-                $storages[$storage['permission']] = $storage;
-            }
+        $domain = $this->domains->domain;
 
-            return $storages;
+        $app = $this->apps->getAppInfo();
+
+        if ((isset($domain['apps'][$app['id']]['publicStorage']) &&
+            $domain['apps'][$app['id']]['publicStorage'] !== '') &&
+            (isset($domain['apps'][$app['id']]['privateStorage']) &&
+            $domain['apps'][$app['id']]['privateStorage'] !== '')
+        ) {
+            $storages['public'] = $this->getById($domain['apps'][$app['id']]['publicStorage']);
+            $storages['private'] = $this->getById($domain['apps'][$app['id']]['privateStorage']);
+        } else {
+            return false;
         }
 
-        return false;
+        foreach ($storages as $key => $storage) {
+            if ($storage['allowed_image_mime_types']) {
+                $storage['allowed_image_mime_types'] = Json::decode($storage['allowed_image_mime_types']);
+            }
+            if ($storage['allowed_image_sizes']) {
+                $storage['allowed_image_sizes'] = Json::decode($storage['allowed_image_sizes']);
+            }
+            if ($storage['allowed_file_mime_types']) {
+                $storage['allowed_file_mime_types'] = Json::decode($storage['allowed_file_mime_types']);
+            }
+            $appStorages[$storage['permission']] = $storage;
+        }
+
+        return $appStorages;
     }
 
     public function getFile(array $getData)
