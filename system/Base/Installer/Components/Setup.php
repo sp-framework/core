@@ -157,7 +157,11 @@ Class Setup
 
 			$this->setupPackage->cleanOldCookies();
 
-			$this->coreJson = Json::decode($this->container->getShared('localContent')->read('core.json'), true);
+			$this->coreJson =
+				Json::decode(
+					$this->container->getShared('localContent')->read('system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json'),
+					true
+				);
 
 			try {
 				if (!$this->setupPackage->checkDbEmpty()) {

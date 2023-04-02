@@ -1,12 +1,31 @@
 {
-    "name"          : "Core",
-    "display_name"  : "Core",
-    "description"   : "Basepackage Core",
-    "app_type"      : "dash",
-    "category"      : "system",
-    "sub_category"  : "tools",
-    "version"       : "0.0.1",
-    "repo"          : "https://.../",
-    "class"         : "System\\Base\\Providers\\CoreServiceProvider\\Core",
-    "settings"      : { }
+    "name"                                  : "Core",
+    "display_name"                          : "Bazaari Core",
+    "description"                           : "Bazaari Framework Core Module",
+    "app_type"                              : "core",
+    "category"                              : "system",
+    "sub_category"                          : "core",
+    "class"                                 : "System\\Base",
+    "version"                               : "0.0.0",
+    "repo"                                  : "https://repo.bazaari.com.au/sp/core",
+    "settings"                              : {
+        "debug"                             : true,
+        "db"                                : [],
+        "cache"                     : {
+            "enabled"                       : false,
+            "timeout"                       : 60,
+            "service"                       : "streamCache"
+        },
+        "security"                  : {
+            "passwordWorkFactor"            : 8,
+            "cookiesWorkFactor"             : 4
+        },
+        "logs"                      : {
+            "enabled"                       : true,
+            "level"                         : "DEBUG",
+            "service"                       : "streamLogs",
+            "emergencyEmailLogs"            : false,
+            "emergencyLogsEmailAddresses"   : ""
+        }
+    }
 }

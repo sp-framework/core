@@ -21,7 +21,7 @@ class Core
 			'core',
 			[
 				'name' 					=> $baseConfig['name'],
-				'display_name'			=> $baseConfig['displayName'],
+				'display_name'			=> $baseConfig['display_name'],
 				'description' 			=> $baseConfig['description'],
 				'version'	 			=> $baseConfig['version'],
 				'repo'					=> $baseConfig['repo'],

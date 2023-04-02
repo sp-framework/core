@@ -379,17 +379,18 @@ class Setup
 						throw new \Exception('Problem reading package.json at location ' . $adminPackage);
 					}
 
-					if ($jsonFile['sub_category'] === 'devtools' &&
+					if (isset($jsonFile['sub_category']) &&
+						$jsonFile['sub_category'] === 'devtools' &&
 						$this->postData['dev'] == 'false'
 					) {
 						continue;
 					}
 
-					$this->registerAdminPackage($jsonFile);
-
 					if ($jsonFile['name'] === 'Storages') {
 						$this->registerStorages($jsonFile);
 					}
+
+					$this->registerAdminPackage($jsonFile);
 				}
 			}
 		} else if ($type === 'middlewares') {
