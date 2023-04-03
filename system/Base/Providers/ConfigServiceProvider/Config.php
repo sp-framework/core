@@ -57,6 +57,10 @@ class Config
 
     protected function runSetup()
     {
+        if (PHP_SAPI === 'cli') {
+            exit;
+        }
+
         require_once base_path('system/Base/Installer/Components/Setup.php');
 
         (new Setup($this->session))->run();
