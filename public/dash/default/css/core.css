@@ -42418,3 +42418,7 @@ a.disabled {
 .table-borderless > thead > tr > th {
   border: none;
 }
+
+.progress-bar {
+  transition: width 1s linear;
+}

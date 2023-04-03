@@ -17,6 +17,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\ImportExport;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Progress;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Pusher;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Templates;
@@ -75,6 +76,8 @@ class Basepackages
 	protected $dashboards;
 
 	protected $widgets;
+
+	protected $progress;
 
 	public function __construct()
 	{
@@ -250,5 +253,12 @@ class Basepackages
 		$this->templates = (new Widgets())->init();
 
 		return $this->templates;
+	}
+
+	protected function initProgress()
+	{
+		$this->progress = (new Progress())->init();
+
+		return $this->progress;
 	}
 }

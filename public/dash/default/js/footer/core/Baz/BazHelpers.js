@@ -363,7 +363,9 @@ var BazHelpers = function() {
                 identifier : identifier,
                 time: time,
                 debug: func.toString()
-            })
+            });
+
+            return true;
         };
 
         // get all active timers
@@ -385,6 +387,8 @@ var BazHelpers = function() {
                 clearTimeout(timers[index].id)
                 timers.splice(index, 1)
             }
+
+            return true;
         };
 
         // stop all timers
@@ -393,6 +397,8 @@ var BazHelpers = function() {
                 clearTimeout(timers[i].id)
             }
             timers = []
+
+            return timers;
         };
 
         return {

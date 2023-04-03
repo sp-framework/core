@@ -19,7 +19,7 @@
 				dataCollection = window.dataCollection;
 				dataCollection.env = { };
 				dataCollection.env.sounds = { };
-				dataCollection.env.rootPath = '{{request.getScheme()}}' + '://' + '{{request.getHttpHost()}}' + '/';
+				dataCollection.env.rootPath = '<?php echo $request->getScheme(); ?>://<?php echo $request->getHttpHost(); ?>/';
 				dataCollection.env.libsLoaded = false;
 			}
 		</script>
@@ -212,6 +212,17 @@
 										<?php } ?>
 									</div>
 									<hr>
+									<div class="installer-progress" hidden>
+										<div class="progress active progress-xs">
+											<div class="progress-bar progress-xs bg-info progress-bar-animated progress-bar-striped installer-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width: 0%"></div>
+										</div>
+										<div class="row text-center text-sm text-primary m-1">
+											<div class="col">
+												<span class="sr-only progress-span"></span>
+												<span class="progress-span"></span>
+											</div>
+										</div>
+									</div>
 									<div class="row text-center p-3">
 										<?php if (!$onlyUpdateDb) { ?>
 											<div class="col" id="submit-div">
@@ -344,15 +355,15 @@
 					$('#submit-spinner').attr('hidden', true);
 					$('#submit').attr('disabled', false);
 				} else {
-					var data;
-					data =
+					var data = { };
+					data = $.extend(data,
 						{
 							"host"          		: $('#host').val(),
 							"port"          		: $('#port').val(),
 							"database_name" 		: $('#database_name').val(),
 							"username"      		: $('#username').val(),
 							"password"      		: $('#password').val()
-						};
+						});
 					if ($('#create').length > 0 && $('#create')[0].checked === true) {
 						data = $.extend(data,
 						{
@@ -392,7 +403,7 @@
 									$('#update-div').attr('hidden', true);
 									$('#submit-spinner, #update-spinner').attr('hidden', true);
 								}, 1000);
-							} else if (data.responseCode === 1) {
+							} else if (data.responseCode === 1 || data.responseCode === 2) {
 								$('#alert').attr('hidden', false);
 								$('#alert').html('');
 								$('#alert').removeClass (function (index, className) {
@@ -414,8 +425,61 @@
 							$('#submit-spinner, #update-spinner').attr('hidden', true);
 						}
 					});
+				<?php if (!$onlyUpdateDb) { ?>
+					setTimeout(getProgress(), 500);
+				<?php } ?>
 				}
 			});
+
+			function getProgress() {
+				var data = { };
+				data['session'] = '<?php echo $session->getId(); ?>';
+
+				$.ajax({
+					type    : 'POST',
+					url     : '/',
+					data    : data,
+					dataType: 'json',
+					success: function (data) {
+						if (data && data.responseCode === 0) {
+							if (data.responseData) {
+								var responseData = JSON.parse(data.responseData);
+
+								if (responseData['total'] !== 'undefined' && responseData['completed'] !== 'undefined') {
+									if (responseData['total'] !== responseData['completed']) {
+										if (responseData['runners']['running'] !== false) {
+											$('.installer-progress').attr('hidden', false);
+											$('.progress-span')
+												.html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
+
+											$('.installer-progress-bar').css('width', responseData['percentComplete'] + '%');
+											$('.installer-progress-bar').attr('aria-valuenow', responseData['percentComplete']);
+										}
+										BazHelpers.setTimeoutTimers.add(function() {
+											getProgress();
+										}, 500);
+									} else {
+										$('.progress-bar').removeClass('progress-bar-animated');
+										$('.progress-span').html('Done (100%)');
+										$('.installer-progress-bar').css('width', '100%');
+										$('.installer-progress-bar').attr('aria-valuenow', 100);
+										BazHelpers.setTimeoutTimers.stopAll();
+									}
+								} else {
+									BazHelpers.setTimeoutTimers.stopAll();
+								}
+							}
+						} else if (data.responseCode === 1) {
+							BazHelpers.setTimeoutTimers.stopAll();
+						}
+					},
+					error: function (data) {
+						if (data && data.responseCode === 1) {
+							BazHelpers.setTimeoutTimers.stopAll();
+						}
+					}
+				});
+			}
 
 			$('#auto-encrypt-level').click(function() {
 				if ($(this)[0].checked === true) {
