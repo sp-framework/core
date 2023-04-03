@@ -337,7 +337,9 @@ class Local extends BasePackage
 
             $this->response->setContentType($file[0]['type']);
 
-            $this->response->setHeader("Content-Length", filesize(base_path($dataFile)));
+            $this->response
+                ->setHeader("Content-Length", filesize(base_path($dataFile)))
+                ->setHeader("Content-Disposition", "attachment; filename=" . $file[0]['org_file_name']);
 
             return $this->response->setContent($this->localContent->read($dataFile));
 
