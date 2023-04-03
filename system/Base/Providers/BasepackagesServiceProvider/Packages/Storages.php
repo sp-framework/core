@@ -138,7 +138,26 @@ class Storages extends BasePackage
             $public = false;
         }
 
-        return $this->initStorage($public)->get($getData);
+        return $this->initStorage($public)->getFile($getData);
+    }
+
+    public function getFiles(array $getData)
+    {
+        if (!isset($getData['params'])) {
+            $this->addResponse('Please provide parameter.', 1);
+
+            return false;
+        }
+
+        if (isset($getData['storagetype']) && $getData['storagetype'] === 'public') {
+            $public = true;
+        } else if (isset($getData['storagetype']) && $getData['storagetype'] === 'private') {
+            $public = false;
+        } else {
+            $public = false;
+        }
+
+        return $this->initStorage($public)->getFiles($getData['params']);
     }
 
     public function getFileById($id, $public = true)

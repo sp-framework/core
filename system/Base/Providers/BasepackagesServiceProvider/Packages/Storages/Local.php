@@ -296,7 +296,7 @@ class Local extends BasePackage
         $this->add($data);
     }
 
-    public function get(array $getData)
+    public function getFile(array $getData)
     {
         $this->getData = $getData;
 
@@ -348,6 +348,11 @@ class Local extends BasePackage
 
             return $this->response->send();
         }
+    }
+
+    public function getFiles($params)
+    {
+        return $this->getByParams($params);
     }
 
     public function getFileInfo($uuid, $orgFileName = null, $like = false)
