@@ -10,7 +10,7 @@ class CoreComponent extends BaseComponent
 
     public function initialize()
     {
-        // $this->coreSettings = $this->core->getBarcodesSettings();
+        //
     }
 
     /**
@@ -28,7 +28,34 @@ class CoreComponent extends BaseComponent
         $this->view->core = $this->core->core;
         $this->view->availableCaches = $availableCaches;
         $this->view->logLevels = $this->logger->getLogLevels();
-        $this->useStorage('public');
+        $storage = $this->useStorage('private');
+
+        $storageFiles =
+            $this->basepackages->storages->getFiles(
+                ['storagetype'  => $storage['permission'],
+                 'params'       =>
+                    [
+                        'conditions'    => 'uuid_location = :uuidLocation: AND storages_id = :storagesId: AND orphan = :orphan:',
+                        'bind'          =>
+                            [
+                                'uuidLocation'    => 'core/',
+                                'storagesId'      => $storage['id'],
+                                'orphan'          => 0
+                            ]
+                    ]
+                ]
+            );
+
+        if ($storageFiles && count($storageFiles) > 0) {
+            foreach ($storageFiles as $storageFileKey => &$storageFile) {
+                if (strpos($storageFile['org_file_name'], 'db-') === false) {
+                    unset($storageFiles[$storageFileKey]);
+                    continue;
+                }
+            }
+        }
+
+        $this->view->dbStorageFiles = $storageFiles;
     }
 
     /**
@@ -77,13 +104,18 @@ class CoreComponent extends BaseComponent
                 return;
             }
 
-            $this->core->dbbackup($this->postData());
-
-            $this->addResponse(
-                $this->core->packagesData->responseMessage,
-                $this->core->packagesData->responseCode,
-                $this->core->packagesData->responseData
-            );
+            if ($this->core->dbbackup($this->postData())) {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode,
+                    $this->core->packagesData->responseData,
+                );
+            } else {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode
+                );
+            }
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }

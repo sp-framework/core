@@ -787,6 +787,10 @@ abstract class BaseComponent extends Controller
 		if (!isset($this->domains->domain['apps'][$this->app['id']][$storageType . 'Storage'])) {
 			$this->view->storages = [];
 		}
+
+		if (isset($storage)) {
+			return $storage;
+		}
 	}
 
 	protected function checkPackage($packageClass)

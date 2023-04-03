@@ -1,4 +1,4 @@
-{{var_dump(core['settings']['dbs'])}}
+{{var_dump(core)}}
 <div class="row vdivide">
     <div class="col-md-2">
         {{adminltetags.useTag('fields',
@@ -176,10 +176,10 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-backup'                      : {
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-dbs').on('select2:select', function(e) {
-                    generateLink(e.params.data.id);
+                    $('#generate-backup-span').html('Generate ' + e.params.data.text + ' database backup');
                 });
 
-                function generateLink(id) {
+                function generateBackup(id) {
                     var postData = { };
                     postData['db'] = id;
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -190,22 +190,69 @@ dataCollectionSection =
                             $('#security-token').val(response.token);
                         }
 
-                        if (response.responseData && response.responseData.link) {
-                            // $('.link').html(
-                            //     '<a href="' + response.responseData.link + '" class="btn btn-app bg-primary p-2"><i class="fas fa-download mb-2"></i> Structures File</a>'
-                            // );
-                        }
+                        if (response.responseCode == 0) {
+                            PNotify.success({text : response.responseMessage});
 
-                        $('.download-upload').attr('hidden', false);
+                            var data = {
+                                id: response.responseData['uuid'],
+                                text: response.responseData['filename']
+                            };
+
+                            var newOption = new Option(data.text, data.id, false, false);
+                            $('#{{componentId}}-{{sectionId}}-backupdbs').append(newOption).trigger('change');
+                        }
                     }, 'json');
                 }
 
-                $('#{{componentId}}-{{sectionId}}-backup').click(function(e) {
+                $('.backup-btn').click(function(e) {
                     e.preventDefault();
 
                     var id = $('#{{componentId}}-{{sectionId}}-dbs').val();
 
-                    generateLink(id);
+                    generateBackup(id);
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-backupdbs'                   : {
+            placeholder : "SELECT DATABASE TO RESTORE",
+            allowClear  : true,
+            afterInit   : function() {
+                $('#{{componentId}}-{{sectionId}}-backupdbs').on('select2:select', function(e) {
+                    var thatE = e;
+                    $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-download-db').removeClass('disabled');
+                    $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '{{links.url("system/storages/q/uuid/' + e.params.data.id + '")}}');
+
+                    $('#{{componentId}}-{{sectionId}}-remove-db').off();
+                    $('#{{componentId}}-{{sectionId}}-remove-db').click(function(e) {
+                        e.preventDefault();
+
+                        var postData = { };
+                        postData['uuid'] = thatE.params.data.id;
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                        $.post('{{links.url("system/storages/remove")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+
+                            if (response.responseCode == 0) {
+                                PNotify.success({text : response.responseMessage});
+
+                                $('#{{componentId}}-{{sectionId}}-backupdbs option[value="' + thatE.params.data.id + '"]').remove();
+                                $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-download-db').addClass('disabled');
+                                $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '#');
+                            }
+                        }, 'json');
+                    })
+                });
+
+                $('#{{componentId}}-{{sectionId}}-backupdbs').on('select2:clear', function(e) {
+                    $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-download-db').addClass('disabled');
+                    $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '#');
                 });
             }
         },

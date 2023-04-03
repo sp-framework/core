@@ -5,12 +5,12 @@
     "app_type"                              : "core",
     "category"                              : "system",
     "sub_category"                          : "core",
-    "class"                                 : "System\\Base",
+    "class"                                 : "System\\Base\\Providers\\CoreServiceProvider\\Core",
     "version"                               : "0.0.0",
     "repo"                                  : "https://repo.bazaari.com.au/sp/core",
     "settings"                              : {
         "debug"                             : true,
-        "db"                                : [],
+        "dbs"                               : [],
         "cache"                     : {
             "enabled"                       : false,
             "timeout"                       : 60,

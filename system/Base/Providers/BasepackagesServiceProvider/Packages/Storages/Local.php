@@ -745,7 +745,7 @@ class Local extends BasePackage
             $file[0]['orphan'] = $status;
 
             if ($this->update($file[0])) {
-                $this->addResponse('UUID: ' . $uuid . ' is now ' . $marked . ' orphan');
+                $this->addResponse('File: ' . $file[0]['org_file_name'] . ' (UUID: ' . $uuid . ') is now ' . $marked . ' orphan');
 
                 return true;
             }

@@ -2,8 +2,10 @@
 
 namespace System\Base\Providers\CoreServiceProvider;
 
+use Carbon\Carbon;
 use Ifsnop\Mysqldump\Mysqldump;
 use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use Phalcon\Helper\Json;
@@ -25,6 +27,8 @@ class Core extends BasePackage
 		$this->core['settings'] = Json::decode($this->core['settings'], true);
 
 		$this->checkKeys();
+
+		$this->checkTmpPath();
 
 		return $this;
 	}
@@ -56,26 +60,47 @@ class Core extends BasePackage
 					['compress' => Mysqldump::GZIP, 'default-character-set' => Mysqldump::UTF8MB4]
 				);
 
-			if ($this->basepackages->storages->storeFile(
-					'private',
-					'core',
-					$csvString,
-					$name,
-					null,
-					'text/csv'
-				)
-			) {
-				$this->basepackages->storages->changeOrphanStatus($this->basepackages->storages->packagesData->storageData['uuid']);
+			$fileName = 'db-' . $data['db'] . '-' . Carbon::now()->format('Y-m-d-H:i:s') . '.gzip';
 
-				return $this->basepackages->storages->packagesData->storageData['uuid'];
-			// $dump->start(base_path('dump.gzip'));
+			$dump->start(base_path('var/tmp/' . $fileName));
+		} catch (\Exception $e) {
+			$this->addResponse('Backup Error: ' . $e->getMessage(), 1);
+		}
 
+		try {
+			$file = $this->localContent->read('var/tmp/' . $fileName);
+		} catch (FilesystemException | UnableToReadFile | \Exception $exception) {
+			throw $exception;
+		}
+
+		if ($this->basepackages->storages->storeFile(
+				'private',
+				'core',
+				$file,
+				$fileName,
+				filesize(base_path('var/tmp/' . $fileName)),
+				'application/gzip'
+			)
+		) {
+			try {
+				$file = $this->localContent->delete('var/tmp/' . $fileName);
+			} catch (FilesystemException | UnableToDeleteFile | \Exception $exception) {
+				throw $exception;
 			}
 
-		} catch (\Exception $e) {
-			var_dump($e);die();
-			echo 'mysqldump-php error: ' . $e->getMessage();
+			$this->basepackages->storages->changeOrphanStatus($this->basepackages->storages->packagesData->storageData['uuid']);
+
+			$this->addResponse('Generated backup ' . $fileName . '.',
+							   0,
+							   ['filename' => $fileName,
+								'uuid' => $this->basepackages->storages->packagesData->storageData['uuid']
+							   ]
+			);
+
+			return true;
 		}
+
+		return false;
 	}
 
 	protected function checkKeys()
@@ -161,5 +186,16 @@ return
 		} catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
 			return false;
 		}
+	}
+
+	protected function checkTmpPath()
+	{
+		if (!is_dir(base_path('var/tmp/'))) {
+			if (!mkdir(base_path('var/tmp/'), 0777, true)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
