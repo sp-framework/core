@@ -144,8 +144,6 @@ class Domain
 				}
 			}
 
-			$this->packagesData->domainDetails = $record;
-
 			return $record;
 		} catch (\Exception $e) {
 			return false;
