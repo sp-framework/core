@@ -14,7 +14,8 @@ class ConfigServiceProvider implements ServiceProviderInterface
 			'config',
 			function () use ($container) {
 				$session = $container->getShared('session');
-				return (new Config($session))->getConfigs();
+				$request = $container->getShared('request');
+				return (new Config($session, $request))->getConfigs();
 			}
 		);
 	}

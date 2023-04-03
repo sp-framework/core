@@ -12,11 +12,15 @@ class Config
 
     protected $session;
 
+    protected $request;
+
     protected $configsFolder;
 
-    public function __construct($session)
+    public function __construct($session, $request)
     {
         $this->session = $session;
+
+        $this->request = $request;
 
         $this->configsFolder = base_path('system/Configs/');
 
@@ -29,7 +33,8 @@ class Config
 
         if (isset($configs['debug']) &&
             isset($configs['db']) &&
-            isset($configs['setup']) && $configs['setup'] === false
+            isset($configs['setup']) && $configs['setup'] === false &&
+            !isset($this->request->getPost()['session'])
         ) {
             return new PhalconConfig($this->getGroupedConfigs()->toArray());
         } else {
