@@ -14,6 +14,10 @@ class Pdo
 
 	protected $session;
 
+	protected $localContent;
+
+	protected $crypt;
+
 	public function __construct($dbConfig, $session, $localContent, $crypt)
 	{
 		$this->dbConfig = $dbConfig;
@@ -67,6 +71,10 @@ class Pdo
 
 	protected function runSetup($onlyUpdateDb = false, $message = null)
 	{
+		if (PHP_SAPI === 'cli') {
+			exit;
+		}
+
 		require_once base_path('system/Base/Installer/Components/Setup.php');
 
 		(new Setup($this->session))->run($onlyUpdateDb, $message);
