@@ -120,6 +120,13 @@ class Accounts extends BasePackage
      */
     public function addAccount(array $data)
     {
+        $validation = $this->validateData($data);
+
+        if ($validation !== true) {
+            $this->addResponse($validation, 1);
+            return;
+        }
+
         if (!isset($data['status'])) {
             $data['status'] = '0';
         }
@@ -155,47 +162,45 @@ class Accounts extends BasePackage
             return false;
         }
 
-        if ($this->validateData($data) === true) {
-            $password = $this->generateNewPassword();
+        $password = $this->generateNewPassword();
 
-            $data['password'] = $this->secTools->hashPassword($password);
+        $data['password'] = $this->secTools->hashPassword($password);
 
-            if (!isset($data['package_name'])) {
-                $data['package_name'] = 'profiles';
+        if (!isset($data['package_name'])) {
+            $data['package_name'] = 'profiles';
+        }
+        if (!isset($data['package_row_id'])) {
+            $data['package_row_id'] = '0';
+        }
+
+        if ($this->add($data)) {
+            $id = $this->packagesData->last['id'];
+
+            $this->addUpdateCanLogin($id, $data['can_login']);
+
+            $data['id'] = $id;
+
+            $this->addUpdateSecurity($id, $data);
+
+            $this->basepackages->profile->addProfile($data);
+
+            if ($data['package_name'] === 'profiles') {
+                $data['package_row_id'] = $this->basepackages->profile->packagesData->responseData['id'];
+
+                $this->update($data);
             }
-            if (!isset($data['package_row_id'])) {
-                $data['package_row_id'] = '0';
+
+            if (isset($data['email_new_password']) &&
+                $data['email_new_password'] == '1'
+            ) {
+                $this->emailNewPassword($data['email'], $password);
             }
 
-            if ($this->add($data)) {
-                $id = $this->packagesData->last['id'];
+            $this->addActivityLog($data);
 
-                $this->addUpdateCanLogin($id, $data['can_login']);
+            $this->addToNotification('add', 'Added new account for ID: ' . $data['email']);
 
-                $data['id'] = $id;
-
-                $this->addUpdateSecurity($id, $data);
-
-                $this->basepackages->profile->addProfile($data);
-
-                if ($data['package_name'] === 'profiles') {
-                    $data['package_row_id'] = $this->basepackages->profile->packagesData->responseData['id'];
-
-                    $this->update($data);
-                }
-
-                if (isset($data['email_new_password']) &&
-                    $data['email_new_password'] == '1'
-                ) {
-                    $this->emailNewPassword($data['email'], $password);
-                }
-
-                $this->addActivityLog($data);
-
-                $this->addToNotification('add', 'Added new account for ID: ' . $data['email']);
-
-                $this->addResponse('Added new account for ID: ' . $data['email'], 0, null, true);
-            }
+            $this->addResponse('Added new account for ID: ' . $data['email'], 0, null, true);
         } else {
             $this->addResponse('Error adding account.', 1);
         }
@@ -208,6 +213,13 @@ class Accounts extends BasePackage
      */
     public function updateAccount(array $data)
     {
+        $validation = $this->validateData($data);
+
+        if ($validation !== true) {
+            $this->addResponse($validation, 1);
+            return;
+        }
+
         if (!isset($data['status'])) {
             $data['status'] = '0';
         }
