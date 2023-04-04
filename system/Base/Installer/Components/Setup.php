@@ -117,6 +117,10 @@ Class Setup
 		try {
 			if (!isset($this->postData['session'])) {
 				$this->setupPackage = new SetupPackage($this->container, $this->postData);
+
+				if (!$this->progress->checkProgressFile()) {
+					$this->registerProgressMethods();
+				}
 			}
 		} catch (\Exception $e) {
 			$this->view->responseCode = 1;
@@ -129,9 +133,6 @@ Class Setup
 			}
 		}
 
-		if (!$this->progress->checkProgressFile()) {
-			$this->registerProgressMethods();
-		}
 
 		if ($this->request->isPost() && !isset($this->postData['session'])) {
 			$validateData = $this->setupPackage->validateData();
@@ -193,10 +194,6 @@ Class Setup
 				return;
 			}
 
-			$this->setupPackage->cleanVar();
-
-			$this->setupPackage->cleanOldCookies();
-
 			$this->coreJson =
 				Json::decode(
 					$this->localContent->read('system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json'),
@@ -217,6 +214,8 @@ Class Setup
 						return $this->response->send();
 					}
 				}
+
+				$this->progress->preCheckComplete();
 
 				$this->setupPackage->buildSchema();
 
@@ -272,9 +271,13 @@ Class Setup
 
 				// $this->setupPackage->removeInstaller();
 
+				$this->setupPackage->cleanVar();
+
+				$this->setupPackage->cleanOldCookies();
+
 				$this->view->responseCode = 0;
 
-				$this->view->responseMessage = 'Schema Updated.';
+				$this->view->responseMessage = 'Framework installed.';
 
 				if ($this->response->isSent() !== true) {
 					$this->response->setJsonContent($this->view->getParamsToView());
@@ -332,14 +335,6 @@ Class Setup
 				[
 					'method'	=> 'checkUser',
 					'text'		=> 'Checking database user...'
-				],
-				[
-					'method'	=> 'cleanVar',
-					'text'		=> 'Cleaning variable directory...'
-				],
-				[
-					'method'	=> 'cleanOldCookies',
-					'text'		=> 'Cleaning old cookies...'
 				],
 				[
 					'method'	=> 'checkDbEmpty',
@@ -429,6 +424,14 @@ Class Setup
 					'method'	=> 'registerTasks',
 					'text'		=> 'Registering tasks...'
 				],
+				[
+					'method'	=> 'cleanVar',
+					'text'		=> 'Cleaning variable directory...'
+				],
+				[
+					'method'	=> 'cleanOldCookies',
+					'text'		=> 'Cleaning old cookies...'
+				]
 			]
 		);
 	}

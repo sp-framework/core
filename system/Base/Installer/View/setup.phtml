@@ -25,6 +25,7 @@
 		</script>
 		<div class="main-content">
 			<div class="container-fluid">
+				<input id="session-token" type="hidden" value="<?php echo $session->getId(); ?>" />
 				<div class="row">
 					<div class="col">
 						<?php if (!$onlyUpdateDb) { ?>
@@ -258,6 +259,8 @@
 			</div>
 		</div>
 		<script type="text/javascript">
+			var preCheckCount = 0;
+
 			$('#create, #create-grant').click(function() {
 				if ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) {
 					$('#create-username, #create-password').attr('disabled', false);
@@ -411,6 +414,7 @@
 								}).addClass('alert-danger').html(data.responseMessage);
 								$('#submit, #update').attr('disabled', false);
 								$('#submit-spinner, #update-spinner').attr('hidden', true);
+								preCheckCount = 0;
 							}
 						},
 						error: function (data) {
@@ -423,6 +427,7 @@
 							}
 							$('#submit, #update').attr('disabled', false);
 							$('#submit-spinner, #update-spinner').attr('hidden', true);
+							preCheckCount = 0;
 						}
 					});
 				<?php if (!$onlyUpdateDb) { ?>
@@ -431,9 +436,24 @@
 				}
 			});
 
+			function getTimerId(identifier) {
+				var timers = BazHelpers.setTimeoutTimers.all();
+				var id = false;
+
+				if (timers.length > 0) {
+					$(timers).each(function(i, timer) {
+						if (timer['identifier'] === identifier) {
+							id = timer['id'];
+						}
+					});
+				}
+
+				return id;
+			}
+
 			function getProgress() {
 				var data = { };
-				data['session'] = '<?php echo $session->getId(); ?>';
+				data['session'] = $('#session-token').val();
 
 				$.ajax({
 					type    : 'POST',
@@ -441,9 +461,33 @@
 					data    : data,
 					dataType: 'json',
 					success: function (data) {
+						var timerId;
+
 						if (data && data.responseCode === 0) {
 							if (data.responseData) {
 								var responseData = JSON.parse(data.responseData);
+
+								if (responseData['preCheckComplete'] == false) {
+									if (preCheckCount !== 5) {
+										preCheckCount ++;
+
+										BazHelpers.setTimeoutTimers.add(function() {
+											getProgress();
+										}, 1000, null, 'preCheckFail');
+									} else {
+										timerId = getTimerId('preCheckFail');
+										if (timerId) {
+											BazHelpers.setTimeoutTimers.stop(timerId, null, 'preCheckFail');
+										}
+									}
+
+									return false;
+								}
+
+								timerId = getTimerId('preCheckFail');
+								if (timerId) {
+									BazHelpers.setTimeoutTimers.stop(timerId, null, 'preCheckFail');
+								}
 
 								if (responseData['total'] !== 'undefined' && responseData['completed'] !== 'undefined') {
 									if (responseData['total'] !== responseData['completed']) {
