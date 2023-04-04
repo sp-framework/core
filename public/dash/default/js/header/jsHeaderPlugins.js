@@ -12,7 +12,7 @@
 
         progressBar: function(input, options) {
             var defaults = {
-                input: input.parent().siblings().children('input'),
+                input: input.parent().siblings().children().find('input'),
                 container: input.parent(),
                 base: 5,
                 hierarchy: {
@@ -56,12 +56,18 @@
 
                     if (password.length > 0) {
                         var pwstrengthUrl = settings.url;
-
-                        var pwstrengthData = {
+                        var pwstrengthData = { };
+                        pwstrengthData = {
                             'pass'              : password
                         }
 
-                        pwstrengthData[$('#security-token').attr('name')] = $('#security-token').val();
+                        if (settings.postData) {
+                            pwstrengthData = $.extend(pwstrengthData, settings.postData);
+                        }
+
+                        if ($('#security-token')) {
+                            pwstrengthData[$('#security-token').attr('name')] = $('#security-token').val();
+                        }
 
                         $.post(pwstrengthUrl, pwstrengthData, function(response) {
                             if (response.responseCode == 0) {

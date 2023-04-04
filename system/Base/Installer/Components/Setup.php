@@ -103,6 +103,7 @@ Class Setup
 		$this->postData = $this->request->getPost();
 
 		$this->security = $this->container->getShared('security');
+		$this->random = $this->container->getShared('random');
 		$this->session = $this->container->getShared('session');
 
 		$this->view = $this->container->getShared('view');
@@ -133,29 +134,57 @@ Class Setup
 			}
 		}
 
-
 		if ($this->request->isPost() && !isset($this->postData['session'])) {
-			$validateData = $this->setupPackage->validateData();
+			if (isset($this->postData['dev']) && $this->postData['dev'] != 'true') {
+				$passStrength = $this->checkPwStrength($this->postData['pass']);
+				$passwordStrength = $this->checkPwStrength($this->postData['password']);
 
-			if ($validateData !== true) {
-				$this->progress->preCheckComplete(false);
+				if ($passStrength !== false && $passwordStrength !== false) {
+					if ($passStrength <= 2 || $passwordStrength <= 2) {
+						if ($passStrength <= 2) {
+							$this->view->responseCode = 1;
 
-				$this->view->responseCode = 1;
+							$this->view->responseMessage = 'User Password strength is weak!';
+						} else if ($passwordStrength <= 2 && !$this->setupPackage->checkUser(true)) {
+							$this->view->responseCode = 1;
 
-				$this->view->responseMessage = $validateData;
+							$this->view->responseMessage = 'DB Password strength is weak!';
+						}
 
-				if ($this->response->isSent() !== true) {
-					$this->response->setJsonContent($this->view->getParamsToView());
+						if ($this->response->isSent() !== true) {
+							$this->response->setJsonContent($this->view->getParamsToView());
 
-					return $this->response->send();
+							return $this->response->send();
+						}
+					}
 				}
+			}
 
-				return;
+			if (!$onlyUpdateDb) {
+				$validateData = $this->setupPackage->validateData();
+
+				if ($validateData !== true) {
+					$this->progress->preCheckComplete(false);
+
+					$this->view->responseCode = 1;
+
+					$this->view->responseMessage = $validateData;
+
+					if ($this->response->isSent() !== true) {
+						$this->response->setJsonContent($this->view->getParamsToView());
+
+						return $this->response->send();
+					}
+
+					return;
+				}
 			}
 
 			if (isset($this->postData['create-username']) &&
 				isset($this->postData['create-password'])
 			) {
+				$this->progress->preCheckComplete();
+
 				try {
 					$this->setupPackage->createNewDb();
 					$this->setupPackage->checkUser();
@@ -291,15 +320,42 @@ Class Setup
 				throw $e;
 			}
 		} else if ($this->request->isPost() && isset($this->postData['session'])) {
-			$progress = $this->progress->getProgress($this->postData['session']);
+			if (isset($this->postData['checkPwStrength']) && isset($this->postData['pass'])) {
+				$strength = $this->checkPwStrength($this->postData['pass']);
 
-			if ($progress) {
-				$this->view->responseCode = 0;
-				$this->view->responseMessage = 'Ok';
-				$this->view->responseData = $progress;
+				if ($strength !== false) {
+					$this->view->responseCode = 0;
+					$this->view->responseMessage = 'Ok';
+					if ($strength === 0) {
+						$strength = 1;
+					}
+					$this->view->responseData = $strength;
+				} else {
+					$this->view->responseCode = 1;
+					$this->view->responseMessage = 'Error retrieving strength.';
+				}
+			} else if (isset($this->postData['generatePw'])) {
+				$newPass = $this->random->base62(12);
+
+				if ($newPass) {
+					$this->view->responseCode = 0;
+					$this->view->responseMessage = 'Ok';
+					$this->view->responseData = $newPass;
+				} else {
+					$this->view->responseCode = 1;
+					$this->view->responseMessage = 'Error retrieving new pass.';
+				}
 			} else {
-				$this->view->responseCode = 1;
-				$this->view->responseMessage = 'Error retrieving progress.';
+				$progress = $this->progress->getProgress($this->postData['session']);
+
+				if ($progress) {
+					$this->view->responseCode = 0;
+					$this->view->responseMessage = 'Ok';
+					$this->view->responseData = $progress;
+				} else {
+					$this->view->responseCode = 1;
+					$this->view->responseMessage = 'Error retrieving progress.';
+				}
 			}
 
 			$this->response->setContentType('application/json', 'UTF-8');
@@ -434,5 +490,18 @@ Class Setup
 				]
 			]
 		);
+	}
+
+	protected function checkPwStrength(string $pass)
+	{
+		$checkingTool = new \ZxcvbnPhp\Zxcvbn();
+
+		$result = $checkingTool->passwordStrength($pass);
+
+		if ($result && is_array($result) && isset($result['score'])) {
+			return $result['score'];
+		}
+
+		return false;
 	}
 }

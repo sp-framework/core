@@ -774,7 +774,7 @@ class Auth
     {
         $this->packagesData->responseCode = 0;
 
-        $this->packagesData->responseData = $this->secTools->random->base62(12);;
+        $this->packagesData->responseData = $this->secTools->random->base62(12);
 
         $this->packagesData->responseMessage = 'Password Generate Successfully';
     }

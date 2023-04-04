@@ -64,7 +64,7 @@ class Pdo
 			!$this->dbConfig->password 	||
 			!$this->dbConfig->port
 		) {
-			$this->runSetup();
+			$this->runSetup(true);
 		}
 		return true;
 	}

@@ -1,537 +1,611 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<meta name="description" content="">
-		<meta name="author" content="">
-		<title>Bazaari Framework Core Setup</title>
-		<link rel="stylesheet" type="text/css" href="/dash/default/css/core.css">
-		<link rel="stylesheet" type="text/css" href="/dash/default/css/plugins.css">
-		<script src="/dash/default/js/header/jsHeaderDependencies.js"></script>
-		<script src="/dash/default/js/header/jsHeaderCore.js"></script>
-		<script src="/dash/default/js/header/jsHeaderPlugins.js"></script>
-	</head>
-	<body>
-		<script type="text/javascript" charset="utf-8">
-			if (!window.dataCollection) {
-				window.dataCollection = { };
-				dataCollection = window.dataCollection;
-				dataCollection.env = { };
-				dataCollection.env.sounds = { };
-				dataCollection.env.rootPath = '<?php echo $request->getScheme(); ?>://<?php echo $request->getHttpHost(); ?>/';
-				dataCollection.env.libsLoaded = false;
-			}
-		</script>
-		<div class="main-content">
-			<div class="container-fluid">
-				<input id="session-token" type="hidden" value="<?php echo $session->getId(); ?>" />
-				<div class="row">
-					<div class="col">
-						<?php if (!$onlyUpdateDb) { ?>
-							<div id="alert" class="alert mt-2 mb-2" hidden></div>
-						<?php } else { ?>
-							<div id="alert" class="alert mt-2 mb-2 alert-danger"><?php echo $message . ". Please update database details or fix your database server."; ?></div>
-						<?php } ?>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col">
-						<div class="card mt-2 mb-2">
-							<form autocomplete="off">
-								<?php if ($onlyUpdateDb) { ?>
-									<div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase">Bazaari Framework Database Update</div>
-								<?php } else { ?>
-									<div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase">Bazaari Framework Core Setup</div>
-								<?php } ?>
-								<div class="card-body bg-white">
-									<div class="row vdivide justify-content-center">
-										<div class="col-6 p-3">
-											<legend>Database</legend>
-											<div class="row">
-												<div class="col">
-													<div class="form-group">
-														<label for="host">Host *</label>
-														<div class="input-group">
-															<input type="text" name="host" id="host" class="form-control" value="localhost">
-														</div>
-													</div>
-												</div>
-												<div class="col">
-													<div class="form-group">
-														<label for="port">Port *</label>
-														<div class="input-group">
-															<input type="text" name="port" id="port" class="form-control" value="3306">
-														</div>
-													</div>
-												</div>
-											</div>
-											<div class="form-group">
-												<label for="database_name">Database Name *</label>
-												<div class="input-group">
-													<input type="text" name="database_name" id="database_name" class="form-control" value="sp">
-												</div>
-											</div>
-											<div class="row">
-												<div class="col">
-													<div class="form-group">
-														<label for="username">Database Username *</label>
-														<div class="input-group">
-															<input type="text" name="username" id="username" class="form-control" value="sp">
-														</div>
-													</div>
-												</div>
-												<div class="col">
-													<div class="form-group">
-														<label for="password">Database Password *</label>
-														<div class="input-group">
-															<input type="password" name="password" id="password" class="form-control">
-														</div>
-													</div>
-												</div>
-											</div>
-											<?php if (!$onlyUpdateDb) { ?>
-												<div class="row">
-													<div class="col">
-														<div class="form-group">
-															<div class="checkbox icheck-danger">
-																<input type="checkbox" name="drop" id="drop">
-																<label for="drop">
-																	Drop tables if exists
-																</label>
-															</div>
-														</div>
-													</div>
-													<div class="col">
-														<div class="form-group">
-															<div class="checkbox icheck-success">
-																<input type="checkbox" name="create" id="create">
-																<label for="create">
-																	Create new database
-																</label>
-															</div>
-														</div>
-													</div>
-													<div class="col">
-														<div class="form-group">
-															<div class="checkbox icheck-success">
-																<input type="checkbox" name="create-grant" id="create-grant">
-																<label for="create-grant">
-																	Create new user/grant permissions
-																</label>
-															</div>
-														</div>
-													</div>
-												</div>
-												<div class="row" id="create-user">
-													<div class="col">
-														<div class="form-group">
-															<label for="create-username">Database Username (With create permission) *</label>
-															<div class="input-group">
-																<input type="text" name="create-username" id="create-username" class="form-control" disabled>
-															</div>
-														</div>
-													</div>
-													<div class="col">
-														<div class="form-group">
-															<label for="create-password">Database Password (With create permission) *</label>
-															<div class="input-group">
-																<input type="password" name="create-password" id="create-password" class="form-control" disabled>
-															</div>
-														</div>
-													</div>
-												</div>
-											<?php } ?>
-										</div>
-										<?php if (!$onlyUpdateDb) { ?>
-											<div class="col-6 p-3">
-												<legend>Admin Account</legend>
-												<div class="row">
-													<div class="col">
-														<div class="form-group">
-															<label for="email">Email *</label>
-															<div class="input-group">
-																<input type="text" name="email" id="email" class="form-control">
-															</div>
-														</div>
-													</div>
-													<div class="col">
-														<div class="form-group">
-															<label for="pass">Password *</label>
-															<div class="input-group">
-																<input type="password" name="pass" id="pass" class="form-control">
-															</div>
-														</div>
-													</div>
-												</div>
-												<legend>Security</legend>
-												<div class="row">
-													<div class="col">
-														<div class="form-group">
-															<label for="pwf">Password Encryption Level *</label>
-															<div class="input-group">
-																<input type="number" min="4" max="16" name="pwf" id="pwf" class="form-control" value="8" disabled>
-															</div>
-														</div>
-													</div>
-													<div class="col">
-														<div class="form-group">
-															<label for="cwf">Cookies Encryption Level *</label>
-															<div class="input-group">
-																<input type="number" min="4" max="16" name="cwf" id="cwf" class="form-control" value="8" disabled>
-															</div>
-														</div>
-													</div>
-												</div>
-												<div class="row">
-													<div class="col">
-														<div class="form-group">
-															<div class="checkbox icheck-info">
-																<input type="checkbox" name="auto-encrypt-level" id="auto-encrypt-level" checked>
-																<label for="auto-encrypt-level">
-																	Calculate level as per system configuration
-																</label>
-															</div>
-														</div>
-													</div>
-												</div>
-												<small>Note: Higher the number, better the security but, slower the performance. Range: 4-16</small>
-												<hr>
-												<div class="row">
-													<div class="col">
-														<div class="form-group">
-															<div class="checkbox icheck-warning">
-																<input type="checkbox" name="dev" id="dev">
-																<label for="dev">
-																	Dev Mode?
-																</label>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										<?php } ?>
-									</div>
-									<hr>
-									<div class="installer-progress" hidden>
-										<div class="progress active progress-xs">
-											<div class="progress-bar progress-xs bg-info progress-bar-animated progress-bar-striped installer-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width: 0%"></div>
-										</div>
-										<div class="row text-center text-sm text-primary m-1">
-											<div class="col">
-												<span class="sr-only progress-span"></span>
-												<span class="progress-span"></span>
-											</div>
-										</div>
-									</div>
-									<div class="row text-center p-3">
-										<?php if (!$onlyUpdateDb) { ?>
-											<div class="col" id="submit-div">
-												<button id="submit" class="btn btn-primary">
-													<i id="submit-spinner" class="fa fa-cog fa-spin" hidden></i>
-													Setup
-												</button>
-											</div>
-										<?php } else { ?>
-											<div class="col" id="update-div">
-												<button id="update" class="btn btn-primary">
-													<i id="update-spinner" class="fa fa-cog fa-spin" hidden></i>
-													Update
-												</button>
-											</div>
-										<?php } ?>
-										<div class="col" id="access-div" hidden>
-											<a href='/' id="access" class="btn btn-success" disabled=""><i class="fa fa-check"></i> Access Admin</a>
-										</div>
-									</div>
-									<hr>
-									<footer class="footer text-center">
-										<strong>Copyright © Bazaari E Trade Pty Ltd.</strong> All rights reserved.
-										<script src="/dash/default/js/footer/jsFooterDependencies.js"></script>
-										<script src="/dash/default/js/footer/jsFooterCore.js"></script>
-										<script src="/dash/default/js/footer/jsFooterPlugins.js"></script>
-									</footer>
-								</div>
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<script type="text/javascript">
-			var preCheckCount = 0;
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <title>Bazaari Framework Core Setup</title>
+        <link rel="stylesheet" type="text/css" href="/dash/default/css/core.css">
+        <link rel="stylesheet" type="text/css" href="/dash/default/css/plugins.css">
+        <script src="/dash/default/js/header/jsHeaderDependencies.js"></script>
+        <script src="/dash/default/js/header/jsHeaderCore.js"></script>
+        <script src="/dash/default/js/header/jsHeaderPlugins.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript" charset="utf-8">
+            if (!window.dataCollection) {
+                window.dataCollection = { };
+                dataCollection = window.dataCollection;
+                dataCollection.env = { };
+                dataCollection.env.sounds = { };
+                dataCollection.env.rootPath = '<?php echo $request->getScheme(); ?>://<?php echo $request->getHttpHost(); ?>/';
+                dataCollection.env.libsLoaded = false;
+            }
+        </script>
+        <div class="main-content">
+            <div class="container-fluid">
+                <input id="session-token" type="hidden" value="<?php echo $session->getId(); ?>" />
+                <div class="row">
+                    <div class="col">
+                        <?php if (!$onlyUpdateDb) { ?>
+                            <div id="alert" class="alert mt-2 mb-2" hidden></div>
+                        <?php } else { ?>
+                            <div id="alert" class="alert mt-2 mb-2 alert-danger"><?php echo $message . ". Please update database details or fix your database server."; ?></div>
+                        <?php } ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="card mt-2 mb-2">
+                            <form autocomplete="off">
+                                <?php if ($onlyUpdateDb) { ?>
+                                    <div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase rounded-0">Bazaari Framework Database Update</div>
+                                <?php } else { ?>
+                                    <div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase rounded-0">Bazaari Framework Core Setup</div>
+                                <?php } ?>
+                                <div class="card-body bg-white">
+                                    <div class="row vdivide justify-content-center">
+                                        <div class="col-6 p-3">
+                                            <legend class="text-uppercase">Database</legend>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="form-group">
+                                                        <label class="text-uppercase text-xs" for="host">Host *</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <input type="text" name="host" id="host" class="form-control rounded-0" value="localhost">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="form-group">
+                                                        <label class="text-uppercase text-xs" for="port">Port *</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <input type="text" name="port" id="port" class="form-control rounded-0" value="3306">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="text-uppercase text-xs" for="database_name">Database Name *</label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text" name="database_name" id="database_name" class="form-control rounded-0" value="sp">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="form-group">
+                                                        <label class="text-uppercase text-xs" for="username">Database Username *</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <input type="text" name="username" id="username" class="form-control rounded-0" value="sp">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="form-group mb-0">
+                                                        <label class="text-uppercase text-xs" for="password">Database Password *</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <input type="password" name="password" id="password" class="form-control rounded-0">
+                                                            <div class="input-group-append">
+                                                                <button class="btn btn-sm btn-primary rounded-0" id="generate_db_password_button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="">
+                                                                    <i class="fas fa-fw fa-cog fa-spin" hidden=""></i> <i class="fas fa-fw fa-wand-magic-sparkles"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div id="db_password_strength_meter"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <?php if (!$onlyUpdateDb) { ?>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <div class="checkbox icheck-danger">
+                                                                <input type="checkbox" name="drop" id="drop">
+                                                                <label class="text-uppercase text-xs" for="drop">
+                                                                    Drop tables if exists
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <div class="checkbox icheck-success">
+                                                                <input type="checkbox" name="create" id="create">
+                                                                <label class="text-uppercase text-xs" for="create">
+                                                                    Create new database
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <div class="checkbox icheck-success">
+                                                                <input type="checkbox" name="create-grant" id="create-grant">
+                                                                <label class="text-uppercase text-xs" for="create-grant">
+                                                                    Create new user/grant permissions
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row" id="create-user">
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <label class="text-uppercase text-xs" for="create-username">Database Username (With create permission) *</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="text" name="create-username" id="create-username" class="form-control rounded-0" disabled>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <label class="text-uppercase text-xs" for="create-password">Database Password (With create permission) *</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="password" name="create-password" id="create-password" class="form-control rounded-0" disabled>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php } ?>
+                                        </div>
+                                        <?php if (!$onlyUpdateDb) { ?>
+                                            <div class="col-6 p-3">
+                                                <legend class="text-uppercase">Admin Account</legend>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <label class="text-uppercase text-xs" for="email">Email *</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="text" name="email" id="email" class="form-control rounded-0">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <div class="form-group mb-0">
+                                                            <label class="text-uppercase text-xs" for="pass">Password *</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="password" name="pass" id="pass" class="form-control rounded-0">
+                                                                <div class="input-group-append">
+                                                                    <button class="btn btn-sm btn-primary rounded-0" id="generate_user_password_button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="">
+                                                                        <i class="fas fa-fw fa-cog fa-spin" hidden=""></i> <i class="fas fa-fw fa-wand-magic-sparkles"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div id="user_password_strength_meter"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <legend class="text-uppercase">Security</legend>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <label class="text-uppercase text-xs" for="pwf">Password Encryption Level *</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="number" min="4" max="16" name="pwf" id="pwf" class="form-control rounded-0" value="8" disabled>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <label class="text-uppercase text-xs" for="cwf">Cookies Encryption Level *</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="number" min="4" max="16" name="cwf" id="cwf" class="form-control rounded-0" value="8" disabled>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="form-group mb-2">
+                                                            <div class="checkbox icheck-info">
+                                                                <input type="checkbox" name="auto-encrypt-level" id="auto-encrypt-level" checked>
+                                                                <label class="text-uppercase text-xs" for="auto-encrypt-level">
+                                                                    Calculate level as per system configuration
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <small class="text-warning">Note: Higher the number, better the security but, slower the performance. Range: 4-16</small>
+                                                <legend class="mt-3">Development</legend>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <div class="checkbox icheck-warning">
+                                                                <input type="checkbox" name="dev" id="dev">
+                                                                <label class="text-uppercase text-xs" for="dev">
+                                                                    Dev Mode?
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php } ?>
+                                    </div>
+                                    <hr>
+                                    <div class="installer-progress" hidden>
+                                        <div class="progress active progress-xs">
+                                            <div class="progress-bar progress-xs bg-info progress-bar-animated progress-bar-striped installer-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width: 0%"></div>
+                                        </div>
+                                        <div class="row text-center text-sm text-primary m-1">
+                                            <div class="col">
+                                                <span class="sr-only progress-span"></span>
+                                                <span class="progress-span"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row text-center p-3">
+                                        <?php if (!$onlyUpdateDb) { ?>
+                                            <div class="col" id="submit-div">
+                                                <button id="submit" class="btn btn-primary">
+                                                    <i id="submit-spinner" class="fa fa-cog fa-spin" hidden></i>
+                                                    Setup
+                                                </button>
+                                            </div>
+                                        <?php } else { ?>
+                                            <div class="col" id="update-div">
+                                                <button id="update" class="btn btn-primary">
+                                                    <i id="update-spinner" class="fa fa-cog fa-spin" hidden></i>
+                                                    Update
+                                                </button>
+                                            </div>
+                                        <?php } ?>
+                                        <div class="col" id="access-div" hidden>
+                                            <a href='/' id="access" class="btn btn-success" disabled=""><i class="fa fa-check"></i> Access Admin</a>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <footer class="footer text-center">
+                                        Copyright © <strong><a target="_blank" href="https://www.bazaari.com.au/">Bazaari E Trade Pty Ltd.</a></strong> 2014-<?php echo date("Y"); ?> All rights reserved.
+                                        <script src="/dash/default/js/footer/jsFooterDependencies.js"></script>
+                                        <script src="/dash/default/js/footer/jsFooterCore.js"></script>
+                                        <script src="/dash/default/js/footer/jsFooterPlugins.js"></script>
+                                    </footer>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var preCheckCount = 0;
 
-			$('#create, #create-grant').click(function() {
-				if ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) {
-					$('#create-username, #create-password').attr('disabled', false);
-				} else if ($('#create')[0].checked === false && $('#create-grant')[0].checked === false) {
-					$('#create-username, #create-password').attr('disabled', true);
-				}
-			});
+            $('#create, #create-grant').click(function() {
+                if ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) {
+                    $('#create-username, #create-password').attr('disabled', false);
+                } else if ($('#create')[0].checked === false && $('#create-grant')[0].checked === false) {
+                    $('#create-username, #create-password').attr('disabled', true);
+                }
+            });
 
-			$('#submit, #update').click(function(e) {
-				e.preventDefault();
+            $('#submit, #update').click(function(e) {
+                e.preventDefault();
 
-				$(this).attr('disabled', true);
-				$('#submit-spinner, #update-spinner').attr('hidden', false);
-				$('#alert').attr('hidden', true);
+                $(this).attr('disabled', true);
+                $('#submit-spinner, #update-spinner').attr('hidden', false);
+                $('#alert').attr('hidden', true);
 
-				if ($('#host').val() === '') {
-					$('#host').addClass('is-invalid');
-					$('#host').focus(function() {
-						$(this).removeClass('is-invalid');
-					});
-					$('#submit-spinner, #update-spinner').attr('hidden', true);
-					$('#submit, #update').attr('disabled', false);
-				} else if ($('#port').val() === '') {
-					$('#port').addClass('is-invalid');
-					$('#port').focus(function() {
-						$(this).removeClass('is-invalid');
-					});
-					$('#submit-spinner, #update-spinner').attr('hidden', true);
-					$('#submit, #update').attr('disabled', false);
-				} else if ($('#database_name').val() === '') {
-					$('#database_name').addClass('is-invalid');
-					$('#database_name').focus(function() {
-						$(this).removeClass('is-invalid');
-					});
-					$('#submit-spinner, #update-spinner').attr('hidden', true);
-					$('#submit, #update').attr('disabled', false);
-				} else if ($('#username').val() === '') {
-					$('#username').addClass('is-invalid');
-					$('#username').focus(function() {
-						$(this).removeClass('is-invalid');
-					});
-					$('#submit-spinner, #update-spinner').attr('hidden', true);
-					$('#submit, #update').attr('disabled', false);
-				} else if ($('#password').val() === '') {
-					$('#password').addClass('is-invalid');
-					$('#password').focus(function() {
-						$(this).removeClass('is-invalid');
-					});
-					$('#submit-spinner, #update-spinner').attr('hidden', true);
-					$('#submit, #update').attr('disabled', false);
-				} else if (($('#create').length > 0 && $('#create-grant').length > 0) &&
-						   ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
-						   $('#create-username').val() === '') {
-					$('#create-username').addClass('is-invalid');
-					$('#create-username').focus(function() {
-						$(this).removeClass('is-invalid');
-					});
-					$('#submit-spinner').attr('hidden', true);
-					$('#submit').attr('disabled', false);
-				} else if (($('#create').length > 0 && $('#create-grant').length > 0) &&
-						   ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
-						   $('#create-password').val() === '') {
-					$('#create-password').addClass('is-invalid');
-					$('#create-password').focus(function() {
-						$(this).removeClass('is-invalid');
-					});
-					$('#submit-spinner').attr('hidden', true);
-					$('#submit').attr('disabled', false);
-				} else if ($('#email').val() === '') {
-					$('#email').addClass('is-invalid');
-					$('#email').focus(function() {
-						$(this).removeClass('is-invalid');
-					});
-					$('#submit-spinner').attr('hidden', true);
-					$('#submit').attr('disabled', false);
-				} else if ($('#pass').val() === '') {
-					$('#pass').addClass('is-invalid');
-					$('#pass').focus(function() {
-						$(this).removeClass('is-invalid');
-					});
-					$('#submit-spinner').attr('hidden', true);
-					$('#submit').attr('disabled', false);
-				} else if ($('#pwf').val() === '') {
-					$('#pwf').addClass('is-invalid');
-					$('#pwf').focus(function() {
-						$(this).removeClass('is-invalid');
-					});
-					$('#submit-spinner').attr('hidden', true);
-					$('#submit').attr('disabled', false);
-				} else if ($('#cwf').val() === '') {
-					$('#cwf').addClass('is-invalid');
-					$('#cwf').focus(function() {
-						$(this).removeClass('is-invalid');
-					});
-					$('#submit-spinner').attr('hidden', true);
-					$('#submit').attr('disabled', false);
-				} else {
-					var data = { };
-					data = $.extend(data,
-						{
-							"host"          		: $('#host').val(),
-							"port"          		: $('#port').val(),
-							"database_name" 		: $('#database_name').val(),
-							"username"      		: $('#username').val(),
-							"password"      		: $('#password').val()
-						});
-					if ($('#create').length > 0 && $('#create')[0].checked === true) {
-						data = $.extend(data,
-						{
-							"create-username"      	: $('#create-username').val(),
-							"create-password"      	: $('#create-password').val()
-						});
-					}
-				<?php if (!$onlyUpdateDb) { ?>
-					data = $.extend(data,
-						{
-							"drop"          		: $('#drop')[0].checked,
-							"email"      			: $('#email').val(),
-							"pass"      			: $('#pass').val(),
-							"pwf"       			: $('#pwf').val(),
-							"cwf"       			: $('#cwf').val(),
-							"auto-encrypt-level"  	: $('#auto-encrypt-level')[0].checked,
-							"dev"  					: $('#dev')[0].checked,
-							"country"      			: $('#country').val()
-						});
-				<?php } ?>
-					$.ajax({
-						type    : 'POST',
-						url     : '/',
-						data    : data,
-						dataType: 'json',
-						success: function (data) {
-							if (data && data.responseCode === 0) {
-								setTimeout(function() {
-									$('#alert').attr('hidden', false);
-									$('#alert').html('');
-									$('#alert').removeClass (function (index, className) {
-										return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
-									}).addClass('alert-success').html(data.responseMessage);
-									$('#access').attr('disabled', false);
-									$('#access-div').attr('hidden', false);
-									$('#submit-div').attr('hidden', true);
-									$('#update-div').attr('hidden', true);
-									$('#submit-spinner, #update-spinner').attr('hidden', true);
-								}, 1000);
-							} else if (data.responseCode === 1 || data.responseCode === 2) {
-								$('#alert').attr('hidden', false);
-								$('#alert').html('');
-								$('#alert').removeClass (function (index, className) {
-									return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
-								}).addClass('alert-danger').html(data.responseMessage);
-								$('#submit, #update').attr('disabled', false);
-								$('#submit-spinner, #update-spinner').attr('hidden', true);
-								preCheckCount = 0;
-							}
-						},
-						error: function (data) {
-							if (data.responseJSON && data.responseJSON.responseCode === 1) {
-								$('#alert').attr('hidden', false);
-								$('#alert').html('');
-								$('#alert').removeClass (function (index, className) {
-									return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
-								}).addClass('alert-danger').html(data.responseJSON.responseMessage);
-							}
-							$('#submit, #update').attr('disabled', false);
-							$('#submit-spinner, #update-spinner').attr('hidden', true);
-							preCheckCount = 0;
-						}
-					});
-				<?php if (!$onlyUpdateDb) { ?>
-					setTimeout(getProgress(), 500);
-				<?php } ?>
-				}
-			});
+                if ($('#host').val() === '') {
+                    $('#host').addClass('is-invalid');
+                    $('#host').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
+                    $('#submit-spinner, #update-spinner').attr('hidden', true);
+                    $('#submit, #update').attr('disabled', false);
+                } else if ($('#port').val() === '') {
+                    $('#port').addClass('is-invalid');
+                    $('#port').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
+                    $('#submit-spinner, #update-spinner').attr('hidden', true);
+                    $('#submit, #update').attr('disabled', false);
+                } else if ($('#database_name').val() === '') {
+                    $('#database_name').addClass('is-invalid');
+                    $('#database_name').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
+                    $('#submit-spinner, #update-spinner').attr('hidden', true);
+                    $('#submit, #update').attr('disabled', false);
+                } else if ($('#username').val() === '') {
+                    $('#username').addClass('is-invalid');
+                    $('#username').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
+                    $('#submit-spinner, #update-spinner').attr('hidden', true);
+                    $('#submit, #update').attr('disabled', false);
+                } else if ($('#password').val() === '') {
+                    $('#password').addClass('is-invalid');
+                    $('#password').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
+                    $('#submit-spinner, #update-spinner').attr('hidden', true);
+                    $('#submit, #update').attr('disabled', false);
+                } else if (($('#create').length > 0 && $('#create-grant').length > 0) &&
+                           ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
+                           $('#create-username').val() === '') {
+                    $('#create-username').addClass('is-invalid');
+                    $('#create-username').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
+                    $('#submit-spinner').attr('hidden', true);
+                    $('#submit').attr('disabled', false);
+                } else if (($('#create').length > 0 && $('#create-grant').length > 0) &&
+                           ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
+                           $('#create-password').val() === '') {
+                    $('#create-password').addClass('is-invalid');
+                    $('#create-password').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
+                    $('#submit-spinner').attr('hidden', true);
+                    $('#submit').attr('disabled', false);
+                } else if ($('#email').val() === '') {
+                    $('#email').addClass('is-invalid');
+                    $('#email').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
+                    $('#submit-spinner').attr('hidden', true);
+                    $('#submit').attr('disabled', false);
+                } else if ($('#pass').val() === '') {
+                    $('#pass').addClass('is-invalid');
+                    $('#pass').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
+                    $('#submit-spinner').attr('hidden', true);
+                    $('#submit').attr('disabled', false);
+                } else if ($('#pwf').val() === '') {
+                    $('#pwf').addClass('is-invalid');
+                    $('#pwf').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
+                    $('#submit-spinner').attr('hidden', true);
+                    $('#submit').attr('disabled', false);
+                } else if ($('#cwf').val() === '') {
+                    $('#cwf').addClass('is-invalid');
+                    $('#cwf').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
+                    $('#submit-spinner').attr('hidden', true);
+                    $('#submit').attr('disabled', false);
+                } else {
+                    var data = { };
+                    data = $.extend(data,
+                        {
+                            "host"                  : $('#host').val(),
+                            "port"                  : $('#port').val(),
+                            "database_name"         : $('#database_name').val(),
+                            "username"              : $('#username').val(),
+                            "password"              : $('#password').val()
+                        });
+                    if ($('#create').length > 0 && $('#create')[0].checked === true) {
+                        data = $.extend(data,
+                        {
+                            "create-username"       : $('#create-username').val(),
+                            "create-password"       : $('#create-password').val(),
+                            "create-db"             : $('#create')[0].checked,
+                            "create-user"           : $('#create-grant')[0].checked
+                        });
+                    }
+                <?php if (!$onlyUpdateDb) { ?>
+                    data = $.extend(data,
+                        {
+                            "drop"                  : $('#drop')[0].checked,
+                            "email"                 : $('#email').val(),
+                            "pass"                  : $('#pass').val(),
+                            "pwf"                   : $('#pwf').val(),
+                            "cwf"                   : $('#cwf').val(),
+                            "auto-encrypt-level"    : $('#auto-encrypt-level')[0].checked,
+                            "dev"                   : $('#dev')[0].checked,
+                            "country"               : $('#country').val()
+                        });
+                <?php } ?>
+                    $.ajax({
+                        type    : 'POST',
+                        url     : '/',
+                        data    : data,
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data && data.responseCode === 0) {
+                                setTimeout(function() {
+                                    $('#alert').attr('hidden', false);
+                                    $('#alert').html('');
+                                    $('#alert').removeClass (function (index, className) {
+                                        return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
+                                    }).addClass('alert-success').html(data.responseMessage);
+                                    $('#access').attr('disabled', false);
+                                    $('#access-div').attr('hidden', false);
+                                    $('#submit-div').attr('hidden', true);
+                                    $('#update-div').attr('hidden', true);
+                                    $('#submit-spinner, #update-spinner').attr('hidden', true);
+                                }, 1000);
+                            } else if (data.responseCode === 1 || data.responseCode === 2) {
+                                $('#alert').attr('hidden', false);
+                                $('#alert').html('');
+                                $('#alert').removeClass (function (index, className) {
+                                    return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
+                                }).addClass('alert-danger').html(data.responseMessage);
+                                $('#submit, #update').attr('disabled', false);
+                                $('#submit-spinner, #update-spinner').attr('hidden', true);
+                                preCheckCount = 0;
+                            }
+                        },
+                        error: function (data) {
+                            if (data.responseJSON && data.responseJSON.responseCode === 1) {
+                                $('#alert').attr('hidden', false);
+                                $('#alert').html('');
+                                $('#alert').removeClass (function (index, className) {
+                                    return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
+                                }).addClass('alert-danger').html(data.responseJSON.responseMessage);
+                            }
+                            $('#submit, #update').attr('disabled', false);
+                            $('#submit-spinner, #update-spinner').attr('hidden', true);
+                            preCheckCount = 0;
+                        }
+                    });
+                <?php if (!$onlyUpdateDb) { ?>
+                    setTimeout(getProgress(), 500);
+                <?php } ?>
+                }
+            });
 
-			function getTimerId(identifier) {
-				var timers = BazHelpers.setTimeoutTimers.all();
-				var id = false;
+            function getTimerId(identifier) {
+                var timers = BazHelpers.setTimeoutTimers.all();
+                var id = false;
 
-				if (timers.length > 0) {
-					$(timers).each(function(i, timer) {
-						if (timer['identifier'] === identifier) {
-							id = timer['id'];
-						}
-					});
-				}
+                if (timers.length > 0) {
+                    $(timers).each(function(i, timer) {
+                        if (timer['identifier'] === identifier) {
+                            id = timer['id'];
+                        }
+                    });
+                }
 
-				return id;
-			}
+                return id;
+            }
 
-			function getProgress() {
-				var data = { };
-				data['session'] = $('#session-token').val();
+            function getProgress() {
+                var data = { };
+                data['session'] = $('#session-token').val();
 
-				$.ajax({
-					type    : 'POST',
-					url     : '/',
-					data    : data,
-					dataType: 'json',
-					success: function (data) {
-						var timerId;
+                $.ajax({
+                    type    : 'POST',
+                    url     : '/',
+                    data    : data,
+                    dataType: 'json',
+                    success: function (data) {
+                        var timerId;
 
-						if (data && data.responseCode === 0) {
-							if (data.responseData) {
-								var responseData = JSON.parse(data.responseData);
+                        if (data && data.responseCode === 0) {
+                            if (data.responseData) {
+                                var responseData = JSON.parse(data.responseData);
 
-								if (responseData['preCheckComplete'] == false) {
-									if (preCheckCount !== 5) {
-										preCheckCount ++;
+                                if (responseData['preCheckComplete'] == false) {
+                                    if (preCheckCount !== 5) {
+                                        preCheckCount ++;
 
-										BazHelpers.setTimeoutTimers.add(function() {
-											getProgress();
-										}, 1000, null, 'preCheckFail');
-									} else {
-										timerId = getTimerId('preCheckFail');
-										if (timerId) {
-											BazHelpers.setTimeoutTimers.stop(timerId, null, 'preCheckFail');
-										}
-									}
+                                        BazHelpers.setTimeoutTimers.add(function() {
+                                            getProgress();
+                                        }, 1000, null, 'preCheckFail');
+                                    } else {
+                                        timerId = getTimerId('preCheckFail');
+                                        if (timerId) {
+                                            BazHelpers.setTimeoutTimers.stop(timerId, null, 'preCheckFail');
+                                        }
+                                    }
 
-									return false;
-								}
+                                    return false;
+                                }
 
-								timerId = getTimerId('preCheckFail');
-								if (timerId) {
-									BazHelpers.setTimeoutTimers.stop(timerId, null, 'preCheckFail');
-								}
+                                timerId = getTimerId('preCheckFail');
+                                if (timerId) {
+                                    BazHelpers.setTimeoutTimers.stop(timerId, null, 'preCheckFail');
+                                }
 
-								if (responseData['total'] !== 'undefined' && responseData['completed'] !== 'undefined') {
-									if (responseData['total'] !== responseData['completed']) {
-										if (responseData['runners']['running'] !== false) {
-											$('.installer-progress').attr('hidden', false);
-											$('.progress-span')
-												.html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
+                                if (responseData['total'] !== 'undefined' && responseData['completed'] !== 'undefined') {
+                                    if (responseData['total'] !== responseData['completed']) {
+                                        if (responseData['runners']['running'] !== false) {
+                                            $('.installer-progress').attr('hidden', false);
+                                            $('.progress-span')
+                                                .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
 
-											$('.installer-progress-bar').css('width', responseData['percentComplete'] + '%');
-											$('.installer-progress-bar').attr('aria-valuenow', responseData['percentComplete']);
-										}
-										BazHelpers.setTimeoutTimers.add(function() {
-											getProgress();
-										}, 500);
-									} else {
-										$('.progress-bar').removeClass('progress-bar-animated');
-										$('.progress-span').html('Done (100%)');
-										$('.installer-progress-bar').css('width', '100%');
-										$('.installer-progress-bar').attr('aria-valuenow', 100);
-										BazHelpers.setTimeoutTimers.stopAll();
-									}
-								} else {
-									BazHelpers.setTimeoutTimers.stopAll();
-								}
-							}
-						} else if (data.responseCode === 1) {
-							BazHelpers.setTimeoutTimers.stopAll();
-						}
-					},
-					error: function (data) {
-						if (data && data.responseCode === 1) {
-							BazHelpers.setTimeoutTimers.stopAll();
-						}
-					}
-				});
-			}
+                                            $('.installer-progress-bar').css('width', responseData['percentComplete'] + '%');
+                                            $('.installer-progress-bar').attr('aria-valuenow', responseData['percentComplete']);
+                                        }
+                                        BazHelpers.setTimeoutTimers.add(function() {
+                                            getProgress();
+                                        }, 500);
+                                    } else {
+                                        $('.progress-bar').removeClass('progress-bar-animated');
+                                        $('.progress-span').html('Done (100%)');
+                                        $('.installer-progress-bar').css('width', '100%');
+                                        $('.installer-progress-bar').attr('aria-valuenow', 100);
+                                        BazHelpers.setTimeoutTimers.stopAll();
+                                    }
+                                } else {
+                                    BazHelpers.setTimeoutTimers.stopAll();
+                                }
+                            }
+                        } else if (data.responseCode === 1) {
+                            BazHelpers.setTimeoutTimers.stopAll();
+                        }
+                    },
+                    error: function (data) {
+                        if (data && data.responseCode === 1) {
+                            BazHelpers.setTimeoutTimers.stopAll();
+                        }
+                    }
+                });
+            }
 
-			$('#auto-encrypt-level').click(function() {
-				if ($(this)[0].checked === true) {
-					$('#pwf, #cwf').attr('disabled', true);
-				} else if ($(this)[0].checked === false) {
-					$('#pwf, #cwf').attr('disabled', false);
-				}
-			});
-		</script>
-	</body>
+            $('#auto-encrypt-level').click(function() {
+                if ($(this)[0].checked === true) {
+                    $('#pwf, #cwf').attr('disabled', true);
+                } else if ($(this)[0].checked === false) {
+                    $('#pwf, #cwf').attr('disabled', false);
+                }
+            });
+
+            $('#db_password_strength_meter').strengthMeter({
+                "url"       : '/',
+                "postData"  : {
+                    "session"           : $('#session-token').val(),
+                    "checkPwStrength"   : true
+                }
+            });
+
+            $('#user_password_strength_meter').strengthMeter({
+                "url"       : '/',
+                "session"   : $('#session-token').val(),
+                "postData"  : {
+                    "session"           : $('#session-token').val(),
+                    "checkPwStrength"   : true
+                }
+            });
+
+            $('#password, #pass').keyup(function() {
+                if ($(this).val() === '') {
+                    $(this).attr('type', 'password');
+                }
+            });
+
+            $('#generate_db_password_button, #generate_user_password_button').click(function(e) {
+                e.preventDefault();
+
+                var that = this;
+                var generatePwData = { };
+                generatePwData['session'] = $('#session-token').val();
+                generatePwData['generatePw'] = true;
+
+                $.post('/', generatePwData, function(response) {
+                    if (response.responseCode == 0) {
+                        if (response.responseData) {
+                            if ($(that)[0].id === 'generate_db_password_button') {
+                                $('#password').val(response.responseData).trigger('change');
+                                $('#password').attr('type', 'text');
+                            } else if ($(that)[0].id === 'generate_user_password_button') {
+                                $('#pass').val(response.responseData).trigger('change');
+                                $('#pass').attr('type', 'text');
+                            }
+                        }
+                    } else {
+                        PNotify.error(response.responseMessage);
+                    }
+                }, 'json');
+            });
+
+            $('#dev').click(function() {
+                if ($(this)[0].checked === true) {
+                    $('#auto-encrypt-level')[0].checked = false;
+                    $('#pwf').val('2');
+                    $('#cwf').val('2');
+                }
+            });
+        </script>
+    </body>
 </html>

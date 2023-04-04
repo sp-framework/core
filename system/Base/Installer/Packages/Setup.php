@@ -686,7 +686,7 @@ class Setup
 		$this->executeSQL("CREATE DATABASE IF NOT EXISTS " . $this->postData['database_name'] . " CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci");
 	}
 
-	protected function checkUser()
+	protected function checkUser($dontCreate = false)
 	{
 		$checkUser = $this->executeSQL("SELECT * FROM `user` WHERE `User` LIKE ?", [$this->postData['username']]);
 
@@ -694,6 +694,11 @@ class Setup
 			if (!isset($this->postData['create-username']) && !isset($this->postData['create-password'])) {
 				throw new \Exception('User ' . $this->postData['username'] . ' does not exist. Please enable create new user/database.');
 			}
+
+			if ($dontCreate) {//We check if user dont exists for password strength
+				return false;
+			}
+
 			$this->executeSQL("CREATE USER ?@'%' IDENTIFIED WITH mysql_native_password BY ?;", [$this->postData['username'], $this->postData['password']]);
 		}
 
