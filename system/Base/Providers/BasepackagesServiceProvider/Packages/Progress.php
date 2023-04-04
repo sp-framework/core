@@ -93,6 +93,10 @@ class Progress extends BasePackage
     {
         $progressFile = $this->readProgressFile($session);
 
+        if (!$progressFile) {
+            return false;
+        }
+
         return Json::encode(
             [
                 'total'             => $progressFile['total'],
@@ -161,13 +165,7 @@ class Progress extends BasePackage
         }
 
         try {
-            do {
-                $file = $this->localContent->read('var/progress/' . $session . '.json');
-
-                usleep(200);
-            } while ($file === '');
-
-            return Json::decode($file, true);
+            return Json::decode($this->localContent->read('/var/progress/' . $session . '.json'), true);
         } catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
             return false;
         }
