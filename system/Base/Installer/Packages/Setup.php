@@ -506,7 +506,7 @@ class Setup
 		return (new RegisterView())->register($this->db, $viewFile, $installedFiles);
 	}
 
-	protected function validateData()
+	public function validateData()
 	{
 		$this->validation->add('email', Email::class, ["message" => "Please enter valid email address."]);
 		$this->validation->add('pass', PresenceOf::class, ["message" => "Please enter a password."]);

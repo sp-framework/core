@@ -134,6 +134,24 @@ Class Setup
 		}
 
 		if ($this->request->isPost() && !isset($this->postData['session'])) {
+			$validateData = $this->setupPackage->validateData();
+
+			if ($validateData !== true) {
+				$this->progress->preCheckComplete(false);
+
+				$this->view->responseCode = 1;
+
+				$this->view->responseMessage = $validateData;
+
+				if ($this->response->isSent() !== true) {
+					$this->response->setJsonContent($this->view->getParamsToView());
+
+					return $this->response->send();
+				}
+
+				return;
+			}
+
 			if (isset($this->postData['create-username']) &&
 				isset($this->postData['create-password'])
 			) {
