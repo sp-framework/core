@@ -173,6 +173,9 @@ dataCollectionSection =
             placeholder : "SELECT DATABASE"
         },
         '{{componentId}}-{{sectionId}}-db_host'                     : { },
+        '{{componentId}}-{{sectionId}}-db_drop'                     : { },
+        '{{componentId}}-{{sectionId}}-db_root_username'            : { },
+        '{{componentId}}-{{sectionId}}-db_root_password'            : { },
         '{{componentId}}-{{sectionId}}-backup'                      : {
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-dbs').on('select2:select', function(e) {
@@ -219,6 +222,7 @@ dataCollectionSection =
             afterInit   : function() {
                 $('#{{componentId}}-{{sectionId}}-backupdbs').on('select2:select', function(e) {
                     var thatE = e;
+
                     $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', false);
                     $('#{{componentId}}-{{sectionId}}-download-db').removeClass('disabled');
                     $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '{{links.url("system/storages/q/uuid/' + e.params.data.id + '")}}');
@@ -246,13 +250,64 @@ dataCollectionSection =
                                 $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '#');
                             }
                         }, 'json');
-                    })
+                    });
+
+                    $('#{{componentId}}-{{sectionId}}-restore-db').off();
+                    $('#{{componentId}}-{{sectionId}}-restore-db').click(function(e) {
+                        e.preventDefault();
+
+                        $('#restore-fields').attr('hidden', false);
+                    });
+
+                    $('#{{componentId}}-{{sectionId}}-start-restore').off();
+                    $('#{{componentId}}-{{sectionId}}-start-restore').click(function(e) {
+                        e.preventDefault();
+
+                        if ($('#{{componentId}}-{{sectionId}}-db_root_username').val() === '') {
+                            $('#{{componentId}}-{{sectionId}}-db_root_username').addClass('is-invalid');
+                            $('#{{componentId}}-{{sectionId}}-db_root_username').focus(function() {
+                                $(this).removeClass('is-invalid');
+                            });
+                        } else if ($('#{{componentId}}-{{sectionId}}-db_root_password').val() === '') {
+                            $('#{{componentId}}-{{sectionId}}-db_root_password').addClass('is-invalid');
+                            $('#{{componentId}}-{{sectionId}}-db_root_password').focus(function() {
+                                $(this).removeClass('is-invalid');
+                            });
+                        } else {
+                            $(this).attr('disabled', true);
+                            $(this).children('i').attr('hidden', false);
+
+                            var postData = { };
+                            postData['filename'] = thatE.params.data.text;
+                            postData['username'] = $('#{{componentId}}-{{sectionId}}-db_root_username').val();
+                            postData['password'] = $('#{{componentId}}-{{sectionId}}-db_root_password').val();
+                            postData['drop'] = $('#{{componentId}}-{{sectionId}}-db_drop')[0].checked;
+                            postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                            $.post('{{links.url("system/core/dbrestore")}}', postData, function(response) {
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+
+                                if (response.responseCode == 0) {
+                                    PNotify.success({text : response.responseMessage});
+                                } else {
+                                    PNotify.error({text : response.responseMessage});
+                                }
+                                $('#{{componentId}}-{{sectionId}}-start-restore').attr('disabled', false);
+                                $('#{{componentId}}-{{sectionId}}-start-restore').children('i').attr('hidden', true);
+                            }, 'json');
+                        }
+                    });
                 });
 
                 $('#{{componentId}}-{{sectionId}}-backupdbs').on('select2:clear', function(e) {
                     $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
                     $('#{{componentId}}-{{sectionId}}-download-db').addClass('disabled');
                     $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '#');
+                    $('#restore-fields').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-db_root_username, #{{componentId}}-{{sectionId}}-db_root_password').val('');
                 });
             }
         },

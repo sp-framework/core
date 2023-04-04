@@ -102,7 +102,7 @@
                                 'fieldHelpTooltipContent'        : 'Select database that you want to restore. If there is none in the list, you can upload a database file.',
                                 'fieldBazScan'                   : true,
                                 'fieldRequired'                  : true,
-                                'fieldBazPostOnUpdate'           : true,
+                                'fieldBazPostOnUpdate'           : false,
                                 'fieldDataSelect2Options'        : dbStorageFiles,
                                 'fieldDataSelect2OptionsKey'     : 'uuid',
                                 'fieldDataSelect2OptionsValue'   : 'org_file_name',
@@ -112,7 +112,7 @@
                         )}}
                     </div>
                 </div>
-                <div class="row" id="restore-btns">
+                <div class="row">
                     <div class="col">
                         {{adminltetags.useTag('buttons',
                             [
@@ -120,15 +120,9 @@
                                 'componentName'                  : componentName,
                                 'componentId'                    : componentId,
                                 'sectionId'                      : sectionId,
-                                'buttonType'                    : 'button',
-                                'buttons'                       :
+                                'buttonType'                     : 'button',
+                                'buttons'                        :
                                     [
-                                        'restore-db'    : [
-                                            'title'                   : 'restore',
-                                            'size'                    : 'sm',
-                                            'disabled'                : true,
-                                            'icon'                    : 'rotate-left'
-                                        ],
                                         'remove-db'    : [
                                             'title'                   : 'remove',
                                             'size'                    : 'sm',
@@ -142,74 +136,113 @@
                                             'disabled'                : true,
                                             'icon'                    : 'download',
                                             'url'                     : '#'
+                                        ],
+                                        'restore-db'    : [
+                                            'title'                   : 'restore',
+                                            'size'                    : 'sm',
+                                            'disabled'                : true,
+                                            'icon'                    : 'rotate-left'
                                         ]
                                     ]
                             ]
                         )}}
                     </div>
-{#                     <div class="col">
-                        {{adminltetags.useTag('fields',
-                            [
-                                'component'                      : component,
-                                'componentName'                  : componentName,
-                                'componentId'                    : componentId,
-                                'sectionId'                      : sectionId,
-                                'fieldId'                        : 'restore',
-                                'fieldLabel'                     : false,
-                                'fieldType'                      : 'html',
-                                'fieldHelp'                      : false,
-                                'fieldHelpTooltipContent'        : 'Restore database from selected database.',
-                                'fieldAdditionalClass'           : 'mb-0',
-                                'fieldHtmlContent'               : '<div class="text-center"><a href="" class="btn btn-sm bg-primary p-2 restorebackup-btn"><i class="fas fa-upload mb-2"></i></a></div>',
-                                'fieldBazScan'                   : true,
-                                'fieldBazJstreeSearch'           : true,
-                                'fieldBazPostOnCreate'           : false,
-                                'fieldBazPostOnUpdate'           : false
-                            ]
-                        )}}
+                </div>
+                <div id="restore-fields" class="mt-2" hidden>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'db_root_username',
+                                    'fieldLabel'                     : 'Username',
+                                    'fieldType'                      : 'input',
+                                    'fieldHelp'                      : true,
+                                    'fieldHelpTooltipContent'        : 'Username with database create permission.',
+                                    'fieldRequired'                  : true,
+                                    'fieldBazScan'                   : true,
+                                    'fieldBazPostOnCreate'           : false,
+                                    'fieldBazPostOnUpdate'           : false,
+                                    'fieldDataInputMinLength'        : 1,
+                                    'fieldDataInputMaxLength'        : 50,
+                                    'fieldValue'                     : ''
+                                ]
+                            )}}
+                        </div>
                     </div>
-                    <div class="col">
-                        {{adminltetags.useTag('fields',
-                            [
-                                'component'                      : component,
-                                'componentName'                  : componentName,
-                                'componentId'                    : componentId,
-                                'sectionId'                      : sectionId,
-                                'fieldId'                        : 'restore',
-                                'fieldLabel'                     : false,
-                                'fieldType'                      : 'html',
-                                'fieldHelp'                      : false,
-                                'fieldHelpTooltipContent'        : 'Restore database from selected database.',
-                                'fieldAdditionalClass'           : 'mb-0',
-                                'fieldHtmlContent'               : '<div class="text-center"><a href="" class="btn btn-sm bg-primary p-2 restorebackup-btn"><i class="fas fa-upload mb-2"></i></a></div>',
-                                'fieldBazScan'                   : true,
-                                'fieldBazJstreeSearch'           : true,
-                                'fieldBazPostOnCreate'           : false,
-                                'fieldBazPostOnUpdate'           : false
-                            ]
-                        )}}
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'db_root_password',
+                                    'fieldLabel'                     : 'Password',
+                                    'fieldType'                      : 'input',
+                                    'fieldInputType'                 : 'password',
+                                    'fieldHelp'                      : true,
+                                    'fieldHelpTooltipContent'        : 'Password with database create permission.',
+                                    'fieldRequired'                  : true,
+                                    'fieldBazScan'                   : true,
+                                    'fieldBazPostOnCreate'           : false,
+                                    'fieldBazPostOnUpdate'           : false,
+                                    'fieldDataInputMinLength'        : 1,
+                                    'fieldDataInputMaxLength'        : 50,
+                                    'fieldValue'                     : ''
+                                ]
+                            )}}
+                        </div>
                     </div>
-                    <div class="col">
-                        {{adminltetags.useTag('fields',
-                            [
-                                'component'                      : component,
-                                'componentName'                  : componentName,
-                                'componentId'                    : componentId,
-                                'sectionId'                      : sectionId,
-                                'fieldId'                        : 'delete',
-                                'fieldLabel'                     : false,
-                                'fieldType'                      : 'html',
-                                'fieldHelp'                      : false,
-                                'fieldHelpTooltipContent'        : 'Delete backup database file from system.',
-                                'fieldAdditionalClass'           : 'mb-0',
-                                'fieldHtmlContent'               : '<div class="text-center"><a href="" class="btn btn-app bg-danger p-2 deletebackup-btn"><i class="fas fa-times mb-2"></i></a></div>',
-                                'fieldBazScan'                   : true,
-                                'fieldBazJstreeSearch'           : true,
-                                'fieldBazPostOnCreate'           : false,
-                                'fieldBazPostOnUpdate'           : false
-                            ]
-                        )}}
-                    </div> #}
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'db_drop',
+                                    'fieldLabel'                     : 'Drop if exists?',
+                                    'fieldHelp'                      : true,
+                                    'fieldHelpTooltipContent'        : 'Drop database/tables if already exists in the system?',
+                                    'fieldRequired'                  : false,
+                                    'fieldType'                      : 'checkbox',
+                                    'fieldCheckboxType'              : 'info',
+                                    'fieldCheckboxChecked'           : false,
+                                    'fieldBazJstreeSearch'           : true,
+                                    'fieldBazPostOnCreate'           : false,
+                                    'fieldBazPostOnUpdate'           : false,
+                                    'fieldBazScan'                   : true
+                                ]
+                            )}}
+                        </div>
+                        <div class="col mt-4">
+                            {{adminltetags.useTag('buttons',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'buttonType'                     : 'button',
+                                    'buttons'                        :
+                                        [
+                                            'start-restore'    : [
+                                                'title'                   : 'start restore',
+                                                'size'                    : 'sm',
+                                                'position'                : 'right',
+                                                'icon'                    : 'cog fa-spin',
+                                                'iconHidden'              : true
+                                            ]
+                                        ]
+                                ]
+                            )}}
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col">

@@ -48,7 +48,7 @@ class CoreComponent extends BaseComponent
 
         if ($storageFiles && count($storageFiles) > 0) {
             foreach ($storageFiles as $storageFileKey => &$storageFile) {
-                if (strpos($storageFile['org_file_name'], 'db-') === false) {
+                if (strpos($storageFile['org_file_name'], 'db') === false) {
                     unset($storageFiles[$storageFileKey]);
                     continue;
                 }
@@ -97,14 +97,38 @@ class CoreComponent extends BaseComponent
         }
     }
 
-    public function dbbackupAction()
+    public function dbBackupAction()
     {
         if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            if ($this->core->dbbackup($this->postData())) {
+            if ($this->core->dbBackup($this->postData())) {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode,
+                    $this->core->packagesData->responseData,
+                );
+            } else {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode
+                );
+            }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function dbRestoreAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->core->dbRestore($this->postData())) {
                 $this->addResponse(
                     $this->core->packagesData->responseMessage,
                     $this->core->packagesData->responseCode,

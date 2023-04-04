@@ -335,6 +335,10 @@ class Local extends BasePackage
                 return;
             }
 
+            if (isset($getData['headers']) && $getData['headers'] ===  false) {
+                return $this->localContent->read($dataFile);
+            }
+
             $this->response->setContentType($file[0]['type']);
 
             $this->response

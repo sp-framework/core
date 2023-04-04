@@ -8,6 +8,7 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
+use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\CoreServiceProvider\Model\Core as CoreModel;
@@ -33,7 +34,7 @@ class Core extends BasePackage
 		return $this;
 	}
 
-	public function dbbackup($data)
+	public function dbBackup($data)
 	{
 		if (!isset($data['db'])) {
 			$this->addResponse('Please provide db name', 1, []);
@@ -48,11 +49,10 @@ class Core extends BasePackage
 		}
 
 		$db = $this->core['settings']['dbs'][$data['db']];
-		$key = $this->getDbKey($db);
 		$db['password'] = $this->crypt->decryptBase64($db['password'], $this->getDbKey($db));
 
 		try {
-			$dump =
+			$dumper =
 				new Mysqldump(
 					'mysql:host=' . $db['host'] . ';dbname=' . $db['dbname'],
 					$db['username'],
@@ -60,9 +60,9 @@ class Core extends BasePackage
 					['compress' => Mysqldump::GZIP, 'default-character-set' => Mysqldump::UTF8MB4]
 				);
 
-			$fileName = 'db-' . $data['db'] . '-' . Carbon::now()->format('Y-m-d-H:i:s') . '.gzip';
+			$fileName = 'db' . $data['db'] . Carbon::now()->getTimestamp() . '.gzip';
 
-			$dump->start(base_path('var/tmp/' . $fileName));
+			$dumper->start(base_path('var/tmp/' . $fileName));
 		} catch (\Exception $e) {
 			$this->addResponse('Backup Error: ' . $e->getMessage(), 1);
 		}
@@ -99,6 +99,88 @@ class Core extends BasePackage
 
 			return true;
 		}
+
+		return false;
+	}
+
+	public function dbRestore($data)
+	{
+		if (!isset($data['filename'])) {
+			$this->addResponse('Please provide database file name', 1, []);
+
+			return false;
+		}
+
+		$fileInfo = $this->basepackages->storages->getFileInfo(null, $data['filename']);
+
+		if ($fileInfo) {
+			try {
+				$newDbName = str_replace('.gzip', '', $fileInfo['org_file_name']);
+
+				$file = $this->basepackages->storages->getFile(['uuid' => $fileInfo['uuid'], 'headers' => false]);
+
+				$file = gzdecode($file);
+
+				try {
+					$this->localContent->write('var/tmp/' . $newDbName . '.sql' , $file);
+				} catch (FilesystemException | UnableToWriteFile $exception) {
+					throw $exception;
+				}
+
+				$newDbUserName = $newDbName . 'User';
+
+				$dbConfig = $this->getActiveDb();
+				$newDbUserPassword = $this->crypt->decryptBase64($dbConfig['password'], $this->getDbKey($dbConfig));
+				$dbConfig['username'] = $data['username'];
+				$dbConfig['password'] = $data['password'];
+				$dbConfig['dbname'] = 'mysql';
+				$this->db = new Mysql($dbConfig);
+
+				$this->executeSQL("CREATE DATABASE IF NOT EXISTS " . $newDbName . " CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci");
+				$checkUser = $this->executeSQL("SELECT * FROM `user` WHERE `User` LIKE ?", [$newDbUserName]);
+				if ($checkUser->numRows() === 0) {
+					$this->executeSQL("CREATE USER ?@'%' IDENTIFIED WITH mysql_native_password BY ?;", [$newDbUserName, $newDbUserPassword]);
+				}
+				$this->executeSQL("GRANT ALL PRIVILEGES ON " . $newDbName . ".* TO ?@'%' WITH GRANT OPTION;", [$newDbUserName]);
+
+				$dbConfig['dbname'] = $newDbName;
+				$this->db = new Mysql($dbConfig);
+
+				$allTables = $this->db->listTables($newDbName);
+
+				if (count($allTables) > 0) {
+					if ($data['drop'] === 'false') {
+						$this->addResponse('Restore Error: Database not empty. Select Drop If Exists checkbox and try again.', 1, []);
+
+						return false;
+					} else {
+						foreach ($allTables as $tableKey => $tableValue) {
+							$this->db->dropTable($tableValue);
+						}
+					}
+				}
+
+				$dumper =
+					new Mysqldump(
+						'mysql:host=' . $dbConfig['host'] . ';dbname=' . $newDbName,
+						$newDbUserName,
+						$newDbUserPassword
+					);
+
+				$dumper->restore(base_path('var/tmp/' . $newDbName . '.sql'));
+
+				//Store new username pass to $this->core->settings->dbs
+				$this->addResponse($data['filename'] . ' restored!');
+
+				return true;
+			} catch (\Exception $e) {
+				$this->addResponse('Restore Error: ' . $e->getMessage(), 1);
+
+				return false;
+			}
+		}
+
+		$this->addResponse('File ' . $data['filename'] . ' not found on system!', 1);
 
 		return false;
 	}
@@ -197,5 +279,16 @@ return
 		}
 
 		return true;
+	}
+
+	public function getActiveDb()
+	{
+		foreach ($this->core['settings']['dbs'] as $db) {
+			if ($db['active'] == true) {
+				return $db;
+			}
+		}
+
+		return false;
 	}
 }
