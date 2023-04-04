@@ -304,6 +304,8 @@ Class Setup
 
 				$this->setupPackage->cleanOldCookies();
 
+				$this->setupPackage->writeConfigs(null, true);
+
 				$this->view->responseCode = 0;
 
 				$this->view->responseMessage = 'Framework installed.';
@@ -314,10 +316,22 @@ Class Setup
 					return $this->response->send();
 				}
 			} catch (\Exception $e) {
+				var_dump($e);die();
+				$this->setupPackage->revertBaseConfig();
 
-				$this->setupPackage->revertBaseConfig($this->coreJson);
+				if (isset($this->postData['dev']) && $this->postData['dev'] == 'true') {
+					throw $e;
+				}
 
-				throw $e;
+				$this->view->responseCode = 1;
+
+				$this->view->responseMessage = 'Framework installation error. Contact developers.';
+
+				if ($this->response->isSent() !== true) {
+					$this->response->setJsonContent($this->view->getParamsToView());
+
+					return $this->response->send();
+				}
 			}
 		} else if ($this->request->isPost() && isset($this->postData['session'])) {
 			if (isset($this->postData['checkPwStrength']) && isset($this->postData['pass'])) {

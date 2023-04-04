@@ -101,6 +101,8 @@ class Setup
 
 	protected $progress;
 
+	protected $configs;
+
 	public function __construct($container, $postData)
 	{
 		$this->container = $container;
@@ -622,14 +624,18 @@ class Setup
 		(new RegisterTasks())->register($this->db);
 	}
 
-	protected function writeConfigs($coreJson = null)
+	protected function writeConfigs($coreJson = null, $writeBaseFile = false)
 	{
-		return (new Configs($this->container, $this->postData, $coreJson))->write();
+		if (!$this->configs) {
+			$this->configs = new Configs($this->container, $this->postData, $coreJson);
+		}
+
+		return $this->configs->write($writeBaseFile);
 	}
 
-	protected function revertBaseConfig($coreJson)
+	protected function revertBaseConfig($coreJson = null)
 	{
-		return (new Configs($this->container, $this->postData, $coreJson))->revert();
+		return $this->configs->revert();
 	}
 
 	protected function removeInstaller()

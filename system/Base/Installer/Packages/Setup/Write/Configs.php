@@ -13,6 +13,8 @@ class Configs
 
 	protected $coreJson;
 
+	protected $baseFileContent;
+
 	public function __construct($container, $postData, $coreJson = null)
 	{
 		$this->container = $container;
@@ -22,9 +24,17 @@ class Configs
 		$this->coreJson = $coreJson;
 	}
 
-	public function write()
+	public function write($writeBaseFile = false)
 	{
-		return $this->writeBaseConfig();
+		if ($writeBaseFile) {
+			$this->writeBaseFile();
+
+			return;
+		}
+
+		$this->writeBaseConfig();
+
+		return $this->coreJson;
 	}
 
 	public function revert()
@@ -34,12 +44,17 @@ class Configs
 
 	protected function writeBaseConfig($revert = false)
 	{
-		if (!$this->coreJson) {
-			try {
-				$this->coreJson['settings'] = include(base_path('system/Configs/Base.php'));
-			} catch (\Exception $exception) {
-				throw $exception;
-			}
+		if ($revert) {
+			$this->baseFileContent =
+'<?php
+
+return
+	[
+		"setup" 		=> true
+	];';
+			$this->writeBaseFile();
+
+			return;
 		}
 
 		if (isset($this->postData['pwf']) &&
@@ -102,7 +117,7 @@ class Configs
 		$this->coreJson['settings']['logs']['level'] = $logLevel;
 		$this->coreJson['settings']['security']['passwordWorkFactor'] = $pwf;
 
-		$baseContent =
+		$this->baseFileContent =
 '<?php
 
 return
@@ -147,13 +162,20 @@ return
 		]
 	];';
 
+		return $this->coreJson;
+	}
+
+	protected function writeBaseFile()
+	{
+		if (!$this->baseFileContent) {
+			$this->writeBaseConfig();
+		}
+
 		try {
-			$this->container['localContent']->write('/system/Configs/Base.php', $baseContent);
+			$this->container['localContent']->write('/system/Configs/Base.php', $this->baseFileContent);
 		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
 			throw $exception;
 		}
-
-		return $this->coreJson;
 	}
 
 	protected function getWorkFactor()
