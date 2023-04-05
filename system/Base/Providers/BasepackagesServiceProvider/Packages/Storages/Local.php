@@ -189,9 +189,7 @@ class Local extends BasePackage
             }
         }
 
-        $this->packagesData->responseData = $storageData;
-
-        $this->addResponse('File(s) Uploaded');
+        $this->addResponse('File(s) Uploaded', 0, ['storageData' => $storageData]);
 
         return true;
     }

@@ -105,7 +105,7 @@ class StoragesComponent extends BaseComponent
         if ($this->request->hasFiles()) {
 
             if ($this->storages->storeFile()) {
-                $this->view->storageData = $this->storages->packagesData->storageData;
+                $this->view->responseData = $this->storages->packagesData->responseData;
             }
 
             $this->addResponse(
