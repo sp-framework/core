@@ -580,7 +580,7 @@ class Dropzone
                                             var newList = "";
 
                                             newList +=
-                                                \'<li class="list-group-item list-group-item-secondary rounded-0" area-disabled="false" style="cursor: pointer" data-uuid="\' + response.storageData.uuid + \'">\';
+                                                \'<li class="list-group-item list-group-item-secondary rounded-0" area-disabled="false" style="cursor: pointer" data-uuid="\' + response.responseData.uuid + \'">\';
 
                                             if (sortable === true) {
                                                 newList +=
@@ -600,13 +600,13 @@ class Dropzone
                                                 newList +=';
                                                 if ($this->params['storage']['permission'] === 'public') {
                                                     $inclJs .=
-                                                        '\'<a class="chocolat-image" title="\' + file.name + \'" href="\' + response.storageData.publicLinks[1][Object.keys(response.storageData.publicLinks[1])[0]] + \'">\' +
-                                                            \'<img alt="\' + file.name + \'" src="\' + response.storageData.publicLinks[0][Object.keys(response.storageData.publicLinks[0])[0]] + \'" class="img-fluid img-thumbnail">\' +
+                                                        '\'<a class="chocolat-image" title="\' + file.name + \'" href="\' + response.responseData.publicLinks[1][Object.keys(response.responseData.publicLinks[1])[0]] + \'">\' +
+                                                            \'<img alt="\' + file.name + \'" src="\' + response.responseData.publicLinks[0][Object.keys(response.responseData.publicLinks[0])[0]] + \'" class="img-fluid img-thumbnail">\' +
                                                         \'</a>\';';
                                                 } else {
                                                     $inclJs .=
-                                                        '\'<a class="chocolat-image" title="\' + file.name + \'" href="' . $this->links->url('system/storages/q/uuid/\' + response.storageData.uuid + \'/storagetype/private/w/' . $this->fieldParams['lightboxSize']) . '">\' +
-                                                            \'<img alt="\' + file.name + \'" src="' . $this->links->url('system/storages/q/uuid/\' + response.storageData.uuid + \'/storagetype/private/w/' . $this->fieldParams['thumbnailSize']) . '" class="img-fluid img-thumbnail">\' +
+                                                        '\'<a class="chocolat-image" title="\' + file.name + \'" href="' . $this->links->url('system/storages/q/uuid/\' + response.responseData.uuid + \'/storagetype/private/w/' . $this->fieldParams['lightboxSize']) . '">\' +
+                                                            \'<img alt="\' + file.name + \'" src="' . $this->links->url('system/storages/q/uuid/\' + response.responseData.uuid + \'/storagetype/private/w/' . $this->fieldParams['thumbnailSize']) . '" class="img-fluid img-thumbnail">\' +
                                                         \'</a>\';';
                                                 }
                                                 $inclJs .=
@@ -620,7 +620,7 @@ class Dropzone
                                             newList +=
                                                 \'</div>\' +
                                                     \'<div class="col">\' +
-                                                        \'<a data-uuid="\' + response.storageData.uuid + \'" class="uploads-delete btn btn-danger btn-xs float-right" href="#">\' +
+                                                        \'<a data-uuid="\' + response.responseData.uuid + \'" class="uploads-delete btn btn-danger btn-xs float-right" href="#">\' +
                                                             \'<i class="fa fa-fw fa-trash"></i>\' +
                                                         \'</a>\';
 
@@ -629,12 +629,12 @@ class Dropzone
 
                                                 if ($this->params['storage']['permission'] === 'public') {
                                                     $inclJs .=
-                                                        '\'<a data-uuid="\' + response.storageData.uuid + \'" class="uploads-download btn btn-primary btn-xs float-right mr-2" href="\' + response.storageData.publicLinks[0] + \'" target="_blank">\' +
+                                                        '\'<a data-uuid="\' + response.responseData.uuid + \'" class="uploads-download btn btn-primary btn-xs float-right mr-2" href="\' + response.responseData.publicLinks[0] + \'" target="_blank">\' +
                                                             \'<i class="fa fa-fw fa-download"></i>\' +
                                                         \'</a>\';';
                                                 } else {
                                                     $inclJs .=
-                                                        '\'<a data-uuid="\' + response.storageData.uuid + \'" class="uploads-download btn btn-primary btn-xs float-right mr-2" href="' . $this->links->url('system/storages/q/uuid/\' + response.storageData.uuid + \'') . '" target="_blank">\' +
+                                                        '\'<a data-uuid="\' + response.responseData.uuid + \'" class="uploads-download btn btn-primary btn-xs float-right mr-2" href="' . $this->links->url('system/storages/q/uuid/\' + response.responseData.uuid + \'') . '" target="_blank">\' +
                                                             \'<i class="fa fa-fw fa-download"></i>\' +
                                                         \'</a>\';';
                                                 }

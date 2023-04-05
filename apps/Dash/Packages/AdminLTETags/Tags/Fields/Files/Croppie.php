@@ -718,9 +718,9 @@ class Croppie
                                             $("#security-token").val(response.token);
                                         }
                                         if (response.responseCode == 0) {
-                                            uploadUUIDs.push(response.storageData.uuid);
-                                            $(".image-text").html(response.storageData.name);
-                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").val(response.storageData.uuid);
+                                            uploadUUIDs.push(response.responseData.uuid);
+                                            $(".image-text").html(response.responseData.name);
+                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").val(response.responseData.uuid);
                                             $("#' . $this->compSecId . '-croppie-remove").attr("hidden", false);
                                             $("#' . $this->compSecId . '-croppie-avatar-male").attr("hidden", true);
                                             $("#' . $this->compSecId . '-croppie-avatar-female").attr("hidden", true);
@@ -733,7 +733,7 @@ class Croppie
                                             .trigger(
                                                 {
                                                     "type"      : "croppieSaved",
-                                                    "uuid"      : response.storageData.uuid
+                                                    "uuid"      : response.responseData.uuid
                                                 }
                                             );
                                         } else {

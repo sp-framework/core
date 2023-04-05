@@ -88,12 +88,12 @@ class Core extends BasePackage
 				throw $exception;
 			}
 
-			$this->basepackages->storages->changeOrphanStatus($this->basepackages->storages->packagesData->storageData['uuid']);
+			$this->basepackages->storages->changeOrphanStatus($this->basepackages->storages->packagesData->responseData['uuid']);
 
 			$this->addResponse('Generated backup ' . $fileName . '.',
 							   0,
 							   ['filename' => $fileName,
-								'uuid' => $this->basepackages->storages->packagesData->storageData['uuid']
+								'uuid' => $this->basepackages->storages->packagesData->responseData['uuid']
 							   ]
 			);
 

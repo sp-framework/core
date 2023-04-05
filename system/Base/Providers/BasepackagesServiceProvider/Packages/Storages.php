@@ -184,7 +184,7 @@ class Storages extends BasePackage
 
         if ($this->storage) {
             if ($this->storage->store($directory, $file, $fileName, $size, $mimeType)) {
-                $storageData = $this->storage->packagesData->storageData;
+                $storageData = $this->storage->packagesData->responseData;
 
                 $fileInfo = $this->storage->getFileInfo($storageData['uuid']);
 
@@ -217,7 +217,7 @@ class Storages extends BasePackage
                     $this->packagesData->responseMessage = 'Files Uploaded!';
                 }
 
-                $this->packagesData->storageData = $storageData;
+                $this->packagesData->responseData = $storageData;
 
                 $this->packagesData->responseCode = $this->storage->packagesData->responseCode;
 

@@ -289,9 +289,9 @@ class ImportExport extends BasePackage
                 'text/csv'
             )
         ) {
-            $this->basepackages->storages->changeOrphanStatus($this->basepackages->storages->packagesData->storageData['uuid']);
+            $this->basepackages->storages->changeOrphanStatus($this->basepackages->storages->packagesData->responseData['uuid']);
 
-            return $this->basepackages->storages->packagesData->storageData['uuid'];
+            return $this->basepackages->storages->packagesData->responseData['uuid'];
         }
 
         return false;

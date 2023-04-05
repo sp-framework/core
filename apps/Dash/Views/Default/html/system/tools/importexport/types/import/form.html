@@ -352,8 +352,8 @@ dataCollectionSection =
                     window["dataCollection"]['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-upload']["onSuccess"] = function(file, response) {
                         if (response.responseCode == 0) {
                             $('#rows-loader').attr('hidden', false);
-                            $('#rows-loader-text').empty().text('Reading ' + response.storageData.name + '...');
-                            $('#{{componentId}}-{{sectionId}}-rows').trigger({'type' : 'loadFile', 'uuid' : response.storageData.uuid});
+                            $('#rows-loader-text').empty().text('Reading ' + response.responseData.name + '...');
+                            $('#{{componentId}}-{{sectionId}}-rows').trigger({'type' : 'loadFile', 'uuid' : response.responseData.uuid});
                         }
                     }
                     window["dataCollection"]['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-upload']["onSave"] = function(files) {
