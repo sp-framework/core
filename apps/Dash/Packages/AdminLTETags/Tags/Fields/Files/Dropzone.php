@@ -135,6 +135,12 @@ class Dropzone
 
         $dropzoneButtons = [];
 
+        if (isset($this->params['setOrphan']) && $this->params['setOrphan'] === false) {
+            $this->params['setOrphan'] = 'false';
+        } else {
+            $this->params['setOrphan'] = 'true';
+        }
+
         if (isset($this->params['upload']) && $this->params['upload'] === true) {
             $dropzoneButtons =
                 array_merge(
@@ -468,7 +474,7 @@ class Dropzone
                                     ) {
                                         src = "' . $this->links->images('/general/powerpoint.png') . '";
                                         alt = "powerpoint";
-                                    } else if (file.type === "application/zip") {
+                                    } else if (file.type === "application/zip" || file.type === "application/gzip") {
                                         src = "' . $this->links->images('/general/zip.png') . '";
                                         alt = "zip";
                                     } else if (file.type === "text/csv") {
@@ -566,7 +572,7 @@ class Dropzone
                                             ) {
                                                 src = "' . $this->links->images('/general/powerpoint.png') . '";
                                                 alt = "powerpoint";
-                                            } else if (file.type === "application/zip") {
+                                            } else if (file.type === "application/zip" ||file.type === "application/gzip") {
                                                 src = "' . $this->links->images('/general/zip.png') . '";
                                                 alt = "zip";
                                             } else if (file.type === "text/csv") {
@@ -746,7 +752,8 @@ class Dropzone
                                 if (fieldId["dropzone"].files.length > 0) {
                                     fieldId["dropzone"].options.params = {
                                         "directory"     : "' . strtolower($this->params['componentName']) . '",
-                                        "storagetype"   : "' . $this->params['storage']['permission'] . '"
+                                        "storagetype"   : "' . $this->params['storage']['permission'] . '",
+                                        "setOrphan"     : "' . $this->params['setOrphan'] . '",
                                     };
 
                                     if ("' . $this->params['storage']['permission'] . '" === "public") {
