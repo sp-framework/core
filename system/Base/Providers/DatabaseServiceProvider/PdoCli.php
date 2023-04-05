@@ -2,7 +2,10 @@
 
 namespace System\Base\Providers\DatabaseServiceProvider;
 
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToReadFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
+use Phalcon\Helper\Json;
 
 class PdoCli
 {
@@ -57,5 +60,18 @@ class PdoCli
         } catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
             return false;
         }
+    }
+
+    public function checkDbConfig()
+    {
+        if (!$this->dbConfig->host      ||
+            !$this->dbConfig->dbname    ||
+            !$this->dbConfig->username  ||
+            !$this->dbConfig->password  ||
+            !$this->dbConfig->port
+        ) {
+            return false;
+        }
+        return true;
     }
 }
