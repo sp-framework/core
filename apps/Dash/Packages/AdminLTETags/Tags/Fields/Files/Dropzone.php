@@ -872,8 +872,6 @@ class Dropzone
                             }
 
                             fieldId["reset"] = function() {
-                                deleteUUIDs = [];
-                                problemWithUpload = false;
                                 delete window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->compSecId . '"]["data"]["' . $this->params['fieldId'] . '"];
 
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments li").remove();
@@ -883,6 +881,11 @@ class Dropzone
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").attr("hidden", true);
 
                                 fieldId["dropzone"].removeAllFiles(true);
+
+                                initialFiles = $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments li").length;
+                                filesLimit = parseInt("' . $this->fieldParams['maxAttachments'] . '") - initialFiles;
+                                deleteUUIDs = [];
+                                problemWithUpload = false;
 
                                 collectData();
                             }
