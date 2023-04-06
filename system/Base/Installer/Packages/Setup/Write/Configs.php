@@ -116,6 +116,7 @@ return
 		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['charset'] = 'utf8mb4';
 		$this->coreJson['settings']['logs']['level'] = $logLevel;
 		$this->coreJson['settings']['security']['passwordWorkFactor'] = $pwf;
+		$this->coreJson['settings']['security']['cookiesWorkFactor'] = $cwf;
 
 		$this->baseFileContent =
 '<?php
@@ -151,7 +152,7 @@ return
 			"exceptions"					=> true,
 			"level"							=> "' . $logLevel . '",
 			"service"						=> "' . $this->coreJson['settings']['logs']['service'] . '",
-			"emergencyEmailLogs"			=> false,
+			"emergencyLogsEmail"			=> false,
 			"emergencyLogsEmailAddresses"	=> "' . $this->coreJson['settings']['logs']['emergencyLogsEmailAddresses'] . '",
 		],
 		"websocket"			=>

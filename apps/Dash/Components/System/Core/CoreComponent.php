@@ -68,7 +68,7 @@ class CoreComponent extends BaseComponent
                 return;
             }
 
-            $this->core->update($this->postData());
+            $this->core->updateCore($this->postData());
 
             $this->addResponse(
                 $this->core->packagesData->responseMessage,
@@ -129,6 +129,30 @@ class CoreComponent extends BaseComponent
             }
 
             if ($this->core->dbRestore($this->postData())) {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode,
+                    $this->core->packagesData->responseData,
+                );
+            } else {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode
+                );
+            }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function removeDbAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->core->removeDb($this->postData())) {
                 $this->addResponse(
                     $this->core->packagesData->responseMessage,
                     $this->core->packagesData->responseCode,

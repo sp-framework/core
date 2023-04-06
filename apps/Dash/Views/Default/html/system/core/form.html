@@ -1,4 +1,4 @@
-{{var_dump(core)}}
+{# {{dump(core)}} #}
 <div class="row vdivide">
     <div class="col-md-2">
         {{adminltetags.useTag('fields',
@@ -72,8 +72,9 @@
         </form>
     </div>
 </div>
+{% set dbs = json_encode(core['settings']['dbs'], 16) %}
 <script>
-/* globals PNotify */
+/* globals PNotify Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -98,15 +99,18 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
 
+var dbs = { };
+dbs = JSON.parse('{{dbs}}');
+
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-id'                          : { },
-        '{{componentId}}-{{sectionId}}-name'                        : { },
-        '{{componentId}}-{{sectionId}}-display_name'                : { },
-        '{{componentId}}-{{sectionId}}-version'                     : { },
-        '{{componentId}}-{{sectionId}}-repo'                        : { },
-        '{{componentId}}-{{sectionId}}-description'                 : { },
-        '{{componentId}}-{{sectionId}}-debug'                       : {
+        '{{componentId}}-{{sectionId}}-id'                              : { },
+        '{{componentId}}-{{sectionId}}-name'                            : { },
+        '{{componentId}}-{{sectionId}}-display_name'                    : { },
+        '{{componentId}}-{{sectionId}}-version'                         : { },
+        '{{componentId}}-{{sectionId}}-repo'                            : { },
+        '{{componentId}}-{{sectionId}}-description'                     : { },
+        '{{componentId}}-{{sectionId}}-debug'                           : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-debug').click(function() {
                     if ($(this).find('input[type=radio]:checked').data('value') == 'debugon') {
@@ -129,8 +133,8 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-auto_off_debug'              : { },
-        '{{componentId}}-{{sectionId}}-cache'                       : {
+        '{{componentId}}-{{sectionId}}-auto_off_debug'                  : { },
+        '{{componentId}}-{{sectionId}}-cache'                           : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-cache').click(function() {
                     if ($(this).find('input[type=radio]:checked').data('value') == 'cacheon') {
@@ -142,21 +146,21 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-cache_timeout'               : { },
-        '{{componentId}}-{{sectionId}}-cache_service'               : {
+        '{{componentId}}-{{sectionId}}-cache_timeout'                   : { },
+        '{{componentId}}-{{sectionId}}-cache_service'                   : {
             placeholder : 'SELECT CACHE SERVICE'
         },
-        '{{componentId}}-{{sectionId}}-passwordWorkFactor'          : { },
-        '{{componentId}}-{{sectionId}}-cookiesWorkFactor'           : { },
-        '{{componentId}}-{{sectionId}}-logs'                        : {
+        '{{componentId}}-{{sectionId}}-passwordWorkFactor'              : { },
+        '{{componentId}}-{{sectionId}}-cookiesWorkFactor'               : { },
+        '{{componentId}}-{{sectionId}}-logs'                            : {
             afterInit : function() {
                 //
             }
         },
-        '{{componentId}}-{{sectionId}}-level'                       : {
+        '{{componentId}}-{{sectionId}}-logs_level'                      : {
             placeholder : 'SELECT LOGS LEVEL'
         },
-        '{{componentId}}-{{sectionId}}-emergency_email_logs'        : {
+        '{{componentId}}-{{sectionId}}-emergency_logs_email'            : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-emergency_email_logs').click(function() {
                     if ($(this).find('input[type=radio]:checked').data('value') == 'emergencyon') {
@@ -168,21 +172,31 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-emergency_email_logs_emails' : { },
-        '{{componentId}}-{{sectionId}}-dbs'                         : {
-            placeholder : "SELECT DATABASE"
-        },
-        '{{componentId}}-{{sectionId}}-db_host'                     : { },
-        '{{componentId}}-{{sectionId}}-db_drop'                     : { },
-        '{{componentId}}-{{sectionId}}-db_root_username'            : { },
-        '{{componentId}}-{{sectionId}}-db_root_password'            : { },
-        '{{componentId}}-{{sectionId}}-backup'                      : {
+        '{{componentId}}-{{sectionId}}-emergency_logs_email_addresses'  : { },
+        '{{componentId}}-{{sectionId}}-dbs'                             : { },
+        '{{componentId}}-{{sectionId}}-alldbs'                          : {
+            placeholder : "SELECT DATABASE",
             afterInit: function() {
-                $('#{{componentId}}-{{sectionId}}-dbs').on('select2:select', function(e) {
-                    $('#generate-backup-span').html('Generate ' + e.params.data.text + ' database backup');
+                $('#{{componentId}}-{{sectionId}}-upload_restore-attachments').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-alldbs').on('select2:select', function(e) {
+                    $('.generate-backup-span').html('Backup ' + e.params.data.text + ' db');
+                    $('.delete-db-span').html('Remove ' + e.params.data.text + ' db');
+
+                    if (dbs[e.params.data.id]['active'] && dbs[e.params.data.id]['active'] == true) {
+                        $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = true;
+                        $('#{{componentId}}-{{sectionId}}-is_active').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', true);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = false;
+                        $('#{{componentId}}-{{sectionId}}-is_active').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', false);
+                    }
                 });
 
                 function generateBackup(id) {
+                    $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-backup-db').children('i').attr('hidden', false);
+
                     var postData = { };
                     postData['db'] = id;
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -202,116 +216,136 @@ dataCollectionSection =
                             };
 
                             var newOption = new Option(data.text, data.id, false, false);
-                            $('#{{componentId}}-{{sectionId}}-backupdbs').append(newOption).trigger('change');
+                            $('#{{componentId}}-{{sectionId}}-backupdbs').append(newOption).val(data.id).trigger('change');
+                            addedNewOption(data.id, data.text);
+
+                            $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-backup-db').children('i').attr('hidden', true);
+                        } else {
+                            PNotify.error({text : response.responseMessage});
                         }
                     }, 'json');
                 }
 
-                $('.backup-btn').click(function(e) {
+                function removeDb(id) {
+                    $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-delete-db').children('i').attr('hidden', false);
+
+                    var postData = { };
+                    postData['db'] = id;
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post('{{links.url("system/core/removedb")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            PNotify.success({text : response.responseMessage});
+
+                            var data = {
+                                id: response.responseData['uuid'],
+                                text: response.responseData['filename']
+                            };
+
+                            var newOption = new Option(data.text, data.id, false, false);
+                            $('#{{componentId}}-{{sectionId}}-backupdbs').append(newOption).val(data.id).trigger('change');
+                            addedNewOption(data.id, data.text);
+
+                            $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-delete-db').children('i').attr('hidden', true);
+                        } else {
+                            PNotify.error({text : response.responseMessage});
+                        }
+                    }, 'json');
+                }
+                $('#{{componentId}}-{{sectionId}}-backup-db').click(function(e) {
                     e.preventDefault();
 
-                    var id = $('#{{componentId}}-{{sectionId}}-dbs').val();
+                    var id = $('#{{componentId}}-{{sectionId}}-alldbs').val();
 
                     generateBackup(id);
                 });
+
+                $('#{{componentId}}-{{sectionId}}-delete-db').click(function(e) {
+                    e.preventDefault();
+
+                    var id = $('#{{componentId}}-{{sectionId}}-alldbs').val();
+
+                    removeDb(id);
+                });
+                extractData();
             }
         },
-        '{{componentId}}-{{sectionId}}-backupdbs'                   : {
+        '{{componentId}}-{{sectionId}}-is_active'                       : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-is_active').click(function() {
+                    var id = $('#{{componentId}}-{{sectionId}}-alldbs').val();
+                    var text = $('#{{componentId}}-{{sectionId}}-alldbs option:selected').text();
+                    var activeDb;
+
+                    for (var db in dbs) {
+                        if (dbs[db]['active'] == true) {
+                            activeDb = db;
+                        }
+                    }
+
+                    if (activeDb !== db && $('#{{componentId}}-{{sectionId}}-is_active')[0].checked === true) {
+                        Swal.fire({
+                            title                       : '<span class="text-danger"> Make database ' + text + ' active?</span>',
+                            text                        : 'Upon update of core configuration, ' + text + ' database will become active.',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Yes',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-danger text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = true;
+                                $('#{{componentId}}-{{sectionId}}-is_active').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', true);
+                                dbs[activeDb]['active'] = false;
+                                dbs[id]['active'] = true;
+                                dbs['changeActive'] = true;
+                                extractData();
+                                return;
+                            }
+                            $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = false;
+                        });
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-db_host'                         : { },
+        '{{componentId}}-{{sectionId}}-db_drop'                         : { },
+        '{{componentId}}-{{sectionId}}-db_root_username'                : { },
+        '{{componentId}}-{{sectionId}}-db_root_password'                : { },
+        '{{componentId}}-{{sectionId}}-backupdbs'                       : {
             placeholder : "SELECT DATABASE TO RESTORE",
             allowClear  : true,
             afterInit   : function() {
                 $('#{{componentId}}-{{sectionId}}-backupdbs').on('select2:select', function(e) {
-                    var thatE = e;
-
-                    $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', false);
-                    $('#{{componentId}}-{{sectionId}}-download-db').removeClass('disabled');
-                    $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '{{links.url("system/storages/q/uuid/' + e.params.data.id + '")}}');
-
-                    $('#{{componentId}}-{{sectionId}}-remove-db').off();
-                    $('#{{componentId}}-{{sectionId}}-remove-db').click(function(e) {
-                        e.preventDefault();
-
-                        var postData = { };
-                        postData['uuid'] = thatE.params.data.id;
-                        postData[$('#security-token').attr('name')] = $('#security-token').val();
-
-                        $.post('{{links.url("system/storages/remove")}}', postData, function(response) {
-                            if (response.tokenKey && response.token) {
-                                $('#security-token').attr('name', response.tokenKey);
-                                $('#security-token').val(response.token);
-                            }
-
-                            if (response.responseCode == 0) {
-                                PNotify.success({text : response.responseMessage});
-
-                                $('#{{componentId}}-{{sectionId}}-backupdbs option[value="' + thatE.params.data.id + '"]').remove();
-                                $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
-                                $('#{{componentId}}-{{sectionId}}-download-db').addClass('disabled');
-                                $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '#');
-                            }
-                        }, 'json');
-                    });
-
-                    $('#{{componentId}}-{{sectionId}}-restore-db').off();
-                    $('#{{componentId}}-{{sectionId}}-restore-db').click(function(e) {
-                        e.preventDefault();
-
-                        $('#restore-fields').attr('hidden', false);
-                    });
-
-                    $('#{{componentId}}-{{sectionId}}-start-restore').off();
-                    $('#{{componentId}}-{{sectionId}}-start-restore').click(function(e) {
-                        e.preventDefault();
-
-                        if ($('#{{componentId}}-{{sectionId}}-db_root_username').val() === '') {
-                            $('#{{componentId}}-{{sectionId}}-db_root_username').addClass('is-invalid');
-                            $('#{{componentId}}-{{sectionId}}-db_root_username').focus(function() {
-                                $(this).removeClass('is-invalid');
-                            });
-                        } else if ($('#{{componentId}}-{{sectionId}}-db_root_password').val() === '') {
-                            $('#{{componentId}}-{{sectionId}}-db_root_password').addClass('is-invalid');
-                            $('#{{componentId}}-{{sectionId}}-db_root_password').focus(function() {
-                                $(this).removeClass('is-invalid');
-                            });
-                        } else {
-                            $(this).attr('disabled', true);
-                            $(this).children('i').attr('hidden', false);
-
-                            var postData = { };
-                            postData['filename'] = thatE.params.data.text;
-                            postData['username'] = $('#{{componentId}}-{{sectionId}}-db_root_username').val();
-                            postData['password'] = $('#{{componentId}}-{{sectionId}}-db_root_password').val();
-                            postData['drop'] = $('#{{componentId}}-{{sectionId}}-db_drop')[0].checked;
-                            postData[$('#security-token').attr('name')] = $('#security-token').val();
-
-                            $.post('{{links.url("system/core/dbrestore")}}', postData, function(response) {
-                                if (response.tokenKey && response.token) {
-                                    $('#security-token').attr('name', response.tokenKey);
-                                    $('#security-token').val(response.token);
-                                }
-
-                                if (response.responseCode == 0) {
-                                    PNotify.success({text : response.responseMessage});
-                                } else {
-                                    PNotify.error({text : response.responseMessage});
-                                }
-                                $('#{{componentId}}-{{sectionId}}-start-restore').attr('disabled', false);
-                                $('#{{componentId}}-{{sectionId}}-start-restore').children('i').attr('hidden', true);
-                            }, 'json');
-                        }
-                    });
+                    addedNewOption(e.params.data.id, e.params.data.text);
                 });
 
                 $('#{{componentId}}-{{sectionId}}-backupdbs').on('select2:clear', function(e) {
-                    $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-download-db').addClass('disabled');
-                    $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '#');
-                    $('#restore-fields').attr('hidden', true);
-                    $('#{{componentId}}-{{sectionId}}-db_root_username, #{{componentId}}-{{sectionId}}-db_root_password').val('');
+                    clearFields(true);
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-form'                        : {
+        '{{componentId}}-{{sectionId}}-form'                            : {
             rules: {
                 '{{componentId}}-{{sectionId}}-display_name'            : 'required',
                 '{{componentId}}-{{sectionId}}-auto_off_debug'          : 'required',
@@ -325,7 +359,185 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-cache_timeout'           : 'Please enter seconds',
                 '{{componentId}}-{{sectionId}}-passwordWorkFactor'      : 'Please enter encryption level',
                 '{{componentId}}-{{sectionId}}-cookiesWorkFactor'       : 'Please enter encryption level',
+            },
+            onSubmit : function() {
+                if (dataCollectionSection['dataToSubmit']['debug'] === 'debugon') {
+                    dataCollectionSection['dataToSubmit']['debug'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['debug'] = false;
+                }
+                if (dataCollectionSection['dataToSubmit']['cache'] === 'cacheon') {
+                    dataCollectionSection['dataToSubmit']['cache'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['cache'] = false;
+                }
+                if (dataCollectionSection['dataToSubmit']['logs'] === 'logson') {
+                    dataCollectionSection['dataToSubmit']['logs'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['logs'] = false;
+                }
+                if (dataCollectionSection['dataToSubmit']['emergency_logs_email'] === 'emergencyon') {
+                    dataCollectionSection['dataToSubmit']['emergency_logs_email'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['emergency_logs_email'] = false;
+                }
+
+                return true;
             }
         }
     });
+
+var swalSound = window['dataCollection'].env.sounds.swalSound;
+
+function clearFields(clear = true) {
+    $('#restore-fields').attr('hidden', true);
+    $('#{{componentId}}-{{sectionId}}-db_root_username, #{{componentId}}-{{sectionId}}-db_root_password').val('');
+    $('#{{componentId}}-{{sectionId}}-db_drop')[0].checked = false;
+    $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', false);
+
+    if (clear) {
+        $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-download-db').addClass('disabled');
+        $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '#');
+        $('#{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
+    }
+}
+
+function addedNewOption(id, text) {
+    clearFields(false);
+    $('#{{componentId}}-{{sectionId}}-restore-db').attr('disabled', false);
+    $('#{{componentId}}-{{sectionId}}-remove-db').attr('disabled', false);
+    $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', false);
+    $('#{{componentId}}-{{sectionId}}-download-db').removeClass('disabled');
+    $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '{{links.url("system/storages/q/uuid/' + id + '")}}');
+
+    $('#{{componentId}}-{{sectionId}}-remove-db').off();
+    $('#{{componentId}}-{{sectionId}}-remove-db').click(function(e) {
+        e.preventDefault();
+
+        Swal.fire({
+            title                       : '<span class="text-danger"> Remove restore file from system?</span>',
+            icon                        : 'question',
+            background                  : 'rgba(0,0,0,.8)',
+            backdrop                    : 'rgba(0,0,0,.6)',
+            buttonsStyling              : false,
+            confirmButtonText           : 'Remove',
+            customClass                 : {
+                'confirmButton'             : 'btn btn-danger text-uppercase',
+                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+            },
+            showCancelButton            : true,
+            keydownListenerCapture      : true,
+            allowOutsideClick           : true,
+            allowEscapeKey              : true,
+            didOpen                     : function() {
+                swalSound.play();
+            }
+        }).then((result) => {
+            if (result.value) {
+                var postData = { };
+                postData['uuid'] = id;
+                postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                $.post('{{links.url("system/storages/remove")}}', postData, function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+
+                    if (response.responseCode == 0) {
+                        PNotify.success({text : response.responseMessage});
+
+                        $('#{{componentId}}-{{sectionId}}-backupdbs option[value="' + id + '"]').remove();
+                        $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-download-db').addClass('disabled');
+                        $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '#');
+                    }
+                }, 'json');
+            }
+        });
+    });
+
+    $('#{{componentId}}-{{sectionId}}-restore-db').off();
+    $('#{{componentId}}-{{sectionId}}-restore-db').click(function(e) {
+        e.preventDefault();
+
+        $(this).attr('disabled', true);
+        $('#restore-fields').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
+    });
+
+    $('#{{componentId}}-{{sectionId}}-cancel-restore').off();
+    $('#{{componentId}}-{{sectionId}}-cancel-restore').click(function(e) {
+        e.preventDefault();
+
+        clearFields(false);
+    });
+    $('#{{componentId}}-{{sectionId}}-start-restore').off();
+    $('#{{componentId}}-{{sectionId}}-start-restore').click(function(e) {
+        e.preventDefault();
+
+        if ($('#{{componentId}}-{{sectionId}}-db_root_username').val() === '') {
+            $('#{{componentId}}-{{sectionId}}-db_root_username').addClass('is-invalid');
+            $('#{{componentId}}-{{sectionId}}-db_root_username').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else if ($('#{{componentId}}-{{sectionId}}-db_root_password').val() === '') {
+            $('#{{componentId}}-{{sectionId}}-db_root_password').addClass('is-invalid');
+            $('#{{componentId}}-{{sectionId}}-db_root_password').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else {
+            $(this).attr('disabled', true);
+            $(this).children('i').attr('hidden', false);
+
+            var postData = { };
+            postData['filename'] = text;
+            postData['username'] = $('#{{componentId}}-{{sectionId}}-db_root_username').val();
+            postData['password'] = $('#{{componentId}}-{{sectionId}}-db_root_password').val();
+            postData['drop'] = $('#{{componentId}}-{{sectionId}}-db_drop')[0].checked;
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+            $.post('{{links.url("system/core/dbrestore")}}', postData, function(response) {
+                if (response.tokenKey && response.token) {
+                    $('#security-token').attr('name', response.tokenKey);
+                    $('#security-token').val(response.token);
+                }
+
+                if (response.responseCode == 0) {
+                    PNotify.success({text : response.responseMessage});
+
+                    clearFields(false);
+                } else {
+                    PNotify.error({text : response.responseMessage});
+                }
+                $('#{{componentId}}-{{sectionId}}-start-restore').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-start-restore').children('i').attr('hidden', true);
+            }, 'json');
+        }
+    });
+}
+
+$('#body').on('dropzoneInitDone', function() {
+    dataCollectionSection['admin-core-main-upload_restore']['onSuccess'] = function(file, response) {
+        if (response.responseData && response.responseData.name && response.responseData.uuid) {
+            var newOption = new Option(response.responseData.name, response.responseData.uuid, false, false);
+            $('#{{componentId}}-{{sectionId}}-backupdbs').append(newOption).val(response.responseData.uuid).trigger('change');
+            addedNewOption(response.responseData.uuid, response.responseData.name);
+            PNotify.success({text: 'File ' + response.responseData.name + ' uploaded and ready to be restored.'});
+            dataCollectionSection['admin-core-main-upload_restore']['reset']();
+        }
+    };
+});
+
+function extractData() {
+    // Make a data object
+    if (!dataCollectionSectionForm['data']) {
+        dataCollectionSectionForm['data'] = { };
+    }
+    if (!dataCollectionSection['data']['dbs']) {
+        dataCollectionSection['data']['dbs'] = { };
+    }
+    dataCollectionSection['data']['dbs'] = dbs;
+}
 </script>

@@ -11,7 +11,7 @@
     {% set coreSettingsLog = 'logson' %}
 {% endif %}
 {% set coreSettingsLogEmergency = 'emergencyoff' %}
-{% if core['settings']['logs']['emergencyEmailLogs'] === true %}
+{% if core['settings']['logs']['emergencyLogsEmail'] === true %}
     {% set coreSettingsLogEmergency = 'emergencyon' %}
 {% endif %}
 <div class="row">
@@ -278,6 +278,11 @@
         )}}
         <div class="row">
             <div class="col">
+                {% set minNumber = 4 %}
+                {% set maxNumber = 16 %}
+                {% if core['settings']['dev'] == true %}
+                    {% set minNumber = 2 %}
+                {% endif %}
                 {{adminltetags.useTag('fields',
                     [
                         'component'                             : component,
@@ -295,8 +300,8 @@
                         'fieldBazScan'                          : true,
                         'fieldBazJstreeSearch'                  : true,
                         'fieldBazPostOnUpdate'                  : true,
-                        'fieldDataInputMinNumber'               : 4,
-                        'fieldDataInputMaxNumber'               : 16,
+                        'fieldDataInputMinNumber'               : minNumber,
+                        'fieldDataInputMaxNumber'               : maxNumber,
                         'fieldDataInputMaxLength'               : 2,
                         'fieldValue'                            : core['settings']['security']['passwordWorkFactor']
                     ]
@@ -320,8 +325,8 @@
                         'fieldBazScan'                          : true,
                         'fieldBazJstreeSearch'                  : true,
                         'fieldBazPostOnUpdate'                  : true,
-                        'fieldDataInputMinNumber'               : 4,
-                        'fieldDataInputMaxNumber'               : 16,
+                        'fieldDataInputMinNumber'               : minNumber,
+                        'fieldDataInputMaxNumber'               : maxNumber,
                         'fieldDataInputMaxLength'               : 2,
                         'fieldValue'                            : core['settings']['security']['cookiesWorkFactor']
                     ]
@@ -396,7 +401,7 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'level',
+                        'fieldId'                        : 'logs_level',
                         'fieldLabel'                     : 'Select Logs Level',
                         'fieldType'                      : 'select2',
                         'fieldHelp'                      : true,
@@ -421,7 +426,7 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'emergency_email_logs',
+                        'fieldId'                        : 'emergency_logs_email',
                         'fieldLabel'                     : 'Email Emergency, Critical & Alert?',
                         'fieldType'                      : 'radio',
                         'fieldHelp'                      : true,
@@ -452,7 +457,7 @@
             </div>
             <div class="col">
                 {% set emergencyEmailDisabled = true %}
-                {% if core['settings']['logs']['emergencyEmailLogs'] == true %}
+                {% if core['settings']['logs']['emergencyLogsEmail'] == true %}
                     {% set emergencyEmailDisabled = false %}
                 {% endif %}
                 {{adminltetags.useTag('fields',
@@ -461,7 +466,7 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'emergency_email_logs_emails',
+                        'fieldId'                        : 'emergency_logs_email_addresses',
                         'fieldLabel'                     : 'Email Addresses',
                         'fieldType'                      : 'input',
                         'fieldHelp'                      : true,

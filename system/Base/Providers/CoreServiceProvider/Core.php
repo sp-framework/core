@@ -60,7 +60,7 @@ class Core extends BasePackage
 					['compress' => Mysqldump::GZIP, 'default-character-set' => Mysqldump::UTF8MB4]
 				);
 
-			$fileName = 'db' . $data['db'] . Carbon::now()->getTimestamp() . '.gzip';
+			$fileName = 'db' . $data['db'] . Carbon::now()->getTimestamp() . '.gz';
 
 			$dumper->start(base_path('var/tmp/' . $fileName));
 		} catch (\Exception $e) {
@@ -115,7 +115,7 @@ class Core extends BasePackage
 
 		if ($fileInfo) {
 			try {
-				$newDbName = str_replace('.gzip', '', $fileInfo['org_file_name']);
+				$newDbName = str_replace('.gz', '', $fileInfo['org_file_name']);
 
 				$file = $this->basepackages->storages->getFile(['uuid' => $fileInfo['uuid'], 'headers' => false]);
 
@@ -129,7 +129,7 @@ class Core extends BasePackage
 
 				$newDbUserName = $newDbName . 'User';
 
-				$dbConfig = $this->getActiveDb();
+				$dbConfig = $this->getDb(true);
 				$newDbUserPassword = $this->crypt->decryptBase64($dbConfig['password'], $this->getDbKey($dbConfig));
 				$dbConfig['username'] = $data['username'];
 				$dbConfig['password'] = $data['password'];
@@ -144,6 +144,7 @@ class Core extends BasePackage
 				$this->executeSQL("GRANT ALL PRIVILEGES ON " . $newDbName . ".* TO ?@'%' WITH GRANT OPTION;", [$newDbUserName]);
 
 				$dbConfig['dbname'] = $newDbName;
+
 				$this->db = new Mysql($dbConfig);
 
 				$allTables = $this->db->listTables($newDbName);
@@ -169,8 +170,25 @@ class Core extends BasePackage
 
 				$dumper->restore(base_path('var/tmp/' . $newDbName . '.sql'));
 
-				//Store new username pass to $this->core->settings->dbs
-				$this->addResponse($data['filename'] . ' restored!');
+				try {
+					$file = $this->localContent->delete('var/tmp/' . $newDbName . '.sql');
+				} catch (FilesystemException | UnableToDeleteFile | \Exception $exception) {
+					throw $exception;
+				}
+
+				$newDb['active'] = false;
+				$newDb['host'] = $dbConfig['host'];
+				$newDb['dbname'] = $newDbName;
+				$newDb['username'] = $newDbUserName;
+				$newDb['password'] = $this->crypt->encryptBase64($newDbUserPassword, $this->createDbKey($newDbName));
+				$newDb['port'] = $dbConfig['port'];
+				$newDb['charset'] = $dbConfig['charset'];
+
+				$this->core['settings']['dbs'][$newDbName] = $newDb;
+
+				$this->update($this->core);
+
+				$this->addResponse($data['filename'] . ' restored!', 0, ['newDb' => $newDb]);
 
 				return true;
 			} catch (\Exception $e) {
@@ -183,6 +201,83 @@ class Core extends BasePackage
 		$this->addResponse('File ' . $data['filename'] . ' not found on system!', 1);
 
 		return false;
+	}
+
+	public function removeDb(array $data)
+	{
+		if (!isset($data['db'])) {
+			$this->addResponse('Please provide database name', 1, []);
+
+			return false;
+		}
+
+		$dbConfig = $this->getDb(false, $data['db']);
+		$dbConfig['password'] = $this->crypt->decryptBase64($dbConfig['password'], $this->getDbKey($dbConfig));
+
+		try {
+			$this->db = new Mysql($dbConfig);
+
+			$this->executeSQL("DROP DATABASE `?`;", [$dbConfig['dbname']]);
+		} catch (\PDOException $e) {
+			$this->addResponse('Remove Error: ' . $e->getMessage(), 1);
+
+			return false;
+		}
+
+		$this->addResponse('Database removed', 0, []);
+	}
+
+	public function updateCore(array $data)
+	{
+		$core = $this->core;
+
+		if (isset($data['cache'])) {
+			$this->core['settings']['cache']['enabled'] = $data['cache'];
+		}
+		if (isset($data['cache_timeout'])) {
+			$this->core['settings']['cache']['timeout'] = $data['cache_timeout'];
+		}
+		if (isset($data['cache_service'])) {
+			$this->core['settings']['cache']['service'] = $data['cache_service'];
+		}
+
+		if (isset($data['passwordWorkFactor'])) {
+			$this->core['settings']['security']['passwordWorkFactor'] = $data['passwordWorkFactor'];
+		}
+		if (isset($data['cookiesWorkFactor'])) {
+			$this->core['settings']['security']['cookiesWorkFactor'] = $data['cookiesWorkFactor'];
+		}
+
+		if (isset($data['logs'])) {
+			$this->core['settings']['logs']['enabled'] = $data['logs'];
+		}
+		if (isset($data['logs_level'])) {
+			$this->core['settings']['logs']['level'] = $data['logs_level'];
+		}
+		if (isset($data['emergency_logs_email'])) {
+			$this->core['settings']['logs']['emergencyLogsEmail'] = $data['emergency_logs_email'];
+		}
+		if (isset($data['emergency_logs_email_addresses'])) {
+			$this->core['settings']['logs']['emergencyLogsEmailAddresses'] = $data['emergency_logs_email_addresses'];
+		}
+		if (isset($data['dbs'])) {
+			$data['dbs'] = Json::decode($data['dbs'], true);
+			$this->core['settings']['dbs'] = $data['dbs'];
+		}
+
+		if (isset($data['dbs']['changeActive']) && $data['dbs']['changeActive'] == true) {
+			unset($data['dbs']['changeActive']);
+
+			foreach ($data['dbs'] as $dbKey => $db) {
+				if ($db['active'] == true) {
+					$dbConfig = $db;
+				}
+			}
+
+			$this->writeBaseConfig($dbConfig);
+		}
+
+		$this->update($data);
 	}
 
 	protected function checkKeys()
@@ -246,6 +341,66 @@ class Core extends BasePackage
 		}
 	}
 
+	private function writeBaseConfig($dbConfig)
+	{
+		$this->core['settings']['setup'] = $this->core['settings']['setup'] === true ? 'true' : 'false';
+		$this->core['settings']['dev'] = $this->core['settings']['dev'] === true ? 'true' : 'false';
+		$this->core['settings']['debug'] = $this->core['settings']['debug'] === true ? 'true' : 'false';
+		$this->core['settings']['cache']['enabled'] = $this->core['settings']['cache']['enabled'] === true ? 'true' : 'false';
+		$this->core['settings']['logs']['level'] = $this->core['settings']['logs']['level'] === true ? 'true' : 'false';
+
+		$baseFileContent =
+'<?php
+
+return
+	[
+		"setup" 			=> ' . $this->core['settings']['setup'] .',
+		"dev"    			=> ' . $this->core['settings']['dev'] . ', //true - Development false - Production
+		"debug"				=> ' . $this->core['settings']['debug'] . ',
+		"db" 				=>
+		[
+			"host" 							=> "' . $dbConfig['host'] . '",
+			"dbname" 						=> "' . $dbConfig['dbname'] . '",
+			"username" 						=> "' . $dbConfig['username'] . '",
+			"password" 						=> "' . $dbConfig['password'] . '",
+			"port" 							=> "' . $dbConfig['port'] . '",
+			"charset" 	 	    			=> "' . $dbConfig['charset'] . '"
+		],
+		"cache"				=>
+		[
+			"enabled"						=> ' . $this->core['settings']['cache']['enabled'] . ', //Global Cache value //true - Production false - Development
+			"timeout"						=> ' . $this->core['settings']['cache']['timeout'] . ', //Global Cache timeout in seconds
+			"service"						=> "' . $this->core['settings']['cache']['service'] . '"
+		],
+		"security"			=>
+		[
+			"passwordWorkFactor"			=> ' . $this->core['settings']['security']['passwordWorkFactor'] . ',
+			"cookiesWorkFactor" 			=> ' . $this->core['settings']['security']['cookiesWorkFactor'] . ',
+		],
+		"logs"				=>
+		[
+			"enabled"						=> ' . $this->core['settings']['logs']['enabled'] . ',
+			"exceptions"					=> true,
+			"level"							=> "' . $this->core['settings']['logs']['level'] . '",
+			"service"						=> "' . $this->core['settings']['logs']['service'] . '",
+			"emergencyLogsEmail"			=> ' . $this->core['settings']['logs']['emergencyLogsEmail'] . ',
+			"emergencyLogsEmailAddresses"	=> "' . $this->core['settings']['logs']['emergencyLogsEmailAddresses'] . '",
+		],
+		"websocket"			=>
+		[
+			"protocol"						=> "tcp",
+			"host"							=> "localhost",
+			"port"							=> 5555
+		]
+	];';
+
+		try {
+			$this->localContent->write('/system/Configs/Base.php', $baseFileContent);
+		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
+			throw $exception;
+		}
+	}
+
 	private function writeResetConfig()
 	{
 		$resetContent =
@@ -256,15 +411,38 @@ return
 		"setup" 		=> true
 	];';
 
-		$this->localContent->write('/system/Configs/Base.php', $resetContent);
+		try {
+			$this->localContent->write('/system/Configs/Base.php', $resetContent);
+		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
+			throw $exception;
+		}
 	}
 
-	private function getDbKey($dbConfig)
+	private function createDbKey($dbname)
+	{
+		$keys = $this->getDbKey();
+
+		$keys[$dbname] = $this->random->base58(4);
+
+		try {
+			$this->localContent->write('system/.dbkeys', Json::encode($keys));
+		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
+			throw $exception;
+		}
+
+		return $keys[$dbname];
+	}
+
+	private function getDbKey($dbConfig = null)
 	{
 		try {
 			$keys = $this->localContent->read('system/.dbkeys');
 
-			return Json::decode($keys, true)[$dbConfig['dbname']];
+			if ($dbConfig) {
+				return Json::decode($keys, true)[$dbConfig['dbname']];
+			}
+
+			return Json::decode($keys, true);
 		} catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
 			return false;
 		}
@@ -281,10 +459,15 @@ return
 		return true;
 	}
 
-	public function getActiveDb()
+	public function getDb($active = true, $dbName = null)
 	{
 		foreach ($this->core['settings']['dbs'] as $db) {
-			if ($db['active'] == true) {
+			if ($active === true && $db['active'] == true) {
+				return $db;
+			} else if ($active === false &&
+					   $dbName &&
+					   $dbName === $db['dbname']
+			) {
 				return $db;
 			}
 		}

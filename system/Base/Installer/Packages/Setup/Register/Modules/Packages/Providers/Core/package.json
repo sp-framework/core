@@ -24,7 +24,7 @@
             "enabled"                       : true,
             "level"                         : "DEBUG",
             "service"                       : "streamLogs",
-            "emergencyEmailLogs"            : false,
+            "emergencyLogsEmail"            : false,
             "emergencyLogsEmailAddresses"   : ""
         }
     }

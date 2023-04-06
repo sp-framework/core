@@ -311,15 +311,17 @@
                         //         }
                         //     });
                         // } else {
+                            var sectionToObj = that._sectionToObj();
+
                             if (dataCollection[componentId][sectionId][sectionId + '-form']['onSubmit']) {
                                 if (dataCollection[componentId][sectionId][sectionId + '-form']['onSubmit']()) {
-                                    that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(that._sectionToObj()));
+                                    that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(sectionToObj));
                                 } else {
                                     $(mainButton).attr('disabled', false);
                                     $(mainButton).children('i').attr('hidden', true);
                                 }
                             } else {
-                                that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(that._sectionToObj()));
+                                that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(sectionToObj));
                             }
 
                         // }
