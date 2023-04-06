@@ -725,28 +725,47 @@ class Auth
             return false;
         }
 
+        if ($this->config->dev === false) {
+            $checkPwStrength = $this->checkPwStrength($data['newpass']);
+
+            if ($checkPwStrength !== false && $checkPwStrength < 4) {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Password strength is too low.';
+
+                return false;
+            }
+        }
+
         $this->account['password'] = $this->secTools->hashPassword($data['newpass'], $this->config->security->passwordWorkFactor);
+
         $this->account['force_pwreset'] = null;
-        // $this->setSessionAndRecaller($data);
-        $this->accounts->updateAccount($this->account);
 
-        $this->logger->log->info('Password reset successful for account ' . $this->account['email'] . ' via pwreset.');
+        if ($this->accounts->addUpdateSecurity($this->account['id'], $this->account)) {
+            $this->logger->log->info('Password reset successful for account ' . $this->account['email'] . ' via pwreset.');
 
-        $this->packagesData->responseCode = 0;
+            $this->packagesData->responseCode = 0;
 
-        if ($viaProfile) {
-            $this->logout();
+            if ($viaProfile) {
+                $this->logout();
+            } else {
+                $this->packagesData->responseMessage = 'Authenticated. Password changed. Redirecting...';
+            }
+
+            if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
+                $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
+            } else {
+                $this->packagesData->redirectUrl = $this->links->url('home');
+            }
+
+            return true;
         } else {
-            $this->packagesData->responseMessage = 'Authenticated. Password changed. Redirecting...';
-        }
+            $this->packagesData->responseCode = 1;
 
-        if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
-            $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
-        } else {
-            $this->packagesData->redirectUrl = $this->links->url('home');
-        }
+            $this->packagesData->responseMessage = $this->accounts->packagesData->responseMessage;
 
-        return true;
+            return false;
+        }
     }
 
     public function checkPwStrength(string $pass)
@@ -762,12 +781,14 @@ class Auth
 
             $this->packagesData->responseMessage = 'Checking Password Strength Success';
 
-            return true;
+            return $result['score'];
         }
 
         $this->packagesData->responseCode = 1;
 
         $this->packagesData->responseMessage = 'Error Checking Password Strength';
+
+        return false;
     }
 
     public function generateNewPassword()

@@ -81,7 +81,7 @@ class ProfileComponent extends BaseComponent
                 return;
             }
 
-            if ($this->auth->checkPwStrength($this->postData()['pass'])) {
+            if ($this->auth->checkPwStrength($this->postData()['pass']) !== false) {
                 $this->view->responseData = $this->auth->packagesData->responseData;
             }
 
@@ -103,12 +103,11 @@ class ProfileComponent extends BaseComponent
 
             $this->auth->generateNewPassword();
 
-            $this->view->responseData = $this->auth->packagesData->responseData;
-
-            $this->view->responseCode = $this->auth->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->auth->packagesData->responseMessage,
+                $this->auth->packagesData->responseCode,
+                $this->auth->packagesData->responseData
+            );
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }

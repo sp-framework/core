@@ -65,7 +65,7 @@ BazCore.header({
     </div>
 </div>
 <script>
-/*global BazCore */
+/*global BazCore PNotify */
 $(document).ready(function(){
 
     $('#{{componentId}}-regular').attr('hidden', false).addClass('animated fadeIn');
@@ -296,5 +296,40 @@ $(document).ready(function(){
             $('.login-box-msg').addClass('animated fadeIn');
         }, 2000);
     }
+
+    $('#{{componentId}}-form-strength-meter').strengthMeter({
+        "url" : '{{links.url("auth/checkPwStrength")}}'
+    });
+
+    $('#{{componentId}}-form-password_generate').click(function(e) {
+        e.preventDefault();
+
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+        $.post('{{links.url("auth/generatePw")}}', postData, function(response) {
+            if (response.responseCode == 0) {
+                if (response.responseData) {
+                    $('#{{componentId}}-form-newpass').val(response.responseData).trigger('change');
+                    $('#{{componentId}}-form-confirmnewpass').val(response.responseData);
+                    $('#{{componentId}}-form-newpass').attr('type', 'text');
+                    $('#{{componentId}}-form-confirmnewpass').attr('type', 'text');
+                }
+            } else {
+                PNotify.error(response.responseMessage);
+            }
+            if (response.tokenKey && response.token) {
+                $("#security-token").attr("name", response.tokenKey);
+                $("#security-token").val(response.token);
+            }
+
+            $('#{{componentId}}-form-newpass, #{{componentId}}-form-confirmnewpass').keyup(function() {
+                if ($(this).val() === '') {
+                    $('#{{componentId}}-form-confirmnewpass').val('');
+                    $(this).attr('type', 'password');
+                }
+            });
+        }, 'json');
+    });
 });
 </script>

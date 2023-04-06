@@ -91,6 +91,10 @@
                  * @param {string} value
                  */
                 update: function(value) {
+                    if (value.result) {
+                        value = value.result;
+                    }
+
                     var width = Math.floor((value/settings.base)*100);
 
                     if (width > 100 || width >= 80) {

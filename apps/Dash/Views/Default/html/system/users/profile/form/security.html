@@ -38,8 +38,6 @@
                     ]
                 )}}
             </div>
-        </div>
-        <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -55,7 +53,17 @@
                         'fieldRequired'                         : true,
                         'fieldBazScan'                          : true,
                         'fieldBazPostOnCreate'                  : false,
-                        'fieldBazPostOnUpdate'                  : false
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldGroupPostAddonButtons'     :
+                            {
+                                'password_generate'   : {
+                                    'title'                         : false,
+                                    'icon'                          : 'wand-magic-sparkles',
+                                    'noMargin'                      : true,
+                                    'buttonAdditionalClass'         : 'rounded-0'
+                                }
+                            },
+                        'fieldAdditionalClass'           : 'mb-0'
                     ]
                 )}}
                 {{adminltetags.useTag('fields',
@@ -75,8 +83,6 @@
                     ]
                 )}}
             </div>
-        </div>
-        <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -100,33 +106,6 @@
     </div>
 </div>
 <div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'generated_password',
-                'fieldLabel'                            : false,
-                'fieldPlaceholder'                      : 'Generated password',
-                'fieldType'                             : 'input',
-                'fieldGroupPreAddonButtons'             :
-                    {
-                        'generate_password_button'      : {
-                            'title'                     : 'Generate Random Password',
-                            'icon'                      : 'cog fa-spin',
-                            'iconHidden'                : true,
-                            'noMargin'                  : true,
-                            'buttonAdditionalClass'     : 'rounded-0'
-                        }
-                    },
-                'fieldBazScan'                          : true,
-                'fieldBazPostOnCreate'                  : false,
-                'fieldBazPostOnUpdate'                  : false
-            ]
-        )}}
-    </div>
     <div class="col">
         {{adminltetags.useTag('buttons',
             [
@@ -265,26 +244,23 @@
 </div>
 <script>
 /* global PNotify Swal */
-var pwresetUrl, pwresetData, generatePwUrl, generatePwData;
-
 $('#{{componentId}}-{{sectionId}}-strength-meter').strengthMeter({
     "url" : '{{links.url("system/users/profile/checkPwStrength")}}'
 });
 
-$('#{{componentId}}-{{sectionId}}-generate_password_button').click(function(e) {
+$('#{{componentId}}-{{sectionId}}-password_generate').click(function(e) {
     e.preventDefault();
 
-    generatePwUrl = '{{links.url("system/users/profile/generatePw")}}';
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-    generatePwData = { };
-    generatePwData[$('#security-token').attr('name')] = $('#security-token').val();
-
-    $.post(generatePwUrl, generatePwData, function(response) {
+    $.post('{{links.url("system/users/profile/generatePw")}}', postData, function(response) {
         if (response.responseCode == 0) {
             if (response.responseData) {
-                $('#{{componentId}}-{{sectionId}}-generated_password').val(response.responseData);
                 $('#{{componentId}}-{{sectionId}}-new_password').val(response.responseData).trigger('change');
                 $('#{{componentId}}-{{sectionId}}-confirm_password').val(response.responseData);
+                $('#{{componentId}}-{{sectionId}}-new_password').attr('type', 'text');
+                $('#{{componentId}}-{{sectionId}}-confirm_password').attr('type', 'text');
             }
         } else {
             PNotify.error(response.responseMessage);
@@ -293,22 +269,27 @@ $('#{{componentId}}-{{sectionId}}-generate_password_button').click(function(e) {
             $("#security-token").attr("name", response.tokenKey);
             $("#security-token").val(response.token);
         }
+
+        $('#{{componentId}}-{{sectionId}}-new_password, #{{componentId}}-{{sectionId}}-confirm_password').keyup(function() {
+            if ($(this).val() === '') {
+                $('#{{componentId}}-{{sectionId}}-confirm_password').val('');
+                $(this).attr('type', 'password');
+            }
+        });
     }, 'json');
 });
 
 $('#{{componentId}}-{{sectionId}}-pwreset-button').click(function(e) {
     e.preventDefault();
 
-    pwresetUrl = '{{links.url("system/users/profile/pwreset")}}';
-
-    pwresetData = {
+    var postData = {
         'pass'              : $('#{{componentId}}-{{sectionId}}-current_password').val().trim(),
         'newpass'           : $('#{{componentId}}-{{sectionId}}-new_password').val().trim(),
         'confirmnewpass'    : $('#{{componentId}}-{{sectionId}}-confirm_password').val().trim()
     }
-    pwresetData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-    $.post(pwresetUrl, pwresetData, function(response) {
+    $.post('{{links.url("system/users/profile/pwreset")}}', postData, function(response) {
         if (response.responseCode == 0) {
             if (response.redirectUrl) {
                 window.location = response.redirectUrl;

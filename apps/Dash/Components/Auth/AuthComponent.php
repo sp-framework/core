@@ -155,4 +155,50 @@ class AuthComponent extends BaseComponent
             $this->addResponse('Method Not Allowed', 1);
         }
     }
+
+    public function checkPwStrengthAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->auth->checkPwStrength($this->postData()['pass']) !== false) {
+                $this->addResponse(
+                    $this->auth->packagesData->responseMessage,
+                    $this->auth->packagesData->responseCode,
+                    $this->auth->packagesData->responseData
+                );
+
+                return;
+            }
+
+            $this->addResponse(
+                $this->auth->packagesData->responseMessage,
+                $this->auth->packagesData->responseCode,
+            );
+
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function generatePwAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->auth->generateNewPassword();
+
+            $this->addResponse(
+                $this->auth->packagesData->responseMessage,
+                $this->auth->packagesData->responseCode,
+                $this->auth->packagesData->responseData
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
 }

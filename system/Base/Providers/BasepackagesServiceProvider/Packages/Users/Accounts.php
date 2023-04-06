@@ -309,6 +309,10 @@ class Accounts extends BasePackage
 
             $this->addResponse('Updated account for ID: ' . $data['email'], 0, null, true);
 
+            if ($data['id'] == $this->auth->account()['id']) {//Cannot logout yourself!
+                $data['force_logout'] = '0';
+            }
+
             if ((isset($data['force_logout']) && $data['force_logout'] === '1') ||
                  (isset($data['status']) && $data['status'] === '0')
             ) {
@@ -455,7 +459,7 @@ class Accounts extends BasePackage
         }
     }
 
-    protected function addUpdateSecurity($id, $data)
+    public function addUpdateSecurity($id, $data)
     {
         $securityModel = new BasepackagesUsersAccountsSecurity;
 
@@ -469,14 +473,20 @@ class Accounts extends BasePackage
             $account->assign($data);
 
             $account->update();
+
+            return true;
         } else {
             $securityModel->assign($data);
 
             $securityModel->create();
+
+            return true;
         }
+
+        return false;
     }
 
-    protected function addUpdateCanLogin($id, $canLogin)
+    public function addUpdateCanLogin($id, $canLogin)
     {
         if ($canLogin !== '') {
             $canLogin = Json::decode($canLogin, true);
