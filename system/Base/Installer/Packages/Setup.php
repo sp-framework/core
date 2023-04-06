@@ -133,8 +133,8 @@ class Setup
 									$this->postData['host'] :
 									'',
 								'dbname' 	=>
-									isset($this->postData['database_name']) ?
-									$this->postData['database_name'] :
+									isset($this->postData['dbname']) ?
+									$this->postData['dbname'] :
 									'',
 								'username'	=>
 									isset($this->postData['username']) ?
@@ -221,7 +221,7 @@ class Setup
 	protected function checkDbEmpty()
 	{
 		$allTables =
-			$this->db->listTables($this->postData['database_name']);
+			$this->db->listTables($this->postData['dbname']);
 
 		if (count($allTables) > 0) {
 			if ($this->postData['drop'] === 'false') {
@@ -693,7 +693,7 @@ class Setup
 
 	protected function createNewDb()
 	{
-		$this->executeSQL("CREATE DATABASE IF NOT EXISTS " . $this->postData['database_name'] . " CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci");
+		$this->executeSQL("CREATE DATABASE IF NOT EXISTS " . $this->postData['dbname'] . " CHARACTER SET " . $this->postData['charset'] . " COLLATE " . $this->postData['charset'] . "_general_ci");
 	}
 
 	protected function checkUser($dontCreate = false)
@@ -712,6 +712,6 @@ class Setup
 			$this->executeSQL("CREATE USER ?@'%' IDENTIFIED WITH mysql_native_password BY ?;", [$this->postData['username'], $this->postData['password']]);
 		}
 
-		$this->executeSQL("GRANT ALL PRIVILEGES ON " . $this->postData['database_name'] . ".* TO ?@'%' WITH GRANT OPTION;", [$this->postData['username']]);
+		$this->executeSQL("GRANT ALL PRIVILEGES ON " . $this->postData['dbname'] . ".* TO ?@'%' WITH GRANT OPTION;", [$this->postData['username']]);
 	}
 }

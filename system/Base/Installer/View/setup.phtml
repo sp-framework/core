@@ -66,10 +66,22 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
-                                                <label class="text-uppercase text-xs" for="database_name">Database Name *</label>
-                                                <div class="input-group input-group-sm">
-                                                    <input type="text" name="database_name" id="database_name" class="form-control rounded-0" value="sp">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="form-group">
+                                                        <label class="text-uppercase text-xs" for="dbname">Database Name *</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <input type="text" name="dbname" id="dbname" class="form-control rounded-0" value="sp">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="form-group">
+                                                        <label class="text-uppercase text-xs" for="charset">Database Charset *</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <input type="text" name="charset" id="charset" class="form-control rounded-0" value="utf8mb4">
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="row">
@@ -288,45 +300,36 @@
             $('#submit, #update').click(function(e) {
                 e.preventDefault();
 
-                $(this).attr('disabled', true);
-                $('#submit-spinner, #update-spinner').attr('hidden', false);
-                $('#alert').attr('hidden', true);
-
                 if ($('#host').val() === '') {
                     $('#host').addClass('is-invalid');
                     $('#host').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                    $('#submit-spinner, #update-spinner').attr('hidden', true);
-                    $('#submit, #update').attr('disabled', false);
                 } else if ($('#port').val() === '') {
                     $('#port').addClass('is-invalid');
                     $('#port').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                    $('#submit-spinner, #update-spinner').attr('hidden', true);
-                    $('#submit, #update').attr('disabled', false);
-                } else if ($('#database_name').val() === '') {
-                    $('#database_name').addClass('is-invalid');
-                    $('#database_name').focus(function() {
+                } else if ($('#dbname').val() === '') {
+                    $('#dbname').addClass('is-invalid');
+                    $('#dbname').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                    $('#submit-spinner, #update-spinner').attr('hidden', true);
-                    $('#submit, #update').attr('disabled', false);
+                } else if ($('#charset').val() === '') {
+                    $('#charset').addClass('is-invalid');
+                    $('#charset').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
                 } else if ($('#username').val() === '') {
                     $('#username').addClass('is-invalid');
                     $('#username').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                    $('#submit-spinner, #update-spinner').attr('hidden', true);
-                    $('#submit, #update').attr('disabled', false);
                 } else if ($('#password').val() === '') {
                     $('#password').addClass('is-invalid');
                     $('#password').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                    $('#submit-spinner, #update-spinner').attr('hidden', true);
-                    $('#submit, #update').attr('disabled', false);
                 } else if (($('#create').length > 0 && $('#create-grant').length > 0) &&
                            ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
                            $('#create-username').val() === '') {
@@ -334,8 +337,6 @@
                     $('#create-username').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                    $('#submit-spinner').attr('hidden', true);
-                    $('#submit').attr('disabled', false);
                 } else if (($('#create').length > 0 && $('#create-grant').length > 0) &&
                            ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
                            $('#create-password').val() === '') {
@@ -343,43 +344,38 @@
                     $('#create-password').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                    $('#submit-spinner').attr('hidden', true);
-                    $('#submit').attr('disabled', false);
                 } else if ($('#email').val() === '') {
                     $('#email').addClass('is-invalid');
                     $('#email').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                    $('#submit-spinner').attr('hidden', true);
-                    $('#submit').attr('disabled', false);
                 } else if ($('#pass').val() === '') {
                     $('#pass').addClass('is-invalid');
                     $('#pass').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                    $('#submit-spinner').attr('hidden', true);
-                    $('#submit').attr('disabled', false);
                 } else if ($('#pwf').val() === '') {
                     $('#pwf').addClass('is-invalid');
                     $('#pwf').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                    $('#submit-spinner').attr('hidden', true);
-                    $('#submit').attr('disabled', false);
                 } else if ($('#cwf').val() === '') {
                     $('#cwf').addClass('is-invalid');
                     $('#cwf').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                    $('#submit-spinner').attr('hidden', true);
-                    $('#submit').attr('disabled', false);
                 } else {
+                    $(this).attr('disabled', true);
+                    $('#submit-spinner, #update-spinner').attr('hidden', false);
+                    $('#alert').attr('hidden', true);
+
                     var data = { };
                     data = $.extend(data,
                         {
                             "host"                  : $('#host').val(),
                             "port"                  : $('#port').val(),
-                            "database_name"         : $('#database_name').val(),
+                            "dbname"                : $('#dbname').val(),
+                            "charset"               : $('#charset').val(),
                             "username"              : $('#username').val(),
                             "password"              : $('#password').val()
                         });
@@ -419,8 +415,6 @@
                                         return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
                                     }).addClass('alert-success').html(data.responseMessage);
                                     $('#access').attr('disabled', false);
-                                    $('#access-div').attr('hidden', false);
-                                    $('#submit-div').attr('hidden', true);
                                     $('#update-div').attr('hidden', true);
                                     $('#submit-spinner, #update-spinner').attr('hidden', true);
                                 }, 1000);
@@ -526,6 +520,10 @@
                                         $('.installer-progress-bar').css('width', '100%');
                                         $('.installer-progress-bar').attr('aria-valuenow', 100);
                                         BazHelpers.setTimeoutTimers.stopAll();
+                                        setTimeout(function() {
+                                            $('#access-div').attr('hidden', false);
+                                            $('#submit-div').attr('hidden', true);
+                                        }, 1000);
                                     }
                                 } else {
                                     BazHelpers.setTimeoutTimers.stopAll();

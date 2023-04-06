@@ -113,6 +113,11 @@ class Dropzone
             $this->params['maxAttachments'] :
             5;
 
+        $this->fieldParams['noPreview'] =
+            isset($this->params['noPreview']) && $this->params['noPreview'] === true ?
+            $this->params['noPreview'] = 'hidden' :
+            $this->params['noPreview'] = '';
+
         if (isset($this->params['allowedUploads']) && $this->params['allowedUploads'] === 'images') {
             $this->fieldParams['allowedImageMimeType'] =
                 Json::encode($this->params['storage']['allowed_image_mime_types']);
@@ -242,7 +247,7 @@ class Dropzone
                         </ul>
                     </div>
                 </div>
-                <div class="row border-top pt-2" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-attachments">
+                <div class="row border-top pt-2" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-attachments" ' . $this->params['noPreview'] . '>
                     <div class="col">
                         <ul class="list-group" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments">';
 

@@ -1,4 +1,4 @@
-{# {{dump(core)}} #}
+{# {{var_dump(core['settings']['dbs'])}} #}
 <div class="row vdivide">
     <div class="col-md-2">
         {{adminltetags.useTag('fields',
@@ -99,18 +99,19 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
 
-var dbs = { };
-dbs = JSON.parse('{{dbs}}');
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['funcs'] = { };
+dataCollectionSectionForm['vars']['dbs'] = JSON.parse('{{dbs}}');
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-id'                              : { },
-        '{{componentId}}-{{sectionId}}-name'                            : { },
-        '{{componentId}}-{{sectionId}}-display_name'                    : { },
-        '{{componentId}}-{{sectionId}}-version'                         : { },
-        '{{componentId}}-{{sectionId}}-repo'                            : { },
-        '{{componentId}}-{{sectionId}}-description'                     : { },
-        '{{componentId}}-{{sectionId}}-debug'                           : {
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
+        '{{componentId}}-{{sectionId}}-name'                                    : { },
+        '{{componentId}}-{{sectionId}}-display_name'                            : { },
+        '{{componentId}}-{{sectionId}}-version'                                 : { },
+        '{{componentId}}-{{sectionId}}-repo'                                    : { },
+        '{{componentId}}-{{sectionId}}-description'                             : { },
+        '{{componentId}}-{{sectionId}}-debug'                                   : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-debug').click(function() {
                     if ($(this).find('input[type=radio]:checked').data('value') == 'debugon') {
@@ -133,8 +134,8 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-auto_off_debug'                  : { },
-        '{{componentId}}-{{sectionId}}-cache'                           : {
+        '{{componentId}}-{{sectionId}}-auto_off_debug'                          : { },
+        '{{componentId}}-{{sectionId}}-cache'                                   : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-cache').click(function() {
                     if ($(this).find('input[type=radio]:checked').data('value') == 'cacheon') {
@@ -146,21 +147,21 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-cache_timeout'                   : { },
-        '{{componentId}}-{{sectionId}}-cache_service'                   : {
+        '{{componentId}}-{{sectionId}}-cache_timeout'                           : { },
+        '{{componentId}}-{{sectionId}}-cache_service'                           : {
             placeholder : 'SELECT CACHE SERVICE'
         },
-        '{{componentId}}-{{sectionId}}-passwordWorkFactor'              : { },
-        '{{componentId}}-{{sectionId}}-cookiesWorkFactor'               : { },
-        '{{componentId}}-{{sectionId}}-logs'                            : {
+        '{{componentId}}-{{sectionId}}-passwordWorkFactor'                      : { },
+        '{{componentId}}-{{sectionId}}-cookiesWorkFactor'                       : { },
+        '{{componentId}}-{{sectionId}}-logs'                                    : {
             afterInit : function() {
                 //
             }
         },
-        '{{componentId}}-{{sectionId}}-logs_level'                      : {
+        '{{componentId}}-{{sectionId}}-logs_level'                              : {
             placeholder : 'SELECT LOGS LEVEL'
         },
-        '{{componentId}}-{{sectionId}}-emergency_logs_email'            : {
+        '{{componentId}}-{{sectionId}}-emergency_logs_email'                    : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-emergency_email_logs').click(function() {
                     if ($(this).find('input[type=radio]:checked').data('value') == 'emergencyon') {
@@ -172,25 +173,33 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-emergency_logs_email_addresses'  : { },
-        '{{componentId}}-{{sectionId}}-dbs'                             : { },
-        '{{componentId}}-{{sectionId}}-alldbs'                          : {
+        '{{componentId}}-{{sectionId}}-emergency_logs_email_addresses'          : { },
+        '{{componentId}}-{{sectionId}}-dbs'                                     : { },
+        '{{componentId}}-{{sectionId}}-alldbs'                                  : {
             placeholder : "SELECT DATABASE",
             afterInit: function() {
-                $('#{{componentId}}-{{sectionId}}-upload_restore-attachments').attr('hidden', true);
                 $('#{{componentId}}-{{sectionId}}-alldbs').on('select2:select', function(e) {
                     $('.generate-backup-span').html('Backup ' + e.params.data.text + ' db');
+                    $('.update-db-span').html('Update ' + e.params.data.text + ' db');
                     $('.delete-db-span').html('Remove ' + e.params.data.text + ' db');
 
-                    if (dbs[e.params.data.id]['active'] && dbs[e.params.data.id]['active'] == true) {
+                    if (dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['active'] && dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['active'] == true) {
                         $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = true;
                         $('#{{componentId}}-{{sectionId}}-is_active').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', true);
                     } else {
                         $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = false;
                         $('#{{componentId}}-{{sectionId}}-is_active').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', false);
                     }
+                    $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-db_host').val(dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['host']);
+                    $('#{{componentId}}-{{sectionId}}-db_port').val(dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['port']);
+                    $('#{{componentId}}-{{sectionId}}-db_name').val(dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['dbname']);
+                    $('#{{componentId}}-{{sectionId}}-db_charset').val(dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['charset']);
+                    $('#{{componentId}}-{{sectionId}}-db_username').val(dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['username']);
                 });
 
                 function generateBackup(id) {
@@ -217,7 +226,7 @@ dataCollectionSection =
 
                             var newOption = new Option(data.text, data.id, false, false);
                             $('#{{componentId}}-{{sectionId}}-backupdbs').append(newOption).val(data.id).trigger('change');
-                            addedNewOption(data.id, data.text);
+                            dataCollectionSectionForm['funcs']['addedNewBackupDbOption'](data.id, data.text);
 
                             $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-backup-db').children('i').attr('hidden', true);
@@ -228,14 +237,69 @@ dataCollectionSection =
                 }
 
                 function removeDb(id) {
-                    $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-delete-db').children('i').attr('hidden', false);
+                    $('#{{componentId}}-{{sectionId}}-start-remove').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-start-remove').children('i').attr('hidden', false);
+
+                    if ($('#{{componentId}}-{{sectionId}}-db_remove_root_username').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-db_remove_root_username').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-db_remove_root_username').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-db_remove_root_password').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-db_remove_root_password').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-db_remove_root_password').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else {
+                        var postData = { };
+                        postData['db'] = id;
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['username'] = $('#{{componentId}}-{{sectionId}}-db_remove_root_username').val();
+                        postData['password'] = $('#{{componentId}}-{{sectionId}}-db_remove_root_password').val();
+
+                        $.post('{{links.url("system/core/removedb")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+
+                            if (response.responseCode == 0) {
+                                PNotify.success({text : response.responseMessage});
+                                $('#{{componentId}}-{{sectionId}}-alldbs option[value="' + id + '"]').remove();
+                                delete dataCollectionSectionForm['vars']['dbs'][id];
+
+                                $('#{{componentId}}-{{sectionId}}-db_host').val('');
+                                $('#{{componentId}}-{{sectionId}}-db_port').val('');
+                                $('#{{componentId}}-{{sectionId}}-db_name').val('');
+                                $('#{{componentId}}-{{sectionId}}-db_charset').val('');
+                                $('#{{componentId}}-{{sectionId}}-db_username').val('');
+                                $('#{{componentId}}-{{sectionId}}-db_password').val('').trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = false;
+                                dataCollectionSectionForm['funcs']['extractData']();
+                            } else {
+                                PNotify.error({text : response.responseMessage});
+                            }
+
+                            $('#{{componentId}}-{{sectionId}}-start-remove').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-start-remove').children('i').attr('hidden', true);
+                            $('#remove-fields').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-db_remove_root_username').val('');
+                            $('#{{componentId}}-{{sectionId}}-db_remove_root_password').val('');
+                        }, 'json');
+                    }
+                }
+
+                function updateDb(id) {
+                    dataCollectionSectionForm['funcs']['extractData'](true, id);
+                    $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-update-db').children('i').attr('hidden', false);
 
                     var postData = { };
-                    postData['db'] = id;
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['db'] = dataCollectionSectionForm['vars']['dbs'][id];
+                    postData['changeActive'] = dataCollectionSectionForm['vars']['dbs']['changeActive'];
 
-                    $.post('{{links.url("system/core/removedb")}}', postData, function(response) {
+                    $.post('{{links.url("system/core/updatedb")}}', postData, function(response) {
                         if (response.tokenKey && response.token) {
                             $('#security-token').attr('name', response.tokenKey);
                             $('#security-token').val(response.token);
@@ -243,23 +307,15 @@ dataCollectionSection =
 
                         if (response.responseCode == 0) {
                             PNotify.success({text : response.responseMessage});
-
-                            var data = {
-                                id: response.responseData['uuid'],
-                                text: response.responseData['filename']
-                            };
-
-                            var newOption = new Option(data.text, data.id, false, false);
-                            $('#{{componentId}}-{{sectionId}}-backupdbs').append(newOption).val(data.id).trigger('change');
-                            addedNewOption(data.id, data.text);
-
-                            $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-delete-db').children('i').attr('hidden', true);
                         } else {
                             PNotify.error({text : response.responseMessage});
                         }
+
+                        $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-update-db').children('i').attr('hidden', true);
                     }, 'json');
                 }
+
                 $('#{{componentId}}-{{sectionId}}-backup-db').click(function(e) {
                     e.preventDefault();
 
@@ -268,25 +324,50 @@ dataCollectionSection =
                     generateBackup(id);
                 });
 
-                $('#{{componentId}}-{{sectionId}}-delete-db').click(function(e) {
+                $('#{{componentId}}-{{sectionId}}-update-db').click(function(e) {
                     e.preventDefault();
 
                     var id = $('#{{componentId}}-{{sectionId}}-alldbs').val();
 
-                    removeDb(id);
+                    updateDb(id);
                 });
-                extractData();
+
+                $('#{{componentId}}-{{sectionId}}-delete-db').click(function(e) {
+                    e.preventDefault();
+
+                    $('#remove-fields').attr('hidden', false);
+                    $(this).attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', true);
+
+                    $('#{{componentId}}-{{sectionId}}-cancel-remove').off();
+                    $('#{{componentId}}-{{sectionId}}-cancel-remove').click(function(e) {
+                        e.preventDefault();
+
+                        dataCollectionSectionForm['funcs']['clearFields'](false);
+                    });
+                    $('#{{componentId}}-{{sectionId}}-start-remove').off();
+                    $('#{{componentId}}-{{sectionId}}-start-remove').click(function(e) {
+                        e.preventDefault();
+
+                        var id = $('#{{componentId}}-{{sectionId}}-alldbs').val();
+
+                        removeDb(id);
+                    });
+                });
+
+                dataCollectionSectionForm['funcs']['extractData']();
             }
         },
-        '{{componentId}}-{{sectionId}}-is_active'                       : {
+        '{{componentId}}-{{sectionId}}-is_active'                               : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-is_active').click(function() {
                     var id = $('#{{componentId}}-{{sectionId}}-alldbs').val();
                     var text = $('#{{componentId}}-{{sectionId}}-alldbs option:selected').text();
                     var activeDb;
 
-                    for (var db in dbs) {
-                        if (dbs[db]['active'] == true) {
+                    for (var db in dataCollectionSectionForm['vars']['dbs']) {
+                        if (dataCollectionSectionForm['vars']['dbs'][db]['active'] == true) {
                             activeDb = db;
                         }
                     }
@@ -316,10 +397,10 @@ dataCollectionSection =
                                 $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = true;
                                 $('#{{componentId}}-{{sectionId}}-is_active').attr('disabled', true);
                                 $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', true);
-                                dbs[activeDb]['active'] = false;
-                                dbs[id]['active'] = true;
-                                dbs['changeActive'] = true;
-                                extractData();
+                                dataCollectionSectionForm['vars']['dbs'][activeDb]['active'] = false;
+                                dataCollectionSectionForm['vars']['dbs'][id]['active'] = true;
+                                dataCollectionSectionForm['vars']['dbs']['changeActive'] = true;
+                                dataCollectionSectionForm['funcs']['extractData']();
                                 return;
                             }
                             $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = false;
@@ -328,24 +409,112 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-db_host'                         : { },
-        '{{componentId}}-{{sectionId}}-db_drop'                         : { },
-        '{{componentId}}-{{sectionId}}-db_root_username'                : { },
-        '{{componentId}}-{{sectionId}}-db_root_password'                : { },
-        '{{componentId}}-{{sectionId}}-backupdbs'                       : {
+        '{{componentId}}-{{sectionId}}-db_host'                                 : { },
+        '{{componentId}}-{{sectionId}}-db_port'                                 : { },
+        '{{componentId}}-{{sectionId}}-db_name'                                 : { },
+        '{{componentId}}-{{sectionId}}-db_charset'                              : { },
+        '{{componentId}}-{{sectionId}}-db_username'                             : { },
+        '{{componentId}}-{{sectionId}}-db_password'                             : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-db_password_generate').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post('{{links.url("system/core/generatePw")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            if (response.responseData.password) {
+                                $('#{{componentId}}-{{sectionId}}-db_password').val(response.responseData.password).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-db_password').attr('type', 'text');
+                            }
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                        $('#{{componentId}}-{{sectionId}}-db_password').keyup(function() {
+                            if ($(this).val() === '') {
+                                $(this).attr('type', 'password');
+                            }
+                        });
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-db_password_strength_meter'              : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-db_password_strength_meter').strengthMeter({
+                    "url"       : '{{links.url("system/core/checkPwStrength")}}',
+                    "postData"  : {
+                        "session"           : $('#session-token').val()
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-db_remove_root_username'                 : { },
+        '{{componentId}}-{{sectionId}}-db_remove_root_password'                 : { },
+        '{{componentId}}-{{sectionId}}-db_drop'                                 : { },
+        '{{componentId}}-{{sectionId}}-db_restore_root_username'                : { },
+        '{{componentId}}-{{sectionId}}-db_restore_root_password'                : { },
+        '{{componentId}}-{{sectionId}}-db_restore_db_name'                      : { },
+        '{{componentId}}-{{sectionId}}-db_restore_db_username'                  : { },
+        '{{componentId}}-{{sectionId}}-db_restore_db_password'                  : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-db_restore_db_password_generate').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post('{{links.url("system/core/generatePw")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            if (response.responseData.password) {
+                                $('#{{componentId}}-{{sectionId}}-db_restore_db_password').val(response.responseData.password).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-db_restore_db_password').attr('type', 'text');
+                            }
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                        $('#{{componentId}}-{{sectionId}}-db_restore_db_password').keyup(function() {
+                            if ($(this).val() === '') {
+                                $(this).attr('type', 'password');
+                            }
+                        });
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-db_restore_db_password_strength_meter'   : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-db_restore_db_password_strength_meter').strengthMeter({
+                    "url"       : '{{links.url("system/core/checkPwStrength")}}',
+                    "postData"  : {
+                        "session"           : $('#session-token').val()
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-backupdbs'                               : {
             placeholder : "SELECT DATABASE TO RESTORE",
             allowClear  : true,
             afterInit   : function() {
                 $('#{{componentId}}-{{sectionId}}-backupdbs').on('select2:select', function(e) {
-                    addedNewOption(e.params.data.id, e.params.data.text);
+                    dataCollectionSectionForm['funcs']['addedNewBackupDbOption'](e.params.data.id, e.params.data.text);
                 });
 
                 $('#{{componentId}}-{{sectionId}}-backupdbs').on('select2:clear', function(e) {
-                    clearFields(true);
+                    dataCollectionSectionForm['funcs']['clearFields'](true);
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-form'                            : {
+        '{{componentId}}-{{sectionId}}-form'                                    : $.extend(dataCollectionSectionForm, {
             rules: {
                 '{{componentId}}-{{sectionId}}-display_name'            : 'required',
                 '{{componentId}}-{{sectionId}}-auto_off_debug'          : 'required',
@@ -384,14 +553,14 @@ dataCollectionSection =
 
                 return true;
             }
-        }
+        })
     });
 
 var swalSound = window['dataCollection'].env.sounds.swalSound;
 
-function clearFields(clear = true) {
+dataCollectionSectionForm['funcs']['clearFields'] = function(clear = true) {
     $('#restore-fields').attr('hidden', true);
-    $('#{{componentId}}-{{sectionId}}-db_root_username, #{{componentId}}-{{sectionId}}-db_root_password').val('');
+    $('#{{componentId}}-{{sectionId}}-db_restore_root_username, #{{componentId}}-{{sectionId}}-db_restore_root_password').val('');
     $('#{{componentId}}-{{sectionId}}-db_drop')[0].checked = false;
     $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', false);
 
@@ -403,8 +572,8 @@ function clearFields(clear = true) {
     }
 }
 
-function addedNewOption(id, text) {
-    clearFields(false);
+dataCollectionSectionForm['funcs']['addedNewBackupDbOption'] = function(id, text) {
+    dataCollectionSectionForm['funcs']['clearFields'](false);
     $('#{{componentId}}-{{sectionId}}-restore-db').attr('disabled', false);
     $('#{{componentId}}-{{sectionId}}-remove-db').attr('disabled', false);
     $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', false);
@@ -465,26 +634,45 @@ function addedNewOption(id, text) {
         $(this).attr('disabled', true);
         $('#restore-fields').attr('hidden', false);
         $('#{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
+        var dbname = $('#{{componentId}}-{{sectionId}}-backupdbs').text().trim().slice(0, -3);
+        var dbUsername = dbname + 'User';
+        $('#{{componentId}}-{{sectionId}}-db_restore_db_name').val(dbname);
+        $('#{{componentId}}-{{sectionId}}-db_restore_db_username').val(dbUsername);
     });
 
     $('#{{componentId}}-{{sectionId}}-cancel-restore').off();
     $('#{{componentId}}-{{sectionId}}-cancel-restore').click(function(e) {
         e.preventDefault();
 
-        clearFields(false);
+        dataCollectionSectionForm['funcs']['clearFields'](false);
     });
     $('#{{componentId}}-{{sectionId}}-start-restore').off();
     $('#{{componentId}}-{{sectionId}}-start-restore').click(function(e) {
         e.preventDefault();
 
-        if ($('#{{componentId}}-{{sectionId}}-db_root_username').val() === '') {
-            $('#{{componentId}}-{{sectionId}}-db_root_username').addClass('is-invalid');
-            $('#{{componentId}}-{{sectionId}}-db_root_username').focus(function() {
+        if ($('#{{componentId}}-{{sectionId}}-db_restore_db_name').val() === '') {
+            $('#{{componentId}}-{{sectionId}}-db_restore_db_name').addClass('is-invalid');
+            $('#{{componentId}}-{{sectionId}}-db_restore_db_name').focus(function() {
                 $(this).removeClass('is-invalid');
             });
-        } else if ($('#{{componentId}}-{{sectionId}}-db_root_password').val() === '') {
-            $('#{{componentId}}-{{sectionId}}-db_root_password').addClass('is-invalid');
-            $('#{{componentId}}-{{sectionId}}-db_root_password').focus(function() {
+        } else if ($('#{{componentId}}-{{sectionId}}-db_restore_db_username').val() === '') {
+            $('#{{componentId}}-{{sectionId}}-db_restore_db_username').addClass('is-invalid');
+            $('#{{componentId}}-{{sectionId}}-db_restore_db_username').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else if ($('#{{componentId}}-{{sectionId}}-db_restore_db_password').val() === '') {
+            $('#{{componentId}}-{{sectionId}}-db_restore_db_password').addClass('is-invalid');
+            $('#{{componentId}}-{{sectionId}}-db_restore_db_password').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else if ($('#{{componentId}}-{{sectionId}}-db_restore_root_username').val() === '') {
+            $('#{{componentId}}-{{sectionId}}-db_restore_root_username').addClass('is-invalid');
+            $('#{{componentId}}-{{sectionId}}-db_restore_root_username').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else if ($('#{{componentId}}-{{sectionId}}-db_restore_root_password').val() === '') {
+            $('#{{componentId}}-{{sectionId}}-db_restore_root_password').addClass('is-invalid');
+            $('#{{componentId}}-{{sectionId}}-db_restore_root_password').focus(function() {
                 $(this).removeClass('is-invalid');
             });
         } else {
@@ -493,8 +681,11 @@ function addedNewOption(id, text) {
 
             var postData = { };
             postData['filename'] = text;
-            postData['username'] = $('#{{componentId}}-{{sectionId}}-db_root_username').val();
-            postData['password'] = $('#{{componentId}}-{{sectionId}}-db_root_password').val();
+            postData['dbname'] = $('#{{componentId}}-{{sectionId}}-db_restore_db_name').val();
+            postData['username'] = $('#{{componentId}}-{{sectionId}}-db_restore_db_username').val();
+            postData['password'] = $('#{{componentId}}-{{sectionId}}-db_restore_db_password').val();
+            postData['root_username'] = $('#{{componentId}}-{{sectionId}}-db_restore_root_username').val();
+            postData['root_password'] = $('#{{componentId}}-{{sectionId}}-db_restore_root_password').val();
             postData['drop'] = $('#{{componentId}}-{{sectionId}}-db_drop')[0].checked;
             postData[$('#security-token').attr('name')] = $('#security-token').val();
 
@@ -507,7 +698,26 @@ function addedNewOption(id, text) {
                 if (response.responseCode == 0) {
                     PNotify.success({text : response.responseMessage});
 
-                    clearFields(false);
+                    dataCollectionSectionForm['vars']['dbs'][response.responseData.newDb.dbname] = response.responseData.newDb;
+
+                    var newOption = new Option(response.responseData.newDb.dbname, response.responseData.newDb.dbname, false, false);
+                    $('#{{componentId}}-{{sectionId}}-alldbs').append(newOption).val(response.responseData.newDb.dbname).trigger('change');
+                    dataCollectionSectionForm['funcs']['clearFields'](false);
+                    $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = false;
+                    $('#{{componentId}}-{{sectionId}}-is_active').attr('disabled', false);
+                    dataCollectionSectionForm['funcs']['extractData']();
+                    $('.generate-backup-span').html('Backup ' + response.responseData.newDb.dbname + ' db');
+                    $('.update-db-span').html('Update ' + response.responseData.newDb.dbname + ' db');
+                    $('.delete-db-span').html('Remove ' + response.responseData.newDb.dbname + ' db');
+                    $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-db_host').val(response.responseData.newDb.host);
+                    $('#{{componentId}}-{{sectionId}}-db_port').val(response.responseData.newDb.port);
+                    $('#{{componentId}}-{{sectionId}}-db_name').val(response.responseData.newDb.dbname);
+                    $('#{{componentId}}-{{sectionId}}-db_charset').val(response.responseData.newDb.charset);
+                    $('#{{componentId}}-{{sectionId}}-db_username').val(response.responseData.newDb.username);
+                    $('#{{componentId}}-{{sectionId}}-db_password').val('');
                 } else {
                     PNotify.error({text : response.responseMessage});
                 }
@@ -523,14 +733,14 @@ $('#body').on('dropzoneInitDone', function() {
         if (response.responseData && response.responseData.name && response.responseData.uuid) {
             var newOption = new Option(response.responseData.name, response.responseData.uuid, false, false);
             $('#{{componentId}}-{{sectionId}}-backupdbs').append(newOption).val(response.responseData.uuid).trigger('change');
-            addedNewOption(response.responseData.uuid, response.responseData.name);
+            dataCollectionSectionForm['funcs']['addedNewBackupDbOption'](response.responseData.uuid, response.responseData.name);
             PNotify.success({text: 'File ' + response.responseData.name + ' uploaded and ready to be restored.'});
             dataCollectionSection['admin-core-main-upload_restore']['reset']();
         }
     };
 });
 
-function extractData() {
+dataCollectionSectionForm['funcs']['extractData'] = function(updateDb = false, id = null) {
     // Make a data object
     if (!dataCollectionSectionForm['data']) {
         dataCollectionSectionForm['data'] = { };
@@ -538,6 +748,16 @@ function extractData() {
     if (!dataCollectionSection['data']['dbs']) {
         dataCollectionSection['data']['dbs'] = { };
     }
-    dataCollectionSection['data']['dbs'] = dbs;
+
+    if (updateDb === true && id) {
+        dataCollectionSectionForm['vars']['dbs'][id]['host'] = $('#{{componentId}}-{{sectionId}}-db_host').val();
+        dataCollectionSectionForm['vars']['dbs'][id]['port'] = $('#{{componentId}}-{{sectionId}}-db_port').val();
+        dataCollectionSectionForm['vars']['dbs'][id]['dbname'] = $('#{{componentId}}-{{sectionId}}-db_name').val();
+        dataCollectionSectionForm['vars']['dbs'][id]['charset'] = $('#{{componentId}}-{{sectionId}}-db_charset').val();
+        dataCollectionSectionForm['vars']['dbs'][id]['username'] = $('#{{componentId}}-{{sectionId}}-db_username').val();
+        dataCollectionSectionForm['vars']['dbs'][id]['password'] = $('#{{componentId}}-{{sectionId}}-db_password').val();
+    }
+
+    dataCollectionSection['data']['dbs'] = dataCollectionSectionForm['vars']['dbs'];
 }
 </script>

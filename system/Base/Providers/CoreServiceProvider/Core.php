@@ -115,6 +115,7 @@ class Core extends BasePackage
 
 		if ($fileInfo) {
 			try {
+				// if (checkCtype($data['dbname']))
 				$newDbName = str_replace('.gz', '', $fileInfo['org_file_name']);
 
 				$file = $this->basepackages->storages->getFile(['uuid' => $fileInfo['uuid'], 'headers' => false]);
@@ -126,7 +127,7 @@ class Core extends BasePackage
 				} catch (FilesystemException | UnableToWriteFile $exception) {
 					throw $exception;
 				}
-
+				var_dump($data);die();
 				$newDbUserName = $newDbName . 'User';
 
 				$dbConfig = $this->getDb(true);
@@ -212,19 +213,89 @@ class Core extends BasePackage
 		}
 
 		$dbConfig = $this->getDb(false, $data['db']);
-		$dbConfig['password'] = $this->crypt->decryptBase64($dbConfig['password'], $this->getDbKey($dbConfig));
 
-		try {
-			$this->db = new Mysql($dbConfig);
-
-			$this->executeSQL("DROP DATABASE `?`;", [$dbConfig['dbname']]);
-		} catch (\PDOException $e) {
-			$this->addResponse('Remove Error: ' . $e->getMessage(), 1);
+		if ($dbConfig['active'] == true) {
+			$this->addResponse('Cannot remove active database', 1, []);
 
 			return false;
 		}
 
+		if (!isset($data['username']) || !isset($data['password'])) {
+			$this->addResponse('Please provide username and password that has delete rights on database.', 1, []);
+
+			return false;
+		}
+
+		$dbConfig['username'] = $data['username'];
+		$dbConfig['password'] = $data['password'];
+
+		try {
+			$this->db = new Mysql($dbConfig);
+
+			$this->executeSQL("DROP DATABASE IF EXISTS `" . $dbConfig['dbname'] . "`;");
+		} catch (\PDOException | \Exception$e) {
+			if ($e->getCode() !== 1049) {
+				$this->addResponse('Remove Error: ' . $e->getMessage(), 1);
+
+				return false;
+			}
+		}
+
+		unset($this->core['settings']['dbs'][$dbConfig['dbname']]);
+
+		$this->update($this->core);
+
 		$this->addResponse('Database removed', 0, []);
+	}
+
+	public function updateDb(array $data)
+	{
+		if (!isset($data['db']['dbname'])) {
+			$this->addResponse('Please provide database name', 1, []);
+
+			return false;
+		}
+
+		$dbConfig = $this->getDb(false, $data['db']['dbname']);
+		// var_dump($dbConfig);die();
+		if ($dbConfig['active'] == true) {
+			$this->addResponse('Cannot update active database', 1, []);
+
+			return false;
+		}
+
+		$dbConfig = array_merge($dbConfig, $data['db']);
+
+		// Try Connecting to DB with new information
+		try {
+			$this->db = new Mysql($dbConfig);
+
+			if ($this->core['settings']['dbs'][$dbConfig['dbname']]['charset'] !== $dbConfig['charset']) {
+				$charsetCollate = $dbConfig['charset'] . '_general_ci';
+				$this->executeSQL("ALTER DATABASE ? CHARACTER SET ? COLLATE ?", [$dbConfig['dbname'], $dbConfig['charset'], $charsetCollate]);
+				// ALTER TABLE tablename CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+			}
+		} catch (\PDOException $e) {
+			$this->addResponse('Update Error: ' . $e->getMessage(), 1);
+
+			return false;
+		}
+
+		$dbConfig['password'] = $this->crypt->encryptBase64($dbConfig['password'], $this->getDbKey($dbConfig));
+
+		if (isset($data['changeActive']) && $data['changeActive'] == true) {
+			foreach ($this->core['settings']['dbs'] as $dbKey => &$db) {
+				$db['active'] = false;//Make all active false.
+			}
+
+			$this->writeBaseConfig($dbConfig);
+		}
+
+		$this->core['settings']['dbs'][$dbConfig['dbname']] = $dbConfig;
+
+		$this->update($this->core);
+
+		$this->addResponse('Database updated', 0, []);
 	}
 
 	public function updateCore(array $data)
@@ -263,18 +334,6 @@ class Core extends BasePackage
 		if (isset($data['dbs'])) {
 			$data['dbs'] = Json::decode($data['dbs'], true);
 			$this->core['settings']['dbs'] = $data['dbs'];
-		}
-
-		if (isset($data['dbs']['changeActive']) && $data['dbs']['changeActive'] == true) {
-			unset($data['dbs']['changeActive']);
-
-			foreach ($data['dbs'] as $dbKey => $db) {
-				if ($db['active'] == true) {
-					$dbConfig = $db;
-				}
-			}
-
-			$this->writeBaseConfig($dbConfig);
 		}
 
 		$this->update($data);
@@ -360,11 +419,11 @@ return
 		"db" 				=>
 		[
 			"host" 							=> "' . $dbConfig['host'] . '",
+			"port" 							=> "' . $dbConfig['port'] . '",
 			"dbname" 						=> "' . $dbConfig['dbname'] . '",
+			"charset" 	 	    			=> "' . $dbConfig['charset'] . '"
 			"username" 						=> "' . $dbConfig['username'] . '",
 			"password" 						=> "' . $dbConfig['password'] . '",
-			"port" 							=> "' . $dbConfig['port'] . '",
-			"charset" 	 	    			=> "' . $dbConfig['charset'] . '"
 		],
 		"cache"				=>
 		[
@@ -380,7 +439,7 @@ return
 		"logs"				=>
 		[
 			"enabled"						=> ' . $this->core['settings']['logs']['enabled'] . ',
-			"exceptions"					=> true,
+			"exceptions"					=> ' . $this->core['settings']['logs']['exceptions'] . ',
 			"level"							=> "' . $this->core['settings']['logs']['level'] . '",
 			"service"						=> "' . $this->core['settings']['logs']['service'] . '",
 			"emergencyLogsEmail"			=> ' . $this->core['settings']['logs']['emergencyLogsEmail'] . ',
@@ -473,5 +532,27 @@ return
 		}
 
 		return false;
+	}
+
+	public function checkPwStrength(string $pass)
+	{
+		$checkingTool = new \ZxcvbnPhp\Zxcvbn();
+
+		$result = $checkingTool->passwordStrength($pass);
+
+		if ($result && is_array($result) && isset($result['score'])) {
+			$this->addResponse('Checking Password Strength Success', 0, ['result' => $result['score']]);
+
+			return $result['score'];
+		}
+
+		$this->addResponse('Error Checking Password Strength', 1);
+
+		return false;
+	}
+
+	public function generateNewPassword()
+	{
+		$this->addResponse('Password Generate Successfully', 0, ['password' => $this->secTools->random->base62(12)]);
 	}
 }

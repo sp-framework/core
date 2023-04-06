@@ -168,4 +168,67 @@ class CoreComponent extends BaseComponent
             $this->addResponse('Method Not Allowed', 1);
         }
     }
+
+    public function updateDbAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->core->updateDb($this->postData())) {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode,
+                    $this->core->packagesData->responseData,
+                );
+            } else {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode
+                );
+            }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function checkPwStrengthAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->core->checkPwStrength($this->postData()['pass']) !== false) {
+                $this->view->responseData = $this->core->packagesData->responseData;
+            }
+
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function generatePwAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->core->generateNewPassword();
+
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode,
+                $this->core->packagesData->responseData
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
 }

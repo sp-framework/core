@@ -87,17 +87,26 @@ return
 		if (isset($this->postData['dev']) && $this->postData['dev'] == 'false') {
 			$debug = "false";
 			$cache = "true";
+			$logsEnabled = "true";
+			$logsExceptions = "true";
 			$logLevel = "INFO";
+			$logsEmail = "false";
 			$dev = "false";
 		} else if (isset($this->postData['dev']) && $this->postData['dev'] == 'true') {
 			$debug = "true";
 			$cache = "false";
+			$logsEnabled = "true";
+			$logsExceptions = "false";
 			$logLevel = "DEBUG";
+			$logsEmail = "true";
 			$dev = "true";
 		} else {
 			$debug = $this->coreJson['settings']['debug'] === true ? 'true' : 'false';
 			$cache = $this->coreJson['settings']['cache']['enabled'] === true ? 'true' : 'false';
+			$logsEnabled = $this->coreJson['settings']['logs']['enabled'] === true ? 'true' : 'false';
+			$logsExceptions = $this->coreJson['settings']['logs']['exceptions'] === true ? 'true' : 'false';
 			$logLevel = $this->coreJson['settings']['logs']['level'] === true ? 'true' : 'false';
+			$logsEmail = $this->coreJson['settings']['logs']['emergencyLogsEmail'] === true ? 'true' : 'false';
 			$dev = $this->coreJson['settings']['dev'] === true ? 'true' : 'false';
 		}
 		$setup = 'false';
@@ -106,14 +115,14 @@ return
 		$this->coreJson['settings']['debug'] = $debug === 'true'? true: false;
 		$this->coreJson['settings']['cache']['enabled'] = $cache === 'true'? true: false;
 		$this->coreJson['settings']['dev'] = $dev === 'true'? true: false;
-		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['active'] = true;
-		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['host'] = $this->postData['host'];
-		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['dbname'] = $this->postData['database_name'];
-		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['username'] = $this->postData['username'];
+		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['active'] = true;
+		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['host'] = $this->postData['host'];
+		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['dbname'] = $this->postData['dbname'];
+		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['username'] = $this->postData['username'];
 		$this->postData['password'] = $this->container['crypt']->encryptBase64($this->postData['password'], $this->createDbKey());
-		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['password'] = $this->postData['password'];
-		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['port'] = $this->postData['port'];
-		$this->coreJson['settings']['dbs'][$this->postData['database_name']]['charset'] = 'utf8mb4';
+		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['password'] = $this->postData['password'];
+		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['port'] = $this->postData['port'];
+		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['charset'] = 'utf8mb4';
 		$this->coreJson['settings']['logs']['level'] = $logLevel;
 		$this->coreJson['settings']['security']['passwordWorkFactor'] = $pwf;
 		$this->coreJson['settings']['security']['cookiesWorkFactor'] = $cwf;
@@ -129,11 +138,11 @@ return
 		"db" 				=>
 		[
 			"host" 							=> "' . $this->postData['host'] . '",
-			"dbname" 						=> "' . $this->postData['database_name'] . '",
+			"port" 							=> "' . $this->postData['port'] . '",
+			"dbname" 						=> "' . $this->postData['dbname'] . '",
+			"charset" 	 	    			=> "' . $this->postData['charset'] . '",
 			"username" 						=> "' . $this->postData['username'] . '",
 			"password" 						=> "' . $this->postData['password'] . '",
-			"port" 							=> "' . $this->postData['port'] . '",
-			"charset" 	 	    			=> "utf8mb4"
 		],
 		"cache"				=>
 		[
@@ -148,11 +157,11 @@ return
 		],
 		"logs"				=>
 		[
-			"enabled"						=> true,
-			"exceptions"					=> true,
+			"enabled"						=> "' . $logsEnabled .'",
+			"exceptions"					=> "' . $logsExceptions .'",
 			"level"							=> "' . $logLevel . '",
-			"service"						=> "' . $this->coreJson['settings']['logs']['service'] . '",
-			"emergencyLogsEmail"			=> false,
+			"service"						=> "streamLogs",
+			"emergencyLogsEmail"			=> "' . $logsEmail . '",
 			"emergencyLogsEmailAddresses"	=> "' . $this->coreJson['settings']['logs']['emergencyLogsEmailAddresses'] . '",
 		],
 		"websocket"			=>
@@ -205,7 +214,7 @@ return
 
 	private function createDbKey()
 	{
-		$keys[$this->postData['database_name']] = $this->container['random']->base58(4);
+		$keys[$this->postData['dbname']] = $this->container['random']->base58(4);
 
 		try {
 			$this->container['localContent']->write('system/.dbkeys', Json::encode($keys));
@@ -213,7 +222,7 @@ return
 			throw $exception;
 		}
 
-		return $keys[$this->postData['database_name']];
+		return $keys[$this->postData['dbname']];
 	}
 
 	private function getDbKey()
@@ -224,6 +233,6 @@ return
 			throw $exception;
 		}
 
-		return Json::decode($keys, true)[$this->postData['database_name']];
+		return Json::decode($keys, true)[$this->postData['dbname']];
 	}
 }
