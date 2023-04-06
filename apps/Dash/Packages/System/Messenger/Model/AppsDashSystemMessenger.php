@@ -4,7 +4,7 @@ namespace Apps\Dash\Packages\System\Messenger\Model;
 
 use System\Base\BaseModel;
 
-class SystemMessenger extends BaseModel
+class AppsDashSystemMessenger extends BaseModel
 {
     public $id;
 

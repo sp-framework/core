@@ -8,11 +8,11 @@ use BlueLibraries\Dns\Records\RecordTypes;
 use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Url;
 use System\Base\BasePackage;
-use System\Base\Providers\DomainsServiceProvider\Model\Domains as DomainsModel;
+use System\Base\Providers\DomainsServiceProvider\Model\ServiceProviderDomains;
 
 class Domains extends BasePackage
 {
-	protected $modelToUse = DomainsModel::class;
+	protected $modelToUse = ServiceProviderDomains::class;
 
 	public $domains;
 

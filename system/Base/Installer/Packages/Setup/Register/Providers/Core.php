@@ -1,6 +1,6 @@
 <?php
 
-namespace System\Base\Installer\Packages\Setup\Register;
+namespace System\Base\Installer\Packages\Setup\Register\Providers;
 
 class Core
 {
@@ -18,7 +18,7 @@ class Core
 		// }
 
 		$db->insertAsDict(
-			'core',
+			'service_provider_core',
 			[
 				'name' 					=> $baseConfig['name'],
 				'display_name'			=> $baseConfig['display_name'],

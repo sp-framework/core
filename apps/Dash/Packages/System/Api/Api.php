@@ -2,11 +2,8 @@
 
 namespace Apps\Dash\Packages\System\Api;
 
-use Apps\Dash\Packages\System\Api\Model\SystemApi;
-use Apps\Dash\Packages\System\Api\Model\SystemApiCalls;
-use Apps\Dash\Packages\System\Api\Model\SystemApiEbay;
-use Apps\Dash\Packages\System\Api\Model\SystemApiGeneric;
-use Apps\Dash\Packages\System\Api\Model\SystemApiXero;
+use Apps\Dash\Packages\System\Api\Model\AppsDashSystemApi;
+use Apps\Dash\Packages\System\Api\Model\AppsDashSystemApiCalls;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
@@ -15,7 +12,7 @@ class Api extends BasePackage
 {
     protected $statsDirectory = 'var/api/callStats/';
 
-    protected $modelToUse = SystemApi::class;
+    protected $modelToUse = AppsDashSystemApi::class;
 
     protected $packageName = 'api';
 
@@ -58,7 +55,7 @@ class Api extends BasePackage
 
     public function init()
     {
-        $this->modelToUse = SystemApi::class;
+        $this->modelToUse = AppsDashSystemApi::class;
 
         $this->packageName = 'api';
 
@@ -92,7 +89,7 @@ class Api extends BasePackage
 
     protected function initAPIType($data)
     {
-        $this->modelToUse = 'Apps\\Dash\\Packages\\System\\Api\\Model\\SystemApi' . ucfirst($data['api_type']);
+        $this->modelToUse = 'Apps\\Dash\\Packages\\System\\Api\\Model\\AppsDashSystemApi' . ucfirst($data['api_type']);
 
         $this->packageName = 'api' . ucfirst($data['api_type']);
     }
@@ -480,7 +477,7 @@ class Api extends BasePackage
 
     public function updateApiCallStats($callMethod, $apiId, $callStats)
     {
-        $this->modelToUse = SystemApiCalls::class;
+        $this->modelToUse = AppsDashSystemApiCalls::class;
 
         $data['call_method'] = $callMethod;
         $data['api_id'] = $apiId;
@@ -494,7 +491,7 @@ class Api extends BasePackage
 
     public function getApiCallMethodStat($callMethod, $apiId)
     {
-        $api = new SystemApiCalls;
+        $api = new AppsDashSystemApiCalls;
 
         $methodEntry = $api::findFirst(
             [

@@ -4,7 +4,7 @@ namespace Apps\Dash\Packages\Devtools\Api\Enums\Model;
 
 use System\Base\BaseModel;
 
-class DevtoolsApiEnums extends BaseModel
+class AppsDashDevtoolsApiEnums extends BaseModel
 {
     public $id;
 

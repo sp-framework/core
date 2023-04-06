@@ -2,7 +2,7 @@
 
 namespace Apps\Dash\Packages\System\Messenger;
 
-use Apps\Dash\Packages\System\Messenger\Model\SystemMessenger;
+use Apps\Dash\Packages\System\Messenger\Model\AppsDashSystemMessenger;
 use Phalcon\Cache\AdapterFactory;
 use Phalcon\Cache\CacheFactory;
 use Phalcon\Helper\Json;
@@ -15,7 +15,7 @@ use ZMQContext;
 
 class Messenger extends BasePackage implements MessageComponentInterface
 {
-    protected $modelToUse = SystemMessenger::class;
+    protected $modelToUse = AppsDashSystemMessenger::class;
 
     protected $packageName = 'messenger';
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace System\Base\Installer\Packages\Setup\Register;
+namespace System\Base\Installer\Packages\Setup\Register\Providers;
 
 use BlueLibraries\Dns\DnsRecords;
 use BlueLibraries\Dns\Handlers\Types\TCP;
@@ -36,7 +36,7 @@ class Domain
 		}
 
 		$db->insertAsDict(
-			'domains',
+			'service_provider_domains',
 			[
 				'name'   							=> $request->getHttpHost(),
 				'description' 						=> '',

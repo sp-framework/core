@@ -7,12 +7,11 @@ use System\Base\BasePackage;
 use System\Base\Providers\AppsServiceProvider\Apps\Types;
 use System\Base\Providers\AppsServiceProvider\Exceptions\AppNotFoundException;
 use System\Base\Providers\AppsServiceProvider\IpFilter;
-use System\Base\Providers\AppsServiceProvider\Model\Apps as AppsModel;
-use System\Base\Providers\AppsServiceProvider\Model\AppsIpFilter;
+use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderApps;
 
 class Apps extends BasePackage
 {
-	protected $modelToUse = AppsModel::class;
+	protected $modelToUse = ServiceProviderApps::class;
 
 	protected $packageName = 'apps';
 

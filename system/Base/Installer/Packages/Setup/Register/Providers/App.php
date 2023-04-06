@@ -1,6 +1,6 @@
 <?php
 
-namespace System\Base\Installer\Packages\Setup\Register;
+namespace System\Base\Installer\Packages\Setup\Register\Providers;
 
 use Phalcon\Db\Enum;
 use Phalcon\Helper\Json;
@@ -10,7 +10,7 @@ class App
 	public function register($db)
 	{
 		$insertApp = $db->insertAsDict(
-			'apps',
+			'service_provider_apps',
 			[
 				'name' 						=> 'Admin',
 				'route' 					=> 'admin',
@@ -53,7 +53,7 @@ class App
 			);
 
 		$db->updateAsDict(
-			'apps',
+			'service_provider_apps',
 			[
 				'default_component' 	=> $dashboardsComponent[0]['id'],
 				'errors_component' 		=> $errorsComponent[0]['id']

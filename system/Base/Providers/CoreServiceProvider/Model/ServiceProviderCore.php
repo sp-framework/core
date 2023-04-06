@@ -4,7 +4,7 @@ namespace System\Base\Providers\CoreServiceProvider\Model;
 
 use System\Base\BaseModel;
 
-class Core extends BaseModel
+class ServiceProviderCore extends BaseModel
 {
     public $id;
 

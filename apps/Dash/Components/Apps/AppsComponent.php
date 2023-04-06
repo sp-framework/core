@@ -5,7 +5,6 @@ namespace Apps\Dash\Components\Apps;
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
-use System\Base\Installer\Packages\Setup\Schema\Apps\IpBlackList;
 
 class AppsComponent extends BaseComponent
 {

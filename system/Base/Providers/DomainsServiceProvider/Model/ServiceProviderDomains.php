@@ -4,7 +4,7 @@ namespace System\Base\Providers\DomainsServiceProvider\Model;
 
 use System\Base\BaseModel;
 
-class Domains extends BaseModel
+class ServiceProviderDomains extends BaseModel
 {
     public $id;
 

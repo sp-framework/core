@@ -4,7 +4,7 @@ namespace Apps\Dash\Packages\System\Api\Model;
 
 use System\Base\BaseModel;
 
-class SystemApiCalls extends BaseModel
+class AppsDashSystemApiCalls extends BaseModel
 {
     public $id;
 

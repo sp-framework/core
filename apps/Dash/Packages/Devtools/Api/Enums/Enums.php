@@ -3,7 +3,7 @@
 namespace Apps\Dash\Packages\Devtools\Api\Enums;
 
 use Apps\Dash\Packages\Devtools\Api\Contracts\Contracts;
-use Apps\Dash\Packages\Devtools\Api\Enums\Model\DevtoolsApiEnums;
+use Apps\Dash\Packages\Devtools\Api\Enums\Model\AppsDashDevtoolsApiEnums;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use Phalcon\Helper\Str;
@@ -11,7 +11,7 @@ use System\Base\BasePackage;
 
 class Enums extends BasePackage
 {
-    protected $modelToUse = DevtoolsApiEnums::class;
+    protected $modelToUse = AppsDashDevtoolsApiEnums::class;
 
     protected $packageName = 'enums';
 

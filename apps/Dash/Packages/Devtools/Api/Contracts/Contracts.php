@@ -4,7 +4,7 @@ namespace Apps\Dash\Packages\Devtools\Api\Contracts;
 
 use Apps\Dash\Packages\Devtools\Api\Contracts\ContractsOAPI;
 use Apps\Dash\Packages\Devtools\Api\Contracts\ContractsXML;
-use Apps\Dash\Packages\Devtools\Api\Contracts\Model\DevtoolsApiContracts;
+use Apps\Dash\Packages\Devtools\Api\Contracts\Model\AppsDashDevtoolsApiContracts;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use Phalcon\Helper\Str;
@@ -12,7 +12,7 @@ use System\Base\BasePackage;
 
 class Contracts extends BasePackage
 {
-    protected $modelToUse = DevtoolsApiContracts::class;
+    protected $modelToUse = AppsDashDevtoolsApiContracts::class;
 
     protected $packageName = 'contracts';
 

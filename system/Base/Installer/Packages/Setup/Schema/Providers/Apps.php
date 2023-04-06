@@ -1,6 +1,6 @@
 <?php
 
-namespace System\Base\Installer\Packages\Setup\Schema;
+namespace System\Base\Installer\Packages\Setup\Schema\Providers;
 
 use Phalcon\Db\Column;
 use Phalcon\Db\Index;

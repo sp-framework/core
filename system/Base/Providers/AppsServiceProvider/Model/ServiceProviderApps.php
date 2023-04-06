@@ -3,9 +3,9 @@
 namespace System\Base\Providers\AppsServiceProvider\Model;
 
 use System\Base\BaseModel;
-use System\Base\Providers\AppsServiceProvider\Model\AppsIpFilter;
+use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsIpFilter;
 
-class Apps extends BaseModel
+class ServiceProviderApps extends BaseModel
 {
     protected $modelRelations = [];
 
@@ -43,7 +43,7 @@ class Apps extends BaseModel
 
         $this->modelRelations['ipFilters']['relationObj'] = $this->hasMany(
             'id',
-            AppsIpFilter::class,
+            ServiceProviderAppsIpFilter::class,
             'app_id',
             [
                 'alias'         => 'ipFilters'
@@ -52,7 +52,7 @@ class Apps extends BaseModel
 
         $this->modelRelations['blacklist']['relationObj'] = $this->hasOne(
             'id',
-            AppsIpFilter::class,
+            ServiceProviderAppsIpFilter::class,
             'app_id',
             [
                 'alias'         => 'blacklist',
@@ -70,7 +70,7 @@ class Apps extends BaseModel
 
         $this->modelRelations['monitorlist']['relationObj'] = $this->hasOne(
             'id',
-            AppsIpFilter::class,
+            ServiceProviderAppsIpFilter::class,
             'app_id',
             [
                 'alias'         => 'monitorlist',

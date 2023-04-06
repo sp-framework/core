@@ -3,7 +3,9 @@
 namespace System\Base\Installer\Packages;
 
 use Apps\Dash\Packages\Devtools\Api\Contracts\Install\Schema\DevtoolsApiContracts;
+use Apps\Dash\Packages\Devtools\Api\Contracts\Model\AppsDashDevtoolsApiContracts;
 use Apps\Dash\Packages\Devtools\Api\Enums\Install\Schema\DevtoolsApiEnums;
+use Apps\Dash\Packages\Devtools\Api\Enums\Model\AppsDashDevtoolsApiEnums;
 use Apps\Dash\Packages\System\Api\Install\Schema\SystemApi;
 use Apps\Dash\Packages\System\Api\Install\Schema\SystemApiCalls;
 use Apps\Dash\Packages\System\Messenger\Install\Schema\SystemMessenger;
@@ -15,7 +17,7 @@ use Phalcon\Db\Column;
 use Phalcon\Db\Index;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
-use System\Base\Installer\Packages\Setup\Register\App as RegisterApp;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Dashboard as RegisterAdminDashboard;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Filter as RegisterFilter;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Geo\Countries as RegisterCountries;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Geo\Timezones as RegisterTimezones;
@@ -24,20 +26,18 @@ use System\Base\Installer\Packages\Setup\Register\Basepackages\Storages\Storages
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Account as RegisterRootAdminAccount;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Profile as RegisterRootAdminProfile;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Role as RegisterRole;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Widgets as RegisterAdminWidgets;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Schedules as RegisterSchedules;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Tasks as RegisterTasks;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Workers as RegisterWorkers;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Dashboard as RegisterAdminDashboard;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Widgets as RegisterAdminWidgets;
-use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
-use System\Base\Installer\Packages\Setup\Register\Domain as RegisterDomain;
 use System\Base\Installer\Packages\Setup\Register\Modules\Component as RegisterComponent;
 use System\Base\Installer\Packages\Setup\Register\Modules\Middleware as RegisterMiddleware;
 use System\Base\Installer\Packages\Setup\Register\Modules\Package as RegisterPackage;
 use System\Base\Installer\Packages\Setup\Register\Modules\Repository as RegisterRepository;
 use System\Base\Installer\Packages\Setup\Register\Modules\View as RegisterView;
-use System\Base\Installer\Packages\Setup\Schema\Apps;
-use System\Base\Installer\Packages\Setup\Schema\Apps\IpFilter;
+use System\Base\Installer\Packages\Setup\Register\Providers\App as RegisterApp;
+use System\Base\Installer\Packages\Setup\Register\Providers\Core as RegisterCore;
+use System\Base\Installer\Packages\Setup\Register\Providers\Domain as RegisterDomain;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ActivityLogs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\AddressBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards;
@@ -71,15 +71,17 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Jobs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Schedules;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Tasks;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Workers;
-use System\Base\Installer\Packages\Setup\Schema\Cache;
-use System\Base\Installer\Packages\Setup\Schema\Core;
-use System\Base\Installer\Packages\Setup\Schema\Domains;
-use System\Base\Installer\Packages\Setup\Schema\Logs;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Components;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Middlewares;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Packages;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Repositories;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Apps;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\IpFilter;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Cache;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Core;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Domains;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Logs;
 use System\Base\Installer\Packages\Setup\Write\Configs;
 use System\Base\Installer\Packages\Setup\Write\Pdo;
 
@@ -238,17 +240,19 @@ class Setup
 	{
 		$dbName = $this->dbConfig['db']['dbname'];
 
-		$this->db->createTable('core', $dbName, (new Core)->columns());
-		$this->db->createTable('apps', $dbName, (new Apps)->columns());
-		$this->db->createTable('apps_ip_filter', $dbName, (new IpFilter)->columns());
-		$this->db->createTable('domains', $dbName, (new Domains)->columns());
+		$this->db->createTable('service_provider_core', $dbName, (new Core)->columns());
+		$this->db->createTable('service_provider_apps', $dbName, (new Apps)->columns());
+		$this->db->createTable('service_provider_apps_ip_filter', $dbName, (new IpFilter)->columns());
+		$this->db->createTable('service_provider_domains', $dbName, (new Domains)->columns());
+		$this->db->createTable('service_provider_logs', $dbName, (new Logs)->columns());
+		$this->db->createTable('service_provider_cache', $dbName, (new Cache)->columns());
+
 		$this->db->createTable('modules_components', $dbName, (new Components)->columns());
 		$this->db->createTable('modules_packages', $dbName, (new Packages)->columns());
 		$this->db->createTable('modules_middlewares', $dbName, (new Middlewares)->columns());
 		$this->db->createTable('modules_views', $dbName, (new Views)->columns());
 		$this->db->createTable('modules_repositories', $dbName, (new Repositories)->columns());
-		$this->db->createTable('basepackages_cache', $dbName, (new Cache)->columns());
-		$this->db->createTable('basepackages_logs', $dbName, (new Logs)->columns());
+
 		$this->db->createTable('basepackages_email_services', $dbName, (new EmailServices)->columns());
 		$this->db->createTable('basepackages_email_queue', $dbName, (new EmailQueue)->columns());
 		$this->db->createTable('basepackages_users_accounts', $dbName, (new Accounts)->columns());
@@ -285,13 +289,13 @@ class Setup
 		$this->db->createTable('basepackages_dashboards', $dbName, (new Dashboards)->columns());
 		$this->db->createTable('basepackages_dashboards_widgets', $dbName, (new DashboardsWidgets)->columns());
 		$this->db->createTable('basepackages_widgets', $dbName, (new Widgets)->columns());
-		$this->db->createTable('system_api_calls', $dbName, (new SystemApiCalls)->columns());
-		$this->db->createTable('system_api', $dbName, (new SystemApi)->columns());
-		$this->db->createTable('system_messenger', $dbName, (new SystemMessenger)->columns());
+		$this->db->createTable('apps_dash_system_api_calls', $dbName, (new SystemApiCalls)->columns());
+		$this->db->createTable('apps_dash_system_api', $dbName, (new SystemApi)->columns());
+		$this->db->createTable('apps_dash_system_messenger', $dbName, (new SystemMessenger)->columns());
 
 		if ($this->postData['dev'] == 'true') {
-			$this->db->createTable('devtools_api_contracts', $dbName, (new DevtoolsApiContracts)->columns());
-			$this->db->createTable('devtools_api_enums', $dbName, (new DevtoolsApiEnums)->columns());
+			$this->db->createTable('apps_dash_devtools_api_contracts', $dbName, (new DevtoolsApiContracts)->columns());
+			$this->db->createTable('apps_dash_devtools_api_enums', $dbName, (new DevtoolsApiEnums)->columns());
 		}
 	}
 

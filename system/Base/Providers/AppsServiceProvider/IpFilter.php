@@ -6,11 +6,11 @@ use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Ip;
 use System\Base\BasePackage;
 use System\Base\Providers\AppsServiceProvider\Exceptions\IpFilterBlockedException;
-use System\Base\Providers\AppsServiceProvider\Model\AppsIpFilter;
+use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsIpFilter;
 
 class IpFilter extends BasePackage
 {
-    protected $modelToUse = AppsIpFilter::class;
+    protected $modelToUse = ServiceProviderAppsIpFilter::class;
 
     protected $packageName = 'ipfilter';
 

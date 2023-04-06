@@ -4,7 +4,7 @@ namespace Apps\Dash\Packages\Devtools\Api\Contracts\Model;
 
 use System\Base\BaseModel;
 
-class DevtoolsApiContracts extends BaseModel
+class AppsDashDevtoolsApiContracts extends BaseModel
 {
     public $id;
 

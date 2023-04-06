@@ -3,9 +3,8 @@
 namespace System\Base\Providers\AppsServiceProvider\Model;
 
 use System\Base\BaseModel;
-use System\Base\Providers\AppsServiceProvider\Model\Apps;
 
-class AppsIpFilter extends BaseModel
+class ServiceProviderAppsIpFilter extends BaseModel
 {
     public $id;
 

@@ -11,11 +11,11 @@ use League\Flysystem\UnableToRetrieveMetadata;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\CoreServiceProvider\Model\Core as CoreModel;
+use System\Base\Providers\CoreServiceProvider\Model\ServiceProviderCore;
 
 class Core extends BasePackage
 {
-	protected $modelToUse = CoreModel::class;
+	protected $modelToUse = ServiceProviderCore::class;
 
 	public $core;
 
