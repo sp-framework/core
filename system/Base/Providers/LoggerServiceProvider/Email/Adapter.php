@@ -5,8 +5,8 @@ namespace System\Base\Providers\LoggerServiceProvider\Email;
 use Phalcon\Helper\Json;
 use Phalcon\Logger\Adapter\AbstractAdapter;
 use Phalcon\Logger\Item;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailException;
 use System\Base\Providers\EmailServiceProvider\Email;
-use System\Base\Providers\EmailServiceProvider\EmailException;
 
 class Adapter extends AbstractAdapter
 {
@@ -41,12 +41,11 @@ class Adapter extends AbstractAdapter
 
     public function sendEmail()
     {
-        if (!$this->logsConfig->emergencyEmailLogs) {
+        if (!$this->logsConfig->emergencyLogsEmail) {
             throw new EmailException('Email not enabled');
         }
 
         if ($this->logsConfig->emergencyLogsEmailAddresses !== '') {
-
             if ($this->email->setup()) {
                 $emailSettings = $this->email->getEmailSettings();
 
@@ -59,7 +58,7 @@ class Adapter extends AbstractAdapter
                     $this->email->setRecipientTo(trim($emailAddress), trim($emailAddress));
                 }
 
-                $this->email->setSubject('System generated errors. Need attention!');
+                $this->email->setSubject('System generated an critical error. Need immediate attention!');
 
                 $this->email->setBody($this->buildMessageBody());
 
@@ -68,10 +67,12 @@ class Adapter extends AbstractAdapter
                 if ($sendNewEmail !== true) {
                     throw new EmailException($sendNewEmail);
                 }
+
+                $this->messages['emailSent'] = true;
             }
-        } else {
-            throw new EmailException('Email enabled but, missing emergency emails recipients.');
         }
+
+        return $this->messages;
     }
 
     protected function buildMessageBody()

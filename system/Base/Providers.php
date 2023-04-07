@@ -23,10 +23,10 @@ return
 				'System\Base\Providers\DispatcherServiceProvider',
 				'System\Base\Providers\ViewServiceProvider',
 				'System\Base\Providers\FlashServiceProvider',
+				'System\Base\Providers\AccessServiceProvider',
 				'System\Base\Providers\ErrorServiceProvider',
 				'System\Base\Providers\WidgetServiceProvider',
 				'System\Base\Providers\ValidationServiceProvider',
-				'System\Base\Providers\AccessServiceProvider',
 				'System\Base\Providers\WebSocketServiceProvider',
 			],
 		'cli'	=>
