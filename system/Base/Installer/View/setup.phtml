@@ -83,6 +83,14 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <div class="col">
+                                                    <div class="form-group">
+                                                        <label class="text-uppercase text-xs" for="collation">Database Collation *</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <input type="text" name="collation" id="collation" class="form-control rounded-0" value="utf8mb4_general_ci">
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col">
@@ -320,6 +328,11 @@
                     $('#charset').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
+                } else if ($('#collation').val() === '') {
+                    $('#collation').addClass('is-invalid');
+                    $('#collation').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
                 } else if ($('#username').val() === '') {
                     $('#username').addClass('is-invalid');
                     $('#username').focus(function() {
@@ -376,6 +389,7 @@
                             "port"                  : $('#port').val(),
                             "dbname"                : $('#dbname').val(),
                             "charset"               : $('#charset').val(),
+                            "collation"             : $('#collation').val(),
                             "username"              : $('#username').val(),
                             "password"              : $('#password').val()
                         });

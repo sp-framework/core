@@ -693,7 +693,9 @@ class Setup
 
 	protected function createNewDb()
 	{
-		$this->executeSQL("CREATE DATABASE IF NOT EXISTS " . $this->postData['dbname'] . " CHARACTER SET " . $this->postData['charset'] . " COLLATE " . $this->postData['charset'] . "_general_ci");
+		$this->executeSQL(
+			"CREATE DATABASE IF NOT EXISTS " . $this->postData['dbname'] . " CHARACTER SET " . $this->postData['charset'] . " COLLATE " . $this->postData['collation']
+		);
 	}
 
 	protected function checkUser($dontCreate = false)

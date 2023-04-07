@@ -122,7 +122,8 @@ return
 		$this->postData['password'] = $this->container['crypt']->encryptBase64($this->postData['password'], $this->createDbKey());
 		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['password'] = $this->postData['password'];
 		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['port'] = $this->postData['port'];
-		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['charset'] = 'utf8mb4';
+		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['charset'] = $this->postData['charset'];
+		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['collation'] = $this->postData['collation'];
 		$this->coreJson['settings']['logs']['level'] = $logLevel;
 		$this->coreJson['settings']['security']['passwordWorkFactor'] = $pwf;
 		$this->coreJson['settings']['security']['cookiesWorkFactor'] = $cwf;
@@ -141,6 +142,7 @@ return
 			"port" 							=> "' . $this->postData['port'] . '",
 			"dbname" 						=> "' . $this->postData['dbname'] . '",
 			"charset" 	 	    			=> "' . $this->postData['charset'] . '",
+			"collation" 	    			=> "' . $this->postData['collation'] . '",
 			"username" 						=> "' . $this->postData['username'] . '",
 			"password" 						=> "' . $this->postData['password'] . '",
 		],
