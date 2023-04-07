@@ -1,4 +1,3 @@
-{# {{var_dump(core['settings']['dbs'])}} #}
 <div class="row vdivide">
     <div class="col-md-2">
         {{adminltetags.useTag('fields',
@@ -155,25 +154,36 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-cookiesWorkFactor'                       : { },
         '{{componentId}}-{{sectionId}}-logs'                                    : {
             afterInit : function() {
-                //
+                $('#{{componentId}}-{{sectionId}}-logs').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'logson') {
+                        $('#{{componentId}}-{{sectionId}}-logs_level').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-logs_level').attr('disabled', true);
+                    }
+                });
             }
         },
         '{{componentId}}-{{sectionId}}-logs_level'                              : {
             placeholder : 'SELECT LOGS LEVEL'
         },
+        '{{componentId}}-{{sectionId}}-logs_exceptions'                         : { },
         '{{componentId}}-{{sectionId}}-emergency_logs_email'                    : {
             afterInit : function() {
-                $('#{{componentId}}-{{sectionId}}-emergency_email_logs').click(function() {
+                $('#{{componentId}}-{{sectionId}}-emergency_logs_email').click(function() {
                     if ($(this).find('input[type=radio]:checked').data('value') == 'emergencyon') {
-                        $('#{{componentId}}-{{sectionId}}-emergency_email_logs_emails').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-emergency_logs_email_addresses').attr('disabled', false);
                     } else {
-                        $('#{{componentId}}-{{sectionId}}-emergency_email_logs_emails').val('');
-                        $('#{{componentId}}-{{sectionId}}-emergency_email_logs_emails').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-emergency_logs_email_addresses').val('');
+                        $('#{{componentId}}-{{sectionId}}-emergency_logs_email_addresses').attr('disabled', true);
                     }
                 });
             }
         },
         '{{componentId}}-{{sectionId}}-emergency_logs_email_addresses'          : { },
+        '{{componentId}}-{{sectionId}}-websocket'                               : { },
+        '{{componentId}}-{{sectionId}}-websocket_protocol'                      : { },
+        '{{componentId}}-{{sectionId}}-websocket_host'                          : { },
+        '{{componentId}}-{{sectionId}}-websocket_port'                          : { },
         '{{componentId}}-{{sectionId}}-dbs'                                     : { },
         '{{componentId}}-{{sectionId}}-alldbs'                                  : {
             placeholder : "SELECT DATABASE",
@@ -548,18 +558,24 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-form'                                    : $.extend(dataCollectionSectionForm, {
             rules: {
-                '{{componentId}}-{{sectionId}}-display_name'            : 'required',
-                '{{componentId}}-{{sectionId}}-auto_off_debug'          : 'required',
-                '{{componentId}}-{{sectionId}}-cache_timeout'           : 'required',
-                '{{componentId}}-{{sectionId}}-passwordWorkFactor'      : 'required',
-                '{{componentId}}-{{sectionId}}-cookiesWorkFactor'       : 'required',
+                '{{componentId}}-{{sectionId}}-auto_off_debug'                  : 'required',
+                '{{componentId}}-{{sectionId}}-cache_timeout'                   : 'required',
+                '{{componentId}}-{{sectionId}}-passwordWorkFactor'              : 'required',
+                '{{componentId}}-{{sectionId}}-cookiesWorkFactor'               : 'required',
+                '{{componentId}}-{{sectionId}}-logs_level'                      : 'required',
+                '{{componentId}}-{{sectionId}}-emergency_logs_email_addresses'  : 'required',
+                '{{componentId}}-{{sectionId}}-websocket_host'                  : 'required',
+                '{{componentId}}-{{sectionId}}-websocket_port'                  : 'required',
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-display_name'            : 'Please enter filter name',
-                '{{componentId}}-{{sectionId}}-auto_off_debug'          : 'Please enter minutes',
-                '{{componentId}}-{{sectionId}}-cache_timeout'           : 'Please enter seconds',
-                '{{componentId}}-{{sectionId}}-passwordWorkFactor'      : 'Please enter encryption level',
-                '{{componentId}}-{{sectionId}}-cookiesWorkFactor'       : 'Please enter encryption level',
+                '{{componentId}}-{{sectionId}}-auto_off_debug'                  : 'Please enter minutes',
+                '{{componentId}}-{{sectionId}}-cache_timeout'                   : 'Please enter seconds',
+                '{{componentId}}-{{sectionId}}-passwordWorkFactor'              : 'Please enter encryption level',
+                '{{componentId}}-{{sectionId}}-cookiesWorkFactor'               : 'Please enter encryption level',
+                '{{componentId}}-{{sectionId}}-logs_level'                      : 'Please select logs level',
+                '{{componentId}}-{{sectionId}}-emergency_logs_email_addresses'  : 'Please enter email addresses (comma saperated)',
+                '{{componentId}}-{{sectionId}}-websocket_host'                  : 'Please enter websocket host address',
+                '{{componentId}}-{{sectionId}}-websocket_port'                  : 'Please enter websocket host port',
             },
             onSubmit : function() {
                 if (dataCollectionSection['dataToSubmit']['debug'] === 'debugon') {
@@ -576,6 +592,11 @@ dataCollectionSection =
                     dataCollectionSection['dataToSubmit']['logs'] = true;
                 } else {
                     dataCollectionSection['dataToSubmit']['logs'] = false;
+                }
+                if (dataCollectionSection['dataToSubmit']['logs_exceptions'] == '1') {
+                    dataCollectionSection['dataToSubmit']['logs_exceptions'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['logs_exceptions'] = false;
                 }
                 if (dataCollectionSection['dataToSubmit']['emergency_logs_email'] === 'emergencyon') {
                     dataCollectionSection['dataToSubmit']['emergency_logs_email'] = true;

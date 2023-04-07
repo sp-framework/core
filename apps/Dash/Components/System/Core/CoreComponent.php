@@ -25,7 +25,15 @@ class CoreComponent extends BaseComponent
             $availableCaches[$value]['name'] = $value;
         }
 
-        $this->view->core = $this->core->core;
+        $core = $this->core->core;
+
+        if (isset($core['settings']['logs']['emergencyLogsEmailAddresses']) &&
+            is_array($core['settings']['logs']['emergencyLogsEmailAddresses'])
+        ) {
+            $core['settings']['logs']['emergencyLogsEmailAddresses'] = trim(implode(', ', $core['settings']['logs']['emergencyLogsEmailAddresses']));
+        }
+
+        $this->view->core = $core;
         $this->view->availableCaches = $availableCaches;
         $this->view->logLevels = $this->logger->getLogLevels();
         $storage = $this->useStorage('private');

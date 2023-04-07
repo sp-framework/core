@@ -6,17 +6,6 @@ class Core
 {
 	public function register($installedFiles, $baseConfig, $db)
 	{
-		// if (isset($baseConfig['settings'])) {
-		// 	$baseConfig['settings']['db'] =
-		// 		[
-		// 			"host" 		=> $postData['host'],
-		// 			"dbname" 	=> $postData['database_name'],
-		// 			"username" 	=> $postData['username'],
-		// 			"password" 	=> $postData['password'],
-		// 			"port" 		=> $postData['port']
-		// 		];
-		// }
-
 		$db->insertAsDict(
 			'service_provider_core',
 			[

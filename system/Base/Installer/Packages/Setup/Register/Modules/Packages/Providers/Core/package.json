@@ -10,6 +10,7 @@
     "repo"                                  : "https://repo.bazaari.com.au/sp/core",
     "settings"                              : {
         "debug"                             : true,
+        "auto_off_debug"                    : 0,
         "dbs"                               : [],
         "cache"                     : {
             "enabled"                       : false,
@@ -22,10 +23,16 @@
         },
         "logs"                      : {
             "enabled"                       : true,
+            "exceptions"                    : true,
             "level"                         : "DEBUG",
             "service"                       : "streamLogs",
             "emergencyLogsEmail"            : false,
             "emergencyLogsEmailAddresses"   : ""
+        },
+        "websocket"                 : {
+            "protocol"                      : "tcp",
+            "host"                          : "localhost",
+            "port"                          : 5555
         }
     }
 }

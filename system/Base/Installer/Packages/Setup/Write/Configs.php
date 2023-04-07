@@ -101,20 +101,20 @@ return
 			$logsEmail = "true";
 			$dev = "true";
 		} else {
-			$debug = $this->coreJson['settings']['debug'] === true ? 'true' : 'false';
-			$cache = $this->coreJson['settings']['cache']['enabled'] === true ? 'true' : 'false';
-			$logsEnabled = $this->coreJson['settings']['logs']['enabled'] === true ? 'true' : 'false';
-			$logsExceptions = $this->coreJson['settings']['logs']['exceptions'] === true ? 'true' : 'false';
-			$logLevel = $this->coreJson['settings']['logs']['level'] === true ? 'true' : 'false';
-			$logsEmail = $this->coreJson['settings']['logs']['emergencyLogsEmail'] === true ? 'true' : 'false';
-			$dev = $this->coreJson['settings']['dev'] === true ? 'true' : 'false';
+			$debug = $this->coreJson['settings']['debug'] == 'true' ? 'true' : 'false';
+			$cache = $this->coreJson['settings']['cache']['enabled'] == 'true' ? 'true' : 'false';
+			$logsEnabled = $this->coreJson['settings']['logs']['enabled'] == 'true' ? 'true' : 'false';
+			$logsExceptions = $this->coreJson['settings']['logs']['exceptions'] == 'true' ? 'true' : 'false';
+			$logLevel = $this->coreJson['settings']['logs']['level'] == 'true' ? 'true' : 'false';
+			$logsEmail = $this->coreJson['settings']['logs']['emergencyLogsEmail'] == 'true' ? 'true' : 'false';
+			$dev = $this->coreJson['settings']['dev'] == 'true' ? 'true' : 'false';
 		}
 		$setup = 'false';
 
-		$this->coreJson['settings']['setup'] = $setup === 'true'? true: false;
-		$this->coreJson['settings']['debug'] = $debug === 'true'? true: false;
-		$this->coreJson['settings']['cache']['enabled'] = $cache === 'true'? true: false;
-		$this->coreJson['settings']['dev'] = $dev === 'true'? true: false;
+		$this->coreJson['settings']['setup'] = $setup == 'true'? true : false;
+		$this->coreJson['settings']['debug'] = $debug == 'true'? true : false;
+		$this->coreJson['settings']['cache']['enabled'] = $cache == 'true'? true : false;
+		$this->coreJson['settings']['dev'] = $dev == 'true'? true : false;
 		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['active'] = true;
 		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['host'] = $this->postData['host'];
 		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['dbname'] = $this->postData['dbname'];
@@ -136,6 +136,7 @@ return
 		"setup" 			=> ' . $setup .',
 		"dev"    			=> ' . $dev . ', //true - Development false - Production
 		"debug"				=> ' . $debug . ',
+		"auto_off_debug"	=> ' . $this->coreJson['settings']['auto_off_debug'] . ',
 		"db" 				=>
 		[
 			"host" 							=> "' . $this->postData['host'] . '",
@@ -168,9 +169,9 @@ return
 		],
 		"websocket"			=>
 		[
-			"protocol"						=> "tcp",
-			"host"							=> "localhost",
-			"port"							=> 5555
+			"protocol"						=> "' . $this->coreJson['settings']['websocket']['protocol'] . '",
+			"host"							=> "' . $this->coreJson['settings']['websocket']['host'] . '",
+			"port"							=> ' . $this->coreJson['settings']['websocket']['port'] . '
 		]
 	];';
 

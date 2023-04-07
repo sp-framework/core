@@ -10,6 +10,7 @@ use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Helper\Json;
+use Phalcon\Validation\Validator\Email;
 use System\Base\BasePackage;
 use System\Base\Providers\CoreServiceProvider\Model\ServiceProviderCore;
 
@@ -389,7 +390,12 @@ class Core extends BasePackage
 
 	public function updateCore(array $data)
 	{
-		$core = $this->core;
+		if (isset($data['debug'])) {
+			$this->core['settings']['debug'] = $data['debug'];
+		}
+		if (isset($data['auto_off_debug'])) {
+			$this->core['settings']['auto_off_debug'] = $data['auto_off_debug'];
+		}
 
 		if (isset($data['cache'])) {
 			$this->core['settings']['cache']['enabled'] = $data['cache'];
@@ -414,10 +420,32 @@ class Core extends BasePackage
 		if (isset($data['logs_level'])) {
 			$this->core['settings']['logs']['level'] = $data['logs_level'];
 		}
+		if (isset($data['logs_exceptions'])) {
+			$this->core['settings']['logs']['exceptions'] = $data['logs_exceptions'];
+		}
 		if (isset($data['emergency_logs_email'])) {
 			$this->core['settings']['logs']['emergencyLogsEmail'] = $data['emergency_logs_email'];
 		}
 		if (isset($data['emergency_logs_email_addresses'])) {
+			if ($data['emergency_logs_email_addresses'] !== '') {
+				$data['emergency_logs_email_addresses'] = explode(',', $data['emergency_logs_email_addresses']);
+
+				if (count($data['emergency_logs_email_addresses']) > 0) {
+					foreach ($data['emergency_logs_email_addresses'] as &$address) {
+						$address = trim($address);
+
+						$validateEmail = $this->validateEmail(['email' => $address]);
+
+						if ($validateEmail !== true) {
+							$this->addResponse($validateEmail, 1);
+
+							return false;
+						}
+					}
+				}
+
+			}
+
 			$this->core['settings']['logs']['emergencyLogsEmailAddresses'] = $data['emergency_logs_email_addresses'];
 		}
 		if (isset($data['dbs']) && $data['dbs'] !== '') {
@@ -425,7 +453,19 @@ class Core extends BasePackage
 			$this->core['settings']['dbs'] = $data['dbs'];
 		}
 
-		$this->update($data);
+		if (isset($data['websocket_protocol'])) {
+			$this->core['settings']['websocket']['protocol'] = $data['websocket_protocol'];
+		}
+		if (isset($data['websocket_host'])) {
+			$this->core['settings']['websocket']['host'] = $data['websocket_host'];
+		}
+		if (isset($data['websocket_port'])) {
+			$this->core['settings']['websocket']['port'] = $data['websocket_port'];
+		}
+
+		$this->update($this->core);
+
+		$this->writeBaseConfig();
 	}
 
 	protected function checkKeys()
@@ -489,13 +529,27 @@ class Core extends BasePackage
 		}
 	}
 
-	private function writeBaseConfig($dbConfig)
+	private function writeBaseConfig($dbConfig = null)
 	{
-		$this->core['settings']['setup'] = $this->core['settings']['setup'] === true ? 'true' : 'false';
-		$this->core['settings']['dev'] = $this->core['settings']['dev'] === true ? 'true' : 'false';
-		$this->core['settings']['debug'] = $this->core['settings']['debug'] === true ? 'true' : 'false';
-		$this->core['settings']['cache']['enabled'] = $this->core['settings']['cache']['enabled'] === true ? 'true' : 'false';
-		$this->core['settings']['logs']['level'] = $this->core['settings']['logs']['level'] === true ? 'true' : 'false';
+		if (!$dbConfig) {
+			$dbConfig = $this->getDb();//Get the active config
+		}
+
+		$this->core['settings']['setup'] = $this->core['settings']['setup'] == 'true' ? 'true' : 'false';
+		$this->core['settings']['dev'] = $this->core['settings']['dev'] == 'true' ? 'true' : 'false';
+		$this->core['settings']['debug'] = $this->core['settings']['debug'] == 'true' ? 'true' : 'false';
+		$this->core['settings']['cache']['enabled'] = $this->core['settings']['cache']['enabled'] == 'true' ? 'true' : 'false';
+		$this->core['settings']['logs']['emergencyLogsEmailAddresses'] =
+			is_array($this->core['settings']['logs']['emergencyLogsEmailAddresses']) ?
+			implode(',', $this->core['settings']['logs']['emergencyLogsEmailAddresses']) :
+			$this->core['settings']['logs']['emergencyLogsEmailAddresses'];
+
+		$this->core['settings']['auto_off_debug'] =
+			$this->core['settings']['auto_off_debug'] == '' ? 0 : $this->core['settings']['auto_off_debug'];
+		$this->core['settings']['cache']['timeout'] =
+			$this->core['settings']['cache']['timeout'] == '' ? 60 : $this->core['settings']['cache']['timeout'];
+		$this->core['settings']['websocket']['port'] =
+			$this->core['settings']['websocket']['port'] == '' ? 5555 : $this->core['settings']['websocket']['port'];
 
 		$baseFileContent =
 '<?php
@@ -505,13 +559,14 @@ return
 		"setup" 			=> ' . $this->core['settings']['setup'] .',
 		"dev"    			=> ' . $this->core['settings']['dev'] . ', //true - Development false - Production
 		"debug"				=> ' . $this->core['settings']['debug'] . ',
+		"auto_off_debug"	=> ' . $this->core['settings']['auto_off_debug'] . ',
 		"db" 				=>
 		[
 			"host" 							=> "' . $dbConfig['host'] . '",
 			"port" 							=> "' . $dbConfig['port'] . '",
 			"dbname" 						=> "' . $dbConfig['dbname'] . '",
-			"charset" 	 	    			=> "' . $dbConfig['charset'] . '"
-			"collation" 	    			=> "' . $dbConfig['collation'] . '"
+			"charset" 	 	    			=> "' . $dbConfig['charset'] . '",
+			"collation" 	    			=> "' . $dbConfig['collation'] . '",
 			"username" 						=> "' . $dbConfig['username'] . '",
 			"password" 						=> "' . $dbConfig['password'] . '",
 		],
@@ -537,9 +592,9 @@ return
 		],
 		"websocket"			=>
 		[
-			"protocol"						=> "tcp",
-			"host"							=> "localhost",
-			"port"							=> 5555
+			"protocol"						=> "' . $this->core['settings']['websocket']['protocol'] . '",
+			"host"							=> "' . $this->core['settings']['websocket']['host'] . '",
+			"port"							=> ' . $this->core['settings']['websocket']['port'] . '
 		]
 	];';
 
@@ -659,5 +714,23 @@ return
 	public function generateNewPassword()
 	{
 		$this->addResponse('Password Generate Successfully', 0, ['password' => $this->secTools->random->base62(12)]);
+	}
+
+	protected function validateEmail(array $data)
+	{
+		$this->validation->add('email', Email::class, ["message" => "Enter valid email address for Emergency Emails."]);
+
+		$validated = $this->validation->validate($data)->jsonSerialize();
+
+		if (count($validated) > 0) {
+			$messages = 'Error: ';
+
+			foreach ($validated as $key => $value) {
+				$messages .= $value['message'] . ' ';
+			}
+			return $messages;
+		} else {
+			return true;
+		}
 	}
 }

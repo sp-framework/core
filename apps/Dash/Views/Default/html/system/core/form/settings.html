@@ -1,19 +1,26 @@
 {% set coreSettingsDebug = 'debugoff' %}
-{% if core['settings']['debug'] === true %}
+{% if core['settings']['debug'] == 'true' %}
     {% set coreSettingsDebug = 'debugon' %}
 {% endif %}
 {% set coreSettingsCache = 'cacheoff' %}
-{% if core['settings']['cache']['enabled'] === true %}
+{% if core['settings']['cache']['enabled'] == 'true' %}
     {% set coreSettingsCache = 'cacheon' %}
 {% endif %}
 {% set coreSettingsLog = 'logsoff' %}
-{% if core['settings']['logs']['enabled'] === true %}
+{% set coreSettingsLogLevelDisabled = true %}
+{% if core['settings']['logs']['enabled'] == 'true' %}
     {% set coreSettingsLog = 'logson' %}
+    {% set coreSettingsLogLevelDisabled = false %}
+{% endif %}
+{% set coreSettingsLogExceptionsChecked = false %}
+{% if core['settings']['logs']['exceptions'] == 'true' %}
+    {% set coreSettingsLogExceptionsChecked = true %}
 {% endif %}
 {% set coreSettingsLogEmergency = 'emergencyoff' %}
-{% if core['settings']['logs']['emergencyLogsEmail'] === true %}
+{% if core['settings']['logs']['emergencyLogsEmail'] == 'true' %}
     {% set coreSettingsLogEmergency = 'emergencyon' %}
 {% endif %}
+
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -30,7 +37,6 @@
                 'fieldBazScan'                          : false,
                 'fieldBazPostOnCreate'                  : false,
                 'fieldBazPostOnUpdate'                  : false,
-                'fieldBazJstreeSearch'                  : true,
                 'fieldHtmlContent'                      : ''
             ]
         )}}
@@ -48,6 +54,7 @@
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Debug on/off at core level.',
                         'fieldRequired'                  : true,
+                        'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnCreate'           : false,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldBazScan'                   : true,
@@ -74,14 +81,13 @@
             {% set autoOffDisabled = true %}
             {% set debugFieldDataInputMinNumber = 1 %}
             {% set debugFieldHelpTooltipContent = '' %}
-            {% set debugFieldValue = '' %}
-            {% if core['settings']['debug'] == true %}
+            {% set debugFieldValue = core['settings']['auto_off_debug'] %}
+            {% if core['settings']['debug'] == 'true' %}
                 {% set autoOffDisabled = false %}
             {% endif %}
-            {% if core['settings']['dev'] == true %}
+            {% if core['settings']['dev'] == 'true' %}
                 {% set debugFieldDataInputMinNumber = 0 %}
                 {% set debugFieldHelpTooltipContent = ' With 0 being no time limit.' %}
-                {% set debugFieldValue = '0' %}
             {% endif %}
             <div class="col">
                 {{adminltetags.useTag('fields',
@@ -151,7 +157,6 @@
                 'fieldBazScan'                          : false,
                 'fieldBazPostOnCreate'                  : false,
                 'fieldBazPostOnUpdate'                  : false,
-                'fieldBazJstreeSearch'                  : true,
                 'fieldHtmlContent'                      : ''
             ]
         )}}
@@ -171,6 +176,7 @@
                         'fieldRequired'                  : true,
                         'fieldBazPostOnCreate'           : false,
                         'fieldBazPostOnUpdate'           : true,
+                        'fieldBazJstreeSearch'           : true,
                         'fieldBazScan'                   : true,
                         'fieldRadioPlacementType'        : 'horizontal',
                         'fieldRadioButtons'              :
@@ -196,13 +202,12 @@
             {% set cacheFieldDataInputMinNumber = 3600 %}
             {% set cacheFieldHelpTooltipContent = 'Values between 3600 (1 Hour) & 604800 (1 week).' %}
             {% set cacheFieldValue = core['settings']['cache']['timeout'] %}
-            {% if core['settings']['cache'] == true %}
+            {% if core['settings']['cache']['enabled'] == 'true' %}
                 {% set cacheTimerDisabled = false %}
             {% endif %}
-            {% if core['settings']['dev'] == true %}
+            {% if core['settings']['dev'] == 'true' %}
                 {% set cacheFieldDataInputMinNumber = 10 %}
                 {% set cacheFieldHelpTooltipContent = 'Values between 10 seconds & 604800 (1 week).' %}
-                {% set cacheFieldValue = '60' %}
             {% endif %}
             <div class="col">
                 {{adminltetags.useTag('fields',
@@ -224,7 +229,7 @@
                         'fieldBazPostOnUpdate'                  : true,
                         'fieldDataInputMinNumber'               : cacheFieldDataInputMinNumber,
                         'fieldDataInputMaxNumber'               : 604800,
-                        'fieldDataInputMaxLength'               : 2,
+                        'fieldDataInputMaxLength'               : 6,
                         'fieldValue'                            : cacheFieldValue
                     ]
                 )}}
@@ -243,6 +248,7 @@
                         'fieldHelpTooltipContent'        : 'Select cache service to use at core level.',
                         'fieldBazScan'                   : true,
                         'fieldRequired'                  : true,
+                        'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataSelect2Options'        : availableCaches,
                         'fieldDataSelect2OptionsKey'     : 'id',
@@ -272,7 +278,6 @@
                 'fieldBazScan'                          : false,
                 'fieldBazPostOnCreate'                  : false,
                 'fieldBazPostOnUpdate'                  : false,
-                'fieldBazJstreeSearch'                  : true,
                 'fieldHtmlContent'                      : ''
             ]
         )}}
@@ -353,7 +358,6 @@
                 'fieldBazScan'                          : false,
                 'fieldBazPostOnCreate'                  : false,
                 'fieldBazPostOnUpdate'                  : false,
-                'fieldBazJstreeSearch'                  : true,
                 'fieldHtmlContent'                      : ''
             ]
         )}}
@@ -366,13 +370,14 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'logs',
-                        'fieldLabel'                     : 'Log',
+                        'fieldLabel'                     : 'Logging',
                         'fieldType'                      : 'radio',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Log on/off.',
+                        'fieldHelpTooltipContent'        : 'Logging on/off.',
                         'fieldRequired'                  : true,
                         'fieldBazPostOnCreate'           : false,
                         'fieldBazPostOnUpdate'           : true,
+                        'fieldBazJstreeSearch'           : true,
                         'fieldBazScan'                   : true,
                         'fieldRadioPlacementType'        : 'horizontal',
                         'fieldRadioButtons'              :
@@ -402,18 +407,42 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'logs_level',
-                        'fieldLabel'                     : 'Select Logs Level',
+                        'fieldLabel'                     : 'Logs Level',
                         'fieldType'                      : 'select2',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Select level of logs to log.',
                         'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
                         'fieldRequired'                  : true,
+                        'fieldDisabled'                  : coreSettingsLogLevelDisabled,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataSelect2Options'        : logLevels,
                         'fieldDataSelect2OptionsKey'     : 'id',
                         'fieldDataSelect2OptionsValue'   : 'name',
                         'fieldDataSelect2OptionsArray'   : true,
                         'fieldDataSelect2OptionsSelected': core['settings']['logs']['level']
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'logs_exceptions',
+                        'fieldLabel'                     : 'Log Exceptions?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Log exceptions that are thrown?',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : coreSettingsLogExceptionsChecked,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
                     ]
                 )}}
             </div>
@@ -432,6 +461,7 @@
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Email Emergency, Critical & Alert?',
                         'fieldRequired'                  : true,
+                        'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnCreate'           : false,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldBazScan'                   : true,
@@ -457,7 +487,7 @@
             </div>
             <div class="col">
                 {% set emergencyEmailDisabled = true %}
-                {% if core['settings']['logs']['emergencyLogsEmail'] == true %}
+                {% if core['settings']['logs']['emergencyLogsEmail'] == 'true' %}
                     {% set emergencyEmailDisabled = false %}
                 {% endif %}
                 {{adminltetags.useTag('fields',
@@ -472,6 +502,7 @@
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Email Addresses, comma saperated.',
                         'fieldRequired'                  : true,
+                        'fieldBazJstreeSearch'           : true,
                         'fieldDisabled'                  : emergencyEmailDisabled,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : false,
@@ -479,6 +510,114 @@
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 1024,
                         'fieldValue'                     : core['settings']['logs']['emergencyLogsEmailAddresses']
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'websocket',
+                'fieldLabel'                            : 'Web Socket',
+                'fieldLabelLegend'                      : true,
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : false,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldHtmlContent'                      : ''
+            ]
+        )}}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'websocket_protocol',
+                        'fieldLabel'                     : 'Websocket Procotcol',
+                        'fieldType'                      : 'radio',
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Websocket Procotcol TCP/UDP.',
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true,
+                        'fieldRadioPlacementType'        : 'horizontal',
+                        'fieldRadioButtons'              :
+                            [
+                                'tcp' :
+                                    [
+                                        'title'                           : 'TCP',
+                                        'type'                            : 'primary',
+                                        'dataValue'                       : 'tcp'
+                                    ],
+                                'udp' :
+                                    [
+                                        'title'                           : 'UDP',
+                                        'type'                            : 'primary',
+                                        'dataValue'                       : 'udp'
+                                    ]
+                            ],
+                        'fieldRadioChecked'              : core['settings']['websocket']['protocol']
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'websocket_host',
+                        'fieldLabel'                     : 'Websocket Host',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Websocket Host',
+                        'fieldRequired'                  : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldValue'                     : core['settings']['websocket']['host']
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'websocket_port',
+                        'fieldLabel'                            : 'Websocket Port',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Websocket Port',
+                        'fieldInputTypeTextFilter'              : 'positiveInt',
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataInputMinNumber'               : 1,
+                        'fieldDataInputMaxNumber'               : 65535,
+                        'fieldDataInputMaxLength'               : 5,
+                        'fieldValue'                            : core['settings']['websocket']['port']
                     ]
                 )}}
             </div>
