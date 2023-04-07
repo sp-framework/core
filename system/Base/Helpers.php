@@ -73,7 +73,7 @@ if (!function_exists('checkCtype')) {
             $ignoreChars = [' ', '&amp;', '&', ',', ':', ';'];
         }
 
-        if ($ctype === 'alum') {
+        if ($ctype === 'alnum') {
             if (ctype_alnum(trim(str_replace($ignoreChars, '' , $str)))) {
                 return trim(str_replace($ignoreChars, '' , $str));
             }

@@ -115,8 +115,17 @@ class Core extends BasePackage
 
 		if ($fileInfo) {
 			try {
-				// if (checkCtype($data['dbname']))
-				$newDbName = str_replace('.gz', '', $fileInfo['org_file_name']);
+				if (isset($data['dbname'])) {
+					if (checkCtype($data['dbname'], 'alnum', []) === false) {
+						$this->addResponse('Database cannot have special characters', 1, []);
+
+						return false;
+					}
+
+					$newDbName = $data['dbname'];
+				} else {
+					$newDbName = str_replace('.gz', '', $fileInfo['org_file_name']);
+				}
 
 				$file = $this->basepackages->storages->getFile(['uuid' => $fileInfo['uuid'], 'headers' => false]);
 
@@ -127,21 +136,69 @@ class Core extends BasePackage
 				} catch (FilesystemException | UnableToWriteFile $exception) {
 					throw $exception;
 				}
-				var_dump($data);die();
-				$newDbUserName = $newDbName . 'User';
+
+				if (isset($data['username'])) {
+					if (checkCtype($data['username'], 'alnum', []) === false) {
+						$this->addResponse('Username cannot have special characters', 1, []);
+
+						return false;
+					}
+
+					$newDbUserName = $data['username'];
+				} else {
+					$newDbUserName = $newDbName . 'User';
+				}
 
 				$dbConfig = $this->getDb(true);
-				$newDbUserPassword = $this->crypt->decryptBase64($dbConfig['password'], $this->getDbKey($dbConfig));
-				$dbConfig['username'] = $data['username'];
-				$dbConfig['password'] = $data['password'];
+
+				if ($this->config->dev === false) {
+					$checkPwStrength = $this->checkPwStrength($data['password']);
+
+					if ($checkPwStrength !== false && $checkPwStrength < 4) {
+						$this->addResponse('Password strength is too low.' , 1);
+
+						return false;
+					}
+				}
+
+				$newDbUserPassword = $data['password'];
+
+				$dbConfig['username'] = $data['root_username'];
+				$dbConfig['password'] = $data['root_password'];
 				$dbConfig['dbname'] = 'mysql';
 				$this->db = new Mysql($dbConfig);
 
-				$this->executeSQL("CREATE DATABASE IF NOT EXISTS " . $newDbName . " CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci");
 				$checkUser = $this->executeSQL("SELECT * FROM `user` WHERE `User` LIKE ?", [$newDbUserName]);
+
 				if ($checkUser->numRows() === 0) {
 					$this->executeSQL("CREATE USER ?@'%' IDENTIFIED WITH mysql_native_password BY ?;", [$newDbUserName, $newDbUserPassword]);
+				} else {
+					$dbConfig['username'] = $data['username'];
+					$dbConfig['password'] = $data['password'];
+					$dbConfig['dbname'] = 'mysql';
+
+					try {
+						$this->db = new Mysql($dbConfig);
+					} catch (\Exception $e) {
+						//1045 is password incorrect
+						//1044 user does not exist
+						if ($e->getCode() === 1045) {
+							$this->addResponse('Incorrect password for user ' . $newDbUserName, 1);
+
+							return false;
+						}
+					}
 				}
+
+				$dbConfig['username'] = $data['root_username'];
+				$dbConfig['password'] = $data['root_password'];
+				$dbConfig['dbname'] = 'mysql';
+				$this->db = new Mysql($dbConfig);
+
+				$this->executeSQL(
+					"CREATE DATABASE IF NOT EXISTS " . $newDbName . " CHARACTER SET " . $data['charset'] . " COLLATE " . $data['collation']
+				);
+
 				$this->executeSQL("GRANT ALL PRIVILEGES ON " . $newDbName . ".* TO ?@'%' WITH GRANT OPTION;", [$newDbUserName]);
 
 				$dbConfig['dbname'] = $newDbName;
@@ -184,6 +241,7 @@ class Core extends BasePackage
 				$newDb['password'] = $this->crypt->encryptBase64($newDbUserPassword, $this->createDbKey($newDbName));
 				$newDb['port'] = $dbConfig['port'];
 				$newDb['charset'] = $dbConfig['charset'];
+				$newDb['collation'] = $dbConfig['collation'];
 
 				$this->core['settings']['dbs'][$newDbName] = $newDb;
 
@@ -214,7 +272,7 @@ class Core extends BasePackage
 
 		$dbConfig = $this->getDb(false, $data['db']);
 
-		if ($dbConfig['active'] == true) {
+		if ($dbConfig['active'] == 'true') {
 			$this->addResponse('Cannot remove active database', 1, []);
 
 			return false;
@@ -233,6 +291,12 @@ class Core extends BasePackage
 			$this->db = new Mysql($dbConfig);
 
 			$this->executeSQL("DROP DATABASE IF EXISTS `" . $dbConfig['dbname'] . "`;");
+
+			if (isset($data['removeUser']) && $data['removeUser'] == 'true' && isset($data['userToRemove'])) {
+				$this->executeSQL("DROP USER IF EXISTS `" . $data['userToRemove'] . "`;");
+			}
+
+			$this->removeDbKey($dbConfig['dbname']);
 		} catch (\PDOException | \Exception$e) {
 			if ($e->getCode() !== 1049) {
 				$this->addResponse('Remove Error: ' . $e->getMessage(), 1);
@@ -257,25 +321,50 @@ class Core extends BasePackage
 		}
 
 		$dbConfig = $this->getDb(false, $data['db']['dbname']);
-		// var_dump($dbConfig);die();
-		if ($dbConfig['active'] == true) {
+
+		if ($dbConfig['active'] == 'true') {
 			$this->addResponse('Cannot update active database', 1, []);
 
 			return false;
 		}
 
+		$oldPassword = $dbConfig['password'];
+		$changePassword = false;
+
 		$dbConfig = array_merge($dbConfig, $data['db']);
+		if (isset($data['db']['password']) && $data['db']['password'] === '') {
+			$dbConfig['password'] = $oldPassword;
+			$dbConfig['password'] = $this->crypt->decryptBase64($dbConfig['password'], $this->getDbKey($dbConfig));
+		} else {
+			$changePassword = true;
+		}
 
 		// Try Connecting to DB with new information
 		try {
 			$this->db = new Mysql($dbConfig);
 
-			if ($this->core['settings']['dbs'][$dbConfig['dbname']]['charset'] !== $dbConfig['charset']) {
-				$charsetCollate = $dbConfig['charset'] . '_general_ci';
-				$this->executeSQL("ALTER DATABASE ? CHARACTER SET ? COLLATE ?", [$dbConfig['dbname'], $dbConfig['charset'], $charsetCollate]);
-				// ALTER TABLE tablename CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+			$checkCharsetCollation =
+				$this->executeSQL(
+					"SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?",
+					[$dbConfig['dbname']]
+				);
+
+			if ($checkCharsetCollation->numRows() > 0) {
+				$dbCharsetOnServer = $checkCharsetCollation->fetchArray();
+
+				if (isset($dbCharsetOnServer['DEFAULT_CHARACTER_SET_NAME']) && $dbCharsetOnServer['DEFAULT_CHARACTER_SET_NAME'] !== $data['db']['charset']) {
+					throw new \Exception(
+						'Database Charset is set to ' . $dbCharsetOnServer['DEFAULT_CHARACTER_SET_NAME'] . ' and provided is ' . $data['db']['charset']
+					);
+				}
+				if (isset($dbCharsetOnServer['DEFAULT_COLLATION_NAME']) && $dbCharsetOnServer['DEFAULT_COLLATION_NAME'] !== $data['db']['collation']) {
+					throw new \Exception(
+						'Database Charset is set to ' . $dbCharsetOnServer['DEFAULT_COLLATION_NAME'] . ' and provided is ' . $data['db']['collation']
+					);
+				}
+
 			}
-		} catch (\PDOException $e) {
+		} catch (\PDOException | \Exception $e) {
 			$this->addResponse('Update Error: ' . $e->getMessage(), 1);
 
 			return false;
@@ -331,7 +420,7 @@ class Core extends BasePackage
 		if (isset($data['emergency_logs_email_addresses'])) {
 			$this->core['settings']['logs']['emergencyLogsEmailAddresses'] = $data['emergency_logs_email_addresses'];
 		}
-		if (isset($data['dbs'])) {
+		if (isset($data['dbs']) && $data['dbs'] !== '') {
 			$data['dbs'] = Json::decode($data['dbs'], true);
 			$this->core['settings']['dbs'] = $data['dbs'];
 		}
@@ -422,6 +511,7 @@ return
 			"port" 							=> "' . $dbConfig['port'] . '",
 			"dbname" 						=> "' . $dbConfig['dbname'] . '",
 			"charset" 	 	    			=> "' . $dbConfig['charset'] . '"
+			"collation" 	    			=> "' . $dbConfig['collation'] . '"
 			"username" 						=> "' . $dbConfig['username'] . '",
 			"password" 						=> "' . $dbConfig['password'] . '",
 		],
@@ -507,6 +597,21 @@ return
 		}
 	}
 
+	private function removeDbKey($dbName)
+	{
+		$keys = $this->getDbKey();
+
+		if (isset($keys[$dbName])) {
+			unset($keys[$dbName]);
+		}
+
+		try {
+			$this->localContent->write('system/.dbkeys', Json::encode($keys));
+		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
+			throw $exception;
+		}
+	}
+
 	protected function checkTmpPath()
 	{
 		if (!is_dir(base_path('var/tmp/'))) {
@@ -521,7 +626,7 @@ return
 	public function getDb($active = true, $dbName = null)
 	{
 		foreach ($this->core['settings']['dbs'] as $db) {
-			if ($active === true && $db['active'] == true) {
+			if ($active === true && $db['active'] == 'true') {
 				return $db;
 			} else if ($active === false &&
 					   $dbName &&

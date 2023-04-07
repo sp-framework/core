@@ -144,6 +144,8 @@
                     ]
                 )}}
             </div>
+        </div>
+        <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -163,6 +165,28 @@
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 50,
                         'fieldValue'                     : activeDbData['charset']
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'db_collation',
+                        'fieldLabel'                     : 'Database Collation',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Collation of database',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : activeDbData['collation']
                     ]
                 )}}
             </div>
@@ -342,6 +366,30 @@
             </div>
             <div class="row">
                 <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'db_remove_db_user',
+                            'fieldLabel'                     : 'Remove Db User',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Remove Database user? Note: user might be in use with other databases.',
+                            'fieldRequired'                  : false,
+                            'fieldType'                      : 'checkbox',
+                            'fieldCheckboxType'              : 'warning',
+                            'fieldCheckboxChecked'           : false,
+                            'fieldBazJstreeSearch'           : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldBazScan'                   : true
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
                     {{adminltetags.useTag('buttons',
                         [
                             'component'                      : component,
@@ -480,6 +528,52 @@
                             'fieldType'                      : 'input',
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Name of the database to use at the time of restore.',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 50,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'db_restore_charset',
+                            'fieldLabel'                     : 'Database Charset',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Charset of database',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 50,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'db_restore_collation',
+                            'fieldLabel'                     : 'Database Collation',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Collation of database',
                             'fieldRequired'                  : true,
                             'fieldBazScan'                   : true,
                             'fieldBazPostOnCreate'           : false,
