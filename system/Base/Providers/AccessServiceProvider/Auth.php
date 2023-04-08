@@ -711,9 +711,13 @@ class Auth
 
             $this->account['email_new_password'] = '1';
 
-            $this->accounts->updateAccount($this->account);
+            $this->account['pwreset_email'] = '1';
 
-            $this->logger->log->info('New password requested for account ' . $this->account['email'] . ' via forgot password. New password was emailed to the account.');
+            if ($this->accounts->updateAccount($this->account)) {
+                $this->logger->log->info('New password requested for account ' . $this->account['email'] . ' via forgot password. New password was emailed to the account.');
+            } else {
+                $this->logger->log->critical('Trying to send new password for ' . $this->account['email'] . ' via forgot password failed.');
+            }
         }
 
         $this->packagesData->responseCode = 0;

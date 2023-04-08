@@ -213,11 +213,16 @@ class Accounts extends BasePackage
      */
     public function updateAccount(array $data)
     {
-        $validation = $this->validateData($data);
+        if (isset($data['pwreset_email']) && $data['pwreset_email'] == '1') {
+            $validation = $this->validateData($data, true);
+        } else {
+            $validation = $this->validateData($data);
+        }
 
         if ($validation !== true) {
             $this->addResponse($validation, 1);
-            return;
+
+            return false;
         }
 
         if (!isset($data['status'])) {
@@ -718,12 +723,15 @@ class Accounts extends BasePackage
         }
     }
 
-    public function validateData(array $data)
+    public function validateData(array $data, $pwresetEmail = false)
     {
-        $this->validation->init()->add('first_name', PresenceOf::class, ["message" => "Enter valid first name."]);
-        $this->validation->add('last_name', PresenceOf::class, ["message" => "Enter valid last name."]);
-        $this->validation->add('email', PresenceOf::class, ["message" => "Enter valid username."]);
+        $this->validation->init()->add('email', PresenceOf::class, ["message" => "Enter valid username."]);
         $this->validation->add('email', Email::class, ["message" => "Enter valid username."]);
+
+        if (!$pwresetEmail) {
+            $this->validation->add('first_name', PresenceOf::class, ["message" => "Enter valid first name."]);
+            $this->validation->add('last_name', PresenceOf::class, ["message" => "Enter valid last name."]);
+        }
 
         $validated = $this->validation->validate($data)->jsonSerialize();
 
