@@ -49,6 +49,11 @@ class AuthComponent extends BaseComponent
             $this->view->pick('auth/forgot');
 
             return;
+        } else if (isset($this->getData()['setup2fa']) && $this->getData()['setup2fa'] === 'true') {
+
+            $this->view->pick('auth/setup2fa');
+
+            return;
         }
 
         $this->setNeedAuthHeader();
@@ -196,6 +201,51 @@ class AuthComponent extends BaseComponent
                 $this->auth->packagesData->responseMessage,
                 $this->auth->packagesData->responseCode,
                 $this->auth->packagesData->responseData
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function enableTwoFaAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->auth->enableTwoFa($this->postData())) {
+                $this->view->provisionUrl = $this->auth->packagesData->provisionUrl;
+
+                $this->view->qrcode = $this->auth->packagesData->qrcode;
+
+                $this->view->secret = $this->auth->packagesData->secret;
+
+                $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            } else {
+                $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            }
+
+            $this->view->responseCode = $this->auth->packagesData->responseCode;
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function verifyTwoFaAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->auth->enableVerifyTwoFa($this->postData())) {
+                $this->view->redirectUrl = $this->links->url('/');
+            }
+
+            $this->addResponse(
+                $this->auth->packagesData->responseMessage,
+                $this->auth->packagesData->responseCode
             );
         } else {
             $this->addResponse('Method Not Allowed', 1);

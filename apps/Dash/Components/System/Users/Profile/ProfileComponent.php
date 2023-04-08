@@ -176,7 +176,7 @@ class ProfileComponent extends BaseComponent
                 return;
             }
 
-            $this->auth->enableVerifyTwoFa($this->postData()['code']);
+            $this->auth->enableVerifyTwoFa($this->postData());
 
             $this->addResponse(
                 $this->auth->packagesData->responseMessage,

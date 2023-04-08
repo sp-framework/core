@@ -127,19 +127,27 @@ class MiddlewaresServiceProvider extends Injectable
             $this->data['givenRoute'] = $this->data['appRoute'] . '/home';
         }
 
-        $this->data['guestAccess'] =
-        [
-            $this->data['appRoute'] . '/auth',
-            $this->data['appRoute'] . '/auth/login',
-            $this->data['appRoute'] . '/auth/forgot',
-            $this->data['appRoute'] . '/auth/pwreset',
-            $this->data['appRoute'] . '/auth/checkpwstrength',
-            $this->data['appRoute'] . '/auth/generatepw',
-            $this->data['appRoute'] . '/auth/logout',
-            $this->data['appRoute'] . '/auth/sendverification',
-            $this->data['appRoute'] . '/register',
-            $this->data['appRoute'] . '/register/registernewaccount',
-        ];
+        if ($this->request->isGet()) {
+            $this->data['guestAccess'] =
+            [
+                $this->data['appRoute'] . '/auth',
+                $this->data['appRoute'] . '/register',
+            ];
+        } else if ($this->request->isPost()) {
+            $this->data['guestAccess'] =
+            [
+                $this->data['appRoute'] . '/auth/login',
+                $this->data['appRoute'] . '/auth/forgot',
+                $this->data['appRoute'] . '/auth/pwreset',
+                $this->data['appRoute'] . '/auth/checkpwstrength',
+                $this->data['appRoute'] . '/auth/generatepw',
+                $this->data['appRoute'] . '/auth/enabletwofa',
+                $this->data['appRoute'] . '/auth/verifytwofa',
+                $this->data['appRoute'] . '/auth/logout',
+                $this->data['appRoute'] . '/auth/sendverification',
+                $this->data['appRoute'] . '/register/registernewaccount',
+            ];
+        }
 
         if (in_array($this->data['givenRoute'], $this->data['guestAccess'])) {
             return true;

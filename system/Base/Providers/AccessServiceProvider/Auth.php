@@ -258,6 +258,20 @@ class Auth
 
         $security = $this->getAccountSecurityObject();
 
+        if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
+            if (!$security->two_fa_status ||
+                ($security->two_fa_status && $security->two_fa_status == '0')
+            ) {
+                $this->packagesData->responseCode = 3;
+
+                $this->packagesData->responseMessage = '2FA Code Required!';
+
+                $this->packagesData->redirectUrl = $this->links->url('auth/q/setup2fa/true');
+
+                return true;
+            }
+        }
+
         if ($security->two_fa_status == '1' && !isset($data['code'])) {
             $this->packagesData->responseCode = 3;
 
@@ -661,7 +675,7 @@ class Auth
                     "message"   => "New password and confirm password don't match.",
                     "with"      => "newpass"
                 ]
-        );
+            );
         }
 
         $validated = $this->validation->validate($data)->jsonSerialize();
@@ -800,8 +814,36 @@ class Auth
         $this->packagesData->responseMessage = 'Password Generate Successfully';
     }
 
-    public function enableTwoFa()
+    public function enableTwoFa(array $data = null)
     {
+        if ($data) {
+            $validate = $this->validateData($data, 'auth');
+
+            if ($validate !== true) {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = $validate;
+
+                return false;
+            }
+        }
+
+        if ($data && !$this->checkAccount($data)) {
+            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
+
+            return false;
+        }
+
+        $security = $this->getAccountSecurityObject();
+
+        if ($security->two_fa_status && $security->two_fa_status == '1') {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = "2FA already enabled! Contact Administrator.";
+
+            return false;
+        }
+
         try {
             $totp = TOTP::create($this->updateTwoFaSecret());
 
@@ -834,6 +876,8 @@ class Auth
 
             $this->packagesData->responseCode = 0;
 
+            $this->packagesData->responseMessage = 'Generated 2FA Code';
+
             return true;
         } catch (\Exception $e) {
             $this->packagesData->responseCode = 1;
@@ -844,8 +888,26 @@ class Auth
         }
     }
 
-    public function enableVerifyTwoFa(int $code)
+    public function enableVerifyTwoFa(array $data)
     {
+        if (isset($data['user']) && isset($data['pass'])) {
+            $validate = $this->validateData($data, 'auth');
+
+            if ($validate !== true) {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = $validate;
+
+                return false;
+            }
+        }
+
+        if (isset($data['user']) && isset($data['pass']) && !$this->checkAccount($data)) {
+            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
+
+            return false;
+        }
+
         $security = $this->getAccountSecurityObject();
 
         if ($security->two_fa_status && $security->two_fa_status == '1') {
@@ -856,10 +918,12 @@ class Auth
             return false;
         }
 
-        if ($this->verifyTwoFa($code, $security->two_fa_secret)) {
+        if ($this->verifyTwoFa($data['code'], $security->two_fa_secret)) {
             $security->two_fa_status = '1';
 
             $security->update();
+
+            return true;
         }
     }
 
