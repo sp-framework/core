@@ -393,7 +393,7 @@ class Accounts extends BasePackage
 
         $data['can_login'] = Json::encode(
             [
-                strtolower($this->app['name']) => $canLogin
+                strtolower($this->app['id']) => $canLogin
             ]
         );
 
@@ -401,6 +401,8 @@ class Accounts extends BasePackage
 
         if ($validation === true) {
             if ($this->addAccount($data)) {
+                $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
+
                 $this->packagesData->redirectUrl = $this->links->url('auth');
             }
 
@@ -510,7 +512,7 @@ class Accounts extends BasePackage
                         $newPermission['account_id'] = $id;
                         $newPermission['app_id'] = $appId;
 
-                        if ($allowed === true) {
+                        if ($allowed == 'true') {
                             $newPermission['allowed'] = '1';
                         } else {
                             $newPermission['allowed'] = '0';

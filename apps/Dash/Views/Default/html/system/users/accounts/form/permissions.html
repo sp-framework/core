@@ -48,8 +48,8 @@
                 )}}
                 {% for app in apps %}
                     {% set checkboxIds[componentId ~ '-' ~ sectionId ~ '-can_login-' ~ app['route']] = app['route'] %}
-                    {% if account['can_login'][app['route']] is defined %}
-                        {% if account['can_login'][app['route']] == true %}
+                    {% if account['can_login'][app['id']] is defined %}
+                        {% if account['can_login'][app['id']] == true %}
                             {% set checked = true %}
                         {% else %}
                             {% set checked = false %}
