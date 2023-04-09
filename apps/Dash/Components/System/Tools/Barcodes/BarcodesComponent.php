@@ -2,7 +2,6 @@
 
 namespace Apps\Dash\Components\System\Tools\Barcodes;
 
-use Apps\Dash\Packages\System\Tools\Barcodes\Barcodes;
 use System\Base\BaseComponent;
 
 class BarcodesComponent extends BaseComponent
@@ -13,7 +12,7 @@ class BarcodesComponent extends BaseComponent
 
     public function initialize()
     {
-        $this->barcodes = $this->usePackage(Barcodes::class);
+        $this->barcodes = $this->basepackages->barcodes;
 
         $this->barcodesSettings = $this->barcodes->getBarcodesSettings();
     }

@@ -2,7 +2,6 @@
 
 namespace Apps\Dash\Components\System\Tools\Qrcodes;
 
-use Apps\Dash\Packages\System\Tools\Qrcodes\Qrcodes;
 use System\Base\BaseComponent;
 
 class QrcodesComponent extends BaseComponent
@@ -13,7 +12,7 @@ class QrcodesComponent extends BaseComponent
 
     public function initialize()
     {
-        $this->qrcodes = $this->usePackage(Qrcodes::class);
+        $this->qrcodes = $this->basepackages->qrcodes;
 
         $this->qrcodesSettings = $this->qrcodes->getQrcodesSettings();
     }

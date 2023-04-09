@@ -4,6 +4,8 @@ namespace System\Base\Providers\BasepackagesServiceProvider;
 
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ActivityLogs;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\AddressBook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Api;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Barcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Dashboards;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\Email;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailQueue;
@@ -19,6 +21,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Progress;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Pusher;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Qrcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Templates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
@@ -258,6 +261,27 @@ class Basepackages
 	protected function initProgress()
 	{
 		$this->progress = (new Progress())->init();
+
+		return $this->progress;
+	}
+
+	protected function initApi()
+	{
+		$this->progress = (new Api())->init();
+
+		return $this->progress;
+	}
+
+	protected function initBarcodes()
+	{
+		$this->progress = (new Barcodes())->init();
+
+		return $this->progress;
+	}
+
+	protected function initQrcodes()
+	{
+		$this->progress = (new Qrcodes())->init();
 
 		return $this->progress;
 	}

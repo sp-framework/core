@@ -6,15 +6,10 @@ use Apps\Dash\Packages\Devtools\Api\Contracts\Install\Schema\DevtoolsApiContract
 use Apps\Dash\Packages\Devtools\Api\Contracts\Model\AppsDashDevtoolsApiContracts;
 use Apps\Dash\Packages\Devtools\Api\Enums\Install\Schema\DevtoolsApiEnums;
 use Apps\Dash\Packages\Devtools\Api\Enums\Model\AppsDashDevtoolsApiEnums;
-use Apps\Dash\Packages\System\Api\Install\Schema\SystemApi;
-use Apps\Dash\Packages\System\Api\Install\Schema\SystemApiCalls;
-use Apps\Dash\Packages\System\Messenger\Install\Schema\SystemMessenger;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
 use League\Flysystem\UnableToDeleteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
-use Phalcon\Db\Column;
-use Phalcon\Db\Index;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Dashboard as RegisterAdminDashboard;
@@ -40,6 +35,8 @@ use System\Base\Installer\Packages\Setup\Register\Providers\Core as RegisterCore
 use System\Base\Installer\Packages\Setup\Register\Providers\Domain as RegisterDomain;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ActivityLogs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\AddressBook;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Api\Api;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Api\ApiCalls;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards\Widgets as DashboardsWidgets;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailQueue;
@@ -51,6 +48,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\States;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Timezones;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ImportExport;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Menus;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Messenger;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notifications;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Settings;
@@ -289,9 +287,9 @@ class Setup
 		$this->db->createTable('basepackages_dashboards', $dbName, (new Dashboards)->columns());
 		$this->db->createTable('basepackages_dashboards_widgets', $dbName, (new DashboardsWidgets)->columns());
 		$this->db->createTable('basepackages_widgets', $dbName, (new Widgets)->columns());
-		$this->db->createTable('apps_dash_system_api_calls', $dbName, (new SystemApiCalls)->columns());
-		$this->db->createTable('apps_dash_system_api', $dbName, (new SystemApi)->columns());
-		$this->db->createTable('apps_dash_system_messenger', $dbName, (new SystemMessenger)->columns());
+		$this->db->createTable('basepackages_api_calls', $dbName, (new ApiCalls)->columns());
+		$this->db->createTable('basepackages_api', $dbName, (new Api)->columns());
+		$this->db->createTable('basepackages_messenger', $dbName, (new Messenger)->columns());
 
 		if ($this->postData['dev'] == 'true') {
 			$this->db->createTable('apps_dash_devtools_api_contracts', $dbName, (new DevtoolsApiContracts)->columns());
