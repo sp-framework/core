@@ -82,6 +82,11 @@ class Basepackages
 
 	protected $progress;
 
+	protected $api;
+
+	protected $barcodes;
+
+	protected $qrcodes;
 	public function __construct()
 	{
 	}
@@ -267,22 +272,23 @@ class Basepackages
 
 	protected function initApi()
 	{
-		$this->progress = (new Api())->init();
+		$this->api = (new Api())->init();
 
-		return $this->progress;
+		return $this->api;
 	}
 
 	protected function initBarcodes()
 	{
-		$this->progress = (new Barcodes())->init();
+		$this->barcodes = (new Barcodes())->init();
 
-		return $this->progress;
+		return $this->barcodes;
 	}
 
 	protected function initQrcodes()
 	{
-		$this->progress = (new Qrcodes())->init();
+		$this->qrcodes = (new Qrcodes())->init();
 
-		return $this->progress;
+		return $this->qrcodes;
+	}
 	}
 }
