@@ -1,0 +1,80 @@
+<?php
+
+namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\Repo\Gitea\Operations;
+
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\Repo\RepoType;
+
+class IssueListIssuesRestRequest extends RepoType
+{
+    private static $propertyTypes = [
+        'owner' => [
+          'attribute' => false,
+          'elementName' => 'owner',
+        ],
+        'repo' => [
+          'attribute' => false,
+          'elementName' => 'repo',
+        ],
+        'state' => [
+          'attribute' => false,
+          'elementName' => 'state',
+        ],
+        'labels' => [
+          'attribute' => false,
+          'elementName' => 'labels',
+        ],
+        'q' => [
+          'attribute' => false,
+          'elementName' => 'q',
+        ],
+        'type' => [
+          'attribute' => false,
+          'elementName' => 'type',
+        ],
+        'milestones' => [
+          'attribute' => false,
+          'elementName' => 'milestones',
+        ],
+        'since' => [
+          'attribute' => false,
+          'elementName' => 'since',
+        ],
+        'before' => [
+          'attribute' => false,
+          'elementName' => 'before',
+        ],
+        'created_by' => [
+          'attribute' => false,
+          'elementName' => 'created_by',
+        ],
+        'assigned_by' => [
+          'attribute' => false,
+          'elementName' => 'assigned_by',
+        ],
+        'mentioned_by' => [
+          'attribute' => false,
+          'elementName' => 'mentioned_by',
+        ],
+        'page' => [
+          'attribute' => false,
+          'elementName' => 'page',
+        ],
+        'limit' => [
+          'attribute' => false,
+          'elementName' => 'limit',
+        ],
+      ];
+
+    public function __construct(array $values = [])
+    {
+        list($parentValues, $childValues) = self::getParentValues(self::$propertyTypes, $values);
+
+        parent::__construct($parentValues);
+
+        if (!array_key_exists(__CLASS__, self::$properties)) {
+            self::$properties[__CLASS__] = array_merge(self::$properties[get_parent_class()], self::$propertyTypes);
+        }
+
+        $this->setValues(__CLASS__, $childValues);
+    }
+}
