@@ -18,9 +18,18 @@ class ContractsOAPI
     {
         $this->contract = $contract;
 
-        $this->servicesClass = '\\Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']);
+        if ($contract['type'] === 'system') {
+            $this->servicesClass =
+                'System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\\' . ucfirst($this->contract['category']) . '\\';
 
-        $this->servicesDirectory = 'apps/Dash/Packages/System/Api/Apis/'. ucfirst($this->contract['api_type']) . '/';
+            $this->servicesDirectory =
+                'system/Base/Providers/BasepackagesServiceProvider/Packages/Api/Apis/'. ucfirst($this->contract['category']) . '/';
+        } else if ($contract['type'] === 'apps') {
+            $this->servicesClass =
+                'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['category']) . '\\';
+
+            $this->servicesDirectory = 'apps/Dash/Packages/System/Api/Apis/'. ucfirst($this->contract['category']) . '/';
+        }
 
         $this->localContent = $localContent;
 
@@ -33,15 +42,15 @@ class ContractsOAPI
 
         $file .= $this->generateBaseServicesHeader();
 
-        if ($this->contract['api_type'] === 'ebay') {
+        if ($this->contract['category'] === 'ecom') {
             $const = '
     const HDR_MARKETPLACE_ID = \'X-EBAY-C-MARKETPLACE-ID\';';
-        } else if ($this->contract['api_type'] === 'xero') {
+        } else if ($this->contract['category'] === 'finance') {
             $const = '
     const HDR_XERO_TENANT_ID = \'xero-tenant-id\';';
-        } else if ($this->contract['api_type'] === 'gitea') {
+        } else if ($this->contract['category'] === 'repo') {
             $const = '';
-        } else if ($this->contract['api_type'] === 'binarylane') {
+        } else if ($this->contract['category'] === 'service_providers') {
             $const = '';
         }
 
@@ -49,9 +58,9 @@ class ContractsOAPI
 '    protected static $endPoints =
         ' . $this->generateProperties('endPoints') . ';';
 
-        if ($this->contract['api_type'] === 'ebay') {
+        if ($this->contract['category'] === 'ecom') {
             $headers =
-'    protected function getEbayHeaders()
+'    protected function getEcomHeaders()
     {
         $headers = [];
 
@@ -65,7 +74,7 @@ class ContractsOAPI
 
         return $headers;
     }';
-        } else if ($this->contract['api_type'] === 'xero') {
+        } else if ($this->contract['category'] === 'finance') {
             $headers =
 '    protected function getXeroHeaders()
     {
@@ -78,9 +87,9 @@ class ContractsOAPI
 
         return $headers;
     }';
-        } else if ($this->contract['api_type'] === 'gitea') {
+        } else if ($this->contract['category'] === 'repo') {
             $headers =
-'    protected function getGiteaHeaders()
+'    protected function getRepoHeaders()
     {
         $headers = [];
 
@@ -89,9 +98,9 @@ class ContractsOAPI
 
         return $headers;
     }';
-        } else if ($this->contract['api_type'] === 'binarylane') {
+        } else if ($this->contract['category'] === 'service_providers') {
             $headers =
-'    protected function getBinarylaneHeaders()
+'    protected function getProvidersHeaders()
     {
         $headers = [];
 
@@ -119,27 +128,27 @@ class ContractsOAPI
 
     protected function generateBaseServicesHeader()
     {
-        if ($this->contract['api_type'] === 'ebay') {
-            $baseRestServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\Ebay\EbayRESTService';
-            $baseRestService = 'EbayRESTService';
-        } else if ($this->contract['api_type'] === 'xero') {
-            $baseRestServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroRESTService';
-            $baseRestService = 'XeroRESTService';
-        } else if ($this->contract['api_type'] === 'gitea') {
-            $baseRestServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\Gitea\GiteaRESTService';
-            $baseRestService = 'GiteaRESTService';
-        } else if ($this->contract['api_type'] === 'binarylane') {
-            $baseRestServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\Binarylane\BinarylaneRESTService';
-            $baseRestService = 'GiteaRESTService';
+        if ($this->contract['type'] === 'system') {
+            $baseNamespace = $this->servicesClass . ucfirst($this->contract['provider_name']) . '\Services;';
+            $baseRestServiceNamespace = $this->servicesClass . 'RESTService';
+            $baseRestService =
+                ucfirst($this->contract['category']) . 'RESTService';
+        } else if ($this->contract['type'] === 'apps') {
+            $baseNamespace =
+                $this->servicesClass . ucfirst($this->contract['provider_name']) . '\Services;';
+            $baseRestServiceNamespace =
+                $this->servicesClass . 'RESTService';
+            $baseRestService =
+                ucfirst($this->contract['category']) . 'RESTService';
         }
 
         return '<?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Services;
+namespace ' . $baseNamespace . '
 
 use ' . $baseRestServiceNamespace . ';
 
-class ' . $this->contract['name'] . 'BaseService extends ' . $baseRestService . '
+class ' . ucfirst($this->contract['provider_name']) . 'BaseService extends ' . $baseRestService . '
 {
 ';
     }
@@ -149,23 +158,27 @@ class ' . $this->contract['name'] . 'BaseService extends ' . $baseRestService . 
         if ($type === 'endPoints') {
             $endpoints = [];
 
-            foreach ($this->contract['content']['servers'] as $serverKey => $server) {
-                $url = explode('{', $server['url']);
+            if(isset($this->contract['content']['servers'])) {
+                foreach ($this->contract['content']['servers'] as $serverKey => $server) {
+                    $url = explode('{', $server['url']);
 
-                if (count($url) > 1) {
-                    $urlKey = str_replace('}', '', $url[1]);
+                    if (count($url) > 1) {
+                        $urlKey = str_replace('}', '', $url[1]);
 
-                    $description = strtolower($server['description']);
+                        $description = strtolower($server['description']);
 
-                    //Dirty fix to apply production/sandbox as key
-                    if (strpos($description, 'prod') !== false) {
-                        $endpoints['primary']['production'] = $url[0] . $server['variables'][$urlKey]['default'];
-                    } else if (strpos($description, 'sand') !== false) {
-                        $endpoints['primary']['sandbox'] = $url[0] . $server['variables'][$urlKey]['default'];
+                        //Dirty fix to apply production/sandbox as key
+                        if (strpos($description, 'prod') !== false) {
+                            $endpoints['primary']['production'] = $url[0] . $server['variables'][$urlKey]['default'];
+                        } else if (strpos($description, 'sand') !== false) {
+                            $endpoints['primary']['sandbox'] = $url[0] . $server['variables'][$urlKey]['default'];
+                        }
+                    } else {
+                        $endpoints['primary']['production'] = $url[0];
                     }
-                } else {
-                    $endpoints['primary']['production'] = $url[0];
                 }
+            } else if (isset($this->contract['content']['basePath'])) {
+                $endpoints['primary']['production'] = $this->contract['content']['basePath'];
             }
 
             foreach ($this->contract['content']['paths'] as $pathKey => $path) {
@@ -193,7 +206,7 @@ class ' . $this->contract['name'] . 'BaseService extends ' . $baseRestService . 
                         // $operations[ucfirst($method['operationId'])]['method'] = strtoupper($methodKey);
                         // $operations[ucfirst($method['operationId'])]['resource'] = ltrim($pathKey, '/');
                         // $operations[ucfirst($method['operationId'])]['responseClass'] =
-                        //     $this->servicesClass . '\\' . $this->contract['name'] . '\Operations\\' . ucfirst($method['operationId']) . 'RestResponse';
+                        //     '\\' . $this->servicesClass . ucfirst($this->contract['provider_name']) . '\Operations\\' . ucfirst($method['operationId']) . 'RestResponse';
                         // if (isset($method['parameters']) && is_array($method['parameters']) && count($method['parameters']) > 0) {
                         //     $operations[ucfirst($method['operationId'])]['params'] = [];
                         //     foreach ($method['parameters'] as $parameterKey => $parameter) {
@@ -231,7 +244,7 @@ class ' . $this->contract['name'] . 'BaseService extends ' . $baseRestService . 
                         $operations[ucfirst($method['operationId'])]['method'] = strtoupper($methodKey);
                         $operations[ucfirst($method['operationId'])]['resource'] = ltrim($pathKey, '/');
                         $operations[ucfirst($method['operationId'])]['responseClass'] =
-                            $this->servicesClass . '\\' . $this->contract['name'] . '\Operations\\' . ucfirst($method['operationId']) . 'RestResponse';
+                            '\\' . $this->servicesClass . ucfirst($this->contract['provider_name']) . '\Operations\\' . ucfirst($method['operationId']) . 'RestResponse';
 
                         if (isset($method['parameters']) && is_array($method['parameters']) && count($method['parameters']) > 0) {
                             $operations[ucfirst($method['operationId'])]['params'] = [];
@@ -310,13 +323,25 @@ class ' . $this->contract['name'] . 'BaseService extends ' . $baseRestService . 
 
     protected function generateServicesHeader()
     {
+        if ($this->contract['type'] === 'system') {
+            $baseNamespace =
+                'namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\\' . ucfirst($this->contract['category']) . '\\' . ucfirst($this->contract['provider_name']) . '\Services;';
+            $baseServiceNamespace =
+                'use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\\' . ucfirst($this->contract['category']) . '\\' . ucfirst($this->contract['provider_name']) . '\Services\\' . ucfirst($this->contract['provider_name']) . 'BaseService;';
+        } else if ($this->contract['type'] === 'apps') {
+            $baseNamespace =
+                'namespace ' . $this->servicesClass . ucfirst($this->contract['provider_name']) . '\Services;';
+            $baseServiceNamespace =
+                'use ' . $this->servicesClass . ucfirst($this->contract['provider_name']) . '\Services\\' . ucfirst($this->contract['provider_name']) . 'BaseService;';
+        }
+
         return '<?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Services;
+' . $baseNamespace . '
 
-use Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Services\\' . $this->contract['name'] . 'BaseService;
+' . $baseServiceNamespace . '
 
-class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name'] . 'BaseService
+class ' . ucfirst($this->contract['provider_name']) . 'Service extends ' . ucfirst($this->contract['provider_name']) . 'BaseService
 {
 ';
     }
@@ -339,12 +364,12 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
                     $methods .=
                     '
 
-    public function ' . $method['operationId'] . '(' . $this->servicesClass . '\\' . $this->contract['name'] . '\Operations\\' . ucfirst($method['operationId']) . 'RestRequest $request)
+    public function ' . $method['operationId'] . '(\\' . $this->servicesClass . ucfirst($this->contract['provider_name']) . '\Operations\\' . ucfirst($method['operationId']) . 'RestRequest $request)
     {
         return $this->' . $method['operationId'] . 'Async($request)->wait();
     }
 
-    public function ' . $method['operationId'] . 'Async(' . $this->servicesClass . '\\' . $this->contract['name'] . '\Operations\\' . ucfirst($method['operationId']) . 'RestRequest $request)
+    public function ' . $method['operationId'] . 'Async(\\' . $this->servicesClass . ucfirst($this->contract['provider_name']) . '\Operations\\' . ucfirst($method['operationId']) . 'RestRequest $request)
     {
         return $this->callOperationAsync(\'' . ucfirst($method['operationId']) . '\', $request);
     }';
@@ -385,9 +410,9 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
         try {
             $this->localContent->write(
                 $this->servicesDirectory .
-                $this->contract['name'] .
+                ucfirst($this->contract['provider_name']) .
                 '/Services/' .
-                $this->contract['name'] .
+                ucfirst($this->contract['provider_name']) .
                 'BaseService.php',
                 $file
             );
@@ -401,9 +426,9 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
         try {
             $this->localContent->write(
                 $this->servicesDirectory .
-                $this->contract['name'] .
+                ucfirst($this->contract['provider_name']) .
                 '/Services/' .
-                $this->contract['name'] .
+                ucfirst($this->contract['provider_name']) .
                 'Service.php',
                 $file
             );
@@ -417,7 +442,7 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
         try {
             $this->localContent->write(
                 $this->servicesDirectory .
-                $this->contract['name'] .
+                ucfirst($this->contract['provider_name']) .
                 '/Types/' .
                 $filename .
                 '.php',
@@ -430,11 +455,27 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
 
     public function buildTypesFile()
     {
-        foreach ($this->contract['content']['components']['schemas'] as $typeKey => $type) {
-            $this->writeTypesFileContent($typeKey, $this->buildTypesFileContent($typeKey, $type));
+        $schemas = [];
+        if (isset($this->contract['content']['components']['schemas'])) {
+            $schemas = $this->contract['content']['components']['schemas'];
+        } else if (isset($this->contract['content']['schemas'])) {
+            $schemas = $this->contract['content']['schemas'];
         }
+        $responses = [];
         if (isset($this->contract['content']['components']['responses'])) {
-            foreach ($this->contract['content']['components']['responses'] as $typeKey => $type) {
+            $responses = $this->contract['content']['components']['responses'];
+        } else if (isset($this->contract['content']['responses'])) {
+            $responses = $this->contract['content']['responses'];
+        }
+
+        if (count($schemas) > 0) {
+            foreach ($schemas as $typeKey => $type) {
+                $this->writeTypesFileContent($typeKey, $this->buildTypesFileContent($typeKey, $type));
+            }
+        }
+
+        if (count($responses) > 0) {
+            foreach ($responses as $typeKey => $type) {
                 $this->writeTypesFileContent($typeKey, $this->buildTypesFileContent($typeKey, $type));
             }
         }
@@ -442,25 +483,20 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
 
     protected function buildTypesFileContent($typeKey, $type)
     {
-        if ($this->contract['api_type'] === 'ebay') {
-            $baseTypeServiceNamespace = 'Apps\Dash\Packages\System\Api\Base\Types\BaseType';
-            $baseTypeService = 'BaseType';
-        } else if ($this->contract['api_type'] === 'xero') {
-            $baseTypeServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroType';
-            $baseTypeService = 'XeroType';
-        } else if ($this->contract['api_type'] === 'gitea') {
-            $baseTypeServiceNamespace = 'Apps\Dash\Packages\System\Api\Base\Types\BaseType';
-            $baseTypeService = 'BaseType';
-        } else if ($this->contract['api_type'] === 'binarylane') {
-            $baseTypeServiceNamespace = 'Apps\Dash\Packages\System\Api\Base\Types\BaseType';
-            $baseTypeService = 'BaseType';
+        if ($this->contract['type'] === 'system') {
+            $categoryServiceNamespace =
+                'System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\\' . ucfirst($this->contract['category']) . '\\' . ucfirst($this->contract['category']) . 'Type';
+        } else if ($this->contract['type'] === 'apps') {
+            $categoryServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['category']) . '\\' . ucfirst($this->contract['category']) . 'Type';
         }
+
+        $baseTypeService = ucfirst($this->contract['category']) . 'Type';
 
         $file = '<?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Types;
+namespace ' . $this->servicesClass . ucfirst($this->contract['provider_name']) . '\Types;
 
-use ' . $baseTypeServiceNamespace . ';
+use ' . $categoryServiceNamespace . ';
 
 class ' . $typeKey . ' extends ' . $baseTypeService . '
 {';
@@ -549,10 +585,14 @@ class ' . $typeKey . ' extends ' . $baseTypeService . '
         }
 
         if ($onlyLast) {
-            return Arr::last($itemArr);
+            try {
+                return Arr::last($itemArr);
+            } catch (\Exception $e) {
+                throw $e;
+            }
         }
 
-        return 'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Types\\' . Arr::last($itemArr);
+        return '' . $this->servicesClass . ucfirst($this->contract['provider_name']) . '\Types\\' . Arr::last($itemArr);
     }
 
     public function buildOperationsFile()
@@ -609,7 +649,7 @@ class ' . $typeKey . ' extends ' . $baseTypeService . '
                                 $requestParams[$parameter['name']]['attribute'] = false;
                                 $requestParams[$parameter['name']]['elementName'] = $parameter['name'];
                             } else {
-                                if ($this->contract['api_type'] === 'xero') {
+                                if ($this->contract['category'] === 'finance') {
                                     if (isset($parameter['$ref'])) {
                                         $refName = $this->getRefClass($parameter['$ref'], true);
                                         $requestParams[$refName]['type'] = 'string';
@@ -634,8 +674,9 @@ class ' . $typeKey . ' extends ' . $baseTypeService . '
                         }
                     } else if (isset($method['requestBody']) && is_array($method['requestBody']) && count($method['requestBody']) > 0) {
                         $requestParams = [];
-                        // if ($this->contract['api_type'] === 'xero') {
+                        // if ($this->contract['category'] === 'finance') {
                             if (isset($method['requestBody']['content']['application/json']['schema'])) {
+                                dump($method['requestBody']);
                                 $refName = $this->getRefClass($method['requestBody']['content']['application/json']['schema'], true);
                                 $requestParams[$refName]['type'] = $this->getRefClass($method['requestBody']['content']['application/json']['schema']);
                                 $requestParams[$refName]['attribute'] = false;
@@ -643,7 +684,7 @@ class ' . $typeKey . ' extends ' . $baseTypeService . '
                                 $requestParams[$refName]['elementName'] = $refName;
                             }
                         // } else {
-                            //FIX THIS FOR OTHER APIs!!! (ebay)
+                            //FIX THIS FOR OTHER APIs!!! (ecom)
                             // $requestParams[$parameter['name']] = [];
                             // if (isset($parameter['$ref'])) {
                             //     $requestParams[$parameter['name']]['type'] = $this->getRefClass($parameter['$ref']);
@@ -664,13 +705,22 @@ class ' . $typeKey . ' extends ' . $baseTypeService . '
 
     protected function buildOperationsRequestFileContent($operationId, $requestParams)
     {
+        if ($this->contract['type'] === 'system') {
+            $categoryServiceNamespace =
+                'System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\\' . ucfirst($this->contract['category']) . '\\' . ucfirst($this->contract['category']) . 'Type';
+        } else if ($this->contract['type'] === 'apps') {
+            $categoryServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['category']) . '\\' . ucfirst($this->contract['category']) . 'Type';
+        }
+
+        $baseTypeService = ucfirst($this->contract['category']) . 'Type';
+
         $file = '<?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Operations;
+namespace ' . $this->servicesClass . ucfirst($this->contract['provider_name']) . '\Operations;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use ' . $categoryServiceNamespace . ';
 
-class ' . $operationId . 'RestRequest extends BaseType
+class ' . $operationId . 'RestRequest extends ' . ucfirst($this->contract['category']) . 'Type
 {
     private static $propertyTypes = ';
 
@@ -699,7 +749,7 @@ class ' . $operationId . 'RestRequest extends BaseType
         try {
             $this->localContent->write(
                 $this->servicesDirectory .
-                $this->contract['name'] .
+                ucfirst($this->contract['provider_name']) .
                 '/Operations/' .
                 $filename .
                 '.php',
@@ -712,6 +762,13 @@ class ' . $operationId . 'RestRequest extends BaseType
 
     protected function buildOperationsResponseFileContent()
     {
+        if ($this->contract['type'] === 'system') {
+            $categoryServiceNamespace =
+                'System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\\' . ucfirst($this->contract['category']) . '\\' . ucfirst($this->contract['category']) . 'Type';
+        } else if ($this->contract['type'] === 'apps') {
+            $categoryServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['category']) . '\\' . ucfirst($this->contract['category']) . 'Type';
+        }
+
         foreach ($this->contract['content']['paths'] as $pathKey => $path) {
             if (is_array($path)) {
                 foreach ($path as $methodKey => $method) {
@@ -725,17 +782,16 @@ class ' . $operationId . 'RestRequest extends BaseType
 
                     $file = '<?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Operations;
+namespace ' . $this->servicesClass . ucfirst($this->contract['provider_name']) . '\Operations;
 
-use Apps\Dash\Packages\System\Api\Base\Traits\HttpHeadersTrait;
-use Apps\Dash\Packages\System\Api\Base\Traits\StatusCodeTrait;
-';
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Traits\HttpHeadersTrait;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Traits\StatusCodeTrait;';
         if ($methodKey === 'get') {
             if (!isset($method['responses']['200'])) {
                 $file .= '
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use ' . $categoryServiceNamespace . ';
 
-class ' . ucfirst($method['operationId']) . 'RestResponse extends BaseType';
+class ' . ucfirst($method['operationId']) . 'RestResponse extends ' . ucfirst($this->contract['category']) . 'Type';
             } else {
                 if (isset($method['responses']['200']['$ref'])) {
                     $class = $method['responses']['200']['$ref'];
@@ -748,9 +804,9 @@ class ' . ucfirst($method['operationId']) . 'RestResponse extends \\' .
             }
         } else {
             $file .= '
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use ' . $categoryServiceNamespace . ';
 
-class ' . ucfirst($method['operationId']) . 'RestResponse extends BaseType';
+class ' . ucfirst($method['operationId']) . 'RestResponse extends ' . ucfirst($this->contract['category']) . 'Type';
         }
 
         $file .= '
@@ -760,13 +816,13 @@ class ' . ucfirst($method['operationId']) . 'RestResponse extends BaseType';
 
     private static $propertyTypes = [
         \'errors\' => [
-            \'type\' => \'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Types\Error\',
+            \'type\' => \'' . $this->servicesClass . ucfirst($this->contract['provider_name']) . '\Types\Error\',
             \'repeatable\' => true,
             \'attribute\' => false,
             \'elementName\' => \'errors\'
         ],
         \'warnings\' => [
-            \'type\' => \'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Types\Error\',
+            \'type\' => \'' . $this->servicesClass . ucfirst($this->contract['provider_name']) . '\Types\Error\',
             \'repeatable\' => true,
             \'attribute\' => false,
             \'elementName\' => \'warnings\'
@@ -802,14 +858,197 @@ class ' . ucfirst($method['operationId']) . 'RestResponse extends BaseType';
         try {
             $this->localContent->write(
                 $this->servicesDirectory .
-                $this->contract['name'] .
+                ucfirst($this->contract['provider_name']) .
                 '/Operations/' .
                 $filename .
                 '.php',
                 $file
             );
         } catch (\League\Flysystem\FilesystemException | \League\Flysystem\UnableToWriteFile $exception) {
-            var_dump($exception);die();
+            throw $exception;
+        }
+    }
+
+    public function writeProviderBaseFileContent()
+    {
+        try {
+            $existingFile = $this->localContent->read(
+                $this->servicesDirectory .
+                ucfirst($this->contract['provider_name']) . '/' .
+                ucfirst($this->contract['provider_name']) . '.php'
+            );
+        } catch (\League\Flysystem\FilesystemException | \League\Flysystem\UnableToReadFile | \Exception $exception) {
+            $existingFile = false;
+        }
+
+        if ($existingFile) {
+            return;
+        }
+
+        if ($this->contract['type'] === 'system') {
+            $servicesClass =
+                'System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\\' . ucfirst($this->contract['category']);
+        } else if ($this->contract['type'] === 'apps') {
+            $servicesClass =
+                'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['category']);
+        }
+
+        $file =
+'<?php
+
+namespace ' . $servicesClass . '\\' . ucfirst($this->contract['provider_name']) . ';
+
+class ' . ucfirst($this->contract['provider_name']) . '
+{
+    //
+}';
+
+        try {
+            $this->localContent->write(
+                $this->servicesDirectory .
+                ucfirst($this->contract['provider_name']) . '/' .
+                ucfirst($this->contract['provider_name']) . '.php',
+                $file
+            );
+        } catch (\League\Flysystem\FilesystemException | \League\Flysystem\UnableToWriteFile $exception) {
+            throw $exception;
+        }
+    }
+
+    public function writeCategoryOperationFileContent()
+    {
+        try {
+            $existingFile = $this->localContent->read(
+                $this->servicesDirectory .
+                ucfirst($this->contract['category']) . 'Operations.php'
+            );
+        } catch (\League\Flysystem\FilesystemException | \League\Flysystem\UnableToReadFile | \Exception $exception) {
+            $existingFile = false;
+        }
+
+        if ($existingFile) {
+            return;
+        }
+
+        if ($this->contract['type'] === 'system') {
+            $servicesClass =
+                'System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\\' . ucfirst($this->contract['category']);
+        } else if ($this->contract['type'] === 'apps') {
+            $servicesClass =
+                'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['category']);
+        }
+
+        $file =
+'<?php
+
+namespace ' . $servicesClass . ';
+
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Types\BaseType;
+
+class ' . ucfirst($this->contract['category']) . 'Operations extends BaseType
+{
+    //
+}';
+
+        try {
+            $this->localContent->write(
+                $this->servicesDirectory .
+                ucfirst($this->contract['category']) . 'Operations.php',
+                $file
+            );
+        } catch (\League\Flysystem\FilesystemException | \League\Flysystem\UnableToWriteFile $exception) {
+            throw $exception;
+        }
+    }
+
+    public function writeCategoryRESTFileContent()
+    {
+        try {
+            $existingFile = $this->localContent->read(
+                $this->servicesDirectory .
+                ucfirst($this->contract['category']) . 'RESTService.php'
+            );
+        } catch (\League\Flysystem\FilesystemException | \League\Flysystem\UnableToReadFile | \Exception $exception) {
+            $existingFile = false;
+        }
+
+        if ($existingFile) {
+            return;
+        }
+
+        if ($this->contract['type'] === 'system') {
+            $servicesClass =
+                'System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\\' . ucfirst($this->contract['category']);
+        } else if ($this->contract['type'] === 'apps') {
+            $servicesClass =
+                'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['category']);
+        }
+
+        $file =
+'<?php
+
+namespace ' . $servicesClass . ';
+
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\BaseRESTService;
+
+class ' . ucfirst($this->contract['category']) . 'RESTService extends BaseRESTService
+{
+    //
+}';
+
+        try {
+            $this->localContent->write(
+                $this->servicesDirectory .
+                ucfirst($this->contract['category']) . 'RESTService.php',
+                $file
+            );
+        } catch (\League\Flysystem\FilesystemException | \League\Flysystem\UnableToWriteFile $exception) {
+            throw $exception;
+        }
+    }
+
+    public function writeCategoryTypeFileContent()
+    {
+        try {
+            $existingFile = $this->localContent->read(
+                $this->servicesDirectory .
+                ucfirst($this->contract['category']) . 'Type.php'
+            );
+        } catch (\League\Flysystem\FilesystemException | \League\Flysystem\UnableToReadFile | \Exception $exception) {
+            $existingFile = false;
+        }
+
+        if ($existingFile) {
+            return;
+        }
+
+        if ($this->contract['type'] === 'system') {
+            $servicesClass =
+                'System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\\' . ucfirst($this->contract['category']);
+        } else if ($this->contract['type'] === 'apps') {
+            $servicesClass =
+                'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['category']);
+        }
+
+        $file =
+'<?php
+
+namespace ' . $servicesClass . ';
+
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Types\BaseType;
+
+class ' . ucfirst($this->contract['category']) . 'Type extends BaseType
+{
+    //
+}';
+
+        try {
+            $this->localContent->write(
+                $this->servicesDirectory .
+                ucfirst($this->contract['category']) . 'Type.php',
+                $file
+            );
+        } catch (\League\Flysystem\FilesystemException | \League\Flysystem\UnableToWriteFile $exception) {
             throw $exception;
         }
     }

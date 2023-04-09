@@ -52,25 +52,15 @@ class ContractsComponent extends BaseComponent
 		}
 
 		if (isset($this->getData()['id'])) {
-			$apiTypes =
-				[
-					[
-						'id'	=> 'ebay',
-						'name'	=> 'eBay'
-					],
-					[
-						'id'	=> 'xero',
-						'name'	=> 'Xero'
-					],
-					[
-						'id'	=> 'gitea',
-						'name'	=> 'Gitea'
-					],
-					[
-						'id'	=> 'binarylane',
-						'name'	=> 'Binary Lane'
-					]
-				];
+			$contractPackage = $this->modules->packages->getNamePackage('Contracts');
+
+			$contractPackage['settings'] = Json::decode($contractPackage['settings'], true);
+
+			$apiCategories = $contractPackage['settings']['categories'];
+
+			$apiTypes = $contractPackage['settings']['types'];
+
+			$this->view->apiCategories = $apiCategories;
 
 			$this->view->apiTypes = $apiTypes;
 
@@ -85,6 +75,7 @@ class ContractsComponent extends BaseComponent
 					$this->view->pick('contracts/viewcontract');
 				} else if (isset($this->getData()['generateclasses']) && $this->getData()['generateclasses'] == 'true') {
 					$this->contractsPackage->generateClassesFromContract($this->getData()['id']);
+
 					return false;
 				} else {
 					$this->view->pick('contracts/view');
@@ -125,13 +116,13 @@ class ContractsComponent extends BaseComponent
 			$this->contractsPackage,
 			'devtools/api/contracts/view',
 			null,
-			['name'],
+			['provider_name'],
 			true,
-			['name'],
+			['provider_name'],
 			$controlActions,
 			null,
 			null,
-			'name',
+			'provider_name',
 			$dtAdditionControlButtons
 		);
 

@@ -68,7 +68,7 @@ if (!function_exists('xmlToArray')) {
 }
 
 if (!function_exists('checkCtype')) {
-    function checkCtype($str, $ctype = 'alum', $ignoreChars = null) {
+    function checkCtype($str, $ctype = 'alnum', $ignoreChars = null) {
         if (!$ignoreChars) {
             $ignoreChars = [' ', '&amp;', '&', ',', ':', ';'];
         }

@@ -1,15 +1,17 @@
 {% if contract['id'] is defined %}
     {% set contractId = contract['id'] %}
-    {% set contractName = contract['name'] %}
-    {% set contractApiType = contract['api_type'] %}
+    {% set contractProviderName = contract['provider_name'] %}
+    {% set contractCategory = contract['category'] %}
+    {% set contractType = contract['type'] %}
     {% set contractWSDLConvert = contract['wsdl_convert'] %}
     {% set contractLink = contract['link'] %}
     {% set contractContent = contract['content'] %}
     {% set linkDisabled = true %}
 {% else %}
     {% set contractId = '' %}
-    {% set contractName = '' %}
-    {% set contractApiType = '' %}
+    {% set contractProviderName = '' %}
+    {% set contractCategory = '' %}
+    {% set contractType = '' %}
     {% set contractWSDLConvert = '' %}
     {% set contractLink = '' %}
     {% set contractContent = '' %}
@@ -49,8 +51,8 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'name',
-                        'fieldLabel'                     : 'Contract Name',
+                        'fieldId'                        : 'provider_name',
+                        'fieldLabel'                     : 'Contract Provider Name',
                         'fieldType'                      : 'input',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Contract Name Example: Ebay Identity Api',
@@ -60,7 +62,7 @@
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 50,
-                        'fieldValue'                     : contractName
+                        'fieldValue'                     : contractProviderName
                     ]
                 )}}
             </div>
@@ -71,11 +73,35 @@
                         'componentName'                        : componentName,
                         'componentId'                          : componentId,
                         'sectionId'                            : sectionId,
-                        'fieldId'                              : 'api_type',
-                        'fieldLabel'                           : 'Api Type',
+                        'fieldId'                              : 'category',
+                        'fieldLabel'                           : 'Api Category',
                         'fieldType'                            : 'select2',
                         'fieldHelp'                            : true,
-                        'fieldHelpTooltipContent'              : 'Select api type',
+                        'fieldHelpTooltipContent'              : 'Select api category',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : apiCategories,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : contractCategory
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'type',
+                        'fieldLabel'                           : 'Type',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select type',
                         'fieldRequired'                        : true,
                         'fieldBazScan'                         : true,
                         'fieldBazPostOnCreate'                 : true,
@@ -84,7 +110,7 @@
                         'fieldDataSelect2OptionsKey'           : 'id',
                         'fieldDataSelect2OptionsValue'         : 'name',
                         'fieldDataSelect2OptionsArray'         : true,
-                        'fieldDataSelect2OptionsSelected'      : contractApiType
+                        'fieldDataSelect2OptionsSelected'      : contractType
                     ]
                 )}}
             </div>
@@ -195,9 +221,12 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                      : { },
-        '{{componentId}}-{{sectionId}}-name'                    : { },
-        '{{componentId}}-{{sectionId}}-api_type'                : {
-            placeholder: "SELECT API TYPE"
+        '{{componentId}}-{{sectionId}}-provider_name'           : { },
+        '{{componentId}}-{{sectionId}}-category'                : {
+            placeholder: "SELECT API CATEGORY"
+        },
+        '{{componentId}}-{{sectionId}}-type'                    : {
+            placeholder: "SELECT TYPE"
         },
         '{{componentId}}-{{sectionId}}-wsdl_convert'            : { },
         '{{componentId}}-{{sectionId}}-link'                    : {

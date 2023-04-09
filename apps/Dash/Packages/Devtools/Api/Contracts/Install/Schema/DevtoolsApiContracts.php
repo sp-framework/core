@@ -21,7 +21,7 @@ class DevtoolsApiContracts
                     ]
                 ),
                 new Column(
-                    'name',
+                    'provider_name',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 50,
@@ -29,7 +29,15 @@ class DevtoolsApiContracts
                     ]
                 ),
                 new Column(
-                    'api_type',
+                    'category',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'type',//system (in basepackage) OR apps (apps/Packages/System/Api/Apis)
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 50,

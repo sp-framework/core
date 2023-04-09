@@ -26,8 +26,6 @@ class Contracts extends BasePackage
 
     public function init()
     {
-        $this->app = $this->apps->getAppInfo();
-
         $this->getContractDirectory();
 
         return $this;
@@ -54,21 +52,25 @@ class Contracts extends BasePackage
         return $this->contractDirectory;
     }
 
-    protected function setServicesDirectory($type = null, $directory = null)
+    protected function setServicesDirectory($category = null, $directory = null)
     {
-        if (!$type && $directory) {
+        if (!$category && $directory) {
             $this->servicesDirectory = base_path($directory);
         } else {
-            $this->servicesDirectory = 'apps/Dash/Packages/System/Api/Apis/' . ucfirst($type) . '/';
+            if ($this->contract['type'] === 'system') {
+                $this->servicesDirectory = 'system/Base/Providers/Basepackages/Packages/Api/Apis/' . ucfirst($category) . '/';
+            } else if ($this->contract['type'] === 'apps') {
+                $this->servicesDirectory = 'apps/Dash/Packages/System/Api/Apis/' . ucfirst($category) . '/';
+            }
         }
 
         return $this->servicesDirectory;
     }
 
-    public function getServicesDirectory($type, $directory = null)
+    public function getServicesDirectory($category, $directory = null)
     {
         if (!$this->servicesDirectory) {
-            return $this->setServicesDirectory($type, $directory);
+            return $this->setServicesDirectory($category, $directory);
         }
 
         return $this->servicesDirectory;
@@ -87,7 +89,7 @@ class Contracts extends BasePackage
 
     public function addContract(array $data)
     {
-        if (!checkCtype($data['name'])) {
+        if (!checkCtype($data['provider_name'])) {
 
             $this->packagesData->responseCode = 1;
 
@@ -96,7 +98,7 @@ class Contracts extends BasePackage
 
             return false;
         } else {
-            $data['name'] = checkCtype($data['name']);
+            $data['provider_name'] = checkCtype($data['provider_name']);
         }
 
         if (isset($data['link']) && $data['link'] !== '') {
@@ -146,9 +148,9 @@ class Contracts extends BasePackage
             $data['link'] = 'See Content';
 
             if (strpos($data['content'], '{') !== false) {
-                $data['filename'] = strtolower(str_replace(' ', '_', $data['name']) . '-' . Str::random(Str::RANDOM_ALNUM) . '.json');
+                $data['filename'] = strtolower(str_replace(' ', '_', $data['provider_name']) . '-' . Str::random(Str::RANDOM_ALNUM) . '.json');
             } else {
-                $data['filename'] = strtolower(str_replace(' ', '_', $data['name']) . '-' . Str::random(Str::RANDOM_ALNUM) . '.yaml');
+                $data['filename'] = strtolower(str_replace(' ', '_', $data['provider_name']) . '-' . Str::random(Str::RANDOM_ALNUM) . '.yaml');
             }
 
             $this->localContent->write($data['filename'], $data['content']);
@@ -157,7 +159,7 @@ class Contracts extends BasePackage
         if ($this->add($data)) {
             $this->packagesData->responseCode = 0;
 
-            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' api contract.';
+            $this->packagesData->responseMessage = 'Added ' . $data['provider_name'] . ' api contract.';
         } else {
             $this->packagesData->responseCode = 1;
 
@@ -167,7 +169,7 @@ class Contracts extends BasePackage
 
     public function updateContract(array $data)
     {
-        if (!checkCtype($data['name'])) {
+        if (!checkCtype($data['provider_name'])) {
 
             $this->packagesData->responseCode = 1;
 
@@ -176,13 +178,13 @@ class Contracts extends BasePackage
 
             return false;
         } else {
-            $data['name'] = checkCtype($data['name']);
+            $data['provider_name'] = checkCtype($data['provider_name']);
         }
 
         if ($this->update($data)) {
             $this->packagesData->responseCode = 0;
 
-            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' api contract.';
+            $this->packagesData->responseMessage = 'Updated ' . $data['provider_name'] . ' api contract.';
         } else {
             $this->packagesData->responseCode = 1;
 
@@ -218,6 +220,7 @@ class Contracts extends BasePackage
         }
 
         $this->contract = $contract;
+
         $this->createServiceDirectories();
 
         if (!$this->contract['wsdl_convert'] || $this->contract['wsdl_convert'] == 0) {
@@ -230,6 +233,14 @@ class Contracts extends BasePackage
             $oAPIContract->buildTypesFile();
 
             $oAPIContract->buildOperationsFile();
+
+            $oAPIContract->writeProviderBaseFileContent();
+
+            $oAPIContract->writeCategoryOperationFileContent();
+
+            $oAPIContract->writeCategoryRESTFileContent();
+
+            $oAPIContract->writeCategoryTypeFileContent();
         } else if ($this->contract['wsdl_convert'] == 1) {
             $xmlContract = (new ContractsXML)->init($this->contract, $this->localContent);
 
@@ -240,27 +251,35 @@ class Contracts extends BasePackage
             $xmlContract->buildTypesFile();
 
             $xmlContract->buildOperationsFile();
+
+            $xmlContract->writeProviderBaseFileContent();
+
+            $xmlContract->writeCategoryOperationFileContent();
+
+            $xmlContract->writeCategoryRESTFileContent();
+
+            $xmlContract->writeCategoryTypeFileContent();
         }
     }
 
     protected function createServiceDirectories()
     {
-        $this->getServicesDirectory($this->contract['api_type']);
+        $this->getServicesDirectory($this->contract['category']);
 
-        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['name'])) {
-            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['name']);
+        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['provider_name'])) {
+            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['provider_name']);
         }
-        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['name'] . '/Services')) {
-            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['name'] . '/Services');
+        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['provider_name'] . '/Services')) {
+            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['provider_name'] . '/Services');
         }
-        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['name'] . '/Enums')) {
-            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['name'] . '/Enums');
+        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['provider_name'] . '/Enums')) {
+            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['provider_name'] . '/Enums');
         }
-        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['name'] . '/Types')) {
-            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['name'] . '/Types');
+        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['provider_name'] . '/Types')) {
+            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['provider_name'] . '/Types');
         }
-        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['name'] . '/Operations')) {
-            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['name'] . '/Operations');
+        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['provider_name'] . '/Operations')) {
+            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['provider_name'] . '/Operations');
         }
     }
 }

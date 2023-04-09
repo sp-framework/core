@@ -8,9 +8,11 @@ class AppsDashDevtoolsApiContracts extends BaseModel
 {
     public $id;
 
-    public $name;
+    public $provider_name;
 
-    public $api_type;
+    public $category;
+
+    public $type;
 
     public $link;
 
