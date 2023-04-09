@@ -1,10 +1,11 @@
 {% set apiButtons = '' %}
-{% if apiTypes|length > 0 %}
+{% if apiCategories|length > 0 %}
+    {{dump(apiCategories)}}
     {% set apiButtons = apiButtons ~ '{' %}
-    {% for apiType in apiTypes %}
-        {% set link = links.url('system/api/q/type/' ~ apiType ~ '/id/0') %}
+    {% for apiCategory in apiCategories %}
+        {% set link = links.url('system/api/q/type/' ~ apiCategory ~ '/id/0') %}
         {% set apiButtons =
-            apiButtons ~ '"' ~ apiType ~ '-api" : {"title" : "' ~ apiType ~ '","type" : "primary","additionalClass" : "contentAjaxLink","url" : "' ~ link ~ '"}'
+            apiButtons ~ '"' ~ apiCategory ~ '-api" : {"title" : "' ~ apiCategory ~ '","type" : "primary","additionalClass" : "contentAjaxLink","url" : "' ~ link ~ '"}'
         %}
         {% if not loop.last %}
             {% set apiButtons = apiButtons ~ ',' %}

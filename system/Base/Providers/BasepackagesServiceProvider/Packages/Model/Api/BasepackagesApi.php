@@ -1,0 +1,28 @@
+<?php
+
+namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Api;
+
+use System\Base\BaseModel;
+
+class BasepackagesApi extends BaseModel
+{
+    public $id;
+
+    public $api_id;
+
+    public $name;
+
+    public $category;
+
+    public $provider_name;
+
+    public $type;
+
+    public $in_use;
+
+    public $used_by;
+
+    public $setup;
+
+    public $description;
+}
