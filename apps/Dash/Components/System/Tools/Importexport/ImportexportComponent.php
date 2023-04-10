@@ -188,7 +188,7 @@ class ImportexportComponent extends BaseComponent
     }
 
     /**
-     * @acl(name=update)
+     * @acl(name=add)
      */
     public function addAction()
     {

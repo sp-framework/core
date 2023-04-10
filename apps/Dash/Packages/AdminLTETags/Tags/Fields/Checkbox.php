@@ -84,8 +84,7 @@ class Checkbox
         $this->content .=
             '<div class="icheck-' . $this->fieldParams['fieldCheckboxType'] . $this->fieldParams['fieldCheckboxInline'] . ' ' . $this->fieldParams['fieldCheckboxAdditionClass'] . '">
                 <input ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' type="checkbox" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" ' . $this->fieldParams['fieldDisabled']  . ' ' . $this->fieldParams['fieldDataAttributes'] . ' ' . $this->fieldParams['fieldCheckboxChecked'] . ' />
-                    <label ' . $this->fieldParams['forId'] . '" >' . $this->fieldParams['fieldCheckboxLabel'] . '</label>' .
-                    $this->fieldParams['showFieldCheckboxLabelHelpAndRequired'] . '
+                <label ' . $this->fieldParams['forId'] . '" >' . $this->fieldParams['fieldCheckboxLabel'] . '</label> <sup>' . $this->fieldParams['showFieldCheckboxLabelHelpAndRequired'] . '</sup>
             </div>';
     }
 }

@@ -1,0 +1,12 @@
+{
+    "name"          : "BackupRestore",
+    "display_name"  : "Backup/Restore Tool",
+    "description"   : "Package for taking system backups and restoring them.",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\BackupRestore",
+    "settings"      : {"componentRoute":"system/tools/backuprestore"}
+}

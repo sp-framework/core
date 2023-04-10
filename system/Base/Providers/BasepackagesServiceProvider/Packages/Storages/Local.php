@@ -158,6 +158,16 @@ class Local extends BasePackage
             $this->directory = null;
         }
 
+        if ((isset($this->request->getPost()['isBackupFile']) && $this->request->getPost()['isBackupFile'] == 'true') ||
+            (isset($this->request->getPost()['isPointer']) && $this->request->getPost()['isPointer'] == 'true')
+        ) {
+            $this->isPointer = 1;
+
+            $this->dataPath = $this->directory;
+
+            $this->imagesPath = $this->directory;
+        }
+
         $storageData = [];
 
         if ($file && $fileName && $size && $mimeType) {
@@ -239,12 +249,16 @@ class Local extends BasePackage
             return true;
 
         } else if (in_array($this->mimeType, $this->fileMimeTypes)) {
-            if (isset($this->storage['max_data_file_size']) &&
-                $this->fileSize > $this->storage['max_data_file_size']
+            if (!isset($this->request->getPost()['isBackupFile']) ||
+                isset($this->request->getPost()['isBackupFile']) && $this->request->getPost()['isBackupFile'] == 'false'
             ) {
-                $this->addResponse('File ' . $this->fileName . ' exceeds allowed file size.', 1);
+                if (isset($this->storage['max_data_file_size']) &&
+                    $this->fileSize > $this->storage['max_data_file_size']
+                ) {
+                    $this->addResponse('File ' . $this->fileName . ' exceeds allowed file size.', 1);
 
-                return false;
+                    return false;
+                }
             }
 
             $this->storeFile();
@@ -260,22 +274,38 @@ class Local extends BasePackage
 
     protected function storeImage()
     {
-        if ($this->directory && !is_dir($this->imagesPath . $this->directory)) {
-            $this->imageStorage->createDirectory($this->directory);
-        }
+        if ($this->isPointer === 1) {
+            if ($this->directory && !is_dir($this->imagesPath)) {
+                $this->localContent->createDirectory($this->imagesPath);
+            }
 
-        $this->moveImageToLocationAsUUID();
+            $this->moveImageToLocationAsImageName();
+        } else {
+            if ($this->directory && !is_dir($this->imagesPath . $this->directory)) {
+                $this->imageStorage->createDirectory($this->directory);
+            }
+
+            $this->moveImageToLocationAsUUID();
+        }
 
         $this->addFileInfoToDb();
     }
 
     protected function storeFile()
     {
-        if ($this->directory && !is_dir($this->dataPath . $this->directory)) {
-            $this->fileStorage->createDirectory($this->directory);
-        }
+        if ($this->isPointer === 1) {
+            if ($this->directory && !is_dir($this->dataPath)) {
+                $this->localContent->createDirectory($this->dataPath);
+            }
 
-        $this->moveFileToLocationAsUUID();
+            $this->moveFileToLocationAsFileName();
+        } else {
+            if ($this->directory && !is_dir($this->dataPath . $this->directory)) {
+                $this->fileStorage->createDirectory($this->directory);
+            }
+
+            $this->moveFileToLocationAsUUID();
+        }
 
         $this->addFileInfoToDb();
     }
@@ -295,6 +325,16 @@ class Local extends BasePackage
     protected function moveFileToLocationAsUUID()
     {
         $this->file->moveTo($this->dataPath . $this->uuidLocation);
+    }
+
+    protected function moveImageToLocationAsImageName()
+    {
+        $this->file->moveTo(base_path($this->directory . '/' . $this->fileName));
+    }
+
+    protected function moveFileToLocationAsFileName()
+    {
+        $this->file->moveTo(base_path($this->directory . '/' . $this->fileName));
     }
 
     protected function addFileInfoToDb()
@@ -369,7 +409,7 @@ class Local extends BasePackage
                 return;
             }
 
-            if (isset($getData['headers']) && $getData['headers'] ===  false) {
+            if (isset($getData['headers']) && $getData['headers'] === false) {
                 return $this->localContent->read($dataFile);
             }
 

@@ -15,7 +15,12 @@ class Content
     public function init(string $path = null, array $visibility = [])
     {
         return new Filesystem(
-            new LocalFilesystemAdapter(base_path($path)),
+            new LocalFilesystemAdapter(
+                base_path($path),
+                null,
+                LOCK_EX,
+                LocalFilesystemAdapter::SKIP_LINKS
+            ),
             $visibility
         );
     }

@@ -1,0 +1,61 @@
+{
+    "route"         : "system/tools/backuprestore",
+    "name"          : "Backup/Restore",
+    "description"   : "Backup/Restore data via this component",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../apps-dash-component-system-admin-tools-backuprestore",
+    "class"         : "Apps\\Dash\\Components\\System\\Tools\\Backuprestore\\BackuprestoreComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "BackupRestore",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-system-admin-tools-backuprestore"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 6,
+        "system"      : {
+            "icon"      : "cogs",
+            "title"     : "system",
+            "childs"    : {
+                "tools" : {
+                    "title"     : "Tools",
+                    "icon"      : "wrench",
+                    "childs"    : {
+                        "backuprestore" : {
+                            "title"     : "Backup/Restore",
+                            "icon"      : "floppy-disk",
+                            "link"      : "system/tools/backuprestore"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+        "mandatory"     : {
+            "admin"     : true
+        }
+    }
+}

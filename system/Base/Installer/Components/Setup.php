@@ -310,6 +310,8 @@ Class Setup
 
 				$this->setupPackage->cleanVar();
 
+				$this->setupPackage->cleanOldBackups();
+
 				$this->setupPackage->cleanOldCookies();
 
 				$this->setupPackage->writeConfigs(null, true);
@@ -506,6 +508,10 @@ Class Setup
 				[
 					'method'	=> 'cleanVar',
 					'text'		=> 'Cleaning variable directory...'
+				],
+				[
+					'method'	=> 'cleanOldBackups',
+					'text'		=> 'Cleaning old backups...'
 				],
 				[
 					'method'	=> 'cleanOldCookies',

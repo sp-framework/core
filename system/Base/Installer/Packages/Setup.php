@@ -186,6 +186,19 @@ class Setup
 		}
 	}
 
+	protected function cleanOldBackups()
+	{
+		$files = $this->getInstalledFiles('.backups/');
+
+		foreach ($files['files'] as $key => $file) {
+			try {
+				$this->localContent->delete($file);
+			} catch (FilesystemException | UnableToDeleteFile $exception) {
+				throw $exception;
+			}
+		}
+	}
+
 	protected function cleanOldCookies()
 	{
 		$cookieKey = 'Bazaari';

@@ -5,6 +5,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ActivityLogs;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\AddressBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Api;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\BackupRestore;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Barcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Dashboards;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\Email;
@@ -87,6 +88,9 @@ class Basepackages
 	protected $barcodes;
 
 	protected $qrcodes;
+
+	protected $backuprestore;
+
 	public function __construct()
 	{
 	}
@@ -290,5 +294,11 @@ class Basepackages
 
 		return $this->qrcodes;
 	}
+
+	protected function initBackupRestore()
+	{
+		$this->backuprestore = (new BackupRestore())->init();
+
+		return $this->backuprestore;
 	}
 }

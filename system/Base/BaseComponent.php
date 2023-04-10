@@ -852,20 +852,37 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	protected function getInstalledFiles($directory = null, $sub = true)
+	protected function getInstalledFiles($directory = null, $sub = true, $exclude = [])
 	{
 		$installedFiles = [];
-		$installedFiles['dir'] = [];
+		$installedFiles['dirs'] = [];
 		$installedFiles['files'] = [];
 
 		if ($directory) {
-			$contents = $this->localContent->listContents($directory, $sub);
+			$installedFiles['files'] =
+				$this->localContent->listContents($directory, $sub)
+				->filter(fn (StorageAttributes $attributes) => $attributes->isFile())
+				->map(fn (StorageAttributes $attributes) => $attributes->path())
+				->toArray();
 
-			foreach ($contents as $contentKey => $content) {
-				if ($content['type'] === 'dir') {
-					array_push($installedFiles['dir'], $content['path']);
-				} else if ($content['type'] === 'file') {
-					array_push($installedFiles['files'], $content['path']);
+			$installedFiles['dirs'] =
+				$this->localContent->listContents($directory, $sub)
+				->filter(fn (StorageAttributes $attributes) => $attributes->isDir())
+				->map(fn (StorageAttributes $attributes) => $attributes->path())
+				->toArray();
+
+			if (count($exclude) > 0) {
+				foreach ($exclude as $excluded) {
+					foreach ($installedFiles['files'] as $key => $file) {
+						if (strpos($file, $excluded)) {
+							unset($installedFiles['files'][$key]);
+						}
+					}
+					foreach ($installedFiles['dirs'] as $key => $dir) {
+						if (strpos($dir, $excluded)) {
+							unset($installedFiles['dirs'][$key]);
+						}
+					}
 				}
 			}
 

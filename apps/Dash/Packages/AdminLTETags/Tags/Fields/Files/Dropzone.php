@@ -118,6 +118,11 @@ class Dropzone
             $this->params['noPreview'] = 'hidden' :
             $this->params['noPreview'] = '';
 
+        $this->fieldParams['uploadDirectory'] =
+            isset($this->params['uploadDirectory']) ?
+            $this->params['uploadDirectory'] = strtolower($this->params['uploadDirectory']) :
+            $this->params['uploadDirectory'] = strtolower($this->params['componentName']);
+
         if (isset($this->params['allowedUploads']) && $this->params['allowedUploads'] === 'images') {
             $this->fieldParams['allowedImageMimeType'] =
                 Json::encode($this->params['storage']['allowed_image_mime_types']);
@@ -144,6 +149,19 @@ class Dropzone
             $this->params['setOrphan'] = 'false';
         } else {
             $this->params['setOrphan'] = 'true';
+        }
+
+        if (isset($this->params['isBackupFile']) && $this->params['isBackupFile'] === true) {
+            $this->params['isBackupFile'] = 'true';
+            $this->params['isPointer'] = true;
+        } else {
+            $this->params['isBackupFile'] = 'false';
+        }
+
+        if (isset($this->params['isPointer']) && $this->params['isPointer'] === true) {
+            $this->params['isPointer'] = 'true';
+        } else {
+            $this->params['isPointer'] = 'false';
         }
 
         if (isset($this->params['upload']) && $this->params['upload'] === true) {
@@ -756,9 +774,11 @@ class Dropzone
                             fieldId["save"] = function() {
                                 if (fieldId["dropzone"].files.length > 0) {
                                     fieldId["dropzone"].options.params = {
-                                        "directory"     : "' . strtolower($this->params['componentName']) . '",
+                                        "directory"     : "' . $this->fieldParams['uploadDirectory'] . '",
                                         "storagetype"   : "' . $this->params['storage']['permission'] . '",
                                         "setOrphan"     : "' . $this->params['setOrphan'] . '",
+                                        "isPointer"     : "' . $this->params['isPointer'] . '",
+                                        "isBackupFile"  : "' . $this->params['isBackupFile'] . '"
                                     };
 
                                     if ("' . $this->params['storage']['permission'] . '" === "public") {
