@@ -147,6 +147,19 @@ class Progress extends BasePackage
         $this->writeProgressFile($progressFile['processes'], false, false, false, null, $progressFile);
     }
 
+    public function resetProgress()
+    {
+        $progressFile = $this->readProgressFile();
+
+        if ($progressFile) {
+            $this->deleteProgressFile();
+
+            $this->registerMethods($progressFile['allProcesses']);
+        }
+
+        return true;
+    }
+
     protected function checkProgressPath()
     {
         if (!is_dir(base_path('var/progress/'))) {
@@ -166,7 +179,8 @@ class Progress extends BasePackage
 
         try {
             return Json::decode($this->localContent->read('/var/progress/' . $session . '.json'), true);
-        } catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
+        } catch (\ErrorException | FilesystemException | UnableToReadFile | \InvalidArgumentException $exception) {
+            //Note : We use LOCK_EX while writing the file. So, if the file is being written and AJAX accesses the file, it will result in false and JSON will throw InvalidArgumentException error. We catch it and return false. This problem is only when retrieving the file while its being written. If we implement Progress updates being sent via Websocket, this will not happen.
             return false;
         }
     }
@@ -183,10 +197,19 @@ class Progress extends BasePackage
                 $file['runners']['last'] = [];
                 $file['runners']['running'] = current($methods);
                 $file['runners']['next'] = next($methods);
+                if ($register) {
+                    $file['allProcesses'] = $methods;
+                } else if ($unregister) {
+                    $progressFile = $this->readProgressFile();
+                    $file['allProcesses'] = $progressFile['allProcesses'];
+                }
             }
 
             if ($update) {
                 $progressFile = $this->readProgressFile();
+                if(isset($progressFile['allProcesses'])) {
+                    $file['allProcesses'] = $progressFile['allProcesses'];
+                }
                 $file['total'] = $progressFile['total'];
                 $file['completed'] = $progressFile['total'] - count($methods);
                 $file['preCheckComplete'] = true;
