@@ -637,6 +637,10 @@ class Setup
 
 	protected function revertBaseConfig($coreJson = null)
 	{
+		if (!$this->configs) {
+			$this->configs = new Configs($this->container, $this->postData, $coreJson);
+		}
+
 		return $this->configs->revert();
 	}
 

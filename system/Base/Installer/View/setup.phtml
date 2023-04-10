@@ -517,17 +517,19 @@
 
                                 if (responseData['total'] !== 'undefined' && responseData['completed'] !== 'undefined') {
                                     if (responseData['total'] !== responseData['completed']) {
-                                        if (responseData['runners']['running'] !== false) {
-                                            $('.installer-progress').attr('hidden', false);
-                                            $('.progress-span')
-                                                .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
+                                        if (responseData['preCheckComplete'] === true) {
+                                            if (responseData['runners']['running'] !== false) {
+                                                $('.installer-progress').attr('hidden', false);
+                                                $('.progress-span')
+                                                    .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
 
-                                            $('.installer-progress-bar').css('width', responseData['percentComplete'] + '%');
-                                            $('.installer-progress-bar').attr('aria-valuenow', responseData['percentComplete']);
+                                                $('.installer-progress-bar').css('width', responseData['percentComplete'] + '%');
+                                                $('.installer-progress-bar').attr('aria-valuenow', responseData['percentComplete']);
+                                            }
+                                            BazHelpers.setTimeoutTimers.add(function() {
+                                                getProgress();
+                                            }, 500);
                                         }
-                                        BazHelpers.setTimeoutTimers.add(function() {
-                                            getProgress();
-                                        }, 500);
                                     } else {
                                         $('.progress-bar').removeClass('progress-bar-animated');
                                         $('.progress-span').html('Done (100%)');

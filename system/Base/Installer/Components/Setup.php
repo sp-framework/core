@@ -124,6 +124,8 @@ Class Setup
 				}
 			}
 		} catch (\Exception $e) {
+			$this->progress->resetProgress();
+
 			$this->view->responseCode = 1;
 			$this->view->responseMessage = $e->getMessage();
 
@@ -150,6 +152,8 @@ Class Setup
 
 							$this->view->responseMessage = 'DB Password strength is weak!';
 						}
+
+						$this->progress->resetProgress();
 
 						if ($this->response->isSent() !== true) {
 							$this->response->setJsonContent($this->view->getParamsToView());
@@ -194,6 +198,8 @@ Class Setup
 
 					$this->setupPackage = new SetupPackage($this->container, $this->postData);
 				} catch (\Exception $e) {
+					$this->progress->resetProgress();
+
 					$this->view->responseCode = 1;
 					$this->view->responseMessage = $e->getMessage();
 
@@ -234,8 +240,10 @@ Class Setup
 
 					$this->view->responseCode = 1;
 					$this->view->responseMessage =
-						'Database <strong>' . $this->postData['database_name'] . '</strong> not empty!' .
+						'Database <strong>' . $this->postData['dbname'] . '</strong> not empty!' .
 						' Use drop existing tables checkbox to drop existing tables.';
+
+					$this->progress->resetProgress();
 
 					if ($this->response->isSent() !== true) {
 						$this->response->setJsonContent($this->view->getParamsToView());
@@ -316,7 +324,8 @@ Class Setup
 					return $this->response->send();
 				}
 			} catch (\Exception $e) {
-				var_dump($e);die();
+				$this->progress->resetProgress();
+
 				$this->setupPackage->revertBaseConfig();
 
 				if (isset($this->postData['dev']) && $this->postData['dev'] == 'true') {
