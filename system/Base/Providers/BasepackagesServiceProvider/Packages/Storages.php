@@ -178,43 +178,47 @@ class Storages extends BasePackage
         return false;
     }
 
-    public function storeFile($type = null, $directory = null, $file = null, $fileName = null, $size = null, $mimeType = null)
+    public function storeFile($type = null, $directory = null, $file = null, $fileName = null, $size = null, $mimeType = null, $addToDbOnly = false)
     {
         $this->initStorage($this->checkPublic($type));
 
         if ($this->storage) {
-            if ($this->storage->store($directory, $file, $fileName, $size, $mimeType)) {
+            if ($this->storage->store($directory, $file, $fileName, $size, $mimeType, $addToDbOnly)) {
                 $storageData = $this->storage->packagesData->responseData['storageData'];
 
-                $fileInfo = $this->storage->getFileInfo($storageData['uuid']);
+                if ($addToDbOnly) {
+                    $this->packagesData->responseMessage = 'File pointer added!';
+                } else {
+                    $fileInfo = $this->storage->getFileInfo($storageData['uuid']);
 
-                if (isset($fileInfo[0])) {
-                    $fileType = $fileInfo[0]['type'];
-                }
+                    if (isset($fileInfo[0])) {
+                        $fileType = $fileInfo[0]['type'];
+                    }
 
-                if (in_array($fileType, $this->storage->storage['allowed_image_mime_types'])) {
-                    if (isset($this->request->getPost()['getpubliclinks'])) {
-                        $widths = explode(',', $this->request->getPost()['getpubliclinks']);
+                    if (in_array($fileType, $this->storage->storage['allowed_image_mime_types'])) {
+                        if (isset($this->request->getPost()['getpubliclinks'])) {
+                            $widths = explode(',', $this->request->getPost()['getpubliclinks']);
 
-                        $storageData['publicLinks'] = [];
+                            $storageData['publicLinks'] = [];
 
-                        foreach ($widths as $width) {
-                            $width = trim($width);
+                            foreach ($widths as $width) {
+                                $width = trim($width);
 
-                            array_push($storageData['publicLinks'], $this->getPublicLink($storageData['uuid'], (int) $width));
+                                array_push($storageData['publicLinks'], $this->getPublicLink($storageData['uuid'], (int) $width));
+                            }
                         }
+
+                        $this->packagesData->responseMessage = 'Files Uploaded!';
+
+                    } else if (in_array($fileType, $this->storage->storage['allowed_file_mime_types'])) {
+                        if (isset($this->request->getPost()['getpubliclinks'])) {
+                            $storageData['publicLinks'] = [];
+
+                            array_push($storageData['publicLinks'], $this->getPublicLink($storageData['uuid'], null));
+                        }
+
+                        $this->packagesData->responseMessage = 'Files Uploaded!';
                     }
-
-                    $this->packagesData->responseMessage = 'Files Uploaded!';
-
-                } else if (in_array($fileType, $this->storage->storage['allowed_file_mime_types'])) {
-                    if (isset($this->request->getPost()['getpubliclinks'])) {
-                        $storageData['publicLinks'] = [];
-
-                        array_push($storageData['publicLinks'], $this->getPublicLink($storageData['uuid'], null));
-                    }
-
-                    $this->packagesData->responseMessage = 'Files Uploaded!';
                 }
 
                 $this->packagesData->responseData = $storageData;
@@ -337,8 +341,8 @@ class Storages extends BasePackage
         return $this->initStorage()->getPublicLink($uuid, $width);
     }
 
-    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false, $status = null)
+    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false, $status = null, $orgFileName = null, $like = false)
     {
-        return $this->initStorage()->changeOrphanStatus($newUUID, $oldUUID, $array, $status);
+        return $this->initStorage()->changeOrphanStatus($newUUID, $oldUUID, $array, $status, $orgFileName, $like);
     }
 }

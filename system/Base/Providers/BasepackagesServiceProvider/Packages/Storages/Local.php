@@ -46,6 +46,8 @@ class Local extends BasePackage
 
     protected $uuid;
 
+    protected $isPointer = 0;
+
     protected $getData;
 
     protected $width;
@@ -118,9 +120,31 @@ class Local extends BasePackage
         return $this;
     }
 
-    public function store($directory = null, $file = null, $fileName = null, $size = null, $mimeType = null)
+    public function store($directory = null, $file = null, $fileName = null, $size = null, $mimeType = null, $addToDbOnly = false)
     {
-        if (!$file && !$this->request->hasFiles()) {
+        if (!$file && $addToDbOnly) {
+            $this->directory = $directory;
+
+            $this->fileName = $fileName;
+
+            $this->fileSize = $size;
+
+            $this->mimeType = $mimeType;
+
+            $this->isPointer = 1;
+
+            $this->generateUUID();
+
+            $this->addFileInfoToDb();
+
+            $storageData['uuid'] = $this->uuid;
+
+            $storageData['id'] = $this->packagesData->last['id'];
+
+            $this->addResponse('File(s) Uploaded', 0, ['storageData' => $storageData]);
+
+            return true;
+        } else if (!$file && !$this->request->hasFiles()) {
             $this->addResponse('File(s) Not Provided', 1);
 
             return false;
@@ -164,7 +188,6 @@ class Local extends BasePackage
             $storageData['id'] = $this->packagesData->last['id'];
 
         } else if ($this->request->getUploadedFiles()) {
-
             foreach ($this->request->getUploadedFiles() as $key => $file) {
                 $this->file = $file;
 
@@ -293,6 +316,7 @@ class Local extends BasePackage
                 'size'                  => $this->fileSize,
                 'type'                  => $this->mimeType,
                 'orphan'                => 1,
+                'is_pointer'            => $this->isPointer,
                 'created_by'            => $createdBy,
                 'updated_by'            => $updatedBy
             ];
@@ -326,14 +350,20 @@ class Local extends BasePackage
                 return $this->response->send();
             }
         } else if (in_array($file[0]['type'], $this->fileMimeTypes)) {
-            $dataFile =
-                '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid'];
+            if ($file[0]['is_pointer'] == 1) {
+                $dataFile = $file[0]['uuid_location'] . $file[0]['org_file_name'];
+            } else {
+                $dataFile =
+                    '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid'];
+            }
 
-            $this->updateFileLink(
-                $file[0],
-                null,
-                '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid']
-            );
+            if ($this->storage['permission'] === 'public') {
+                $this->updateFileLink(
+                    $file[0],
+                    null,
+                    '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid']
+                );
+            }
 
             if (isset($this->request->getPost()['getpubliclinks'])) {
                 return;
@@ -695,7 +725,7 @@ class Local extends BasePackage
         }
     }
 
-    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false, $status = null)
+    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false, $status = null, $orgFileName = null, $like = false)
     {
         if ($array) {
             if ($oldUUID) {
@@ -726,20 +756,20 @@ class Local extends BasePackage
                     $status = 1;
                 }
 
-                $this->flipOrphanStatus($oldUUID, $status);
+                $this->flipOrphanStatus($oldUUID, $status, $orgFileName, $like);
             }
 
-            if ($newUUID) {
+            if ($newUUID || $orgFileName) {
                 if (!$status) {
                     $status = 0;
                 }
 
-                $this->flipOrphanStatus($newUUID, $status);
+                $this->flipOrphanStatus($newUUID, $status, $orgFileName, $like);
             }
         }
     }
 
-    protected function flipOrphanStatus($uuid, $status)
+    protected function flipOrphanStatus($uuid, $status, $orgFileName = null, $like = false)
     {
         if ($status === 0) {
             $marked = 'unmarked';
@@ -747,7 +777,7 @@ class Local extends BasePackage
             $marked = 'marked';
         }
 
-        $file = $this->getFileInfo($uuid);
+        $file = $this->getFileInfo($uuid, $orgFileName, $like);
 
         if ($file && count($file) === 1) {
             $file[0]['orphan'] = $status;
