@@ -60,14 +60,14 @@ class Service
 			return
 				array_merge(
 					include(self::$base . 'system/Base/Loader/Namespaces.php'),
-					include(self::$base . 'system/Base/Loader/ThirdParty/Namespaces.php'),
+					include(self::$base . 'system/Base/Loader/External/Namespaces.php'),
 					include(self::$base . 'system/Base/Loader/Dev/Namespaces.php')
 				);
 		} else {
 			return
 				array_merge(
 					include(self::$base . 'system/Base/Loader/Namespaces.php'),
-					include(self::$base . 'system/Base/Loader/ThirdParty/Namespaces.php')
+					include(self::$base . 'system/Base/Loader/External/Namespaces.php')
 				);
 		}
 	}
@@ -78,14 +78,14 @@ class Service
 			return
 				array_merge(
 					include(self::$base . 'system/Base/Loader/Classes.php'),
-					include(self::$base . 'system/Base/Loader/ThirdParty/Classes.php'),
+					include(self::$base . 'system/Base/Loader/External/Classes.php'),
 					include(self::$base . 'system/Base/Loader/Dev/Classes.php')
 				);
 		} else {
 			return
 				array_merge(
 					include(self::$base . 'system/Base/Loader/Classes.php'),
-					include(self::$base . 'system/Base/Loader/ThirdParty/Classes.php')
+					include(self::$base . 'system/Base/Loader/External/Classes.php')
 				);
 		}
 	}
@@ -96,14 +96,14 @@ class Service
 			return
 				array_merge(
 					include(self::$base . 'system/Base/Loader/Files.php'),
-					include(self::$base . 'system/Base/Loader/ThirdParty/Files.php'),
+					include(self::$base . 'system/Base/Loader/External/Files.php'),
 					include(self::$base . 'system/Base/Loader/Dev/Files.php')
 				);
 		} else {
 			return
 				array_merge(
 					include(self::$base . 'system/Base/Loader/Files.php'),
-					include(self::$base . 'system/Base/Loader/ThirdParty/Files.php')
+					include(self::$base . 'system/Base/Loader/External/Files.php')
 				);
 		}
 	}
