@@ -295,7 +295,7 @@
             </div>
         </div>
         <script type="text/javascript">
-            var preCheckCount = 0;
+            var progressCounter = 0;
 
             $('#create, #create-grant').click(function() {
                 if ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) {
@@ -440,8 +440,8 @@
                                 }).addClass('alert-danger').html(data.responseMessage);
                                 $('#submit, #update').attr('disabled', false);
                                 $('#submit-spinner, #update-spinner').attr('hidden', true);
-                                preCheckCount = 0;
                             }
+                            progressCounter = 0;
                         },
                         error: function (data) {
                             if (data.responseJSON && data.responseJSON.responseCode === 1) {
@@ -453,11 +453,13 @@
                             }
                             $('#submit, #update').attr('disabled', false);
                             $('#submit-spinner, #update-spinner').attr('hidden', true);
-                            preCheckCount = 0;
+                            progressCounter = 0;
                         }
                     });
                 <?php if (!$onlyUpdateDb) { ?>
-                    setTimeout(getProgress(), 500);
+                    setTimeout(function() {
+                        getProgress();
+                    }, 1000);
                 <?php } ?>
                 }
             });
@@ -494,25 +496,8 @@
                                 var responseData = JSON.parse(data.responseData);
 
                                 if (responseData['preCheckComplete'] == false) {
-                                    if (preCheckCount !== 5) {
-                                        preCheckCount ++;
-
-                                        BazHelpers.setTimeoutTimers.add(function() {
-                                            getProgress();
-                                        }, 1000, null, 'preCheckFail');
-                                    } else {
-                                        timerId = getTimerId('preCheckFail');
-                                        if (timerId) {
-                                            BazHelpers.setTimeoutTimers.stop(timerId, null, 'preCheckFail');
-                                        }
-                                    }
-
+                                    resetProgressCounter();
                                     return false;
-                                }
-
-                                timerId = getTimerId('preCheckFail');
-                                if (timerId) {
-                                    BazHelpers.setTimeoutTimers.stop(timerId, null, 'preCheckFail');
                                 }
 
                                 if (responseData['total'] !== 'undefined' && responseData['completed'] !== 'undefined') {
@@ -526,11 +511,15 @@
                                                 $('.installer-progress-bar').css('width', responseData['percentComplete'] + '%');
                                                 $('.installer-progress-bar').attr('aria-valuenow', responseData['percentComplete']);
                                             }
+                                            timerId = getTimerId('progressCounter');
+                                            if (timerId) {
+                                                BazHelpers.setTimeoutTimers.stop(timerId, null, 'progressCounter');
+                                            }
                                             BazHelpers.setTimeoutTimers.add(function() {
                                                 getProgress();
-                                            }, 500);
+                                            }, 300);
                                         }
-                                    } else {
+                                    } else if (responseData['total'] === responseData['completed']) {
                                         $('.progress-bar').removeClass('progress-bar-animated');
                                         $('.progress-span').html('Done (100%)');
                                         $('.installer-progress-bar').css('width', '100%');
@@ -540,21 +529,34 @@
                                             $('#access-div').attr('hidden', false);
                                             $('#submit-div').attr('hidden', true);
                                         }, 1000);
+                                    } else {
+                                        resetProgressCounter();
                                     }
                                 } else {
-                                    BazHelpers.setTimeoutTimers.stopAll();
+                                    resetProgressCounter();
                                 }
+                            } else {
+                                resetProgressCounter();
                             }
-                        } else if (data.responseCode === 1) {
-                            BazHelpers.setTimeoutTimers.stopAll();
+                        } else {
+                            resetProgressCounter();
                         }
                     },
                     error: function (data) {
-                        if (data && data.responseCode === 1) {
-                            BazHelpers.setTimeoutTimers.stopAll();
-                        }
+                        resetProgressCounter();
                     }
                 });
+            }
+
+            function resetProgressCounter() {
+                if (progressCounter !== 60) {
+                    progressCounter ++;
+
+                    BazHelpers.setTimeoutTimers.stopAll();
+                    BazHelpers.setTimeoutTimers.add(function() {
+                        getProgress();
+                    }, 5000, null, 'progressCounter');
+                }
             }
 
             $('#auto-encrypt-level').click(function() {
