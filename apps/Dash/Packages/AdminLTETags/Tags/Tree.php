@@ -130,7 +130,7 @@ class Tree extends AdminLTETags
             $itemIcon =
                 isset($items['icon']) ?
                 $items['icon'] :
-                'circle';
+                'circle-dot';
 
             $itemTitle =
                 isset($items['title']) ?
@@ -195,7 +195,7 @@ class Tree extends AdminLTETags
                     foreach ($items as $itemKey => $itemValue) {
                         if (isset($itemValue['childs'])) {
                             $this->content .=
-                                $this->treeGroup($itemKey, $itemValue, '{"icon" : "fa fa-fw fa-plus text-sm"}', '{"icon" : "fa fa-fw fa-circle text-sm"}', null);
+                                $this->treeGroup($itemKey, $itemValue, '{"icon" : "fa fa-fw fa-plus text-sm"}', '{"icon" : "fa fa-fw fa-circle-dot text-sm"}', null);
                         } else {
                             $this->generateItemContent($itemKey, $itemValue, $itemAdditionalClass);
                         }
@@ -209,7 +209,7 @@ class Tree extends AdminLTETags
                     $itemIcon =
                         isset($items['icon']) ?
                         $items['icon'] :
-                        'circle';
+                        'circle-dot';
 
                     $this->content .=
                         '<li class="nav-item">
@@ -234,7 +234,7 @@ class Tree extends AdminLTETags
                             $itemIcon =
                                 isset($itemValue['icon']) ?
                                 $itemValue['icon'] :
-                                'circle';
+                                'circle-dot';
 
                             $this->content .=
                                 '<li class="nav-item">
@@ -370,7 +370,7 @@ class Tree extends AdminLTETags
         if (isset($item['icon'])) {
             $itemIcon = '{"icon" : "fa fa-fw fa-' . $item["icon"] . ' text-sm"}';
         } else {
-            $itemIcon = '{"icon" : "fa fa-fw fa-circle text-sm"}';
+            $itemIcon = '{"icon" : "fa fa-fw fa-circle-dot text-sm"}';
         }
 
         if (isset($item['link'])) {

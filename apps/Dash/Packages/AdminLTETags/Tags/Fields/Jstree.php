@@ -3,6 +3,7 @@
 namespace Apps\Dash\Packages\AdminLTETags\Tags\Fields;
 
 use Apps\Dash\Packages\AdminLTETags\AdminLTETags;
+use Phalcon\Helper\Json;
 
 class Jstree
 {
@@ -147,18 +148,20 @@ class Jstree
                     ]
                 );
 
-            if (!isset($this->fieldParams['fieldJstreeAdditionalClass'])) {
+            if (!isset($this->params['fieldJstreeAdditionalClass'])) {
                 $this->fieldParams['fieldJstreeAdditionalClass'] = 'height-control-400';
+            } else {
+                $this->fieldParams['fieldJstreeAdditionalClass'] = $this->params['fieldJstreeAdditionalClass'] . ' height-control-400';
             }
 
             $this->content .=
-                '<div class="' . $this->fieldParams['fieldJstreeAdditionalClass'] . ' p-1 border mt-1 text-uppercase" ' . $this->fieldParams['fieldId'] . '-tree-div" style="font-size: 0.75rem !important;">
+                '<div class="' . $this->fieldParams['fieldJstreeAdditionalClass'] . ' p-1 border mt-1" ' . $this->fieldParams['fieldId'] . '-tree-div" style="font-size: 0.75rem !important;">
                     <div '. $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' ' . $this->fieldParams['fieldId'] . '">';
 
                         $this->fieldParams['fieldJstreeRootIcon'] =
                             isset($this->params['fieldJstreeRootIcon']) ?
                             '{"icon" : "fa fa-fw fa-' . $this->params['fieldJstreeRootIcon'] . ' text-sm"}' :
-                            '{"icon" : "fa fa-fw fa-circle text-sm"}';
+                            '{"icon" : "fas fa-fw fa-circle-dot text-sm"}';
 
                         if (isset($this->params['fieldJstreeIncludeRootInPath']) &&
                             $this->params['fieldJstreeIncludeRootInPath'] === true
@@ -195,7 +198,7 @@ class Jstree
                                 $itemIcon =
                                     isset($dataArr['itemIcon']) ?
                                     $itemIcon = '{"icon" : "fa fa-fw fa-' . $dataArr['itemIcon'] . ' text-sm"}':
-                                    $itemIcon = '{"icon" : "fa fa-fw fa-circle text-sm"}';
+                                    $itemIcon = '{"icon" : "fas fa-fw fa-circle-dot text-sm"}';
 
                                 $this->content .=
                                     $this->adminLTETags->useTag(
@@ -326,6 +329,11 @@ class Jstree
             $this->params['fieldJstreeSearchCaseSensitive'] :
             false;
 
+        $this->fieldParams['fieldJstreePlugins'] =
+            isset($this->params['fieldJstreePlugins']) ?
+            Json::encode($this->params['fieldJstreePlugins']) :
+            Json::encode(["search", "types", "dnd"]);
+
         return
         '<script type="text/javascript" charset="utf-8">
             if (!window["dataCollection"]["' . $this->params['componentId'] . '"]) {
@@ -364,11 +372,16 @@ class Jstree
                         "check_callback": true,
                         "multiple": "' . $this->fieldParams['fieldJstreeMultiple'] . '",
                     },
-                    "plugins": ["search", "types", "dnd"],
+                    "plugins": ' . $this->fieldParams['fieldJstreePlugins'] . ',
                     "search": {
                         "show_only_matches": "' . $this->fieldParams['fieldJstreeSearchShowOnlyMatches'] . '",
                         "show_only_matches_children": "' . $this->fieldParams['fieldJstreeSearchShowOnlyMatchesChildren'] . '",
                         "case_sensitive" : "' . $this->fieldParams['fieldJstreeSearchCaseSensitive'] . '"
+                    },
+                    "checkbox": {
+                        "whole_node": false,
+                        "keep_selected_style" : false,
+                        "tie_selection": false
                     }
                 }
             });

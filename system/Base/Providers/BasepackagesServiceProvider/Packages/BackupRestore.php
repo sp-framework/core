@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Ifsnop\Mysqldump\Mysqldump;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
+use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
@@ -49,6 +50,17 @@ class BackupRestore extends BasePackage
             return;
         }
 
+        if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true') {
+            $this->backupInfo['request']['systems_dir'] = 'true';
+            if (isset($this->backupInfo['request']['encryption_passphrase']) &&
+                $this->backupInfo['request']['encryption_passphrase'] === ''
+            ) {
+                $this->addResponse('Passphrase to encrypt keys missing!', 1, []);
+
+                return;
+            }
+        }
+
         $now = Carbon::now();
         $this->backupInfo['takenAt'] = $now->format('Y-m-d H:i:s');
         $this->backupInfo['createdBy'] = $this->auth->account() ? $this->auth->account()['email'] : 'System';
@@ -87,7 +99,27 @@ class BackupRestore extends BasePackage
         }
 
         foreach ($this->backupInfo['files'] as $file) {
-            $this->zip->addFile(base_path($file), $file);
+            if ($file === 'system/.keys' || $file === 'system/.dbkeys') {
+                if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true') {
+                    if (isset($this->backupInfo['request']['encryption_passphrase']) &&
+                        $this->backupInfo['request']['encryption_passphrase'] !== ''
+                    ) {
+                        $this->encryptKeysUsingPassphrase();
+
+                        if ($file === 'system/.keys') {
+                            $this->zip->addFile(base_path('system/.keysbackup'), $file);
+                        } else if ($file === 'system/.dbkeys') {
+                            $this->zip->addFile(base_path('system/.dbKeysbackup'), $file);
+                        }
+                    }
+                }
+            } else {
+                $this->zip->addFile(base_path($file), $file);
+            }
+        }
+
+        if(isset($this->backupInfo['request']['encryption_passphrase'])) {
+            unset($this->backupInfo['request']['encryption_passphrase']);
         }
 
         if (isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] == 'true') {
@@ -319,27 +351,96 @@ class BackupRestore extends BasePackage
         return false;
     }
 
+    public function analyseBackinfoFile($id)
+    {
+        $fileInfo = $this->basepackages->storages->getFileInfo($id);
+
+        if ($fileInfo) {
+            $fileNameLocation = explode('.zip', $fileInfo['org_file_name'])[0];
+
+            if ($this->zip->open(base_path($fileInfo['uuid_location'] . $fileInfo['org_file_name']))) {
+                if ($this->zip->extractTo(base_path('var/tmp/backups/' . $fileNameLocation))) {
+                    try {
+                        $backupInfo = $this->localContent->read('var/tmp/backups/' . $fileNameLocation . '/backupInfo.json');
+
+                        if ($backupInfo) {
+                            $this->backupInfo = Json::decode($backupInfo, true);
+                            $this->backupInfo['structure'] = [];
+
+                            foreach ($this->backupInfo['dirs'] as $dirKey => $dirValue) {
+                                $this->addToStructure($dirValue, $dirKey);
+                            }
+                            foreach ($this->backupInfo['files'] as $fileKey => $fileValue) {
+                                $this->addToStructure($fileValue, $fileKey, true);
+                            }
+                        }
+
+                        return $this->backupInfo;
+                    } catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
+                        $this->addResponse('Error reading backupInfo.json file. Please upload backup again.', 1);
+                    }
+                } else {
+                    $this->addResponse('Error unzipping backup file. Please upload backup again.', 1);
+                }
+            } else {
+                $this->addResponse('Error opening backup zip file. Please upload backup again.', 1);
+            }
+        } else {
+            $this->addResponse('Backup file not found on server. Please upload backup again.', 1);
+        }
+
+        return false;
+    }
+
     protected function getContent($localContent)
     {
-        $this->backupInfo['dirs'] = array_merge($this->backupInfo['dirs'], array_filter($localContent['dirs'], function($content) {
+        foreach ($localContent['dirs'] as $key => $dir) {
             if (isset($this->backupInfo['request']['html_compiled']) && $this->backupInfo['request']['html_compiled'] == 'true') {
-                return $content;
+                $this->backupInfo['dirs'] = array_merge($this->backupInfo['dirs'], ['fo' . $key => $dir]);
             } else {
-                if (strpos($content, 'Html_compiled') === false) {
-                    return $content;
+                if (strpos($dir, 'Html_compiled') === false) {
+                    $this->backupInfo['dirs'] = array_merge($this->backupInfo['dirs'], ['fo' . $key => $dir]);
                 }
             }
-        }));
+        }
 
-        $this->backupInfo['files'] = array_merge($this->backupInfo['files'], array_filter($localContent['files'], function($content) {
+        foreach ($localContent['files'] as $key => $file) {
             if (isset($this->backupInfo['request']['html_compiled']) && $this->backupInfo['request']['html_compiled'] == 'true') {
-                return $content;
+                $this->backupInfo['files'] = array_merge($this->backupInfo['files'], ['fi' . $key => $file]);
             } else {
-                if (strpos($content, 'Html_compiled') === false) {
-                    return $content;
+                if (strpos($file, 'Html_compiled') === false) {
+                    if ($file === 'system/.keys' || $file === 'system/.dbkeys') {
+                        if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true') {
+                            $this->backupInfo['files'] = array_merge($this->backupInfo['files'], ['fi' . $key => $file]);
+                        }
+                    } else {
+                        $this->backupInfo['files'] = array_merge($this->backupInfo['files'], ['fi' . $key => $file]);
+                    }
                 }
+
             }
-        }));
+        }
+    }
+
+    protected function addToStructure($path, $pathKey, $files = false)
+    {
+        $pathArr = explode('/', $path);
+
+        if ($files) {
+            $structure = ['id' => strtolower(Arr::last($pathArr)), 'title' => Arr::last($pathArr), 'data' => ['type' => 'file', 'pathId' => $pathKey]];
+        } else {
+            $structure = ['id' => strtolower(Arr::last($pathArr)), 'title' => Arr::last($pathArr), 'data' => ['type' => 'folder', 'pathId' => $pathKey]];
+        }
+
+        while ($key = array_pop($pathArr)) {
+            if (count($pathArr) === 0) {
+                $structure = [$key => ['id' => strtolower($key), 'title' => $key, 'childs' => $structure['childs']]];
+            } else {
+                $structure = ['childs' => [$key => $structure]];
+            }
+        }
+
+        $this->backupInfo['structure'] = array_replace_recursive($this->backupInfo['structure'], $structure);
     }
 
     private function getDbKey($dbConfig = null)
@@ -353,6 +454,47 @@ class BackupRestore extends BasePackage
 
             return Json::decode($keys, true);
         } catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
+            return false;
+        }
+    }
+
+    public function checkPassphraseStrength(string $pass)
+    {
+        $checkingTool = new \ZxcvbnPhp\Zxcvbn();
+
+        $result = $checkingTool->passwordStrength($pass);
+
+        if ($result && is_array($result) && isset($result['score'])) {
+            $this->addResponse('Checking Passphrase Strength Success', 0, ['result' => $result['score']]);
+
+            return $result['score'];
+        }
+
+        $this->addResponse('Error Checking Passphrase Strength', 1);
+
+        return false;
+    }
+
+    public function generateNewPassphrase()
+    {
+        $this->addResponse('Passphrase Generate Successfully', 0, ['passphrase' => $this->secTools->random->base62(12)]);
+    }
+
+    protected function encryptKeysUsingPassphrase()
+    {
+        try {
+            $keys = $this->localContent->read('system/.keys');
+
+            $encryptedKeys = $this->crypt->encryptBase64($keys, $this->backupInfo['request']['encryption_passphrase']);
+
+            $this->localContent->write('system/.keysbackup', $encryptedKeys);
+
+            $dbkeys = $this->localContent->read('system/.dbkeys');
+
+            $encryptedDbKeys = $this->crypt->encryptBase64($dbkeys, $this->backupInfo['request']['encryption_passphrase']);
+
+            $this->localContent->write('system/.dbKeysbackup', $encryptedDbKeys);
+        } catch (\ErrorException | FilesystemException | UnableToReadFile | UnableToWriteFile $exception) {
             return false;
         }
     }

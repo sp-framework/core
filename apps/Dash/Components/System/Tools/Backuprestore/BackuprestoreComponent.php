@@ -18,6 +18,16 @@ class BackuprestoreComponent extends BaseComponent
     {
         $this->getNewToken();
 
+        if (isset($this->getData()['analyse']) && $this->getData()['analyse'] == 'info') {
+            $backupInfoFile = $this->basepackages->backuprestore->analyseBackinfoFile($this->getData()['id']);
+
+            if ($backupInfoFile) {
+                return $this->view->getPartial('backuprestore/analyse/analysis', ['backupInfoFile' => $backupInfoFile]);
+            }
+
+            return $this->basepackages->backuprestore->packagesData->responseMessage;
+        }
+
         $storage = $this->useStorage('private');
 
         $storageFiles =
@@ -25,11 +35,10 @@ class BackuprestoreComponent extends BaseComponent
                 ['storagetype'  => $storage['permission'],
                  'params'       =>
                     [
-                        'conditions'    => 'uuid_location = :uuidLocation: OR uuid_location = :tmpLocation: AND storages_id = :storagesId: AND orphan = :orphan:',
+                        'conditions'    => 'uuid_location = :uuidLocation: AND storages_id = :storagesId: AND orphan = :orphan:',
                         'bind'          =>
                             [
                                 'uuidLocation'    => '.backups/',
-                                'tmpLocation'     => 'var/tmp/backups/',
                                 'storagesId'      => $storage['id'],
                                 'orphan'          => 0
                             ]
@@ -92,6 +101,45 @@ class BackuprestoreComponent extends BaseComponent
                     $this->basepackages->backuprestore->packagesData->responseCode
                 );
             }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function checkPassphraseStrengthAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->basepackages->backuprestore->checkPassphraseStrength($this->postData()['pass']) !== false) {
+                $this->view->responseData = $this->basepackages->backuprestore->packagesData->responseData;
+            }
+
+            $this->addResponse(
+                $this->basepackages->backuprestore->packagesData->responseMessage,
+                $this->basepackages->backuprestore->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function generatePassphraseAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->basepackages->backuprestore->generateNewPassphrase();
+
+            $this->addResponse(
+                $this->basepackages->backuprestore->packagesData->responseMessage,
+                $this->basepackages->backuprestore->packagesData->responseCode,
+                $this->basepackages->backuprestore->packagesData->responseData
+            );
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }

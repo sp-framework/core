@@ -1,635 +1,65 @@
-<div class="row vdivide">
-    <div class="col">
-        <legend>BACKUP</legend>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
+<form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        {{adminltetags.useTag('tabs',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : 'main',
+                'tabsId'                        : 'tabs',
+                'tabsStyle'                     : 'card-outline-tabs',
+                'tabsData'                      :
                     [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'apps_dir',
-                        'fieldLabel'                     : false,
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Backup apps directory?',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'success',
-                        'fieldCheckboxLabel'             : 'BACKUP APPS DIRECTORY',
-                        'fieldCheckboxChecked'           : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldBazScan'                   : true
+                        'backup'   :
+                        [
+                            'tabTitle'          : 'Backup',
+                            'tabInclude'        : 'backuprestore/form/backup'
+                        ],
+                        'restore'   :
+                        [
+                            'tabTitle'          : 'Restore',
+                            'tabInclude'        : 'backuprestore/form/restore'
+                        ]
                     ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'systems_dir',
-                        'fieldLabel'                     : false,
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Backup systems directory?',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'success',
-                        'fieldCheckboxLabel'             : 'BACKUP SYSTEMS DIRECTORY',
-                        'fieldCheckboxChecked'           : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'public_dir',
-                        'fieldLabel'                     : false,
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Backup public directory?',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'success',
-                        'fieldCheckboxLabel'             : 'BACKUP PUBLIC DIRECTORY',
-                        'fieldCheckboxChecked'           : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'private_dir',
-                        'fieldLabel'                     : false,
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Backup private directory?',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'success',
-                        'fieldCheckboxLabel'             : 'BACKUP PRIVATE DIRECTORY',
-                        'fieldCheckboxChecked'           : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'external_dir',
-                        'fieldLabel'                     : false,
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Backup external (third party) directory? It includes only composer files. If you want to backup whole vendor folder, select Backup External Vendor Directory option as well.',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'success',
-                        'fieldCheckboxLabel'             : 'BACKUP EXTERNAL DIRECTORY',
-                        'fieldCheckboxChecked'           : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'html_compiled',
-                        'fieldLabel'                     : false,
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Compiled Templates Directory? Note: This can be regenerated.',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'warning',
-                        'fieldCheckboxChecked'           : false,
-                        'fieldCheckboxLabel'             : 'COMPILED HTML DIRECTORY',
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'var_dir',
-                        'fieldLabel'                     : false,
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Backup var (variable) directory? This directory contains logs, cache, session information. Information that will be regenerated by the system again.',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'warning',
-                        'fieldCheckboxChecked'           : false,
-                        'fieldCheckboxLabel'             : 'VAR DIRECTORY',
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'external_vendor_dir',
-                        'fieldLabel'                     : false,
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Backup external (third party) vendor directory? Note: External code can be restored using composer.',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'warning',
-                        'fieldCheckboxLabel'             : 'BACKUP EXTERNAL VENDOR DIRECTORY',
-                        'fieldCheckboxChecked'           : false,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'old_backups',
-                        'fieldLabel'                     : false,
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Old backup files? This will increase the total size of the backup depending on how many backups you have taken before.',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'danger',
-                        'fieldCheckboxChecked'           : false,
-                        'fieldCheckboxLabel'             : 'OLD BACKUP FILES',
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'database',
-                        'fieldLabel'                     : false,
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Backup database?',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'success',
-                        'fieldCheckboxChecked'           : true,
-                        'fieldCheckboxLabel'             : 'DATABASE',
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
-        </div>
-        <hr class="mt-0">
-        <div class="backup-progress mb-3" hidden>
-            <div class="progress active progress-xs">
-                <div class="progress-bar progress-xs bg-info progress-bar-animated progress-bar-striped backup-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width: 0%"></div>
-            </div>
-            <div class="row text-center text-sm text-primary m-1">
-                <div class="col">
-                    <span class="sr-only progress-span"></span>
-                    <span class="progress-span"></span>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col text-center">
-                {{adminltetags.useTag('buttons',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'buttonType'                     : 'button',
-                        'buttons'                        :
-                            [
-                                'backup'    : [
-                                    'title'                   : 'Generate Backup',
-                                    'size'                    : 'xs',
-                                    'type'                    : 'primary',
-                                    'icon'                    : 'cog fa-spin',
-                                    'iconHidden'              : true
-                                ]
+            ]
+        )}}
+    </fieldset>
+</form>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'restore-analyse-modal',
+            'modalBodyInclude'          : 'backuprestore/analyse/view',
+            'modalSize'                 : 'xl',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-file-zipper"></i> ANALYSE BACKUP',
+            'modalFooterButtons'        :
+                [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'parentComponentId'             : parent,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                        [
+                            'modal-button-restore' : [
+                                'title'                   : 'Restore',
+                                'type'                    : 'primary',
+                                'position'                : 'right',
+                                'disabled'                : true,
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true
                             ]
-                    ]
-                )}}
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <legend>RESTORE</legend>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                     : component,
-                        'componentName'                 : componentName,
-                        'componentId'                   : componentId,
-                        'sectionId'                     : sectionId,
-                        'fieldId'                       : 'upload_restore',
-                        'fieldType'                     : 'files/dropzone',
-                        'fieldLabel'                    : false,
-                        'fieldDropzoneLabel'            : 'Upload Backup',
-                        'fieldRequired'                 : false,
-                        'fieldHelp'                     : true,
-                        'fieldHelpTooltipContent'       : 'Max: 1. Upload backup file. Acceptable extension .zip. File should be downloaded from this system for restore to work properly and file must include backupInfo.json that was generated at the time of backup.',
-                        'fieldAdditionalClass'          : 'mb-1',
-                        'fieldBazScan'                  : true,
-                        'fieldBazPostOnCreate'          : false,
-                        'fieldBazPostOnUpdate'          : false,
-                        'attachments'                   : [],
-                        'maxAttachments'                : 1,
-                        'noPreview'                     : true,
-                        'uploadDirectory'               : '.backups',
-                        'isBackupFile'                  : true,
-                        'storage'                       : storage,
-                        'setOrphan'                     : false,
-                        'upload'                        : true
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'backups',
-                        'fieldLabel'                     : 'Select Backup To Restore',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select backup that you want to restore. If there is none in the list, you can upload a backup file.',
-                        'fieldBazScan'                   : true,
-                        'fieldRequired'                  : true,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldDataSelect2Options'        : dbStorageFiles,
-                        'fieldDataSelect2OptionsKey'     : 'uuid',
-                        'fieldDataSelect2OptionsValue'   : 'org_file_name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': ''
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col text-center">
-                {{adminltetags.useTag('buttons',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'buttonType'                     : 'button',
-                        'buttons'                        :
-                            [
-                                'remove'    : [
-                                    'title'                   : 'remove',
-                                    'size'                    : 'xs',
-                                    'disabled'                : true,
-                                    'type'                    : 'danger',
-                                    'icon'                    : 'times'
-                                ],
-                                'download'    : [
-                                    'title'                   : 'download',
-                                    'size'                    : 'xs',
-                                    'disabled'                : true,
-                                    'icon'                    : 'download',
-                                    'url'                     : '#'
-                                ],
-                                'restore'    : [
-                                    'title'                   : 'restore',
-                                    'size'                    : 'xs',
-                                    'disabled'                : true,
-                                    'icon'                    : 'rotate-left'
-                                ]
-                            ]
-                    ]
-                )}}
-            </div>
-        </div>
-        <div id="restore-fields" hidden>
-            <hr>
-            <div class="row">
-                <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'restore_db_name',
-                            'fieldLabel'                     : 'Database Name',
-                            'fieldType'                      : 'input',
-                            'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'Name of the database to use at the time of restore.',
-                            'fieldRequired'                  : true,
-                            'fieldBazScan'                   : true,
-                            'fieldBazPostOnCreate'           : false,
-                            'fieldBazPostOnUpdate'           : false,
-                            'fieldDataInputMinLength'        : 1,
-                            'fieldDataInputMaxLength'        : 50,
-                            'fieldValue'                     : ''
                         ]
-                    )}}
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'restore_charset',
-                            'fieldLabel'                     : 'Database Charset',
-                            'fieldType'                      : 'input',
-                            'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'Charset of database',
-                            'fieldRequired'                  : true,
-                            'fieldBazScan'                   : true,
-                            'fieldBazPostOnCreate'           : false,
-                            'fieldBazPostOnUpdate'           : false,
-                            'fieldDataInputMinLength'        : 1,
-                            'fieldDataInputMaxLength'        : 50,
-                            'fieldValue'                     : ''
-                        ]
-                    )}}
-                </div>
-                <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'restore_collation',
-                            'fieldLabel'                     : 'Database Collation',
-                            'fieldType'                      : 'input',
-                            'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'Collation of database',
-                            'fieldRequired'                  : true,
-                            'fieldBazScan'                   : true,
-                            'fieldBazPostOnCreate'           : false,
-                            'fieldBazPostOnUpdate'           : false,
-                            'fieldDataInputMinLength'        : 1,
-                            'fieldDataInputMaxLength'        : 50,
-                            'fieldValue'                     : ''
-                        ]
-                    )}}
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'restore_db_username',
-                            'fieldLabel'                     : 'Database Username',
-                            'fieldType'                      : 'input',
-                            'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'Username of the database',
-                            'fieldRequired'                  : true,
-                            'fieldBazScan'                   : true,
-                            'fieldBazPostOnCreate'           : false,
-                            'fieldBazPostOnUpdate'           : false,
-                            'fieldDataInputMinLength'        : 1,
-                            'fieldDataInputMaxLength'        : 50,
-                            'fieldValue'                     : ''
-                        ]
-                    )}}
-                </div>
-                <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'restore_db_password',
-                            'fieldLabel'                     : 'Database User Password',
-                            'fieldType'                      : 'input',
-                            'fieldInputType'                 : 'password',
-                            'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'Password of database.',
-                            'fieldRequired'                  : true,
-                            'fieldBazScan'                   : true,
-                            'fieldBazPostOnCreate'           : false,
-                            'fieldBazPostOnUpdate'           : false,
-                            'fieldDataInputMinLength'        : 1,
-                            'fieldDataInputMaxLength'        : 50,
-                            'fieldGroupPostAddonButtons'     :
-                                {
-                                    'restore_db_password_generate'   : {
-                                        'title'                         : false,
-                                        'icon'                          : 'wand-magic-sparkles',
-                                        'noMargin'                      : true,
-                                        'buttonAdditionalClass'         : 'rounded-0'
-                                    }
-                                },
-                            'fieldAdditionalClass'           : 'mb-0',
-                            'fieldValue'                     : ''
-                        ]
-                    )}}
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                             : component,
-                            'componentName'                         : componentName,
-                            'componentId'                           : componentId,
-                            'sectionId'                             : sectionId,
-                            'fieldId'                               : 'restore_db_password_strength_meter',
-                            'fieldLabel'                            : false,
-                            'fieldHidden'                           : false,
-                            'fieldType'                             : 'html',
-                            'fieldRequired'                         : false,
-                            'fieldBazScan'                          : true,
-                            'fieldBazPostOnCreate'                  : false,
-                            'fieldBazPostOnUpdate'                  : false
-                        ]
-                    )}}
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'db_drop',
-                            'fieldLabel'                     : 'Drop if exists?',
-                            'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'Drop database/tables if already exists in the system?',
-                            'fieldRequired'                  : false,
-                            'fieldType'                      : 'checkbox',
-                            'fieldCheckboxType'              : 'info',
-                            'fieldCheckboxChecked'           : false,
-                            'fieldBazJstreeSearch'           : true,
-                            'fieldBazPostOnCreate'           : false,
-                            'fieldBazPostOnUpdate'           : false,
-                            'fieldBazScan'                   : true
-                        ]
-                    )}}
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'restore_root_username',
-                            'fieldLabel'                     : 'Root Username',
-                            'fieldType'                      : 'input',
-                            'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'Username with database create permission.',
-                            'fieldRequired'                  : true,
-                            'fieldBazScan'                   : true,
-                            'fieldBazPostOnCreate'           : false,
-                            'fieldBazPostOnUpdate'           : false,
-                            'fieldDataInputMinLength'        : 1,
-                            'fieldDataInputMaxLength'        : 50,
-                            'fieldValue'                     : ''
-                        ]
-                    )}}
-                </div>
-                <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'restore_root_password',
-                            'fieldLabel'                     : 'Root Password',
-                            'fieldType'                      : 'input',
-                            'fieldInputType'                 : 'password',
-                            'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'Password with database create permission.',
-                            'fieldRequired'                  : true,
-                            'fieldBazScan'                   : true,
-                            'fieldBazPostOnCreate'           : false,
-                            'fieldBazPostOnUpdate'           : false,
-                            'fieldDataInputMinLength'        : 1,
-                            'fieldDataInputMaxLength'        : 50,
-                            'fieldValue'                     : ''
-                        ]
-                    )}}
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    {{adminltetags.useTag('buttons',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'buttonType'                     : 'button',
-                            'buttons'                        :
-                                [
-                                    'start-restore'    : [
-                                        'title'                   : 'start',
-                                        'size'                    : 'xs',
-                                        'additionalClass'         : 'mt-1',
-                                        'position'                : 'right',
-                                        'icon'                    : 'cog fa-spin',
-                                        'iconHidden'              : true
-                                    ],
-                                    'cancel-restore'    : [
-                                        'title'                   : 'Cancel',
-                                        'size'                    : 'xs',
-                                        'type'                    : 'secondary',
-                                        'additionalClass'         : 'mt-1',
-                                        'position'                : 'right'
-                                    ]
-                                ]
-                        ]
-                    )}}
-                </div>
-            </div>
-        </div>
-    </div>
+                ]
+        ]
+    )}}
 </div>
 <script>
 /* globals PNotify Swal */
@@ -683,6 +113,53 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-old_backups'                             : { },
         '{{componentId}}-{{sectionId}}-database'                                : { },
+        '{{componentId}}-{{sectionId}}-keys'                                    : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-keys').click(function() {
+                    if ($(this)[0].checked === true) {
+                        $('#{{componentId}}-{{sectionId}}-encryption_passphrase').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-systems_dir').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-systems_dir')[0].checked = true;
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-encryption_passphrase').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-encryption_passphrase').val('');
+                        $('#{{componentId}}-{{sectionId}}-systems_dir').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-encryption_passphrase'                   : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-passphrase_generate').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post('{{links.url("system/tools/backuprestore/generatePassphrase")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            if (response.responseData.passphrase) {
+                                $('#{{componentId}}-{{sectionId}}-encryption_passphrase').val(response.responseData.passphrase).trigger('change');
+                            }
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-strength-meter'                          : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-strength-meter').off();
+                $('#{{componentId}}-{{sectionId}}-strength-meter').strengthMeter({
+                    "url" : '{{links.url("system/tools/backuprestore/checkPassphraseStrength")}}'
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-db_drop'                                 : { },
         '{{componentId}}-{{sectionId}}-restore_root_username'                   : { },
         '{{componentId}}-{{sectionId}}-restore_root_password'                   : { },
@@ -692,42 +169,42 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-restore_db_username'                     : { },
         '{{componentId}}-{{sectionId}}-restore_db_password'                     : {
             afterInit : function() {
-                $('#{{componentId}}-{{sectionId}}-restore_db_password_generate').click(function(e) {
-                    e.preventDefault();
+                // $('#{{componentId}}-{{sectionId}}-restore_db_password_generate').click(function(e) {
+                //     e.preventDefault();
 
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                //     var postData = { };
+                //     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-                    $.post('{{links.url("system/tools/backuprestore/generatePw")}}', postData, function(response) {
-                        if (response.responseCode == 0) {
-                            if (response.responseData.password) {
-                                $('#{{componentId}}-{{sectionId}}-restore_db_password').val(response.responseData.password).trigger('change');
-                                $('#{{componentId}}-{{sectionId}}-restore_db_password').attr('type', 'text');
-                            }
-                        } else {
-                            PNotify.error(response.responseMessage);
-                        }
-                        if (response.tokenKey && response.token) {
-                            $("#security-token").attr("name", response.tokenKey);
-                            $("#security-token").val(response.token);
-                        }
-                        $('#{{componentId}}-{{sectionId}}-restore_db_password').keyup(function() {
-                            if ($(this).val() === '') {
-                                $(this).attr('type', 'password');
-                            }
-                        });
-                    }, 'json');
-                });
+                //     $.post('{{links.url("system/tools/backuprestore/generatePw")}}', postData, function(response) {
+                //         if (response.responseCode == 0) {
+                //             if (response.responseData.password) {
+                //                 $('#{{componentId}}-{{sectionId}}-restore_db_password').val(response.responseData.password).trigger('change');
+                //                 $('#{{componentId}}-{{sectionId}}-restore_db_password').attr('type', 'text');
+                //             }
+                //         } else {
+                //             PNotify.error(response.responseMessage);
+                //         }
+                //         if (response.tokenKey && response.token) {
+                //             $("#security-token").attr("name", response.tokenKey);
+                //             $("#security-token").val(response.token);
+                //         }
+                //         $('#{{componentId}}-{{sectionId}}-restore_db_password').keyup(function() {
+                //             if ($(this).val() === '') {
+                //                 $(this).attr('type', 'password');
+                //             }
+                //         });
+                //     }, 'json');
+                // });
             }
         },
         '{{componentId}}-{{sectionId}}-restore_db_password_strength_meter'      : {
             afterInit : function() {
-                $('#{{componentId}}-{{sectionId}}-restore_db_password_strength_meter').strengthMeter({
-                    "url"       : '{{links.url("system/core/checkPwStrength")}}',
-                    "postData"  : {
-                        "session"           : $('#session-token').val()
-                    }
-                });
+                // $('#{{componentId}}-{{sectionId}}-restore_db_password_strength_meter').strengthMeter({
+                //     "url"       : '{{links.url("system/core/checkPwStrength")}}',
+                //     "postData"  : {
+                //         "session"           : $('#session-token').val()
+                //     }
+                // });
             }
         },
         '{{componentId}}-{{sectionId}}-backups'                                 : {
@@ -758,6 +235,10 @@ dataCollectionSection =
                     postData['external_vendor_dir'] = $('#{{componentId}}-{{sectionId}}-external_vendor_dir')[0].checked;
                     postData['old_backups'] = $('#{{componentId}}-{{sectionId}}-old_backups')[0].checked;
                     postData['database'] = $('#{{componentId}}-{{sectionId}}-database')[0].checked;
+                    postData['keys'] = $('#{{componentId}}-{{sectionId}}-keys')[0].checked;
+                    if ($('#{{componentId}}-{{sectionId}}-keys')[0].checked === true) {
+                        postData['encryption_passphrase'] = $('#{{componentId}}-{{sectionId}}-encryption_passphrase').val();
+                    }
 
                     $.post('{{links.url("system/tools/backuprestore/backup")}}', postData, function(response) {
                         if (response.tokenKey && response.token) {
@@ -785,6 +266,7 @@ dataCollectionSection =
                     }, 'json');
                 }
 
+                $('#{{componentId}}-{{sectionId}}-backup').off();
                 $('#{{componentId}}-{{sectionId}}-backup').click(function(e) {
                     e.preventDefault();
 
@@ -792,6 +274,7 @@ dataCollectionSection =
                 });
             }
         },
+        '{{componentId}}-{{sectionId}}-backup_structure'                        : { },
         '{{componentId}}-{{sectionId}}-form'                                    : $.extend(dataCollectionSectionForm, {
             rules: {
             },
@@ -880,15 +363,38 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
     $('#{{componentId}}-{{sectionId}}-restore').click(function(e) {
         e.preventDefault();
 
-        $(this).attr('disabled', true);
-        $('#restore-fields').attr('hidden', false);
-        $('#{{componentId}}-{{sectionId}}-remove').attr('disabled', true);
-        var dbname = $('#{{componentId}}-{{sectionId}}-backups').find(':selected').text().trim().slice(0, -4);
-        var dbUsername = dbname + 'User';
-        $('#{{componentId}}-{{sectionId}}-restore_db_name').val(dbname);
-        $('#{{componentId}}-{{sectionId}}-restore_charset').val('utf8mb4');
-        $('#{{componentId}}-{{sectionId}}-restore_collation').val('utf8mb4_general_ci');
-        $('#{{componentId}}-{{sectionId}}-restore_db_username').val(dbUsername);
+        $('#{{componentId}}-{{sectionId}}-restore-analyse-modal').modal('show');
+        var url = '{{links.url("system/tools/backuprestore/q/analyse/info/id/' + id + '")}}';
+
+        $('#{{componentId}}-{{sectionId}}-analyse-info').load(url, null, function (response, status, xhr) {
+            if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
+                $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
+                $('#security-token').val(xhr.getResponseHeader('token'));
+            }
+
+            if (status === 'success') {
+                $('#{{componentId}}-{{sectionId}}-analyse-info').empty().html(response);
+                $(document).ready(function() {
+                    $('#{{componentId}}-{{sectionId}}-analyse-info').attr('hidden', false);
+                    $('#{{componentId}}-{{sectionId}}-modal-button-add').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-analyse-loader').attr('hidden', true);
+                });
+                //eslint-disable-next-line
+                // console.log(response, status, xhr);
+            } else {
+            //     $('#{{componentId}}-{{sectionId}}-analyse-error').attr('hidden', false);
+            //     $('#{{componentId}}-{{sectionId}}-modal-button-add').attr('disabled', true);
+            }
+        });
+        // $(this).attr('disabled', true);
+        // $('#restore-fields').attr('hidden', false);
+        // $('#{{componentId}}-{{sectionId}}-remove').attr('disabled', true);
+        // var dbname = $('#{{componentId}}-{{sectionId}}-backups').find(':selected').text().trim().slice(0, -4);
+        // var dbUsername = dbname + 'User';
+        // $('#{{componentId}}-{{sectionId}}-restore_db_name').val(dbname);
+        // $('#{{componentId}}-{{sectionId}}-restore_charset').val('utf8mb4');
+        // $('#{{componentId}}-{{sectionId}}-restore_collation').val('utf8mb4_general_ci');
+        // $('#{{componentId}}-{{sectionId}}-restore_db_username').val(dbUsername);
     });
 
     $('#{{componentId}}-{{sectionId}}-cancel-restore').off();

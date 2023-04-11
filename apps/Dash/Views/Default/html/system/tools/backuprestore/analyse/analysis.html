@@ -1,0 +1,168 @@
+{# {{dump(backupInfoFile)}} #}
+<div class="row">
+    <div class="col">
+        <label>TAKEN AT: </label>
+        <span>{{backupInfoFile['takenAt']}}</span>
+    </div>
+    <div class="col">
+        <label>CREATED BY: </label>
+        <span>{{backupInfoFile['createdBy']}}</span>
+    </div>
+    <div class="col">
+        <label>BACKUP NAME: </label>
+        <span>{{backupInfoFile['backupName']}}</span>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <label>BACKUP APPS DIRECTORY: </label>
+        {% if backupInfoFile['request']['apps_dir'] == 'true' %}
+            <span>Yes</span>
+        {% else %}
+            <span>No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label>BACKUP SYSTEMS DIRECTORY: </label>
+        {% if backupInfoFile['request']['systems_dir'] == 'true' %}
+            <span>Yes</span>
+        {% else %}
+            <span>No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label>BACKUP PUBLIC DIRECTORY: </label>
+        {% if backupInfoFile['request']['public_dir'] == 'true' %}
+            <span>Yes</span>
+        {% else %}
+            <span>No</span>
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <label>BACKUP PRIVATE DIRECTORY: </label>
+        {% if backupInfoFile['request']['private_dir'] == 'true' %}
+            <span>Yes</span>
+        {% else %}
+            <span>No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label>BACKUP EXTERNAL DIRECTORY: </label>
+        {% if backupInfoFile['request']['external_dir'] == 'true' %}
+            <span>Yes</span>
+        {% else %}
+            <span>No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label>COMPILED HTML DIRECTORY: </label>
+        {% if backupInfoFile['request']['html_compiled'] == 'true' %}
+            <span>Yes</span>
+        {% else %}
+            <span>No</span>
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <label>VAR DIRECTORY: </label>
+        {% if backupInfoFile['request']['var_dir'] == 'true' %}
+            <span>Yes</span>
+        {% else %}
+            <span>No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label>BACKUP EXTERNAL VENDOR DIRECTORY: </label>
+        {% if backupInfoFile['request']['external_vendor_dir'] == 'true' %}
+            <span>Yes</span>
+        {% else %}
+            <span>No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label>OLD BACKUP FILES: </label>
+        {% if backupInfoFile['request']['old_backups'] == 'true' %}
+            <span>Yes</span>
+        {% else %}
+            <span>No</span>
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <label>DATABASE: </label>
+        {% if backupInfoFile['request']['database'] == 'true' %}
+            <span>Yes</span>
+        {% else %}
+            <span>No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label>SECURITY/DB KEYS: </label>
+        {% if backupInfoFile['request']['keys'] == 'true' %}
+            <span>Yes</span>
+        {% else %}
+            <span>No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+    </div>
+</div>
+<hr>
+<div class="row vdivide">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : 'main',
+                'fieldId'                                   : 'backup_structure',
+                'fieldLabel'                                : 'Backup Structure',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'This is a structure of files in the backup zip file. You can select which files you want to restore.',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : true,
+                'fieldJstreeDataSrcArr'                     : ["structure":["srcArr" : backupInfoFile['structure']]],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeRootIcon'                       : 'folder-tree',
+                'fieldJstreeToggleAllChildren'              : true,
+                'fieldJstreeIncludeRootInPath'              : true,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : true,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                'fieldJstreeHideJstreeIcons'                : false,
+                'fieldJstreePlugins'                        : ["checkbox", "search", "types", "dnd"]
+            ]
+        )}}
+    </div>
+    {% if backupInfoFile['request']['database'] == 'true' or backupInfoFile['request']['keys'] == 'true' %}
+        <div class="col">
+        </div>
+    {% endif %}
+</div>
+<script>
+/* globals BazContentFields */
+$(document).ready(function() {
+    BazContentFields.init({
+        'componentId'   : "{{componentId}}",
+        'sectionId'     : "{{componentId}}-main"
+    });
+});
+</script>

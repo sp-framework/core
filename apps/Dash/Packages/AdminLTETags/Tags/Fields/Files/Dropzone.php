@@ -426,11 +426,13 @@ class Dropzone
                             var imageMimeTypes = JSON.parse(\'' . $this->fieldParams['allowedImageMimeType'] . '\');
 
                             var previewNode = document.querySelector(".' . $this->compSecId . '-' . $this->params['fieldId'] . '-upload-template");
-                            previewNode.id = "";
-                            var previewTemplate = previewNode.parentNode.innerHTML;
-                            $(document).ready(function() {
-                                $(previewNode.parentNode).children("li").remove();
-                            });
+                            if (previewNode) {
+                                previewNode.id = "";
+                                var previewTemplate = previewNode.parentNode.innerHTML;
+                                $(document).ready(function() {
+                                    $(previewNode.parentNode).children("li").remove();
+                                });
+                            }
 
                             var fieldId =
                                 window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->compSecId . '"]["' . $this->compSecId . '-' . $this->params['fieldId'] . '"];
