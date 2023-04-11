@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Apps\Dash\Packages\System\Messenger\Messenger;
 use Phalcon\Helper\Json;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
@@ -184,7 +183,7 @@ class Pusher extends BasePackage implements WampServerInterface
 
             $profile = $this->basepackages->profile->getProfile($account['id']);
 
-            $messenger = new Messenger();
+            $messenger = $this->basepackages->messenger;
 
             if (isset($profile['settings']['messenger']['status'])) {
                 if ($profile['settings']['messenger']['status'] == 4) {

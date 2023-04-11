@@ -2,7 +2,6 @@
 
 namespace System\Cli\Tasks;
 
-use Apps\Dash\Packages\System\Messenger\Messenger;
 use Phalcon\Cli\Task;
 use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
@@ -20,7 +19,7 @@ class MessengerTask extends Task
         $server = IoServer::factory(
             new HttpServer(
                 new WsServer(
-                    new Messenger()
+                    $this->basepackages->messenger
                 )
             ),
             4443

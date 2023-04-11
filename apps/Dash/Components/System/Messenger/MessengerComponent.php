@@ -2,17 +2,12 @@
 
 namespace Apps\Dash\Components\System\Messenger;
 
-use Apps\Dash\Packages\System\Messenger\Messenger;
 use System\Base\BaseComponent;
 
 class MessengerComponent extends BaseComponent
 {
-    protected $messengerPackage;
-
     public function initialize()
     {
-        $this->messengerPackage = $this->usePackage(Messenger::class);
-
         $this->accounts = $this->basepackages->accounts;
     }
 
@@ -29,12 +24,12 @@ class MessengerComponent extends BaseComponent
                 return;
             }
 
-            $this->messengerPackage->getMessages($this->postData());
+            $this->basepackages->messenger->getMessages($this->postData());
 
             $this->addResponse(
-                $this->messengerPackage->packagesData->responseMessage,
-                $this->messengerPackage->packagesData->responseCode,
-                $this->messengerPackage->packagesData->responseData
+                $this->basepackages->messenger->packagesData->responseMessage,
+                $this->basepackages->messenger->packagesData->responseCode,
+                $this->basepackages->messenger->packagesData->responseData
             );
         } else {
             $this->addResponse('Method Not Allowed', 1);
@@ -48,11 +43,11 @@ class MessengerComponent extends BaseComponent
                 return;
             }
 
-            if ($this->messengerPackage->getUnreadMessagesCount()) {
+            if ($this->basepackages->messenger->getUnreadMessagesCount()) {
                 $this->addResponse(
-                    $this->messengerPackage->packagesData->responseMessage,
-                    $this->messengerPackage->packagesData->responseCode,
-                    $this->messengerPackage->packagesData->responseData
+                    $this->basepackages->messenger->packagesData->responseMessage,
+                    $this->basepackages->messenger->packagesData->responseCode,
+                    $this->basepackages->messenger->packagesData->responseData
                 );
             }
         } else {
@@ -67,11 +62,11 @@ class MessengerComponent extends BaseComponent
                 return;
             }
 
-            $this->messengerPackage->markAllMessagesRead($this->postData());
+            $this->basepackages->messenger->markAllMessagesRead($this->postData());
 
             $this->addResponse(
-                $this->messengerPackage->packagesData->responseMessage,
-                $this->messengerPackage->packagesData->responseCode
+                $this->basepackages->messenger->packagesData->responseMessage,
+                $this->basepackages->messenger->packagesData->responseCode
             );
         } else {
             $this->addResponse('Method Not Allowed', 1);
@@ -85,12 +80,12 @@ class MessengerComponent extends BaseComponent
                 return;
             }
 
-            $this->messengerPackage->addMessage($this->postData());
+            $this->basepackages->messenger->addMessage($this->postData());
 
             $this->addResponse(
-                $this->messengerPackage->packagesData->responseMessage,
-                $this->messengerPackage->packagesData->responseCode,
-                $this->messengerPackage->packagesData->responseData
+                $this->basepackages->messenger->packagesData->responseMessage,
+                $this->basepackages->messenger->packagesData->responseCode,
+                $this->basepackages->messenger->packagesData->responseData
             );
         } else {
             $this->addResponse('Method Not Allowed', 1);
@@ -104,12 +99,12 @@ class MessengerComponent extends BaseComponent
                 return;
             }
 
-            $this->messengerPackage->updateMessage($this->postData());
+            $this->basepackages->messenger->updateMessage($this->postData());
 
             $this->addResponse(
-                $this->messengerPackage->packagesData->responseMessage,
-                $this->messengerPackage->packagesData->responseCode,
-                $this->messengerPackage->packagesData->responseData
+                $this->basepackages->messenger->packagesData->responseMessage,
+                $this->basepackages->messenger->packagesData->responseCode,
+                $this->basepackages->messenger->packagesData->responseData
             );
         } else {
             $this->addResponse('Method Not Allowed', 1);
@@ -123,11 +118,11 @@ class MessengerComponent extends BaseComponent
                 return;
             }
 
-            $this->messengerPackage->removeMessage($this->postData());
+            $this->basepackages->messenger->removeMessage($this->postData());
 
             $this->addResponse(
-                $this->messengerPackage->packagesData->responseMessage,
-                $this->messengerPackage->packagesData->responseCode
+                $this->basepackages->messenger->packagesData->responseMessage,
+                $this->basepackages->messenger->packagesData->responseCode
             );
         } else {
             $this->addResponse('Method Not Allowed', 1);
@@ -141,11 +136,11 @@ class MessengerComponent extends BaseComponent
                 return;
             }
 
-            $this->messengerPackage->changeStatus($this->postData());
+            $this->basepackages->messenger->changeStatus($this->postData());
 
             $this->addResponse(
-                $this->messengerPackage->packagesData->responseMessage,
-                $this->messengerPackage->packagesData->responseCode
+                $this->basepackages->messenger->packagesData->responseMessage,
+                $this->basepackages->messenger->packagesData->responseCode
             );
 
         } else {
@@ -160,11 +155,11 @@ class MessengerComponent extends BaseComponent
                 return;
             }
 
-            $this->messengerPackage->changeSettings($this->postData());
+            $this->basepackages->messenger->changeSettings($this->postData());
 
             $this->addResponse(
-                $this->messengerPackage->packagesData->responseMessage,
-                $this->messengerPackage->packagesData->responseCode
+                $this->basepackages->messenger->packagesData->responseMessage,
+                $this->basepackages->messenger->packagesData->responseCode
             );
 
         } else {

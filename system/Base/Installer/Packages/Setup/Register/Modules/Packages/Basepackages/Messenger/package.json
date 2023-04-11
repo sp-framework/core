@@ -7,6 +7,6 @@
     "sub_category"  : "tools",
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-system-tools-messenger",
-    "class"         : "Apps\\Dash\\Packages\\System\\Messenger\\Messenger",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Messenger",
     "settings"      : { }
 }

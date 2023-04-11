@@ -1,6 +1,6 @@
 <?php
 
-namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Messenger;
+namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use Phalcon\Cache\AdapterFactory;
 use Phalcon\Cache\CacheFactory;

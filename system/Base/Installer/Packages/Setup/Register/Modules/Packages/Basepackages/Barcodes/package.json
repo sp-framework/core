@@ -7,7 +7,7 @@
     "sub_category"  : "tools",
     "version"       : "0.0.1",
     "repo"          : "https://.../",
-    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Barcodes\\Barcodes",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Barcodes",
     "settings"      : {
         "componentRoute"        : "system/tools/barcodes",
         "availableCodes"        : {

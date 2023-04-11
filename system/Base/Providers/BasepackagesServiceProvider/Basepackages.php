@@ -18,6 +18,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ImportExport;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Messenger;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Progress;
@@ -84,6 +85,8 @@ class Basepackages
 	protected $progress;
 
 	protected $api;
+
+	protected $messenger;
 
 	protected $barcodes;
 
@@ -279,6 +282,13 @@ class Basepackages
 		$this->api = (new Api())->init();
 
 		return $this->api;
+	}
+
+	protected function initMessenger()
+	{
+		$this->messenger = (new Messenger())->init();
+
+		return $this->messenger;
 	}
 
 	protected function initBarcodes()

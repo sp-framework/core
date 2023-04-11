@@ -7,7 +7,7 @@
     "sub_category"  : "tools",
     "version"       : "0.0.1",
     "repo"          : "https://.../",
-    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Qrcodes\\Qrcodes",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Qrcodes",
     "settings"      : {
         "componentRoute"        : "system/tools/qrcodes",
         "availableEncodings"    : {
