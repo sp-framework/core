@@ -109,6 +109,12 @@
         {% endif %}
     </div>
     <div class="col">
+        <label>PASSWORD PROTECTED: </label>
+        {% if backupInfoFile['request']['password_protect'] is defined and backupInfoFile['request']['password_protect'] !== '' %}
+            <span>Yes</span>
+        {% else %}
+            <span>No</span>
+        {% endif %}
     </div>
 </div>
 <hr>
@@ -119,7 +125,7 @@
                 'component'                                 : component,
                 'componentName'                             : componentName,
                 'componentId'                               : componentId,
-                'sectionId'                                 : 'main',
+                'sectionId'                                 : 'analysis',
                 'fieldId'                                   : 'backup_structure',
                 'fieldLabel'                                : 'Backup Structure',
                 'fieldType'                                 : 'jstree',
@@ -152,8 +158,27 @@
             ]
         )}}
     </div>
-    {% if backupInfoFile['request']['database'] == 'true' or backupInfoFile['request']['keys'] == 'true' %}
+    {% if backupInfoFile['request']['database'] == 'true' or backupInfoFile['request']['password_protect'] is defined and backupInfoFile['request']['password_protect'] !== '' %}
         <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : 'analysis',
+                    'fieldId'                               : 'password',
+                    'fieldLabel'                            : 'Password',
+                    'fieldType'                             : 'input',
+                    'fieldInputType'                        : 'password',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Enter the password (if any) that was entered during the time of backup.',
+                    'fieldRequired'                         : true,
+                    'fieldDisabled'                         : false,
+                    'fieldBazScan'                          : true,
+                    'fieldBazPostOnCreate'                  : false,
+                    'fieldBazPostOnUpdate'                  : false
+                ]
+            )}}
         </div>
     {% endif %}
 </div>
@@ -162,7 +187,33 @@
 $(document).ready(function() {
     BazContentFields.init({
         'componentId'   : "{{componentId}}",
-        'sectionId'     : "{{componentId}}-main"
+        'sectionId'     : "{{componentId}}-analysis"
     });
+    $('.tooltip').remove();
+    $('[data-toggle="tooltip"]').tooltip();
+    $('[data-toggle="popover"]').popover('enable');
 });
+
+/* globals PNotify Swal */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-analysis']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-analysis'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-analysis'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-analysis-password'                 : { }
+    });
 </script>

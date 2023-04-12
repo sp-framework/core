@@ -50,17 +50,6 @@ class BackupRestore extends BasePackage
             return;
         }
 
-        if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true') {
-            $this->backupInfo['request']['systems_dir'] = 'true';
-            if (isset($this->backupInfo['request']['encryption_passphrase']) &&
-                $this->backupInfo['request']['encryption_passphrase'] === ''
-            ) {
-                $this->addResponse('Passphrase to encrypt keys missing!', 1, []);
-
-                return;
-            }
-        }
-
         $now = Carbon::now();
         $this->backupInfo['takenAt'] = $now->format('Y-m-d H:i:s');
         $this->backupInfo['createdBy'] = $this->auth->account() ? $this->auth->account()['email'] : 'System';
@@ -69,6 +58,23 @@ class BackupRestore extends BasePackage
         $this->backupInfo['dbs'] = [];
         $this->backupInfo['dirs'] = [];
         $this->backupInfo['files'] = [];
+
+        if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true' ||
+            isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] == 'true'
+        ) {
+            if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true') {
+                $this->backupInfo['request']['systems_dir'] = 'true';
+            }
+
+            if (!isset($this->backupInfo['request']['password_protect']) ||
+                (isset($this->backupInfo['request']['password_protect']) &&
+                $this->backupInfo['request']['password_protect'] === '')
+            ) {
+                $this->addResponse('Password missing!', 1, []);
+
+                return;
+            }
+        }
 
         $this->zip->open(base_path($this->backupLocation . $this->backupInfo['backupName']), $this->zip::CREATE);
 
@@ -99,27 +105,9 @@ class BackupRestore extends BasePackage
         }
 
         foreach ($this->backupInfo['files'] as $file) {
-            if ($file === 'system/.keys' || $file === 'system/.dbkeys') {
-                if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true') {
-                    if (isset($this->backupInfo['request']['encryption_passphrase']) &&
-                        $this->backupInfo['request']['encryption_passphrase'] !== ''
-                    ) {
-                        $this->encryptKeysUsingPassphrase();
-
-                        if ($file === 'system/.keys') {
-                            $this->zip->addFile(base_path('system/.keysbackup'), $file);
-                        } else if ($file === 'system/.dbkeys') {
-                            $this->zip->addFile(base_path('system/.dbKeysbackup'), $file);
-                        }
-                    }
-                }
-            } else {
-                $this->zip->addFile(base_path($file), $file);
+            if (!$this->addToZip(base_path($file), $file)) {
+                return false;
             }
-        }
-
-        if(isset($this->backupInfo['request']['encryption_passphrase'])) {
-            unset($this->backupInfo['request']['encryption_passphrase']);
         }
 
         if (isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] == 'true') {
@@ -139,7 +127,9 @@ class BackupRestore extends BasePackage
 
                     $dumper->start(base_path('var/tmp/' . $fileName));
 
-                    $this->zip->addFile(base_path('var/tmp/' . $fileName), 'dbs/' . $fileName);
+                    if (!$this->addToZip(base_path('var/tmp/' . $fileName), 'dbs/' . $fileName)) {
+                        return false;
+                    }
 
                     array_push($this->backupInfo['dbs'], [$db['dbname'] => 'dbs/' . $fileName]);
                 } catch (\Exception $e) {
@@ -150,13 +140,21 @@ class BackupRestore extends BasePackage
             }
         }
 
+        if (isset($this->backupInfo['request']['password_protect']) && $this->backupInfo['request']['password_protect'] !== '') {
+            $this->backupInfo['request']['password_protect'] =
+                $this->secTools->hashPassword($this->backupInfo['request']['password_protect'], 4);
+        }
+
         try {
             $this->localContent->write('var/tmp/backupInfo.json' , Json::encode($this->backupInfo));
         } catch (FilesystemException | UnableToWriteFile $exception) {
             throw $exception;
         }
 
-        $this->zip->addFile(base_path('var/tmp/backupInfo.json'), 'backupInfo.json');
+        //Dont Encrypt info file as we need to know if encryption is applied or not during restore. We can encrypt the content in case we want to hide something (like we are encrypting the password_protect password)
+        if (!$this->addToZip(base_path('var/tmp/backupInfo.json'), 'backupInfo.json', false)) {
+            return false;
+        }
 
         $this->zip->close();
 
@@ -192,13 +190,84 @@ class BackupRestore extends BasePackage
         return false;
     }
 
+    protected function addToZip($absolutePath, $relativePath, $encrypt = true, $passwordProtectOrg = null)
+    {
+        if (isset($this->backupInfo['request']['password_protect']) &&
+            $this->backupInfo['request']['password_protect'] !== '' &&
+            $encrypt
+        ) {
+            if (!$passwordProtectOrg) {
+                $passwordProtectOrg = $this->backupInfo['request']['password_protect'];
+            }
+
+            $this->zip->addFile($absolutePath, $relativePath);
+
+            if (!$this->zip->setEncryptionName($relativePath, \ZipArchive::EM_AES_256, $passwordProtectOrg)) {
+                $name = $this->zip->getNameIndex($this->zip->numFiles - 1);
+
+                if ($relativePath === $name) {
+                    $this->zip->deleteIndex($this->zip->numFiles - 1);
+                }
+
+                $this->zip->close();
+
+                $this->addResponse('Could not set provided password for file ' . $name, 1, []);
+
+                return false;
+            }
+        } else {
+            if (!$this->zip->addFile($absolutePath, $relativePath)) {
+                $name = $this->zip->getNameIndex($this->zip->numFiles - 1);
+
+                $this->addResponse('Could not zip file: ' . $name, 1, []);
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function restore(array $data)
     {
-        if (!isset($data['filename'])) {
-            $this->addResponse('Please provide database file name', 1, []);
+        if (!isset($data['id'])) {
+            $this->addResponse('Please provide backup file id', 1, []);
 
             return false;
         }
+
+        $backupInfo = $this->analyseBackinfoFile($data['id']);
+
+        if (!$backupInfo) {
+            return false;
+        }
+
+        if (isset($backupInfo['request']['password_protect']) && $backupInfo['request']['password_protect'] !== '') {
+            if (!isset($data['password'])) {
+                $this->addResponse('Please provide backup file password', 1, []);
+
+                return false;
+            }
+
+            if (!$this->security->checkHash($data['password'], $backupInfo['request']['password_protect'])) {
+                $this->addResponse('Backup password incorrect! Please provide correct password', 1, []);
+
+                return false;
+            }
+
+            $this->zip->setPassword($data['password']);
+        }
+
+        $fileNameLocation = explode('.zip', $backupInfo['backupName'])[0];
+
+        if (!$this->zip->extractTo(base_path('var/tmp/backups/' . $fileNameLocation))) {
+            $this->addResponse('Error unzipping backup file. Please upload backup again.', 1);
+
+            return false;
+        }
+
+        var_dump($backupInfo['request']['password_protect']);die();
+
 
         $backupInfo = $this->basepackages->storages->getFileInfo(null, $data['filename']);
 
@@ -356,32 +425,33 @@ class BackupRestore extends BasePackage
         $fileInfo = $this->basepackages->storages->getFileInfo($id);
 
         if ($fileInfo) {
-            $fileNameLocation = explode('.zip', $fileInfo['org_file_name'])[0];
-
             if ($this->zip->open(base_path($fileInfo['uuid_location'] . $fileInfo['org_file_name']))) {
-                if ($this->zip->extractTo(base_path('var/tmp/backups/' . $fileNameLocation))) {
-                    try {
-                        $backupInfo = $this->localContent->read('var/tmp/backups/' . $fileNameLocation . '/backupInfo.json');
+                $backupInfo = $this->zip->getFromName('backupInfo.json');
 
-                        if ($backupInfo) {
-                            $this->backupInfo = Json::decode($backupInfo, true);
-                            $this->backupInfo['structure'] = [];
+                if (!$backupInfo) {
+                    $this->addResponse('Error reading backupInfo.json file. Please upload backup again.', 1);
 
-                            foreach ($this->backupInfo['dirs'] as $dirKey => $dirValue) {
-                                $this->addToStructure($dirValue, $dirKey);
-                            }
-                            foreach ($this->backupInfo['files'] as $fileKey => $fileValue) {
-                                $this->addToStructure($fileValue, $fileKey, true);
-                            }
-                        }
-
-                        return $this->backupInfo;
-                    } catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
-                        $this->addResponse('Error reading backupInfo.json file. Please upload backup again.', 1);
-                    }
-                } else {
-                    $this->addResponse('Error unzipping backup file. Please upload backup again.', 1);
+                    return false;
                 }
+
+                try {
+                    $this->backupInfo = Json::decode($backupInfo, true);
+                } catch (\InvalidArgumentException $exception) {
+                    $this->addResponse('Error reading contents of backupInfo.json file. Please check if file is in correct Json format.', 1);
+
+                    return false;
+                }
+
+                $this->backupInfo['structure'] = [];
+
+                foreach ($this->backupInfo['dirs'] as $dirKey => $dirValue) {
+                    $this->addToStructure($dirValue, $dirKey);
+                }
+                foreach ($this->backupInfo['files'] as $fileKey => $fileValue) {
+                    $this->addToStructure($fileValue, $fileKey, true);
+                }
+
+                return $this->backupInfo;
             } else {
                 $this->addResponse('Error opening backup zip file. Please upload backup again.', 1);
             }
@@ -417,7 +487,6 @@ class BackupRestore extends BasePackage
                         $this->backupInfo['files'] = array_merge($this->backupInfo['files'], ['fi' . $key => $file]);
                     }
                 }
-
             }
         }
     }
@@ -458,44 +527,25 @@ class BackupRestore extends BasePackage
         }
     }
 
-    public function checkPassphraseStrength(string $pass)
+    public function checkPwStrength(string $pass)
     {
         $checkingTool = new \ZxcvbnPhp\Zxcvbn();
 
         $result = $checkingTool->passwordStrength($pass);
 
         if ($result && is_array($result) && isset($result['score'])) {
-            $this->addResponse('Checking Passphrase Strength Success', 0, ['result' => $result['score']]);
+            $this->addResponse('Checking Password Strength Success', 0, ['result' => $result['score']]);
 
             return $result['score'];
         }
 
-        $this->addResponse('Error Checking Passphrase Strength', 1);
+        $this->addResponse('Error Checking Password Strength', 1);
 
         return false;
     }
 
-    public function generateNewPassphrase()
+    public function generateNewPw()
     {
-        $this->addResponse('Passphrase Generate Successfully', 0, ['passphrase' => $this->secTools->random->base62(12)]);
-    }
-
-    protected function encryptKeysUsingPassphrase()
-    {
-        try {
-            $keys = $this->localContent->read('system/.keys');
-
-            $encryptedKeys = $this->crypt->encryptBase64($keys, $this->backupInfo['request']['encryption_passphrase']);
-
-            $this->localContent->write('system/.keysbackup', $encryptedKeys);
-
-            $dbkeys = $this->localContent->read('system/.dbkeys');
-
-            $encryptedDbKeys = $this->crypt->encryptBase64($dbkeys, $this->backupInfo['request']['encryption_passphrase']);
-
-            $this->localContent->write('system/.dbKeysbackup', $encryptedDbKeys);
-        } catch (\ErrorException | FilesystemException | UnableToReadFile | UnableToWriteFile $exception) {
-            return false;
-        }
+        $this->addResponse('Password Generate Successfully', 0, ['password' => $this->secTools->random->base62(12)]);
     }
 }

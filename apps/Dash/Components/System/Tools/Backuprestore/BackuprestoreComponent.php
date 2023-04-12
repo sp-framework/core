@@ -106,14 +106,14 @@ class BackuprestoreComponent extends BaseComponent
         }
     }
 
-    public function checkPassphraseStrengthAction()
+    public function checkPwStrengthAction()
     {
         if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            if ($this->basepackages->backuprestore->checkPassphraseStrength($this->postData()['pass']) !== false) {
+            if ($this->basepackages->backuprestore->checkPwStrength($this->postData()['pass']) !== false) {
                 $this->view->responseData = $this->basepackages->backuprestore->packagesData->responseData;
             }
 
@@ -126,14 +126,14 @@ class BackuprestoreComponent extends BaseComponent
         }
     }
 
-    public function generatePassphraseAction()
+    public function generatePwAction()
     {
         if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            $this->basepackages->backuprestore->generateNewPassphrase();
+            $this->basepackages->backuprestore->generateNewPw();
 
             $this->addResponse(
                 $this->basepackages->backuprestore->packagesData->responseMessage,

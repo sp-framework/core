@@ -270,19 +270,19 @@
                 'componentName'                         : componentName,
                 'componentId'                           : componentId,
                 'sectionId'                             : sectionId,
-                'fieldId'                               : 'encryption_passphrase',
-                'fieldLabel'                            : 'Encryption Passphrase',
+                'fieldId'                               : 'password_protect',
+                'fieldLabel'                            : 'Password Protect',
                 'fieldType'                             : 'input',
                 'fieldInputType'                        : 'text',
-                'fieldHelpTooltipContent'               : 'We will encrypto the security and DB keys using this passphrase. During restore, you need to enter this passphrase for restore to decrypt the keys. Please keep this passphrase safe.',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'We will password protect the zip file if password is provided. Password protection is a must in case of Security and DB keys. During restore, you need to enter this password, else restore will fail. Please keep this password safe.',
                 'fieldRequired'                         : true,
-                'fieldDisabled'                         : true,
                 'fieldBazScan'                          : true,
                 'fieldBazPostOnCreate'                  : false,
                 'fieldBazPostOnUpdate'                  : false,
                 'fieldGroupPostAddonButtons'     :
                     {
-                        'passphrase_generate'   : {
+                        'password_generate'   : {
                             'title'                         : false,
                             'icon'                          : 'wand-magic-sparkles',
                             'noMargin'                      : true,
