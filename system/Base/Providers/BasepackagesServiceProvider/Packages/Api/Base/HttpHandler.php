@@ -41,6 +41,6 @@ class HttpHandler extends BasePackage
             }
         }
 
-        return $this->remoteContent->sendAsync($request, $options);
+        return $this->remoteWebContent->sendAsync($request, $options);
     }
 }

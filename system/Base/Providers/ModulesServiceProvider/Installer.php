@@ -404,7 +404,7 @@ class Installer extends BasePackage
     protected function downloadPackagesAndDependencies($module)
     {
         try {
-            $downloadedContents = $this->remoteContent
+            $downloadedContents = $this->remoteWebContent
                     ->request('GET', $module['repo'] . '/archive/master.zip')
                     ->getBody()
                     ->getContents();

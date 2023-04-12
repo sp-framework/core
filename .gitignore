@@ -20,3 +20,5 @@ apps/Dash/Packages/System/Api/CallStats/*
 system/.keys
 system/.dbkeys
 composer
+!external/composer
+!external/composer.json

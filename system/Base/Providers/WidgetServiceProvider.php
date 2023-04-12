@@ -17,9 +17,9 @@ class WidgetServiceProvider implements ServiceProviderInterface
 				$connection = $container->getShared('connection');
 				$session = $container->getShared('session');
 				$request = $container->getShared('request');
-				$remoteContent = $container->getShared('remoteContent');
+				$remoteWebContent = $container->getShared('remoteWebContent');
 				$logger = $container->getShared('logger');
-				return (new Widget($session, $connection, $request, $remoteContent, $logger))->init();
+				return (new Widget($session, $connection, $request, $remoteWebContent, $logger))->init();
 			}
 		);
 	}

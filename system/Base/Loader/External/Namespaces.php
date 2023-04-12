@@ -50,5 +50,9 @@ return
         'Http\\Client'                                  => __DIR__ . '/../../../../external/vendor/php-http/httplug/src',
         'MyCLabs\\Enum'                                 => __DIR__ . '/../../../../external/vendor/myclabs/php-enum/src',
         'BlueLibraries\\Dns'                            => __DIR__ . '/../../../../external/vendor/bluelibraries/dns/src',
-        'Ifsnop'                                        => __DIR__ . '/../../../../external/vendor/ifsnop/mysqldump-php/src/Ifsnop'
+        'Ifsnop'                                        => __DIR__ . '/../../../../external/vendor/ifsnop/mysqldump-php/src/Ifsnop',
+        'GrahamCampbell\\GuzzleFactory'                 => __DIR__ . '/../../../../external/vendor/graham-campbell/guzzle-factory/src',
+        'Spatie\\Dropbox'                               => __DIR__ . '/../../../../external/vendor/spatie/dropbox-api/src',
+        'Spatie\\FlysystemDropbox'                      => __DIR__ . '/../../../../external/vendor/spatie/flysystem-dropbox/src'
     ];
+    //This needs to change. This file should be auto generated when composer is ran during install or during backup restore.

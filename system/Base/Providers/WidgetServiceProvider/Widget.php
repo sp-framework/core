@@ -8,11 +8,11 @@ class Widget
 
 	protected $request;
 
-	protected $remoteContent;
+	protected $remoteWebContent;
 
 	protected $logger;
 
-	public function __construct($session, $connection, $request, $remoteContent, $logger)
+	public function __construct($session, $connection, $request, $remoteWebContent, $logger)
 	{
 		$this->session = $session;
 
@@ -20,7 +20,7 @@ class Widget
 
 		$this->request = $request;
 
-		$this->remoteContent = $remoteContent;
+		$this->remoteWebContent = $remoteWebContent;
 
 		$this->logger = $logger;
 	}
@@ -39,6 +39,6 @@ class Widget
 
 		$this->logger->log->debug('Making widget connection for connection ID: ' . $this->connection->getId());
 
-		return $this->remoteContent->get($widgetRoute)->getBody()->getContents();
+		return $this->remoteWebContent->get($widgetRoute)->getBody()->getContents();
 	}
 }

@@ -142,7 +142,7 @@ class GeoCountries extends BasePackage
         try {
             $this->localContent->write(
                 $this->sourceDir . $country . '.zip',
-                $this->remoteContent
+                $this->remoteWebContent
                     ->request(
                         'GET',
                         'https://dev.bazaari.com.au/sp-public/geodata/raw/branch/master/' . $country . '.zip',

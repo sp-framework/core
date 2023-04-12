@@ -287,7 +287,7 @@ class Manager extends BasePackage
         $headers['verify'] = false;
 
         try {
-            $body = Json::decode($this->remoteContent->get($repoUrl, $headers)->getBody()->getContents());
+            $body = Json::decode($this->remoteWebContent->get($repoUrl, $headers)->getBody()->getContents());
 
         } catch (ClientException $e) {
             $body = null;
@@ -323,7 +323,7 @@ class Manager extends BasePackage
                         try {
                             $this->remoteModules['core'][$value->name] =
                                 Json::decode(
-                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
+                                    $this->remoteWebContent->get($url, $headers)->getBody()->getContents()
                                     , true
                                 );
                         } catch (\Exception $e) {
@@ -349,7 +349,7 @@ class Manager extends BasePackage
                         try {
                             $this->remoteModules['components'][$value->name] =
                                 Json::decode(
-                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
+                                    $this->remoteWebContent->get($url, $headers)->getBody()->getContents()
                                     , true
                                 );
 
@@ -376,7 +376,7 @@ class Manager extends BasePackage
                         try {
                             $this->remoteModules['packages'][$value->name] =
                                 Json::decode(
-                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
+                                    $this->remoteWebContent->get($url, $headers)->getBody()->getContents()
                                     , true
                                 );
 
@@ -403,7 +403,7 @@ class Manager extends BasePackage
                         try {
                             $this->remoteModules['middlewares'][$value->name] =
                                 Json::decode(
-                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
+                                    $this->remoteWebContent->get($url, $headers)->getBody()->getContents()
                                     , true
                                 );
 
@@ -430,7 +430,7 @@ class Manager extends BasePackage
                         try {
                             $this->remoteModules['views'][$value->name] =
                                 Json::decode(
-                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
+                                    $this->remoteWebContent->get($url, $headers)->getBody()->getContents()
                                     , true
                                 );
                         } catch (\Exception $e) {

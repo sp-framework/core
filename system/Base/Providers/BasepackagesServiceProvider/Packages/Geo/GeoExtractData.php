@@ -244,7 +244,7 @@ class GeoExtractData extends BasePackage
 
         include('vendor/Simplehtmldom.php');
 
-        $response = $this->remoteContent->get($this->tzLink)->getBody()->getContents();
+        $response = $this->remoteWebContent->get($this->tzLink)->getBody()->getContents();
 
         $html = str_get_html($response);
 
