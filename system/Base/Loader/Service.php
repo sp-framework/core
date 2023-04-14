@@ -59,15 +59,15 @@ class Service
 		if (self::$mode) {
 			return
 				array_merge(
-					include(self::$base . 'system/Base/Loader/Namespaces.php'),
-					include(self::$base . 'system/Base/Loader/External/Namespaces.php'),
-					include(self::$base . 'system/Base/Loader/Dev/Namespaces.php')
+					$this->namespaces(),
+					$this->externalNamespaces(),
+					$this->devNamespaces()
 				);
 		} else {
 			return
 				array_merge(
-					include(self::$base . 'system/Base/Loader/Namespaces.php'),
-					include(self::$base . 'system/Base/Loader/External/Namespaces.php')
+					$this->namespaces(),
+					$this->externalNamespaces()
 				);
 		}
 	}
@@ -77,15 +77,15 @@ class Service
 		if (self::$mode) {
 			return
 				array_merge(
-					include(self::$base . 'system/Base/Loader/Classes.php'),
-					include(self::$base . 'system/Base/Loader/External/Classes.php'),
-					include(self::$base . 'system/Base/Loader/Dev/Classes.php')
+					$this->classes(),
+					$this->externalClasses(),
+					$this->devClasses()
 				);
 		} else {
 			return
 				array_merge(
-					include(self::$base . 'system/Base/Loader/Classes.php'),
-					include(self::$base . 'system/Base/Loader/External/Classes.php')
+					$this->classes(),
+					$this->externalClasses()
 				);
 		}
 	}
@@ -95,16 +95,107 @@ class Service
 		if (self::$mode) {
 			return
 				array_merge(
-					include(self::$base . 'system/Base/Loader/Files.php'),
-					include(self::$base . 'system/Base/Loader/External/Files.php'),
-					include(self::$base . 'system/Base/Loader/Dev/Files.php')
+					$this->files(),
+					$this->externalFiles(),
+					$this->devFiles()
 				);
 		} else {
 			return
 				array_merge(
-					include(self::$base . 'system/Base/Loader/Files.php'),
-					include(self::$base . 'system/Base/Loader/External/Files.php')
+					$this->files(),
+					$this->externalFiles()
 				);
 		}
+	}
+
+	private function namespaces()
+	{
+		return
+			[
+				'Apps'                          	=> self::$base . 'apps/',
+				'System'                        	=> self::$base . 'system/'
+			];
+	}
+
+	private function externalNamespaces()
+	{
+		$externalNamespaces = [];
+
+		$externalNamespacesArr = include_once self::$base . 'external/vendor/composer/autoload_psr4.php';
+
+		foreach ($externalNamespacesArr as $class => $classArr) {
+			$class = rtrim($class, '\\');
+
+			if (count($classArr) === 1) {
+				$externalNamespaces[$class] = $classArr[0];
+			} else {
+				$externalNamespaces[$class] = [];
+				foreach ($classArr as $path) {
+					array_push($externalNamespaces[$class], $path);
+				}
+			}
+		}
+
+		return $externalNamespaces;
+	}
+
+	private function devNamespaces()
+	{
+		return
+			[
+				'Symfony\\Component\\VarDumper'		=> self::$base . 'vendor/symfony/var-dumper/'
+			];
+	}
+
+	private function classes()
+	{
+		return
+			[
+			];
+	}
+
+	private function externalClasses()
+	{
+		$externalClasses = include_once self::$base . 'external/vendor/composer/autoload_classmap.php';
+
+		if ($externalClasses) {
+			return $externalClasses;
+		}
+
+		return [];
+	}
+
+	private function devClasses()
+	{
+		return
+			[
+				__DIR__ . '/../../Base/Helpers.php'
+			];
+	}
+
+	private function files()
+	{
+		return
+			[
+				__DIR__ . '/../../Base/Helpers.php'
+			];
+	}
+
+	private function externalFiles()
+	{
+		$externalFiles = include_once self::$base . 'external/vendor/composer/autoload_files.php';
+		if ($externalFiles) {
+			return $externalFiles;
+		}
+
+		return [];
+	}
+
+	private function devFiles()
+	{
+		return
+			[
+				__DIR__ . '/../../Base/Helpers.php'
+			];
 	}
 }
