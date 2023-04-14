@@ -13,7 +13,8 @@ var/*
 .vscode*
 linter-backup*
 repos/*
-# external/vendor/*
+external/vendor/*
+external/base.lock
 ignore/*
 composer.json
 apps/Dash/Packages/System/Api/CallStats/*
