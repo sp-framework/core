@@ -34,6 +34,8 @@
         "ifsnop/mysqldump-php": "^2.11",
         "spatie/flysystem-dropbox": "^2.0",
         "league/flysystem-sftp": "^2.0",
-        "league/flysystem-ftp": "^2.0"
+        "league/flysystem-ftp": "^2.0",
+        "bjeavons/zxcvbn-php": "^1.2",
+        "bluelibraries/dns": "^1.1.1"
     }
 }
