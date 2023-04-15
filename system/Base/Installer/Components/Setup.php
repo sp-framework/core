@@ -239,8 +239,8 @@ Class Setup
 
 			try {
 				if (!$this->setupPackage->checkDbEmpty()) {
-
 					$this->view->responseCode = 1;
+
 					$this->view->responseMessage =
 						'Database <strong>' . $this->postData['dbname'] . '</strong> not empty!' .
 						' Use drop existing tables checkbox to drop existing tables.';
@@ -255,6 +255,28 @@ Class Setup
 				}
 
 				$this->progress->preCheckComplete();
+
+				$this->setupPackage->executeComposer();
+
+				do {
+					$callResult = $this->progress->getCallResult('executeComposer');
+
+					if ($callResult === false) {
+						$this->progress->resetProgress();
+
+						$this->view->responseCode = 3;
+
+						$this->view->responseMessage = 'External packages installation error!';
+
+						if ($this->response->isSent() !== true) {
+							$this->response->setJsonContent($this->view->getParamsToView());
+
+							return $this->response->send();
+						}
+					}
+
+					sleep(1);
+				} while ($callResult === null);
 
 				$this->setupPackage->buildSchema();
 
@@ -309,8 +331,6 @@ Class Setup
 				}
 
 				// $this->setupPackage->removeInstaller();
-
-				$this->setupPackage->executeComposer();
 
 				$this->setupPackage->cleanVar();
 
@@ -379,10 +399,20 @@ Class Setup
 
 				if (isset($this->postData['composer'])) {
 					$progress = Json::decode($progress, true);
+					$callResult = $this->progress->getCallResult('executeComposer');
 
+					if ($callResult === false) {
+						$progress = array_merge($progress, ['composer_error' => true]);
+					}
 					try {
 						$composerInstall = $this->localContent->read('external/composer.install');
-						$progress = array_merge($progress, ['composer' => $composerInstall]);
+						if (strpos($composerInstall, 'curl error') !== false) {
+							$progress = array_merge($progress, ['composer' => $composerInstall, 'composer_error' => true]);
+						} else if (strpos($composerInstall, 'requirements could not be resolved') !== false) {
+							$progress = array_merge($progress, ['composer' => $composerInstall, 'composer_error' => true]);
+						} else {
+							$progress = array_merge($progress, ['composer' => $composerInstall]);
+						}
 					} catch (FilesystemException | UnableToReadFile $exception) {
 						$progress = array_merge($progress, ['composer' => 'Error retrieving external packages installer information...']);
 					}
@@ -437,6 +467,10 @@ Class Setup
 				[
 					'method'	=> 'checkDbEmpty',
 					'text'		=> 'Checking if db is empty...'
+				],
+				[
+					'method'	=> 'executeComposer',
+					'text'		=> 'Downloading & installing external packages...'
 				],
 				[
 					'method'	=> 'buildSchema',
@@ -521,10 +555,6 @@ Class Setup
 				[
 					'method'	=> 'registerTasks',
 					'text'		=> 'Registering tasks...'
-				],
-				[
-					'method'	=> 'executeComposer',
-					'text'		=> 'Downloading & installing external packages...'
 				],
 				[
 					'method'	=> 'cleanVar',

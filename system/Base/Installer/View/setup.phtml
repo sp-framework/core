@@ -222,7 +222,7 @@
                                                 <div class="row">
                                                     <div class="col">
                                                         <div class="form-group mb-2">
-                                                            <div class="checkbox icheck-info">
+                                                            <div class="checkbox icheck-success">
                                                                 <input type="checkbox" name="auto-encrypt-level" id="auto-encrypt-level" checked>
                                                                 <label class="text-uppercase text-xs" for="auto-encrypt-level">
                                                                     Calculate level as per system configuration
@@ -231,7 +231,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <small class="text-warning">Note: Higher the number, better the security but, slower the performance. Range: 4-16</small>
+                                                <small class="text-danger">Note: Higher the number, better the security but, slower the performance. Range: 4-16</small>
                                                 <legend class="mt-3">Development</legend>
                                                 <div class="row">
                                                     <div class="col">
@@ -282,7 +282,10 @@
                                     </div>
                                     <div class="row">
                                         <div class="col" id="external-div" hidden>
-                                            <textarea id="external-data" class="form-control form-control-sm rounded-0" rows="10" disabled>Downloading & installing external packages...</textarea>
+                                            <div class="form-group">
+                                                <label class="text-uppercase text-xs" for="username">External Package Installer Logs</label>
+                                                <textarea id="external-data" class="form-control form-control-sm rounded-0" rows="10" disabled>Downloading & installing external packages...</textarea>
+                                            </div>
                                         </div>
                                     </div>
                                     <hr>
@@ -420,6 +423,10 @@
                             "country"               : $('#country').val()
                         });
                 <?php } ?>
+                    $('.installer-progress-bar').css('width', '0%');
+                    $('.installer-progress-bar').attr('aria-valuenow', 0);
+                    $('.progress-bar').addClass('progress-bar-animated');
+                    $('#external-data').val('Downloading & installing external packages...');
                     $.ajax({
                         type    : 'POST',
                         url     : '/',
@@ -427,26 +434,33 @@
                         dataType: 'json',
                         success: function (data) {
                             if (data && data.responseCode === 0) {
+                                var alert = 'alert-success';
                                 setTimeout(function() {
                                     $('#alert').attr('hidden', false);
                                     $('#alert').html('');
-                                    $('#alert').removeClass (function (index, className) {
+                                    if ($('#access').is('.btn-warning')) {
+                                        alert = 'alert-warning';
+                                    }
+                                    $('#alert').removeClass(function (index, className) {
                                         return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
-                                    }).addClass('alert-success').html(data.responseMessage);
+                                    }).addClass(alert).html(data.responseMessage);
                                     $('#access').attr('disabled', false);
                                     $('#update-div').attr('hidden', true);
                                     $('#submit-spinner, #update-spinner').attr('hidden', true);
                                 }, 1000);
-                            } else if (data.responseCode === 1 || data.responseCode === 2) {
+                            } else if (data.responseCode === 1 || data.responseCode === 2 || data.responseCode === 3) {
                                 $('#alert').attr('hidden', false);
                                 $('#alert').html('');
-                                $('#alert').removeClass (function (index, className) {
+                                $('#alert').removeClass(function (index, className) {
                                     return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
                                 }).addClass('alert-danger').html(data.responseMessage);
                                 $('#submit, #update').attr('disabled', false);
                                 $('#submit-spinner, #update-spinner').attr('hidden', true);
                                 $('#external-div').attr('hidden', true);
-                                $('#external-data').val('Downloading & installing external packages...')
+                                $('#external-data').val('Downloading & installing external packages...');
+                                if (data.responseCode === 3) {
+                                    getProgress(true);
+                                }
                             }
                             progressCounter = 0;
                         },
@@ -454,14 +468,14 @@
                             if (data.responseJSON && data.responseJSON.responseCode === 1) {
                                 $('#alert').attr('hidden', false);
                                 $('#alert').html('');
-                                $('#alert').removeClass (function (index, className) {
+                                $('#alert').removeClass(function (index, className) {
                                     return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
                                 }).addClass('alert-danger').html(data.responseJSON.responseMessage);
                             }
                             $('#submit, #update').attr('disabled', false);
                             $('#submit-spinner, #update-spinner').attr('hidden', true);
                             $('#external-div').attr('hidden', true);
-                            $('#external-data').val('Downloading & installing external packages...')
+                            $('#external-data').val('Downloading & installing external packages...');
                             progressCounter = 0;
                         }
                     });
@@ -509,46 +523,62 @@
                                 var responseData = JSON.parse(data.responseData);
 
                                 if (responseData['preCheckComplete'] == false) {
+                                    if (responseData.composer) {
+                                        $('#external-data').val(responseData.composer);
+                                        $('#external-data').scrollTop($('#external-data')[0].scrollHeight);
+                                        $('#external-div').attr('hidden', false);
+                                    }
+                                    if (responseData.composer_error) {
+                                        $('.progress-bar').removeClass('progress-bar-animated');
+                                        $('.progress-span').html('Error installing external packages. Please resolve errors and try again.');
+                                        $('.installer-progress-bar').removeClass(function (index, className) {
+                                            return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
+                                        }).addClass('bg-danger');
+                                        $('.installer-progress-bar').css('width', '100%');
+                                        $('.installer-progress-bar').attr('aria-valuenow', 100);
+                                        $('#access').addClass('btn-warning');
+                                        $('#access').children('i').addClass('fa-exclamation');
+                                    }
                                     resetProgressCounter();
                                     return false;
                                 }
 
                                 if (responseData['total'] !== 'undefined' && responseData['completed'] !== 'undefined') {
                                     if (responseData['total'] !== responseData['completed']) {
-                                        if (responseData['preCheckComplete'] === true) {
-                                            if (responseData['runners']['running'] !== false) {
-                                                $('.installer-progress').attr('hidden', false);
-                                                $('.progress-span')
-                                                    .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
+                                        if (responseData['runners']['running'] !== false) {
+                                            $('.installer-progress').attr('hidden', false);
+                                            $('.progress-span')
+                                                .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
 
-                                                $('.installer-progress-bar').css('width', responseData['percentComplete'] + '%');
-                                                $('.installer-progress-bar').attr('aria-valuenow', responseData['percentComplete']);
+                                            $('.installer-progress-bar').css('width', responseData['percentComplete'] + '%');
+                                            $('.installer-progress-bar').attr('aria-valuenow', responseData['percentComplete']);
 
-                                                if (responseData['runners']['running']['method'] === 'executeComposer') {
-                                                    $('#external-div').attr('hidden', false);
-                                                    getComposer = true;
-                                                }
-                                                if (responseData.composer) {
-                                                    $('#external-data').val(responseData.composer);
-                                                    $('#external-data').scrollTop($('#external-data')[0].scrollHeight);
-                                                }
+                                            if (responseData['runners']['running']['method'] === 'executeComposer') {
+                                                $('#external-div').attr('hidden', false);
+                                                getComposer = true;
                                             }
-                                            timerId = getTimerId('progressCounter');
-                                            if (timerId) {
-                                                BazHelpers.setTimeoutTimers.stop(timerId, null, 'progressCounter');
+                                            if (responseData.composer) {
+                                                $('#external-data').val(responseData.composer);
+                                                $('#external-data').scrollTop($('#external-data')[0].scrollHeight);
                                             }
-                                            BazHelpers.setTimeoutTimers.add(function() {
-                                                getProgress(getComposer);
-                                            }, 300);
                                         }
+                                        timerId = getTimerId('progressCounter');
+                                        if (timerId) {
+                                            BazHelpers.setTimeoutTimers.stop(timerId, null, 'progressCounter');
+                                        }
+                                        BazHelpers.setTimeoutTimers.add(function() {
+                                            getProgress(getComposer);
+                                        }, 300);
                                     } else if (responseData['total'] === responseData['completed']) {
                                         BazHelpers.setTimeoutTimers.stopAll();
                                         setTimeout(function() {
                                             $('.progress-bar').removeClass('progress-bar-animated');
-                                            $('.progress-span').html('Done (100%)');
                                             $('.installer-progress-bar').css('width', '100%');
                                             $('.installer-progress-bar').attr('aria-valuenow', 100);
-                                            $('.installer-progress-bar').removeClass('bg-info').addClass('bg-success');
+                                            $('.progress-span').html('Done (100%)');
+                                            $('.installer-progress-bar').removeClass(function (index, className) {
+                                                return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
+                                            }).addClass('bg-success');
                                             $('#access').addClass('btn-success');
                                             $('#access').children('i').addClass('fa-check');
                                             $('#access-div').attr('hidden', false);
@@ -587,6 +617,7 @@
             $('#auto-encrypt-level').click(function() {
                 if ($(this)[0].checked === true) {
                     $('#pwf, #cwf').attr('disabled', true);
+                    $('#dev')[0].checked = false;
                 } else if ($(this)[0].checked === false) {
                     $('#pwf, #cwf').attr('disabled', false);
                 }

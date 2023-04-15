@@ -165,7 +165,7 @@ class Setup
 		if (method_exists($this, $method)) {
 			$call = call_user_func_array([$this, $method], $arguments);
 
-			$this->progress->updateProgress($method, false);
+			$this->progress->updateProgress($method, $call, false);
 
 			return $call;
 		}
@@ -742,10 +742,17 @@ class Setup
 
 		$application = new \Composer\Console\Application();
 		$application->setAutoExit(false); // prevent `$application->run` method from exiting the script
+
 		try {
 			$app = $application->run($input, $output);
 		} catch (\throwable $e) {
 			throw $e;
 		}
+
+		if ($app !== 0) {
+			return false;
+		}
+
+		return true;
 	}
 }
