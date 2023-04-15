@@ -21,7 +21,9 @@ class BackupRestore extends BasePackage
 
     protected $backupLocation = '.backups/';
 
-    public function init()
+    protected $now;
+
+    public function init($process = 'backup')
     {
         $this->zip = new \ZipArchive;
 
@@ -31,10 +33,46 @@ class BackupRestore extends BasePackage
             $this->localContent->createDirectory($this->backupLocation);
         }
 
+        $this->basepackages->progress->deleteProgressFile();
+
+        if ($process === 'backup') {
+            $this->registerBackupProgressMethods();
+        } else if ($process === 'restore') {
+            $this->registerRestoreProgressMethods();
+        }
+
         return $this;
     }
 
-    public function backup(array $data)
+    public function withProgress($method, $arguments)
+    {
+        if (method_exists($this, $method)) {
+            if (is_array($arguments)) {
+                $arguments = [$arguments];
+            }
+
+            $call = call_user_func_array([$this, $method], $arguments);
+
+            $this->basepackages->progress->updateProgress($method, $call, false);
+
+            return $call;
+        }
+    }
+
+    protected function backup(array $data)
+    {
+        if ($this->withProgress('generateBackupInfo', $data) === false) return false;
+        if ($this->withProgress('generateStructure', $data) === false) return false;
+        if ($this->withProgress('zipBackupFiles', $data) === false) return false;
+        if (isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] == 'true') {
+            if ($this->withProgress('performDbBackup', $data) === false) return false;
+        }
+        if ($this->withProgress('finishBackup', $data) === false) return false;
+
+        return true;
+    }
+
+    protected function generateBackupInfo(array $data)
     {
         $tokenkey = array_search($this->security->getRequestToken(), $data);
         if ($tokenkey) {
@@ -53,10 +91,10 @@ class BackupRestore extends BasePackage
             return;
         }
 
-        $now = Carbon::now();
-        $this->backupInfo['takenAt'] = $now->format('Y-m-d H:i:s');
+        $this->now = Carbon::now();
+        $this->backupInfo['takenAt'] = $this->now->format('Y-m-d H:i:s');
         $this->backupInfo['createdBy'] = $this->auth->account() ? $this->auth->account()['email'] : 'System';
-        $this->backupInfo['backupName'] = 'backup-' . $now->getTimestamp() . '.zip';
+        $this->backupInfo['backupName'] = 'backup-' . $this->now->getTimestamp() . '.zip';
         $this->backupInfo['request'] = $data;
         $this->backupInfo['dbs'] = [];
         $this->backupInfo['dirs'] = [];
@@ -75,10 +113,15 @@ class BackupRestore extends BasePackage
             ) {
                 $this->addResponse('Password missing!', 1, []);
 
-                return;
+                return false;
             }
         }
 
+        return true;
+    }
+
+    protected function generateStructure(array $data)
+    {
         $this->zip->open(base_path($this->backupLocation . $this->backupInfo['backupName']), $this->zip::CREATE);
 
         if (isset($this->backupInfo['request']['apps_dir']) && $this->backupInfo['request']['apps_dir'] == 'true') {
@@ -107,47 +150,60 @@ class BackupRestore extends BasePackage
             $this->getContent($this->getInstalledFiles('.backups/'));
         }
 
+        return true;
+    }
+
+    protected function zipBackupFiles(array $data)
+    {
         foreach ($this->backupInfo['files'] as $file) {
             if (!$this->addToZip(base_path($file), $file)) {
                 return false;
             }
         }
 
-        if (isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] == 'true') {
-            foreach ($this->core->core['settings']['dbs'] as $dbKey => $db) {
-                try {
-                    $db['password'] = $this->crypt->decryptBase64($db['password'], $this->getDbKey($db));
+        return true;
+    }
 
-                    $dumper =
-                        new Mysqldump(
-                            'mysql:host=' . $db['host'] . ';dbname=' . $db['dbname'],
-                            $db['username'],
-                            $db['password'],
-                            ['default-character-set' => Mysqldump::UTF8MB4]
-                        );
+    protected function performDbBackup(array $data)
+    {
+        foreach ($this->core->core['settings']['dbs'] as $dbKey => $db) {
+            try {
+                $db['password'] = $this->crypt->decryptBase64($db['password'], $this->getDbKey($db));
 
-                    $fileName = 'db' . $db['dbname'] . $now->getTimestamp() . '.sql';
+                $dumper =
+                    new Mysqldump(
+                        'mysql:host=' . $db['host'] . ';dbname=' . $db['dbname'],
+                        $db['username'],
+                        $db['password'],
+                        ['default-character-set' => Mysqldump::UTF8MB4]
+                    );
 
-                    $dumper->start(base_path('var/tmp/' . $fileName));
+                $fileName = 'db' . $db['dbname'] . $this->now->getTimestamp() . '.sql';
 
-                    if (!$this->addToZip(base_path('var/tmp/' . $fileName), 'dbs/' . $fileName)) {
-                        return false;
-                    }
+                $dumper->start(base_path('var/tmp/' . $fileName));
 
-                    $db['password'] = $this->crypt->encryptBase64($db['password'], $this->getDbKey($db));
-
-                    $this->backupInfo['dbs'][$db['dbname']] = $db;
-                    $this->backupInfo['dbs'][$db['dbname']]['file'] = 'dbs/' . $fileName;
-                } catch (\Exception $e) {
-                    $this->addResponse('Backup Error: ' . $e->getMessage(), 1);
-
+                if (!$this->addToZip(base_path('var/tmp/' . $fileName), 'dbs/' . $fileName)) {
                     return false;
                 }
-            }
 
-            $this->addToZip(base_path('system/.dbkeys'), 'system/.dbkeys');
+                $db['password'] = $this->crypt->encryptBase64($db['password'], $this->getDbKey($db));
+
+                $this->backupInfo['dbs'][$db['dbname']] = $db;
+                $this->backupInfo['dbs'][$db['dbname']]['file'] = 'dbs/' . $fileName;
+            } catch (\Exception $e) {
+                $this->addResponse('Backup Error: ' . $e->getMessage(), 1);
+
+                return false;
+            }
         }
 
+        $this->addToZip(base_path('system/.dbkeys'), 'system/.dbkeys');
+
+        return true;
+    }
+
+    protected function finishBackup(array $data)
+    {
         if (isset($this->backupInfo['request']['password_protect']) && $this->backupInfo['request']['password_protect'] !== '') {
             $this->backupInfo['request']['password_protect'] =
                 $this->secTools->hashPassword($this->backupInfo['request']['password_protect'], 4);
@@ -236,7 +292,7 @@ class BackupRestore extends BasePackage
         return true;
     }
 
-    public function restore(array $data)
+    protected function restore(array $data)
     {
         if (!isset($data['id'])) {
             $this->addResponse('Please provide backup file id', 1, []);
@@ -564,5 +620,45 @@ class BackupRestore extends BasePackage
     public function generateNewPw()
     {
         $this->addResponse('Password Generate Successfully', 0, ['password' => $this->secTools->random->base62(12)]);
+    }
+
+    protected function registerBackupProgressMethods()
+    {
+        $this->basepackages->progress->registerMethods(
+            [
+                [
+                    'method'    => 'generateBackupInfo',
+                    'text'      => 'Creating new backup information...'
+                ],
+                [
+                    'method'    => 'generateStructure',
+                    'text'      => 'Generate backup file structure...'
+                ],
+                [
+                    'method'    => 'zipBackupFiles',
+                    'text'      => 'Archiving backup...'
+                ],
+                [
+                    'method'    => 'performDbBackup',
+                    'text'      => 'Performing Database Backup...'
+                ],
+                [
+                    'method'    => 'finishBackup',
+                    'text'      => 'Fnishing up...'
+                ]
+            ]
+        );
+    }
+
+    protected function registerRestoreProgressMethods()
+    {
+        $this->basepackages->progress->registerMethods(
+            [
+                [
+                    'method'    => 'createNewDb',
+                    'text'      => 'Creating new database...'
+                ]
+            ]
+        );
     }
 }

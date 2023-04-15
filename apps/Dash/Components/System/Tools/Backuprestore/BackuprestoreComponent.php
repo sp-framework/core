@@ -65,7 +65,7 @@ class BackuprestoreComponent extends BaseComponent
                 return;
             }
 
-            if ($this->basepackages->backuprestore->backup($this->postData())) {
+            if ($this->basepackages->backuprestore->init()->withProgress('backup', $this->postData())) {
                 $this->addResponse(
                     $this->basepackages->backuprestore->packagesData->responseMessage,
                     $this->basepackages->backuprestore->packagesData->responseCode,
@@ -89,7 +89,7 @@ class BackuprestoreComponent extends BaseComponent
                 return;
             }
 
-            if ($this->basepackages->backuprestore->restore($this->postData())) {
+            if ($this->basepackages->backuprestore->init('restore')->withProgress('restore', $this->postData())) {
                 $this->addResponse(
                     $this->basepackages->backuprestore->packagesData->responseMessage,
                     $this->basepackages->backuprestore->packagesData->responseCode,
