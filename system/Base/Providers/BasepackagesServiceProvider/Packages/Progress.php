@@ -93,7 +93,7 @@ class Progress extends BasePackage
     {
         $progressFile = $this->readProgressFile($session);
 
-        if (!$progressFile) {
+        if (!$progressFile || ($progressFile && !isset($progressFile['runners']))) {
             return false;
         }
 
@@ -108,8 +108,27 @@ class Progress extends BasePackage
         );
     }
 
-    public function updateProgress($method, $deleteFile = true)
+    public function getCallResult($method)
     {
+        $progressFile = $this->readProgressFile();
+
+        if ($progressFile && isset($progressFile['allProcesses'])) {
+            foreach ($progressFile['allProcesses'] as $allProcess) {
+                if ($allProcess['method'] === $method) {
+                    if (isset($allProcess['callResult'])) {
+                        return $allProcess['callResult'];
+                    }
+                }
+            }
+        }
+    }
+
+    public function updateProgress($method, $callResult, $deleteFile = true)
+    {
+        if ($callResult !== false) {
+            $callResult = true;
+        }
+
         $progressFile = $this->readProgressFile();
 
         if (isset($progressFile['processes']) && count($progressFile['processes']) > 0) {
@@ -130,7 +149,7 @@ class Progress extends BasePackage
                 return true;
             }
 
-            $this->writeProgressFile($progressFile['processes'], false, false, true, $runners);
+            $this->writeProgressFile($progressFile['processes'], false, false, true, $runners, null, $method, $callResult);
 
             return true;
         }
@@ -185,8 +204,9 @@ class Progress extends BasePackage
         }
     }
 
-    protected function writeProgressFile($methods, $register = false, $unregister = false, $update = false, $runners = null, $progressFile = null)
-    {
+    protected function writeProgressFile(
+        $methods, $register = false, $unregister = false, $update = false, $runners = null, $progressFile = null, $method = null, $callResult = null
+    ) {
         if ($progressFile) {
             $file = $progressFile;
         } else {
@@ -207,7 +227,15 @@ class Progress extends BasePackage
 
             if ($update) {
                 $progressFile = $this->readProgressFile();
-                if(isset($progressFile['allProcesses'])) {
+                if (isset($progressFile['allProcesses'])) {
+                    if ($method && $callResult !== null) {
+                        foreach ($progressFile['allProcesses'] as &$allProcess) {
+                            if ($allProcess['method'] === $method) {
+                                $allProcess['callResult'] = $callResult;
+                            }
+                        }
+                    }
+
                     $file['allProcesses'] = $progressFile['allProcesses'];
                 }
                 $file['total'] = $progressFile['total'];
