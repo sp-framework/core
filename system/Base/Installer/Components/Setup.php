@@ -2,6 +2,8 @@
 
 namespace System\Base\Installer\Components;
 
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToReadFile;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Helper\Json;
 use Phalcon\Http\Response\Cookies;
@@ -308,6 +310,8 @@ Class Setup
 
 				// $this->setupPackage->removeInstaller();
 
+				$this->setupPackage->executeComposer();
+
 				$this->setupPackage->cleanVar();
 
 				$this->setupPackage->cleanOldBackups();
@@ -372,6 +376,19 @@ Class Setup
 				}
 			} else {
 				$progress = $this->progress->getProgress($this->postData['session']);
+
+				if (isset($this->postData['composer'])) {
+					$progress = Json::decode($progress, true);
+
+					try {
+						$composerInstall = $this->localContent->read('external/composer.install');
+						$progress = array_merge($progress, ['composer' => $composerInstall]);
+					} catch (FilesystemException | UnableToReadFile $exception) {
+						$progress = array_merge($progress, ['composer' => 'Error retrieving external packages installer information...']);
+					}
+
+					$progress = Json::encode($progress);
+				}
 
 				if ($progress) {
 					$this->view->responseCode = 0;
@@ -504,6 +521,10 @@ Class Setup
 				[
 					'method'	=> 'registerTasks',
 					'text'		=> 'Registering tasks...'
+				],
+				[
+					'method'	=> 'executeComposer',
+					'text'		=> 'Downloading & installing external packages...'
 				],
 				[
 					'method'	=> 'cleanVar',

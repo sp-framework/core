@@ -73,7 +73,7 @@ try {
 	} else if (PHP_SAPI !== 'cli') {
 		$bootstrap->mvc();
 	}
-} catch (Exception $exception) {
+} catch (throwable | Exception $exception) {
 	if (isset($bootstrap->error)) {
 		$bootstrap->error->handle($exception);
 	} else {

@@ -277,7 +277,12 @@
                                             </div>
                                         <?php } ?>
                                         <div class="col" id="access-div" hidden>
-                                            <a href='/' id="access" class="btn btn-success" disabled=""><i class="fa fa-check"></i> Access Admin</a>
+                                            <a href='/' id="access" class="btn" disabled=""><i class="fa"></i> Access Admin</a>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col" id="external-div" hidden>
+                                            <textarea id="external-data" class="form-control form-control-sm rounded-0" rows="10" disabled>Downloading & installing external packages...</textarea>
                                         </div>
                                     </div>
                                     <hr>
@@ -440,6 +445,8 @@
                                 }).addClass('alert-danger').html(data.responseMessage);
                                 $('#submit, #update').attr('disabled', false);
                                 $('#submit-spinner, #update-spinner').attr('hidden', true);
+                                $('#external-div').attr('hidden', true);
+                                $('#external-data').val('Downloading & installing external packages...')
                             }
                             progressCounter = 0;
                         },
@@ -453,6 +460,8 @@
                             }
                             $('#submit, #update').attr('disabled', false);
                             $('#submit-spinner, #update-spinner').attr('hidden', true);
+                            $('#external-div').attr('hidden', true);
+                            $('#external-data').val('Downloading & installing external packages...')
                             progressCounter = 0;
                         }
                     });
@@ -479,9 +488,12 @@
                 return id;
             }
 
-            function getProgress() {
+            function getProgress(composer = false) {
                 var data = { };
                 data['session'] = $('#session-token').val();
+                if (composer) {
+                    data['composer'] = 'true';
+                }
 
                 $.ajax({
                     type    : 'POST',
@@ -493,6 +505,7 @@
 
                         if (data && data.responseCode === 0) {
                             if (data.responseData) {
+                                var getComposer = false;
                                 var responseData = JSON.parse(data.responseData);
 
                                 if (responseData['preCheckComplete'] == false) {
@@ -510,25 +523,37 @@
 
                                                 $('.installer-progress-bar').css('width', responseData['percentComplete'] + '%');
                                                 $('.installer-progress-bar').attr('aria-valuenow', responseData['percentComplete']);
+
+                                                if (responseData['runners']['running']['method'] === 'executeComposer') {
+                                                    $('#external-div').attr('hidden', false);
+                                                    getComposer = true;
+                                                }
+                                                if (responseData.composer) {
+                                                    $('#external-data').val(responseData.composer);
+                                                    $('#external-data').scrollTop($('#external-data')[0].scrollHeight);
+                                                }
                                             }
                                             timerId = getTimerId('progressCounter');
                                             if (timerId) {
                                                 BazHelpers.setTimeoutTimers.stop(timerId, null, 'progressCounter');
                                             }
                                             BazHelpers.setTimeoutTimers.add(function() {
-                                                getProgress();
+                                                getProgress(getComposer);
                                             }, 300);
                                         }
                                     } else if (responseData['total'] === responseData['completed']) {
-                                        $('.progress-bar').removeClass('progress-bar-animated');
-                                        $('.progress-span').html('Done (100%)');
-                                        $('.installer-progress-bar').css('width', '100%');
-                                        $('.installer-progress-bar').attr('aria-valuenow', 100);
                                         BazHelpers.setTimeoutTimers.stopAll();
                                         setTimeout(function() {
+                                            $('.progress-bar').removeClass('progress-bar-animated');
+                                            $('.progress-span').html('Done (100%)');
+                                            $('.installer-progress-bar').css('width', '100%');
+                                            $('.installer-progress-bar').attr('aria-valuenow', 100);
+                                            $('.installer-progress-bar').removeClass('bg-info').addClass('bg-success');
+                                            $('#access').addClass('btn-success');
+                                            $('#access').children('i').addClass('fa-check');
                                             $('#access-div').attr('hidden', false);
                                             $('#submit-div').attr('hidden', true);
-                                        }, 1000);
+                                        }, 500);
                                     } else {
                                         resetProgressCounter();
                                     }
