@@ -42420,5 +42420,5 @@ a.disabled {
 }
 
 .progress-bar {
-  transition: width 1s linear;
+  transition: width .5s linear;
 }

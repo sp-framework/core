@@ -5,7 +5,7 @@
         'componentId'                   : componentId,
         'parentComponentId'             : parent,
         'sectionId'                     : 'main',
-        'contentType'                   : 'section',
+        'contentType'                   : 'sectionWithForm',
         'cardHeader'                    : true,
         'cardFooter'                    : false,
         'cardType'                      : 'primary',
@@ -15,3 +15,38 @@
         'cardBodyInclude'               : 'backuprestore/form'
     ]
 )}}
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : 'analysis',
+            'modalId'                   : 'restore-analyse-modal',
+            'modalBodyInclude'          : 'backuprestore/analyse/view',
+            'modalSize'                 : 'xl',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-file-zipper"></i> ANALYSE BACKUP',
+            'modalFooterButtons'        :
+                [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'parentComponentId'             : parent,
+                'sectionId'                     : 'analysis',
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                        [
+                            'start-restore' : [
+                                'title'                   : 'Restore',
+                                'type'                    : 'primary',
+                                'position'                : 'right',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true
+                            ]
+                        ]
+                ]
+        ]
+    )}}
+</div>

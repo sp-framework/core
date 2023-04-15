@@ -142,7 +142,8 @@
                 'fieldJstreeExpand'                         : true,
                 'fieldJstreeCollapse'                       : true,
                 'fieldJstreeFirstOpen'                      : true,
-                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeAllOpen'                        : true,
+                'fieldJstreeAllChecked'                     : true,
                 'fieldJstreeRootIcon'                       : 'folder-tree',
                 'fieldJstreeToggleAllChildren'              : true,
                 'fieldJstreeIncludeRootInPath'              : true,
@@ -154,31 +155,116 @@
                 'fieldJstreeSearchShowOnlyMatches'          : false,
                 'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
                 'fieldJstreeHideJstreeIcons'                : false,
-                'fieldJstreePlugins'                        : ["checkbox", "search", "types", "dnd"]
+                'fieldJstreePlugins'                        : ["checkbox", "search", "types", "dnd", "noClose"]
             ]
         )}}
     </div>
     {% if backupInfoFile['request']['database'] == 'true' or backupInfoFile['request']['password_protect'] is defined and backupInfoFile['request']['password_protect'] !== '' %}
         <div class="col">
-            {{adminltetags.useTag('fields',
-                [
-                    'component'                             : component,
-                    'componentName'                         : componentName,
-                    'componentId'                           : componentId,
-                    'sectionId'                             : 'analysis',
-                    'fieldId'                               : 'password',
-                    'fieldLabel'                            : 'Password',
-                    'fieldType'                             : 'input',
-                    'fieldInputType'                        : 'password',
-                    'fieldHelp'                             : true,
-                    'fieldHelpTooltipContent'               : 'Enter the password (if any) that was entered during the time of backup.',
-                    'fieldRequired'                         : true,
-                    'fieldDisabled'                         : false,
-                    'fieldBazScan'                          : true,
-                    'fieldBazPostOnCreate'                  : false,
-                    'fieldBazPostOnUpdate'                  : false
-                ]
-            )}}
+            {% if backupInfoFile['request']['password_protect'] is defined and backupInfoFile['request']['password_protect'] !== '' %}
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : 'analysis',
+                                'fieldId'                               : 'password',
+                                'fieldLabel'                            : 'Password',
+                                'fieldType'                             : 'input',
+                                'fieldInputType'                        : 'password',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Enter the password (if any) that was entered during the time of backup.',
+                                'fieldRequired'                         : true,
+                                'fieldDisabled'                         : false,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : false
+                            ]
+                        )}}
+                    </div>
+                </div>
+            {% endif %}
+            <hr>
+            {% if backupInfoFile['request']['database'] == 'true' and backupInfoFile['dbs']|length > 0 %}
+                <label class="text-uppercase">Restore Databases</label>
+                {% for db, dbPath in backupInfoFile['dbs'] %}
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : 'analysis',
+                                    'fieldId'                        : db,
+                                    'fieldLabel'                     : false,
+                                    'fieldHelp'                      : true,
+                                    'fieldHelpTooltipContent'        : 'Restore db ' ~ db ~ '? Note: If there is a database ' ~ db ~ ', it will be dropped and replaced by this database.',
+                                    'fieldRequired'                  : false,
+                                    'fieldType'                      : 'checkbox',
+                                    'fieldCheckboxType'              : 'success',
+                                    'fieldCheckboxLabel'             : db,
+                                    'fieldCheckboxChecked'           : true,
+                                    'fieldBazJstreeSearch'           : false,
+                                    'fieldBazPostOnCreate'           : false,
+                                    'fieldBazPostOnUpdate'           : false,
+                                    'fieldBazScan'                   : false,
+                                    'fieldAdditionalClass'           : 'db-restore'
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : 'analysis',
+                                'fieldId'                        : 'root_username',
+                                'fieldLabel'                     : 'Root Username',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Username with database create permission.',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : false,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : false,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 50,
+                                'fieldValue'                     : ''
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : 'analysis',
+                                'fieldId'                        : 'root_password',
+                                'fieldLabel'                     : 'Root Password',
+                                'fieldType'                      : 'input',
+                                'fieldInputType'                 : 'password',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Password with database create permission.',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : false,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : false,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 50,
+                                'fieldValue'                     : ''
+                            ]
+                        )}}
+                    </div>
+                </div>
+            {% endif %}
         </div>
     {% endif %}
 </div>

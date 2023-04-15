@@ -274,6 +274,11 @@ class Jstree
             $this->params['fieldJstreeAllOpen'] :
             false;
 
+        $this->fieldParams['fieldJstreeAllChecked'] =
+            isset($this->params['fieldJstreeAllChecked']) ?
+            $this->params['fieldJstreeAllChecked'] :
+            false;
+
         $this->fieldParams['fieldJstreeToggleAllChildren'] =
             isset($this->params['fieldJstreeToggleAllChildren']) ?
             $this->params['fieldJstreeToggleAllChildren'] :
@@ -358,6 +363,7 @@ class Jstree
                         "collapse": "' . $this->fieldParams['fieldJstreeCollapse'] . '",
                         "firstOpen": "' . $this->fieldParams['fieldJstreeFirstOpen'] . '",
                         "allOpen" : "' . $this->fieldParams['fieldJstreeAllOpen'] . '",
+                        "allChecked" : "' . $this->fieldParams['fieldJstreeAllChecked'] . '",
                         "toggleAllChildren": "' . $this->fieldParams['fieldJstreeToggleAllChildren'] . '",
                         "inclRoot": "' . $this->fieldParams['fieldJstreeIncludeRootInPath'] . '",
                         "selectEndNodeOnly": "' . $this->fieldParams['fieldJstreeSelectEndNodeOnly'] . '",

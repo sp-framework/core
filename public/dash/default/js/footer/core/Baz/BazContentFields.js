@@ -650,6 +650,10 @@ var BazContentFields = function() {
         if (options.bazJstreeOptions.allOpen == null || options.bazJstreeOptions.allOpen) {
             $(fieldId).jstree('open_all');
         }
+        //All Checked
+        if (options.bazJstreeOptions.allChecked == null || options.bazJstreeOptions.allChecked) {
+            $(fieldId).jstree('check_all');
+        }
         // Show all children if root is clicked
         if (options.bazJstreeOptions.toggleAllChildren == null || options.bazJstreeOptions.toggleAllChildren) {
             $(fieldId).on('select_node.jstree', function(e, data) {
