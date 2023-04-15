@@ -166,14 +166,16 @@ class Progress extends BasePackage
         $this->writeProgressFile($progressFile['processes'], false, false, false, null, $progressFile);
     }
 
-    public function resetProgress()
+    public function resetProgress($reRegisterMethods = true)
     {
         $progressFile = $this->readProgressFile();
 
         if ($progressFile) {
             $this->deleteProgressFile();
 
-            $this->registerMethods($progressFile['allProcesses']);
+            if ($reRegisterMethods) {
+                $this->registerMethods($progressFile['allProcesses']);
+            }
         }
 
         return true;
@@ -256,7 +258,7 @@ class Progress extends BasePackage
         }
     }
 
-    protected function deleteProgressFile()
+    public function deleteProgressFile()
     {
         try {
             $this->localContent->delete('var/progress/' . $this->session->getId() . '.json');
