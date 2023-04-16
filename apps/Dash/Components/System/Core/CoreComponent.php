@@ -22,7 +22,15 @@ class CoreComponent extends BaseComponent
 
         foreach ($this->cacheTools->getAvailableCaches() as $key => $value) {
             $availableCaches[$value]['id'] = $value;
-            $availableCaches[$value]['name'] = $value;
+            if ($value === 'streamCache') {
+                $availableCaches[$value]['name'] = 'Local Files';
+            } else if ($value === 'apcuCache') {
+                $availableCaches[$value]['name'] = 'APCu Cache';
+            } else if ($value === 'memCached') {
+                $availableCaches[$value]['name'] = 'MemCached';
+            } else if ($value === 'redis') {
+                $availableCaches[$value]['name'] = 'Redis';
+            }
         }
 
         $core = $this->core->core;

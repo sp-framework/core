@@ -4,6 +4,7 @@ namespace System\Base\Providers\CacheServiceProvider;
 
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToWriteFile;
 use Phalcon\Helper\Json;
 
 class CacheTools
@@ -18,11 +19,13 @@ class CacheTools
 
 	protected $localContent;
 
+	protected $opCache;
+
 	protected $index;
 
 	public $caches;
 
-	public function __construct($cacheConfig, array $caches, $localContent)
+	public function __construct($cacheConfig, array $caches, $localContent, $opCache)
 	{
 		$this->cacheConfig = $cacheConfig;
 
@@ -39,6 +42,8 @@ class CacheTools
 		$this->cache = $caches[$this->cacheService];
 
 		$this->localContent = $localContent;
+
+		$this->opCache = $opCache;
 	}
 
 	public function getAvailableCaches()
@@ -122,12 +127,22 @@ class CacheTools
 
 	public function createIndexFile($cacheName, $recreate = false)
 	{
-		if (!$this->localContent->fileExists('var/storage/cache/stream/index/' . $cacheName . '.json') || $recreate) {
-			$content['all'] = [];
-			$content['list'] = [];
-			$content['ids'] = [];
+		$content['all'] = [];
+		$content['list'] = [];
+		$content['ids'] = [];
 
-			$this->localContent->write('var/storage/cache/stream/index/' . $cacheName . '.json', Json::encode($content));
+		if ($this->opCache) {
+			if (!$this->opCache->getCache($cacheName)) {
+				$this->opCache->setCache($cacheName, $content);
+			} else if ($recreate) {
+				$this->opCache->resetCache($cacheName, $content);
+			}
+		} else {
+			if (!$this->localContent->fileExists('var/storage/cache/stream/index/' . $cacheName . '.json') ||
+				$recreate
+			) {
+				$this->localContent->write('var/storage/cache/stream/index/' . $cacheName . '.json', Json::encode($content));
+			}
 		}
 	}
 
@@ -166,8 +181,20 @@ class CacheTools
 				}
 			}
 
-			$this->localContent->write('var/storage/cache/stream/index/' . $cacheName . '.json', Json::encode($index));
+			if ($this->opCache) {
+				$this->opCache->resetCache($cacheName, $index);
+			} else {
+				try {
+					$this->localContent->write('var/storage/cache/stream/index/' . $cacheName . '.json', Json::encode($index));
+				} catch (FilesystemException | UnableToWriteFile | \Exception $e) {
+					return false;
+				}
+			}
+
+			return true;
 		}
+
+		return false;
 	}
 
 	public function resetCache($cacheName = null, $id = null, $removeId = false)
@@ -177,7 +204,11 @@ class CacheTools
 		if (!$cacheName) {//Only do this in maintenance mode
 			$this->cache->clear();
 
-			$this->localContent->deleteDirectory('var/storage/cache/stream/');
+			if ($this->opCache) {
+				$this->opCache->resetCache();
+			} else {
+				$this->localContent->deleteDirectory('var/storage/cache/stream/');
+			}
 
 			$this->index = null;
 
@@ -186,26 +217,24 @@ class CacheTools
 
 		if ($cacheName && $id) {
 			$keys = $this->getKeysFromIndex($cacheName, $id);
-
-			if ($keys && is_array($keys) && count($keys) > 0) {
-				foreach ($keys as $key => $parameters) {
-					$this->deleteCache($key);
-
-					$this->removeKeyFromIndex($cacheName, $key, $id, $removeId);
-				}
-
-				$this->localContent->write('var/storage/cache/stream/index/' . $cacheName . '.json', Json::encode($this->index));
-			}
 		} else {
 			$keys = $this->getKeysFromIndex($cacheName);
+		}
 
-			if ($keys && is_array($keys) && count($keys) > 0) {
-				foreach ($keys as $key => $parameters) {
-					$this->deleteCache($key);
+		if ($keys && is_array($keys) && count($keys) > 0) {
+			foreach ($keys as $key => $parameters) {
+				$this->deleteCache($key);
 
+				if ($cacheName && $id) {
+					$this->removeKeyFromIndex($cacheName, $key, $id, $removeId);
+				} else {
 					$this->removeKeyFromIndex($cacheName, $key);
 				}
+			}
 
+			if ($this->opCache) {
+				$this->opCache->resetCache($cacheName, $this->index);
+			} else {
 				$this->localContent->write('var/storage/cache/stream/index/' . $cacheName . '.json', Json::encode($this->index));
 			}
 		}
@@ -258,24 +287,32 @@ class CacheTools
 
 	protected function getIndex($cacheName)
 	{
-		try {
-			$index = $this->localContent->read('var/storage/cache/stream/index/' . $cacheName . '.json');
-
-			$index = Json::decode($index, true);
+		if ($this->opCache) {
+			$index = $this->opCache->getCache($cacheName);
 
 			$this->index = $index;
 
 			return $index;
-		} catch (FilesystemException | UnableToReadFile | \Exception $e) {
-			if (str_contains($e->getMessage(), "json_decode") ||
-				get_class($e) !== 'FilesystemException' ||
-				get_class($e) !== 'UnableToReadFile'
-			) {
-				$this->createIndexFile($cacheName, true);
+		} else {
+			try {
+				$index = $this->localContent->read('var/storage/cache/stream/index/' . $cacheName . '.json');
 
-				return $this->getIndex($cacheName);
-			} else {
-				throw $e;
+				$index = Json::decode($index, true);
+
+				$this->index = $index;
+
+				return $index;
+			} catch (FilesystemException | UnableToReadFile | \Exception $e) {
+				if (str_contains($e->getMessage(), "json_decode") ||
+					get_class($e) !== 'FilesystemException' ||
+					get_class($e) !== 'UnableToReadFile'
+				) {
+					$this->createIndexFile($cacheName, true);
+
+					return $this->getIndex($cacheName);
+				} else {
+					throw $e;
+				}
 			}
 		}
 	}
