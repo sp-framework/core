@@ -40,7 +40,6 @@ var BazNotifications = function() {
         if (initialConnection) {
             serviceOnline();
         }
-
     }
 
     function serviceOnline() {
@@ -53,6 +52,11 @@ var BazNotifications = function() {
         //eslint-disable-next-line
         console.log('Notification service online');
 
+        $('.socket-icon').removeClass(function (index, className) {
+            return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+        }).addClass('text-success');
+        $('.socket').attr('title', 'Socket Status: Online').tooltip('_fixTitle');
+
         initPullNotifications(false);
     }
 
@@ -63,6 +67,11 @@ var BazNotifications = function() {
 
         //eslint-disable-next-line
         console.log('Notification service offline');
+
+        $('.socket-icon').removeClass(function (index, className) {
+            return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+        }).addClass('text-secondary');
+        $('.socket').attr('title', 'Socket Status: Offline').tooltip('_fixTitle');
 
         initPullNotifications(true);
     }
@@ -114,12 +123,18 @@ var BazNotifications = function() {
 
         if (response.responseData.count.error > 0) {
             notificationCount = response.responseData.count.error;
-            $('#notifications-button-counter').removeClass('badge-info badge-warning').addClass('badge-danger');
+            $('#notifications-button-counter').removeClass(function (index, className) {
+                return (className.match (/(^|\s)badge-\S+/g) || []).join(' ');
+            }).addClass('badge-danger');
         } else if (response.responseData.count.warning > 0) {
-            $('#notifications-button-counter').removeClass('badge-info badge-danger').addClass('badge-warning');
+            $('#notifications-button-counter').removeClass(function (index, className) {
+                return (className.match (/(^|\s)badge-\S+/g) || []).join(' ');
+            }).addClass('badge-warning');
             notificationCount = response.responseData.count.warning;
         } else {
-            $('#notifications-button-counter').removeClass('badge-warning badge-danger').addClass('badge-info');
+            $('#notifications-button-counter').removeClass(function (index, className) {
+                return (className.match (/(^|\s)badge-\S+/g) || []).join(' ');
+            }).addClass('badge-info');
             notificationCount = response.responseData.count.total;
         }
 
@@ -182,7 +197,9 @@ var BazNotifications = function() {
         }, 10000);
     }
 
-    function onMessage() {
+    function onMessage(type, data) {
+        //eslint-disable-next-line
+        console.log(type, data);
         getNotificationsCount();
 
         if ($('#baz-content section').length > 0) {
@@ -214,8 +231,8 @@ var BazNotifications = function() {
         BazNotifications.initPullNotifications = function(options) {
             initPullNotifications(_extends(BazNotifications.defaults, options));
         }
-        BazNotifications.onMessage = function(options) {
-            onMessage(_extends(BazNotifications.defaults, options));
+        BazNotifications.onMessage = function(type, options) {
+            onMessage(type, _extends(BazNotifications.defaults, options));
         }
         BazNotifications.getNotificationsCount = function(options) {
             getNotificationsCount(_extends(BazNotifications.defaults, options));

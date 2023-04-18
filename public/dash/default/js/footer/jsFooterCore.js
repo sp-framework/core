@@ -9800,7 +9800,7 @@ var BazContentFieldsValidator = function() {
     return bazContentFieldsValidatorConstructor;
 }();
 /* exported BazTunnels */
-/* globals BazNotifications BazMessenger BazAnnouncements ab */
+/* globals BazNotifications BazMessenger BazAnnouncements BazProgress ab BazHelpers */
 /*
 * @title                    : BazTunnels
 * @description              : Baz Tunnels Lib for wstunnels
@@ -9816,10 +9816,10 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 // eslint-disable-next-line no-unused-vars
 var BazTunnels = function() {
     var BazTunnels = void 0;
-    var dataCollection;
+    var dataCollection, timerId;
 
-    var reconnectMessengerTunnel = null;
-    var reconnectPusherTunnel = null;
+    // var reconnectMessengerTunnel = null;
+    // var reconnectPusherTunnel = null;
 
     // Error
     // function error(errorMsg) {
@@ -9839,8 +9839,8 @@ var BazTunnels = function() {
         dataCollection.env.wsTunnels.pusher = { };
         dataCollection.env.wsTunnels.messenger = { };
 
-        initPusherTunnel();
         // initMessengerOTR();
+        initPusherTunnel();
     }
 
     // Init Messenger tunnel as needed. Messages can be transmitted purely on WSS avoiding message to be added to DB.
@@ -9850,23 +9850,20 @@ var BazTunnels = function() {
 
         dataCollection.env.wsTunnels.messenger.onopen = null;
         dataCollection.env.wsTunnels.messenger.onopen = function() {
-            if (reconnectMessengerTunnel) {
-                clearInterval(reconnectMessengerTunnel);
-                reconnectMessengerTunnel = null;
-                BazMessenger.serviceOnline();
-            } else {
-                BazMessenger.init();
+            timerId = BazHelpers.getTimerId('initMessengerOTR');
+            if (timerId) {
+                BazHelpers.setTimeoutTimers.stop(timerId, null, 'initMessengerOTR');
             }
+            BazMessenger.initOTR();
         };
 
         dataCollection.env.wsTunnels.messenger.onclose = null;
         dataCollection.env.wsTunnels.messenger.onclose = function() {
-            if (!reconnectMessengerTunnel) {
-                BazMessenger.serviceOffline();
-                reconnectMessengerTunnel = setInterval(() => {
-                    initMessengerOTR();
-                }, 10000);
-            }
+            BazMessenger.otrServiceOffline();
+            BazHelpers.setTimeoutTimers.add(function() {
+                BazNotifications.serviceOffline();
+                initMessengerOTR();
+            }, 10000, null, 'initMessengerOTR');
         };
 
         dataCollection.env.wsTunnels.messenger.onerror = null;
@@ -9875,52 +9872,62 @@ var BazTunnels = function() {
         };
 
         dataCollection.env.wsTunnels.messenger.onmessage = null;
-        dataCollection.env.wsTunnels.messenger.onmessage = function() {
+        dataCollection.env.wsTunnels.messenger.onmessage = function(e) {
+            //eslint-disable-next-line
+            console.log(e.data);
         };
     }
 
     function initPusherTunnel() {
-        // window.ab.debug(true, true);
         dataCollection.env.wsTunnels.pusher = { };
         dataCollection.env.wsTunnels.pusher =
             new ab.Session(dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/pusher/',
                 function() {
                     //eslint-disable-next-line
                     console.info('WebSocket connection open');
+
                     dataCollection.env.wsTunnels.pusher.subscribe('systemNotifications', function(topic, data) {
-                        BazNotifications.onMessage(data);
+                        BazNotifications.onMessage('systemNotifications', data);
                     });
+
                     dataCollection.env.wsTunnels.pusher.subscribe('messengerNotifications', function(topic, data) {
                         BazMessenger.onMessage(data);
                     });
-                    dataCollection.env.wsTunnels.pusher.subscribe('announcements', function(topic, data) {
-                        BazAnnouncements.onMessage(data);
+
+                    dataCollection.env.wsTunnels.pusher.subscribe('systemAnnouncements', function(topic, data) {
+                        BazAnnouncements.onMessage('systemAnnouncements', data);
                     });
-                    if (reconnectPusherTunnel) {
-                        clearInterval(reconnectPusherTunnel);
-                        reconnectPusherTunnel = null;
-                        BazMessenger.serviceOnline();
+
+                    dataCollection.env.wsTunnels.pusher.subscribe('progress', function(topic, data) {
+                        BazProgress.onMessage(data);
+                    });
+
+                    timerId = BazHelpers.getTimerId('initPusherTunnel');
+                    if (timerId) {
+                        BazHelpers.setTimeoutTimers.stop(timerId, null, 'initPusherTunnel');
                         BazNotifications.serviceOnline();
+                        BazMessenger.serviceOnline();
                         BazAnnouncements.serviceOnline();
+                        BazProgress.serviceOnline();
                     } else {
-                        BazMessenger.init();
                         BazNotifications.init();
+                        BazMessenger.init();
                         BazAnnouncements.init();
+                        BazProgress.init();
                     }
                 },
                 function() {
-                    //eslint-disable-next-line
-                    console.log(reconnectPusherTunnel);
-                    if (!reconnectPusherTunnel || reconnectPusherTunnel == null) {
-                        BazMessenger.serviceOffline();
-                        BazNotifications.serviceOffline();
-                        BazAnnouncements.serviceOffline();
-                        reconnectPusherTunnel = setInterval(() => {
-                            initPusherTunnel();
-                        }, 10000);
-                    }
+                    BazNotifications.serviceOffline();
+                    BazMessenger.serviceOffline();
+                    BazAnnouncements.serviceOffline();
+                    BazProgress.serviceOffline();
                     //eslint-disable-next-line
                     console.warn('WebSocket connection closed');
+
+                    BazHelpers.setTimeoutTimers.add(function() {
+                        BazNotifications.serviceOffline();
+                        initPusherTunnel();
+                    }, 10000, null, 'initPusherTunnel');
                 },
                 {
                     'skipSubprotocolCheck': true
@@ -9993,7 +10000,6 @@ var BazNotifications = function() {
         if (initialConnection) {
             serviceOnline();
         }
-
     }
 
     function serviceOnline() {
@@ -10006,6 +10012,11 @@ var BazNotifications = function() {
         //eslint-disable-next-line
         console.log('Notification service online');
 
+        $('.socket-icon').removeClass(function (index, className) {
+            return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+        }).addClass('text-success');
+        $('.socket').attr('title', 'Socket Status: Online').tooltip('_fixTitle');
+
         initPullNotifications(false);
     }
 
@@ -10016,6 +10027,11 @@ var BazNotifications = function() {
 
         //eslint-disable-next-line
         console.log('Notification service offline');
+
+        $('.socket-icon').removeClass(function (index, className) {
+            return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+        }).addClass('text-secondary');
+        $('.socket').attr('title', 'Socket Status: Offline').tooltip('_fixTitle');
 
         initPullNotifications(true);
     }
@@ -10067,12 +10083,18 @@ var BazNotifications = function() {
 
         if (response.responseData.count.error > 0) {
             notificationCount = response.responseData.count.error;
-            $('#notifications-button-counter').removeClass('badge-info badge-warning').addClass('badge-danger');
+            $('#notifications-button-counter').removeClass(function (index, className) {
+                return (className.match (/(^|\s)badge-\S+/g) || []).join(' ');
+            }).addClass('badge-danger');
         } else if (response.responseData.count.warning > 0) {
-            $('#notifications-button-counter').removeClass('badge-info badge-danger').addClass('badge-warning');
+            $('#notifications-button-counter').removeClass(function (index, className) {
+                return (className.match (/(^|\s)badge-\S+/g) || []).join(' ');
+            }).addClass('badge-warning');
             notificationCount = response.responseData.count.warning;
         } else {
-            $('#notifications-button-counter').removeClass('badge-warning badge-danger').addClass('badge-info');
+            $('#notifications-button-counter').removeClass(function (index, className) {
+                return (className.match (/(^|\s)badge-\S+/g) || []).join(' ');
+            }).addClass('badge-info');
             notificationCount = response.responseData.count.total;
         }
 
@@ -10135,7 +10157,9 @@ var BazNotifications = function() {
         }, 10000);
     }
 
-    function onMessage() {
+    function onMessage(type, data) {
+        //eslint-disable-next-line
+        console.log(type, data);
         getNotificationsCount();
 
         if ($('#baz-content section').length > 0) {
@@ -10167,8 +10191,8 @@ var BazNotifications = function() {
         BazNotifications.initPullNotifications = function(options) {
             initPullNotifications(_extends(BazNotifications.defaults, options));
         }
-        BazNotifications.onMessage = function(options) {
-            onMessage(_extends(BazNotifications.defaults, options));
+        BazNotifications.onMessage = function(type, options) {
+            onMessage(type, _extends(BazNotifications.defaults, options));
         }
         BazNotifications.getNotificationsCount = function(options) {
             getNotificationsCount(_extends(BazNotifications.defaults, options));
@@ -10225,7 +10249,7 @@ var BazMessenger = function() {
             appRoute = '';
         }
 
-        dataCollection.env.wsTunnels.messenger.emojiPicker = new EmojiPicker({
+        dataCollection.env.wsTunnels.messenger['emojiPicker'] = new EmojiPicker({
             emojiable_selector: '[data-emojiable=true]',
             assetsPath: '/dash/default/images/emoji-picker/',
             popupButtonClasses: 'fa fa-fw fa-smile',
@@ -10335,7 +10359,9 @@ var BazMessenger = function() {
         $("#messenger-online").attr('hidden', false);
         $("#messenger-offline").attr('hidden', true);
         $('#messenger-offline-icon').attr('hidden', true);
-        $('#messenger-button-icon').removeClass('text-success text-warning text-danger text-secondary').addClass('text-' + messengerButonIconColor);
+        $('#messenger-button-icon').removeClass(function (index, className) {
+            return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+        }).addClass('text-' + messengerButonIconColor);
         initListeners();
         getUnreadMessagesCount();
     }
@@ -10389,7 +10415,9 @@ var BazMessenger = function() {
                         statusTextColor = 'secondary';
                     }
 
-                    $('#messenger-button-icon').removeClass('text-success text-warning text-danger text-secondary').addClass('text-' + statusTextColor);
+                    $('#messenger-button-icon').removeClass(function (index, className) {
+                        return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                    }).addClass('text-' + statusTextColor);
                     messengerButonIconColor = statusTextColor;
                     if (oldStatus == '4') {
                         getUnreadMessagesCount();
@@ -10580,7 +10608,9 @@ var BazMessenger = function() {
             '</div>'
         );
 
-        window.dataCollection.env.wsTunnels.messenger.emojiPicker.discover();
+        if (window.dataCollection.env.wsTunnels.messenger.emojiPicker) {
+            window.dataCollection.env.wsTunnels.messenger.emojiPicker.discover();
+        }
 
         $("#messenger-card-" + user.user).on('removed.lte.cardwidget', function(e) {
             removeCard(e);
@@ -10677,7 +10707,6 @@ var BazMessenger = function() {
     }
 
     function populateMessages(toUser, messages, paginationCounters, update = false) {
-
         if (messages.length === 0) {
             $('#messenger-no-messages-' + toUser.user).attr('hidden', false);
             return;
@@ -10860,6 +10889,14 @@ var BazMessenger = function() {
     }
 
     function sendMessage(user, message) {
+        // OTR (Off The Record) - This will be initiated by a user and a request is sent to the other user/users in case of group chat.
+        // Once all users accept the OTR request, OTR is enabled and when messages are sent, they bypass the DB.
+        // if (dataCollection.env.wsTunnels.messenger.otr && dataCollection.env.wsTunnels.messenger.otr === true) {
+        //     dataCollection.env.wsTunnels.messenger.send(user, message);
+
+        //     return;
+        // }
+
         var action = $('.messenger-send-' + user.user).data('action');
         var url;
 
@@ -10874,7 +10911,6 @@ var BazMessenger = function() {
             postData['id'] = $('.messenger-send-' + user.user).data('msgid');
             url = dataCollection.env.rootPath + appRoute + 'system/messenger/update';
         }
-
 
         $.post(url, postData, function(response) {
             if (response.tokenKey && response.token) {
@@ -11030,6 +11066,8 @@ var BazMessenger = function() {
     }
 
     function onMessage(message) {
+        //eslint-disable-next-line
+        console.log(message);
         if (message.responseCode === 0) {
             if (message.responseData.type === 'statusChange') {
                 userStatusChange(message.responseData.data);
@@ -11070,16 +11108,16 @@ var BazMessenger = function() {
                 }
                 $(li).data('status', data.status);
                 $(li).attr('data-status', data.status);
-                $('#messenger-user-' + data.id + '-icon')
-                    .removeClass('text-success text-secondary text-warning text-danger')
-                    .addClass('text-' + color);
+                $('#messenger-user-' + data.id + '-icon').removeClass(function (index, className) {
+                    return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                }).addClass('text-' + color);
             }
         });
 
         if ($('#messenger-card-' + data.id).length > 0) {
-            $('#messenger-card-' + data.id)
-                .removeClass('card-success card-secondary card-warning card-danger')
-                .addClass('card-' + color);
+            $('#messenger-card-' + data.id).removeClass(function (index, className) {
+                return (className.match (/(^|\s)card-\S+/g) || []).join(' ');
+            }).addClass('card-' + color);
 
             $('#messenger-loader-' + data.id).attr('hidden', true);
             $('#direct-chat-messages-' + data.id).append(
@@ -11269,6 +11307,14 @@ var BazMessenger = function() {
         return null;
     }
 
+    function otrServiceOnline() {
+        //
+    }
+
+    function otrServiceOffline() {
+        //
+    }
+
     function setup(BazMessengerConstructor) {
         BazMessenger = BazMessengerConstructor;
         BazMessenger.defaults = { };
@@ -11286,6 +11332,12 @@ var BazMessenger = function() {
         }
         BazMessenger.getUnreadMessagesCount = function(options) {
             getUnreadMessagesCount(_extends(BazMessenger.defaults, options));
+        }
+        BazMessenger.otrServiceOnline = function(options) {
+            otrServiceOnline(_extends(BazMessenger.defaults, options));
+        }
+        BazMessenger.otrServiceOffline = function(options) {
+            otrServiceOffline(_extends(BazMessenger.defaults, options));
         }
     }
 
@@ -11401,4 +11453,203 @@ var BazAnnouncements = function() {
     setup(bazAnnouncementsConstructor);
 
     return bazAnnouncementsConstructor;
+}();
+/* exported BazProgress */
+/* globals BazHelpers */
+/*
+* @title                    : BazProgress
+* @description              : Baz Progress Lib
+* @developer                : guru@bazaari.com.au
+* @usage                    : BazProgress._function_(_options_);
+* @functions                : BazProgress
+* @options                  :
+*/
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+// var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+// eslint-disable-next-line no-unused-vars
+var BazProgress = function() {
+    var BazProgress = void 0;
+    var initialized = false;
+    var progressCounter = 0;
+    var online = false;
+    var element;
+    var dataCollection = window.dataCollection;
+    // Error
+    // function error(errorMsg) {
+    //     throw new Error(errorMsg);
+    // }
+
+    //Init
+    function init(initialConnection = true) {
+        initialized = true;
+
+        if (initialConnection) {
+            serviceOnline();
+        }
+    }
+
+    function serviceOnline() {
+        if (!initialized) {
+            init(false);
+        }
+
+        online = true;
+        //eslint-disable-next-line
+        console.log('Progress service online');
+    }
+
+    function serviceOffline() {
+        if (!initialized) {
+            init(false);
+        }
+
+        online = false;
+        //eslint-disable-next-line
+        console.log('Progress service offline');
+    }
+
+    function buildProgressBar(el) {
+        element = el;
+        $(element).html(
+            '<div class="progress active progress-xs">' +
+                '<div class="progress-bar progress-xs bg-info progress-bar-animated progress-bar-striped ' + $(element)[0].id + '-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width: 0%"></div>' +
+            '</div>' +
+            '<div class="row text-center text-sm text-primary m-1">' +
+                '<div class="col">' +
+                    '<span class="sr-only progress-span"></span>' +
+                    '<span class="' + $(element)[0].id + '-progress-span"></span>' +
+                '</div>' +
+            '</div>'
+        );
+    }
+
+    function getProgress() {
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+        $.post(
+            dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/system/progress/getProgress',
+            postData,
+            function(response)
+        {
+            processResponse(response);
+        }, 'json');
+    }
+
+    function processResponse(response) {
+        var timerId;
+        if (response && response.responseCode === 0) {
+            if (response.responseData) {
+                var responseData;
+
+                if (typeof response.responseData === 'string' || response.responseData instanceof String) {
+                    responseData = JSON.parse(response.responseData);
+                } else {
+                    responseData = response.responseData;
+                }
+
+                if (responseData['preCheckComplete'] == false) {
+                    resetProgressCounter();
+
+                    return false;
+                }
+
+                if (responseData['total'] !== 'undefined' && responseData['completed'] !== 'undefined') {
+                    if (responseData['total'] !== responseData['completed']) {
+                        if (responseData['runners']['running'] !== false) {
+                            $(element).attr('hidden', false);
+                            $('.' + $(element)[0].id + '-progress-span')
+                                .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
+
+                            $('.' + $(element)[0].id + '-bar').css('width', responseData['percentComplete'] + '%');
+                            $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', responseData['percentComplete']);
+                        }
+                        if (online === false) {
+                            timerId = BazHelpers.getTimerId('progressCounter');
+                            if (timerId) {
+                                BazHelpers.setTimeoutTimers.stop(timerId, null, 'progressCounter');
+                            }
+                            BazHelpers.setTimeoutTimers.add(function() {
+                                getProgress();
+                            }, 500);
+                        }
+                    } else if (responseData['total'] === responseData['completed']) {
+                        if (online === false) {
+                            BazHelpers.setTimeoutTimers.stopAll();
+                        }
+                        $('.' + $(element)[0].id + '-bar').removeClass('progress-bar-animated');
+                        $('.' + $(element)[0].id + '-bar').css('width', '100%');
+                        $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', 100);
+                        $('.' + $(element)[0].id + '-progress-span').html('Done (100%)');
+                        $('.' + $(element)[0].id + '-bar').removeClass(function (index, className) {
+                            return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
+                        }).addClass('bg-success');
+                    } else {
+                        resetProgressCounter();
+                    }
+                } else {
+                    resetProgressCounter();
+                }
+            } else {
+                resetProgressCounter();
+            }
+        } else {
+            resetProgressCounter();
+        }
+    }
+
+    function resetProgressCounter() {
+        if (progressCounter !== 60) {
+            progressCounter ++;
+
+            if (online === false) {
+                BazHelpers.setTimeoutTimers.stopAll();
+                BazHelpers.setTimeoutTimers.add(function() {
+                    getProgress();
+                }, 1000, null, 'progressCounter');
+            }
+        }
+    }
+
+    function onMessage(data) {
+        //eslint-disable-next-line
+        console.log(data);
+        processResponse(data);
+    }
+
+    function bazProgressConstructor() {
+        // if something needs to be constructed
+        return null;
+    }
+
+    function setup(BazProgressConstructor) {
+        BazProgress = BazProgressConstructor;
+        BazProgress.defaults = { };
+        BazProgress.init = function(options) {
+            init(_extends(BazProgress.defaults, options));
+        }
+        BazProgress.serviceOnline = function(options) {
+            serviceOnline(_extends(BazProgress.defaults, options));
+        }
+        BazProgress.serviceOffline = function(options) {
+            serviceOffline(_extends(BazProgress.defaults, options));
+        }
+        BazProgress.onMessage = function(data) {
+            onMessage(data);
+        }
+        BazProgress.getProgress = function() {
+            if (online === false) {
+                getProgress();
+            }
+        }
+        BazProgress.buildProgressBar = function(el) {
+            buildProgressBar(el);
+        }
+    }
+
+    setup(bazProgressConstructor);
+
+    return bazProgressConstructor;
 }();

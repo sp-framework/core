@@ -1,5 +1,5 @@
 /* exported BazTunnels */
-/* globals BazNotifications BazMessenger BazAnnouncements ab */
+/* globals BazNotifications BazMessenger BazAnnouncements BazProgress ab BazHelpers */
 /*
 * @title                    : BazTunnels
 * @description              : Baz Tunnels Lib for wstunnels
@@ -15,10 +15,10 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 // eslint-disable-next-line no-unused-vars
 var BazTunnels = function() {
     var BazTunnels = void 0;
-    var dataCollection;
+    var dataCollection, timerId;
 
-    var reconnectMessengerTunnel = null;
-    var reconnectPusherTunnel = null;
+    // var reconnectMessengerTunnel = null;
+    // var reconnectPusherTunnel = null;
 
     // Error
     // function error(errorMsg) {
@@ -38,8 +38,8 @@ var BazTunnels = function() {
         dataCollection.env.wsTunnels.pusher = { };
         dataCollection.env.wsTunnels.messenger = { };
 
-        initPusherTunnel();
         // initMessengerOTR();
+        initPusherTunnel();
     }
 
     // Init Messenger tunnel as needed. Messages can be transmitted purely on WSS avoiding message to be added to DB.
@@ -49,23 +49,20 @@ var BazTunnels = function() {
 
         dataCollection.env.wsTunnels.messenger.onopen = null;
         dataCollection.env.wsTunnels.messenger.onopen = function() {
-            if (reconnectMessengerTunnel) {
-                clearInterval(reconnectMessengerTunnel);
-                reconnectMessengerTunnel = null;
-                BazMessenger.serviceOnline();
-            } else {
-                BazMessenger.init();
+            timerId = BazHelpers.getTimerId('initMessengerOTR');
+            if (timerId) {
+                BazHelpers.setTimeoutTimers.stop(timerId, null, 'initMessengerOTR');
             }
+            BazMessenger.initOTR();
         };
 
         dataCollection.env.wsTunnels.messenger.onclose = null;
         dataCollection.env.wsTunnels.messenger.onclose = function() {
-            if (!reconnectMessengerTunnel) {
-                BazMessenger.serviceOffline();
-                reconnectMessengerTunnel = setInterval(() => {
-                    initMessengerOTR();
-                }, 10000);
-            }
+            BazMessenger.otrServiceOffline();
+            BazHelpers.setTimeoutTimers.add(function() {
+                BazNotifications.serviceOffline();
+                initMessengerOTR();
+            }, 10000, null, 'initMessengerOTR');
         };
 
         dataCollection.env.wsTunnels.messenger.onerror = null;
@@ -74,52 +71,62 @@ var BazTunnels = function() {
         };
 
         dataCollection.env.wsTunnels.messenger.onmessage = null;
-        dataCollection.env.wsTunnels.messenger.onmessage = function() {
+        dataCollection.env.wsTunnels.messenger.onmessage = function(e) {
+            //eslint-disable-next-line
+            console.log(e.data);
         };
     }
 
     function initPusherTunnel() {
-        // window.ab.debug(true, true);
         dataCollection.env.wsTunnels.pusher = { };
         dataCollection.env.wsTunnels.pusher =
             new ab.Session(dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/pusher/',
                 function() {
                     //eslint-disable-next-line
                     console.info('WebSocket connection open');
+
                     dataCollection.env.wsTunnels.pusher.subscribe('systemNotifications', function(topic, data) {
-                        BazNotifications.onMessage(data);
+                        BazNotifications.onMessage('systemNotifications', data);
                     });
+
                     dataCollection.env.wsTunnels.pusher.subscribe('messengerNotifications', function(topic, data) {
                         BazMessenger.onMessage(data);
                     });
-                    dataCollection.env.wsTunnels.pusher.subscribe('announcements', function(topic, data) {
-                        BazAnnouncements.onMessage(data);
+
+                    dataCollection.env.wsTunnels.pusher.subscribe('systemAnnouncements', function(topic, data) {
+                        BazAnnouncements.onMessage('systemAnnouncements', data);
                     });
-                    if (reconnectPusherTunnel) {
-                        clearInterval(reconnectPusherTunnel);
-                        reconnectPusherTunnel = null;
-                        BazMessenger.serviceOnline();
+
+                    dataCollection.env.wsTunnels.pusher.subscribe('progress', function(topic, data) {
+                        BazProgress.onMessage(data);
+                    });
+
+                    timerId = BazHelpers.getTimerId('initPusherTunnel');
+                    if (timerId) {
+                        BazHelpers.setTimeoutTimers.stop(timerId, null, 'initPusherTunnel');
                         BazNotifications.serviceOnline();
+                        BazMessenger.serviceOnline();
                         BazAnnouncements.serviceOnline();
+                        BazProgress.serviceOnline();
                     } else {
-                        BazMessenger.init();
                         BazNotifications.init();
+                        BazMessenger.init();
                         BazAnnouncements.init();
+                        BazProgress.init();
                     }
                 },
                 function() {
-                    //eslint-disable-next-line
-                    console.log(reconnectPusherTunnel);
-                    if (!reconnectPusherTunnel || reconnectPusherTunnel == null) {
-                        BazMessenger.serviceOffline();
-                        BazNotifications.serviceOffline();
-                        BazAnnouncements.serviceOffline();
-                        reconnectPusherTunnel = setInterval(() => {
-                            initPusherTunnel();
-                        }, 10000);
-                    }
+                    BazNotifications.serviceOffline();
+                    BazMessenger.serviceOffline();
+                    BazAnnouncements.serviceOffline();
+                    BazProgress.serviceOffline();
                     //eslint-disable-next-line
                     console.warn('WebSocket connection closed');
+
+                    BazHelpers.setTimeoutTimers.add(function() {
+                        BazNotifications.serviceOffline();
+                        initPusherTunnel();
+                    }, 10000, null, 'initPusherTunnel');
                 },
                 {
                     'skipSubprotocolCheck': true

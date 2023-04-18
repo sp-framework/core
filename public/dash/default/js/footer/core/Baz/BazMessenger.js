@@ -38,7 +38,7 @@ var BazMessenger = function() {
             appRoute = '';
         }
 
-        dataCollection.env.wsTunnels.messenger.emojiPicker = new EmojiPicker({
+        dataCollection.env.wsTunnels.messenger['emojiPicker'] = new EmojiPicker({
             emojiable_selector: '[data-emojiable=true]',
             assetsPath: '/dash/default/images/emoji-picker/',
             popupButtonClasses: 'fa fa-fw fa-smile',
@@ -148,7 +148,9 @@ var BazMessenger = function() {
         $("#messenger-online").attr('hidden', false);
         $("#messenger-offline").attr('hidden', true);
         $('#messenger-offline-icon').attr('hidden', true);
-        $('#messenger-button-icon').removeClass('text-success text-warning text-danger text-secondary').addClass('text-' + messengerButonIconColor);
+        $('#messenger-button-icon').removeClass(function (index, className) {
+            return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+        }).addClass('text-' + messengerButonIconColor);
         initListeners();
         getUnreadMessagesCount();
     }
@@ -202,7 +204,9 @@ var BazMessenger = function() {
                         statusTextColor = 'secondary';
                     }
 
-                    $('#messenger-button-icon').removeClass('text-success text-warning text-danger text-secondary').addClass('text-' + statusTextColor);
+                    $('#messenger-button-icon').removeClass(function (index, className) {
+                        return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                    }).addClass('text-' + statusTextColor);
                     messengerButonIconColor = statusTextColor;
                     if (oldStatus == '4') {
                         getUnreadMessagesCount();
@@ -393,7 +397,9 @@ var BazMessenger = function() {
             '</div>'
         );
 
-        window.dataCollection.env.wsTunnels.messenger.emojiPicker.discover();
+        if (window.dataCollection.env.wsTunnels.messenger.emojiPicker) {
+            window.dataCollection.env.wsTunnels.messenger.emojiPicker.discover();
+        }
 
         $("#messenger-card-" + user.user).on('removed.lte.cardwidget', function(e) {
             removeCard(e);
@@ -490,7 +496,6 @@ var BazMessenger = function() {
     }
 
     function populateMessages(toUser, messages, paginationCounters, update = false) {
-
         if (messages.length === 0) {
             $('#messenger-no-messages-' + toUser.user).attr('hidden', false);
             return;
@@ -673,6 +678,14 @@ var BazMessenger = function() {
     }
 
     function sendMessage(user, message) {
+        // OTR (Off The Record) - This will be initiated by a user and a request is sent to the other user/users in case of group chat.
+        // Once all users accept the OTR request, OTR is enabled and when messages are sent, they bypass the DB.
+        // if (dataCollection.env.wsTunnels.messenger.otr && dataCollection.env.wsTunnels.messenger.otr === true) {
+        //     dataCollection.env.wsTunnels.messenger.send(user, message);
+
+        //     return;
+        // }
+
         var action = $('.messenger-send-' + user.user).data('action');
         var url;
 
@@ -687,7 +700,6 @@ var BazMessenger = function() {
             postData['id'] = $('.messenger-send-' + user.user).data('msgid');
             url = dataCollection.env.rootPath + appRoute + 'system/messenger/update';
         }
-
 
         $.post(url, postData, function(response) {
             if (response.tokenKey && response.token) {
@@ -843,6 +855,8 @@ var BazMessenger = function() {
     }
 
     function onMessage(message) {
+        //eslint-disable-next-line
+        console.log(message);
         if (message.responseCode === 0) {
             if (message.responseData.type === 'statusChange') {
                 userStatusChange(message.responseData.data);
@@ -883,16 +897,16 @@ var BazMessenger = function() {
                 }
                 $(li).data('status', data.status);
                 $(li).attr('data-status', data.status);
-                $('#messenger-user-' + data.id + '-icon')
-                    .removeClass('text-success text-secondary text-warning text-danger')
-                    .addClass('text-' + color);
+                $('#messenger-user-' + data.id + '-icon').removeClass(function (index, className) {
+                    return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                }).addClass('text-' + color);
             }
         });
 
         if ($('#messenger-card-' + data.id).length > 0) {
-            $('#messenger-card-' + data.id)
-                .removeClass('card-success card-secondary card-warning card-danger')
-                .addClass('card-' + color);
+            $('#messenger-card-' + data.id).removeClass(function (index, className) {
+                return (className.match (/(^|\s)card-\S+/g) || []).join(' ');
+            }).addClass('card-' + color);
 
             $('#messenger-loader-' + data.id).attr('hidden', true);
             $('#direct-chat-messages-' + data.id).append(
@@ -1082,6 +1096,14 @@ var BazMessenger = function() {
         return null;
     }
 
+    function otrServiceOnline() {
+        //
+    }
+
+    function otrServiceOffline() {
+        //
+    }
+
     function setup(BazMessengerConstructor) {
         BazMessenger = BazMessengerConstructor;
         BazMessenger.defaults = { };
@@ -1099,6 +1121,12 @@ var BazMessenger = function() {
         }
         BazMessenger.getUnreadMessagesCount = function(options) {
             getUnreadMessagesCount(_extends(BazMessenger.defaults, options));
+        }
+        BazMessenger.otrServiceOnline = function(options) {
+            otrServiceOnline(_extends(BazMessenger.defaults, options));
+        }
+        BazMessenger.otrServiceOffline = function(options) {
+            otrServiceOffline(_extends(BazMessenger.defaults, options));
         }
     }
 
