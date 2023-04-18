@@ -1,5 +1,5 @@
 /* exported BazCore */
-/* globals PNotify Pace BazContentLoader PNotifyBootstrap4 PNotifyFontAwesome5 PNotifyFontAwesome5Fix PNotifyPaginate PNotifyMobile BazTunnels */
+/* globals PNotify Pace BazContentLoader PNotifyBootstrap4 PNotifyFontAwesome5 PNotifyFontAwesome5Fix PNotifyPaginate PNotifyMobile BazTunnels BazHelpers */
 /*
 * @title                    : BazCore
 * @description              : Baz Core Lib
@@ -15,7 +15,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 // eslint-disable-next-line no-unused-vars
 var BazCore = function() {
     var BazCore = void 0;
-    var dataCollection;
+    var dataCollection, timerId;
 
     // Error
     // function error(errorMsg) {
@@ -107,6 +107,50 @@ var BazCore = function() {
         if (dataCollection.env.currentRoute.indexOf('auth') === -1) {
             BazTunnels.init();
         }
+        initPings();
+    }
+
+    //10 mins get update of site status. Note this is not PING, but webserver responsive time to reply with favicon.
+    function initPings() {
+        BazHelpers.ping(dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost, {}, function(err, data) {
+            timerId = BazHelpers.getTimerId('ping');
+
+            if (!err && data) {
+                if (data <= 100) {
+                    $('.connectivity-icon').removeClass(function (index, className) {
+                        return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                    }).addClass('text-success');
+                    $('.connectivity').attr('title', 'Connectivity Status: Good (' + data + ' ms)').tooltip('_fixTitle');
+                } else if (data > 100 && data <= 200) {
+                    $('.connectivity-icon').removeClass(function (index, className) {
+                        return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                    }).addClass('text-warning');
+                    $('.connectivity').attr('title', 'Connectivity Status: Average (' + data + ' ms)').tooltip('_fixTitle');
+                } else if (data > 200) {
+                    $('.connectivity-icon').removeClass(function (index, className) {
+                        return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                    }).addClass('text-danger');
+                    $('.connectivity').attr('title', 'Connectivity Status: Bad (' + data + ' ms)').tooltip('_fixTitle');
+                }
+                if (timerId) {
+                    BazHelpers.setTimeoutTimers.stop(timerId, null, 'ping');
+                }
+                BazHelpers.setTimeoutTimers.add(function() {
+                    initPings();
+                }, 60000, null, 'ping');
+            } else {
+                //Connection is Dead
+                $('.connectivity-icon').removeClass(function (index, className) {
+                    return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                }).addClass('text-secondary');
+                if (timerId) {
+                    BazHelpers.setTimeoutTimers.stop(timerId, null, 'ping');
+                }
+                BazHelpers.setTimeoutTimers.add(function() {
+                    initPings();
+                }, 300000, null, 'ping');
+            }
+        });
     }
 
     // Tooltips

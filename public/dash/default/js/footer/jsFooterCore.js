@@ -3373,6 +3373,97 @@ var BazHelpers = function() {
         };
     }
 
+    function getTimerId(identifier) {
+        var timers = BazHelpers.setTimeoutTimers.all();
+        var id = false;
+
+        if (timers.length > 0) {
+            $(timers).each(function(i, timer) {
+                if (timer['identifier'] === identifier) {
+                    id = timer['id'];
+                }
+            });
+        }
+
+        return id;
+    }
+
+    function ping(source, option, callback) {
+        var promise, resolve, reject;
+        this.option = option || {};
+        this.favicon = this.option.favicon || "/favicon.ico";
+        this.logError = this.option.logError || false;
+
+        if (typeof Promise !== "undefined") {
+            promise = new Promise(function(_resolve, _reject) {
+                resolve = _resolve;
+                reject = _reject;
+            });
+        }
+
+        var self = this;
+        self.wasSuccess = false;
+        self.img = new Image();
+        self.img.onload = onload;
+        self.img.onerror = onerror;
+
+        var timer = null;
+        var start = new Date();
+
+        function onload(e) {
+            self.wasSuccess = true;
+            pingCheck.call(self, e);
+        }
+
+        function onerror(e) {
+            self.wasSuccess = false;
+            pingCheck.call(self, e);
+        }
+
+        /**
+         * Times ping and triggers callback.
+         */
+        function pingCheck() {
+            if (timer) {
+                clearTimeout(timer);
+            }
+
+            var pong = new Date() - start;
+
+            if (!callback) {
+                if (promise) {
+                    return this.wasSuccess ? resolve(pong) : reject(pong);
+                } else {
+                    throw new Error("Promise is not supported by your browser. Use callback instead.");
+                }
+            } else if (typeof callback === "function") {
+                if (!this.wasSuccess) {
+                    if (self.logError) {
+                        //eslint-disable-next-line
+                        console.error("error loading resource");
+                    }
+                    if (promise) {
+                        reject(pong);
+                    }
+
+                    return callback("error", pong);
+                }
+
+                if (promise) {
+                    resolve(pong);
+                }
+
+                return callback(null, pong);
+            } else {
+                throw new Error("Callback is not a function.");
+            }
+        }
+
+        self.img.src = source + self.favicon + "?" + (+new Date()); // Trigger image load with cache buster
+
+        return promise;
+    }
+
     function setup(BazHelpersConstructor) {
         BazHelpers = BazHelpersConstructor;
 
@@ -3451,6 +3542,14 @@ var BazHelpers = function() {
         BazHelpers.setTimeoutTimers = (function() {
             return setTimeoutTimers();
         })();
+
+        BazHelpers.getTimerId = function(identifier) {
+            return getTimerId(identifier);
+        }
+
+        BazHelpers.ping = function(source, options, callback) {
+            ping(source, options, callback);
+        }
     }
 
     setup(bazHelpersConstructor);
