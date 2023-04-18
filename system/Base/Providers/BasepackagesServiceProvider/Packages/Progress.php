@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
+use Carbon\Carbon;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToReadFile;
@@ -12,10 +13,14 @@ use System\Base\BasePackage;
 
 class Progress extends BasePackage
 {
-    public function init($localContent = null)
+    public function init($localContent = null, $opCache = null)
     {
         if ($localContent) {
             $this->localContent = $localContent;
+        }
+
+        if ($opCache) {
+            $this->opCache = $opCache;
         }
 
         $this->checkProgressPath();
@@ -45,7 +50,7 @@ class Progress extends BasePackage
 
         $progressFile = $this->readProgressFile();
 
-        if (isset($progressFile['processes']) && count($progressFile['processes']) > 0) {
+        if ($progressFile && isset($progressFile['processes']) && count($progressFile['processes']) > 0) {
             foreach ($methods as $method) {
                 array_push($progressFile['processes'], $method);
             }
@@ -123,25 +128,26 @@ class Progress extends BasePackage
         }
     }
 
-    public function updateProgress($method, $callResult, $deleteFile = true)
+    public function updateProgress($method, $callResult = null, $deleteFile = true)
     {
-        if ($callResult !== false) {
-            $callResult = true;
-        }
-
         $progressFile = $this->readProgressFile();
 
         if (isset($progressFile['processes']) && count($progressFile['processes']) > 0) {
             $runners = [];
+
             foreach ($progressFile['processes'] as $progressFileKey => $progressFileMethod) {
                 if ($progressFileMethod['method'] === $method) {
-                    $runners['last'] = current($progressFile['processes']);
-                    $runners['running'] = next($progressFile['processes']);
+                    if ($callResult !== null) {
+                        unset($progressFile['processes'][$progressFileKey]);
+                    }
+
+                    $runners['running'] = current($progressFile['processes']);
                     $runners['next'] = next($progressFile['processes']);
-                    unset($progressFile['processes'][$progressFileKey]);
+
                     break;
                 }
             }
+
 
             if (count($progressFile['processes']) === 0 && $deleteFile) {
                 $this->deleteProgressFile();
@@ -149,7 +155,40 @@ class Progress extends BasePackage
                 return true;
             }
 
+            if ($callResult !== false) {
+                $callResult = true;
+            }
+
             $this->writeProgressFile($progressFile['processes'], false, false, true, $runners, null, $method, $callResult);
+
+            $account =
+                $this->basepackages->accounts->getAccountById(
+                    $this->auth->account()['id'], false, false, false, false, false, true
+                );
+
+            if ($account && isset($account['notifications_tunnel'])) {
+                $progressFile = $this->readProgressFile();
+
+                $this->wss->send(
+                    [
+                        'type'              => 'progress',
+                        'to'                => $account['notifications_tunnel'],
+                        'response'          => [
+                            'responseCode'      => 0,
+                            'responseMessage'   => 'Ok',
+                            'responseData'      =>
+                                [
+                                    'total'             => $progressFile['total'],
+                                    'completed'         => $progressFile['completed'],
+                                    'preCheckComplete'  => $progressFile['preCheckComplete'],
+                                    'percentComplete'   => number_format(($progressFile['completed'] * 100) / $progressFile['total']),
+                                    'runners'           => $progressFile['runners'],
+                                    'callResult'        => $callResult
+                                ]
+                        ]
+                    ]
+                );
+            }
 
             return true;
         }
@@ -198,16 +237,26 @@ class Progress extends BasePackage
             $session = $this->session->getId();
         }
 
-        try {
-            return Json::decode($this->localContent->read('/var/progress/' . $session . '.json'), true);
-        } catch (\ErrorException | FilesystemException | UnableToReadFile | \InvalidArgumentException $exception) {
-            //Note : We use LOCK_EX while writing the file. So, if the file is being written and AJAX accesses the file, it will result in false and JSON will throw InvalidArgumentException error. We catch it and return false. This problem is only when retrieving the file while its being written. If we implement Progress updates being sent via Websocket, this will not happen.
-            return false;
+        if ($this->opCache) {
+            return $this->opCache->getCache($session);
+        } else {
+            try {
+                return Json::decode($this->localContent->read('/var/progress/' . $session . '.json'), true);
+            } catch (\ErrorException | FilesystemException | UnableToReadFile | \InvalidArgumentException $exception) {
+                return false;
+            }
         }
     }
 
     protected function writeProgressFile(
-        $methods, $register = false, $unregister = false, $update = false, $runners = null, $progressFile = null, $method = null, $callResult = null
+        $methods,
+        $register = false,
+        $unregister = false,
+        $update = false,
+        $runners = null,
+        $progressFile = null,
+        $method = null,
+        $callResult = null
     ) {
         if ($progressFile) {
             $file = $progressFile;
@@ -216,7 +265,6 @@ class Progress extends BasePackage
                 $file['total'] = count($methods);
                 $file['completed'] = 0;
                 $file['preCheckComplete'] = false;
-                $file['runners']['last'] = [];
                 $file['runners']['running'] = current($methods);
                 $file['runners']['next'] = next($methods);
                 if ($register) {
@@ -230,10 +278,18 @@ class Progress extends BasePackage
             if ($update) {
                 $progressFile = $this->readProgressFile();
                 if (isset($progressFile['allProcesses'])) {
-                    if ($method && $callResult !== null) {
+                    if ($method) {
                         foreach ($progressFile['allProcesses'] as &$allProcess) {
                             if ($allProcess['method'] === $method) {
-                                $allProcess['callResult'] = $callResult;
+                                if ($callResult !== null) {
+                                    $allProcess['callResult'] = $callResult;
+                                }
+
+                                if (!isset($allProcess['callExecTime'])) {
+                                    $allProcess['callExecTime'] = Carbon::now()->getTimestampMs();
+                                } else {
+                                    $allProcess['callExecTime'] = Carbon::now()->getTimestampMs() - $allProcess['callExecTime'];
+                                }
                             }
                         }
                     }
@@ -251,19 +307,31 @@ class Progress extends BasePackage
             $file['processes'] = $methods;
         }
 
-        try {
-            $this->localContent->write('var/progress/' . $this->session->getId() . '.json' , Json::encode($file));
-        } catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
-            throw $exception;
+        if ($this->opCache) {
+            if ($progressFile) {
+                $this->opCache->resetCache($this->session->getId(), $file);
+            } else {
+                $this->opCache->setCache($this->session->getId(), $file);
+            }
+        } else {
+            try {
+                $this->localContent->write('var/progress/' . $this->session->getId() . '.json' , Json::encode($file));
+            } catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
+                throw $exception;
+            }
         }
     }
 
     public function deleteProgressFile()
     {
-        try {
-            $this->localContent->delete('var/progress/' . $this->session->getId() . '.json');
-        } catch (\ErrorException | FilesystemException | UnableToDeleteFile $exception) {
-            throw $exception;
+        if ($this->opCache) {
+            $this->opCache->removeCache($this->session->getId());
+        } else {
+            try {
+                $this->localContent->delete('var/progress/' . $this->session->getId() . '.json');
+            } catch (\ErrorException | FilesystemException | UnableToDeleteFile $exception) {
+                throw $exception;
+            }
         }
     }
 }

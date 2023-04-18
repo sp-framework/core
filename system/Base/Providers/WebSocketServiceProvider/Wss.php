@@ -3,7 +3,6 @@
 namespace System\Base\Providers\WebSocketServiceProvider;
 
 use Phalcon\Helper\Json;
-use Phalcon\Validation as PhalconValidation;
 use ZMQContext;
 
 class Wss
@@ -84,5 +83,7 @@ class Wss
         $this->socket->connect($this->connector);
 
         $this->socket->send(Json::encode($data));
+
+        return true;
     }
 }
