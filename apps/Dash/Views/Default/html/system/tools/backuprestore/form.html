@@ -26,7 +26,7 @@
     </fieldset>
 </form>
 <script>
-/* globals PNotify Swal */
+/* globals PNotify Swal BazHelpers BazProgress */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -134,6 +134,8 @@ dataCollectionSection =
                     dataCollectionSectionForm['funcs']['clearFields']('remove');
                 });
 
+                BazProgress.buildProgressBar($('#backup-progress'));
+
                 function generateBackup() {
                     $('#{{componentId}}-{{sectionId}}-backup').attr('disabled', true);
                     $('#{{componentId}}-{{sectionId}}-backup').children('i').attr('hidden', false);
@@ -170,12 +172,12 @@ dataCollectionSection =
                             var newOption = new Option(data.text, data.id, false, false);
                             $('#{{componentId}}-{{sectionId}}-backups').append(newOption).val(data.id).trigger('change');
                             dataCollectionSectionForm['funcs']['addedNewBackupOption'](data.id, data.text);
-
-                            $('#{{componentId}}-{{sectionId}}-backup').attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-backup').children('i').attr('hidden', true);
                         } else {
                             PNotify.error({text : response.responseMessage});
+                            $('#{{componentId}}-{{sectionId}}-backup').attr('disabled', false);
                         }
+
+                        $('#{{componentId}}-{{sectionId}}-backup').children('i').attr('hidden', true);
                     }, 'json');
                 }
 
@@ -184,6 +186,7 @@ dataCollectionSection =
                     e.preventDefault();
 
                     generateBackup();
+                    BazProgress.getProgress();
                 });
             }
         },

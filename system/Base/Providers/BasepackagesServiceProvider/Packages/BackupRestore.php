@@ -23,6 +23,10 @@ class BackupRestore extends BasePackage
 
     protected $now;
 
+    protected $backupProgressMethods;
+
+    protected $restoreProgressMethods;
+
     public function init($process = 'backup')
     {
         $this->zip = new \ZipArchive;
@@ -44,12 +48,14 @@ class BackupRestore extends BasePackage
         return $this;
     }
 
-    public function withProgress($method, $arguments)
+    protected function withProgress($method, $arguments)
     {
         if (method_exists($this, $method)) {
             if (is_array($arguments)) {
                 $arguments = [$arguments];
             }
+
+            $this->basepackages->progress->updateProgress($method, null, false);
 
             $call = call_user_func_array([$this, $method], $arguments);
 
@@ -59,21 +65,9 @@ class BackupRestore extends BasePackage
         }
     }
 
-    protected function backup(array $data)
+    public function backup(array $data)
     {
-        if ($this->withProgress('generateBackupInfo', $data) === false) return false;
-        if ($this->withProgress('generateStructure', $data) === false) return false;
-        if ($this->withProgress('zipBackupFiles', $data) === false) return false;
-        if (isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] == 'true') {
-            if ($this->withProgress('performDbBackup', $data) === false) return false;
-        }
-        if ($this->withProgress('finishBackup', $data) === false) return false;
-
-        return true;
-    }
-
-    protected function generateBackupInfo(array $data)
-    {
+        set_time_limit(300);//5 mins
         $tokenkey = array_search($this->security->getRequestToken(), $data);
         if ($tokenkey) {
             unset($data[$tokenkey]);
@@ -88,14 +82,18 @@ class BackupRestore extends BasePackage
         if ($noOptions) {
             $this->addResponse('Nothing to backup!', 1, []);
 
-            return;
+            $this->basepackages->progress->preCheckComplete(false);
+
+            $this->basepackages->progress->resetProgress();
+
+            return false;
         }
 
         $this->now = Carbon::now();
+        $this->backupInfo['request'] = $data;
         $this->backupInfo['takenAt'] = $this->now->format('Y-m-d H:i:s');
         $this->backupInfo['createdBy'] = $this->auth->account() ? $this->auth->account()['email'] : 'System';
         $this->backupInfo['backupName'] = 'backup-' . $this->now->getTimestamp() . '.zip';
-        $this->backupInfo['request'] = $data;
         $this->backupInfo['dbs'] = [];
         $this->backupInfo['dirs'] = [];
         $this->backupInfo['files'] = [];
@@ -113,8 +111,28 @@ class BackupRestore extends BasePackage
             ) {
                 $this->addResponse('Password missing!', 1, []);
 
+                $this->basepackages->progress->preCheckComplete(false);
+
+                $this->basepackages->progress->resetProgress();
+
                 return false;
             }
+        }
+
+        $this->basepackages->progress->preCheckComplete();
+
+        foreach ($this->backupProgressMethods as $method) {
+            if ($method['method'] === 'performDbBackup') {
+                if (!isset($this->backupInfo['request']['database']) ||
+                    (isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] != 'true')
+                ) {
+                    continue;
+                }
+            }
+
+            if ($this->withProgress($method['method'], $data) === false) return false;
+
+            usleep(500);
         }
 
         return true;
@@ -150,16 +168,34 @@ class BackupRestore extends BasePackage
             $this->getContent($this->getInstalledFiles('.backups/'));
         }
 
-        return true;
-    }
-
-    protected function zipBackupFiles(array $data)
-    {
         foreach ($this->backupInfo['files'] as $file) {
             if (!$this->addToZip(base_path($file), $file)) {
                 return false;
             }
         }
+
+        return true;
+    }
+
+    protected function zipBackupFiles(array $data)
+    {
+        if (isset($this->backupInfo['request']['password_protect']) && $this->backupInfo['request']['password_protect'] !== '') {
+            $this->backupInfo['request']['password_protect'] =
+                $this->secTools->hashPassword($this->backupInfo['request']['password_protect'], 4);
+        }
+
+        try {
+            $this->localContent->write('var/tmp/backupInfo.json' , Json::encode($this->backupInfo));
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            throw $exception;
+        }
+
+        //Dont Encrypt info file as we need to know if encryption is applied or not during restore. We can encrypt the content in case we want to hide something (like we are encrypting the password_protect password)
+        if (!$this->addToZip(base_path('var/tmp/backupInfo.json'), 'backupInfo.json', false)) {
+            return false;
+        }
+
+        $this->zip->close();
 
         return true;
     }
@@ -193,6 +229,8 @@ class BackupRestore extends BasePackage
             } catch (\Exception $e) {
                 $this->addResponse('Backup Error: ' . $e->getMessage(), 1);
 
+                $this->basepackages->progress->resetProgress();
+
                 return false;
             }
         }
@@ -204,24 +242,6 @@ class BackupRestore extends BasePackage
 
     protected function finishBackup(array $data)
     {
-        if (isset($this->backupInfo['request']['password_protect']) && $this->backupInfo['request']['password_protect'] !== '') {
-            $this->backupInfo['request']['password_protect'] =
-                $this->secTools->hashPassword($this->backupInfo['request']['password_protect'], 4);
-        }
-
-        try {
-            $this->localContent->write('var/tmp/backupInfo.json' , Json::encode($this->backupInfo));
-        } catch (FilesystemException | UnableToWriteFile $exception) {
-            throw $exception;
-        }
-
-        //Dont Encrypt info file as we need to know if encryption is applied or not during restore. We can encrypt the content in case we want to hide something (like we are encrypting the password_protect password)
-        if (!$this->addToZip(base_path('var/tmp/backupInfo.json'), 'backupInfo.json', false)) {
-            return false;
-        }
-
-        $this->zip->close();
-
         if ($this->basepackages->storages->storeFile(
                 'private',
                 '.backups',
@@ -277,6 +297,8 @@ class BackupRestore extends BasePackage
 
                 $this->addResponse('Could not set provided password for file ' . $name, 1, []);
 
+                $this->basepackages->progress->resetProgress();
+
                 return false;
             }
         } else {
@@ -284,6 +306,8 @@ class BackupRestore extends BasePackage
                 $name = $this->zip->getNameIndex($this->zip->numFiles - 1);
 
                 $this->addResponse('Could not zip file: ' . $name, 1, []);
+
+                $this->basepackages->progress->resetProgress();
 
                 return false;
             }
@@ -296,6 +320,8 @@ class BackupRestore extends BasePackage
     {
         if (!isset($data['id'])) {
             $this->addResponse('Please provide backup file id', 1, []);
+
+            $this->basepackages->progress->resetProgress();
 
             return false;
         }
@@ -310,11 +336,15 @@ class BackupRestore extends BasePackage
             if (!isset($data['password'])) {
                 $this->addResponse('Please provide backup file password', 1, []);
 
+                $this->basepackages->progress->resetProgress();
+
                 return false;
             }
 
             if (!$this->security->checkHash($data['password'], $backupInfo['request']['password_protect'])) {
                 $this->addResponse('Backup password incorrect! Please provide correct password', 1, []);
+
+                $this->basepackages->progress->resetProgress();
 
                 return false;
             }
@@ -327,6 +357,8 @@ class BackupRestore extends BasePackage
         if (!$this->zip->extractTo(base_path('var/tmp/backups/' . $fileNameLocation))) {
             $this->addResponse('Error unzipping backup file. Please upload backup again.', 1);
 
+            $this->basepackages->progress->resetProgress();
+
             return false;
         }
 
@@ -336,6 +368,8 @@ class BackupRestore extends BasePackage
             if (!isset($data['root_username']) || !isset($data['root_username'])) {
                 $this->addResponse('Root Username & Password required to restore databases.', 1);
 
+                $this->basepackages->progress->resetProgress();
+
                 return false;
             }
 
@@ -343,6 +377,8 @@ class BackupRestore extends BasePackage
                 foreach ($data['dbs'] as $dbs) {
                     if (!isset($backupInfo['dbs'][$dbs])) {
                         $this->addResponse('Database ' . $dbs . ' is not in the backup file uploaded.', 1);
+
+                        $this->basepackages->progress->resetProgress();
 
                         return false;
                     }
@@ -399,10 +435,14 @@ class BackupRestore extends BasePackage
                 } catch (\Exception $e) {
                     $this->addResponse('Restore Error: ' . $e->getMessage(), 1);
 
+                    $this->basepackages->progress->resetProgress();
+
                     return false;
                 }
             } else {
                 $this->addResponse('Please provide database(s) to restore.', 1);
+
+                $this->basepackages->progress->resetProgress();
 
                 return false;
             }
@@ -413,6 +453,8 @@ class BackupRestore extends BasePackage
         } catch (\ErrorException | FilesystemException | UnableToReadFile | InvalidArgumentException $exception) {
             $this->addResponse('Error reading/accessing backupInfo.json file. Please upload backup again with correct file.', 1);
 
+            $this->basepackages->progress->resetProgress();
+
             return false;
         }
 
@@ -421,6 +463,8 @@ class BackupRestore extends BasePackage
                 foreach ($data['restore_structure']['folders'] as $restoreStructureFolders) {
                     if (!isset($backupInfo['dirs'][$restoreStructureFolders])) {
                         $this->addResponse('Folder with ID: ' . $restoreStructureFolders . ' does not exist in the backup zip file.', 1);
+
+                        $this->basepackages->progress->resetProgress();
 
                         return false;
                     }
@@ -431,6 +475,8 @@ class BackupRestore extends BasePackage
                 foreach ($data['restore_structure']['files'] as $restoreStructureFiles) {
                     if (!isset($backupInfo['files'][$restoreStructureFiles])) {
                         $this->addResponse('File with ID: ' . $restoreStructureFiles . ' does not exist in the backup zip file.', 1);
+
+                        $this->basepackages->progress->resetProgress();
 
                         return false;
                     }
@@ -443,6 +489,8 @@ class BackupRestore extends BasePackage
                         $this->localContent->createDirectory($backupInfo['dirs'][$restoreStructureFolders]);
                     } catch (FilesystemException | UnableToCreateDirectory $exception) {
                         $this->addResponse('Filed to create directory with ID: ' . $restoreStructureFolders, 1);
+
+                        $this->basepackages->progress->resetProgress();
 
                         return false;
                     }
@@ -459,6 +507,8 @@ class BackupRestore extends BasePackage
                     } catch (FilesystemException | UnableToCopyFile $exception) {
                         $this->addResponse('Filed to copy file with ID: ' . $restoreStructureFiles, 1);
 
+                        $this->basepackages->progress->resetProgress();
+
                         return false;
                     }
                 }
@@ -469,6 +519,8 @@ class BackupRestore extends BasePackage
                     $this->localContent->createDirectory($dir);
                 } catch (FilesystemException | UnableToCreateDirectory $exception) {
                     $this->addResponse('Filed to create directory with ID: ' . $dirKey, 1);
+
+                    $this->basepackages->progress->resetProgress();
 
                     return false;
                 }
@@ -482,6 +534,8 @@ class BackupRestore extends BasePackage
                     );
                 } catch (FilesystemException | UnableToCopyFile $exception) {
                     $this->addResponse('Filed to copy file with ID: ' . $fileKey, 1);
+
+                    $this->basepackages->progress->resetProgress();
 
                     return false;
                 }
@@ -504,6 +558,8 @@ class BackupRestore extends BasePackage
                 if (!$backupInfo) {
                     $this->addResponse('Error reading backupInfo.json file. Please upload backup again.', 1);
 
+                    $this->basepackages->progress->resetProgress();
+
                     return false;
                 }
 
@@ -511,6 +567,8 @@ class BackupRestore extends BasePackage
                     $this->backupInfo = Json::decode($backupInfo, true);
                 } catch (\InvalidArgumentException $exception) {
                     $this->addResponse('Error reading contents of backupInfo.json file. Please check if file is in correct Json format.', 1);
+
+                    $this->basepackages->progress->resetProgress();
 
                     return false;
                 }
@@ -527,9 +585,13 @@ class BackupRestore extends BasePackage
                 return $this->backupInfo;
             } else {
                 $this->addResponse('Error opening backup zip file. Please upload backup again.', 1);
+
+                $this->basepackages->progress->resetProgress();
             }
         } else {
             $this->addResponse('Backup file not found on server. Please upload backup again.', 1);
+
+            $this->basepackages->progress->resetProgress();
         }
 
         return false;
@@ -624,41 +686,39 @@ class BackupRestore extends BasePackage
 
     protected function registerBackupProgressMethods()
     {
-        $this->basepackages->progress->registerMethods(
+        $this->backupProgressMethods =
             [
-                [
-                    'method'    => 'generateBackupInfo',
-                    'text'      => 'Creating new backup information...'
-                ],
                 [
                     'method'    => 'generateStructure',
                     'text'      => 'Generate backup file structure...'
-                ],
-                [
-                    'method'    => 'zipBackupFiles',
-                    'text'      => 'Archiving backup...'
                 ],
                 [
                     'method'    => 'performDbBackup',
                     'text'      => 'Performing Database Backup...'
                 ],
                 [
+                    'method'    => 'zipBackupFiles',
+                    'text'      => 'Generate backup zip file...'
+                ],
+                [
                     'method'    => 'finishBackup',
                     'text'      => 'Fnishing up...'
                 ]
-            ]
-        );
+            ];
+
+        $this->basepackages->progress->registerMethods($this->backupProgressMethods);
     }
 
     protected function registerRestoreProgressMethods()
     {
-        $this->basepackages->progress->registerMethods(
+        $this->restoreProgressMethods =
             [
                 [
                     'method'    => 'createNewDb',
                     'text'      => 'Creating new database...'
                 ]
-            ]
-        );
+            ];
+
+        $this->basepackages->progress->registerMethods($this->restoreProgressMethods);
     }
 }
