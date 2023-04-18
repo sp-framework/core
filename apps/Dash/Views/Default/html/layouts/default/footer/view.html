@@ -4,19 +4,31 @@
 {% else %}
     <footer class="main-footer">
 {% endif %}
-    <strong>Copyright &copy;
-        {% if orgFrom is defined %}
-            {{orgFrom ~ '-'|default('')}}
-            {{date("Y")}}
-        {% endif %}
-        {% if orgSite is defined and orgName is defined %}
-            <a target="_blank" href="{{orgSite}}">{{orgName}}</a>.
-        {% elseif perName is defined %}
-            {{perName}}
-        {% endif %}
-    </strong> All rights reserved.
-    {{assets.outputJs('footerJs')}}
-    {{assets.outputInlineJs()}}
+    <div class="row">
+        <div class="col">
+            <strong>Copyright &copy;
+                {% if orgFrom is defined %}
+                    {{orgFrom ~ '-'|default('')}}
+                    {{date("Y")}}
+                {% endif %}
+                {% if orgSite is defined and orgName is defined %}
+                    <a target="_blank" href="{{orgSite}}">{{orgName}}</a>.
+                {% elseif perName is defined %}
+                    {{perName}}
+                {% endif %}
+            </strong> All rights reserved.
+            {{assets.outputJs('footerJs')}}
+            {{assets.outputInlineJs()}}
+        </div>
+        <div class="col text-right mr-3">
+            <span class="connectivity" data-toggle="tooltip" data-placement="auto" title="Connectivity Status">
+                <i class="fa fa-fw fa-signal connectivity-icon text-secondary"></i>
+            </span>
+            <span class="socket" data-toggle="tooltip" data-placement="auto" title="Socket Status">
+                <i class="fa fa-fw fa-plug-circle-bolt socket-icon text-secondary"></i>
+            </span>
+        </div>
+    </div>
 </footer>
 <script>
 /* globals BazCore */
