@@ -121,17 +121,32 @@ class Service
 	{
 		$externalNamespaces = [];
 
-		$externalNamespacesArr = include_once self::$base . 'external/vendor/composer/autoload_psr4.php';
+		$externalPsr4Arr = include_once self::$base . 'external/vendor/composer/autoload_psr4.php';
 
-		foreach ($externalNamespacesArr as $class => $classArr) {
-			$class = rtrim($class, '\\');
+		foreach ($externalPsr4Arr as $psr4class => $psr4classArr) {
+			$psr4class = rtrim($psr4class, '\\');
 
-			if (count($classArr) === 1) {
-				$externalNamespaces[$class] = $classArr[0];
+			if (count($psr4classArr) === 1) {
+				$externalNamespaces[$psr4class] = $psr4classArr[0];
 			} else {
-				$externalNamespaces[$class] = [];
-				foreach ($classArr as $path) {
-					array_push($externalNamespaces[$class], $path);
+				$externalNamespaces[$psr4class] = [];
+				foreach ($psr4classArr as $path) {
+					array_push($externalNamespaces[$psr4class], $path);
+				}
+			}
+		}
+
+		$externalNamespacesArr = include_once self::$base . 'external/vendor/composer/autoload_namespaces.php';
+
+		foreach ($externalNamespacesArr as $namespaceclass => $namespaceclassArr) {
+			$namespaceclass = rtrim($namespaceclass, '\\');
+
+			if (count($namespaceclassArr) === 1) {
+				$externalNamespaces[$namespaceclass] = $namespaceclassArr[0] . '/' . $namespaceclass;
+			} else {
+				$externalNamespaces[$namespaceclass] = [];
+				foreach ($namespaceclassArr as $path) {
+					array_push($externalNamespaces[$namespaceclass], $path . '/' . $namespaceclass);
 				}
 			}
 		}
@@ -169,7 +184,6 @@ class Service
 	{
 		return
 			[
-				__DIR__ . '/../../Base/Helpers.php'
 			];
 	}
 
@@ -195,7 +209,7 @@ class Service
 	{
 		return
 			[
-				__DIR__ . '/../../Base/Helpers.php'
+				__DIR__ . '/../../../vendor/symfony/var-dumper/VarDumper.php'
 			];
 	}
 }
