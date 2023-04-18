@@ -46,9 +46,8 @@ class CacheServiceProvider implements ServiceProviderInterface
         if (extension_loaded('Zend OPcache')) {
             $container->setShared(
                 'opCache',
-                function () use ($container) {
-                    $cacheConfig = $container->getShared('config')->cache;
-                    return (new OpCache($cacheConfig))->init();
+                function () {
+                    return (new OpCache())->init();
                 }
             );
         } else {

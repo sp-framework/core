@@ -6,13 +6,10 @@ class OpCache
 {
     protected $cache;
 
-    protected $cacheConfig;
-
     protected $storagePath = 'var/storage/cache/opcache/';
 
-    public function __construct($cacheConfig)
+    public function __construct()
     {
-        $this->cacheConfig = $cacheConfig;
     }
 
     public function init()
