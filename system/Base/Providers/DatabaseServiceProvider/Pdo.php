@@ -72,7 +72,9 @@ class Pdo
 	protected function runSetup($onlyUpdateDb = false, $message = null)
 	{
 		if (PHP_SAPI === 'cli') {
-			exit;
+			sleep(10);
+
+			exit();
 		}
 
 		require_once base_path('system/Base/Installer/Components/Setup.php');

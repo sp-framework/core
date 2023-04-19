@@ -36,9 +36,9 @@ class Config
             isset($configs['setup']) && $configs['setup'] === false &&
             !isset($this->request->getPost()['session'])
         ) {
-            return new PhalconConfig($this->getGroupedConfigs()->toArray());
+            return new PhalconConfig($configs);
         } else {
-            $this->runSetup();
+            return $this->runSetup($configs);
         }
     }
 
@@ -60,10 +60,14 @@ class Config
         }
     }
 
-    protected function runSetup()
+    protected function runSetup($configs)
     {
         if (PHP_SAPI === 'cli') {
-            exit;
+            if ($configs['setup'] === true) {
+                sleep(10);
+            }
+
+            exit();
         }
 
         require_once base_path('system/Base/Installer/Components/Setup.php');
