@@ -16,6 +16,13 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var BazTunnels = function() {
     var BazTunnels = void 0;
     var dataCollection, timerId;
+    dataCollection = window.dataCollection;
+    dataCollection.env.wsTunnels = { };
+    if (dataCollection.env.httpScheme === 'http') {
+        dataCollection.env.wsTunnels.protocol = 'ws';
+    } else if (dataCollection.env.httpScheme === 'https') {
+        dataCollection.env.wsTunnels.protocol = 'wss';
+    }
 
     // var reconnectMessengerTunnel = null;
     // var reconnectPusherTunnel = null;
@@ -27,17 +34,6 @@ var BazTunnels = function() {
 
     //Init
     function init() {
-        dataCollection = window.dataCollection;
-        dataCollection.env.wsTunnels = { };
-        if (dataCollection.env.httpScheme === 'http') {
-            dataCollection.env.wsTunnels.protocol = 'ws';
-        } else if (dataCollection.env.httpScheme === 'https') {
-            dataCollection.env.wsTunnels.protocol = 'wss';
-        }
-
-        dataCollection.env.wsTunnels.pusher = { };
-        dataCollection.env.wsTunnels.messenger = { };
-
         // initMessengerOTR();
         initPusherTunnel();
     }
@@ -77,7 +73,12 @@ var BazTunnels = function() {
         };
     }
 
-    function initPusherTunnel() {
+    function initPusherTunnel(options) {
+        var tunnelsToInit = ['systemNotifications','messengerNotifications','systemAnnouncements','progress'];
+        if (options && options.tunnelsToInit) {
+            tunnelsToInit = options.tunnelsToInit;
+        }
+
         dataCollection.env.wsTunnels.pusher = { };
         dataCollection.env.wsTunnels.pusher =
             new ab.Session(dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/pusher/',
@@ -85,47 +86,78 @@ var BazTunnels = function() {
                     //eslint-disable-next-line
                     console.info('WebSocket connection open');
 
-                    dataCollection.env.wsTunnels.pusher.subscribe('systemNotifications', function(topic, data) {
-                        BazNotifications.onMessage('systemNotifications', data);
-                    });
+                    if (tunnelsToInit.includes('systemNotifications')) {
+                        dataCollection.env.wsTunnels.pusher.subscribe('systemNotifications', function(topic, data) {
+                            BazNotifications.onMessage('systemNotifications', data);
+                        });
+                    }
 
-                    dataCollection.env.wsTunnels.pusher.subscribe('messengerNotifications', function(topic, data) {
-                        BazMessenger.onMessage(data);
-                    });
+                    // if (tunnelsToInit.includes('messengerNotifications')) {
+                    //     dataCollection.env.wsTunnels.pusher.subscribe('messengerNotifications', function(topic, data) {
+                    //         BazMessenger.onMessage(data);
+                    //     });
+                    // }
 
-                    dataCollection.env.wsTunnels.pusher.subscribe('systemAnnouncements', function(topic, data) {
-                        BazAnnouncements.onMessage('systemAnnouncements', data);
-                    });
+                    if (tunnelsToInit.includes('systemAnnouncements')) {
+                        dataCollection.env.wsTunnels.pusher.subscribe('systemAnnouncements', function(topic, data) {
+                            BazAnnouncements.onMessage('systemAnnouncements', data);
+                        });
+                    }
 
-                    dataCollection.env.wsTunnels.pusher.subscribe('progress', function(topic, data) {
-                        BazProgress.onMessage(data);
-                    });
+                    if (tunnelsToInit.includes('progress')) {
+                        dataCollection.env.wsTunnels.pusher.subscribe('progress', function(topic, data) {
+                            BazProgress.onMessage(data);
+                        });
+                    }
 
                     timerId = BazHelpers.getTimerId('initPusherTunnel');
                     if (timerId) {
                         BazHelpers.setTimeoutTimers.stop(timerId, null, 'initPusherTunnel');
-                        BazNotifications.serviceOnline();
-                        BazMessenger.serviceOnline();
-                        BazAnnouncements.serviceOnline();
-                        BazProgress.serviceOnline();
+                        if (tunnelsToInit.includes('systemNotifications')) {
+                            BazNotifications.serviceOnline();
+                        }
+                        // if (tunnelsToInit.includes('messengerNotifications')) {
+                        //     BazMessenger.serviceOnline();
+                        // }
+                        if (tunnelsToInit.includes('systemAnnouncements')) {
+                            BazAnnouncements.serviceOnline();
+                        }
+                        if (tunnelsToInit.includes('progress')) {
+                            BazProgress.serviceOnline();
+                        }
                     } else {
-                        BazNotifications.init();
-                        BazMessenger.init();
-                        BazAnnouncements.init();
-                        BazProgress.init();
+                        if (tunnelsToInit.includes('systemNotifications')) {
+                            BazNotifications.init();
+                        }
+                        // if (tunnelsToInit.includes('messengerNotifications')) {
+                        //     BazMessenger.init();
+                        // }
+                        if (tunnelsToInit.includes('systemAnnouncements')) {
+                            BazAnnouncements.init();
+                        }
+                        if (tunnelsToInit.includes('progress')) {
+                            BazProgress.init();
+                        }
                     }
                 },
                 function() {
-                    BazNotifications.serviceOffline();
-                    BazMessenger.serviceOffline();
-                    BazAnnouncements.serviceOffline();
-                    BazProgress.serviceOffline();
+                    if (tunnelsToInit.includes('systemNotifications')) {
+                        BazNotifications.serviceOffline();
+                    }
+                    // if (tunnelsToInit.includes('messengerNotifications')) {
+                    //     BazMessenger.serviceOffline();
+                    // }
+                    if (tunnelsToInit.includes('systemAnnouncements')) {
+                        BazAnnouncements.serviceOffline();
+                    }
+                    if (tunnelsToInit.includes('progress')) {
+                        BazProgress.serviceOffline();
+                    }
                     //eslint-disable-next-line
                     console.warn('WebSocket connection closed');
 
                     BazHelpers.setTimeoutTimers.add(function() {
-                        BazNotifications.serviceOffline();
-                        initPusherTunnel();
+                        initPusherTunnel(options);
                     }, 10000, null, 'initPusherTunnel');
                 },
                 {
@@ -145,11 +177,14 @@ var BazTunnels = function() {
             loadHeaderAt : null,
             loadFooterAt : null
         };
-        BazTunnels.init = function(options) {
-            init(_extends(BazTunnels.defaults, options));
+        BazTunnels.init = function() {
+            init();
         }
         BazTunnels.initMessengerOTR = function(options) {
             initMessengerOTR(_extends(BazTunnels.defaults, options));
+        }
+        BazTunnels.initPusherTunnel = function(options) {
+            initPusherTunnel(_extends(BazTunnels.defaults, options));
         }
     }
 

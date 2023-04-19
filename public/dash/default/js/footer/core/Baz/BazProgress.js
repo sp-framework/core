@@ -19,7 +19,11 @@ var BazProgress = function() {
     var progressCounter = 0;
     var online = false;
     var element;
+    var callableFunc = null;
     var dataCollection = window.dataCollection;
+    var url
+    var postData = { };
+    var progressOptions;
     // Error
     // function error(errorMsg) {
     //     throw new Error(errorMsg);
@@ -62,27 +66,51 @@ var BazProgress = function() {
             '</div>' +
             '<div class="row text-center text-sm text-primary m-1">' +
                 '<div class="col">' +
-                    '<span class="sr-only progress-span"></span>' +
+                    '<span class="sr-only ' + $(element)[0].id + '-progress-span"></span>' +
                     '<span class="' + $(element)[0].id + '-progress-span"></span>' +
                 '</div>' +
             '</div>'
         );
     }
 
-    function getProgress() {
-        var postData = { };
-        postData[$('#security-token').attr('name')] = $('#security-token').val();
+    function getProgress(options) {
+        progressOptions = options;
 
-        $.post(
-            dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/system/progress/getProgress',
-            postData,
-            function(response)
-        {
+        if (callableFunc && callableFunc['beforeStart']) {
+            if (callableFunc['beforeStart']() === false) {
+                resetProgressCounter();
+                return;
+            }
+        }
+
+        if (options && options.url) {
+            url = options.url;
+        } else {
+            url =
+                dataCollection.env.httpScheme +
+                '://' + dataCollection.env.httpHost + '/' +
+                dataCollection.env.appRoute + '/system/progress/getProgress';
+        }
+
+        if (options && options.postData) {
+            postData = $.extend(postData, options.postData);
+        } else {
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+        }
+
+        $.post(url, postData, function(response) {
             processResponse(response);
         }, 'json');
     }
 
     function processResponse(response) {
+        if (callableFunc && callableFunc['beforeProcess']) {
+            if (callableFunc['beforeProcess'](response) === false) {
+                resetProgressCounter();
+                return;
+            }
+        }
+
         var timerId;
         if (response && response.responseCode === 0) {
             if (response.responseData) {
@@ -115,9 +143,11 @@ var BazProgress = function() {
                             if (timerId) {
                                 BazHelpers.setTimeoutTimers.stop(timerId, null, 'progressCounter');
                             }
-                            BazHelpers.setTimeoutTimers.add(function() {
-                                getProgress();
-                            }, 500);
+                            if (BazHelpers.getTimerId('getProgress') === false) {
+                                BazHelpers.setTimeoutTimers.add(function() {
+                                    getProgress(progressOptions);
+                                }, 500, null, 'getProgress');
+                            }
                         }
                     } else if (responseData['total'] === responseData['completed']) {
                         if (online === false) {
@@ -130,6 +160,10 @@ var BazProgress = function() {
                         $('.' + $(element)[0].id + '-bar').removeClass(function (index, className) {
                             return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
                         }).addClass('bg-success');
+
+                        if (callableFunc && callableFunc['onComplete']) {
+                            callableFunc['onComplete'](response);
+                        }
                     } else {
                         resetProgressCounter();
                     }
@@ -142,6 +176,13 @@ var BazProgress = function() {
         } else {
             resetProgressCounter();
         }
+
+        if (callableFunc && callableFunc['afterProcess']) {
+            if (callableFunc['afterProcess'](response) === false) {
+                resetProgressCounter();
+                return;
+            }
+        }
     }
 
     function resetProgressCounter() {
@@ -151,7 +192,7 @@ var BazProgress = function() {
             if (online === false) {
                 BazHelpers.setTimeoutTimers.stopAll();
                 BazHelpers.setTimeoutTimers.add(function() {
-                    getProgress();
+                    getProgress(progressOptions);
                 }, 1000, null, 'progressCounter');
             }
         }
@@ -161,6 +202,10 @@ var BazProgress = function() {
         //eslint-disable-next-line
         console.log(data);
         processResponse(data);
+    }
+
+    function setCallable(callable) {
+        callableFunc = callable;
     }
 
     function bazProgressConstructor() {
@@ -183,13 +228,19 @@ var BazProgress = function() {
         BazProgress.onMessage = function(data) {
             onMessage(data);
         }
-        BazProgress.getProgress = function() {
-            if (online === false) {
-                getProgress();
+        BazProgress.getProgress = function(options, force = false) {
+            if (online === false || force === true) {
+                getProgress(options);
             }
         }
         BazProgress.buildProgressBar = function(el) {
             buildProgressBar(el);
+        }
+        BazProgress.setCallable = function(callable) {
+            setCallable(callable);
+        }
+        BazProgress.isOnline = function() {
+            return online;
         }
     }
 

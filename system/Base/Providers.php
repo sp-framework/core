@@ -48,7 +48,7 @@ return
 				'System\Base\Providers\ContentServiceProvider',
 				// 'System\Base\Providers\RouterServiceProvider',
 				// 'System\Base\Providers\DispatcherServiceProvider',
-				'System\Base\Providers\ViewServiceProvider',
+				// 'System\Base\Providers\ViewServiceProvider',
 				'System\Base\Providers\WebSocketServiceProvider',
 				// 'System\Base\Providers\FlashServiceProvider',
 				// 'System\Base\Providers\ErrorServiceProvider',

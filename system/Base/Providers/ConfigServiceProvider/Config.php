@@ -31,14 +31,16 @@ class Config
     {
         $configs = $this->getGroupedConfigs()->toArray();
 
+        $configsObj = new PhalconConfig($configs);
+
         if (isset($configs['debug']) &&
             isset($configs['db']) &&
             isset($configs['setup']) && $configs['setup'] === false &&
             !isset($this->request->getPost()['session'])
         ) {
-            return new PhalconConfig($configs);
+            return $configsObj;
         } else {
-            return $this->runSetup($configs);
+            return $this->runSetup($configsObj);
         }
     }
 
@@ -60,19 +62,20 @@ class Config
         }
     }
 
-    protected function runSetup($configs)
+    protected function runSetup($configsObj)
     {
         if (PHP_SAPI === 'cli') {
-            if ($configs['setup'] === true) {
-                sleep(10);
+            if ($configsObj->setup === true) {
+                return $configsObj;
             }
 
+            sleep(10);
             exit();
         }
 
         require_once base_path('system/Base/Installer/Components/Setup.php');
 
-        (new Setup($this->session))->run();
+        (new Setup($this->session, $configsObj))->run();
 
         exit;
     }

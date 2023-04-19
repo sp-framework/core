@@ -33,7 +33,7 @@ class Logger
 
     protected $oneDbEntry = true;//True to make only 1 DB Entry
 
-    public function __construct($logsConfig, $session, $connection, $request, $email)
+    public function __construct($logsConfig, $session, $connection, $request, $email = null)
     {
         $this->logsConfig = $logsConfig;
 
@@ -103,7 +103,7 @@ class Logger
 
             $this->setLogLevel();
 
-            if ($this->logsConfig->emergencyLogsEmail) {
+            if ($this->email && $this->logsConfig->emergencyLogsEmail) {
                 $emailAdapter = new EmailAdapter($this->email, $this->logsConfig);
                 $emailAdapter->setFormatter($this->customFormatter);
 

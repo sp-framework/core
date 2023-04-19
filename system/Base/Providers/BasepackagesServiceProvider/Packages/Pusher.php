@@ -26,6 +26,8 @@ class Pusher extends BasePackage implements WampServerInterface
     public function onSubscribe(ConnectionInterface $conn, $topic)
     {
         $this->subscriptions[$topic->getId()] = $topic;
+
+        $this->opCache->setCache('pusherSubscriptions', $this->subscriptions);
     }
 
     public function onUnSubscribe(ConnectionInterface $conn, $topic)
@@ -44,7 +46,7 @@ class Pusher extends BasePackage implements WampServerInterface
     public function onClose(ConnectionInterface $conn)
     {
         var_dump('Close: '.  $conn->resourceId);
-        $this->markMessengerAway($conn->resourceId);
+        $this->markPusherAway($conn->resourceId);
     }
 
     public function onCall(ConnectionInterface $conn, $id, $topic, array $params)
@@ -66,6 +68,11 @@ class Pusher extends BasePackage implements WampServerInterface
         $conn->close();
     }
 
+    public function getSubscriptions()
+    {
+        $this->opCache->getCache('pusherSubscriptions');
+    }
+
     public function onNewPush($newPush)
     {
         $newPush = Json::decode($newPush, true);
@@ -82,11 +89,23 @@ class Pusher extends BasePackage implements WampServerInterface
             $excludeUsers = [];
             $eligibleUsers = [];
 
-            foreach ($topic->getIterator() as $key => $connection) {
-                if ($connection->resourceId != $newPush['to']) {
-                    array_push($excludeUsers, $connection->WAMP->sessionId);
-                } else if ($connection->resourceId == $newPush['to']) {
-                    array_push($eligibleUsers, $connection->WAMP->sessionId);
+            if ($this->config->setup && $this->config->setup === false) {
+                foreach ($topic->getIterator() as $key => $connection) {
+                    if ($connection->resourceId != $newPush['to']) {
+                        array_push($excludeUsers, $connection->WAMP->sessionId);
+                    } else if ($connection->resourceId == $newPush['to']) {
+                        array_push($eligibleUsers, $connection->WAMP->sessionId);
+                    }
+                }
+            } else {
+                if ($newPush['type'] === 'progress') {
+                    $installerResourceId = $this->opCache->getCache('InstallerResourceId');
+
+                    if ($installerResourceId) {
+                        foreach ($topic->getIterator() as $key => $connection) {
+                            array_push($eligibleUsers, $connection->WAMP->sessionId);
+                        }
+                    }
                 }
             }
 
@@ -107,51 +126,72 @@ class Pusher extends BasePackage implements WampServerInterface
         } else {
             $topic->broadcast($newPush['response']);
         }
+
+        return true;
     }
 
     protected function checkAccount($conn)
     {
-        $this->db->connect();
-
-        $cookiesArr = $conn->httpRequest->getHeaders()['Cookie'][0];
-
-        $cookiesArr = explode(';', $cookiesArr);
-
+        $cookiesArr = [];
         $cookies = [];
 
-        foreach ($cookiesArr as $cookie) {
-            $cookie = explode('=', $cookie);
-            $cookies[trim($cookie[0])] = trim($cookie[1]);
-        }
+        if (isset($conn->httpRequest->getHeaders()['Cookie'][0])) {
+            $cookiesArr = $conn->httpRequest->getHeaders()['Cookie'][0];
+            $cookiesArr = explode(';', $cookiesArr);
 
-        $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($cookies['id']);
-
-        if ($this->accountsObj && $this->accountsObj->count() > 0) {
-            $this->account = $this->accountsObj->toArray();
-        }
-
-        if (!$this->account) {
+            foreach ($cookiesArr as $cookie) {
+                $cookie = explode('=', $cookie);
+                $cookies[trim($cookie[0])] = trim($cookie[1]);
+            }
+        } else {
             return false;
         }
 
-        $this->account['profile'] = $this->basepackages->profile->getProfile($this->account['id']);
+        if (!isset($cookies['Bazaari'])) {
+            return false;
+        }
 
-        if ($this->checkSession($cookies)) {
-            if (!$this->accountsObj->tunnels) {
-                $newTunnel =
-                    [
-                        'account_id'            => $this->account['id'],
-                        'notifications_tunnel'  => $conn->resourceId
-                    ];
+        //For Installer Progress
+        if (isset($cookies['Installer']) &&
+            $cookies['Installer'] === $cookies['Bazaari']
+        ) {
+            $this->opCache->setCache('InstallerResourceId', $conn->resourceId);
 
-
-                $this->tunnelsObj->assign($newTunnel);
-
-                $this->tunnelsObj->create();
-            } else {
-                $this->accountsObj->tunnels->assign(['notifications_tunnel'  => $conn->resourceId])->update();
-            }
             return true;
+        }
+
+        if (isset($cookies['id'])) {
+            $this->db->connect();
+
+            $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($cookies['id']);
+
+            if ($this->accountsObj && $this->accountsObj->count() > 0) {
+                $this->account = $this->accountsObj->toArray();
+            }
+
+            if (!$this->account) {
+                return false;
+            }
+
+            $this->account['profile'] = $this->basepackages->profile->getProfile($this->account['id']);
+
+            if ($this->checkSession($cookies)) {
+                if (!$this->accountsObj->tunnels) {
+                    $newTunnel =
+                        [
+                            'account_id'            => $this->account['id'],
+                            'notifications_tunnel'  => $conn->resourceId
+                        ];
+
+
+                    $this->tunnelsObj->assign($newTunnel);
+
+                    $this->tunnelsObj->create();
+                } else {
+                    $this->accountsObj->tunnels->assign(['notifications_tunnel'  => $conn->resourceId])->update();
+                }
+                return true;
+            }
         }
 
         return false;
@@ -170,7 +210,7 @@ class Pusher extends BasePackage implements WampServerInterface
         return false;
     }
 
-    protected function markMessengerAway($resourceId)
+    protected function markPusherAway($resourceId)
     {
         //if someone closes their browser and hits refresh.
         $account = $this->basepackages->accounts->checkAccountByNotificationsTunnelId($resourceId);

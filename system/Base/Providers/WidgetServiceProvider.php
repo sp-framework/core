@@ -10,7 +10,6 @@ class WidgetServiceProvider implements ServiceProviderInterface
 {
 	public function register(DiInterface $container) : void
 	{
-
 		$container->setShared(
 			'widget',
 			function () use ($container) {

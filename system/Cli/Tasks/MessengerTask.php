@@ -6,6 +6,7 @@ use Phalcon\Cli\Task;
 use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
+use React\EventLoop\Factory;
 
 class MessengerTask extends Task
 {
@@ -16,11 +17,14 @@ class MessengerTask extends Task
 
     public function startAction()
     {
+        $loop = Factory::create();
+
+        $wsserver = new WsServer($this->basepackages->messenger);
+        $wsserver->enableKeepAlive($loop);
+
         $server = IoServer::factory(
             new HttpServer(
-                new WsServer(
-                    $this->basepackages->messenger
-                )
+                $wsserver
             ),
             4443
         );

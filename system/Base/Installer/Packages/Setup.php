@@ -163,11 +163,19 @@ class Setup
 	public function __call($method, $arguments)
 	{
 		if (method_exists($this, $method)) {
+			$this->progress->updateProgress($method, null, false);
+
 			$call = call_user_func_array([$this, $method], $arguments);
+
+			$callResult = $call;
+
+			if ($call !== false) {
+				$call = true;
+			}
 
 			$this->progress->updateProgress($method, $call, false);
 
-			return $call;
+			return $callResult;
 		}
 	}
 
@@ -177,13 +185,19 @@ class Setup
 
 		foreach ($files['files'] as $key => $file) {
 			try {
-				if (strpos($file, 'progress') === false) {
+				if (strpos($file, 'progress') === false &&
+					strpos($file, 'opcache') === false &&
+					strpos($file, 'pusher-') === false &&
+					strpos($file, 'messenger-') === false
+				) {
 					$this->localContent->delete($file);
 				}
 			} catch (FilesystemException | UnableToDeleteFile $exception) {
 				throw $exception;
 			}
 		}
+
+		return true;
 	}
 
 	protected function cleanOldBackups()
@@ -197,6 +211,8 @@ class Setup
 				throw $exception;
 			}
 		}
+
+		return true;
 	}
 
 	protected function cleanOldCookies()
@@ -226,7 +242,19 @@ class Setup
 			true
 		);
 
+		$this->cookies->set(
+			'Installer',
+			'0',
+			1,
+			'/',
+			null,
+			null,
+			true
+		);
+
 		$this->cookies->send();
+
+		return true;
 	}
 
 	protected function checkDbEmpty()
@@ -244,6 +272,7 @@ class Setup
 				return true;
 			}
 		}
+
 		return true;
 	}
 
@@ -308,16 +337,22 @@ class Setup
 			$this->db->createTable('apps_dash_devtools_api_contracts', $dbName, (new DevtoolsApiContracts)->columns());
 			$this->db->createTable('apps_dash_devtools_api_enums', $dbName, (new DevtoolsApiEnums)->columns());
 		}
+
+		return true;
 	}
 
 	protected function registerRepository()
 	{
 		(new RegisterRepository())->register($this->db);
+
+		return true;
 	}
 
 	protected function registerDomain()
 	{
-		return (new RegisterDomain())->register($this->db, $this->request);
+		(new RegisterDomain())->register($this->db, $this->request);
+
+		return true;
 	}
 
 	protected function registerCore(array $baseConfig)
@@ -330,6 +365,8 @@ class Setup
 		array_push($installedFiles['files'], 'index.php', 'core.json', 'system/bootstrap.php');
 
 		(new RegisterCore())->register($installedFiles, $baseConfig, $this->db);
+
+		return true;
 	}
 
 	protected function registerApp()
@@ -470,6 +507,8 @@ class Setup
 
 			$this->registerAdminView($jsonFile);
 		}
+
+		return true;
 	}
 
 	protected function registerAdminComponent(array $componentFile, $menuId)
@@ -627,16 +666,22 @@ class Setup
 	protected function registerWorkers()
 	{
 		(new RegisterWorkers())->register($this->db);
+
+		return true;
 	}
 
 	protected function registerSchedules()
 	{
 		(new RegisterSchedules())->register($this->db);
+
+		return true;
 	}
 
 	protected function registerTasks()
 	{
 		(new RegisterTasks())->register($this->db);
+
+		return true;
 	}
 
 	protected function writeConfigs($coreJson = null, $writeBaseFile = false)
@@ -711,6 +756,8 @@ class Setup
 		$this->executeSQL(
 			"CREATE DATABASE IF NOT EXISTS " . $this->postData['dbname'] . " CHARACTER SET " . $this->postData['charset'] . " COLLATE " . $this->postData['collation']
 		);
+
+		return true;
 	}
 
 	protected function checkUser($dontCreate = false)
@@ -730,6 +777,8 @@ class Setup
 		}
 
 		$this->executeSQL("GRANT ALL PRIVILEGES ON " . $this->postData['dbname'] . ".* TO ?@'%' WITH GRANT OPTION;", [$this->postData['username']]);
+
+		return true;
 	}
 
 	protected function executeComposer()

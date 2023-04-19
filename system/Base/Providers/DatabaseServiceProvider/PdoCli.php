@@ -33,8 +33,6 @@ class PdoCli
                 $key = $this->getDbKey($dbConfig);
 
                 if (!$key) {
-                    $this->runSetup(true, 'Unable to connect to DB server');
-
                     return true;
                 }
 
@@ -43,7 +41,7 @@ class PdoCli
                 return new Mysql($dbConfig);
             } catch (\PDOException $e) {
                 if ($e->getCode() === 1044 || $e->getCode() === 1045 || $e->getCode() === 1049) {
-                    $this->runSetup(true, $e->getMessage());
+                    return true;
                 }
 
                 throw $e;

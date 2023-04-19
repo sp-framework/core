@@ -10,12 +10,14 @@ use Phalcon\Http\Response\Cookies;
 use Phalcon\Mvc\View\Simple;
 use System\Base\Installer\Packages\Setup as SetupPackage;
 use System\Base\Providers\BasepackagesServiceProvider\Basepackages;
+use System\Base\Providers\CacheServiceProvider\OpCache;
 use System\Base\Providers\ContentServiceProvider\Local\Content as LocalContent;
 use System\Base\Providers\SecurityServiceProvider\Crypt;
 use System\Base\Providers\SecurityServiceProvider\Random;
 use System\Base\Providers\SecurityServiceProvider\Security;
 use System\Base\Providers\SessionServiceProvider\Session;
 use System\Base\Providers\ValidationServiceProvider\Validation;
+use System\Base\Providers\WebSocketServiceProvider\Wss;
 
 Class Setup
 {
@@ -29,7 +31,7 @@ Class Setup
 
 	protected $coreJson;
 
-	public function __construct($session)
+	public function __construct($session, $configsObj)
 	{
 		$container = new FactoryDefault();
 
@@ -93,6 +95,29 @@ Class Setup
 			}
 		);
 
+		if (extension_loaded('Zend OPcache')) {
+			$container->setShared(
+				'opCache',
+				function () {
+					return (new OpCache())->init();
+				}
+			);
+		} else {
+			$container->setShared(
+				'opCache',
+				function () {
+					return false;
+				}
+			);
+		}
+
+		$container->setShared(
+			'wss',
+			function () use ($configsObj) {
+				return (new Wss($configsObj))->init();
+			}
+		);
+
 		$container->setShared('session', $session);
 
 		$this->container = $container;
@@ -107,12 +132,15 @@ Class Setup
 		$this->security = $this->container->getShared('security');
 		$this->random = $this->container->getShared('random');
 		$this->session = $this->container->getShared('session');
+		$this->cookies = $this->container->getShared('cookies');
 
 		$this->view = $this->container->getShared('view');
 
 		$this->localContent = $this->container->getShared('localContent');
 
-		$this->progress = $this->container->getShared('basepackages')->progress->init($this->localContent);
+		$this->basepackages = $this->container->getShared('basepackages');
+
+		$this->progress = $this->basepackages->progress->init($this->container);
 	}
 
 	public function run($onlyUpdateDb = false, $message = null)
@@ -121,9 +149,11 @@ Class Setup
 			if (!isset($this->postData['session'])) {
 				$this->setupPackage = new SetupPackage($this->container, $this->postData);
 
-				if (!$this->progress->checkProgressFile()) {
-					$this->registerProgressMethods();
+				if ($this->progress->checkProgressFile()) {
+					$this->progress->deleteProgressFile();
 				}
+
+				$this->registerProgressMethods();
 			}
 		} catch (\Exception $e) {
 			$this->progress->resetProgress();
@@ -395,10 +425,9 @@ Class Setup
 					$this->view->responseMessage = 'Error retrieving new pass.';
 				}
 			} else {
-				$progress = $this->progress->getProgress($this->postData['session']);
+				$progress = $this->progress->getProgress($this->postData['session'], true);
 
 				if (isset($this->postData['composer'])) {
-					$progress = Json::decode($progress, true);
 					$callResult = $this->progress->getCallResult('executeComposer');
 
 					if ($callResult === false) {
@@ -439,6 +468,25 @@ Class Setup
 				return $this->response->send();
 			}
 		} else {
+			$this->cookies->useEncryption(false);
+
+			$this->cookies->set(
+				'Installer',
+				$this->session->getId(),
+				time() + 600,
+				'/',
+				null,
+				null,
+				true,
+				[
+					'samesite'	=> 'Strict'
+				]
+			);
+
+			$this->cookies->send();
+
+			$this->cookies->useEncryption(true);
+
 			echo $this->container->getShared('view')->render(
 				'setup',
 				[

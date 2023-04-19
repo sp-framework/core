@@ -54,7 +54,7 @@ class Error
 		return $this;
 	}
 
-	public function handle(\Exception $exception)
+	public function handle(\throwable $exception)
 	{
 		$this->exception = $exception;
 

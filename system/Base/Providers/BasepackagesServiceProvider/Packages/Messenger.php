@@ -40,7 +40,7 @@ class Messenger extends BasePackage implements MessageComponentInterface
     {
         $this->clients = new \SplObjectStorage;
 
-        $this->initSocket();
+        // $this->initSocket();
 
         parent::onConstruct();
     }
@@ -62,7 +62,8 @@ class Messenger extends BasePackage implements MessageComponentInterface
     //Off The Record Messages
     public function onMessage(ConnectionInterface $from, $msg)
     {
-        $message = Json::decode($msg, true);
+        // var_dump($from, $msg);die();
+        // $message = Json::decode($msg, true);
 
         var_dump($from->resourceId, $msg);
         // if (isset($message['changeStatus'])) {
@@ -203,13 +204,13 @@ class Messenger extends BasePackage implements MessageComponentInterface
         $this->addResponse('Could not modify status, messenger service offline.', 1);
     }
 
-    protected function initSocket()
-    {
-        $context = new ZMQContext();
+    // protected function initSocket()
+    // {
+    //     $context = new ZMQContext();
 
-        $this->socket = $context->getSocket(\ZMQ::SOCKET_PUSH, 'New Notification');
-        $this->socket->connect("tcp://localhost:5555");
-    }
+    //     $this->socket = $context->getSocket(\ZMQ::SOCKET_PUSH, 'New Notification');
+    //     $this->socket->connect("tcp://localhost:5555");
+    // }
 
     protected function pushNotification($type, $from, $to, bool $broadcast = null, array $data)
     {
@@ -222,7 +223,7 @@ class Messenger extends BasePackage implements MessageComponentInterface
                 'response'          => $data
             ];
 
-        $this->socket->send(Json::encode($message));
+        $this->wss->send($message);
     }
 
     public function getMessages(array $data)

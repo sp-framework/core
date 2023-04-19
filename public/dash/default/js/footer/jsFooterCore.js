@@ -9817,6 +9817,13 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var BazTunnels = function() {
     var BazTunnels = void 0;
     var dataCollection, timerId;
+    dataCollection = window.dataCollection;
+    dataCollection.env.wsTunnels = { };
+    if (dataCollection.env.httpScheme === 'http') {
+        dataCollection.env.wsTunnels.protocol = 'ws';
+    } else if (dataCollection.env.httpScheme === 'https') {
+        dataCollection.env.wsTunnels.protocol = 'wss';
+    }
 
     // var reconnectMessengerTunnel = null;
     // var reconnectPusherTunnel = null;
@@ -9828,17 +9835,6 @@ var BazTunnels = function() {
 
     //Init
     function init() {
-        dataCollection = window.dataCollection;
-        dataCollection.env.wsTunnels = { };
-        if (dataCollection.env.httpScheme === 'http') {
-            dataCollection.env.wsTunnels.protocol = 'ws';
-        } else if (dataCollection.env.httpScheme === 'https') {
-            dataCollection.env.wsTunnels.protocol = 'wss';
-        }
-
-        dataCollection.env.wsTunnels.pusher = { };
-        dataCollection.env.wsTunnels.messenger = { };
-
         // initMessengerOTR();
         initPusherTunnel();
     }
@@ -9878,7 +9874,12 @@ var BazTunnels = function() {
         };
     }
 
-    function initPusherTunnel() {
+    function initPusherTunnel(options) {
+        var tunnelsToInit = ['systemNotifications','messengerNotifications','systemAnnouncements','progress'];
+        if (options && options.tunnelsToInit) {
+            tunnelsToInit = options.tunnelsToInit;
+        }
+
         dataCollection.env.wsTunnels.pusher = { };
         dataCollection.env.wsTunnels.pusher =
             new ab.Session(dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/pusher/',
@@ -9886,47 +9887,78 @@ var BazTunnels = function() {
                     //eslint-disable-next-line
                     console.info('WebSocket connection open');
 
-                    dataCollection.env.wsTunnels.pusher.subscribe('systemNotifications', function(topic, data) {
-                        BazNotifications.onMessage('systemNotifications', data);
-                    });
+                    if (tunnelsToInit.includes('systemNotifications')) {
+                        dataCollection.env.wsTunnels.pusher.subscribe('systemNotifications', function(topic, data) {
+                            BazNotifications.onMessage('systemNotifications', data);
+                        });
+                    }
 
-                    dataCollection.env.wsTunnels.pusher.subscribe('messengerNotifications', function(topic, data) {
-                        BazMessenger.onMessage(data);
-                    });
+                    // if (tunnelsToInit.includes('messengerNotifications')) {
+                    //     dataCollection.env.wsTunnels.pusher.subscribe('messengerNotifications', function(topic, data) {
+                    //         BazMessenger.onMessage(data);
+                    //     });
+                    // }
 
-                    dataCollection.env.wsTunnels.pusher.subscribe('systemAnnouncements', function(topic, data) {
-                        BazAnnouncements.onMessage('systemAnnouncements', data);
-                    });
+                    if (tunnelsToInit.includes('systemAnnouncements')) {
+                        dataCollection.env.wsTunnels.pusher.subscribe('systemAnnouncements', function(topic, data) {
+                            BazAnnouncements.onMessage('systemAnnouncements', data);
+                        });
+                    }
 
-                    dataCollection.env.wsTunnels.pusher.subscribe('progress', function(topic, data) {
-                        BazProgress.onMessage(data);
-                    });
+                    if (tunnelsToInit.includes('progress')) {
+                        dataCollection.env.wsTunnels.pusher.subscribe('progress', function(topic, data) {
+                            BazProgress.onMessage(data);
+                        });
+                    }
 
                     timerId = BazHelpers.getTimerId('initPusherTunnel');
                     if (timerId) {
                         BazHelpers.setTimeoutTimers.stop(timerId, null, 'initPusherTunnel');
-                        BazNotifications.serviceOnline();
-                        BazMessenger.serviceOnline();
-                        BazAnnouncements.serviceOnline();
-                        BazProgress.serviceOnline();
+                        if (tunnelsToInit.includes('systemNotifications')) {
+                            BazNotifications.serviceOnline();
+                        }
+                        // if (tunnelsToInit.includes('messengerNotifications')) {
+                        //     BazMessenger.serviceOnline();
+                        // }
+                        if (tunnelsToInit.includes('systemAnnouncements')) {
+                            BazAnnouncements.serviceOnline();
+                        }
+                        if (tunnelsToInit.includes('progress')) {
+                            BazProgress.serviceOnline();
+                        }
                     } else {
-                        BazNotifications.init();
-                        BazMessenger.init();
-                        BazAnnouncements.init();
-                        BazProgress.init();
+                        if (tunnelsToInit.includes('systemNotifications')) {
+                            BazNotifications.init();
+                        }
+                        // if (tunnelsToInit.includes('messengerNotifications')) {
+                        //     BazMessenger.init();
+                        // }
+                        if (tunnelsToInit.includes('systemAnnouncements')) {
+                            BazAnnouncements.init();
+                        }
+                        if (tunnelsToInit.includes('progress')) {
+                            BazProgress.init();
+                        }
                     }
                 },
                 function() {
-                    BazNotifications.serviceOffline();
-                    BazMessenger.serviceOffline();
-                    BazAnnouncements.serviceOffline();
-                    BazProgress.serviceOffline();
+                    if (tunnelsToInit.includes('systemNotifications')) {
+                        BazNotifications.serviceOffline();
+                    }
+                    // if (tunnelsToInit.includes('messengerNotifications')) {
+                    //     BazMessenger.serviceOffline();
+                    // }
+                    if (tunnelsToInit.includes('systemAnnouncements')) {
+                        BazAnnouncements.serviceOffline();
+                    }
+                    if (tunnelsToInit.includes('progress')) {
+                        BazProgress.serviceOffline();
+                    }
                     //eslint-disable-next-line
                     console.warn('WebSocket connection closed');
 
                     BazHelpers.setTimeoutTimers.add(function() {
-                        BazNotifications.serviceOffline();
-                        initPusherTunnel();
+                        initPusherTunnel(options);
                     }, 10000, null, 'initPusherTunnel');
                 },
                 {
@@ -9946,11 +9978,14 @@ var BazTunnels = function() {
             loadHeaderAt : null,
             loadFooterAt : null
         };
-        BazTunnels.init = function(options) {
-            init(_extends(BazTunnels.defaults, options));
+        BazTunnels.init = function() {
+            init();
         }
         BazTunnels.initMessengerOTR = function(options) {
             initMessengerOTR(_extends(BazTunnels.defaults, options));
+        }
+        BazTunnels.initPusherTunnel = function(options) {
+            initPusherTunnel(_extends(BazTunnels.defaults, options));
         }
     }
 
@@ -11475,7 +11510,11 @@ var BazProgress = function() {
     var progressCounter = 0;
     var online = false;
     var element;
+    var callableFunc = null;
     var dataCollection = window.dataCollection;
+    var url
+    var postData = { };
+    var progressOptions;
     // Error
     // function error(errorMsg) {
     //     throw new Error(errorMsg);
@@ -11518,27 +11557,51 @@ var BazProgress = function() {
             '</div>' +
             '<div class="row text-center text-sm text-primary m-1">' +
                 '<div class="col">' +
-                    '<span class="sr-only progress-span"></span>' +
+                    '<span class="sr-only ' + $(element)[0].id + '-progress-span"></span>' +
                     '<span class="' + $(element)[0].id + '-progress-span"></span>' +
                 '</div>' +
             '</div>'
         );
     }
 
-    function getProgress() {
-        var postData = { };
-        postData[$('#security-token').attr('name')] = $('#security-token').val();
+    function getProgress(options) {
+        progressOptions = options;
 
-        $.post(
-            dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/system/progress/getProgress',
-            postData,
-            function(response)
-        {
+        if (callableFunc && callableFunc['beforeStart']) {
+            if (callableFunc['beforeStart']() === false) {
+                resetProgressCounter();
+                return;
+            }
+        }
+
+        if (options && options.url) {
+            url = options.url;
+        } else {
+            url =
+                dataCollection.env.httpScheme +
+                '://' + dataCollection.env.httpHost + '/' +
+                dataCollection.env.appRoute + '/system/progress/getProgress';
+        }
+
+        if (options && options.postData) {
+            postData = $.extend(postData, options.postData);
+        } else {
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+        }
+
+        $.post(url, postData, function(response) {
             processResponse(response);
         }, 'json');
     }
 
     function processResponse(response) {
+        if (callableFunc && callableFunc['beforeProcess']) {
+            if (callableFunc['beforeProcess'](response) === false) {
+                resetProgressCounter();
+                return;
+            }
+        }
+
         var timerId;
         if (response && response.responseCode === 0) {
             if (response.responseData) {
@@ -11571,9 +11634,11 @@ var BazProgress = function() {
                             if (timerId) {
                                 BazHelpers.setTimeoutTimers.stop(timerId, null, 'progressCounter');
                             }
-                            BazHelpers.setTimeoutTimers.add(function() {
-                                getProgress();
-                            }, 500);
+                            if (BazHelpers.getTimerId('getProgress') === false) {
+                                BazHelpers.setTimeoutTimers.add(function() {
+                                    getProgress(progressOptions);
+                                }, 500, null, 'getProgress');
+                            }
                         }
                     } else if (responseData['total'] === responseData['completed']) {
                         if (online === false) {
@@ -11586,6 +11651,10 @@ var BazProgress = function() {
                         $('.' + $(element)[0].id + '-bar').removeClass(function (index, className) {
                             return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
                         }).addClass('bg-success');
+
+                        if (callableFunc && callableFunc['onComplete']) {
+                            callableFunc['onComplete'](response);
+                        }
                     } else {
                         resetProgressCounter();
                     }
@@ -11598,6 +11667,13 @@ var BazProgress = function() {
         } else {
             resetProgressCounter();
         }
+
+        if (callableFunc && callableFunc['afterProcess']) {
+            if (callableFunc['afterProcess'](response) === false) {
+                resetProgressCounter();
+                return;
+            }
+        }
     }
 
     function resetProgressCounter() {
@@ -11607,7 +11683,7 @@ var BazProgress = function() {
             if (online === false) {
                 BazHelpers.setTimeoutTimers.stopAll();
                 BazHelpers.setTimeoutTimers.add(function() {
-                    getProgress();
+                    getProgress(progressOptions);
                 }, 1000, null, 'progressCounter');
             }
         }
@@ -11617,6 +11693,10 @@ var BazProgress = function() {
         //eslint-disable-next-line
         console.log(data);
         processResponse(data);
+    }
+
+    function setCallable(callable) {
+        callableFunc = callable;
     }
 
     function bazProgressConstructor() {
@@ -11639,13 +11719,19 @@ var BazProgress = function() {
         BazProgress.onMessage = function(data) {
             onMessage(data);
         }
-        BazProgress.getProgress = function() {
-            if (online === false) {
-                getProgress();
+        BazProgress.getProgress = function(options, force = false) {
+            if (online === false || force === true) {
+                getProgress(options);
             }
         }
         BazProgress.buildProgressBar = function(el) {
             buildProgressBar(el);
+        }
+        BazProgress.setCallable = function(callable) {
+            setCallable(callable);
+        }
+        BazProgress.isOnline = function() {
+            return online;
         }
     }
 

@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Carbon\Carbon;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToReadFile;
@@ -13,14 +12,10 @@ use System\Base\BasePackage;
 
 class Progress extends BasePackage
 {
-    public function init($localContent = null, $opCache = null)
+    public function init($container = null)
     {
-        if ($localContent) {
-            $this->localContent = $localContent;
-        }
-
-        if ($opCache) {
-            $this->opCache = $opCache;
+        if ($container) {
+            $this->container = $container;
         }
 
         $this->checkProgressPath();
@@ -94,7 +89,7 @@ class Progress extends BasePackage
         return false;
     }
 
-    public function getProgress($session = null)
+    public function getProgress($session = null, $returnArray = false)
     {
         $progressFile = $this->readProgressFile($session);
 
@@ -102,15 +97,20 @@ class Progress extends BasePackage
             return false;
         }
 
-        return Json::encode(
+        $progress =
             [
                 'total'             => $progressFile['total'],
                 'completed'         => $progressFile['completed'],
                 'preCheckComplete'  => $progressFile['preCheckComplete'],
                 'percentComplete'   => number_format(($progressFile['completed'] * 100) / $progressFile['total']),
                 'runners'           => $progressFile['runners']
-            ]
-        );
+            ];
+
+        if ($returnArray) {
+            return $progress;
+        }
+
+        return Json::encode($progress);
     }
 
     public function getCallResult($method)
@@ -148,7 +148,6 @@ class Progress extends BasePackage
                 }
             }
 
-
             if (count($progressFile['processes']) === 0 && $deleteFile) {
                 $this->deleteProgressFile();
 
@@ -161,18 +160,26 @@ class Progress extends BasePackage
 
             $this->writeProgressFile($progressFile['processes'], false, false, true, $runners, null, $method, $callResult);
 
-            $account =
-                $this->basepackages->accounts->getAccountById(
-                    $this->auth->account()['id'], false, false, false, false, false, true
-                );
+            if ($callResult === true) {
+                if (isset($this->apps)) {
+                    $account =
+                        $this->basepackages->accounts->getAccountById(
+                            $this->auth->account()['id'], false, false, false, false, false, true
+                        );
 
-            if ($account && isset($account['notifications_tunnel'])) {
+                    if ($account && isset($account['notifications_tunnel'])) {
+                        $notificationTunnel = $account['notifications_tunnel'];
+                    }
+                } else {
+                    $notificationTunnel = 0;
+                }
+
                 $progressFile = $this->readProgressFile();
 
                 $this->wss->send(
                     [
                         'type'              => 'progress',
-                        'to'                => $account['notifications_tunnel'],
+                        'to'                => $notificationTunnel,
                         'response'          => [
                             'responseCode'      => 0,
                             'responseMessage'   => 'Ok',
@@ -286,9 +293,9 @@ class Progress extends BasePackage
                                 }
 
                                 if (!isset($allProcess['callExecTime'])) {
-                                    $allProcess['callExecTime'] = Carbon::now()->getTimestampMs();
+                                    $allProcess['callExecTime'] = gettimeofday(true);
                                 } else {
-                                    $allProcess['callExecTime'] = Carbon::now()->getTimestampMs() - $allProcess['callExecTime'];
+                                    $allProcess['callExecTime'] = gettimeofday(true) - $allProcess['callExecTime'];
                                 }
                             }
                         }

@@ -99,6 +99,7 @@ final class Bootstrap
             $container->register(new $provider());
         }
 
+        $logger = $container->getShared('logger');
         $dispatcher = $container->getShared('dispatcher');
         $dispatcher->setDefaultNamespace('System\Cli\Tasks');
 
@@ -127,5 +128,7 @@ final class Bootstrap
             fwrite(STDERR, $exception->getMessage() . PHP_EOL);
             exit(1);
         }
+
+        $logger->commit();
     }
 }
