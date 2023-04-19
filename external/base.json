@@ -6,6 +6,8 @@
         "guzzlehttp/guzzle": "^7.5",
         "symfony/translation" : "^v5.4.22",
         "bjeavons/zxcvbn-php": "^1.2",
-        "bluelibraries/dns": "^1.1.1"
+        "bluelibraries/dns": "^1.1.1",
+        "react/zmq": "^0.4.0",
+        "cboden/ratchet": "^0.4.3"
     }
 }
