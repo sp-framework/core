@@ -389,10 +389,10 @@ class Accounts extends BasePackage
         $data['email'] = strtolower($data['email']);
         $data['username'] = str_replace('@', '.', $data['email']);
 
-        $canLogin = true;
+        $canLogin = '1';
 
         if ($this->app['approve_accounts_manually'] == '1') {
-            $canLogin = false;
+            $canLogin = '0';
             $data['status'] = '0';
         }
 
@@ -504,24 +504,14 @@ class Accounts extends BasePackage
                     $permission = $canloginModel::findFirst(['account_id = ' . $id . ' AND app_id = "' . $appId . '"']);
 
                     if ($permission) {
-                        if ($allowed === true) {
-                            $updatePermission['allowed'] = '1';
-                        } else {
-                            $updatePermission['allowed'] = '0';
-                        }
-
+                        $updatePermission['allowed'] = $allowed;
                         $permission->assign($updatePermission);
 
                         $permission->update();
                     } else {
                         $newPermission['account_id'] = $id;
                         $newPermission['app_id'] = $appId;
-
-                        if ($allowed == 'true') {
-                            $newPermission['allowed'] = '1';
-                        } else {
-                            $newPermission['allowed'] = '0';
-                        }
+                        $newPermission['allowed'] = $allowed;
 
                         $canloginModel->assign($newPermission);
 
@@ -648,16 +638,23 @@ class Accounts extends BasePackage
                     $allowed = $allowed->toArray();
 
                     if ($allowed['account_id'] == $id &&
-                        $allowed['app_id'] === $appID &&
-                        $allowed['allowed'] == true
+                        $allowed['app_id'] === $appID
                     ) {
                         return $allowed;
                     }
                 }
             );
 
-        if (count($canLogin) === 1) {
+        if (count($canLogin) === 1 &&
+            ($canLogin[0]['allowed'] == '1' || $canLogin[0]['allowed'] == '2')
+        ) {
             return true;
+        } else if (count($canLogin) === 1 && $canLogin[0]['allowed'] == '0') {
+            return $canLogin[0];
+        } else if (count($canLogin) > 1) {
+            $this->logger->log->debug('Multiple login entries for user :' . $id . ' are wrong');
+
+            return true;//Sending true as we dont want to make more entries.
         }
 
         return false;

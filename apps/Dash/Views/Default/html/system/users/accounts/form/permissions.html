@@ -25,7 +25,7 @@
     {% set vdivide = '' %}
 {% endif %}
 <div class="row">
-    <div class="col-md-4">
+    <div class="col">
         <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
@@ -35,9 +35,9 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'can_login',
-                        'fieldLabel'                     : 'Can Login To App?',
-                        'fieldHelp'                      : true,
-                        'fieldAdditionalClass'           : 'mb-1',
+                        'fieldLabel'                     : false,
+                        'fieldHelp'                      : false,
+                        'fieldAdditionalClass'           : 'm-0',
                         'fieldHelpTooltipContent'        : 'Select apps to which this account can login',
                         'fieldRequired'                  : false,
                         'fieldType'                      : 'html',
@@ -47,17 +47,33 @@
                     ]
                 )}}
                 {% for app in apps %}
-                    {% set checkboxIds[componentId ~ '-' ~ sectionId ~ '-can_login-' ~ app['route']] = app['route'] %}
-                    {% if account['can_login'][app['id']] is defined %}
-                        {% if account['can_login'][app['id']] == true %}
-                            {% set checked = true %}
-                        {% else %}
-                            {% set checked = false %}
-                        {% endif %}
-                    {% else %}
-                        {% set checked = false %}
+                    {% set radioIds[componentId ~ '-' ~ sectionId ~ '-can_login-' ~ app['route']] = app['route'] %}
+                    {% if account['can_login'][app['id']] is not defined %}
+                        {% set account['can_login'][app['id']] = '2' %}
                     {% endif %}
                     <div class="app" data-id="{{app['id']}}" data-route="{{app['route']}}">
+                        {% set fieldRadioButtons = [] %}
+                        {% set fieldRadioButtons[app['route'] ~ '2'] =
+                            [
+                                'title'                           : 'APP ALLOWED ROLE',
+                                'type'                            : 'primary',
+                                'dataValue'                       : '2'
+                            ]
+                        %}
+                        {% set fieldRadioButtons[app['route'] ~ '1'] =
+                            [
+                                'title'                           : 'YES',
+                                'type'                            : 'success',
+                                'dataValue'                       : '1'
+                            ]
+                        %}
+                        {% set fieldRadioButtons[app['route'] ~ '0'] =
+                            [
+                                'title'                           : 'NO',
+                                'type'                            : 'danger',
+                                'dataValue'                       : '0'
+                            ]
+                        %}
                         {{adminltetags.useTag('fields',
                             [
                                 'component'                      : component,
@@ -65,72 +81,72 @@
                                 'componentId'                    : componentId,
                                 'sectionId'                      : sectionId,
                                 'fieldId'                        : 'can_login-' ~ app['route'],
-                                'fieldLabel'                     : false,
-                                'fieldType'                      : 'checkbox',
-                                'fieldCheckboxType'              : 'success',
-                                'fieldCheckboxLabel'             : app['name'],
-                                'fieldCheckboxChecked'           : checked,
-                                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                                'fieldBazScan'                   : false
+                                'fieldLabel'                     : 'Can Login to app ' ~ app['name'],
+                                'fieldType'                      : 'radio',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : app['name'] ~ ' login permission for this user. If set to APP ALLOWED ROLE and the user is assigned to that role, the user will be allowed to login. This is the default setting for all users when new app is created.',
+                                'fieldBazScan'                   : false,
+                                'fieldRadioPlacementType'        : 'horizontal',
+                                'fieldRadioButtons'              : fieldRadioButtons,
+                                'fieldRadioChecked'              : account['can_login'][app['id']]
                             ]
                         )}}
                     </div>
                 {% endfor %}
-                {% set checkboxIds = json_encode(checkboxIds, 16) %}
+                {% set radioIds = json_encode(radioIds, 16) %}
             </div>
         </div>
     </div>
+</div>
+<hr>
+<div class="row {{vdivide}}">
     <div class="col">
-        <div class="row {{vdivide}}">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'role_id',
-                        'fieldLabel'                     : 'Account Role',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select a role for this account.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldDataSelect2Options'        : roles,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': accountRole
-                    ]
-                )}}
-            </div>
-            <div class="col" {{permissionshidden}}>
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'override_role',
-                        'fieldLabel'                     : 'Account Level Permissions',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select permissions for the account<br>NOTE: These permissions override role permissions',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'warning',
-                        'fieldCheckboxLabel'             : '',
-                        'fieldCheckboxChecked'           : override,
-                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
-        </div>
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'role_id',
+                'fieldLabel'                     : 'Account Role',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select a role for this account.',
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldRequired'                  : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldDataSelect2Options'        : roles,
+                'fieldDataSelect2OptionsKey'     : 'id',
+                'fieldDataSelect2OptionsValue'   : 'name',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': accountRole
+            ]
+        )}}
+    </div>
+    <div class="col" {{permissionshidden}}>
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'override_role',
+                'fieldLabel'                     : 'Account Level Permissions',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select permissions for the account<br>NOTE: These permissions override role permissions',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'warning',
+                'fieldCheckboxLabel'             : '',
+                'fieldCheckboxChecked'           : override,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
     </div>
 </div>
 <div class="row" id="account-permissions" {{permissionshidden}}>
@@ -264,20 +280,17 @@ dataCollectionSection =
             'afterInit'     : function () {
                 //CanLogin
                 dataCollectionSection['data']['can_login'] = { };
-                var checkboxIds = JSON.parse('{{checkboxIds}}');
-                for (var checkbox in checkboxIds) {
-                    $('#' + checkbox).click(function() {
+                var radioIds = JSON.parse('{{radioIds}}');
+
+                for (var radio in radioIds) {
+                    $('#' + radio).click(function() {
                         var id = $(this)[0].id;
                         extractCheckboxData(id, $('#' + id).parents('.app').data('id'))
                     });
-                    extractCheckboxData(checkbox, $('#' + checkbox).parents('.app').data('id'))
+                    extractCheckboxData(radio, $('#' + radio).parents('.app').data('id'))
                 }
-                function extractCheckboxData(checkbox, app) {
-                    if ($('#' + checkbox)[0].checked === true) {
-                        dataCollectionSection['data']['can_login'][app] = true;
-                    } else {
-                        dataCollectionSection['data']['can_login'][app] = false;
-                    }
+                function extractCheckboxData(radio, app) {
+                    dataCollectionSection['data']['can_login'][app] = $('#' + radio).find('input[type=radio]:checked').data('value');
                 }
             }
         },

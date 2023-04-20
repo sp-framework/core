@@ -334,10 +334,10 @@ class Auth
             }
 
             //New App OR New account via rego
-            if (!$this->accounts->canLogin($this->account['id'], $this->app['id'])) {
+            $canLogin = $this->accounts->canLogin($this->account['id'], $this->app['id']);
 
+            if ($canLogin === false) {
                 if ($this->app['can_login_role_ids']) {
-
                     $this->app['can_login_role_ids'] = Json::decode($this->app['can_login_role_ids'], true);
 
                     if (in_array($this->account['role_id'], $this->app['can_login_role_ids'])) {
@@ -346,7 +346,7 @@ class Auth
 
                         $newLogin['account_id'] = $this->account['id'];
                         $newLogin['app_id'] = $this->app['id'];
-                        $newLogin['allowed'] = '1';
+                        $newLogin['allowed'] = '2';
 
                         $canloginModel->assign($newLogin);
 
@@ -360,7 +360,23 @@ class Auth
 
                         return false;
                     }
+                } else {
+                    $this->packagesData->responseCode = 1;
+
+                    $this->packagesData->responseMessage = 'Error: Contact System Administrator';
+
+                    $this->logger->log->debug('App\'s can_login_role_ids not set for app ' . $this->app['name']);
+
+                    return false;
                 }
+            } else if ($canLogin['allowed'] == '0') {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Error: Contact System Administrator';
+
+                $this->logger->log->debug($this->account['email'] . ' and their role is not allowed to login to app ' . $this->app['name']);
+
+                return false;
             }
 
             if (!$this->secTools->checkPassword($data['pass'], $this->account['password'])) {//Password Fail
