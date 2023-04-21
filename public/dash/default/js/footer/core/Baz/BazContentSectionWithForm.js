@@ -106,7 +106,7 @@
                         var url = window.location.href;
 
                         if (!url.includes('resetcache')) {
-                            $('.btn-tool-reset-cache').attr('href', url + '/resetcache/true');
+                            $('.btn-tool-reset-cache').attr('href', url + '/q/resetcache/true');
                         } else {
                             $('.btn-tool-reset-cache').attr('href', url);
                         }
