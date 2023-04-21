@@ -376,10 +376,14 @@ var BazHelpers = function() {
             let index;
             if (dataCollectionObj) {
                 index = getIndex(timers, 'dataCollectionObj', dataCollectionObj);
-                id = timers[index]['id'];
+                if (index !== -1) {
+                    id = timers[index]['id'];
+                }
             } else if (identifier) {
                 index = getIndex(timers, 'identifier', identifier);
-                id = timers[index]['id'];
+                if (index !== -1) {
+                    id = timers[index]['id'];
+                }
             } else {
                 index = getIndex(timers, 'id', id);
             }

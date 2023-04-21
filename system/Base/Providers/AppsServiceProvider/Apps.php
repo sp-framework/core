@@ -42,10 +42,12 @@ class Apps extends BasePackage
 		return $this;
 	}
 
-	public function getAppInfo()
+	public function getAppInfo($route = null)
 	{
 		if (PHP_SAPI === 'cli') {
-			$this->appInfo = $this->getRouteApp('admin');
+			$this->appInfo = $this->getRouteApp($route);
+
+			$this->ipFilter = (new IpFilter())->init($this, $this->appInfo);
 		}
 
 		if (isset($this->appInfo)) {

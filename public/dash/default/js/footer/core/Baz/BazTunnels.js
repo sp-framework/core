@@ -23,6 +23,8 @@ var BazTunnels = function() {
     } else if (dataCollection.env.httpScheme === 'https') {
         dataCollection.env.wsTunnels.protocol = 'wss';
     }
+    dataCollection.env.wsTunnels.messenger = { };
+    dataCollection.env.wsTunnels.pusher = { };
 
     // var reconnectMessengerTunnel = null;
     // var reconnectPusherTunnel = null;
@@ -40,8 +42,8 @@ var BazTunnels = function() {
 
     // Init Messenger tunnel as needed. Messages can be transmitted purely on WSS avoiding message to be added to DB.
     function initMessengerOTR() {
-        dataCollection.env.wsTunnels.messenger = { };
-        dataCollection.env.wsTunnels.messenger = new WebSocket(dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/messenger/');
+        dataCollection.env.wsTunnels.messenger =
+            new WebSocket(dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/messenger/');
 
         dataCollection.env.wsTunnels.messenger.onopen = null;
         dataCollection.env.wsTunnels.messenger.onopen = function() {
@@ -79,9 +81,8 @@ var BazTunnels = function() {
             tunnelsToInit = options.tunnelsToInit;
         }
 
-        dataCollection.env.wsTunnels.pusher = { };
         dataCollection.env.wsTunnels.pusher =
-            new ab.Session(dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/pusher/',
+            new ab.Session(dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/pusher/app/' + dataCollection.env.appRoute,
                 function() {
                     //eslint-disable-next-line
                     console.info('WebSocket connection open');
@@ -92,11 +93,11 @@ var BazTunnels = function() {
                         });
                     }
 
-                    // if (tunnelsToInit.includes('messengerNotifications')) {
-                    //     dataCollection.env.wsTunnels.pusher.subscribe('messengerNotifications', function(topic, data) {
-                    //         BazMessenger.onMessage(data);
-                    //     });
-                    // }
+                    if (tunnelsToInit.includes('messengerNotifications')) {
+                        dataCollection.env.wsTunnels.pusher.subscribe('messengerNotifications', function(topic, data) {
+                            BazMessenger.onMessage(data);
+                        });
+                    }
 
                     if (tunnelsToInit.includes('systemAnnouncements')) {
                         dataCollection.env.wsTunnels.pusher.subscribe('systemAnnouncements', function(topic, data) {
@@ -116,9 +117,9 @@ var BazTunnels = function() {
                         if (tunnelsToInit.includes('systemNotifications')) {
                             BazNotifications.serviceOnline();
                         }
-                        // if (tunnelsToInit.includes('messengerNotifications')) {
-                        //     BazMessenger.serviceOnline();
-                        // }
+                        if (tunnelsToInit.includes('messengerNotifications')) {
+                            BazMessenger.serviceOnline();
+                        }
                         if (tunnelsToInit.includes('systemAnnouncements')) {
                             BazAnnouncements.serviceOnline();
                         }
@@ -129,9 +130,9 @@ var BazTunnels = function() {
                         if (tunnelsToInit.includes('systemNotifications')) {
                             BazNotifications.init();
                         }
-                        // if (tunnelsToInit.includes('messengerNotifications')) {
-                        //     BazMessenger.init();
-                        // }
+                        if (tunnelsToInit.includes('messengerNotifications')) {
+                            BazMessenger.init();
+                        }
                         if (tunnelsToInit.includes('systemAnnouncements')) {
                             BazAnnouncements.init();
                         }
@@ -144,9 +145,9 @@ var BazTunnels = function() {
                     if (tunnelsToInit.includes('systemNotifications')) {
                         BazNotifications.serviceOffline();
                     }
-                    // if (tunnelsToInit.includes('messengerNotifications')) {
-                    //     BazMessenger.serviceOffline();
-                    // }
+                    if (tunnelsToInit.includes('messengerNotifications')) {
+                        BazMessenger.serviceOffline();
+                    }
                     if (tunnelsToInit.includes('systemAnnouncements')) {
                         BazAnnouncements.serviceOffline();
                     }

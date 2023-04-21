@@ -31,9 +31,9 @@ return
 			],
 		'cli'	=>
 			[
-				'System\Base\Providers\HttpServiceProvider',
 				'System\Base\Providers\ConfigServiceProvider',
 				'System\Base\Providers\EventsServiceProvider',
+				'System\Base\Providers\HttpServiceProvider',
 				// 'System\Base\Providers\AnnotationsServiceProvider',
 				'System\Base\Providers\SecurityServiceProvider',
 				'System\Base\Providers\SessionServiceProvider',

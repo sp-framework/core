@@ -16,6 +16,10 @@ class Pusher extends BasePackage implements WampServerInterface
 
     protected $tunnelsObj;
 
+    protected $account;
+
+    protected $appRoute;
+
     public function init()
     {
         $this->tunnelsObj = new BasepackagesUsersAccountsTunnels;
@@ -132,6 +136,28 @@ class Pusher extends BasePackage implements WampServerInterface
 
     protected function checkAccount($conn)
     {
+        $pathArr = explode('/', ltrim(rtrim($conn->httpRequest->getUri()->getPath(), '/'), '/'));
+
+        if (count($pathArr) === 2) {
+            if (strtolower($pathArr[0]) === 'app') {
+                $this->appRoute = strtolower($pathArr[1]);
+            }
+        } else {
+            return false;//Disconnect as we didnt receive appRoute
+        }
+
+        $app = $this->apps->getAppInfo($this->appRoute);
+
+        if (!$app) {
+            return false;//App not found
+        }
+
+        $this->apps->ipFilter->setClientAddress($conn->httpRequest->getHeaders()['X-Forwarded-For'][0]);
+        if (!$this->apps->ipFilter->checkList()) {//IP Is Blocked
+            return false;
+        }
+        // $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
+
         $cookiesArr = [];
         $cookies = [];
 
@@ -144,10 +170,15 @@ class Pusher extends BasePackage implements WampServerInterface
                 $cookies[trim($cookie[0])] = trim($cookie[1]);
             }
         } else {
+            //Someone trying to connect without proper cookies
+            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
+
             return false;
         }
 
         if (!isset($cookies['Bazaari'])) {
+            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
+
             return false;
         }
 
@@ -183,7 +214,6 @@ class Pusher extends BasePackage implements WampServerInterface
                             'notifications_tunnel'  => $conn->resourceId
                         ];
 
-
                     $this->tunnelsObj->assign($newTunnel);
 
                     $this->tunnelsObj->create();
@@ -199,7 +229,7 @@ class Pusher extends BasePackage implements WampServerInterface
 
     protected function checkSession($cookies)
     {
-        if ($this->accountsObj->sessions) {
+        if ($this->accountsObj && $this->accountsObj->sessions) {
             foreach ($this->accountsObj->sessions as $key => $session) {
                 if ($session->session_id === $cookies['Bazaari']) {
                     return true;

@@ -36,8 +36,16 @@
     {% endif %}
 {% endif %}
 <aside class="p-3 control-sidebar control-sidebar-light">
-    <div id="messenger-offline" class="text-danger text-center">
-        Messenger Service Offline!
+    <div id="messenger-service-status" class="row">
+        <div class="col">
+            <div id="messenger-offline" class="text-danger text-center">
+                Messenger Service Offline!
+            </div>
+            <div id="messenger-otr-offline" class="text-danger text-center">
+                Messenger OTR Service Offline!
+            </div>
+            <hr>
+        </div>
     </div>
     <div id="messenger-online" hidden>
         <div class="row">
