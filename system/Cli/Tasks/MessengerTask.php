@@ -4,10 +4,10 @@ namespace System\Cli\Tasks;
 
 use Phalcon\Cli\Task;
 use Ratchet\Http\HttpServer;
-use Ratchet\Http\OriginCheck;
 use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
 use React\EventLoop\Factory;
+use System\Base\Providers\WebSocketServiceProvider\WssOriginCheck;
 
 class MessengerTask extends Task
 {
@@ -20,21 +20,17 @@ class MessengerTask extends Task
     {
         $loop = Factory::create();
 
-        $allowedDomains = ['localhost'];
-
-        foreach ($this->domains->domains as $domain) {
-            array_push($allowedDomains, $domain['name']);
-        }
-
-        $wsserver = new WsServer($this->basepackages->messenger);
+        $wsserver = new WsServer($this->basepackages->messenger->setCliLogger($this->logger));
         $wsserver->enableKeepAlive($loop);
 
         $server = IoServer::factory(
             new HttpServer(
-                new OriginCheck(
+                new WssOriginCheck(
                     $wsserver
                 ),
-                $allowedDomains
+                [],
+                $this->logger,
+                $this->domains->domains
             ),
             4443
         );

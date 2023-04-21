@@ -277,9 +277,9 @@ class IpFilter extends BasePackage
         }
     }
 
-    public function bumpFilterHitCounter($filter = null, $updateHitCount = true, $updateIncorrectAttempts = false)
+    public function bumpFilterHitCounter($filter = null, $updateHitCount = true, $updateIncorrectAttempts = false, $appRoute = null)
     {
-        if (!$this->ipFilterMiddlewareEnabled()) {
+        if (!$this->ipFilterMiddlewareEnabled($appRoute)) {
             return;
         }
 
@@ -358,9 +358,9 @@ class IpFilter extends BasePackage
         }
     }
 
-    private function ipFilterMiddlewareEnabled()
+    private function ipFilterMiddlewareEnabled($appRoute)
     {
-        $middleware = $this->modules->middlewares->getNamedMiddlewareForApp('IpFilter', $this->apps->getAppInfo()['id']);
+        $middleware = $this->modules->middlewares->getNamedMiddlewareForApp('IpFilter', $this->apps->getAppInfo($appRoute)['id']);
 
         if (isset($middleware['apps'][$this->app['id']]['enabled']) &&
             $middleware['apps'][$this->app['id']]['enabled'] === true

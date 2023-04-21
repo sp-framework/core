@@ -5,10 +5,10 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 use Phalcon\Helper\Json;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
-use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
+use System\Base\Providers\WebSocketServiceProvider\WebsocketBase;
 
-class Pusher extends BasePackage implements WampServerInterface
+class Pusher extends WebsocketBase implements WampServerInterface
 {
     protected $subscriptions = [];
 
@@ -42,7 +42,7 @@ class Pusher extends BasePackage implements WampServerInterface
     public function onOpen(ConnectionInterface $conn)
     {
         var_dump('Open: '. $conn->resourceId);
-        if (!$this->checkAccount($conn)) {
+        if ($this->checkAccount($conn) !== true) {
             $conn->close();
         }
     }
@@ -51,6 +51,8 @@ class Pusher extends BasePackage implements WampServerInterface
     {
         var_dump('Close: '.  $conn->resourceId);
         $this->markPusherAway($conn->resourceId);
+
+        $this->logger->commit();
     }
 
     public function onCall(ConnectionInterface $conn, $id, $topic, array $params)
@@ -144,6 +146,7 @@ class Pusher extends BasePackage implements WampServerInterface
             }
         } else {
             $this->logger->log->debug('Disconnect as we didn\'t receive app route');
+
             return false;//Disconnect as we didnt receive appRoute
         }
 
@@ -151,21 +154,22 @@ class Pusher extends BasePackage implements WampServerInterface
 
         if (!$app) {
             $this->logger->log->debug('Disconnect as app not found');
+
             return false;//App not found
         }
 
-        $this->apps->ipFilter->setClientAddress($conn->httpRequest->getHeaders()['X-Forwarded-For'][0]);
+        $this->apps->ipFilter->setClientAddress($conn->httpRequest->getHeader('X-Forwarded-For')[0]);
         if (!$this->apps->ipFilter->checkList()) {//IP Is Blocked
-            $this->logger->log->debug($conn->httpRequest->getHeaders()['X-Forwarded-For'][0] . ' IP is blocked.');
+            $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' IP is blocked.');
+
             return false;
         }
-        // $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
 
         $cookiesArr = [];
         $cookies = [];
 
-        if (isset($conn->httpRequest->getHeaders()['Cookie'][0])) {
-            $cookiesArr = $conn->httpRequest->getHeaders()['Cookie'][0];
+        if (isset($conn->httpRequest->getHeader('Cookie')[0])) {
+            $cookiesArr = $conn->httpRequest->getHeader('Cookie')[0];
             $cookiesArr = explode(';', $cookiesArr);
 
             foreach ($cookiesArr as $cookie) {
@@ -174,16 +178,18 @@ class Pusher extends BasePackage implements WampServerInterface
             }
         } else {
             //Someone trying to connect without proper cookies
-            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
+            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true, $this->appRoute);
 
-            $this->logger->log->debug($conn->httpRequest->getHeaders()['X-Forwarded-For'][0] . ' Cookie misuse. disconnected websocket.');
+            $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' Cookie misuse. disconnected websocket.');
+
             return false;
         }
 
         if (!isset($cookies['Bazaari'])) {
-            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
+            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true, $this->appRoute);
 
-            $this->logger->log->debug($conn->httpRequest->getHeaders()['X-Forwarded-For'][0] . ' Bazaari Cookie not set. disconnected websocket.');
+            $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' Bazaari Cookie not set. disconnected websocket.');
+
             return false;
         }
 
@@ -229,7 +235,7 @@ class Pusher extends BasePackage implements WampServerInterface
             }
         }
 
-        $this->logger->log->debug($conn->httpRequest->getHeaders()['X-Forwarded-For'][0] . ' ID Cookie not set. disconnected websocket.');
+        $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' ID Cookie not set. disconnected websocket.');
 
         return false;
     }

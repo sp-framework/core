@@ -8,12 +8,12 @@ use Phalcon\Helper\Json;
 use Phalcon\Storage\SerializerFactory;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
-use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Messenger\BasepackagesMessenger;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
+use System\Base\Providers\WebSocketServiceProvider\WebsocketBase;
 use ZMQContext;
 
-class Messenger extends BasePackage implements MessageComponentInterface
+class Messenger extends WebsocketBase implements MessageComponentInterface
 {
     protected $modelToUse = BasepackagesMessenger::class;
 

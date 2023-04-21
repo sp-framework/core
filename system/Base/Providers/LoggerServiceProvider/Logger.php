@@ -77,44 +77,55 @@ class Logger
         }
 
         if ($this->logsConfig->enabled) {
-            if ($this->logsConfig->service === 'streamLogs') {
-                $streamAdapter = new Stream($savePath . 'debug.log');
+            if (PHP_SAPI === 'cli') {
+                $streamAdapter = new Stream($savePath . 'cli.log');
                 $streamAdapter->setFormatter($this->customFormatter);
 
                 $this->log = new PhalconLogger(
                     'messages',
-                    ['logs'        => $streamAdapter]
+                    ['cli'        => $streamAdapter]
                 );
 
-                $this->log->getAdapter('logs')->begin();
+                $this->log->getAdapter('cli')->begin();
+            } else {
+                if ($this->logsConfig->service === 'streamLogs') {
+                    $streamAdapter = new Stream($savePath . 'debug.log');
+                    $streamAdapter->setFormatter($this->customFormatter);
 
-            } else if ($this->logsConfig->service === 'dbLogs') {
+                    $this->log = new PhalconLogger(
+                        'messages',
+                        ['logs'        => $streamAdapter]
+                    );
 
-                $dbAdapter = new DbAdapter($this->oneDbEntry);
-                $dbAdapter->setFormatter($this->customFormatter);
+                    $this->log->getAdapter('logs')->begin();
 
-                $this->log = new PhalconLogger(
-                    'messages',
-                    ['db'            => $dbAdapter]
-                );
+                } else if ($this->logsConfig->service === 'dbLogs') {
 
-                $this->log->getAdapter('db')->begin();
+                    $dbAdapter = new DbAdapter($this->oneDbEntry);
+                    $dbAdapter->setFormatter($this->customFormatter);
+
+                    $this->log = new PhalconLogger(
+                        'messages',
+                        ['db'            => $dbAdapter]
+                    );
+
+                    $this->log->getAdapter('db')->begin();
+                }
+
+                $this->setLogLevel();
+
+                if ($this->email && $this->logsConfig->emergencyLogsEmail) {
+                    $emailAdapter = new EmailAdapter($this->email, $this->logsConfig);
+                    $emailAdapter->setFormatter($this->customFormatter);
+
+                    $this->logEmail = new PhalconLogger(
+                        'messages',
+                        ['email'         => $emailAdapter]
+                    );
+
+                    $this->logEmail->getAdapter('email')->begin();
+                }
             }
-
-            $this->setLogLevel();
-
-            if ($this->email && $this->logsConfig->emergencyLogsEmail) {
-                $emailAdapter = new EmailAdapter($this->email, $this->logsConfig);
-                $emailAdapter->setFormatter($this->customFormatter);
-
-                $this->logEmail = new PhalconLogger(
-                    'messages',
-                    ['email'         => $emailAdapter]
-                );
-
-                $this->logEmail->getAdapter('email')->begin();
-            }
-
         } else {
             //Blackhole
             $noopAdapter = new Noop();
@@ -152,19 +163,25 @@ class Logger
         }
 
         if ($this->logsConfig->enabled) {
-            if ($this->logsConfig->service === 'streamLogs') {
-                if ($this->log->getAdapter('logs')->inTransaction()) {
-                    $this->log->getAdapter('logs')->commit();
+            if (PHP_SAPI === 'cli') {
+                if ($this->log->getAdapter('cli')->inTransaction()) {
+                    $this->log->getAdapter('cli')->commit();
                 }
-            } else if ($this->logsConfig->service === 'dbLogs') {
-                if ($this->oneDbEntry) {
-                    if ($this->log->getAdapter('db')->inTransaction()) {
-                        $this->log->getAdapter('db')->commit();
-                        $this->log->getAdapter('db')->addToDb();
+            } else {
+                if ($this->logsConfig->service === 'streamLogs') {
+                    if ($this->log->getAdapter('logs')->inTransaction()) {
+                        $this->log->getAdapter('logs')->commit();
                     }
-                } else {
-                    if ($this->log->getAdapter('db')->inTransaction()) {
-                        $this->log->getAdapter('db')->commit();
+                } else if ($this->logsConfig->service === 'dbLogs') {
+                    if ($this->oneDbEntry) {
+                        if ($this->log->getAdapter('db')->inTransaction()) {
+                            $this->log->getAdapter('db')->commit();
+                            $this->log->getAdapter('db')->addToDb();
+                        }
+                    } else {
+                        if ($this->log->getAdapter('db')->inTransaction()) {
+                            $this->log->getAdapter('db')->commit();
+                        }
                     }
                 }
             }

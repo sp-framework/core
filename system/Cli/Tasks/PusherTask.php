@@ -4,13 +4,13 @@ namespace System\Cli\Tasks;
 
 use Phalcon\Cli\Task;
 use Ratchet\Http\HttpServer;
-use Ratchet\Http\OriginCheck;
 use Ratchet\Server\IoServer;
 use Ratchet\Wamp\WampServer;
 use Ratchet\WebSocket\WsServer;
 use React\EventLoop\Factory;
 use React\Socket\Server;
 use React\ZMQ\Context;
+use System\Base\Providers\WebSocketServiceProvider\WssOriginCheck;
 
 class PusherTask extends Task
 {
@@ -22,12 +22,6 @@ class PusherTask extends Task
     public function startAction()
     {
         $this->checkLogPath();
-
-        $allowedDomains = ['localhost'];
-
-        foreach ($this->domains->domains as $domain) {
-            array_push($allowedDomains, $domain['name']);
-        }
 
         $loop = Factory::create();
 
@@ -42,13 +36,15 @@ class PusherTask extends Task
         try {
             $webServer = new IoServer(
                 new HttpServer(
-                    new OriginCheck(
+                    new WssOriginCheck(
                         new WsServer(
                             new WampServer(
-                                $this->basepackages->pusher
+                                $this->basepackages->pusher->setCliLogger($this->logger)
                             )
                         ),
-                        $allowedDomains
+                        [],
+                        $this->logger,
+                        $this->domains->domains
                     )
                 ),
                 $webSock
