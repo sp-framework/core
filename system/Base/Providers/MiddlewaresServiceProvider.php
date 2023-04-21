@@ -34,9 +34,9 @@ class MiddlewaresServiceProvider extends Injectable
 
             if ($ipFilterMiddleware) {
                 $middlewares[] = $ipFilterMiddleware;
-                $middlewares = array_merge($middlewares, msort($this->modules->middlewares->getMiddlewaresForApp($this->data['app']['id'], true), 'sequence'));
+                $middlewares = array_merge($middlewares, msort($this->modules->middlewares->getMiddlewaresForApp($this->data['app']['id']), 'sequence'));
             } else {
-                $middlewares = msort($this->modules->middlewares->getMiddlewaresForApp($this->data['app']['id'], true), 'sequence');
+                $middlewares = msort($this->modules->middlewares->getMiddlewaresForApp($this->data['app']['id']), 'sequence');
             }
 
             foreach ($middlewares as $middleware) {

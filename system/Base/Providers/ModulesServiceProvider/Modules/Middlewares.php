@@ -38,7 +38,7 @@ class Middlewares extends BasePackage
 		return false;
 	}
 
-	public function getMiddlewaresForApp($appId, $excludeBlackWhite = false)
+	public function getMiddlewaresForApp($appId)
 	{
 		$middlewares = [];
 
@@ -48,12 +48,6 @@ class Middlewares extends BasePackage
 			if (isset($middleware['apps'][$appId]) &&
 				$middleware['apps'][$appId]['enabled'] == true
 			) {
-				if ($excludeBlackWhite &&
-					strtolower($middleware['name']) === 'blackwhitelist'
-				) {
-					continue;
-				}
-
 				$middlewares[$middleware['id']] = $middleware;
 				$middlewares[$middleware['id']]['sequence'] = $middleware['apps'][$appId]['sequence'];
 				$middlewares[$middleware['id']]['enabled'] = $middleware['apps'][$appId]['enabled'];

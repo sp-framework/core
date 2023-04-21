@@ -158,11 +158,15 @@ class Pusher extends WebsocketBase implements WampServerInterface
             return false;//App not found
         }
 
-        $this->apps->ipFilter->setClientAddress($conn->httpRequest->getHeader('X-Forwarded-For')[0]);
-        if (!$this->apps->ipFilter->checkList()) {//IP Is Blocked
-            $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' IP is blocked.');
+        $ipFilterMiddleware = $this->modules->middlewares->getNamedMiddlewareForApp('IpFilter', $app['id']);
+        if ($ipFilterMiddleware) {
+            $this->apps->ipFilter->setClientAddress($conn->httpRequest->getHeader('X-Forwarded-For')[0]);
 
-            return false;
+            if (!$this->apps->ipFilter->checkList()) {//IP Is Blocked
+                $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' IP is blocked.');
+
+                return false;
+            }
         }
 
         $cookiesArr = [];
@@ -180,7 +184,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
             //Someone trying to connect without proper cookies
             $this->apps->ipFilter->bumpFilterHitCounter(null, false, true, $this->appRoute);
 
-            $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' Cookie misuse. disconnected websocket.');
+            $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' Cookie misuse. Disconnecting websocket.');
 
             return false;
         }
@@ -188,7 +192,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
         if (!isset($cookies['Bazaari'])) {
             $this->apps->ipFilter->bumpFilterHitCounter(null, false, true, $this->appRoute);
 
-            $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' Bazaari Cookie not set. disconnected websocket.');
+            $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' Bazaari Cookie not set. Disconnecting websocket.');
 
             return false;
         }
@@ -218,6 +222,29 @@ class Pusher extends WebsocketBase implements WampServerInterface
             $this->account['profile'] = $this->basepackages->profile->getProfile($this->account['id']);
 
             if ($this->checkSession($cookies)) {
+
+                $agentCheckMiddleware = $this->modules->middlewares->getNamedMiddlewareForApp('AgentCheck', $app['id']);
+                if ($agentCheckMiddleware) {
+                    $agent = $conn->httpRequest->getHeader('User-Agent')[0];
+
+                    if ($this->accountsObj->agents) {
+                        if ($this->accountsObj->agents::count(
+                                [
+                                    'conditions'    => 'session_id = :sid: AND account_id = :aid: AND verified = :ver:',
+                                    'bind'          => [
+                                        'sid'       => $cookies['Bazaari'],
+                                        'aid'       => $this->account['id'],
+                                        'ver'       => '1'
+                                    ]
+                                ]
+                            ) == 0
+                        ) {
+                            $this->logger->log->debug($conn->httpRequest->getHeader('User-Agent')[0] . ' browser is not verified. Disconnecting websocket.');
+
+                            return false;
+                        }
+                    }
+                }
                 if (!$this->accountsObj->tunnels) {
                     $newTunnel =
                         [
@@ -231,11 +258,12 @@ class Pusher extends WebsocketBase implements WampServerInterface
                 } else {
                     $this->accountsObj->tunnels->assign(['notifications_tunnel'  => $conn->resourceId])->update();
                 }
+
                 return true;
             }
         }
 
-        $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' ID Cookie not set. disconnected websocket.');
+        $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' ID Cookie not set. Disconnecting websocket.');
 
         return false;
     }
