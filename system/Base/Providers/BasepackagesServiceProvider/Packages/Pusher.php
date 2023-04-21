@@ -143,17 +143,20 @@ class Pusher extends BasePackage implements WampServerInterface
                 $this->appRoute = strtolower($pathArr[1]);
             }
         } else {
+            $this->logger->log->debug('Disconnect as we didn\'t receive app route');
             return false;//Disconnect as we didnt receive appRoute
         }
 
         $app = $this->apps->getAppInfo($this->appRoute);
 
         if (!$app) {
+            $this->logger->log->debug('Disconnect as app not found');
             return false;//App not found
         }
 
         $this->apps->ipFilter->setClientAddress($conn->httpRequest->getHeaders()['X-Forwarded-For'][0]);
         if (!$this->apps->ipFilter->checkList()) {//IP Is Blocked
+            $this->logger->log->debug($conn->httpRequest->getHeaders()['X-Forwarded-For'][0] . ' IP is blocked.');
             return false;
         }
         // $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
@@ -173,12 +176,14 @@ class Pusher extends BasePackage implements WampServerInterface
             //Someone trying to connect without proper cookies
             $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
 
+            $this->logger->log->debug($conn->httpRequest->getHeaders()['X-Forwarded-For'][0] . ' Cookie misuse. disconnected websocket.');
             return false;
         }
 
         if (!isset($cookies['Bazaari'])) {
             $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
 
+            $this->logger->log->debug($conn->httpRequest->getHeaders()['X-Forwarded-For'][0] . ' Bazaari Cookie not set. disconnected websocket.');
             return false;
         }
 
@@ -223,6 +228,8 @@ class Pusher extends BasePackage implements WampServerInterface
                 return true;
             }
         }
+
+        $this->logger->log->debug($conn->httpRequest->getHeaders()['X-Forwarded-For'][0] . ' ID Cookie not set. disconnected websocket.');
 
         return false;
     }
