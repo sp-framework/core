@@ -13,7 +13,7 @@ var/*
 .vscode*
 linter-backup*
 repos/*
-# external/vendor/*
+external/vendor/*
 !external/vendor/guzzlehttp
 !external/vendor/psr
 external/cache/*
@@ -23,6 +23,6 @@ composer.json
 apps/Dash/Packages/System/Api/CallStats/*
 system/.keys
 system/.dbkeys
-# composer
+composer
 !external/composer
 !external/composer.json
