@@ -369,7 +369,7 @@ class Auth
 
                     return false;
                 }
-            } else if ($canLogin['allowed'] == '0') {
+            } else if ($canLogin && is_array($canLogin) && $canLogin['allowed'] == '0') {
                 $this->packagesData->responseCode = 1;
 
                 $this->packagesData->responseMessage = 'Error: Contact System Administrator';
