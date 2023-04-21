@@ -26,11 +26,11 @@ class MessengerTask extends Task
         $server = IoServer::factory(
             new HttpServer(
                 new WssOriginCheck(
-                    $wsserver
+                    $wsserver,
+                    [],
+                    $this->logger,
+                    $this->domains->domains
                 ),
-                [],
-                $this->logger,
-                $this->domains->domains
             ),
             4443
         );
