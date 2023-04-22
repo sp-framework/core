@@ -16,6 +16,10 @@ class Tree extends AdminLTETags
 
     public function getContent(array $treeParams)
     {
+        if (!$this->app) {
+            $this->init();
+        }
+
         $this->fieldParams =
             isset($treeParams['fieldParams']) ?
             $treeParams['fieldParams'] :
@@ -211,10 +215,20 @@ class Tree extends AdminLTETags
                         $items['icon'] :
                         'circle-dot';
 
+
                     $this->content .=
-                        '<li class="nav-item">
-                            <a class="nav-link contentAjaxLink" href="/' . $this->init()->app['route'] . '/' . $items['link'] . '">
-                                <i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
+                        '<li class="nav-item">';
+
+                        if ($this->app['id'] == $this->domains->domain['exclusive_to_default_app']) {
+                            $this->content .=
+                                '<a class="nav-link contentAjaxLink" href="/' . $items['link'] . '">';
+                        } else {
+                            $this->content .=
+                                '<a class="nav-link contentAjaxLink" href="/' . $this->app['route'] . '/' . $items['link'] . '">';
+                        }
+
+                    $this->content .=
+                                '<i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
                                 <p class="text-uppercase">';
 
                     if (isset($items['title'])) {
@@ -237,10 +251,19 @@ class Tree extends AdminLTETags
                                 'circle-dot';
 
                             $this->content .=
-                                '<li class="nav-item">
-                                    <a class="nav-link contentAjaxLink" href="/' . $this->init()->app['route'] . '/' . $itemValue['link'] . '">
-                                        <i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
-                                        <p class="text-uppercase">';
+                                '<li class="nav-item">';
+
+                                if ($this->app['id'] == $this->domains->domain['exclusive_to_default_app']) {
+                                    $this->content .=
+                                        '<a class="nav-link contentAjaxLink" href="/' . $itemValue['link'] . '">';
+                                } else {
+                                    $this->content .=
+                                        '<a class="nav-link contentAjaxLink" href="/' . $this->app['route'] . '/' . $itemValue['link'] . '">';
+                                }
+
+                            $this->content .=
+                                '<i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
+                                <p class="text-uppercase">';
 
                             if (isset($itemValue['title'])) {
                                 $this->content .= $itemValue['title'];
