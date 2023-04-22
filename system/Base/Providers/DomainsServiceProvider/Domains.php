@@ -317,7 +317,9 @@ class Domains extends BasePackage
 
 			return $record;
 		} catch (\Exception $e) {
-			return false;
+			$this->logger->log->debug('DNS resolution for domain failed: ' . $e->getMessage());
+
+			return [];
 		}
 	}
 }
