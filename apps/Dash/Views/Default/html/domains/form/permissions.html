@@ -41,7 +41,11 @@
                     {% set privateStorageServiceDisabled = true %}
                 {% endif %}
             {% else %}
-                {% set checked = false %}
+                {% if apps|length === 1 %}
+                    {% set checked = true %}
+                {% else %}
+                    {% set checked = false %}
+                {% endif %}
                 {% set viewDisabled = true %}
                 {% set emailServiceDisabled = true %}
                 {% set publicStorageServiceDisabled = true %}
@@ -250,57 +254,7 @@ var dynamicFields = { };
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-exclusive_to_default_app'            : {
-            afterInit : function () {
-                var defaultApp = $('#{{componentId}}-{{sectionId}}-default_app_id').select2('data')[0]['id'];
-                var exclusiveChecked = $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app')[0].checked;
-
-                if (defaultApp == 0) {
-                    $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app')[0].checked = false;
-                    $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').attr('disabled', true);
-                }
-
-                if (exclusiveChecked) {
-                    for (var checkbox in dynamicFields['checkboxes']) {
-                        if (checkbox !== '{{componentId}}-{{sectionId}}-' + defaultApp + '-allowed') {
-                            $('#' + checkbox).attr('disabled', true);
-                        }
-                    }
-                }
-
-                $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').click(function() {
-                    defaultApp = $('#{{componentId}}-{{sectionId}}-default_app_id').select2('data')[0]['id'];
-
-                    if ($(this)[0].checked === true) {
-                        for (var checkbox in dynamicFields['checkboxes']) {
-                            var appId = $('#' + checkbox).parents('.app').data('id');
-
-                            if (checkbox === '{{componentId}}-{{sectionId}}-' + defaultApp + '-allowed') {
-                                $('#' + checkbox)[0].checked = true;
-                                $('#' + checkbox).attr('disabled', true);
-                                dataCollectionSection['data']['apps'][appId]['allowed'] = true;
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', false);
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', false);
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', false);
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', false);
-                            } else {
-                                $('#' + checkbox)[0].checked = false;
-                                $('#' + checkbox).attr('disabled', true);
-                                dataCollectionSection['data']['apps'][appId]['allowed'] = false;
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true);
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true);
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true);
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true);
-                            }
-                        }
-                    } else {
-                        for (var disableCheckbox in dynamicFields['checkboxes']) {
-                            $('#' + disableCheckbox).attr('disabled', false);
-                        }
-                    }
-                });
-            }
-        },
+        '{{componentId}}-{{sectionId}}-exclusive_to_default_app'            : { },
         '{{componentId}}-{{sectionId}}-default_app_id'                      : {
             'placeholder'   : 'SELECT DEFAULT APPLICATION',
             afterInit       : function() {

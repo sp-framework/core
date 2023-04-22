@@ -270,7 +270,7 @@ class Router
 				'Domain ' . $this->request->getHttpHost() . ' is not registered with system!'
 			);
 
-			$this->response->setStatusCode(404, 'Not Found');
+			$this->response->setStatusCode(404);
 			$this->response->send();
 			exit;
 
@@ -301,7 +301,7 @@ class Router
 					' on domain ' . $this->request->getHttpHost()
 				);
 
-				$this->response->setStatusCode(404, 'Not Found');
+				$this->response->setStatusCode(404);
 				$this->response->send();
 				exit;
 
