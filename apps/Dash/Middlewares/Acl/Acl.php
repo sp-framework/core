@@ -173,7 +173,11 @@ class Acl extends BaseMiddleware
                 unset($url[Arr::lastKey($url)]);
             }
 
-            unset($url[0]);
+            if (isset($this->domain['exclusive_to_default_app']) &&
+                $this->domain['exclusive_to_default_app'] == 0
+            ) {
+                unset($url[0]);
+            }
 
             $componentRoute = implode('/', $url);
 
