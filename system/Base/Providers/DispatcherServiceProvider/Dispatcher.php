@@ -20,17 +20,13 @@ class Dispatcher
 
     protected $components;
 
-    protected $router;
-
-    public function __construct($appsInfo, $config, $events, $components, $router)
+    public function __construct($appsInfo, $events, $components)
     {
         $this->appsInfo = $appsInfo;
 
         $this->events = $events;
 
         $this->components = $components;
-
-        $this->router = $router;
 
         $this->dispatcher = new PhalconDispatcher();
 
