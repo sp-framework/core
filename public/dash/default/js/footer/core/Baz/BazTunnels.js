@@ -44,8 +44,8 @@ var BazTunnels = function() {
     function initMessengerOTR() {
         var url;
 
-        if (dataCollection.env.appRoute) {
-            url = dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/messenger/app/' + dataCollection.env.appRoute;
+        if (dataCollection.env.websocketAppRoute) {
+            url = dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/messenger/app/' + dataCollection.env.websocketAppRoute;
         } else {
             url = dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/messenger/';
         }
@@ -89,8 +89,8 @@ var BazTunnels = function() {
         }
 
         var url;
-        if (dataCollection.env.appRoute) {
-            url = dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/pusher/app/' + dataCollection.env.appRoute;
+        if (dataCollection.env.websocketAppRoute) {
+            url = dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/pusher/app/' + dataCollection.env.websocketAppRoute;
         } else {
             url = dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/pusher/';
         }

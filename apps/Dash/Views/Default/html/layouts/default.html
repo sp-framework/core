@@ -44,6 +44,7 @@ if (!window.dataCollection) {
     } else {
         dataCollection.env.appRoute = "{{apps.getAppInfo()['route']}}";
     }
+    dataCollection.env.websocketAppRoute = "{{apps.getAppInfo()['route']}}";
     dataCollection.env.jsPath =
         dataCollection.env.rootPath +
         "{{apps.getAppInfo()['app_type']}}" + '/' +
