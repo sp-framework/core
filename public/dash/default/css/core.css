@@ -41881,6 +41881,7 @@ a.text-muted:hover {
 }
 
 .form-control::placeholder,
+.select2-search__field::placeholder,
 .select2-selection__placeholder {
   font-size: 0.75rem !important;
 }

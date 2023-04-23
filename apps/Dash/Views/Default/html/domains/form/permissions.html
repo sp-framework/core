@@ -389,6 +389,16 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').click(function() {
                     defaultApp = $('#{{componentId}}-{{sectionId}}-default_app_id').select2('data')[0]['id'];
 
+                    if (defaultApp != 0) {
+                        $('.app').each(function(i, app) {
+                            if ($(app).data('id') == defaultApp) {
+                                $(app).attr('hidden', false);
+                            } else {
+                                $(app).attr('hidden', true);
+                            }
+                        });
+                        $('#{{componentId}}-{{sectionId}}-apps_settings').val(defaultApp).trigger('change');
+                    }
                     if ($(this)[0].checked === true) {
                         for (var checkbox in dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']) {
                             var appId = $('#' + checkbox).parents('.app').data('id');
@@ -413,7 +423,11 @@ dataCollectionSection =
                         }
                     } else {
                         for (var disableCheckbox in dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']) {
-                            $('#' + disableCheckbox).attr('disabled', false);
+                            if (disableCheckbox === '{{componentId}}-{{sectionId}}-' + defaultApp + '-allowed') {
+                                $('#' + disableCheckbox).attr('disabled', true);
+                            } else {
+                                $('#' + disableCheckbox).attr('disabled', false);
+                            }
                         }
                     }
                 });
@@ -444,8 +458,7 @@ dataCollectionSection =
 
                     for (var checkbox in dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']) {
                         var appId = $('#' + checkbox).parents('.app').data('id');
-                        //eslint-disable-next-line
-                        console.log(appId);
+
                         if (checkbox === '{{componentId}}-{{sectionId}}-' + defaultApp + '-allowed') {
                             $('#' + checkbox)[0].checked = true;
                             $('#' + checkbox).attr('disabled', true);
@@ -455,20 +468,22 @@ dataCollectionSection =
                             $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', false);
                         } else {
-                            $('#' + checkbox)[0].checked = false;
                             if ($('#{{componentId}}-{{sectionId}}-exclusive_to_default_app')[0].checked === true) {
                                 $('#' + checkbox).attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true).val(0).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true).val(0).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true).val(0).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true).val(0).trigger('change');
                             } else {
                                 $('#' + checkbox).attr('disabled', false);
                             }
-                            dataCollectionSection['data']['apps'][appId]['allowed'] = false;
-                            $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true).val(0).trigger('change');
-                            $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true).val(0).trigger('change');
-                            $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true).val(0).trigger('change');
-                            $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true).val(0).trigger('change');
+                            if ($('#' + checkbox)[0].checked === true) {
+                                dataCollectionSection['data']['apps'][appId]['allowed'] = true;
+                            } else {
+                                dataCollectionSection['data']['apps'][appId]['allowed'] = false;
+                            }
                         }
                     }
-
                 });
             }
         },
@@ -489,8 +504,6 @@ dataCollectionSection =
                     });
                     dataCollectionSectionForm['funcs']['extractData'](null, select2, $('#' + select2).data('type'), $('#' + select2).parents('.app').data('id'));
                 }
-
-
             }
         },
         '{{componentId}}-{{sectionId}}-form'                                : {

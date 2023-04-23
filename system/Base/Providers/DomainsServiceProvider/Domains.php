@@ -65,6 +65,16 @@ class Domains extends BasePackage
 			$data['dns_record'] = $this->validateDomain($data['name']);
 		}
 
+		if (isset($data['exclusive_to_default_app']) && $data['exclusive_to_default_app'] == '1') {
+			$data = $this->checkAppsData($data);
+		} else {
+			$data = $this->checkAppsData($data, false);
+		}
+
+		if (!$data) {
+			return false;
+		}
+
 		try {
 			$add = $this->add($data);
 		} catch (\Exception $e) {
@@ -99,13 +109,23 @@ class Domains extends BasePackage
 			$data['dns_record'] = $this->validateDomain($data['name']);
 		}
 
+		if (isset($data['exclusive_to_default_app']) && $data['exclusive_to_default_app'] == '1') {
+			$data = $this->checkAppsData($data);
+		} else {
+			$data = $this->checkAppsData($data, false);
+		}
+
+		if (!$data) {
+			return false;
+		}
+
 		$domain = $this->getById($data['id']);
 
 		$domain = array_merge($domain, $data);
+
 		try {
 			$update = $this->update($domain);
 		} catch (\Exception $e) {
-			var_dump($e);
 			if ($e->getCode() == '23000') {
 				$this->addResponse('Domain name ' . $data['name'] . ' already in use.', 1);
 
@@ -122,6 +142,50 @@ class Domains extends BasePackage
 		} else {
 			$this->addResponse('Error adding new domain.', 1);
 		}
+	}
+
+	protected function checkAppsData($data, $exclusive = true)
+	{
+		$data['apps'] = Json::decode($data['apps'], true);
+
+		if (count($data['apps']) >= 1) {
+			foreach ($data['apps'] as $appId => &$appSettings) {
+				if ($exclusive === true) {
+					if ($data['default_app_id'] == $appId) {
+						$appSettings['allowed'] = true;
+
+						if (!isset($appSettings['view']) ||
+							!isset($appSettings['publicStorage']) ||
+							!isset($appSettings['privateStorage'])
+						) {
+							$this->addResponse('Please provide complete app settings for app Id: ' . $appId, 1);
+
+							return false;
+						}
+					} else {
+						$appSettings['allowed'] = false;
+						$appSettings['view'] = '';
+						$appSettings['email_service'] = '';
+						$appSettings['publicStorage'] = '';
+						$appSettings['privateStorage'] = '';
+					}
+				} else {
+					if ($appSettings['allowed'] === true &&
+						(!isset($appSettings['view']) ||
+						!isset($appSettings['publicStorage']) ||
+						!isset($appSettings['privateStorage']))
+					) {
+						$this->addResponse('Please provide complete app settings for app Id: ' . $appId, 1);
+
+						return false;
+					}
+				}
+			}
+		} else {
+			$this->addResponse('Please provide app settings for this domain. Can not add placeholder domains.', 1);
+		}
+
+		return $data;
 	}
 
 	/**

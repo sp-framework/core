@@ -31,11 +31,11 @@ class Domain
 		];
 
 		$record = $this->validateDomain($this->request->getHttpHost());
-		if ($record) {
+		if (count($record) > 0) {
 			$record = Json::encode($record);
-			$isInternal = 0;
+			$isInternal = isset($record['internal']) ? $record['internal'] : 1;
 		} else {
-			$record = null;
+			$record = [];
 			$isInternal = 1;
 		}
 
