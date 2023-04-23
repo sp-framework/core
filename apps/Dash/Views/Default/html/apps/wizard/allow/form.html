@@ -243,6 +243,9 @@ $(document).ready(function() {
                             );
 
                             $('#{{componentId}}-{{sectionId}}-view').append(newOption).trigger('change');
+                            $('#{{componentId}}-{{sectionId}}-id').val(
+                                window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"]['1']['responseData']['id']
+                            );
                         }
                     }
 

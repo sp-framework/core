@@ -1,6 +1,94 @@
+{% if domain['id'] is defined %}
+    {% set domainDefaultAppId = domain['default_app_id'] %}
+    {% if domain['exclusive_to_default_app'] is defined and domain['exclusive_to_default_app'] == 1 %}
+        {% set exclusiveChecked = true %}
+    {% else %}
+        {% set exclusiveChecked = false %}
+    {% endif %}
+{% else %}
+    {% set domainDefaultAppId = '' %}
+    {% set exclusiveChecked = false %}
+{% endif %}
 <div class="row">
     <div class="col">
-        {# For apps #}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'default_app_id',
+                'fieldLabel'                     : 'Default App',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select a default app for this domain.<br> Example: When you access this site via root link like http://www.yoursite.com.au/',
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldRequired'                  : true,
+                'fieldDataSelect2Options'        : apps,
+                'fieldDataSelect2OptionsKey'     : 'id',
+                'fieldDataSelect2OptionsValue'   : 'name',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': domainDefaultAppId
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'exclusive_to_default_app',
+                'fieldLabel'                     : 'Exclusive to default app?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Is this domain exclusive to default app? If yes, then you dont need to add /app_route/ to each link',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : exclusiveChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    {% if apps|length > 1 %}
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'apps_settings',
+                    'fieldLabel'                     : 'Apps Settings',
+                    'fieldType'                      : 'select2',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Select an app to change its settings.',
+                    'fieldBazScan'                   : true,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldRequired'                  : false,
+                    'fieldDataSelect2Options'        : apps,
+                    'fieldDataSelect2OptionsKey'     : 'id',
+                    'fieldDataSelect2OptionsValue'   : 'name',
+                    'fieldDataSelect2OptionsArray'   : true,
+                    'fieldDataSelect2OptionsSelected': domainDefaultAppId
+                ]
+            )}}
+        </div>
+    {% endif %}
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {# For apps settings #}
         {{adminltetags.useTag('fields',
             [
                 'component'                      : component,
@@ -40,18 +128,28 @@
                     {% set publicStorageServiceDisabled = true %}
                     {% set privateStorageServiceDisabled = true %}
                 {% endif %}
+                {% if app['id'] == domain['default_app_id'] %}
+                    {% set appSettingsHidden = '' %}
+                    {% set checkboxDisabled = true %}
+                {% else %}
+                    {% set appSettingsHidden = 'hidden' %}
+                    {% set checkboxDisabled = false %}
+                {% endif %}
             {% else %}
                 {% if apps|length === 1 %}
                     {% set checked = true %}
                 {% else %}
                     {% set checked = false %}
                 {% endif %}
+                {% set checkboxDisabled = true %}
                 {% set viewDisabled = true %}
                 {% set emailServiceDisabled = true %}
                 {% set publicStorageServiceDisabled = true %}
                 {% set privateStorageServiceDisabled = true %}
+                {% set appSettingsHidden = 'hidden' %}
+                {% set checkboxDisabled = false %}
             {% endif %}
-            <div class="app" data-id="{{app['id']}}">
+            <div class="app" data-id="{{app['id']}}" {{appSettingsHidden}}>
                 <div class="row">
                     <div class="col">
                         {{adminltetags.useTag('fields',
@@ -218,8 +316,8 @@
                         )}}
                     </div>
                 </div>
+                <hr>
             </div>
-            <hr>
         {% endfor %}
         {% set appIds = json_encode(appIds, 16) %}
     </div>
@@ -250,11 +348,77 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
 
-var dynamicFields = { };
-
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-exclusive_to_default_app'            : { },
+        '{{componentId}}-{{sectionId}}-apps_settings'                       : {
+            'placeholder'   : 'SELECT APP TO CHANGE SETTINGS',
+            afterInit : function () {
+                $('#{{componentId}}-{{sectionId}}-apps_settings').change(function() {
+                    var selectedApp = $('#{{componentId}}-{{sectionId}}-apps_settings').select2('data')[0]['id'];
+
+                    if (selectedApp != 0) {
+                        $('.app').each(function(i, app) {
+                            if ($(app).data('id') == selectedApp) {
+                                $(app).attr('hidden', false);
+                            } else {
+                                $(app).attr('hidden', true);
+                            }
+                        });
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-exclusive_to_default_app'            : {
+            afterInit : function () {
+                var defaultApp = $('#{{componentId}}-{{sectionId}}-default_app_id').select2('data')[0]['id'];
+                var exclusiveChecked = $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app')[0].checked;
+
+                if (defaultApp == 0) {
+                    $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app')[0].checked = false;
+                    $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').attr('disabled', true);
+                }
+
+                if (exclusiveChecked) {
+                    for (var checkbox in dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']) {
+                        if (checkbox !== '{{componentId}}-{{sectionId}}-' + defaultApp + '-allowed') {
+                            $('#' + checkbox).attr('disabled', true);
+                        }
+                    }
+                }
+
+                $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').click(function() {
+                    defaultApp = $('#{{componentId}}-{{sectionId}}-default_app_id').select2('data')[0]['id'];
+
+                    if ($(this)[0].checked === true) {
+                        for (var checkbox in dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']) {
+                            var appId = $('#' + checkbox).parents('.app').data('id');
+
+                            if (checkbox === '{{componentId}}-{{sectionId}}-' + defaultApp + '-allowed') {
+                                $('#' + checkbox)[0].checked = true;
+                                $('#' + checkbox).attr('disabled', true);
+                                dataCollectionSection['data']['apps'][appId]['allowed'] = true;
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', false);
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', false);
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', false);
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', false);
+                            } else {
+                                $('#' + checkbox)[0].checked = false;
+                                $('#' + checkbox).attr('disabled', true);
+                                dataCollectionSection['data']['apps'][appId]['allowed'] = false;
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true).val(0).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true).val(0).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true).val(0).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true).val(0).trigger('change');
+                            }
+                        }
+                    } else {
+                        for (var disableCheckbox in dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']) {
+                            $('#' + disableCheckbox).attr('disabled', false);
+                        }
+                    }
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-default_app_id'                      : {
             'placeholder'   : 'SELECT DEFAULT APPLICATION',
             afterInit       : function() {
@@ -264,54 +428,69 @@ dataCollectionSection =
                     if (defaultApp == 0) {
                         $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app')[0].checked = false;
                         $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-apps_settings').val(defaultApp).trigger('change');
+                        $('.app').attr('hidden', true);
                     } else if (defaultApp != 0) {
                         $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-apps_settings').val(defaultApp).trigger('change');
+                        $('.app').each(function(i, app) {
+                            if ($(app).data('id') == defaultApp) {
+                                $(app).attr('hidden', false);
+                            } else {
+                                $(app).attr('hidden', true);
+                            }
+                        });
                     }
-                });
-            }
-        },
-        '{{componentId}}-{{sectionId}}-apps'                                : {
-            afterInit : function () {
-                for (var checkbox in dynamicFields['checkboxes']) {
-                    $('#' + checkbox).click(function() {
-                        var id = $(this)[0].id;
-                        extractData(id, null, null, $('#' + id).parents('.app').data('id'));
-                    });
-                    extractData(checkbox, null, null, $('#' + checkbox).parents('.app').data('id'))
-                }
 
-                for (var select2 in dynamicFields['select2']) {
-                    $('#' + select2).on('change', function() {
-                        var id = $(this)[0].id;
-                        extractData(null, id, $('#' + id).data('type'), $('#' + id).parents('.app').data('id'));
-                    });
-                    extractData(null, select2, $('#' + select2).data('type'), $('#' + select2).parents('.app').data('id'));
-                }
-
-                function extractData(checkbox = null, select2 = null, select2Type = null, appId) {
-                    if (checkbox) {
-                        if ($('#' + checkbox)[0].checked === true) {
+                    for (var checkbox in dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']) {
+                        var appId = $('#' + checkbox).parents('.app').data('id');
+                        //eslint-disable-next-line
+                        console.log(appId);
+                        if (checkbox === '{{componentId}}-{{sectionId}}-' + defaultApp + '-allowed') {
+                            $('#' + checkbox)[0].checked = true;
+                            $('#' + checkbox).attr('disabled', true);
                             dataCollectionSection['data']['apps'][appId]['allowed'] = true;
                             $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', false);
                         } else {
+                            $('#' + checkbox)[0].checked = false;
+                            if ($('#{{componentId}}-{{sectionId}}-exclusive_to_default_app')[0].checked === true) {
+                                $('#' + checkbox).attr('disabled', true);
+                            } else {
+                                $('#' + checkbox).attr('disabled', false);
+                            }
                             dataCollectionSection['data']['apps'][appId]['allowed'] = false;
-                            $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-' + appId + '-view').val(0).trigger('change');
-                            $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').val(0).trigger('change');
-                            $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').val(0).trigger('change');
-                            $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').val(0).trigger('change');
+                            $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true).val(0).trigger('change');
+                            $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true).val(0).trigger('change');
+                            $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true).val(0).trigger('change');
+                            $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true).val(0).trigger('change');
                         }
-                    } else if (select2 && select2Type) {
-                        dataCollectionSection['data']['apps'][appId][select2Type] =
-                            $($('#' + select2)[0].selectedOptions[0]).val();
                     }
+
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-apps'                                : {
+            afterInit : function () {
+                for (var checkbox in dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']) {
+                    $('#' + checkbox).click(function() {
+                        var id = $(this)[0].id;
+                        dataCollectionSectionForm['funcs']['extractData'](id, null, null, $('#' + id).parents('.app').data('id'));
+                    });
+                    dataCollectionSectionForm['funcs']['extractData'](checkbox, null, null, $('#' + checkbox).parents('.app').data('id'))
                 }
+
+                for (var select2 in dataCollectionSectionForm['vars']['dynamicFields']['select2']) {
+                    $('#' + select2).on('change', function() {
+                        var id = $(this)[0].id;
+                        dataCollectionSectionForm['funcs']['extractData'](null, id, $('#' + id).data('type'), $('#' + id).parents('.app').data('id'));
+                    });
+                    dataCollectionSectionForm['funcs']['extractData'](null, select2, $('#' + select2).data('type'), $('#' + select2).parents('.app').data('id'));
+                }
+
+
             }
         },
         '{{componentId}}-{{sectionId}}-form'                                : {
@@ -331,23 +510,52 @@ dataCollectionSection =
         }
     });
 
-var appIds = JSON.parse('{{appIds}}');
 
-dynamicFields['checkboxes'] = { };
-dynamicFields['select2'] = { };
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['appIds'] = JSON.parse('{{appIds}}');
+dataCollectionSectionForm['vars']['dynamicFields'] = { };
+dataCollectionSectionForm['vars']['dynamicFields']['checkboxes'] = { };
+dataCollectionSectionForm['vars']['dynamicFields']['select2'] = { };
 dataCollectionSection['data'] = { };
 dataCollectionSection['data']['apps'] = { };
-for (var id in appIds) {
-    dataCollectionSection['data']['apps'][appIds[id]] = { };
-    dynamicFields['checkboxes']['{{componentId}}-{{sectionId}}-' + id + '-allowed'] = { };
+dataCollectionSectionForm['funcs'] = { };
+dataCollectionSectionForm['funcs']['extractData'] =
+    function (checkbox = null, select2 = null, select2Type = null, appId) {
+        if (checkbox) {
+            if ($('#' + checkbox)[0].checked === true) {
+                dataCollectionSection['data']['apps'][appId]['allowed'] = true;
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', false);
+            } else {
+                dataCollectionSection['data']['apps'][appId]['allowed'] = false;
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').val(0).trigger('change');
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').val(0).trigger('change');
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').val(0).trigger('change');
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').val(0).trigger('change');
+            }
+        } else if (select2 && select2Type) {
+            dataCollectionSection['data']['apps'][appId][select2Type] =
+                $($('#' + select2)[0].selectedOptions[0]).val();
+        }
+    };
+
+for (var id in dataCollectionSectionForm['vars']['appIds']) {
+    dataCollectionSection['data']['apps'][dataCollectionSectionForm['vars']['appIds'][id]] = { };
+    dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']['{{componentId}}-{{sectionId}}-' + id + '-allowed'] = { };
     dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-allowed'] = { };
-    dynamicFields['select2']['{{componentId}}-{{sectionId}}-' + id + '-view'] = { };
+    dataCollectionSectionForm['vars']['dynamicFields']['select2']['{{componentId}}-{{sectionId}}-' + id + '-view'] = { };
     dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-view'] = {"placeholder": "SELECT VIEW (TEMPLATE)"};
-    dynamicFields['select2']['{{componentId}}-{{sectionId}}-' + id + '-email-service'] = { };
+    dataCollectionSectionForm['vars']['dynamicFields']['select2']['{{componentId}}-{{sectionId}}-' + id + '-email-service'] = { };
     dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-email-service'] = {"placeholder": "SELECT EMAIL SERVICE", "allowClear" : true};
-    dynamicFields['select2']['{{componentId}}-{{sectionId}}-' + id + '-public-storage'] = { };
+    dataCollectionSectionForm['vars']['dynamicFields']['select2']['{{componentId}}-{{sectionId}}-' + id + '-public-storage'] = { };
     dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-public-storage'] = {"placeholder": "SELECT PUBLIC STORAGE"};
-    dynamicFields['select2']['{{componentId}}-{{sectionId}}-' + id + '-private-storage'] = { };
+    dataCollectionSectionForm['vars']['dynamicFields']['select2']['{{componentId}}-{{sectionId}}-' + id + '-private-storage'] = { };
     dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-private-storage'] = {"placeholder": "SELECT PRIVATE STORAGE"};
     dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']['{{componentId}}-{{sectionId}}-' + id + '-view'] = "required";
     dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']['{{componentId}}-{{sectionId}}-' + id + '-view'] = "please select a view (template)";
