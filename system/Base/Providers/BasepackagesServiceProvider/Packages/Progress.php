@@ -189,7 +189,7 @@ class Progress extends BasePackage
                                     'completed'         => $progressFile['completed'],
                                     'preCheckComplete'  => $progressFile['preCheckComplete'],
                                     'percentComplete'   => number_format(($progressFile['completed'] * 100) / $progressFile['total']),
-                                    'runners'           => $progressFile['runners'],
+                                    'runners'           => $progressFile['runners'] ?? [],
                                     'callResult'        => $callResult
                                 ]
                         ]

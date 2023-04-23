@@ -138,6 +138,28 @@ class Pusher extends WebsocketBase implements WampServerInterface
 
     protected function checkAccount($conn)
     {
+        //Someone trying to connect without proper cookies
+        if (!isset($conn->httpRequest->getHeader('Cookie')[0])) {
+            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true, $this->appRoute);
+
+            $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' Cookie misuse. Disconnecting websocket.');
+
+            return false;
+        }
+
+        //Get Cookies information
+        $cookiesArr = [];
+        $cookies = [];
+
+        $cookiesArr = $conn->httpRequest->getHeader('Cookie')[0];
+        $cookiesArr = explode(';', $cookiesArr);
+
+        foreach ($cookiesArr as $cookie) {
+            $cookie = explode('=', $cookie);
+            $cookies[trim($cookie[0])] = trim($cookie[1]);
+        }
+
+        //Get App Information
         $pathArr = explode('/', ltrim(rtrim($conn->httpRequest->getUri()->getPath(), '/'), '/'));
 
         if (count($pathArr) === 2) {
@@ -145,48 +167,10 @@ class Pusher extends WebsocketBase implements WampServerInterface
                 $this->appRoute = strtolower($pathArr[1]);
             }
         } else {
-            $this->logger->log->debug('Disconnect as we didn\'t receive app route');
+            $this->appRoute = null;
+            // $this->logger->log->debug('Disconnect as we didn\'t receive app route');
 
-            return false;//Disconnect as we didnt receive appRoute
-        }
-
-        $app = $this->apps->getAppInfo($this->appRoute);
-
-        if (!$app) {
-            $this->logger->log->debug('Disconnect as app not found');
-
-            return false;//App not found
-        }
-
-        $ipFilterMiddleware = $this->modules->middlewares->getNamedMiddlewareForApp('IpFilter', $app['id']);
-        if ($ipFilterMiddleware) {
-            $this->apps->ipFilter->setClientAddress($conn->httpRequest->getHeader('X-Forwarded-For')[0]);
-
-            if (!$this->apps->ipFilter->checkList()) {//IP Is Blocked
-                $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' IP is blocked.');
-
-                return false;
-            }
-        }
-
-        $cookiesArr = [];
-        $cookies = [];
-
-        if (isset($conn->httpRequest->getHeader('Cookie')[0])) {
-            $cookiesArr = $conn->httpRequest->getHeader('Cookie')[0];
-            $cookiesArr = explode(';', $cookiesArr);
-
-            foreach ($cookiesArr as $cookie) {
-                $cookie = explode('=', $cookie);
-                $cookies[trim($cookie[0])] = trim($cookie[1]);
-            }
-        } else {
-            //Someone trying to connect without proper cookies
-            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true, $this->appRoute);
-
-            $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' Cookie misuse. Disconnecting websocket.');
-
-            return false;
+            // return false;//Disconnect as we didnt receive appRoute
         }
 
         if (!isset($cookies['Bazaari'])) {
@@ -204,6 +188,27 @@ class Pusher extends WebsocketBase implements WampServerInterface
             $this->opCache->setCache('InstallerResourceId', $conn->resourceId);
 
             return true;
+        }
+
+        if ($this->appRoute) {
+            $app = $this->apps->getAppInfo($this->appRoute);
+
+            if (!$app) {
+                $this->logger->log->debug('Disconnect as app not found');
+
+                return false;//App not found
+            }
+
+            $ipFilterMiddleware = $this->modules->middlewares->getNamedMiddlewareForApp('IpFilter', $app['id']);
+            if ($ipFilterMiddleware) {
+                $this->apps->ipFilter->setClientAddress($conn->httpRequest->getHeader('X-Forwarded-For')[0]);
+
+                if (!$this->apps->ipFilter->checkList()) {//IP Is Blocked
+                    $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' IP is blocked.');
+
+                    return false;
+                }
+            }
         }
 
         if (isset($cookies['id'])) {

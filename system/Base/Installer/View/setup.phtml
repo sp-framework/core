@@ -502,6 +502,10 @@
 
             BazProgress.setCallable({
                 beforeProcess : function getComposerProgress(response) {
+                    if (response.responseCode !== 0) {
+                        return;
+                    }
+
                     var responseData;
 
                     if (typeof response.responseData === 'string' || response.responseData instanceof String) {
@@ -538,6 +542,10 @@
                     return true;
                 },
                 afterProcess : function(response) {
+                    if (response.responseCode !== 0) {
+                        return;
+                    }
+
                     var responseData, timerId;
 
                     if (typeof response.responseData === 'string' || response.responseData instanceof String) {
@@ -545,8 +553,7 @@
                     } else {
                         responseData = response.responseData;
                     }
-                    //eslint-disable-next-line
-                    console.log(responseData['runners']['running']['method']);
+
                     if (responseData['runners']['running']['method'] === 'executeComposer') {
                         if (BazHelpers.getTimerId('composer') === false) {
                             if (BazHelpers.getTimerId('getProgress') !== false) {

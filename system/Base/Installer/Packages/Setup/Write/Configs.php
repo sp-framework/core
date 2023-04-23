@@ -50,7 +50,22 @@ class Configs
 
 return
 	[
-		"setup" 		=> true
+		"setup" 			=> true,
+		"logs"				=>
+		[
+			"enabled"						=> true,
+			"exceptions"					=> true,
+			"level"							=> "DEBUG",
+			"service"						=> "streamLogs",
+			"emergencyLogsEmail"			=> false,
+			"emergencyLogsEmailAddresses"	=> "",
+		],
+		"websocket"			=>
+		[
+			"protocol"						=> "tcp",
+			"host"							=> "localhost",
+			"port"							=> 5555
+		]
 	];';
 			$this->writeBaseFile();
 
