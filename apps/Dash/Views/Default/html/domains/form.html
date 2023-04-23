@@ -1,41 +1,4 @@
-<div class="row vdivide">
-    <div class="col-md-2">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                                 : component,
-                'componentName'                             : componentName,
-                'componentId'                               : componentId,
-                'sectionId'                                 : sectionId,
-                'fieldId'                                   : 'form-fields',
-                'fieldLabel'                                : 'Form Fields',
-                'fieldType'                                 : 'jstree',
-                'fieldHelp'                                 : true,
-                'fieldHelpTooltipContent'                   : 'Form Fields',
-                'fieldRequired'                             : false,
-                'fieldBazScan'                              : true,
-                'fieldJstreeSearch'                         : true,
-                'fieldBazPostOnCreate'                      : false,
-                'fieldBazPostOnUpdate'                      : false,
-                'fieldJstreeDataSrcArr'                     : [],
-                'fieldJstreeAdd'                            : false,
-                'fieldJstreeEdit'                           : false,
-                'fieldJstreeExpand'                         : true,
-                'fieldJstreeCollapse'                       : true,
-                'fieldJstreeFirstOpen'                      : true,
-                'fieldJstreeAllOpen'                        : false,
-                'fieldJstreeToggleAllChildren'              : false,
-                'fieldJstreeIncludeRootInPath'              : false,
-                'fieldJstreeSelectEndNodeOnly'              : false,
-                'fieldJstreeShowDots'                       : false,
-                'fieldJstreeDoubleClickToggle'              : true,
-                'fieldJstreeMultiple'                       : false,
-                'fieldJstreeSearchCaseSensitive'            : false,
-                'fieldJstreeSearchShowOnlyMatches'          : false,
-                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
-                'fieldJstreeHideJstreeIcons'                : false
-            ]
-        )}}
-    </div>
+<div class="row">
     <div class="col">
         <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -101,13 +64,6 @@ if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
     dataCollectionSection =
         dataCollectionComponent['{{componentId}}-{{sectionId}}'];
 }
-if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
-    dataCollectionSectionForm =
-        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
-} else {
-    dataCollectionSectionForm =
-        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
-}
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
@@ -149,12 +105,14 @@ dataCollectionSection =
                             $("#security-token").val(response.token);
                         }
 
-                        if (response.responseCode === 3) {
+                        if (response.responseCode === 3 || response.responseCode === 4) {
                             $('#{{componentId}}-{{sectionId}}-is_internal')[0].checked = true;
                             PNotify.notice({
                                 text : response.responseMessage
                             });
-                            return;
+                            if (response.responseCode === 3) {
+                                return;
+                            }
                         } else if (response.responseCode === 0) {
                             $('#{{componentId}}-{{sectionId}}-is_internal')[0].checked = false;
                             PNotify.success({
@@ -166,6 +124,7 @@ dataCollectionSection =
                                 text : response.responseMessage
                             });
                         }
+                        dataCollectionSection['data']['dns_record'] = response.domainDetails;
                         updateModalInfo(response.domainDetails);
                     }, 'json');
                 });
@@ -178,6 +137,10 @@ dataCollectionSection =
                 function updateModalInfo(domainDetails) {
                     if (domainDetails) {
                         var matched = false;
+
+                        if (domainDetails['matched']) {
+                            matched = domainDetails['matched'];
+                        }
 
                         $('#{{componentId}}-{{sectionId}}-domain-info').attr('disabled', false);
 
@@ -196,7 +159,6 @@ dataCollectionSection =
                             var aRecords = [];
                             for (var aRecord in domainDetails.A) {
                                 if (domainDetails.server_address === domainDetails.A[aRecord]) {
-                                    matched = true;
                                     aRecords.push('<span class="text-success">' + domainDetails.A[aRecord] + '</span>');
                                 } else {
                                     aRecords.push('<span class="text-warning">' + domainDetails.A[aRecord] + '</span>');
@@ -210,7 +172,6 @@ dataCollectionSection =
                             var aaaaRecords = [];
                             for (var aaaaRecord in domainDetails.AAAA) {
                                 if (domainDetails.server_address === domainDetails.AAAA[aaaaRecord]) {
-                                    matched = true;
                                     aaaaRecords.push('<span class="text-success">' + domainDetails.AAAA[aaaaRecord] + '</span>');
                                 } else {
                                     aaaaRecords.push('<span class="text-warning">' + domainDetails.AAAA[aaaaRecord] + '</span>');
@@ -233,6 +194,7 @@ dataCollectionSection =
                                 domainDetails.server_address + '</span>'
                             );
                         }
+                        $('#domain-alert').append('<br><span class="text-info">Note: This tool is for information purpose only.</span>');
                     } else {
                         $('#domain-name').html('-');
                         $('#domain-cname').html('-');

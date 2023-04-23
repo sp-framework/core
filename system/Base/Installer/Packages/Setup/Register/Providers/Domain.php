@@ -9,9 +9,13 @@ use Phalcon\Helper\Json;
 
 class Domain
 {
+	protected $request;
+
 	public function register($db, $request)
 	{
-		$request->setStrictHostCheck(true);
+		$this->request = $request;
+
+		$this->request->setStrictHostCheck(true);
 
 		$apps =
 		[
@@ -26,7 +30,7 @@ class Domain
 			]
 		];
 
-		$record = $this->validateDomain($request->getHttpHost());
+		$record = $this->validateDomain($this->request->getHttpHost());
 		if ($record) {
 			$record = Json::encode($record);
 			$isInternal = 0;
@@ -38,7 +42,7 @@ class Domain
 		$db->insertAsDict(
 			'service_provider_domains',
 			[
-				'name'   							=> $request->getHttpHost(),
+				'name'   							=> $this->request->getHttpHost(),
 				'description' 						=> '',
 				"default_app_id"					=> 1,
 				"exclusive_to_default_app"			=> 0,
@@ -54,13 +58,15 @@ class Domain
 	{
 		$record = [];
 		$record['internal'] = false;
+		$record['matched'] = false;
+		$record['server_address'] = $this->request->getServer('SERVER_ADDR');
 
 		try {
 			$dnsHandler = (new TCP())
 				->setPort(53)
 				->setNameserver('8.8.8.8')
 				->setTimeout(3) // limit execution to 3 seconds
-				->setRetries(3); // allows 5 retries if response fails
+				->setRetries(3); // allows 3 retries if response fails
 
 			$dnsRecordsService = new DnsRecords($dnsHandler);
 
@@ -116,37 +122,20 @@ class Domain
 				$record['internal'] = true;
 			}
 
-			$keys = [
-				'HTTP_CLIENT_IP',
-				'HTTP_X_FORWARDED_FOR',
-				'HTTP_X_FORWARDED',
-				'HTTP_X_CLUSTER_CLIENT_IP',
-				'HTTP_FORWARDED_FOR',
-				'HTTP_FORWARDED',
-				'REMOTE_ADDR'
-			];
-
-			$record['server_address'] = $_SERVER['REMOTE_ADDR'];
-
-			foreach ($keys as $key) {
-				if (array_key_exists($key, $_SERVER) === true) {
-					foreach (array_map('trim', explode(',', $_SERVER[$key])) as $ip) {
-						if ($record['internal']) {
-							$flags = FILTER_FLAG_NO_RES_RANGE;
-						} else {
-							$flags = FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
-						}
-
-						if (filter_var($ip, FILTER_VALIDATE_IP, $flags) !== false) {
-							$record['server_address'] = $ip;
-						}
-					}
+			if ($record['internal'] === false) {
+				if (count($record['A']) > 0 && in_array($record['server_address'], $record['A'])) {
+					$record['internal'] = false;
+					$record['matched'] = true;
+				}
+				if (count($record['AAAA']) > 0 && in_array($record['server_address'], $record['AAAA'])) {
+					$record['internal'] = false;
+					$record['matched'] = true;
 				}
 			}
 
 			return $record;
 		} catch (\Exception $e) {
-			return false;
+			return [];
 		}
 	}
 }

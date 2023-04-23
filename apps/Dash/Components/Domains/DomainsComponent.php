@@ -221,9 +221,12 @@ class DomainsComponent extends BaseComponent
                 if ($domainDetails) {
                     $this->view->domainDetails = $this->domains->packagesData->domainDetails;
 
-                    if ($this->view->domainDetails['internal']) {
+                    if ($this->view->domainDetails['internal'] === true) {
                         $this->view->responseMessage = 'Domain details not found on the internet.';
                         $this->view->responseCode = 3;
+                    } else if ($this->view->domainDetails['internal'] === false && $this->view->domainDetails['matched'] === false) {
+                        $this->view->responseMessage = 'Domain details found on the internet, but did not match.';
+                        $this->view->responseCode = 4;
                     } else {
                         $this->view->responseCode = 0;
                         $this->view->responseMessage = 'Domain details found on the internet.';
