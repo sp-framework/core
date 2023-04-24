@@ -95,6 +95,8 @@ class Basepackages
 
 	protected $backuprestore;
 
+	protected $utils;
+
 	public function __construct()
 	{
 	}
