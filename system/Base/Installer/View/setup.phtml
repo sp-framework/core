@@ -531,7 +531,10 @@
                         }
                         return false;
                     } else {
-                        if (responseData['runners']['running']['method'] === 'executeComposer') {
+                        if (responseData['runners'] &&
+                            responseData['runners']['running'] &&
+                            responseData['runners']['running']['method'] === 'executeComposer'
+                        ) {
                             $('#external-div').attr('hidden', false);
                         }
                         if (responseData.composer) {
@@ -554,7 +557,10 @@
                         responseData = response.responseData;
                     }
 
-                    if (responseData['runners']['running']['method'] === 'executeComposer') {
+                    if (responseData['runners'] &&
+                        responseData['runners']['running'] &&
+                        responseData['runners']['running']['method'] === 'executeComposer'
+                    ) {
                         if (BazHelpers.getTimerId('composer') === false) {
                             if (BazHelpers.getTimerId('getProgress') !== false) {
                                 BazHelpers.setTimeoutTimers.stop(BazHelpers.getTimerId('getProgress'), null, 'getProgress');

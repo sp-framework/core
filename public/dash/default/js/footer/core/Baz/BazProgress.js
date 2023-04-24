@@ -130,7 +130,7 @@ var BazProgress = function() {
 
                 if (responseData['total'] !== 'undefined' && responseData['completed'] !== 'undefined') {
                     if (responseData['total'] !== responseData['completed']) {
-                        if (responseData['runners']['running'] !== false) {
+                        if (responseData['runners'] && responseData['runners']['running'] !== false) {
                             $(element).attr('hidden', false);
                             $('.' + $(element)[0].id + '-progress-span')
                                 .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
