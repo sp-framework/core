@@ -7,8 +7,12 @@ use System\Base\BasePackage;
 
 class Utils extends BasePackage
 {
-    public function init()
+    public function init($container = null)
     {
+        if ($container) {
+            $this->container = $container;
+        }
+
         return $this;
     }
 
