@@ -84,6 +84,30 @@ class Input
             'data-fieldinputfilter="' . $this->params['fieldInputTypeTextFilter'] . '"' :
             '';
 
+        if ($this->fieldParams['fieldInputType'] === 'password') {
+            if (isset($this->params['fieldInputPasswordToggleVisibility']) &&
+                $this->params['fieldInputPasswordToggleVisibility'] == true
+            ) {
+                $this->params['fieldGroupPostAddonButtonId'] = 'visibility';
+                $this->params['fieldGroupPostAddonButtonValue'] = '<i class="fas fa-fw fa-eye-slash"></i>';
+                $this->params['fieldGroupPostAddonButtonTooltipTitle'] = false;
+            }
+
+            if (isset($this->params['fieldInputPasswordGenerate']) &&
+                $this->params['fieldInputPasswordGenerate'] == true
+            ) {
+                $this->params['fieldGroupPreAddonButtons'] =
+                    [
+                        $this->params['fieldId'] . '-password_generate'   => [
+                            'title'                         => false,
+                            'icon'                          => 'wand-magic-sparkles',
+                            'noMargin'                      => true,
+                            'buttonAdditionalClass'         => 'rounded-0'
+                        ]
+                    ];
+            }
+        }
+
         $this->fieldParams['fieldGroupPreAddonTextAdditionalClass'] =
             isset($this->params['fieldGroupPreAddonTextAdditionalClass']) ?
             $this->params['fieldGroupPreAddonTextAdditionalClass'] :
@@ -156,7 +180,6 @@ class Input
         }
 
         if (isset($this->params['fieldGroupPreAddonDropdown'])) {
-
             $this->fieldParams['fieldGroupPreAddonDropdownButtonClass'] =
                 isset($this->params['fieldGroupPreAddonDropdownButtonClass']) ?
                 $this->params['fieldGroupPreAddonDropdownButtonClass'] :
@@ -246,7 +269,7 @@ class Input
         if (isset($this->params['fieldGroupPreAddonButtons'])) {
 
             $this->content .=
-                '<div class="input-group-append">';
+                '<div class="input-group-prepend">';
 
             $this->content .=
                 $this->adminLTETags->useTag(

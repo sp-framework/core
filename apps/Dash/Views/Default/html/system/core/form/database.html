@@ -217,49 +217,27 @@
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'db_password',
-                        'fieldLabel'                     : 'Database User Password',
-                        'fieldType'                      : 'input',
-                        'fieldInputType'                 : 'password',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Password of database. Leave empty to keep the password same.',
-                        'fieldRequired'                  : false,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 50,
-                        'fieldGroupPostAddonButtons'     :
-                            {
-                                'db_password_generate'   : {
-                                    'title'                         : false,
-                                    'icon'                          : 'wand-magic-sparkles',
-                                    'noMargin'                      : true,
-                                    'buttonAdditionalClass'         : 'rounded-0'
-                                }
-                            },
-                        'fieldAdditionalClass'           : 'mb-0',
-                        'fieldValue'                     : ''
-                    ]
-                )}}
-                {{adminltetags.useTag('fields',
-                    [
                         'component'                             : component,
                         'componentName'                         : componentName,
                         'componentId'                           : componentId,
                         'sectionId'                             : sectionId,
-                        'fieldId'                               : 'db_password_strength_meter',
-                        'fieldLabel'                            : false,
-                        'fieldHidden'                           : false,
-                        'fieldType'                             : 'html',
+                        'fieldId'                               : 'db_password',
+                        'fieldLabel'                            : 'Database User Password',
+                        'fieldType'                             : 'input',
+                        'fieldInputType'                        : 'password',
+                        'fieldInputPasswordToggleVisibility'    : true,
+                        'fieldInputPasswordGenerate'            : true,
+                        'fieldInputPasswordStrengthMeter'       : true,
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Password of database. Leave empty to keep the password same.',
                         'fieldRequired'                         : false,
                         'fieldBazScan'                          : true,
                         'fieldBazPostOnCreate'                  : false,
-                        'fieldBazPostOnUpdate'                  : false
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 50,
+                        'fieldAdditionalClass'                  : 'mb-0',
+                        'fieldValue'                            : ''
                     ]
                 )}}
             </div>
@@ -437,7 +415,7 @@
                         'fieldDropzoneLabel'            : 'Upload Backup Database',
                         'fieldRequired'                 : false,
                         'fieldHelp'                     : true,
-                        'fieldHelpTooltipContent'       : 'Max: 1. Upload database backup file. Acceptable extension .gzip. File should be downloaded from this system or generated using mysqldump and then gzipped.',
+                        'fieldHelpTooltipContent'       : 'Max: 1. Upload backup file. Acceptable extension .zip. File should be downloaded from this system for restore to work properly',
                         'fieldAdditionalClass'          : 'mb-1',
                         'fieldBazScan'                  : true,
                         'fieldBazPostOnCreate'          : false,
@@ -611,49 +589,27 @@
                 <div class="col">
                     {{adminltetags.useTag('fields',
                         [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'db_restore_db_password',
-                            'fieldLabel'                     : 'Database User Password',
-                            'fieldType'                      : 'input',
-                            'fieldInputType'                 : 'password',
-                            'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'Password of database.',
-                            'fieldRequired'                  : true,
-                            'fieldBazScan'                   : true,
-                            'fieldBazPostOnCreate'           : false,
-                            'fieldBazPostOnUpdate'           : false,
-                            'fieldDataInputMinLength'        : 1,
-                            'fieldDataInputMaxLength'        : 50,
-                            'fieldGroupPostAddonButtons'     :
-                                {
-                                    'db_restore_db_password_generate'   : {
-                                        'title'                         : false,
-                                        'icon'                          : 'wand-magic-sparkles',
-                                        'noMargin'                      : true,
-                                        'buttonAdditionalClass'         : 'rounded-0'
-                                    }
-                                },
-                            'fieldAdditionalClass'           : 'mb-0',
-                            'fieldValue'                     : ''
-                        ]
-                    )}}
-                    {{adminltetags.useTag('fields',
-                        [
                             'component'                             : component,
                             'componentName'                         : componentName,
                             'componentId'                           : componentId,
                             'sectionId'                             : sectionId,
-                            'fieldId'                               : 'db_restore_db_password_strength_meter',
-                            'fieldLabel'                            : false,
-                            'fieldHidden'                           : false,
-                            'fieldType'                             : 'html',
-                            'fieldRequired'                         : false,
+                            'fieldId'                               : 'db_restore_db_password',
+                            'fieldLabel'                            : 'Database User Password',
+                            'fieldType'                             : 'input',
+                            'fieldInputType'                        : 'password',
+                            'fieldInputPasswordToggleVisibility'    : true,
+                            'fieldInputPasswordGenerate'            : true,
+                            'fieldInputPasswordStrengthMeter'       : true,
+                            'fieldHelp'                             : true,
+                            'fieldHelpTooltipContent'               : 'Password of database.',
+                            'fieldRequired'                         : true,
                             'fieldBazScan'                          : true,
                             'fieldBazPostOnCreate'                  : false,
-                            'fieldBazPostOnUpdate'                  : false
+                            'fieldBazPostOnUpdate'                  : false,
+                            'fieldDataInputMinLength'               : 1,
+                            'fieldDataInputMaxLength'               : 50,
+                            'fieldAdditionalClass'                  : 'mb-0',
+                            'fieldValue'                            : ''
                         ]
                     )}}
                 </div>

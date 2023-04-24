@@ -13,81 +13,104 @@ BazCore.header({
             <div id="{{componentId}}-regular" hidden>
                 <p class="login-box-msg text-sm font-weight-bold">Password Reset</p>
                 <div id="{{componentId}}-form">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'componentId'                           : componentId,
-                            'sectionId'                             : 'form',
-                            'fieldId'                               : 'user',
-                            'fieldLabel'                            : false,
-                            'fieldType'                             : 'input',
-                            'fieldInputType'                        : 'text',
-                            'fieldPlaceholder'                      : 'Username',
-                            'fieldBazScan'                          : true,
-                            'fieldGroupPostAddonIcon'               : 'user'
-                        ]
-                    )}}
-                    {{adminltetags.useTag('fields',
-                        [
-                            'componentId'                           : componentId,
-                            'sectionId'                             : 'form',
-                            'fieldId'                               : 'pass',
-                            'fieldLabel'                            : false,
-                            'fieldType'                             : 'input',
-                            'fieldInputType'                        : 'password',
-                            'fieldPlaceholder'                      : 'Current Password',
-                            'fieldBazScan'                          : true,
-                            'fieldGroupPostAddonIcon'               : 'lock'
-                        ]
-                    )}}
-                    {{adminltetags.useTag('fields',
-                        [
-                            'componentId'                           : componentId,
-                            'sectionId'                             : 'form',
-                            'fieldId'                               : 'newpass',
-                            'fieldLabel'                            : false,
-                            'fieldType'                             : 'input',
-                            'fieldInputType'                        : 'password',
-                            'fieldPlaceholder'                      : 'New Password',
-                            'fieldBazScan'                          : true,
-                            'fieldAdditionalClass'                  : 'mb-0',
-                            'fieldGroupPostAddonButtons'            :
-                                {
-                                    'password_generate'             : {
-                                        'title'                         : false,
-                                        'icon'                          : 'wand-magic-sparkles',
-                                        'noMargin'                      : true,
-                                        'buttonAdditionalClass'         : 'rounded-0'
-                                    }
-                                }
-                        ]
-                    )}}
-                    {{adminltetags.useTag('fields',
-                        [
-                            'componentId'                           : componentId,
-                            'sectionId'                             : 'form',
-                            'fieldId'                               : 'strength-meter',
-                            'fieldLabel'                            : false,
-                            'fieldHidden'                           : false,
-                            'fieldType'                             : 'html',
-                            'fieldRequired'                         : false,
-                            'fieldBazScan'                          : true,
-                            'fieldBazPostOnCreate'                  : false,
-                            'fieldBazPostOnUpdate'                  : false
-                        ]
-                    )}}
-                    {{adminltetags.useTag('fields',
-                        [
-                            'componentId'                           : componentId,
-                            'sectionId'                             : 'form',
-                            'fieldId'                               : 'confirmnewpass',
-                            'fieldLabel'                            : false,
-                            'fieldType'                             : 'input',
-                            'fieldInputType'                        : 'password',
-                            'fieldPlaceholder'                      : 'Confirm New Password',
-                            'fieldBazScan'                          : true,
-                            'fieldGroupPostAddonIcon'               : 'lock'
-                        ]
-                    )}}
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'componentId'                           : componentId,
+                                    'sectionId'                             : 'form',
+                                    'fieldId'                               : 'user',
+                                    'fieldLabel'                            : false,
+                                    'fieldType'                             : 'input',
+                                    'fieldInputType'                        : 'text',
+                                    'fieldPlaceholder'                      : 'Username',
+                                    'fieldBazScan'                          : true,
+                                    'fieldGroupPostAddonIcon'               : 'user'
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'componentId'                           : componentId,
+                                    'sectionId'                             : 'form',
+                                    'fieldId'                               : 'pass',
+                                    'fieldLabel'                            : false,
+                                    'fieldType'                             : 'input',
+                                    'fieldInputType'                        : 'password',
+                                    'fieldPlaceholder'                      : 'Current Password',
+                                    'fieldBazScan'                          : true,
+                                    'fieldGroupPostAddonButtonId'            : 'visibility',
+                                    'fieldGroupPostAddonButtonValue'         : '<i class="fas fa-fw fa-eye-slash"></i>',
+                                    'fieldGroupPostAddonButtonTooltipTitle'  : false
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'componentId'                           : componentId,
+                                    'sectionId'                             : 'form',
+                                    'fieldId'                               : 'newpass',
+                                    'fieldLabel'                            : false,
+                                    'fieldType'                             : 'input',
+                                    'fieldInputType'                        : 'password',
+                                    'fieldPlaceholder'                      : 'New Password',
+                                    'fieldBazScan'                          : true,
+                                    'fieldGroupPostAddonButtonId'           : 'visibility',
+                                    'fieldGroupPostAddonButtonValue'        : '<i class="fas fa-fw fa-eye-slash"></i>',
+                                    'fieldGroupPostAddonButtonTooltipTitle' : false,
+                                    'fieldAdditionalClass'                  : 'mb-0',
+                                    'fieldGroupPreAddonButtons'             :
+                                        {
+                                            'password_generate'             : {
+                                                'title'                         : false,
+                                                'icon'                          : 'wand-magic-sparkles',
+                                                'noMargin'                      : true,
+                                                'buttonAdditionalClass'         : 'rounded-0'
+                                            }
+                                        }
+                                ]
+                            )}}
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'componentId'                           : componentId,
+                                    'sectionId'                             : 'form',
+                                    'fieldId'                               : 'strength-meter',
+                                    'fieldLabel'                            : false,
+                                    'fieldHidden'                           : false,
+                                    'fieldType'                             : 'html',
+                                    'fieldRequired'                         : false,
+                                    'fieldBazScan'                          : true,
+                                    'fieldBazPostOnCreate'                  : false,
+                                    'fieldBazPostOnUpdate'                  : false
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'componentId'                           : componentId,
+                                    'sectionId'                             : 'form',
+                                    'fieldId'                               : 'confirmnewpass',
+                                    'fieldLabel'                            : false,
+                                    'fieldType'                             : 'input',
+                                    'fieldInputType'                        : 'password',
+                                    'fieldPlaceholder'                      : 'Confirm New Password',
+                                    'fieldBazScan'                          : true,
+                                    'fieldGroupPostAddonButtonId'           : 'visibility',
+                                    'fieldGroupPostAddonButtonValue'        : '<i class="fas fa-fw fa-eye-slash"></i>',
+                                    'fieldGroupPostAddonButtonTooltipTitle' : false
+                                ]
+                            )}}
+                        </div>
+                    </div>
                     <div class="row mt-2">
                         <div class="col">
                             <button id="{{componentId}}-form-reset" type="button" class="btn btn-info float-right">
@@ -471,6 +494,38 @@ $(document).ready(function(){
             $('.login-box-msg').addClass('animated fadeIn');
         }, 2000);
     }
+
+    $('#{{componentId}}-form-pass-visibility, #{{componentId}}-form-newpass-visibility, #{{componentId}}-form-confirmnewpass-visibility').click(function(e) {
+        e.preventDefault();
+
+        var id = $(this)[0].id;
+
+        if (id === '{{componentId}}-form-pass-visibility') {
+            if ($('#{{componentId}}-form-pass').attr('type') === 'password') {
+                $('#{{componentId}}-form-pass').attr('type', 'text');
+                $('#' + id).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+            } else if ($('#{{componentId}}-form-pass').attr('type') === 'text') {
+                $('#{{componentId}}-form-pass').attr('type', 'password');
+                $('#' + id).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+        } else if (id === '{{componentId}}-form-newpass-visibility') {
+            if ($('#{{componentId}}-form-newpass').attr('type') === 'password') {
+                $('#{{componentId}}-form-newpass').attr('type', 'text');
+                $('#' + id).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+            } else if ($('#{{componentId}}-form-newpass').attr('type') === 'text') {
+                $('#{{componentId}}-form-newpass').attr('type', 'password');
+                $('#' + id).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+        } else if (id === '{{componentId}}-form-confirmnewpass-visibility') {
+            if ($('#{{componentId}}-form-confirmnewpass').attr('type') === 'password') {
+                $('#{{componentId}}-form-confirmnewpass').attr('type', 'text');
+                $('#' + id).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+            } else if ($('#{{componentId}}-form-confirmnewpass').attr('type') === 'text') {
+                $('#{{componentId}}-form-confirmnewpass').attr('type', 'password');
+                $('#' + id).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+        }
+    });
 
     $('#{{componentId}}-form-strength-meter').strengthMeter({
         "url" : '{{links.url("auth/checkPwStrength")}}'

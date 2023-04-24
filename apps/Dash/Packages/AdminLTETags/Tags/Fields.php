@@ -79,6 +79,25 @@ class Fields extends AdminLTETags
         ) {
             $this->content .= '</div>';
         }
+
+        if (isset($this->params['fieldInputPasswordStrengthMeter']) &&
+            $this->params['fieldInputPasswordStrengthMeter'] == true
+        ) {
+            $this->content .= $this->useTag('fields',
+                [
+                    'componentId'                           => $this->params['componentId'],
+                    'sectionId'                             => $this->params['sectionId'],
+                    'fieldId'                               => $this->params['fieldId'] . '-strength-meter',
+                    'fieldLabel'                            => false,
+                    'fieldHidden'                           => false,
+                    'fieldType'                             => 'html',
+                    'fieldRequired'                         => false,
+                    'fieldBazScan'                          => false,
+                    'fieldBazPostOnCreate'                  => false,
+                    'fieldBazPostOnUpdate'                  => false
+                ]
+            );
+        }
     }
 
     protected function getFieldType()

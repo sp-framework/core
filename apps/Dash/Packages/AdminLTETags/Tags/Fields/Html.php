@@ -59,7 +59,7 @@ class Html
     protected function generateContent()
     {
         $this->content .=
-            '<div ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="' . $this->fieldParams['fieldHtmlAdditionalClass'] . '" ' . $this->fieldParams['fieldId'] . '">' .
+            '<div ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' data-type="html" class="' . $this->fieldParams['fieldHtmlAdditionalClass'] . '" ' . $this->fieldParams['fieldId'] . '">' .
                 $this->fieldParams['fieldHtmlContent'] .
             '</div>';
     }

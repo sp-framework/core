@@ -495,6 +495,38 @@ $(document).ready(function(){
         }, 2000);
     }
 
+    $('#{{componentId}}-form-pass-visibility, #{{componentId}}-form-newpass-visibility, #{{componentId}}-form-confirmnewpass-visibility').click(function(e) {
+        e.preventDefault();
+
+        var id = $(this)[0].id;
+
+        if (id === '{{componentId}}-form-pass-visibility') {
+            if ($('#{{componentId}}-form-pass').attr('type') === 'password') {
+                $('#{{componentId}}-form-pass').attr('type', 'text');
+                $('#' + id).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+            } else if ($('#{{componentId}}-form-pass').attr('type') === 'text') {
+                $('#{{componentId}}-form-pass').attr('type', 'password');
+                $('#' + id).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+        } else if (id === '{{componentId}}-form-newpass-visibility') {
+            if ($('#{{componentId}}-form-newpass').attr('type') === 'password') {
+                $('#{{componentId}}-form-newpass').attr('type', 'text');
+                $('#' + id).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+            } else if ($('#{{componentId}}-form-newpass').attr('type') === 'text') {
+                $('#{{componentId}}-form-newpass').attr('type', 'password');
+                $('#' + id).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+        } else if (id === '{{componentId}}-form-confirmnewpass-visibility') {
+            if ($('#{{componentId}}-form-confirmnewpass').attr('type') === 'password') {
+                $('#{{componentId}}-form-confirmnewpass').attr('type', 'text');
+                $('#' + id).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+            } else if ($('#{{componentId}}-form-confirmnewpass').attr('type') === 'text') {
+                $('#{{componentId}}-form-confirmnewpass').attr('type', 'password');
+                $('#' + id).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+        }
+    });
+
     $('#{{componentId}}-form-strength-meter').strengthMeter({
         "url" : '{{links.url("auth/checkPwStrength")}}'
     });

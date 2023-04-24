@@ -453,46 +453,8 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-db_charset'                              : { },
         '{{componentId}}-{{sectionId}}-db_collation'                            : { },
         '{{componentId}}-{{sectionId}}-db_username'                             : { },
-        '{{componentId}}-{{sectionId}}-db_password'                             : {
-            afterInit : function() {
-                $('#{{componentId}}-{{sectionId}}-db_password_generate').click(function(e) {
-                    e.preventDefault();
-
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-
-                    $.post('{{links.url("system/core/generatePw")}}', postData, function(response) {
-                        if (response.responseCode == 0) {
-                            if (response.responseData.password) {
-                                $('#{{componentId}}-{{sectionId}}-db_password').val(response.responseData.password).trigger('change');
-                                $('#{{componentId}}-{{sectionId}}-db_password').attr('type', 'text');
-                            }
-                        } else {
-                            PNotify.error(response.responseMessage);
-                        }
-                        if (response.tokenKey && response.token) {
-                            $("#security-token").attr("name", response.tokenKey);
-                            $("#security-token").val(response.token);
-                        }
-                        $('#{{componentId}}-{{sectionId}}-db_password').keyup(function() {
-                            if ($(this).val() === '') {
-                                $(this).attr('type', 'password');
-                            }
-                        });
-                    }, 'json');
-                });
-            }
-        },
-        '{{componentId}}-{{sectionId}}-db_password_strength_meter'              : {
-            afterInit : function() {
-                $('#{{componentId}}-{{sectionId}}-db_password_strength_meter').strengthMeter({
-                    "url"       : '{{links.url("system/core/checkPwStrength")}}',
-                    "postData"  : {
-                        "session"           : $('#session-token').val()
-                    }
-                });
-            }
-        },
+        '{{componentId}}-{{sectionId}}-db_password'                             : { },
+        '{{componentId}}-{{sectionId}}-db_password_strength_meter'              : { },
         '{{componentId}}-{{sectionId}}-db_remove_db_user'                       : { },
         '{{componentId}}-{{sectionId}}-db_remove_root_username'                 : { },
         '{{componentId}}-{{sectionId}}-db_remove_root_password'                 : { },
@@ -503,46 +465,8 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-db_restore_charset'                      : { },
         '{{componentId}}-{{sectionId}}-db_restore_collation'                    : { },
         '{{componentId}}-{{sectionId}}-db_restore_db_username'                  : { },
-        '{{componentId}}-{{sectionId}}-db_restore_db_password'                  : {
-            afterInit : function() {
-                $('#{{componentId}}-{{sectionId}}-db_restore_db_password_generate').click(function(e) {
-                    e.preventDefault();
-
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-
-                    $.post('{{links.url("system/core/generatePw")}}', postData, function(response) {
-                        if (response.responseCode == 0) {
-                            if (response.responseData.password) {
-                                $('#{{componentId}}-{{sectionId}}-db_restore_db_password').val(response.responseData.password).trigger('change');
-                                $('#{{componentId}}-{{sectionId}}-db_restore_db_password').attr('type', 'text');
-                            }
-                        } else {
-                            PNotify.error(response.responseMessage);
-                        }
-                        if (response.tokenKey && response.token) {
-                            $("#security-token").attr("name", response.tokenKey);
-                            $("#security-token").val(response.token);
-                        }
-                        $('#{{componentId}}-{{sectionId}}-db_restore_db_password').keyup(function() {
-                            if ($(this).val() === '') {
-                                $(this).attr('type', 'password');
-                            }
-                        });
-                    }, 'json');
-                });
-            }
-        },
-        '{{componentId}}-{{sectionId}}-db_restore_db_password_strength_meter'   : {
-            afterInit : function() {
-                $('#{{componentId}}-{{sectionId}}-db_restore_db_password_strength_meter').strengthMeter({
-                    "url"       : '{{links.url("system/core/checkPwStrength")}}',
-                    "postData"  : {
-                        "session"           : $('#session-token').val()
-                    }
-                });
-            }
-        },
+        '{{componentId}}-{{sectionId}}-db_restore_db_password'                  : { },
+        '{{componentId}}-{{sectionId}}-db_restore_db_password_strength_meter'   : { },
         '{{componentId}}-{{sectionId}}-backupdbs'                               : {
             placeholder : "SELECT DATABASE TO RESTORE",
             allowClear  : true,

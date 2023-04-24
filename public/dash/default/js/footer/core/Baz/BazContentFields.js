@@ -338,6 +338,61 @@ var BazContentFields = function() {
         if ($(fieldId).attr('type') === 'text' && $(fieldId).data('fieldinputfilter')) {
             applyInputFilter($(fieldId), $(fieldId).data('fieldinputfilter'));
         }
+
+        if ($(fieldId).attr('type') === 'password') {
+            if ($(fieldId).parents('.form-group').siblings().children().length > 0 &&
+                $(fieldId).parents('.form-group').siblings().children()[0].id ===
+                    fieldId.id + '-strength-meter'
+            ) {
+                $('#' + fieldId.id + '-strength-meter').strengthMeter({
+                    "url" : dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/home/checkPwStrength'
+                });
+            }
+
+            if ($('#' + fieldId.id + '-visibility').length > 0) {
+                $('#' + fieldId.id + '-visibility').click(function(e) {
+                    e.preventDefault();
+
+                    if ($(fieldId).attr('type') === 'password') {
+                        $(fieldId).attr('type', 'text');
+                        $('#' + fieldId.id + '-visibility').children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+                    } else if ($(fieldId).attr('type') === 'text') {
+                        $(fieldId).attr('type', 'password');
+                        $('#' + fieldId.id + '-visibility').children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+                    }
+                });
+            }
+
+            if ($('#' + fieldId.id + '-password_generate').length > 0) {
+                $('#' + fieldId.id + '-password_generate').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    var url = dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/home/generatePw'
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode == 0) {
+                            if (response.responseData.password) {
+                                $(fieldId).val(response.responseData.password).trigger('change');
+                            }
+
+                            if ($(fieldId).attr('type') === 'password') {
+                                $(fieldId).attr('type', 'text');
+                                $('#' + fieldId.id + '-visibility').children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+                            }
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        }
+
         maxLength(thisFieldId, options);
         if (options.afterInit) {
             options.afterInit(dataCollection);

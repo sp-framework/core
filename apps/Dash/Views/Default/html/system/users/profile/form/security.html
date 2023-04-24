@@ -31,6 +31,7 @@
                         'fieldHidden'                           : false,
                         'fieldType'                             : 'input',
                         'fieldInputType'                        : 'password',
+                        'fieldInputPasswordToggleVisibility'    : true,
                         'fieldRequired'                         : true,
                         'fieldBazScan'                          : true,
                         'fieldBazPostOnCreate'                  : false,
@@ -50,36 +51,14 @@
                         'fieldHidden'                           : false,
                         'fieldType'                             : 'input',
                         'fieldInputType'                        : 'password',
+                        'fieldInputPasswordToggleVisibility'    : true,
+                        'fieldInputPasswordGenerate'            : true,
+                        'fieldInputPasswordStrengthMeter'       : true,
                         'fieldRequired'                         : true,
                         'fieldBazScan'                          : true,
                         'fieldBazPostOnCreate'                  : false,
                         'fieldBazPostOnUpdate'                  : false,
-                        'fieldGroupPostAddonButtons'     :
-                            {
-                                'password_generate'   : {
-                                    'title'                         : false,
-                                    'icon'                          : 'wand-magic-sparkles',
-                                    'noMargin'                      : true,
-                                    'buttonAdditionalClass'         : 'rounded-0'
-                                }
-                            },
-                        'fieldAdditionalClass'           : 'mb-0'
-                    ]
-                )}}
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                             : component,
-                        'componentName'                         : componentName,
-                        'componentId'                           : componentId,
-                        'sectionId'                             : sectionId,
-                        'fieldId'                               : 'strength-meter',
-                        'fieldLabel'                            : false,
-                        'fieldHidden'                           : false,
-                        'fieldType'                             : 'html',
-                        'fieldRequired'                         : false,
-                        'fieldBazScan'                          : true,
-                        'fieldBazPostOnCreate'                  : false,
-                        'fieldBazPostOnUpdate'                  : false
+                        'fieldAdditionalClass'                  : 'mb-0'
                     ]
                 )}}
             </div>
@@ -95,6 +74,7 @@
                         'fieldHidden'                           : false,
                         'fieldType'                             : 'input',
                         'fieldInputType'                        : 'password',
+                        'fieldInputPasswordToggleVisibility'    : true,
                         'fieldBazScan'                          : true,
                         'fieldRequired'                         : true,
                         'fieldBazPostOnCreate'                  : false,
@@ -244,41 +224,6 @@
 </div>
 <script>
 /* global PNotify Swal */
-$('#{{componentId}}-{{sectionId}}-strength-meter').strengthMeter({
-    "url" : '{{links.url("system/users/profile/checkPwStrength")}}'
-});
-
-$('#{{componentId}}-{{sectionId}}-password_generate').click(function(e) {
-    e.preventDefault();
-
-    var postData = { };
-    postData[$('#security-token').attr('name')] = $('#security-token').val();
-
-    $.post('{{links.url("system/users/profile/generatePw")}}', postData, function(response) {
-        if (response.responseCode == 0) {
-            if (response.responseData) {
-                $('#{{componentId}}-{{sectionId}}-new_password').val(response.responseData).trigger('change');
-                $('#{{componentId}}-{{sectionId}}-confirm_password').val(response.responseData);
-                $('#{{componentId}}-{{sectionId}}-new_password').attr('type', 'text');
-                $('#{{componentId}}-{{sectionId}}-confirm_password').attr('type', 'text');
-            }
-        } else {
-            PNotify.error(response.responseMessage);
-        }
-        if (response.tokenKey && response.token) {
-            $("#security-token").attr("name", response.tokenKey);
-            $("#security-token").val(response.token);
-        }
-
-        $('#{{componentId}}-{{sectionId}}-new_password, #{{componentId}}-{{sectionId}}-confirm_password').keyup(function() {
-            if ($(this).val() === '') {
-                $('#{{componentId}}-{{sectionId}}-confirm_password').val('');
-                $(this).attr('type', 'password');
-            }
-        });
-    }, 'json');
-});
-
 $('#{{componentId}}-{{sectionId}}-pwreset-button').click(function(e) {
     e.preventDefault();
 
