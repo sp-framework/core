@@ -49,6 +49,15 @@ class Core extends BasePackage
 			return false;
 		}
 
+		if (!isset($data['password_protect']) ||
+			(isset($data['password_protect']) &&
+			$data['password_protect'] === '')
+		) {
+			$this->addResponse('Protect password missing!', 1, []);
+
+			return false;
+		}
+
 		$db = $this->core['settings']['dbs'][$data['db']];
 		$db['password'] = $this->crypt->decryptBase64($db['password'], $this->getDbKey($db));
 
@@ -58,10 +67,10 @@ class Core extends BasePackage
 					'mysql:host=' . $db['host'] . ';dbname=' . $db['dbname'],
 					$db['username'],
 					$db['password'],
-					['compress' => Mysqldump::GZIP, 'default-character-set' => Mysqldump::UTF8MB4]
+					['default-character-set' => Mysqldump::UTF8MB4]
 				);
 
-			$fileName = 'db' . $data['db'] . Carbon::now()->getTimestamp() . '.gz';
+			$fileName = 'db' . $data['db'] . Carbon::now()->getTimestamp() . '.sql';
 
 			$dumper->start(base_path('var/tmp/' . $fileName));
 		} catch (\Exception $e) {
@@ -74,13 +83,14 @@ class Core extends BasePackage
 			throw $exception;
 		}
 
+		//Add to zip here
 		if ($this->basepackages->storages->storeFile(
 				'private',
 				'core',
 				$file,
 				$fileName,
 				filesize(base_path('var/tmp/' . $fileName)),
-				'application/gzip'
+				'application/zip'
 			)
 		) {
 			try {

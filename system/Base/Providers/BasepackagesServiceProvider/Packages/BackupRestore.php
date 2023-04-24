@@ -109,7 +109,7 @@ class BackupRestore extends BasePackage
                 (isset($this->backupInfo['request']['password_protect']) &&
                 $this->backupInfo['request']['password_protect'] === '')
             ) {
-                $this->addResponse('Password missing!', 1, []);
+                $this->addResponse('Protect password missing!', 1, []);
 
                 $this->basepackages->progress->preCheckComplete(false);
 
