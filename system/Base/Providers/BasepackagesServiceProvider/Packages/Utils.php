@@ -4,6 +4,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use League\Flysystem\StorageAttributes;
 use System\Base\BasePackage;
+use ZxcvbnPhp\Zxcvbn;
 
 class Utils extends BasePackage
 {
@@ -54,5 +55,27 @@ class Utils extends BasePackage
         } else {
             return null;
         }
+    }
+
+    public function checkPwStrength(string $pass)
+    {
+        $checkingTool = new Zxcvbn();
+
+        $result = $checkingTool->passwordStrength($pass);
+
+        if ($result && is_array($result) && isset($result['score'])) {
+            $this->addResponse('Checking Password Strength Success', 0, ['result' => $result['score']]);
+
+            return $result['score'];
+        }
+
+        $this->addResponse('Error Checking Password Strength', 1);
+
+        return false;
+    }
+
+    public function generateNewPassword()
+    {
+        $this->addResponse('Password Generate Successfully', 0, ['password' => $this->secTools->random->base62(12)]);
     }
 }
