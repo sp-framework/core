@@ -245,7 +245,7 @@ class Progress extends BasePackage
         }
 
         if ($this->opCache) {
-            return $this->opCache->getCache($session);
+            return $this->opCache->getCache($session, 'progress');
         } else {
             try {
                 return Json::decode($this->localContent->read('/var/progress/' . $session . '.json'), true);
@@ -316,9 +316,9 @@ class Progress extends BasePackage
 
         if ($this->opCache) {
             if ($progressFile) {
-                $this->opCache->resetCache($this->session->getId(), $file);
+                $this->opCache->resetCache($this->session->getId(), $file, 'progress');
             } else {
-                $this->opCache->setCache($this->session->getId(), $file);
+                $this->opCache->setCache($this->session->getId(), $file, 'progress');
             }
         } else {
             try {
@@ -332,7 +332,7 @@ class Progress extends BasePackage
     public function deleteProgressFile()
     {
         if ($this->opCache) {
-            $this->opCache->removeCache($this->session->getId());
+            $this->opCache->removeCache($this->session->getId(), 'progress');
         } else {
             try {
                 $this->localContent->delete('var/progress/' . $this->session->getId() . '.json');

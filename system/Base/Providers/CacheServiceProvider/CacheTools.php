@@ -132,10 +132,10 @@ class CacheTools
 		$content['ids'] = [];
 
 		if ($this->opCache) {
-			if (!$this->opCache->getCache($cacheName)) {
-				$this->opCache->setCache($cacheName, $content);
+			if (!$this->opCache->getCache($cacheName, 'index')) {
+				$this->opCache->setCache($cacheName, $content, 'index');
 			} else if ($recreate) {
-				$this->opCache->resetCache($cacheName, $content);
+				$this->opCache->resetCache($cacheName, $content, 'index');
 			}
 		} else {
 			if (!$this->localContent->fileExists('var/storage/cache/stream/index/' . $cacheName . '.json') ||
@@ -182,7 +182,7 @@ class CacheTools
 			}
 
 			if ($this->opCache) {
-				$this->opCache->resetCache($cacheName, $index);
+				$this->opCache->resetCache($cacheName, $index, 'index');
 			} else {
 				try {
 					$this->localContent->write('var/storage/cache/stream/index/' . $cacheName . '.json', Json::encode($index));
@@ -205,7 +205,7 @@ class CacheTools
 			$this->cache->clear();
 
 			if ($this->opCache) {
-				$this->opCache->resetCache();
+				$this->opCache->resetCache(null, 'index');
 			} else {
 				$this->localContent->deleteDirectory('var/storage/cache/stream/');
 			}
@@ -233,7 +233,7 @@ class CacheTools
 			}
 
 			if ($this->opCache) {
-				$this->opCache->resetCache($cacheName, $this->index);
+				$this->opCache->resetCache($cacheName, $this->index, 'index');
 			} else {
 				$this->localContent->write('var/storage/cache/stream/index/' . $cacheName . '.json', Json::encode($this->index));
 			}
@@ -288,7 +288,7 @@ class CacheTools
 	protected function getIndex($cacheName)
 	{
 		if ($this->opCache) {
-			$index = $this->opCache->getCache($cacheName);
+			$index = $this->opCache->getCache($cacheName, 'index');
 
 			$this->index = $index;
 

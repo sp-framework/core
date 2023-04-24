@@ -31,7 +31,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
     {
         $this->subscriptions[$topic->getId()] = $topic;
 
-        $this->opCache->setCache('pusherSubscriptions', $this->subscriptions);
+        $this->opCache->setCache('pusherSubscriptions', $this->subscriptions, 'pusher');
     }
 
     public function onUnSubscribe(ConnectionInterface $conn, $topic)
@@ -76,7 +76,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
 
     public function getSubscriptions()
     {
-        $this->opCache->getCache('pusherSubscriptions');
+        $this->opCache->getCache('pusherSubscriptions', 'pusher');
     }
 
     public function onNewPush($newPush)
@@ -105,7 +105,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
                 }
             } else {
                 if ($newPush['type'] === 'progress') {
-                    $installerResourceId = $this->opCache->getCache('InstallerResourceId');
+                    $installerResourceId = $this->opCache->getCache('InstallerResourceId', 'pusher');
 
                     if ($installerResourceId) {
                         foreach ($topic->getIterator() as $key => $connection) {
@@ -185,7 +185,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
         if (isset($cookies['Installer']) &&
             $cookies['Installer'] === $cookies['Bazaari']
         ) {
-            $this->opCache->setCache('InstallerResourceId', $conn->resourceId);
+            $this->opCache->setCache('InstallerResourceId', $conn->resourceId, 'pusher');
 
             return true;
         }

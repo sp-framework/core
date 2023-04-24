@@ -6,6 +6,44 @@ if (!function_exists('base_path')) {
     }
 }
 
+if (!function_exists('scanAllDir')) {
+    function scanAllDir($dir) {
+        $result = [];
+
+        foreach(scandir($dir) as $filename) {
+            if ($filename[0] === '.') continue;
+
+            $filePath = $dir . '/' . $filename;
+
+            if (is_dir($filePath)) {
+                foreach (scanAllDir($filePath) as $childFilename) {
+                    $result[] = $filename . '/' . $childFilename;
+                }
+            } else {
+                $result[] = $filename;
+            }
+        }
+
+        return $result;
+    }
+}
+
+if (!function_exists('deleteFiles')) {
+    function deleteFiles($target) {
+        if (is_dir($target)) {
+            $files = glob($target . '*', GLOB_MARK);
+
+            foreach ($files as $file ) {
+                deleteFiles( $file );
+            }
+
+            rmdir($target);
+        } else {
+            unlink($target);
+        }
+    }
+}
+
 if (!function_exists('flatten_array')) {
     function flatten_array(array $items) {
         return iterator_to_array(
