@@ -173,8 +173,8 @@ class Acl extends BaseMiddleware
                 unset($url[Arr::lastKey($url)]);
             }
 
-            if (isset($this->domain['exclusive_to_default_app']) &&
-                $this->domain['exclusive_to_default_app'] == 0
+            if (isset($this->domains->domain['exclusive_to_default_app']) &&
+                $this->domains->domain['exclusive_to_default_app'] == 0
             ) {
                 unset($url[0]);
             }

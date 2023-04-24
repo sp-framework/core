@@ -48,7 +48,7 @@ class Domains
 						'exclusive_to_default_app',
 						[
 							'type'    => Column::TYPE_TINYINTEGER,
-							'notNull' => false,
+							'notNull' => true,
 						]
 					),
 					new Column(
