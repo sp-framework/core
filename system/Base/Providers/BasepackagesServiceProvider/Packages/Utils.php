@@ -7,6 +7,11 @@ use System\Base\BasePackage;
 
 class Utils extends BasePackage
 {
+    public function init()
+    {
+        return $this;
+    }
+
     public function scanDir($directory, $sub = true, $exclude = [])
     {
         $files = [];
