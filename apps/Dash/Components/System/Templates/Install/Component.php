@@ -61,7 +61,7 @@ class Component extends BaseComponent
                 false,
             'apps'          =>
                 Json::encode([$this->app['id']=>['installed'=>true,'menu_id'=>false]]),
-            'files'                 => Json::encode($this->getInstalledFiles($componentPath))
+            'files'                 => Json::encode($this->basepackages->utils->scanDir($componentPath))
         ];
 
         $this->modules->components->add($component);

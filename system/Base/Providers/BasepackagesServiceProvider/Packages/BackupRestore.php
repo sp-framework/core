@@ -143,29 +143,29 @@ class BackupRestore extends BasePackage
         $this->zip->open(base_path($this->backupLocation . $this->backupInfo['backupName']), $this->zip::CREATE);
 
         if (isset($this->backupInfo['request']['apps_dir']) && $this->backupInfo['request']['apps_dir'] == 'true') {
-            $this->getContent($this->getInstalledFiles('apps/'));
+            $this->getContent($this->basepackages->utils->scanDir('apps/'));
         }
         if (isset($this->backupInfo['request']['systems_dir']) && $this->backupInfo['request']['systems_dir'] == 'true') {
-            $this->getContent($this->getInstalledFiles('system/'));
+            $this->getContent($this->basepackages->utils->scanDir('system/'));
         }
         if (isset($this->backupInfo['request']['public_dir']) && $this->backupInfo['request']['public_dir'] == 'true') {
-            $this->getContent($this->getInstalledFiles('public/'));
+            $this->getContent($this->basepackages->utils->scanDir('public/'));
         }
         if (isset($this->backupInfo['request']['private_dir']) && $this->backupInfo['request']['private_dir'] == 'true') {
-            $this->getContent($this->getInstalledFiles('private/'));
+            $this->getContent($this->basepackages->utils->scanDir('private/'));
         }
         if (isset($this->backupInfo['request']['var_dir']) && $this->backupInfo['request']['var_dir'] == 'true') {
-            $this->getContent($this->getInstalledFiles('var/'));
+            $this->getContent($this->basepackages->utils->scanDir('var/'));
         }
         if (isset($this->backupInfo['request']['external_dir']) && $this->backupInfo['request']['external_dir'] == 'true') {
             if (isset($this->backupInfo['request']['external_vendor_dir']) && $this->backupInfo['request']['external_vendor_dir'] == 'true') {
-                $this->getContent($this->getInstalledFiles('external/'));
+                $this->getContent($this->basepackages->utils->scanDir('external/'));
             } else {
-                $this->getContent($this->getInstalledFiles('external/', false));
+                $this->getContent($this->basepackages->utils->scanDir('external/', false));
             }
         }
         if (isset($this->backupInfo['request']['old_backups']) && $this->backupInfo['request']['old_backups'] == 'true') {
-            $this->getContent($this->getInstalledFiles('.backups/'));
+            $this->getContent($this->basepackages->utils->scanDir('.backups/'));
         }
 
         foreach ($this->backupInfo['files'] as $file) {

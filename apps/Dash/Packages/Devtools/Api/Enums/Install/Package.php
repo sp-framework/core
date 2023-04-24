@@ -63,7 +63,7 @@ class Package extends BasePackage
         $jsonFile['display_name'] = $jsonFile['displayName'];
         $jsonFile['settings'] = Json::encode($jsonFile['settings']);
         $jsonFile['apps'] = Json::encode([$this->init()->app['id'] => ['enabled' => true]]);
-        $jsonFile['files'] = Json::encode($this->getInstalledFiles($packagePath));
+        $jsonFile['files'] = Json::encode($this->basepackages->utils->scanDir($packagePath));
         $jsonFile['updated_by'] = 0;
         $jsonFile['installed'] = 1;
 

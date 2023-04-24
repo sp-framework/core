@@ -29,6 +29,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Templates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profile;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Utils;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Widgets;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
@@ -310,5 +311,12 @@ class Basepackages
 		$this->backuprestore = (new BackupRestore())->init();
 
 		return $this->backuprestore;
+	}
+
+	protected function initUtils()
+	{
+		$this->utils = (new Utils())->init();
+
+		return $this->utils;
 	}
 }

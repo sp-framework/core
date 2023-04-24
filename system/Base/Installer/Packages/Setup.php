@@ -99,6 +99,8 @@ class Setup
 
 	protected $localContent;
 
+	protected $basepackages;
+
 	protected $progress;
 
 	protected $configs;
@@ -157,7 +159,9 @@ class Setup
 			$this->db = new Mysql($this->dbConfig['db']);
 		}
 
-		$this->progress = $this->container->getShared('basepackages')->progress;
+		$this->basepackages = $this->container->getShared('basepackages');
+
+		$this->progress = $this->basepackages->progress;
 	}
 
 	public function __call($method, $arguments)
@@ -181,7 +185,7 @@ class Setup
 
 	protected function cleanVar()
 	{
-		$files = $this->getInstalledFiles('var/');
+		$files = $this->basepackages->utils->scanDir('var/');
 
 		foreach ($files['files'] as $key => $file) {
 			try {
@@ -202,7 +206,7 @@ class Setup
 
 	protected function cleanOldBackups()
 	{
-		$files = $this->getInstalledFiles('.backups/');
+		$files = $this->basepackages->utils->scanDir('.backups/');
 
 		foreach ($files['files'] as $key => $file) {
 			try {
@@ -360,7 +364,7 @@ class Setup
 		$installedFiles = [];
 
 		$installedFiles =
-			array_merge_recursive($this->getInstalledFiles('system/Base', true), $this->getInstalledFiles('system/Configs', true));
+			array_merge_recursive($this->basepackages->utils->scanDir('system/Base', true), $this->basepackages->utils->scanDir('system/Configs', true));
 
 		array_push($installedFiles['files'], 'index.php', 'core.json', 'system/bootstrap.php');
 
@@ -383,7 +387,7 @@ class Setup
 	{
 		if ($type === 'components') {
 
-			$adminComponents = $this->getInstalledFiles('apps/Dash/Components/', true);
+			$adminComponents = $this->basepackages->utils->scanDir('apps/Dash/Components/', true);
 
 			if (!$adminComponents || count($adminComponents) === 0) {
 				return false;
@@ -426,12 +430,12 @@ class Setup
 			}
 		} else if ($type === 'packages') {
 
-			$adminPackages = $this->getInstalledFiles('apps/Dash/Packages/', true);
+			$adminPackages = $this->basepackages->utils->scanDir('apps/Dash/Packages/', true);
 
 			$adminPackages =
 				array_merge_recursive(
 					$adminPackages,
-					$this->getInstalledFiles('system/Base/Installer/Packages/Setup/Register/Modules/Packages/', true)
+					$this->basepackages->utils->scanDir('system/Base/Installer/Packages/Setup/Register/Modules/Packages/', true)
 				);
 
 			if (!$adminPackages || count($adminPackages) === 0) {
@@ -465,7 +469,7 @@ class Setup
 				}
 			}
 		} else if ($type === 'middlewares') {
-			$adminMiddlewares = $this->getInstalledFiles('apps/Dash/Middlewares/', true);
+			$adminMiddlewares = $this->basepackages->utils->scanDir('apps/Dash/Middlewares/', true);
 
 			foreach ($adminMiddlewares['files'] as $adminMiddlewareKey => $adminMiddleware) {
 				if (strpos($adminMiddleware, 'middleware.json')) {
@@ -513,7 +517,7 @@ class Setup
 
 	protected function registerAdminComponent(array $componentFile, $menuId)
 	{
-		$installedFiles = $this->getInstalledFiles('apps/Dash/Components/' . $componentFile['name'], true);
+		$installedFiles = $this->basepackages->utils->scanDir('apps/Dash/Components/' . $componentFile['name'], true);
 
 		return (new RegisterComponent())->register($this->db, $componentFile, $installedFiles, $menuId);
 	}
@@ -540,22 +544,22 @@ class Setup
 
 	protected function registerAdminPackage(array $packageFile)
 	{
-		$installedFiles = $this->getInstalledFiles('apps/Dash/Packages/' . $packageFile['name'], true);
+		$installedFiles = $this->basepackages->utils->scanDir('apps/Dash/Packages/' . $packageFile['name'], true);
 
 		return (new RegisterPackage())->register($this->db, $packageFile, $installedFiles);
 	}
 
 	protected function registerAdminMiddleware(array $middlewareFile)
 	{
-		$installedFiles = $this->getInstalledFiles('apps/Dash/Middlewares/' . $middlewareFile['name'], true);
+		$installedFiles = $this->basepackages->utils->scanDir('apps/Dash/Middlewares/' . $middlewareFile['name'], true);
 
 		return (new RegisterMiddleware())->register($this->db, $middlewareFile, $installedFiles);
 	}
 
 	protected function registerAdminView(array $viewFile)
 	{
-		$appInstalledFiles = $this->getInstalledFiles('apps/Dash/Views/', true, ['Html_compiled', 'linter-backup']);
-		$publicInstalledFiles = $this->getInstalledFiles('public/dash/', true, ['linter-backup']);
+		$appInstalledFiles = $this->basepackages->utils->scanDir('apps/Dash/Views/', true, ['Html_compiled', 'linter-backup']);
+		$publicInstalledFiles = $this->basepackages->utils->scanDir('public/dash/', true, ['linter-backup']);
 
 		$installedFiles = array_merge($appInstalledFiles, $publicInstalledFiles);
 
@@ -621,46 +625,6 @@ class Setup
 	protected function registerStorages(array $packageFile)
 	{
 		return (new RegisterStorages())->register($this->db, $packageFile);
-	}
-
-	protected function getInstalledFiles($directory = null, $sub = true, $exclude = [])
-	{
-		$installedFiles = [];
-		$installedFiles['dirs'] = [];
-		$installedFiles['files'] = [];
-
-		if ($directory) {
-			$installedFiles['files'] =
-				$this->localContent->listContents($directory, $sub)
-				->filter(fn (StorageAttributes $attributes) => $attributes->isFile())
-				->map(fn (StorageAttributes $attributes) => $attributes->path())
-				->toArray();
-
-			$installedFiles['dirs'] =
-				$this->localContent->listContents($directory, $sub)
-				->filter(fn (StorageAttributes $attributes) => $attributes->isDir())
-				->map(fn (StorageAttributes $attributes) => $attributes->path())
-				->toArray();
-
-			if (count($exclude) > 0) {
-				foreach ($exclude as $excluded) {
-					foreach ($installedFiles['files'] as $key => $file) {
-						if (strpos($file, $excluded)) {
-							unset($installedFiles['files'][$key]);
-						}
-					}
-					foreach ($installedFiles['dirs'] as $key => $dir) {
-						if (strpos($dir, $excluded)) {
-							unset($installedFiles['dirs'][$key]);
-						}
-					}
-				}
-			}
-
-			return $installedFiles;
-		} else {
-			return null;
-		}
 	}
 
 	protected function registerWorkers()

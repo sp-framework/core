@@ -1536,46 +1536,6 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	protected function getInstalledFiles($directory = null, $sub = true, $exclude = [])
-	{
-		$installedFiles = [];
-		$installedFiles['dirs'] = [];
-		$installedFiles['files'] = [];
-
-		if ($directory) {
-			$installedFiles['files'] =
-				$this->localContent->listContents($directory, $sub)
-				->filter(fn (StorageAttributes $attributes) => $attributes->isFile())
-				->map(fn (StorageAttributes $attributes) => $attributes->path())
-				->toArray();
-
-			$installedFiles['dirs'] =
-				$this->localContent->listContents($directory, $sub)
-				->filter(fn (StorageAttributes $attributes) => $attributes->isDir())
-				->map(fn (StorageAttributes $attributes) => $attributes->path())
-				->toArray();
-
-			if (count($exclude) > 0) {
-				foreach ($exclude as $excluded) {
-					foreach ($installedFiles['files'] as $key => $file) {
-						if (strpos($file, $excluded)) {
-							unset($installedFiles['files'][$key]);
-						}
-					}
-					foreach ($installedFiles['dirs'] as $key => $dir) {
-						if (strpos($dir, $excluded)) {
-							unset($installedFiles['dirs'][$key]);
-						}
-					}
-				}
-			}
-
-			return $installedFiles;
-		} else {
-			return null;
-		}
-	}
-
 	protected function addActivityLog(array $data, $oldData = null)
 	{
 		if (!$oldData) {

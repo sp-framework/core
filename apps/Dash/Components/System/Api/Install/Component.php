@@ -66,7 +66,7 @@ class Component extends BaseComponent
                 isset($jsonFile['settings']) ?
                 Json::encode($jsonFile['settings']) :
                 null,
-            'files'                 => Json::encode($this->getInstalledFiles($componentPath)),
+            'files'                 => Json::encode($this->basepackages->utils->scanDir($componentPath)),
             'updated_by'            => 0
         ];
 
