@@ -582,7 +582,7 @@ class BackupRestore extends BasePackage
                     $this->addToStructure($fileValue, $fileKey, true);
                 }
 
-                return true;
+                return $this->backupInfo;
             } else {
                 $this->addResponse('Error opening backup zip file. Please upload backup again.', 1);
 

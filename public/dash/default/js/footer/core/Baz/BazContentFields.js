@@ -350,6 +350,7 @@ var BazContentFields = function() {
             }
 
             if ($('#' + fieldId.id + '-visibility').length > 0) {
+                $('#' + fieldId.id + '-visibility').off();
                 $('#' + fieldId.id + '-visibility').click(function(e) {
                     e.preventDefault();
 
@@ -364,6 +365,7 @@ var BazContentFields = function() {
             }
 
             if ($('#' + fieldId.id + '-password_generate').length > 0) {
+                $('#' + fieldId.id + '-password_generate').off();
                 $('#' + fieldId.id + '-password_generate').click(function(e) {
                     e.preventDefault();
 

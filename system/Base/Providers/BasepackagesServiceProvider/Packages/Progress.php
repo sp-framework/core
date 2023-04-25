@@ -174,27 +174,29 @@ class Progress extends BasePackage
                     $notificationTunnel = 0;
                 }
 
-                $progressFile = $this->readProgressFile();
+                if (isset($notificationTunnel)) {
+                    $progressFile = $this->readProgressFile();
 
-                $this->wss->send(
-                    [
-                        'type'              => 'progress',
-                        'to'                => $notificationTunnel,
-                        'response'          => [
-                            'responseCode'      => 0,
-                            'responseMessage'   => 'Ok',
-                            'responseData'      =>
-                                [
-                                    'total'             => $progressFile['total'],
-                                    'completed'         => $progressFile['completed'],
-                                    'preCheckComplete'  => $progressFile['preCheckComplete'],
-                                    'percentComplete'   => number_format(($progressFile['completed'] * 100) / $progressFile['total']),
-                                    'runners'           => $progressFile['runners'] ?? false,
-                                    'callResult'        => $callResult
-                                ]
+                    $this->wss->send(
+                        [
+                            'type'              => 'progress',
+                            'to'                => $notificationTunnel,
+                            'response'          => [
+                                'responseCode'      => 0,
+                                'responseMessage'   => 'Ok',
+                                'responseData'      =>
+                                    [
+                                        'total'             => $progressFile['total'],
+                                        'completed'         => $progressFile['completed'],
+                                        'preCheckComplete'  => $progressFile['preCheckComplete'],
+                                        'percentComplete'   => number_format(($progressFile['completed'] * 100) / $progressFile['total']),
+                                        'runners'           => $progressFile['runners'] ?? false,
+                                        'callResult'        => $callResult
+                                    ]
+                            ]
                         ]
-                    ]
-                );
+                    );
+                }
             }
 
             return true;
