@@ -56,6 +56,19 @@ class StoragesComponent extends BaseComponent
                 $this->view->allowedImageSizes = $storagePackage['settings']['allowedImageSizes'];
                 $this->view->allowedFileMimeTypes = $storagePackage['settings']['allowedFileMimeTypes'];
 
+                $maxFilesizeSettings = ini_get('upload_max_filesize');
+                $maxFilesize = toBytes($maxFilesizeSettings);
+                $maxPostsizeSettings = ini_get('post_max_size');
+                $maxPostsize = toBytes($maxPostsizeSettings);
+
+                if ($maxPostsize >= $maxFilesize) {
+                    $this->view->maxBytes = $maxFilesize;
+                    $this->view->settingSize = 'upload_max_filesize = ' . $maxFilesizeSettings;
+                } else {
+                    $this->view->maxBytes = $maxPostsize;
+                    $this->view->settingSize = 'post_max_size = ' . $maxPostsizeSettings;
+                }
+
                 $this->view->responseCode = $this->storages->packagesData->responseCode;
 
                 $this->view->responseMessage = $this->storages->packagesData->responseMessage;
@@ -102,16 +115,21 @@ class StoragesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->hasFiles()) {
+        if ($this->request->isPost() &&
+            isset($this->postData()['upload']) && $this->postData()['upload'] == true
+        ) {
+            if ($this->request->hasFiles()) {
+                if ($this->storages->storeFile()) {
+                    $this->view->responseData = $this->storages->packagesData->responseData;
+                }
 
-            if ($this->storages->storeFile()) {
-                $this->view->responseData = $this->storages->packagesData->responseData;
+                $this->addResponse(
+                    $this->storages->packagesData->responseMessage,
+                    $this->storages->packagesData->responseCode
+                );
+            } else {
+                $this->addResponse('No files provided to upload or file provided cannot be uploaded due to error.', 1);
             }
-
-            $this->addResponse(
-                $this->storages->packagesData->responseMessage,
-                $this->storages->packagesData->responseCode
-            );
 
             return;
         }

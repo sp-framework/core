@@ -6,6 +6,19 @@ if (!function_exists('base_path')) {
     }
 }
 
+if (!function_exists('toBytes')) {
+    function toBytes($from) {
+        $type = substr($from, -1);
+        $size = (int) substr($from, 0, -1);
+
+        if ($type === 'G') {
+            return $size * 1073741824;
+        } else if ($type === 'M') {
+            return $size * 1048576;
+        }
+    }
+}
+
 if (!function_exists('scanAllDir')) {
     function scanAllDir($dir) {
         $result = [];

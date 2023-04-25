@@ -425,6 +425,9 @@ class Dropzone
                             var fileMimeTypes = JSON.parse(\'' . $this->fieldParams['allowedFileMimeType'] . '\');
                             var imageMimeTypes = JSON.parse(\'' . $this->fieldParams['allowedImageMimeType'] . '\');
 
+                            var maxImageFileSize = parseInt(' . $this->params['storage']['max_image_file_size'] . ');
+                            var maxFileSize = parseInt(' . $this->params['storage']['max_data_file_size'] . ');
+
                             var previewNode = document.querySelector(".' . $this->compSecId . '-' . $this->params['fieldId'] . '-upload-template");
                             if (previewNode) {
                                 previewNode.id = "";
@@ -472,6 +475,16 @@ class Dropzone
 
                             function initEvents() {
                                 fieldId["dropzone"].on("addedfile", function(file) {
+                                    if (file.size > maxFileSize) {
+                                        fieldId["dropzone"].removeFile(file);
+                                        PNotify.error({
+                                            title: file.name,
+                                            text: "File size exceeds allowed size! File not added."
+                                        });
+
+                                        return;
+                                    }
+
                                     registerSaveCancel();
 
                                     var src, alt;
@@ -521,6 +534,8 @@ class Dropzone
                                             title: file.name,
                                             text: "Extension not allowed! File not added."
                                         });
+
+                                        return;
                                     }
 
                                     if (fieldId["onAddedFile"]) {
@@ -776,6 +791,7 @@ class Dropzone
                             fieldId["save"] = function() {
                                 if (fieldId["dropzone"].files.length > 0) {
                                     fieldId["dropzone"].options.params = {
+                                        "upload"        : "true",
                                         "directory"     : "' . $this->fieldParams['uploadDirectory'] . '",
                                         "storagetype"   : "' . $this->params['storage']['permission'] . '",
                                         "setOrphan"     : "' . $this->params['setOrphan'] . '",

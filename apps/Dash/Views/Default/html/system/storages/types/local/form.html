@@ -227,14 +227,14 @@
                         'fieldLabel'                     : 'Max Image File Size (Bytes)',
                         'fieldType'                      : 'input',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Max Image File Size in bytes. 1 MegaByte = 1048576 Bytes',
+                        'fieldHelpTooltipContent'        : 'Max Data File Size in bytes. 1 MegaByte = 1048576 Bytes. Note: Maxbytes information is received from php.ini file or from .user.ini file in the public folder. Current setting is ' ~ settingSize,
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldInputTypeTextFilter'       : 'positiveIntMax',
                         'fieldDataInputMinNumber'        : 1,
-                        'fieldDataInputMaxNumber'        : 10485760,
+                        'fieldDataInputMaxNumber'        : maxBytes,
                         'fieldValue'                     : storageMaxImageFileSize
                     ]
                 )}}
@@ -302,14 +302,14 @@
                         'fieldLabel'                     : 'Max Data File Size (Bytes)',
                         'fieldType'                      : 'input',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Max Data File Size in bytes. 1 MegaByte = 1048576 Bytes',
+                        'fieldHelpTooltipContent'        : 'Max Data File Size in bytes. 1 MegaByte = 1048576 Bytes. Note: Maxbytes information is received from php.ini file or from .user.ini file in the public folder. Current setting is ' ~ settingSize,
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldInputTypeTextFilter'       : 'positiveIntMax',
                         'fieldDataInputMinNumber'        : 1,
-                        'fieldDataInputMaxNumber'        : 10485760,
+                        'fieldDataInputMaxNumber'        : maxBytes,
                         'fieldValue'                     : storageMaxDataFileSize
                     ]
                 )}}

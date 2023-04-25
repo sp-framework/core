@@ -47,6 +47,15 @@ class Storages
 
     protected function addToDb($name, $type, $permission, $allowedImageMimeTypes, $allowedImageSizes, $allowedFileMimeTypes)
     {
+        $maxFilesize = toBytes(ini_get('upload_max_filesize'));
+        $maxPostsize = toBytes(ini_get('post_max_size'));
+
+        if ($maxPostsize >= $maxFilesize) {
+            $maxBytes = $maxFilesize;
+        } else {
+            $maxBytes = $maxPostsize;
+        }
+
         $this->db->insertAsDict('basepackages_storages',
             [
                 'name'                          => $name,
@@ -59,10 +68,10 @@ class Storages
                 'cache_path'                    => 'cache',
                 'max_image_size'                => 2000,
                 'default_image_quality'         => 100,
-                'max_image_file_size'           => 10485760,
+                'max_image_file_size'           => $maxBytes,
                 'allowed_file_mime_types'       => Json::encode($allowedFileMimeTypes),
                 'data_path'                     => 'data',
-                'max_data_file_size'            => 10485760
+                'max_data_file_size'            => $maxBytes
             ]
         );
     }
