@@ -410,7 +410,7 @@ class Local extends BasePackage
             }
 
             if (isset($getData['headers']) && $getData['headers'] === false) {
-                return $this->localContent->read($dataFile);
+                return $this->response->setFileToSend(base_path($dataFile));
             }
 
             $this->response->setContentType($file[0]['type']);
@@ -419,7 +419,7 @@ class Local extends BasePackage
                 ->setHeader("Content-Length", filesize(base_path($dataFile)))
                 ->setHeader("Content-Disposition", "attachment; filename=" . $file[0]['org_file_name']);
 
-            return $this->response->setContent($this->localContent->read($dataFile));
+            return $this->response->setFileToSend(base_path($dataFile));
 
         } else {
             $this->response->setStatusCode(404, 'Not Found');

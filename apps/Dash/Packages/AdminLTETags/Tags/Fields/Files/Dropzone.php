@@ -449,7 +449,7 @@ class Dropzone
 
                                 fieldId["dropzone"] = new Dropzone("#' . $this->compSecId . '-' . $this->params['fieldId'] . '", {
                                     url                 : "' . $this->links->url('system/storages/add') . '",
-                                    timeout             : 60000,
+                                    timeout             : 3600000,
                                     thumbnailWidth      : ' . $this->fieldParams['thumbnailSize'] . ',
                                     thumbnailHeight     : ' . $this->fieldParams['thumbnailSize'] . ',
                                     parallelUploads     : 5,
