@@ -226,7 +226,7 @@ class BackupRestore extends BasePackage
 
                 $this->backupInfo['dbs'][$db['dbname']] = $db;
                 $this->backupInfo['dbs'][$db['dbname']]['file'] = 'dbs/' . $fileName;
-            } catch (\Exception $e) {
+            } catch (\Exception | \throwable $e) {
                 $this->addResponse('Backup Error: ' . $e->getMessage(), 1);
 
                 $this->basepackages->progress->resetProgress();
@@ -326,13 +326,13 @@ class BackupRestore extends BasePackage
             return false;
         }
 
-        $backupInfo = $this->analyseBackinfoFile($data['id']);
+        $this->analyseBackinfoFile($data['id']);
 
-        if (!$backupInfo) {
+        if (!$this->backupInfo) {
             return false;
         }
 
-        if (isset($backupInfo['request']['password_protect']) && $backupInfo['request']['password_protect'] !== '') {
+        if (isset($this->backupInfo['request']['password_protect']) && $this->backupInfo['request']['password_protect'] !== '') {
             if (!isset($data['password'])) {
                 $this->addResponse('Please provide backup file password', 1, []);
 
@@ -341,7 +341,7 @@ class BackupRestore extends BasePackage
                 return false;
             }
 
-            if (!$this->security->checkHash($data['password'], $backupInfo['request']['password_protect'])) {
+            if (!$this->security->checkHash($data['password'], $this->backupInfo['request']['password_protect'])) {
                 $this->addResponse('Backup password incorrect! Please provide correct password', 1, []);
 
                 $this->basepackages->progress->resetProgress();
@@ -352,7 +352,7 @@ class BackupRestore extends BasePackage
             $this->zip->setPassword($data['password']);
         }
 
-        $fileNameLocation = explode('.zip', $backupInfo['backupName'])[0];
+        $fileNameLocation = explode('.zip', $this->backupInfo['backupName'])[0];
 
         if (!$this->zip->extractTo(base_path('var/tmp/backups/' . $fileNameLocation))) {
             $this->addResponse('Error unzipping backup file. Please upload backup again.', 1);
@@ -375,7 +375,7 @@ class BackupRestore extends BasePackage
 
             if (is_array($data['dbs']) && count($data['dbs']) > 0) {
                 foreach ($data['dbs'] as $dbs) {
-                    if (!isset($backupInfo['dbs'][$dbs])) {
+                    if (!isset($this->backupInfo['dbs'][$dbs])) {
                         $this->addResponse('Database ' . $dbs . ' is not in the backup file uploaded.', 1);
 
                         $this->basepackages->progress->resetProgress();
@@ -398,24 +398,24 @@ class BackupRestore extends BasePackage
                         $this->db = new Mysql($dbConfig);
 
                         $this->executeSQL(
-                            "CREATE DATABASE IF NOT EXISTS " . $backupInfo['dbs'][$dbs]['dbname'] . " CHARACTER SET " . $backupInfo['dbs'][$dbs]['charset'] . " COLLATE " . $backupInfo['dbs'][$dbs]['collation']
+                            "CREATE DATABASE IF NOT EXISTS " . $this->backupInfo['dbs'][$dbs]['dbname'] . " CHARACTER SET " . $this->backupInfo['dbs'][$dbs]['charset'] . " COLLATE " . $this->backupInfo['dbs'][$dbs]['collation']
                         );
 
-                        $backupInfo['dbs'][$dbs]['password'] = $this->crypt->decryptBase64($backupInfo['dbs'][$dbs]['password'], $dbkeys[$dbs]);
+                        $this->backupInfo['dbs'][$dbs]['password'] = $this->crypt->decryptBase64($this->backupInfo['dbs'][$dbs]['password'], $dbkeys[$dbs]);
 
-                        $checkUser = $this->executeSQL("SELECT * FROM `user` WHERE `User` LIKE ?", [$backupInfo['dbs'][$dbs]['username']]);
+                        $checkUser = $this->executeSQL("SELECT * FROM `user` WHERE `User` LIKE ?", [$this->backupInfo['dbs'][$dbs]['username']]);
 
                         if ($checkUser->numRows() === 0) {
-                            $this->executeSQL("CREATE USER ?@'%' IDENTIFIED WITH mysql_native_password BY ?;", [$backupInfo['dbs'][$dbs]['username'], $backupInfo['dbs'][$dbs]['password']]);
+                            $this->executeSQL("CREATE USER ?@'%' IDENTIFIED WITH mysql_native_password BY ?;", [$this->backupInfo['dbs'][$dbs]['username'], $this->backupInfo['dbs'][$dbs]['password']]);
                         }
 
-                        $this->executeSQL("GRANT ALL PRIVILEGES ON " . $backupInfo['dbs'][$dbs]['dbname'] . ".* TO ?@'%' WITH GRANT OPTION;", [$backupInfo['dbs'][$dbs]['username']]);
+                        $this->executeSQL("GRANT ALL PRIVILEGES ON " . $this->backupInfo['dbs'][$dbs]['dbname'] . ".* TO ?@'%' WITH GRANT OPTION;", [$this->backupInfo['dbs'][$dbs]['username']]);
 
 
-                        $allTables = $this->db->listTables($backupInfo['dbs'][$dbs]['dbname']);
+                        $allTables = $this->db->listTables($this->backupInfo['dbs'][$dbs]['dbname']);
 
                         if (count($allTables) > 0) {
-                            $dbConfig['dbname'] = $backupInfo['dbs'][$dbs]['dbname'];
+                            $dbConfig['dbname'] = $this->backupInfo['dbs'][$dbs]['dbname'];
                             $this->db = new Mysql($dbConfig);
 
                             foreach ($allTables as $tableKey => $tableValue) {
@@ -425,9 +425,9 @@ class BackupRestore extends BasePackage
 
                         $dumper =
                             new Mysqldump(
-                                'mysql:host=' . $backupInfo['dbs'][$dbs]['host'] . ';dbname=' . $backupInfo['dbs'][$dbs]['dbname'],
-                                $backupInfo['dbs'][$dbs]['username'],
-                                $backupInfo['dbs'][$dbs]['password']
+                                'mysql:host=' . $this->backupInfo['dbs'][$dbs]['host'] . ';dbname=' . $this->backupInfo['dbs'][$dbs]['dbname'],
+                                $this->backupInfo['dbs'][$dbs]['username'],
+                                $this->backupInfo['dbs'][$dbs]['password']
                             );
 
                         $dumper->restore(base_path('var/tmp/backups/' . $fileNameLocation . '/dbs/db' . $dbs . $fileNameDate . '.sql'));
@@ -461,7 +461,7 @@ class BackupRestore extends BasePackage
         if (isset($data['restore_structure'])) {
             if (isset($data['restore_structure']['folders'])) {
                 foreach ($data['restore_structure']['folders'] as $restoreStructureFolders) {
-                    if (!isset($backupInfo['dirs'][$restoreStructureFolders])) {
+                    if (!isset($this->backupInfo['dirs'][$restoreStructureFolders])) {
                         $this->addResponse('Folder with ID: ' . $restoreStructureFolders . ' does not exist in the backup zip file.', 1);
 
                         $this->basepackages->progress->resetProgress();
@@ -473,7 +473,7 @@ class BackupRestore extends BasePackage
 
             if (isset($data['restore_structure']['files'])) {
                 foreach ($data['restore_structure']['files'] as $restoreStructureFiles) {
-                    if (!isset($backupInfo['files'][$restoreStructureFiles])) {
+                    if (!isset($this->backupInfo['files'][$restoreStructureFiles])) {
                         $this->addResponse('File with ID: ' . $restoreStructureFiles . ' does not exist in the backup zip file.', 1);
 
                         $this->basepackages->progress->resetProgress();
@@ -486,7 +486,7 @@ class BackupRestore extends BasePackage
             if (isset($data['restore_structure']['folders'])) {
                 foreach ($data['restore_structure']['folders'] as $restoreStructureFolders) {
                     try {
-                        $this->localContent->createDirectory($backupInfo['dirs'][$restoreStructureFolders]);
+                        $this->localContent->createDirectory($this->backupInfo['dirs'][$restoreStructureFolders]);
                     } catch (FilesystemException | UnableToCreateDirectory $exception) {
                         $this->addResponse('Filed to create directory with ID: ' . $restoreStructureFolders, 1);
 
@@ -501,8 +501,8 @@ class BackupRestore extends BasePackage
                 foreach ($data['restore_structure']['files'] as $restoreStructureFiles) {
                     try {
                         $this->localContent->copy(
-                            'var/tmp/backups/' . $fileNameLocation . '/' . $backupInfo['files'][$restoreStructureFiles],
-                            $backupInfo['files'][$restoreStructureFiles]
+                            'var/tmp/backups/' . $fileNameLocation . '/' . $this->backupInfo['files'][$restoreStructureFiles],
+                            $this->backupInfo['files'][$restoreStructureFiles]
                         );
                     } catch (FilesystemException | UnableToCopyFile $exception) {
                         $this->addResponse('Filed to copy file with ID: ' . $restoreStructureFiles, 1);
@@ -514,7 +514,7 @@ class BackupRestore extends BasePackage
                 }
             }
         } else {
-            foreach ($backupInfo['dirs'] as $dirKey => $dir) {
+            foreach ($this->backupInfo['dirs'] as $dirKey => $dir) {
                 try {
                     $this->localContent->createDirectory($dir);
                 } catch (FilesystemException | UnableToCreateDirectory $exception) {
@@ -526,7 +526,7 @@ class BackupRestore extends BasePackage
                 }
             }
 
-            foreach ($backupInfo['files'] as $fileKey => $file) {
+            foreach ($this->backupInfo['files'] as $fileKey => $file) {
                 try {
                     $this->localContent->copy(
                         'var/tmp/backups/' . $fileNameLocation . '/' . $file,
@@ -582,7 +582,7 @@ class BackupRestore extends BasePackage
                     $this->addToStructure($fileValue, $fileKey, true);
                 }
 
-                return $this->backupInfo;
+                return true;
             } else {
                 $this->addResponse('Error opening backup zip file. Please upload backup again.', 1);
 
