@@ -64,6 +64,10 @@ class Utils extends BasePackage
         $result = $checkingTool->passwordStrength($pass);
 
         if ($result && is_array($result) && isset($result['score'])) {
+            if ($result['score'] === 0) {
+                $result['score'] = 1;
+            }
+
             $this->addResponse('Checking Password Strength Success', 0, ['result' => $result['score']]);
 
             return $result['score'];

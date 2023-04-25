@@ -243,23 +243,24 @@
                     <div class="col">
                         {{adminltetags.useTag('fields',
                             [
-                                'component'                      : component,
-                                'componentName'                  : componentName,
-                                'componentId'                    : componentId,
-                                'sectionId'                      : 'analysis',
-                                'fieldId'                        : 'root_password',
-                                'fieldLabel'                     : 'Root Password',
-                                'fieldType'                      : 'input',
-                                'fieldInputType'                 : 'password',
-                                'fieldHelp'                      : true,
-                                'fieldHelpTooltipContent'        : 'Password with database create permission.',
-                                'fieldRequired'                  : true,
-                                'fieldBazScan'                   : false,
-                                'fieldBazPostOnCreate'           : false,
-                                'fieldBazPostOnUpdate'           : false,
-                                'fieldDataInputMinLength'        : 1,
-                                'fieldDataInputMaxLength'        : 50,
-                                'fieldValue'                     : ''
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : 'analysis',
+                                'fieldId'                               : 'root_password',
+                                'fieldLabel'                            : 'Root Password',
+                                'fieldType'                             : 'input',
+                                'fieldInputType'                        : 'password',
+                                'fieldHelp'                             : true,
+                                'fieldInputPasswordToggleVisibility'    : true,
+                                'fieldHelpTooltipContent'               : 'Password with database create permission.',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : false,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 50,
+                                'fieldValue'                            : ''
                             ]
                         )}}
                     </div>
@@ -268,13 +269,15 @@
         </div>
     {% endif %}
 </div>
+<div id="restore-progress" class="mb-3" hidden></div>
 <script>
-/* globals BazContentFields */
+/* globals BazContentFields BazProgress */
 $(document).ready(function() {
     BazContentFields.init({
         'componentId'   : "{{componentId}}",
         'sectionId'     : "{{componentId}}-analysis"
     });
+
     $('.tooltip').remove();
     $('[data-toggle="tooltip"]').tooltip();
     $('[data-toggle="popover"]').popover('enable');
@@ -300,6 +303,11 @@ if (!dataCollectionComponent['{{componentId}}-analysis']) {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-analysis-password'                 : { }
+        '{{componentId}}-analysis-password'                 : { },
+        '{{componentId}}-analysis-root_password'            : {
+            afterInit : function() {
+                BazProgress.buildProgressBar($('#restore-progress'));
+            }
+        }
     });
 </script>

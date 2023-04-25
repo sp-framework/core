@@ -130,7 +130,9 @@ class BackupRestore extends BasePackage
                 }
             }
 
-            if ($this->withProgress($method['method'], $data) === false) return false;
+            if ($this->withProgress($method['method'], $data) === false) {
+                 return false;
+            }
 
             usleep(500);
         }
@@ -316,7 +318,7 @@ class BackupRestore extends BasePackage
         return true;
     }
 
-    protected function restore(array $data)
+    public function restore(array $data)
     {
         if (!isset($data['id'])) {
             $this->addResponse('Please provide backup file id', 1, []);
@@ -325,6 +327,8 @@ class BackupRestore extends BasePackage
 
             return false;
         }
+
+        set_time_limit(300);//5 mins
 
         $this->analyseBackinfoFile($data['id']);
 
@@ -352,6 +356,23 @@ class BackupRestore extends BasePackage
             $this->zip->setPassword($data['password']);
         }
 
+        $this->basepackages->progress->preCheckComplete();
+
+        foreach ($this->restoreProgressMethods as $method) {
+            if ($this->withProgress($method['method'], $data) === false) {
+                 return false;
+            }
+
+            usleep(500);
+        }
+
+        $this->addResponse('Backup ' . $this->backupInfo['backupName'] . ' restored!', 0);
+
+        return true;
+    }
+
+    protected function unzipBackupFiles($data)
+    {
         $fileNameLocation = explode('.zip', $this->backupInfo['backupName'])[0];
 
         if (!$this->zip->extractTo(base_path('var/tmp/backups/' . $fileNameLocation))) {
@@ -361,6 +382,13 @@ class BackupRestore extends BasePackage
 
             return false;
         }
+
+        return true;
+    }
+
+    protected function performDbRestore($data)
+    {
+        $fileNameLocation = explode('.zip', $this->backupInfo['backupName'])[0];
 
         $fileNameDate = str_replace('backup-', '', $fileNameLocation);
 
@@ -458,6 +486,11 @@ class BackupRestore extends BasePackage
             return false;
         }
 
+        return true;
+    }
+
+    protected function performStructureRestore($data)
+    {
         if (isset($data['restore_structure'])) {
             if (isset($data['restore_structure']['folders'])) {
                 foreach ($data['restore_structure']['folders'] as $restoreStructureFolders) {
@@ -541,8 +574,6 @@ class BackupRestore extends BasePackage
                 }
             }
         }
-
-        $this->addResponse('Backup restored. Refresh page!', 0);
 
         return true;
     }
@@ -692,8 +723,16 @@ class BackupRestore extends BasePackage
         $this->restoreProgressMethods =
             [
                 [
-                    'method'    => 'createNewDb',
-                    'text'      => 'Creating new database...'
+                    'method'    => 'unzipBackupFiles',
+                    'text'      => 'Unzipping backup file...'
+                ],
+                [
+                    'method'    => 'performDbRestore',
+                    'text'      => 'Restore databases...'
+                ],
+                [
+                    'method'    => 'performStructureRestore',
+                    'text'      => 'Restore file structure...'
                 ]
             ];
 

@@ -89,18 +89,12 @@ class BackuprestoreComponent extends BaseComponent
                 return;
             }
 
-            if ($this->basepackages->backuprestore->init()->restore($this->postData())) {
-                $this->addResponse(
-                    $this->basepackages->backuprestore->packagesData->responseMessage,
-                    $this->basepackages->backuprestore->packagesData->responseCode,
-                    $this->basepackages->backuprestore->packagesData->responseData,
-                );
-            } else {
-                $this->addResponse(
-                    $this->basepackages->backuprestore->packagesData->responseMessage,
-                    $this->basepackages->backuprestore->packagesData->responseCode
-                );
-            }
+            $this->basepackages->backuprestore->init('restore')->restore($this->postData());
+
+            $this->addResponse(
+                $this->basepackages->backuprestore->packagesData->responseMessage,
+                $this->basepackages->backuprestore->packagesData->responseCode
+            );
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }

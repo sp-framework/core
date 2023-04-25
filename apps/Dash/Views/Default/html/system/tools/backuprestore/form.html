@@ -57,7 +57,18 @@ dataCollectionSectionForm['funcs'] = { };
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-apps_dir'                                : { },
-        '{{componentId}}-{{sectionId}}-systems_dir'                             : { },
+        '{{componentId}}-{{sectionId}}-systems_dir'                             : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-systems_dir').click(function() {
+                    if ($(this)[0].checked === true) {
+                        $('#{{componentId}}-{{sectionId}}-keys').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-keys')[0].checked = true;
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-keys').attr('disabled', false);
+                    }
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-public_dir'                              : { },
         '{{componentId}}-{{sectionId}}-private_dir'                             : { },
         '{{componentId}}-{{sectionId}}-external_dir'                            : { },
@@ -76,7 +87,20 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-old_backups'                             : { },
-        '{{componentId}}-{{sectionId}}-database'                                : { },
+        '{{componentId}}-{{sectionId}}-database'                                : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-database').click(function() {
+                    if ($(this)[0].checked === true) {
+                        $('#{{componentId}}-{{sectionId}}-keys').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-keys')[0].checked = true;
+                    } else {
+                        if ($('#{{componentId}}-{{sectionId}}-systems_dir')[0].checked === false) {
+                            $('#{{componentId}}-{{sectionId}}-keys').attr('disabled', false);
+                        }
+                    }
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-keys'                                    : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-keys').click(function() {
