@@ -6,6 +6,7 @@ private/*
 *.sublime-workspace
 /vendor/*
 .backups
+.dbbackups
 .downloads
 composer.lock
 var/*

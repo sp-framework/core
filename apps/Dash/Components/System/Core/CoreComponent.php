@@ -54,7 +54,7 @@ class CoreComponent extends BaseComponent
                         'conditions'    => 'uuid_location = :uuidLocation: AND storages_id = :storagesId: AND orphan = :orphan:',
                         'bind'          =>
                             [
-                                'uuidLocation'    => 'core/',
+                                'uuidLocation'    => '.dbbackups/',
                                 'storagesId'      => $storage['id'],
                                 'orphan'          => 0
                             ]

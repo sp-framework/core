@@ -8,6 +8,7 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
+use League\Flysystem\UnableToWriteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Email;
@@ -20,6 +21,14 @@ class Core extends BasePackage
 
 	public $core;
 
+	protected $zip;
+
+	protected $backupInfo;
+
+	protected $backupLocation = '.dbbackups/';
+
+	protected $now;
+
 	public function init(bool $resetCache = false)
 	{
 		$this->getAll($resetCache);
@@ -30,7 +39,13 @@ class Core extends BasePackage
 
 		$this->checkKeys();
 
-		$this->checkTmpPath();
+		$this->zip = new \ZipArchive;
+
+		$this->backupInfo = [];
+
+		if (!$this->localContent->fileExists($this->backupLocation)) {
+			$this->localContent->createDirectory($this->backupLocation);
+		}
 
 		return $this;
 	}
@@ -58,7 +73,20 @@ class Core extends BasePackage
 			return false;
 		}
 
-		$db = $this->core['settings']['dbs'][$data['db']];
+		$tokenkey = array_search($this->security->getRequestToken(), $data);
+		if ($tokenkey) {
+			unset($data[$tokenkey]);
+		}
+
+		$this->now = Carbon::now();
+		$this->backupInfo['request'] = $data;
+		$this->backupInfo['takenAt'] = $this->now->format('Y-m-d H:i:s');
+		$this->backupInfo['createdBy'] = $this->auth->account() ? $this->auth->account()['email'] : 'System';
+		$this->backupInfo['backupName'] = 'db' . $data['db'] . $this->now->getTimestamp() . '.zip';
+
+		$this->zip->open(base_path($this->backupLocation . $this->backupInfo['backupName']), $this->zip::CREATE);
+
+		$db = $this->core['settings']['dbs'][$this->backupInfo['request']['db']];
 		$db['password'] = $this->crypt->decryptBase64($db['password'], $this->getDbKey($db));
 
 		try {
@@ -70,11 +98,22 @@ class Core extends BasePackage
 					['default-character-set' => Mysqldump::UTF8MB4]
 				);
 
-			$fileName = 'db' . $data['db'] . Carbon::now()->getTimestamp() . '.sql';
+			$fileName = 'db' . $this->backupInfo['request']['db'] . $this->now->getTimestamp() . '.sql';
 
 			$dumper->start(base_path('var/tmp/' . $fileName));
-		} catch (\Exception $e) {
+
+			if (!$this->addToZip(base_path('var/tmp/' . $fileName), $fileName)) {
+				return false;
+			}
+
+			$db['password'] = $this->crypt->encryptBase64($db['password'], $this->getDbKey($db));
+
+			$this->backupInfo[$db['dbname']] = $db;
+			$this->backupInfo[$db['dbname']]['file'] = $fileName;
+		} catch (\Exception | \throwable $e) {
 			$this->addResponse('Backup Error: ' . $e->getMessage(), 1);
+
+			return false;
 		}
 
 		try {
@@ -83,28 +122,31 @@ class Core extends BasePackage
 			throw $exception;
 		}
 
-		//Add to zip here
+		$this->zipBackupFiles();
+
 		if ($this->basepackages->storages->storeFile(
 				'private',
-				'core',
-				$file,
-				$fileName,
-				filesize(base_path('var/tmp/' . $fileName)),
-				'application/zip'
+				'.dbbackups',
+				null,
+				$this->backupInfo['backupName'],
+				filesize(base_path('.dbbackups/' . $this->backupInfo['backupName'])),
+				'application/zip',
+				true
 			)
 		) {
-			try {
-				$file = $this->localContent->delete('var/tmp/' . $fileName);
-			} catch (FilesystemException | UnableToDeleteFile | \Exception $exception) {
-				throw $exception;
-			}
+			$this->basepackages->storages->changeOrphanStatus(
+				null,
+				null,
+				false,
+				null,
+				$this->backupInfo['backupName']
+			);
 
-			$this->basepackages->storages->changeOrphanStatus($this->basepackages->storages->packagesData->responseData['uuid']);
-
-			$this->addResponse('Generated backup ' . $fileName . '.',
+			$this->addResponse('Generated backup ' . $this->backupInfo['backupName'] . '.',
 							   0,
-							   ['filename' => $fileName,
-								'uuid' => $this->basepackages->storages->packagesData->responseData['uuid']
+							   ['filename'  => $this->backupInfo['backupName'],
+								'uuid'      => $this->basepackages->storages->packagesData->responseData['uuid'],
+								'request'   => $data
 							   ]
 			);
 
@@ -114,161 +156,254 @@ class Core extends BasePackage
 		return false;
 	}
 
-	public function dbRestore($data)
+	protected function zipBackupFiles()
 	{
-		if (!isset($data['filename'])) {
-			$this->addResponse('Please provide database file name', 1, []);
+		if (isset($this->backupInfo['request']['password_protect']) && $this->backupInfo['request']['password_protect'] !== '') {
+			$this->backupInfo['request']['password_protect'] =
+				$this->secTools->hashPassword($this->backupInfo['request']['password_protect'], 4);
+		}
 
+		try {
+			$this->localContent->write('var/tmp/backupInfo.json' , Json::encode($this->backupInfo));
+		} catch (FilesystemException | UnableToWriteFile $exception) {
+			throw $exception;
+		}
+
+		//Dont Encrypt info file as we need to know if encryption is applied or not during restore. We can encrypt the content in case we want to hide something (like we are encrypting the password_protect password)
+		if (!$this->addToZip(base_path('var/tmp/backupInfo.json'), 'backupInfo.json', false)) {
 			return false;
 		}
 
-		$fileInfo = $this->basepackages->storages->getFileInfo(null, $data['filename']);
+		$this->zip->close();
 
-		if ($fileInfo) {
-			try {
-				if (isset($data['dbname'])) {
-					if (checkCtype($data['dbname'], 'alnum', []) === false) {
-						$this->addResponse('Database cannot have special characters', 1, []);
+		return true;
+	}
 
-						return false;
-					}
+	protected function addToZip($absolutePath, $relativePath, $encrypt = true, $passwordProtectOrg = null)
+	{
+		if (isset($this->backupInfo['request']['password_protect']) &&
+			$this->backupInfo['request']['password_protect'] !== '' &&
+			$encrypt
+		) {
+			if (!$passwordProtectOrg) {
+				$passwordProtectOrg = $this->backupInfo['request']['password_protect'];
+			}
 
-					$newDbName = $data['dbname'];
-				} else {
-					$newDbName = str_replace('.gz', '', $fileInfo['org_file_name']);
+			$this->zip->addFile($absolutePath, $relativePath);
+
+			if (!$this->zip->setEncryptionName($relativePath, \ZipArchive::EM_AES_256, $passwordProtectOrg)) {
+				$name = $this->zip->getNameIndex($this->zip->numFiles - 1);
+
+				if ($relativePath === $name) {
+					$this->zip->deleteIndex($this->zip->numFiles - 1);
 				}
 
-				$file = $this->basepackages->storages->getFile(['uuid' => $fileInfo['uuid'], 'headers' => false]);
+				$this->zip->close();
 
-				$file = gzdecode($file);
+				$this->addResponse('Could not set provided password for file ' . $name, 1, []);
 
-				try {
-					$this->localContent->write('var/tmp/' . $newDbName . '.sql' , $file);
-				} catch (FilesystemException | UnableToWriteFile $exception) {
-					throw $exception;
-				}
+				$this->basepackages->progress->resetProgress();
 
-				if (isset($data['username'])) {
-					if (checkCtype($data['username'], 'alnum', []) === false) {
-						$this->addResponse('Username cannot have special characters', 1, []);
+				return false;
+			}
+		} else {
+			if (!$this->zip->addFile($absolutePath, $relativePath)) {
+				$name = $this->zip->getNameIndex($this->zip->numFiles - 1);
 
-						return false;
-					}
+				$this->addResponse('Could not zip file: ' . $name, 1, []);
 
-					$newDbUserName = $data['username'];
-				} else {
-					$newDbUserName = $newDbName . 'User';
-				}
-
-				$dbConfig = $this->getDb(true);
-
-				if ($this->config->dev === false) {
-					$checkPwStrength = $this->checkPwStrength($data['password']);
-
-					if ($checkPwStrength !== false && $checkPwStrength < 4) {
-						$this->addResponse('Password strength is too low.' , 1);
-
-						return false;
-					}
-				}
-
-				$newDbUserPassword = $data['password'];
-
-				$dbConfig['username'] = $data['root_username'];
-				$dbConfig['password'] = $data['root_password'];
-				$dbConfig['dbname'] = 'mysql';
-				$this->db = new Mysql($dbConfig);
-
-				$checkUser = $this->executeSQL("SELECT * FROM `user` WHERE `User` LIKE ?", [$newDbUserName]);
-
-				if ($checkUser->numRows() === 0) {
-					$this->executeSQL("CREATE USER ?@'%' IDENTIFIED WITH mysql_native_password BY ?;", [$newDbUserName, $newDbUserPassword]);
-				} else {
-					$dbConfig['username'] = $data['username'];
-					$dbConfig['password'] = $data['password'];
-					$dbConfig['dbname'] = 'mysql';
-
-					try {
-						$this->db = new Mysql($dbConfig);
-					} catch (\Exception $e) {
-						//1045 is password incorrect
-						//1044 user does not exist
-						if ($e->getCode() === 1045) {
-							$this->addResponse('Incorrect password for user ' . $newDbUserName, 1);
-
-							return false;
-						}
-					}
-				}
-
-				$dbConfig['username'] = $data['root_username'];
-				$dbConfig['password'] = $data['root_password'];
-				$dbConfig['dbname'] = 'mysql';
-				$this->db = new Mysql($dbConfig);
-
-				$this->executeSQL(
-					"CREATE DATABASE IF NOT EXISTS " . $newDbName . " CHARACTER SET " . $data['charset'] . " COLLATE " . $data['collation']
-				);
-
-				$this->executeSQL("GRANT ALL PRIVILEGES ON " . $newDbName . ".* TO ?@'%' WITH GRANT OPTION;", [$newDbUserName]);
-
-				$dbConfig['dbname'] = $newDbName;
-
-				$this->db = new Mysql($dbConfig);
-
-				$allTables = $this->db->listTables($newDbName);
-
-				if (count($allTables) > 0) {
-					if ($data['drop'] === 'false') {
-						$this->addResponse('Restore Error: Database not empty. Select Drop If Exists checkbox and try again.', 1, []);
-
-						return false;
-					} else {
-						foreach ($allTables as $tableKey => $tableValue) {
-							$this->db->dropTable($tableValue);
-						}
-					}
-				}
-
-				$dumper =
-					new Mysqldump(
-						'mysql:host=' . $dbConfig['host'] . ';dbname=' . $newDbName,
-						$newDbUserName,
-						$newDbUserPassword
-					);
-
-				$dumper->restore(base_path('var/tmp/' . $newDbName . '.sql'));
-
-				try {
-					$file = $this->localContent->delete('var/tmp/' . $newDbName . '.sql');
-				} catch (FilesystemException | UnableToDeleteFile | \Exception $exception) {
-					throw $exception;
-				}
-
-				$newDb['active'] = false;
-				$newDb['host'] = $dbConfig['host'];
-				$newDb['dbname'] = $newDbName;
-				$newDb['username'] = $newDbUserName;
-				$newDb['password'] = $this->crypt->encryptBase64($newDbUserPassword, $this->createDbKey($newDbName));
-				$newDb['port'] = $dbConfig['port'];
-				$newDb['charset'] = $dbConfig['charset'];
-				$newDb['collation'] = $dbConfig['collation'];
-
-				$this->core['settings']['dbs'][$newDbName] = $newDb;
-
-				$this->update($this->core);
-
-				$this->addResponse($data['filename'] . ' restored!', 0, ['newDb' => $newDb]);
-
-				return true;
-			} catch (\Exception $e) {
-				$this->addResponse('Restore Error: ' . $e->getMessage(), 1);
+				$this->basepackages->progress->resetProgress();
 
 				return false;
 			}
 		}
 
-		$this->addResponse('File ' . $data['filename'] . ' not found on system!', 1);
+		return true;
+	}
+
+	public function dbRestore($data)
+	{
+		if (!isset($data['id'])) {
+			$this->addResponse('Please provide backup file id', 1, []);
+
+			return false;
+		}
+
+		$fileInfo = $this->basepackages->storages->getFileInfo($data['id']);
+
+		if ($fileInfo) {
+			if ($this->zip->open(base_path($fileInfo['uuid_location'] . $fileInfo['org_file_name']))) {
+				$backupInfo = $this->zip->getFromName('backupInfo.json');
+
+				if (!$backupInfo) {
+					$this->addResponse('Error reading backupInfo.json file. Please upload backup again.', 1);
+
+					return false;
+				}
+
+				try {
+					$this->backupInfo = Json::decode($backupInfo, true);
+				} catch (\InvalidArgumentException $exception) {
+					$this->addResponse('Error reading contents of backupInfo.json file. Please check if file is in correct Json format.', 1);
+
+					return false;
+				}
+
+				if (isset($this->backupInfo['request']['password_protect']) && $this->backupInfo['request']['password_protect'] !== '') {
+					if (!isset($data['password_protect_restore'])) {
+						$this->addResponse('Please provide backup file password', 1, []);
+
+						return false;
+					}
+
+					if (!$this->security->checkHash($data['password_protect_restore'], $this->backupInfo['request']['password_protect'])) {
+						$this->addResponse('Backup password incorrect! Please provide correct password', 1, []);
+
+						return false;
+					}
+
+					$this->zip->setPassword($data['password_protect_restore']);
+				}
+
+				$fileNameLocation = explode('.zip', $this->backupInfo['backupName'])[0];
+
+				if (!$this->zip->extractTo(base_path('var/tmp/' . $fileNameLocation))) {
+					$this->addResponse('Error unzipping backup file. Please upload backup again.', 1);
+
+					return false;
+				}
+
+				try {
+					if (isset($data['dbname'])) {
+						if (checkCtype($data['dbname'], 'alnum', []) === false) {
+							$this->addResponse('Database cannot have special characters', 1, []);
+
+							return false;
+						}
+
+						$newDbName = $data['dbname'];
+					} else {
+						$newDbName = str_replace('.zip', '', $fileInfo['org_file_name']);
+					}
+
+					if (isset($data['username'])) {
+						if (checkCtype($data['username'], 'alnum', []) === false) {
+							$this->addResponse('Username cannot have special characters', 1, []);
+
+							return false;
+						}
+
+						$newDbUserName = $data['username'];
+					} else {
+						$newDbUserName = $newDbName . 'User';
+					}
+
+					$dbConfig = $this->getDb(true);
+
+					if ($this->config->dev === false) {
+						$checkPwStrength = $this->checkPwStrength($data['password']);
+
+						if ($checkPwStrength !== false && $checkPwStrength < 4) {
+							$this->addResponse('Password strength is too low.' , 1);
+
+							return false;
+						}
+					}
+
+					$newDbUserPassword = $data['password'];
+
+					$dbConfig['username'] = $data['root_username'];
+					$dbConfig['password'] = $data['root_password'];
+					$dbConfig['dbname'] = 'mysql';
+					$this->db = new Mysql($dbConfig);
+
+					$checkUser = $this->executeSQL("SELECT * FROM `user` WHERE `User` LIKE ?", [$newDbUserName]);
+
+					if ($checkUser->numRows() === 0) {
+						$this->executeSQL("CREATE USER ?@'%' IDENTIFIED WITH mysql_native_password BY ?;", [$newDbUserName, $newDbUserPassword]);
+					} else {
+						$dbConfig['username'] = $data['username'];
+						$dbConfig['password'] = $data['password'];
+						$dbConfig['dbname'] = 'mysql';
+
+						try {
+							$this->db = new Mysql($dbConfig);
+						} catch (\Exception $e) {
+							//1045 is password incorrect
+							//1044 user does not exist
+							if ($e->getCode() === 1045) {
+								$this->addResponse('Incorrect password for user ' . $newDbUserName, 1);
+
+								return false;
+							}
+						}
+					}
+
+					$dbConfig['username'] = $data['root_username'];
+					$dbConfig['password'] = $data['root_password'];
+					$dbConfig['dbname'] = 'mysql';
+					$this->db = new Mysql($dbConfig);
+
+					$this->executeSQL(
+						"CREATE DATABASE IF NOT EXISTS " . $newDbName . " CHARACTER SET " . $data['charset'] . " COLLATE " . $data['collation']
+					);
+
+					$this->executeSQL("GRANT ALL PRIVILEGES ON " . $newDbName . ".* TO ?@'%' WITH GRANT OPTION;", [$newDbUserName]);
+
+					$dbConfig['dbname'] = $newDbName;
+
+					$this->db = new Mysql($dbConfig);
+
+					$allTables = $this->db->listTables($newDbName);
+
+					if (count($allTables) > 0) {
+						if ($data['drop'] === 'false') {
+							$this->addResponse('Restore Error: Database not empty. Select Drop If Exists checkbox and try again.', 1, []);
+
+							return false;
+						} else {
+							foreach ($allTables as $tableKey => $tableValue) {
+								$this->db->dropTable($tableValue);
+							}
+						}
+					}
+
+					$dumper =
+						new Mysqldump(
+							'mysql:host=' . $dbConfig['host'] . ';dbname=' . $newDbName,
+							$newDbUserName,
+							$newDbUserPassword
+						);
+
+					$dumper->restore(base_path('var/tmp/' . $fileNameLocation . '/' . $fileNameLocation . '.sql'));
+
+					$newDb['active'] = false;
+					$newDb['host'] = $dbConfig['host'];
+					$newDb['dbname'] = $newDbName;
+					$newDb['username'] = $newDbUserName;
+					$newDb['password'] = $this->crypt->encryptBase64($newDbUserPassword, $this->createDbKey($newDbName));
+					$newDb['port'] = $dbConfig['port'];
+					$newDb['charset'] = $dbConfig['charset'];
+					$newDb['collation'] = $dbConfig['collation'];
+
+					$this->core['settings']['dbs'][$newDbName] = $newDb;
+
+					$this->update($this->core);
+
+					$this->addResponse($this->backupInfo['backupName'] . ' restored!', 0, ['newDb' => $newDb]);
+
+					return true;
+				} catch (\Exception $e) {
+					$this->addResponse('Restore Error: ' . $e->getMessage(), 1);
+
+					return false;
+				}
+			} else {
+				$this->addResponse('Error opening backup zip file. Please upload backup again.', 1);
+			}
+		} else {
+			$this->addResponse('File ' . $data['filename'] . ' not found on system!', 1);
+		}
 
 		return false;
 	}
@@ -675,17 +810,6 @@ return
 		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
 			throw $exception;
 		}
-	}
-
-	protected function checkTmpPath()
-	{
-		if (!is_dir(base_path('var/tmp/'))) {
-			if (!mkdir(base_path('var/tmp/'), 0777, true)) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	public function getDb($active = true, $dbName = null)
