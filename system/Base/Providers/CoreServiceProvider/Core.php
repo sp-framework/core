@@ -704,28 +704,6 @@ return
 		return false;
 	}
 
-	public function checkPwStrength(string $pass)
-	{
-		$checkingTool = new \ZxcvbnPhp\Zxcvbn();
-
-		$result = $checkingTool->passwordStrength($pass);
-
-		if ($result && is_array($result) && isset($result['score'])) {
-			$this->addResponse('Checking Password Strength Success', 0, ['result' => $result['score']]);
-
-			return $result['score'];
-		}
-
-		$this->addResponse('Error Checking Password Strength', 1);
-
-		return false;
-	}
-
-	public function generateNewPassword()
-	{
-		$this->addResponse('Password Generate Successfully', 0, ['password' => $this->secTools->random->base62(12)]);
-	}
-
 	protected function validateEmail(array $data)
 	{
 		$this->validation->add('email', Email::class, ["message" => "Enter valid email address for Emergency Emails."]);

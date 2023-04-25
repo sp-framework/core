@@ -105,43 +105,4 @@ class BackuprestoreComponent extends BaseComponent
             $this->addResponse('Method Not Allowed', 1);
         }
     }
-
-    public function checkPwStrengthAction()
-    {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
-
-            if ($this->basepackages->backuprestore->checkPwStrength($this->postData()['pass']) !== false) {
-                $this->view->responseData = $this->basepackages->backuprestore->packagesData->responseData;
-            }
-
-            $this->addResponse(
-                $this->basepackages->backuprestore->packagesData->responseMessage,
-                $this->basepackages->backuprestore->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
-    }
-
-    public function generatePwAction()
-    {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
-
-            $this->basepackages->backuprestore->generateNewPw();
-
-            $this->addResponse(
-                $this->basepackages->backuprestore->packagesData->responseMessage,
-                $this->basepackages->backuprestore->packagesData->responseCode,
-                $this->basepackages->backuprestore->packagesData->responseData
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
-    }
 }
