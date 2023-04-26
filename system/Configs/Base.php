@@ -5,11 +5,11 @@ return
 		"setup" 			=> true,
 		"logs"				=>
 		[
-			"enabled"						=> "true",
+			"enabled"						=> "false",
 			"exceptions"					=> "false",
 			"level"							=> "DEBUG",
 			"service"						=> "streamLogs",
-			"emergencyLogsEmail"			=> "true",
+			"emergencyLogsEmail"			=> "false",
 			"emergencyLogsEmailAddresses"	=> "",
 		],
 		"websocket"			=>
