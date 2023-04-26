@@ -162,6 +162,8 @@ Class Setup
 				}
 			}
 		} catch (\Exception $e) {
+			$this->progress->preCheckComplete(false);
+
 			$this->progress->resetProgress();
 
 			$this->view->responseCode = 1;
@@ -222,24 +224,60 @@ Class Setup
 				}
 			}
 
-			if (isset($this->postData['create-username']) &&
-				isset($this->postData['create-password'])
+			$checkDb = true;
+			$checkUser = true;
+			if (!isset($this->postData['create-db']) ||
+				(isset($this->postData['create-db']) && $this->postData['create-db'] == 'false')
 			) {
-				$this->progress->preCheckComplete();
+				$this->progress->unregisterMethods(['createNewDb']);
+				$checkDb = false;
+			}
 
-				try {
-					$this->setupPackage->createNewDb();
-					$this->setupPackage->checkUser();
+			if (!isset($this->postData['create-user']) ||
+				(isset($this->postData['create-user']) && $this->postData['create-user'] == 'false')
+			) {
+				$this->progress->unregisterMethods(['checkUser']);
+				$checkUser = false;
+			}
 
-					unset($this->postData['create-username']);
-					unset($this->postData['create-password']);
+			if ($checkDb || $checkUser) {
+				if (isset($this->postData['create-username']) &&
+					isset($this->postData['create-password'])
+				) {
+					$this->progress->preCheckComplete();
 
-					$this->setupPackage = new SetupPackage($this->container, $this->postData);
-				} catch (\Exception $e) {
+					try {
+						if ($checkDb) {
+							$this->setupPackage->createNewDb();
+						}
+
+						if ($checkUser) {
+							$this->setupPackage->checkUser();
+						}
+
+						unset($this->postData['create-username']);
+						unset($this->postData['create-password']);
+
+						$this->setupPackage = new SetupPackage($this->container, $this->postData);
+					} catch (\Exception $e) {
+						$this->progress->preCheckComplete(false);
+
+						$this->progress->resetProgress();
+
+						$this->view->responseCode = 1;
+						$this->view->responseMessage = $e->getMessage();
+
+						if ($this->response->isSent() !== true) {
+							$this->response->setJsonContent($this->view->getParamsToView());
+
+							return $this->response->send();
+						}
+					}
+				} else {
 					$this->progress->resetProgress();
 
 					$this->view->responseCode = 1;
-					$this->view->responseMessage = $e->getMessage();
+					$this->view->responseMessage = 'Database username and password with create permission not provided.';
 
 					if ($this->response->isSent() !== true) {
 						$this->response->setJsonContent($this->view->getParamsToView());
@@ -247,8 +285,6 @@ Class Setup
 						return $this->response->send();
 					}
 				}
-			} else {
-				$this->progress->unregisterMethods(['createNewDb','checkUser']);
 			}
 
 			$this->coreJson =

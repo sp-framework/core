@@ -122,7 +122,9 @@ var BazProgress = function() {
                     responseData = response.responseData;
                 }
 
-                if (responseData['preCheckComplete'] == false) {
+                if (responseData['preCheckComplete'] == false ||
+                    (responseData['callResult'] && responseData['callResult'] === 'reset')
+                ) {
                     resetProgressCounter();
 
                     return false;
@@ -196,6 +198,10 @@ var BazProgress = function() {
                 }, 1000, null, 'progressCounter');
             }
         }
+
+        $('#' + $(element)[0].id).attr('hidden', true);
+        $('.' + $(element)[0].id + '-bar').css('width', '0%');
+        $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', 0);
     }
 
     function onMessage(data) {

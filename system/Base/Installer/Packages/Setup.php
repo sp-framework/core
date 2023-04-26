@@ -263,8 +263,7 @@ class Setup
 
 	protected function checkDbEmpty()
 	{
-		$allTables =
-			$this->db->listTables($this->postData['dbname']);
+		$allTables = $this->db->listTables($this->postData['dbname']);
 
 		if (count($allTables) > 0) {
 			if ($this->postData['drop'] === 'false') {

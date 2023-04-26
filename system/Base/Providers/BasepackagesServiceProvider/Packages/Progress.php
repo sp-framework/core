@@ -161,48 +161,53 @@ class Progress extends BasePackage
             $this->writeProgressFile($progressFile['processes'], false, false, true, $runners, null, $method, $callResult);
 
             if ($callResult === true) {
-                if (isset($this->apps)) {
-                    $account =
-                        $this->basepackages->accounts->getAccountById(
-                            $this->auth->account()['id'], false, false, false, false, false, true
-                        );
-
-                    if ($account && isset($account['notifications_tunnel'])) {
-                        $notificationTunnel = $account['notifications_tunnel'];
-                    }
-                } else {
-                    $notificationTunnel = 0;
-                }
-
-                if (isset($notificationTunnel)) {
-                    $progressFile = $this->readProgressFile();
-
-                    $this->wss->send(
-                        [
-                            'type'              => 'progress',
-                            'to'                => $notificationTunnel,
-                            'response'          => [
-                                'responseCode'      => 0,
-                                'responseMessage'   => 'Ok',
-                                'responseData'      =>
-                                    [
-                                        'total'             => $progressFile['total'],
-                                        'completed'         => $progressFile['completed'],
-                                        'preCheckComplete'  => $progressFile['preCheckComplete'],
-                                        'percentComplete'   => number_format(($progressFile['completed'] * 100) / $progressFile['total']),
-                                        'runners'           => $progressFile['runners'] ?? false,
-                                        'callResult'        => $callResult
-                                    ]
-                            ]
-                        ]
-                    );
-                }
+                $this->sendNotification($callResult);
             }
 
             return true;
         }
 
         return false;
+    }
+
+    protected function sendNotification($callResult)
+    {
+        if (isset($this->apps)) {
+            $account =
+                $this->basepackages->accounts->getAccountById(
+                    $this->auth->account()['id'], false, false, false, false, false, true
+                );
+
+            if ($account && isset($account['notifications_tunnel'])) {
+                $notificationTunnel = $account['notifications_tunnel'];
+            }
+        } else {
+            $notificationTunnel = 0;
+        }
+
+        if (isset($notificationTunnel)) {
+            $progressFile = $this->readProgressFile();
+
+            $this->wss->send(
+                [
+                    'type'              => 'progress',
+                    'to'                => $notificationTunnel,
+                    'response'          => [
+                        'responseCode'      => 0,
+                        'responseMessage'   => 'Ok',
+                        'responseData'      =>
+                            [
+                                'total'             => $progressFile['total'],
+                                'completed'         => $progressFile['completed'],
+                                'preCheckComplete'  => $progressFile['preCheckComplete'],
+                                'percentComplete'   => number_format(($progressFile['completed'] * 100) / $progressFile['total']),
+                                'runners'           => $progressFile['runners'] ?? false,
+                                'callResult'        => $callResult
+                            ]
+                    ]
+                ]
+            );
+        }
     }
 
     public function preCheckComplete($complete = true)
@@ -225,6 +230,8 @@ class Progress extends BasePackage
                 $this->registerMethods($progressFile['allProcesses']);
             }
         }
+
+        $this->sendNotification('reset');
 
         return true;
     }
