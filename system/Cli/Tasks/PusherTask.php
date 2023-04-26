@@ -21,6 +21,27 @@ class PusherTask extends Task
 
     public function startAction()
     {
+        if ($this->config->setup === true) {
+            $originCheck =
+                new WsServer(
+                    new WampServer(
+                        $this->basepackages->pusher->setCliLogger($this->logger)
+                    )
+                );
+        } else {
+            $originCheck =
+                new WssOriginCheck(
+                    new WsServer(
+                        new WampServer(
+                            $this->basepackages->pusher->setCliLogger($this->logger)
+                        )
+                    ),
+                    [],
+                    $this->logger,
+                    $this->domains->domains
+                );
+        }
+
         $this->checkLogPath();
 
         $loop = Factory::create();
@@ -35,18 +56,7 @@ class PusherTask extends Task
 
         try {
             $webServer = new IoServer(
-                new HttpServer(
-                    new WssOriginCheck(
-                        new WsServer(
-                            new WampServer(
-                                $this->basepackages->pusher->setCliLogger($this->logger)
-                            )
-                        ),
-                        [],
-                        $this->logger,
-                        $this->domains->domains
-                    )
-                ),
+                new HttpServer($originCheck),
                 $webSock
             );
 
