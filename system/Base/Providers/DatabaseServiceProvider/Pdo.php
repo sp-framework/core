@@ -73,7 +73,7 @@ class Pdo
 			!$this->dbConfig->password 	||
 			!$this->dbConfig->port
 		) {
-			$this->runSetup(true);
+			$this->runSetup(true, 'DB configuration missing or has errors');
 		}
 		return true;
 	}

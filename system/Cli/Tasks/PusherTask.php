@@ -21,7 +21,13 @@ class PusherTask extends Task
 
     public function startAction()
     {
-        if ($this->config->setup === true) {
+        try {
+            $domains = $this->domains->domains;
+        } catch (\throwable $e) {
+            $domains = [];
+        }
+
+        if ($this->config->setup === true || count($domains) === 0) {
             $originCheck =
                 new WsServer(
                     new WampServer(

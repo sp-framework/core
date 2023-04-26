@@ -18,31 +18,29 @@ class MessengerTask extends Task
 
     public function startAction()
     {
-        if ($this->config->setup === true) {
-            $originCheck =
-                new WsServer(
-                    new WampServer(
-                        $this->basepackages->pusher->setCliLogger($this->logger)
-                    )
-                );
-        } else {
-            $originCheck =
-                new WssOriginCheck(
-                    new WsServer(
-                        new WampServer(
-                            $this->basepackages->pusher->setCliLogger($this->logger)
-                        )
-                    ),
-                    [],
-                    $this->logger,
-                    $this->domains->domains
-                );
-        }
 
         $loop = Factory::create();
 
         $wsserver = new WsServer($this->basepackages->messenger->setCliLogger($this->logger));
         $wsserver->enableKeepAlive($loop);
+
+        try {
+            $domains = $this->domains->domains;
+        } catch (\throwable $e) {
+            $domains = [];
+        }
+
+        if ($this->config->setup === true || count($domains) === 0) {
+            $originCheck = $wsserver;
+        } else {
+            $originCheck =
+                new WssOriginCheck(
+                    $wsserver,
+                    [],
+                    $this->logger,
+                    $this->domains->domains
+                );
+        }
 
         $server = IoServer::factory(
             new HttpServer($originCheck),
