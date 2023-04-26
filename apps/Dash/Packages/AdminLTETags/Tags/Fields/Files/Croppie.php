@@ -627,6 +627,7 @@ class Croppie
                                 var formData = new FormData();
 
                                 formData.append("file", avatarBlob);
+                                formData.append("upload", true);
                                 formData.append("directory", "' . strtolower($this->params['componentName']) . '");
                                 formData.append("fileName", avatarName);
                                 formData.append("storagetype", "' . $this->params['storageType'] . '");
@@ -691,6 +692,7 @@ class Croppie
                                 var formData = new FormData();
 
                                 formData.append("file", imageBlob);
+                                formData.append("upload", true);
                                 formData.append("directory", "' . strtolower($this->params['componentName']) . '");
                                 formData.append("fileName", imageName);
                                 formData.append("storagetype", "' . $this->params['storageType'] . '");
