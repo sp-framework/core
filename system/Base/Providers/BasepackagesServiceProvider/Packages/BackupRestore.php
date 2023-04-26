@@ -19,6 +19,8 @@ class BackupRestore extends BasePackage
 
     protected $backupInfo;
 
+    protected $fileNameLocation;
+
     protected $backupLocation = '.backups/';
 
     protected $now;
@@ -35,6 +37,10 @@ class BackupRestore extends BasePackage
 
         if (!$this->localContent->fileExists($this->backupLocation)) {
             $this->localContent->createDirectory($this->backupLocation);
+        }
+
+        if (!$this->localContent->fileExists('var/tmp/backups/')) {
+            $this->localContent->createDirectory('var/tmp/backups/');
         }
 
         $this->basepackages->progress->deleteProgressFile();
@@ -373,9 +379,7 @@ class BackupRestore extends BasePackage
 
     protected function unzipBackupFiles($data)
     {
-        $fileNameLocation = explode('.zip', $this->backupInfo['backupName'])[0];
-
-        if (!$this->zip->extractTo(base_path('var/tmp/backups/' . $fileNameLocation))) {
+        if (!$this->zip->extractTo(base_path('var/tmp/backups/' . $this->fileNameLocation))) {
             $this->addResponse('Error unzipping backup file. Please upload backup again.', 1);
 
             $this->basepackages->progress->resetProgress();
@@ -388,10 +392,6 @@ class BackupRestore extends BasePackage
 
     protected function performDbRestore($data)
     {
-        $fileNameLocation = explode('.zip', $this->backupInfo['backupName'])[0];
-
-        $fileNameDate = str_replace('backup-', '', $fileNameLocation);
-
         if (isset($data['dbs'])) {
             if (!isset($data['root_username']) || !isset($data['root_username'])) {
                 $this->addResponse('Root Username & Password required to restore databases.', 1);
@@ -417,7 +417,7 @@ class BackupRestore extends BasePackage
                 $dbConfig['dbname'] = 'mysql';
 
                 try {
-                    $dbkeys = Json::decode($this->localContent->read('var/tmp/backups/' . $fileNameLocation . '/system/.dbkeys'), true);
+                    $dbkeys = Json::decode($this->localContent->read('var/tmp/backups/' . $this->fileNameLocation . '/system/.dbkeys'), true);
 
                     foreach ($data['dbs'] as $dbs) {
                         $dbConfig['username'] = $data['root_username'];
@@ -458,7 +458,7 @@ class BackupRestore extends BasePackage
                                 $this->backupInfo['dbs'][$dbs]['password']
                             );
 
-                        $dumper->restore(base_path('var/tmp/backups/' . $fileNameLocation . '/dbs/db' . $dbs . $fileNameDate . '.sql'));
+                        $dumper->restore(base_path('var/tmp/backups/' . $this->fileNameLocation . '/dbs/db' . $dbs . str_replace('backup-', '', $this->fileNameLocation) . '.sql'));
                     }
                 } catch (\Exception $e) {
                     $this->addResponse('Restore Error: ' . $e->getMessage(), 1);
@@ -477,7 +477,7 @@ class BackupRestore extends BasePackage
         }
 
         try {
-            $backupInfo = Json::decode($this->localContent->read('var/tmp/backups/' . $fileNameLocation . '/backupInfo.json'), true);
+            $backupInfo = Json::decode($this->localContent->read('var/tmp/backups/' . $this->fileNameLocation . '/backupInfo.json'), true);
         } catch (\ErrorException | FilesystemException | UnableToReadFile | InvalidArgumentException $exception) {
             $this->addResponse('Error reading/accessing backupInfo.json file. Please upload backup again with correct file.', 1);
 
@@ -534,7 +534,7 @@ class BackupRestore extends BasePackage
                 foreach ($data['restore_structure']['files'] as $restoreStructureFiles) {
                     try {
                         $this->localContent->copy(
-                            'var/tmp/backups/' . $fileNameLocation . '/' . $this->backupInfo['files'][$restoreStructureFiles],
+                            'var/tmp/backups/' . $this->fileNameLocation . '/' . $this->backupInfo['files'][$restoreStructureFiles],
                             $this->backupInfo['files'][$restoreStructureFiles]
                         );
                     } catch (FilesystemException | UnableToCopyFile $exception) {
@@ -562,7 +562,7 @@ class BackupRestore extends BasePackage
             foreach ($this->backupInfo['files'] as $fileKey => $file) {
                 try {
                     $this->localContent->copy(
-                        'var/tmp/backups/' . $fileNameLocation . '/' . $file,
+                        'var/tmp/backups/' . $this->fileNameLocation . '/' . $file,
                         $file
                     );
                 } catch (FilesystemException | UnableToCopyFile $exception) {
@@ -612,6 +612,8 @@ class BackupRestore extends BasePackage
                 foreach ($this->backupInfo['files'] as $fileKey => $fileValue) {
                     $this->addToStructure($fileValue, $fileKey, true);
                 }
+
+                $this->fileNameLocation = explode('.zip', $this->backupInfo['backupName'])[0];
 
                 return $this->backupInfo;
             } else {
