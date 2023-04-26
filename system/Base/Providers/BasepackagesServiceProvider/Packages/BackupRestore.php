@@ -729,12 +729,12 @@ class BackupRestore extends BasePackage
                     'text'      => 'Unzipping backup file...'
                 ],
                 [
-                    'method'    => 'performDbRestore',
-                    'text'      => 'Restore databases...'
-                ],
-                [
                     'method'    => 'performStructureRestore',
                     'text'      => 'Restore file structure...'
+                ],
+                [
+                    'method'    => 'performDbRestore',
+                    'text'      => 'Restore databases...'
                 ]
             ];
 
