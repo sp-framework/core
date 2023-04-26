@@ -172,6 +172,11 @@
                                                             <label class="text-uppercase text-xs" for="create-password">Database Password (With create permission) *</label>
                                                             <div class="input-group input-group-sm">
                                                                 <input type="password" name="create-password" id="create-password" class="form-control rounded-0" disabled>
+                                                                <div class="input-group-append">
+                                                                    <button id="create-password-visibility" class="btn btn-primary rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" data-original-title="">
+                                                                        <i class="fas fa-fw fa-eye-slash"></i>
+                                                                    </button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -450,6 +455,11 @@
                                         return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
                                     }).addClass(alert).html(data.responseMessage);
                                     $('#access').attr('disabled', false);
+                                    <?php if ($onlyUpdateDb) { ?>
+                                        $('#access-div').attr('hidden', false);
+                                        $('#access').addClass('btn-success');
+                                        $('#access').children('i').addClass('fa-check');
+                                    <?php } ?>
                                     $('#update-div').attr('hidden', true);
                                     $('#submit-spinner, #update-spinner').attr('hidden', true);
                                 }, 1000);
@@ -631,6 +641,14 @@
                 }
             });
 
+            $('#dev').click(function() {
+                if ($(this)[0].checked === true) {
+                    $('#auto-encrypt-level')[0].checked = false;
+                    $('#pwf').val('2');
+                    $('#cwf').val('2');
+                }
+            });
+
             $('#db_password_strength_meter').strengthMeter({
                 "url"       : '/',
                 "postData"  : {
@@ -648,7 +666,7 @@
                 }
             });
 
-            $('#password-visibility, #pass-visibility').click(function(e) {
+            $('#password-visibility, #create-password-visibility, #pass-visibility').click(function(e) {
                 e.preventDefault();
 
                 if ($(this).parent().siblings('input').attr('type') === 'password') {
@@ -685,14 +703,6 @@
                         PNotify.error(response.responseMessage);
                     }
                 }, 'json');
-            });
-
-            $('#dev').click(function() {
-                if ($(this)[0].checked === true) {
-                    $('#auto-encrypt-level')[0].checked = false;
-                    $('#pwf').val('2');
-                    $('#cwf').val('2');
-                }
             });
         </script>
     </body>
