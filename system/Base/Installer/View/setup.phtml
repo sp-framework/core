@@ -107,10 +107,15 @@
                                                     <div class="form-group mb-0">
                                                         <label class="text-uppercase text-xs" for="password">Database Password *</label>
                                                         <div class="input-group input-group-sm">
-                                                            <input type="password" name="password" id="password" class="form-control rounded-0">
-                                                            <div class="input-group-append">
+                                                            <div class="input-group-prepend">
                                                                 <button class="btn btn-sm btn-primary rounded-0" id="generate_db_password_button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="">
                                                                     <i class="fas fa-fw fa-cog fa-spin" hidden=""></i> <i class="fas fa-fw fa-wand-magic-sparkles"></i>
+                                                                </button>
+                                                            </div>
+                                                            <input type="password" name="password" id="password" class="form-control rounded-0">
+                                                            <div class="input-group-append">
+                                                                <button id="password-visibility" class="btn btn-primary rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" data-original-title="">
+                                                                    <i class="fas fa-fw fa-eye-slash"></i>
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -189,10 +194,15 @@
                                                         <div class="form-group mb-0">
                                                             <label class="text-uppercase text-xs" for="pass">Password *</label>
                                                             <div class="input-group input-group-sm">
-                                                                <input type="password" name="pass" id="pass" class="form-control rounded-0">
-                                                                <div class="input-group-append">
+                                                                <div class="input-group-prepend">
                                                                     <button class="btn btn-sm btn-primary rounded-0" id="generate_user_password_button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="">
                                                                         <i class="fas fa-fw fa-cog fa-spin" hidden=""></i> <i class="fas fa-fw fa-wand-magic-sparkles"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <input type="password" name="pass" id="pass" class="form-control rounded-0">
+                                                                <div class="input-group-append">
+                                                                    <button id="pass-visibility" class="btn btn-primary rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" data-original-title="">
+                                                                        <i class="fas fa-fw fa-eye-slash"></i>
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -638,9 +648,15 @@
                 }
             });
 
-            $('#password, #pass').keyup(function() {
-                if ($(this).val() === '') {
-                    $(this).attr('type', 'password');
+            $('#password-visibility, #pass-visibility').click(function(e) {
+                e.preventDefault();
+
+                if ($(this).parent().siblings('input').attr('type') === 'password') {
+                    $(this).parent().siblings('input').attr('type', 'text');
+                    $(this).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+                } else if ($(this).parent().siblings('input').attr('type') === 'text') {
+                    $(this).parent().siblings('input').attr('type', 'password');
+                    $(this).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
                 }
             });
 
@@ -658,9 +674,11 @@
                             if ($(that)[0].id === 'generate_db_password_button') {
                                 $('#password').val(response.responseData).trigger('change');
                                 $('#password').attr('type', 'text');
+                                $('#password-visibility').children('i').removeClass('fa-eye-slash').addClass('fa-eye');
                             } else if ($(that)[0].id === 'generate_user_password_button') {
                                 $('#pass').val(response.responseData).trigger('change');
                                 $('#pass').attr('type', 'text');
+                                $('#pass-visibility').children('i').removeClass('fa-eye-slash').addClass('fa-eye');
                             }
                         }
                     } else {

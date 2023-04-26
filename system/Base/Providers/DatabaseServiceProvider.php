@@ -37,11 +37,11 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 		$container->setShared(
 			'db',
 			function () use ($container) {
-				$dbConfig = $container->getShared('config')->db;
+				$config = $container->getShared('config');
 				$session = $container->getShared('session');
 				$localContent = $container->getShared('localContent');
 				$crypt = $container->getShared('crypt');
-				return (new Pdo($dbConfig, $session, $localContent, $crypt))->init();
+				return (new Pdo($config, $session, $localContent, $crypt))->init();
 			}
 		);
 

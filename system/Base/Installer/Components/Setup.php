@@ -31,6 +31,8 @@ Class Setup
 
 	protected $coreJson;
 
+	protected $config;
+
 	public function __construct($session, $configsObj)
 	{
 		$container = new FactoryDefault();
@@ -141,6 +143,8 @@ Class Setup
 		$this->basepackages = $this->container->getShared('basepackages');
 
 		$this->progress = $this->basepackages->progress->init($this->container);
+
+		$this->config = $configsObj->toArray();
 	}
 
 	public function run($onlyUpdateDb = false, $message = null)
@@ -149,11 +153,13 @@ Class Setup
 			if (!isset($this->postData['session'])) {
 				$this->setupPackage = new SetupPackage($this->container, $this->postData);
 
-				if ($this->progress->checkProgressFile()) {
-					$this->progress->deleteProgressFile();
-				}
+				if (!$onlyUpdateDb) {
+					if ($this->progress->checkProgressFile()) {
+						$this->progress->deleteProgressFile();
+					}
 
-				$this->registerProgressMethods();
+					$this->registerProgressMethods();
+				}
 			}
 		} catch (\Exception $e) {
 			$this->progress->resetProgress();
@@ -245,8 +251,18 @@ Class Setup
 				$this->progress->unregisterMethods(['createNewDb','checkUser']);
 			}
 
+			$this->coreJson =
+				Json::decode(
+					$this->localContent->read('system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json'),
+					true
+				);
+
 			if ($onlyUpdateDb) {
-				$this->setupPackage->writeConfigs();
+				if ($this->config) {
+					$this->coreJson['settings'] = array_replace($this->coreJson['settings'], $this->config);
+				}
+
+				$this->setupPackage->writeConfigs($this->coreJson, true);
 
 				$this->view->responseCode = 0;
 
@@ -260,12 +276,6 @@ Class Setup
 
 				return;
 			}
-
-			$this->coreJson =
-				Json::decode(
-					$this->localContent->read('system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json'),
-					true
-				);
 
 			try {
 				if (!$this->setupPackage->checkDbEmpty()) {

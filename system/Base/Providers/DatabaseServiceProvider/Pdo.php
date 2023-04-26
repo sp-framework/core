@@ -7,9 +7,12 @@ use League\Flysystem\UnableToReadFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Helper\Json;
 use System\Base\Installer\Components\Setup;
+use Phalcon\Config as PhalconConfig;
 
 class Pdo
 {
+	protected $config;
+
 	protected $dbConfig;
 
 	protected $session;
@@ -18,15 +21,21 @@ class Pdo
 
 	protected $crypt;
 
-	public function __construct($dbConfig, $session, $localContent, $crypt)
+	protected $configsObj;
+
+	public function __construct($config, $session, $localContent, $crypt)
 	{
-		$this->dbConfig = $dbConfig;
+		$this->config = $config;
+
+		$this->dbConfig = $config->db;
 
 		$this->session = $session;
 
 		$this->localContent = $localContent;
 
 		$this->crypt = $crypt;
+
+		$this->configsObj = new PhalconConfig($this->config->toArray());
 	}
 
 	public function init()
@@ -38,7 +47,7 @@ class Pdo
 				$key = $this->getDbKey($dbConfig);
 
 				if (!$key) {
-					$this->runSetup(true, 'Unable to connect to DB server');
+					$this->runSetup(true, 'Unable to connect to DB server', $this->configsObj);
 
 					return true;
 				}
@@ -79,7 +88,7 @@ class Pdo
 
 		require_once base_path('system/Base/Installer/Components/Setup.php');
 
-		(new Setup($this->session))->run($onlyUpdateDb, $message);
+		(new Setup($this->session, $this->configsObj))->run($onlyUpdateDb, $message);
 
 		exit;
 	}
