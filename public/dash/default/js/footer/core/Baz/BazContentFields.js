@@ -782,6 +782,23 @@ var BazContentFields = function() {
                 runFunction();
             }
         }
+
+        if (options.bazJstreeOptions.replaceIdWithDataField && options.bazJstreeOptions.replaceIdWithDataField !== '') {
+            if (dataCollection[componentId][sectionId][thisFieldId]['jstree']['_cnt']) {
+                var allNodes = dataCollection[componentId][sectionId][thisFieldId]['jstree'].get_json('#',{'flat':true});
+
+                for (var i = 0; i < allNodes.length; i++) {
+                    var newId = null;
+                    if (allNodes[i].data[options.bazJstreeOptions.replaceIdWithDataField]) {
+                        newId = allNodes[i].data[options.bazJstreeOptions.replaceIdWithDataField];
+                    }
+                    if (newId) {
+                        dataCollection[componentId][sectionId][thisFieldId]['jstree'].set_id(allNodes[i], newId);
+                    }
+                }
+            }
+        }
+
         if (options.afterInit) {
             options.afterInit(dataCollection);
         }

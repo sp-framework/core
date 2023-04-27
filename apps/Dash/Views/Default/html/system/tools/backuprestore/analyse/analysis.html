@@ -116,6 +116,16 @@
         {% endif %}
     </div>
 </div>
+<div class="row">
+    <div class="col">
+        <label>NOTES: </label>
+        {% if backupInfoFile['request']['notes'] is defined and backupInfoFile['request']['notes'] != '' %}
+            <p>{{backupInfoFile['request']['notes']}}</p>
+        {% else %}
+            <span>-</span>
+        {% endif %}
+    </div>
+</div>
 <hr>
 <div class="row vdivide">
     <div class="col">
@@ -141,8 +151,8 @@
                 'fieldJstreeExpand'                         : true,
                 'fieldJstreeCollapse'                       : true,
                 'fieldJstreeFirstOpen'                      : true,
-                'fieldJstreeAllOpen'                        : true,
-                'fieldJstreeAllChecked'                     : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeAllChecked'                     : false,
                 'fieldJstreeRootIcon'                       : 'folder-tree',
                 'fieldJstreeToggleAllChildren'              : true,
                 'fieldJstreeIncludeRootInPath'              : true,
@@ -154,7 +164,8 @@
                 'fieldJstreeSearchShowOnlyMatches'          : false,
                 'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
                 'fieldJstreeHideJstreeIcons'                : false,
-                'fieldJstreePlugins'                        : ["checkbox", "search", "types", "dnd", "noClose"]
+                'fieldJstreeReplaceIdWithDataField'         : 'pathid',
+                'fieldJstreePlugins'                        : ["checkbox", "search", "types", "dnd"]
             ]
         )}}
     </div>

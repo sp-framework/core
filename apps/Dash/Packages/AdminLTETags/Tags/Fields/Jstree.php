@@ -334,6 +334,11 @@ class Jstree
             $this->params['fieldJstreeSearchCaseSensitive'] :
             false;
 
+        $this->fieldParams['fieldJstreeReplaceIdWithDataField'] =
+            isset($this->params['fieldJstreeReplaceIdWithDataField']) ?
+            $this->params['fieldJstreeReplaceIdWithDataField'] :
+            false;
+
         $this->fieldParams['fieldJstreePlugins'] =
             isset($this->params['fieldJstreePlugins']) ?
             Json::encode($this->params['fieldJstreePlugins']) :
@@ -367,7 +372,8 @@ class Jstree
                         "toggleAllChildren": "' . $this->fieldParams['fieldJstreeToggleAllChildren'] . '",
                         "inclRoot": "' . $this->fieldParams['fieldJstreeIncludeRootInPath'] . '",
                         "selectEndNodeOnly": "' . $this->fieldParams['fieldJstreeSelectEndNodeOnly'] . '",
-                        "hideJstreeIcon": "' . $this->fieldParams['fieldJstreeHideJstreeIcons'] . '"
+                        "hideJstreeIcon": "' . $this->fieldParams['fieldJstreeHideJstreeIcons'] . '",
+                        "replaceIdWithDataField": "' . $this->fieldParams['fieldJstreeReplaceIdWithDataField'] . '"
                     },
                     "core": {
                         "themes": {

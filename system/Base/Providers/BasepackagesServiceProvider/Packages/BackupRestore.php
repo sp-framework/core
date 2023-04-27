@@ -103,6 +103,7 @@ class BackupRestore extends BasePackage
         $this->backupInfo['dbs'] = [];
         $this->backupInfo['dirs'] = [];
         $this->backupInfo['files'] = [];
+        $this->backupInfo['notes'] = $data['notes'];
 
         if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true' ||
             isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] == 'true'
@@ -172,14 +173,9 @@ class BackupRestore extends BasePackage
                 $this->getContent($this->basepackages->utils->scanDir('external/', false));
             }
         }
+
         if (isset($this->backupInfo['request']['old_backups']) && $this->backupInfo['request']['old_backups'] == 'true') {
             $this->getContent($this->basepackages->utils->scanDir('.backups/'));
-        }
-
-        foreach ($this->backupInfo['files'] as $file) {
-            if (!$this->addToZip(base_path($file), $file)) {
-                return false;
-            }
         }
 
         return true;
@@ -187,6 +183,12 @@ class BackupRestore extends BasePackage
 
     protected function zipBackupFiles(array $data)
     {
+        foreach ($this->backupInfo['files'] as $file) {
+            if (!$this->addToZip(base_path($file), $file)) {
+                return false;
+            }
+        }
+
         if (isset($this->backupInfo['request']['password_protect']) && $this->backupInfo['request']['password_protect'] !== '') {
             $this->backupInfo['request']['password_protect'] =
                 $this->secTools->hashPassword($this->backupInfo['request']['password_protect'], 4);
@@ -632,7 +634,11 @@ class BackupRestore extends BasePackage
 
     protected function getContent($localContent)
     {
+        $dirsKeyCount = count($this->backupInfo['dirs']);
+        $filesKeyCount = count($this->backupInfo['files']);
+
         foreach ($localContent['dirs'] as $key => $dir) {
+            $key = $dirsKeyCount + $key;
             if (isset($this->backupInfo['request']['html_compiled']) && $this->backupInfo['request']['html_compiled'] == 'true') {
                 $this->backupInfo['dirs'] = array_merge($this->backupInfo['dirs'], ['fo' . $key => $dir]);
             } else {
@@ -643,6 +649,7 @@ class BackupRestore extends BasePackage
         }
 
         foreach ($localContent['files'] as $key => $file) {
+            $key = $filesKeyCount + $key;
             if (isset($this->backupInfo['request']['html_compiled']) && $this->backupInfo['request']['html_compiled'] == 'true') {
                 $this->backupInfo['files'] = array_merge($this->backupInfo['files'], ['fi' . $key => $file]);
             } else {

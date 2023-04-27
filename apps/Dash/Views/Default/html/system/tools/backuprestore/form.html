@@ -114,6 +114,7 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-password_protect'                        : { },
+        '{{componentId}}-{{sectionId}}-notes'                                   : { },
         '{{componentId}}-{{sectionId}}-restore_root_username'                   : { },
         '{{componentId}}-{{sectionId}}-restore_root_password'                   : { },
         '{{componentId}}-{{sectionId}}-backups'                                 : {
@@ -148,6 +149,7 @@ dataCollectionSection =
                     postData['database'] = $('#{{componentId}}-{{sectionId}}-database')[0].checked;
                     postData['keys'] = $('#{{componentId}}-{{sectionId}}-keys')[0].checked;
                     postData['password_protect'] = $('#{{componentId}}-{{sectionId}}-password_protect').val();
+                    postData['notes'] = $('#{{componentId}}-{{sectionId}}-notes').val();
 
                     $.post('{{links.url("system/tools/backuprestore/backup")}}', postData, function(response) {
                         if (response.tokenKey && response.token) {
@@ -184,7 +186,6 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-backup_structure'                        : { },
         '{{componentId}}-{{sectionId}}-form'                                    : $.extend(dataCollectionSectionForm, {
             rules: {
             },
@@ -270,6 +271,9 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
     $('#{{componentId}}-{{sectionId}}-analyse').click(function(e) {
         e.preventDefault();
 
+        $(this).attr('disabled', true);
+        $(this).children('i').removeClass('fa-file-zipper').addClass('fa-cog fa-spin');
+
         var url = '{{links.url("system/tools/backuprestore/q/analyse/info/id/' + id + '")}}';
 
         $('#{{componentId}}-analysis-analyse-info').load(url, null, function (response, status, xhr) {
@@ -285,12 +289,22 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
                     $('#{{componentId}}-analysis-modal-button-add').attr('disabled', false);
                     $('#{{componentId}}-analysis-analyse-loader').attr('hidden', true);
                     $('#{{componentId}}-analysis-restore-analyse-modal').modal('show');
+                    $('#{{componentId}}-{{sectionId}}-analyse').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-analyse').children('i').removeClass('fa-cog fa-spin').addClass('fa-file-zipper');
                 });
             } else {
                 $('#{{componentId}}-{{sectionId}}-analyse-error').attr('hidden', false);
                 $('#{{componentId}}-{{sectionId}}-modal-button-add').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-analyse').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-analyse').children('i').removeClass('fa-file-zipper').addClass('fa-cog fa-spin');
             }
         });
+    });
+
+    $('#{{componentId}}-analysis-restore-analyse-modal').on('hide.bs.modal', function(e) {
+        $('#{{componentId}}-analysis-restore-analyse-modal .modal-body').empty();
+        $('#{{componentId}}-analysis-start-restore').attr('disabled', false);
+        $('#{{componentId}}-analysis-start-restore').children('i').attr('hidden', true);
     });
 
     $('#{{componentId}}-analysis-start-restore').off();
@@ -300,30 +314,15 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
         $(this).attr('disabled', true);
         $(this).children('i').attr('hidden', false);
 
+        setTimeout(function() {
+            processRestore();
+        }, 500);
+    });
+
+    function processRestore() {
         var postData = { };
         postData['id'] = id;
         postData[$('#security-token').attr('name')] = $('#security-token').val();
-
-        var allNodes = dataCollectionComponent['{{componentId}}-analysis']['{{componentId}}-analysis-backup_structure']['jstree'].get_json('#',{'flat':true});
-        var checkedFiles = dataCollectionComponent['{{componentId}}-analysis']['{{componentId}}-analysis-backup_structure']['jstree'].get_checked();
-
-        if (allNodes.length !== checkedFiles.length) {
-            var restoreStructure = { };
-            restoreStructure['folders'] = [];
-            restoreStructure['files'] = [];
-
-            for (var i = 0; i < checkedFiles.length; i++) {
-                var pathid = $('#' + checkedFiles[i]).data('pathid');
-
-                if (pathid.startsWith('fo')) {
-                    restoreStructure['folders'].push(pathid);
-                } else if (pathid.startsWith('fi')) {
-                    restoreStructure['files'].push(pathid);
-                }
-            }
-
-            postData['restore_structure'] = restoreStructure;
-        }
 
         if ($('#{{componentId}}-analysis-password').length > 0) {
             if ($('#{{componentId}}-analysis-password').val() === '') {
@@ -331,6 +330,10 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
                 $('#{{componentId}}-analysis-password').focus(function() {
                     $(this).removeClass('is-invalid');
                 });
+                $('#{{componentId}}-analysis-start-restore').attr('disabled', false);
+                $('#{{componentId}}-analysis-start-restore').children('i').attr('hidden', true);
+
+                return;
             } else {
                 postData['password'] = $('#{{componentId}}-analysis-password').val();
             }
@@ -341,29 +344,68 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
 
             var dbsCheckboxes = $('.db-restore').children().find('input');
             for (var j = 0; j < dbsCheckboxes.length; j++) {
-                postData['dbs'].push($(dbsCheckboxes[j]).siblings('label').html());
+                if ($(dbsCheckboxes[j])[0].checked === true) {
+                    postData['dbs'].push($(dbsCheckboxes[j]).siblings('label').html());
+                }
+            }
+
+            if (postData['dbs'].length > 0 &&
+                $('#{{componentId}}-analysis-root_username').length > 0 &&
+                $('#{{componentId}}-analysis-root_password').length > 0
+            ) {
+                if ($('#{{componentId}}-analysis-root_username').val() === '') {
+                    $('#{{componentId}}-analysis-root_username').addClass('is-invalid');
+                    $('#{{componentId}}-analysis-root_username').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
+                    $('#{{componentId}}-analysis-start-restore').attr('disabled', false);
+                    $('#{{componentId}}-analysis-start-restore').children('i').attr('hidden', true);
+
+                    return;
+                } else if ($('#{{componentId}}-analysis-root_password').val() === '') {
+                    $('#{{componentId}}-analysis-root_password').addClass('is-invalid');
+                    $('#{{componentId}}-analysis-root_password').focus(function() {
+                        $(this).removeClass('is-invalid');
+                    });
+                    $('#{{componentId}}-analysis-start-restore').attr('disabled', false);
+                    $('#{{componentId}}-analysis-start-restore').children('i').attr('hidden', true);
+
+                    return;
+                } else {
+                    postData['root_username'] = $('#{{componentId}}-analysis-root_username').val();
+                    postData['root_password'] = $('#{{componentId}}-analysis-root_password').val();
+                }
             }
         }
 
-        if ($('#{{componentId}}-analysis-root_username').length > 0 && $('#{{componentId}}-analysis-root_password').length > 0) {
-            if ($('#{{componentId}}-analysis-root_username').val() === '') {
-                $('#{{componentId}}-analysis-root_username').addClass('is-invalid');
-                $('#{{componentId}}-analysis-root_username').focus(function() {
-                    $(this).removeClass('is-invalid');
-                });
-            } else if ($('#{{componentId}}-analysis-root_password').val() === '') {
-                $('#{{componentId}}-analysis-root_password').addClass('is-invalid');
-                $('#{{componentId}}-analysis-root_password').focus(function() {
-                    $(this).removeClass('is-invalid');
-                });
-            } else {
-                postData['root_username'] = $('#{{componentId}}-analysis-root_username').val();
-                postData['root_password'] = $('#{{componentId}}-analysis-root_password').val();
+        var checkedFiles = dataCollectionComponent['{{componentId}}-analysis']['{{componentId}}-analysis-backup_structure']['jstree'].get_checked();
+        if (checkedFiles.length === 0 && postData['dbs'].length === 0) {
+            PNotify.error({text: 'Nothing to restore! Select files or database to restore.'});
+            $('#{{componentId}}-analysis-start-restore').attr('disabled', false);
+            $('#{{componentId}}-analysis-start-restore').children('i').attr('hidden', true);
+
+            return;
+        }
+
+        var allNodes = dataCollectionComponent['{{componentId}}-analysis']['{{componentId}}-analysis-backup_structure']['jstree'].get_json('#',{'flat':true});
+        if (allNodes.length !== checkedFiles.length) {
+            var restoreStructure = { };
+            restoreStructure['folders'] = [];
+            restoreStructure['files'] = [];
+
+            for (var i = 0; i < checkedFiles.length; i++) {
+                if (checkedFiles[i].startsWith('fo')) {
+                    restoreStructure['folders'].push(checkedFiles[i]);
+                } else if (checkedFiles[i].startsWith('fi')) {
+                    restoreStructure['files'].push(checkedFiles[i]);
+                }
             }
+
+            postData['restore_structure'] = restoreStructure;
         }
 
         startRestore(postData);
-    });
+    }
 
     function startRestore(postData) {
         $.post('{{links.url("system/tools/backuprestore/restore")}}', postData, function(response) {
@@ -377,6 +419,8 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
                 $('#{{componentId}}-analysis-start-restore').children('i').attr('hidden', true);
             } else {
                 PNotify.error({text: response.responseMessage});
+                $('#{{componentId}}-analysis-start-restore').attr('disabled', false);
+                $('#{{componentId}}-analysis-start-restore').children('i').attr('hidden', true);
             }
         }, 'json');
     }
