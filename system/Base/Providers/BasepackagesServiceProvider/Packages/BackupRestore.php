@@ -196,7 +196,7 @@ class BackupRestore extends BasePackage
 
         try {
             $this->localContent->write('var/tmp/backupInfo.json' , Json::encode($this->backupInfo));
-        } catch (FilesystemException | UnableToWriteFile $exception) {
+        } catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
             throw $exception;
         }
 
@@ -522,7 +522,7 @@ class BackupRestore extends BasePackage
                 foreach ($data['restore_structure']['folders'] as $restoreStructureFolders) {
                     try {
                         $this->localContent->createDirectory($this->backupInfo['dirs'][$restoreStructureFolders]);
-                    } catch (FilesystemException | UnableToCreateDirectory $exception) {
+                    } catch (\ErrorException | FilesystemException | UnableToCreateDirectory $exception) {
                         $this->addResponse('Filed to create directory with ID: ' . $restoreStructureFolders, 1);
 
                         $this->basepackages->progress->resetProgress();
@@ -539,7 +539,7 @@ class BackupRestore extends BasePackage
                             'var/tmp/backups/' . $this->fileNameLocation . '/' . $this->backupInfo['files'][$restoreStructureFiles],
                             $this->backupInfo['files'][$restoreStructureFiles]
                         );
-                    } catch (FilesystemException | UnableToCopyFile $exception) {
+                    } catch (\ErrorException | FilesystemException | UnableToCopyFile $exception) {
                         $this->addResponse('Filed to copy file with ID: ' . $restoreStructureFiles, 1);
 
                         $this->basepackages->progress->resetProgress();
@@ -552,7 +552,7 @@ class BackupRestore extends BasePackage
             foreach ($this->backupInfo['dirs'] as $dirKey => $dir) {
                 try {
                     $this->localContent->createDirectory($dir);
-                } catch (FilesystemException | UnableToCreateDirectory $exception) {
+                } catch (\ErrorException | FilesystemException | UnableToCreateDirectory $exception) {
                     $this->addResponse('Filed to create directory with ID: ' . $dirKey, 1);
 
                     $this->basepackages->progress->resetProgress();
@@ -567,7 +567,7 @@ class BackupRestore extends BasePackage
                         'var/tmp/backups/' . $this->fileNameLocation . '/' . $file,
                         $file
                     );
-                } catch (FilesystemException | UnableToCopyFile $exception) {
+                } catch (\ErrorException | FilesystemException | UnableToCopyFile $exception) {
                     $this->addResponse('Filed to copy file with ID: ' . $fileKey, 1);
 
                     $this->basepackages->progress->resetProgress();
