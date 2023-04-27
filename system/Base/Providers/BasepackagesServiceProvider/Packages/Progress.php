@@ -187,7 +187,7 @@ class Progress extends BasePackage
             $this->notificationTunnel = 0;
         }
 
-        if ($this->notificationTunnel) {
+        if ($this->notificationTunnel !== null) {
             $progressFile = $this->readProgressFile();
 
             $this->wss->send(
