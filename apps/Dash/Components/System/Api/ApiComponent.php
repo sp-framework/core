@@ -27,17 +27,26 @@ class ApiComponent extends BaseComponent
                 $api = $this->apiPackage->getApiById($this->getData()['id']);
             } else {
                 $api = [];
-
                 $api['setup'] = 0;
-
-                $api['category'] = $this->getData()['type'];
-
-                $apiClass = $this->apiPackage->getApiClass($api['category']);
+                $api['category'] = $this->getData()['category'];
+                $api['type'] = $this->getData()['type'];
 
                 try {
-                    $api = (new $apiClass($api, $this->apiPackage))->init()->view();
-                } catch (\Exception $e) {
-                    throw new ControllerNotFoundException;
+                    $apiClass = $this->apiPackage->getApiClass(
+                        $this->getData()['category'] . '/' . $this->getData()['type'] . '/' . $this->getData()['type'], false
+                    );
+
+                    (new $apiClass($api, $this->apiPackage))->init();
+                } catch (\throwable $e) {
+                    try {
+                        $apiClass = $this->apiPackage->getApiClass(
+                            $this->getData()['category'] . '/' . $this->getData()['type'] . '/' . $this->getData()['type']
+                        );
+
+                        (new $apiClass($api, $this->apiPackage))->init();
+                    } catch (\throwable $e) {
+                        throw new ControllerNotFoundException;
+                    }
                 }
             }
 

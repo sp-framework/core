@@ -74,7 +74,30 @@
                 'componentName'                  : componentName,
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
-                'fieldId'                        : 'api_type',
+                'fieldId'                        : 'category',
+                'fieldLabel'                     : 'API Category',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'API Category',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldDisabled'                  : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : api['category']|uppercase
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'type',
                 'fieldLabel'                     : 'API Type',
                 'fieldType'                      : 'input',
                 'fieldHelp'                      : true,
@@ -86,7 +109,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 50,
-                'fieldValue'                     : api['api_type']|uppercase
+                'fieldValue'                     : api['type']|uppercase
             ]
         )}}
     </div>

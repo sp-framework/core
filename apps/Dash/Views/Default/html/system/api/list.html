@@ -1,14 +1,17 @@
 {% set apiButtons = '' %}
 {% if apiCategories|length > 0 %}
-    {{dump(apiCategories)}}
     {% set apiButtons = apiButtons ~ '{' %}
-    {% for apiCategory in apiCategories %}
-        {% set link = links.url('system/api/q/type/' ~ apiCategory ~ '/id/0') %}
-        {% set apiButtons =
-            apiButtons ~ '"' ~ apiCategory ~ '-api" : {"title" : "' ~ apiCategory ~ '","type" : "primary","additionalClass" : "contentAjaxLink","url" : "' ~ link ~ '"}'
-        %}
-        {% if not loop.last %}
-            {% set apiButtons = apiButtons ~ ',' %}
+    {% for apiCategoryKey, apiCategory in apiCategories %}
+        {% if apiCategory|length > 0 %}
+            {% for apiCategoryType in apiCategory %}
+                {% set link = links.url('system/api/q/category/' ~ apiCategoryKey ~ '/type/' ~ apiCategoryType ~ '/id/0') %}
+                {% set apiButtons =
+                    apiButtons ~ '"' ~ apiCategoryType ~ '-api" : {"title" : "' ~ apiCategoryType ~ '","type" : "primary","additionalClass" : "contentAjaxLink","url" : "' ~ link ~ '"}'
+                %}
+                {% if not loop.last %}
+                    {% set apiButtons = apiButtons ~ ',' %}
+                {% endif %}
+            {% endfor %}
         {% endif %}
     {% endfor %}
     {% set apiButtons = apiButtons ~ '}' %}

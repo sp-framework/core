@@ -84,7 +84,7 @@ class Api extends BasePackage
                 );
 
             $this->registerApis($categories);
-            dump($this->apiCategories);die();
+
         } catch (FilesystemException $exception) {
             throw $exception;
         }
@@ -99,22 +99,22 @@ class Api extends BasePackage
                 $folderName = Arr::last($path);
 
                 if (!isset($this->apiCategories[$folderName])) {
-                    $this->apiCategories[$folderName] = [];
-                }
-            }
-
-            if ($item instanceof \League\Flysystem\FileAttributes) {
-                $path = explode('/', $item->path());
-
-                $fileName = Arr::last($path);
-
-                $folderName = $path[array_key_last($path) - 1];
-
-                if (!isset($this->apiCategories[$folderName])) {
-                    $this->apiCategories[$folderName] = [];
+                    $this->apiCategories[strtolower($folderName)] = [];
                 }
 
-                array_push($this->apiCategories[$folderName], strtolower(explode('.php', $fileName)[0]));
+                $category = $this->localContent->listContents($item->path());
+
+                foreach ($category as $subCategory) {
+                    if ($subCategory instanceof \League\Flysystem\DirectoryAttributes) {
+                        $path = explode('/', $subCategory->path());
+
+                        $subCategoryFolderName = Arr::last($path);
+
+                        if (!isset($this->apiCategories[strtolower($folderName)][$subCategoryFolderName])) {
+                            array_push($this->apiCategories[strtolower($folderName)], strtolower($subCategoryFolderName));
+                        }
+                    }
+                }
             }
         }
     }
@@ -404,7 +404,7 @@ class Api extends BasePackage
         }
     }
 
-    public function getApiClass($api)
+    public function getApiClass($api, $basepackages = true)
     {
         $path = explode('/', $api);
 
@@ -416,6 +416,10 @@ class Api extends BasePackage
             }
         } else {
             $apiClass .= '\\' . ucfirst($api);
+        }
+
+        if ($basepackages) {
+            return 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Api\\Apis' . $apiClass;
         }
 
         return 'Apps\\Dash\\Packages\\System\\Api\\Apis' . $apiClass;

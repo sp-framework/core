@@ -1,12 +1,12 @@
 {% if api['id'] is defined %}
     {% set apiId = api['id'] %}
-    {% set title = api['api_type'] ~ ' API (' ~ api['name'] ~ ')' %}
+    {% set title = api['type'] ~ ' API (' ~ api['name'] ~ ')' %}
 {% else %}
     {% set apiId = '' %}
-    {% set title = 'New ' ~ api['api_type'] ~ ' API' %}
+    {% set title = 'New API - ' ~ api['category'] ~ ':' ~ api['type'] %}
 {% endif %}
-{{view.getPartial('api/apis/' ~ api['api_type'] ~ '/view')}}
-{# {% if api['api_type'] === 'repo' %}
+{{view.getPartial('api/apis/' ~ api['category'] ~ '/' ~ api['type'] ~ '/view')}}
+{# {% if api['type'] === 'repo' %}
     {{adminltetags.useTag('content',
         [
             'component'                     : component,
@@ -34,7 +34,7 @@
             ]
         ]
     )}}
-{% elseif api['api_type'] === 'generic' %}
+{% elseif api['type'] === 'generic' %}
     {{adminltetags.useTag('content',
         [
             'component'                     : component,

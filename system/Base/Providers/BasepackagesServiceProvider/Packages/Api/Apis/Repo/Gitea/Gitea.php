@@ -4,5 +4,13 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\Re
 
 class Gitea
 {
-    //
+    public function __construct($api, $apiPackage)
+    {
+        //
+    }
+
+    public function init()
+    {
+        return $this;
+    }
 }
