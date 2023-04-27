@@ -12,6 +12,8 @@ use System\Base\BasePackage;
 
 class Progress extends BasePackage
 {
+    protected $notificationTunnel;
+
     public function init($container = null)
     {
         if ($container) {
@@ -172,26 +174,26 @@ class Progress extends BasePackage
 
     protected function sendNotification($callResult)
     {
-        if (isset($this->apps)) {
+        if (!$this->notificationTunnel && isset($this->apps)) {
             $account =
                 $this->basepackages->accounts->getAccountById(
                     $this->auth->account()['id'], false, false, false, false, false, true
                 );
 
             if ($account && isset($account['notifications_tunnel'])) {
-                $notificationTunnel = $account['notifications_tunnel'];
+                $this->notificationTunnel = $account['notifications_tunnel'];
             }
         } else {
-            $notificationTunnel = 0;
+            $this->notificationTunnel = 0;
         }
 
-        if (isset($notificationTunnel)) {
+        if ($this->notificationTunnel) {
             $progressFile = $this->readProgressFile();
 
             $this->wss->send(
                 [
                     'type'              => 'progress',
-                    'to'                => $notificationTunnel,
+                    'to'                => $this->notificationTunnel,
                     'response'          => [
                         'responseCode'      => 0,
                         'responseMessage'   => 'Ok',
