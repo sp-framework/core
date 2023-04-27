@@ -544,6 +544,10 @@ class Dropzone
                                 });
 
                                 fieldId["dropzone"].on("removedfile", function(file) {
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-upload").attr("disabled", false);
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").children("i").removeClass("fa-cog fa-spin").addClass("fa-save");
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("disabled", false);
+
                                     if (fieldId["dropzone"].getAcceptedFiles().length === 0) {
                                         $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("hidden", true);
                                         $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").attr("hidden", true);
@@ -569,8 +573,11 @@ class Dropzone
                                 });
 
                                 fieldId["dropzone"].on("success", function(file, response) {
-                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("hidden", true);
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").attr("hidden", true);
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-upload").attr("disabled", false);
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("hidden", true);
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").children("i").removeClass("fa-cog fa-spin").addClass("fa-save");
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("disabled", false);
 
                                     if (response.tokenKey && response.token) {
                                         $("#security-token").attr("name", response.tokenKey);
@@ -731,9 +738,11 @@ class Dropzone
                                         });
 
                                         fieldId["dropzone"].removeAllFiles(true);
-                                        $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-upload").attr("hidden", true);
-                                        $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("hidden", true);
+                                        $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-upload").attr("disabled", false);
                                         $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").attr("hidden", true);
+                                        $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("hidden", true);
+                                        $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").children("i").removeClass("fa-cog fa-spin").addClass("fa-save");
+                                        $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("disabled", false);
 
                                         return;
                                     }
@@ -778,12 +787,18 @@ class Dropzone
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("hidden", false);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").off();
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").click(function() {
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-upload").attr("disabled", true);
+                                    $(this).attr("disabled", true);
+                                    $(this).children("i").removeClass("fa-save").addClass("fa-cog fa-spin");
                                     fieldId["save"]();
                                 });
 
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").attr("hidden", false);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").off();
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").click(function() {
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-upload").attr("disabled", false);
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").children("i").removeClass("fa-cog fa-spin").addClass("fa-save");
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("disabled", false);
                                     fieldId["cancel"]();
                                 });
                             }
@@ -823,6 +838,9 @@ class Dropzone
 
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("hidden", true);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").attr("hidden", true);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-upload").attr("disabled", false);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").children("i").removeClass("fa-cog fa-spin").addClass("fa-save");
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("disabled", false);
 
                                 deleteUUIDs = [];
                                 registerDeleteButtons();
