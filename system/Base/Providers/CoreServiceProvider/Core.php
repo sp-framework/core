@@ -47,6 +47,10 @@ class Core extends BasePackage
 			$this->localContent->createDirectory($this->backupLocation);
 		}
 
+		if (!$this->localContent->fileExists('var/tmp/')) {
+			$this->localContent->createDirectory('var/tmp/');
+		}
+
 		return $this;
 	}
 
