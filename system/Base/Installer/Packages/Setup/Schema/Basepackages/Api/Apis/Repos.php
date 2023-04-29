@@ -21,7 +21,7 @@ class Repos
                         ]
                     ),
                     new Column(
-                        'repo_url',
+                        'api_url',
                         [
                             'type'    => Column::TYPE_VARCHAR,
                             'size'    => 1024,
@@ -29,7 +29,15 @@ class Repos
                         ]
                     ),
                     new Column(
-                        'site_url',
+                        'org_user',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 1024,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
+                        'repo_url',
                         [
                             'type'    => Column::TYPE_VARCHAR,
                             'size'    => 1024,
@@ -69,7 +77,7 @@ class Repos
                         ]
                     ),
                     new Column(
-                        'token',
+                        'access_token',
                         [
                             'type'    => Column::TYPE_VARCHAR,
                             'size'    => 2048,

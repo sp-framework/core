@@ -6,12 +6,27 @@ use GuzzleHttp\Client;
 
 class Content
 {
+    protected $client;
+
+    protected $options = [];
+
     public function __construct()
     {
     }
 
-    public function init()
+    public function init($options = null)
     {
-        return new Client();
+        if ($options) {
+            $this->setOptions($options);
+        }
+
+        $this->client = new Client($this->options);
+
+        return $this->client;
+    }
+
+    protected function setOptions(array $options)
+    {
+        $this->options = array_merge($this->options, $options);
     }
 }

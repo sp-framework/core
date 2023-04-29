@@ -9,13 +9,14 @@
     {% set apiSetup = api['setup'] %}
     {% set apiLocation = api['location'] %}
     {% set apiDescription = api['description'] %}
+    {% set apiApiUrl = api['api_url'] %}
+    {% set apiOrgUser = api['org_user'] %}
     {% set apiRepoUrl = api['repo_url'] %}
-    {% set apiSiteUrl = api['site_url'] %}
     {% set apiBranch = api['branch'] %}
     {% set apiAuthType = api['auth_type'] %}
     {% set apiUsername = api['username'] %}
     {% set apiPassword = api['password'] %}
-    {% set apiToken = api['token'] %}
+    {% set apiAccessToken = api['access_token'] %}
     {% set apiAuthorization = api['authorization'] %}
     {% set locationDisabled = true %}
 {% else %}
@@ -28,35 +29,82 @@
     {% set apiSetup = '4' %}
     {% set apiLocation = '' %}
     {% set apiDescription = '' %}
+    {% set apiApiUrl = '' %}
+    {% set apiOrgUser = '' %}
     {% set apiRepoUrl = '' %}
-    {% set apiSiteUrl = '' %}
     {% set apiBranch = '' %}
     {% set apiAuthType = 'none' %}
     {% set apiUsername = '' %}
     {% set apiPassword = '' %}
-    {% set apiToken = '' %}
+    {% set apiAccessToken = '' %}
     {% set apiAuthorization = '' %}
 {% endif %}
 {% if apiAuthType === 'auth' %}
     {% set authDisabled = false %}
     {% set authoDisabled = true %}
-    {% set tokenDisabled = true %}
-{% elseif apiAuthType === 'token' %}
+    {% set accessTokenDisabled = true %}
+{% elseif apiAuthType === 'access_token' %}
     {% set authDisabled = true %}
     {% set authoDisabled = true %}
-    {% set tokenDisabled = false %}
+    {% set accessTokenDisabled = false %}
 {% elseif apiAuthType === 'autho' %}
     {% set authDisabled = true %}
     {% set authoDisabled = false %}
-    {% set tokenDisabled = true %}
+    {% set accessTokenDisabled = true %}
 {% else %}
     {% set authDisabled = true %}
     {% set authoDisabled = true %}
-    {% set tokenDisabled = true %}
+    {% set accessTokenDisabled = true %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         {% include 'api/apis/common.html' %}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'api_url',
+                        'fieldLabel'                     : 'API Url',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'API URL',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldValue'                     : apiApiUrl
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'org_user',
+                        'fieldLabel'                     : 'Org/User',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Org/User name',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldValue'                     : apiOrgUser
+                    ]
+                )}}
+            </div>
+        </div>
         <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
@@ -103,30 +151,6 @@
                 )}}
             </div>
         </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'site_url',
-                        'fieldLabel'                     : 'API Site Url',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'API Site URL',
-                        'fieldRequired'                  : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 1024,
-                        'fieldValue'                     : apiSiteUrl
-                    ]
-                )}}
-            </div>
-        </div>
         <hr>
         <div class="row">
             <div class="col-md-4">
@@ -159,11 +183,11 @@
                                         'type'                            : 'primary',
                                         'dataValue'                       : 'auth'
                                     ],
-                                'token' :
+                                'access_token' :
                                     [
                                         'title'                           : 'Token',
                                         'type'                            : 'primary',
-                                        'dataValue'                       : 'token'
+                                        'dataValue'                       : 'access_token'
                                     ],
                                 'autho' :
                                     [
@@ -233,19 +257,19 @@
                                 'componentName'                         : componentName,
                                 'componentId'                           : componentId,
                                 'sectionId'                             : sectionId,
-                                'fieldId'                               : 'token',
-                                'fieldLabel'                            : 'Token',
+                                'fieldId'                               : 'access_token',
+                                'fieldLabel'                            : 'Access Token',
                                 'fieldType'                             : 'input',
                                 'fieldInputType'                        : 'password',
                                 'fieldInputPasswordToggleVisibility'    : true,
                                 'fieldHelp'                             : true,
-                                'fieldHelpTooltipContent'               : 'Token',
+                                'fieldHelpTooltipContent'               : 'Access Token',
                                 'fieldRequired'                         : true,
                                 'fieldBazScan'                          : true,
                                 'fieldBazPostOnCreate'                  : true,
                                 'fieldBazPostOnUpdate'                  : true,
-                                'fieldDisabled'                         : tokenDisabled,
-                                'fieldValue'                            : apiToken
+                                'fieldDisabled'                         : accessTokenDisabled,
+                                'fieldValue'                            : apiAccessToken
                             ]
                         )}}
                     </div>
@@ -320,22 +344,23 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-in_use'                              : { },
         '{{componentId}}-{{sectionId}}-used_by'                             : { },
         '{{componentId}}-{{sectionId}}-description'                         : { },
-        '{{componentId}}-{{sectionId}}-repo_url'                            : { },
+        '{{componentId}}-{{sectionId}}-api_url'                             : { },
+        '{{componentId}}-{{sectionId}}-org_user'                            : { },
         '{{componentId}}-{{sectionId}}-branch'                              : { },
-        '{{componentId}}-{{sectionId}}-site_url'                            : { },
+        '{{componentId}}-{{sectionId}}-repo_url'                            : { },
         '{{componentId}}-{{sectionId}}-auth_type'                           : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-auth_type').click(function() {
                     if ($(this).find('input[type=radio]:checked').data('value') == 'none') {
-                        $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password, #{{componentId}}-{{sectionId}}-token, #{{componentId}}-{{sectionId}}-authorization').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password, #{{componentId}}-{{sectionId}}-access_token, #{{componentId}}-{{sectionId}}-authorization').attr('disabled', true);
                     } else if ($(this).find('input[type=radio]:checked').data('value') == 'auth') {
                         $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-token, #{{componentId}}-{{sectionId}}-authorization').attr('disabled', true);
-                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'token') {
+                        $('#{{componentId}}-{{sectionId}}-access_token, #{{componentId}}-{{sectionId}}-authorization').attr('disabled', true);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'access_token') {
                         $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password, #{{componentId}}-{{sectionId}}-authorization').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-token').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-access_token').attr('disabled', false);
                     } else if ($(this).find('input[type=radio]:checked').data('value') == 'autho') {
-                        $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password, #{{componentId}}-{{sectionId}}-token').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password, #{{componentId}}-{{sectionId}}-access_token').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-authorization').attr('disabled', false);
                     }
                 });
@@ -343,7 +368,7 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-username'                            : { },
         '{{componentId}}-{{sectionId}}-password'                            : { },
-        '{{componentId}}-{{sectionId}}-token'                               : { },
+        '{{componentId}}-{{sectionId}}-access_token'                        : { },
         '{{componentId}}-{{sectionId}}-authorization'                       : { },
         '{{componentId}}-{{sectionId}}-form'                                : {
             rules: {
@@ -354,7 +379,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-site_url'                    : 'required',
                 '{{componentId}}-{{sectionId}}-username'                    : 'required',
                 '{{componentId}}-{{sectionId}}-password'                    : 'required',
-                '{{componentId}}-{{sectionId}}-token'                       : 'required',
+                '{{componentId}}-{{sectionId}}-access_token'                : 'required',
                 '{{componentId}}-{{sectionId}}-authorization'               : 'required'
             },
             messages: {
@@ -365,7 +390,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-site_url'                    : 'Please enter site url',
                 '{{componentId}}-{{sectionId}}-username'                    : 'Please enter username',
                 '{{componentId}}-{{sectionId}}-password'                    : 'Please enter password',
-                '{{componentId}}-{{sectionId}}-token'                       : 'Please enter api token',
+                '{{componentId}}-{{sectionId}}-access_token'                : 'Please enter api access token',
                 '{{componentId}}-{{sectionId}}-authorization'               : 'Please enter api authorization code'
             }
         }

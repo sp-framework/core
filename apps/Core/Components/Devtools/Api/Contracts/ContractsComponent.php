@@ -73,12 +73,6 @@ class ContractsComponent extends BaseComponent
 					$contract = $this->getViewLink($contract);
 
 					$this->view->pick('contracts/viewcontract');
-				} else if (isset($this->getData()['generateclasses']) && $this->getData()['generateclasses'] == 'true') {
-					$this->contractsPackage->generateClassesFromContract($this->getData()['id']);
-
-					echo 'Generated Classes!';
-
-					return false;
 				} else {
 					$this->view->pick('contracts/view');
 				}
@@ -102,18 +96,6 @@ class ContractsComponent extends BaseComponent
 				]
 			];
 
-		$dtAdditionControlButtons =
-			[
-				'includeId'  => true,
-				'buttons'    => [
-					'generateclasses'    => [
-						'title'     => 'Generate Classes',
-						'icon'      => 'code',
-						'link'      => 'contracts/q/generateclasses/true'
-					]
-				]
-			];
-
 		$this->generateDTContent(
 			$this->contractsPackage,
 			'devtools/api/contracts/view',
@@ -124,8 +106,7 @@ class ContractsComponent extends BaseComponent
 			$controlActions,
 			null,
 			null,
-			'provider_name',
-			$dtAdditionControlButtons
+			'provider_name'
 		);
 
 		$this->view->pick('contracts/list');

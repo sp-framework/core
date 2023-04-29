@@ -291,7 +291,7 @@ class Api extends BasePackage
         $this->addToNotification('error', $messageTitle, $messageDetails, 'api', $id);
     }
 
-    public function useApi($data)//or ID (integer/string)
+    public function useApi($data, $debug = false)//or ID (integer/string)
     {
         $this->apiConfig = null;
 
@@ -339,22 +339,12 @@ class Api extends BasePackage
             $this->apiConfig = $this->getApiById((int) $data);
         }
 
-        if ($this->apiConfig) {
-            $api = $this->initApi();
+        if ($debug) {
+            $this->apiConfig['debug'] = true;
+        }
 
-            if (isset($data['service'])) {
-                try {
-                    if (isset($data['serviceRequestParams'])) {
-                        return $api->useService($data['service'], $data['serviceRequestParams']);
-                    } else {
-                        return $api->useService($data['service']);
-                    }
-                } catch (\Exception $e) {
-                    throw $e;
-                }
-            } else {
-                return $api;
-            }
+        if ($this->apiConfig) {
+            return $this->initApi();
         }
 
         $this->addResponse('API Id/Config missing...', 1);
@@ -362,10 +352,12 @@ class Api extends BasePackage
         return false;
     }
 
-    protected function initApi($config = null)
+    protected function initApi(array $config = null)
     {
         if (!$config) {
             $config = $this->apiConfig;
+        } else {
+            $config = array_merge($config, $this->apiConfig);
         }
 
         try {

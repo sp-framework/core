@@ -55,17 +55,18 @@ class TestComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $apiPackage = $this->usePackage(Api::class);
+        $responseArr = $this->basepackages->api->useApi(1)->useMethod('UserApi', 'userListRepos', ['sp-core']);
+        foreach ($responseArr as $key => $response) {
+            var_dump(Json::decode($response->__toString(), true));
+        }
+        die();
+        // try {
+        //     $response = $gitea->userListRepos();
+        // } catch (\throwable $e) {
+        //     var_dump($e);die();
+        // }
 
-        $api = $apiPackage->useApi(1);
-
-        $gitea = $api->useService('Gitea');
-
-        $request = new \System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\Repos\Gitea\Operations\UserListReposRestRequest;
-        $request->username = 'sp-core';
-        $response = $gitea->userListRepos($request);
-        var_dump($response->toArray());
-        var_dump($api);die();
+        // var_dump($response);die();
         // $this->basepackages->emailServices->errorEmailService(
         //                     'Email was added to the queue but, there is no email service associated with this app. Please add a new service ' .
         //                     'and assign it to the app via domains.'
