@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
-use Apps\Dash\Packages\System\Api\Model\SystemApiCalls;
+use Apps\Core\Packages\System\Api\Model\SystemApiCalls;
 use Carbon\Carbon;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;

@@ -5,7 +5,6 @@
  *
  * @property string $value
  */
-
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Types;
 
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Types\BaseType;

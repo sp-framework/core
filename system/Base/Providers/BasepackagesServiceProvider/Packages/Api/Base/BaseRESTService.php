@@ -91,7 +91,7 @@ class BaseRESTService
      * Sends an asynchronous API request.
      *
      * @param string $name The name of the operation.
-     * @param \Apps\Dash\Packages\System\Api\Base\Types\BaseType $request Request object containing the request information.
+     * @param \Apps\Core\Packages\System\Api\Base\Types\BaseType $request Request object containing the request information.
      *
      * @return \GuzzleHttp\Promise\PromiseInterface A promise that will be resolved with an object created from the JSON response.
      */
@@ -131,7 +131,7 @@ class BaseRESTService
         $httpHandler = $this->getConfig('httpHandler');
         $httpOptions = $this->getConfig('httpOptions');
 
-        $apiId = $this->getConfig('api_id');
+        $apiId = $this->getConfig('id');
 
         $httpOptions['on_stats'] = function (TransferStats $stats) use ($name, $apiId) {
             $errorCode = null;
@@ -140,9 +140,9 @@ class BaseRESTService
                 $errorCode = $stats->getHandlerErrorData();
             }
 
-            $api = new \Apps\Dash\Packages\System\Api\Api;
+            $api = (new \System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Api)->init();
 
-            $api->updateApiCallStats($name, $apiId, $stats->getHandlerStats(), $errorCode);
+            $api->apiStats->updateApiCallStats($name, $apiId, $stats->getHandlerStats(), $errorCode);
         };
 
         if ($debug !== false) {
@@ -157,7 +157,7 @@ class BaseRESTService
                     strpos($res->getHeaders()['Content-Type'][0], 'application/json') !== false
                 ) {
                     $json = $res->getBody()->getContents();
-                    // var_dump(json_decode($json, true));
+
                     if ($debug !== false) {
                         $this->debugResponse($json);
                     }

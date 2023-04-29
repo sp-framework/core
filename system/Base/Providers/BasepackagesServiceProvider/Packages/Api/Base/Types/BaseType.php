@@ -1,9 +1,7 @@
 <?php
-
 /**
  * Base class for all API objects.
  */
-
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Types;
 
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\BaseFunctions;
@@ -267,8 +265,8 @@ class BaseType
      * @param string $class The name of the class the properties belong to.
      * @param array $values. Associative array of property names and their values.
      *
-     * @throws \Apps\Dash\Packages\System\Api\Apis\Ebay\Exceptions\UnknownPropertyException If the property does not exist.
-     * @throws \Apps\Dash\Packages\System\Api\Apis\Ebay\Exceptions\InvalidPropertyTypeException If the value is the wrong type for the property.
+     * @throws \Apps\Core\Packages\System\Api\Apis\Ebay\Exceptions\UnknownPropertyException If the property does not exist.
+     * @throws \Apps\Core\Packages\System\Api\Apis\Ebay\Exceptions\InvalidPropertyTypeException If the value is the wrong type for the property.
      */
     protected function setValues($class, array $values = [])
     {
@@ -289,7 +287,7 @@ class BaseType
      * @param string $name The property name.
      *
      * @return mixed The property value.
-     * @throws \Apps\Dash\Packages\System\Api\Apis\Ebay\Exceptions\UnknownPropertyException If the property does not exist.
+     * @throws \Apps\Core\Packages\System\Api\Apis\Ebay\Exceptions\UnknownPropertyException If the property does not exist.
      */
     private function get($class, $name)
     {
@@ -305,8 +303,8 @@ class BaseType
      * @param string $name The property name.
      * @param mixed $value. The value to assign to the property.
      *
-     * @throws \Apps\Dash\Packages\System\Api\Apis\Ebay\Exceptions\UnknownPropertyException If the property does not exist.
-     * @throws \Apps\Dash\Packages\System\Api\Apis\Ebay\Exceptions\InvalidPropertyTypeException If the value is the wrong type for the property.
+     * @throws \Apps\Core\Packages\System\Api\Apis\Ebay\Exceptions\UnknownPropertyException If the property does not exist.
+     * @throws \Apps\Core\Packages\System\Api\Apis\Ebay\Exceptions\InvalidPropertyTypeException If the value is the wrong type for the property.
      */
     private function set($class, $name, $value)
     {
@@ -323,7 +321,7 @@ class BaseType
      * @param string $name The property name.
      *
      * @return bool Returns if the property has been set.
-     * @throws \Apps\Dash\Packages\System\Api\Apis\Ebay\Exceptions\UnknownPropertyException If the property does not exist.
+     * @throws \Apps\Core\Packages\System\Api\Apis\Ebay\Exceptions\UnknownPropertyException If the property does not exist.
      */
     private function isPropertySet($class, $name)
     {
@@ -338,7 +336,7 @@ class BaseType
      * @param string $class The name of the class the properties belong to.
      * @param string $name The property name.
      *
-     * @throws \Apps\Dash\Packages\System\Api\Apis\Ebay\Exceptions\UnknownPropertyException If the property does not exist.
+     * @throws \Apps\Core\Packages\System\Api\Apis\Ebay\Exceptions\UnknownPropertyException If the property does not exist.
      */
     private function unSetProperty($class, $name)
     {
@@ -373,7 +371,7 @@ class BaseType
      * @param string $name The property name.
      * @param mixed $value. The value to assign to the property.
      *
-     * @throws \Apps\Dash\Packages\System\Api\Apis\Ebay\Exceptions\InvalidPropertyTypeException If trying to assign a non array type to an repeatable property.
+     * @throws \Apps\Core\Packages\System\Api\Apis\Ebay\Exceptions\InvalidPropertyTypeException If trying to assign a non array type to an repeatable property.
      */
     private function setValue($class, $name, $value)
     {
@@ -384,7 +382,7 @@ class BaseType
         } else {
             $actualType = self::getActualType($value);
             if ('array' !== $actualType) {
-                throw new InvalidPropertyTypeException($name, 'Apps\Dash\Packages\System\Api\Apis\Ebay\Types\RepeatableType', $actualType);
+                throw new InvalidPropertyTypeException($name, '\System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Types\RepeatableType', $actualType);
             } else {
                 $this->values[$name] = new RepeatableType(get_class($this), $name, $info['type']);
 
@@ -461,7 +459,7 @@ class BaseType
      * @param string $class The name of the class that we are checking for.
      * @param string $name The property name.
      *
-     * @throws \Apps\Dash\Packages\System\Api\Apis\Ebay\Exceptions\UnknownPropertyException If the property does not exist.
+     * @throws \Apps\Core\Packages\System\Api\Apis\Ebay\Exceptions\UnknownPropertyException If the property does not exist.
      */
     private static function ensurePropertyExists($class, $name)
     {
@@ -477,7 +475,7 @@ class BaseType
      * @param mixed $name The property name.
      * @param mixed $value The value to check the type of.
      *
-     * @throws \Apps\Dash\Packages\System\Api\Apis\Ebay\Exceptions\InvalidPropertyTypeException If the value is the wrong type for the property.
+     * @throws \Apps\Core\Packages\System\Api\Apis\Ebay\Exceptions\InvalidPropertyTypeException If the value is the wrong type for the property.
      */
     private static function ensurePropertyType($class, $name, $value)
     {
@@ -574,7 +572,7 @@ class BaseType
      */
     private static function propertyToXml($name, $value)
     {
-        if (is_subclass_of($value, '\Apps\Dash\Packages\System\Api\Apis\Ebay\Types\BaseType', false)) {
+        if (is_subclass_of($value, '\System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Types\BaseType', false)) {
             return $value->toXml($name);
         } else {
             return sprintf('<%s>%s</%s>', $name, self::encodeValueXml($value), $name);
@@ -608,7 +606,7 @@ class BaseType
      */
     private static function propertyToArrayValue($value)
     {
-        if (is_subclass_of($value, '\Apps\Dash\Packages\System\Api\Base\Types\BaseType', false)) {
+        if (is_subclass_of($value, '\System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Types\BaseType', false)) {
             return $value->toArray();
         } elseif ($value instanceof \DateTime) {
             return $value->format('Y-m-d\TH:i:s.000\Z');

@@ -1,0 +1,51 @@
+{
+    "route"         : "devtools/test",
+    "name"          : "Test",
+    "description"   : "Test anything in this component.",
+    "app_type"      : "core",
+    "category"      : "system",
+    "sub_category"  : "devtools",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-system-devtools-test",
+    "class"         : "Apps\\Core\\Components\\Devtools\\Test\\TestComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Test",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-system-devtools-test"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 99,
+        "devtools"          : {
+            "title"     : "devtools",
+            "icon"      : "code",
+            "childs"    : {
+                "test"        : {
+                    "title"     : "test",
+                    "link"      : "devtools/test"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

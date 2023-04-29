@@ -6,7 +6,7 @@ use Phalcon\Helper\Json;
 
 class Role
 {
-    public function registerAdminRole($db)
+    public function registerCoreRole($db)
     {
         $insertAdminRole = $db->insertAsDict(
             'basepackages_users_roles',

@@ -38,7 +38,7 @@ class XmlParser
      *
      * @param string $xml The xml string to parse.
      *
-     * @return mixed A PHP object derived from Apps\Dash\Packages\System\Api\Base\Types\BaseType
+     * @return mixed A PHP object derived from Apps\Core\Packages\System\Api\Base\Types\BaseType
      */
     public function parse($xml)
     {

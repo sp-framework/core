@@ -2,41 +2,43 @@
 
 namespace System\Base\Installer\Packages;
 
-use Apps\Dash\Packages\Devtools\Api\Contracts\Install\Schema\DevtoolsApiContracts;
-use Apps\Dash\Packages\Devtools\Api\Contracts\Model\AppsDashDevtoolsApiContracts;
-use Apps\Dash\Packages\Devtools\Api\Enums\Install\Schema\DevtoolsApiEnums;
-use Apps\Dash\Packages\Devtools\Api\Enums\Model\AppsDashDevtoolsApiEnums;
+use Apps\Core\Packages\Devtools\Api\Contracts\Install\Schema\DevtoolsApiContracts;
+use Apps\Core\Packages\Devtools\Api\Contracts\Model\AppsDashDevtoolsApiContracts;
+use Apps\Core\Packages\Devtools\Api\Enums\Install\Schema\DevtoolsApiEnums;
+use Apps\Core\Packages\Devtools\Api\Enums\Model\AppsDashDevtoolsApiEnums;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
 use League\Flysystem\UnableToDeleteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Dashboard as RegisterAdminDashboard;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Api\Apis\Repos as RegisterRepos;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Dashboard as RegisterCoreDashboard;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Filter as RegisterFilter;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Geo\Countries as RegisterCountries;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Geo\Timezones as RegisterTimezones;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Menu as RegisterMenu;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Storages\Storages as RegisterStorages;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Account as RegisterRootAdminAccount;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Profile as RegisterRootAdminProfile;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Account as RegisterRootCoreAccount;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Profile as RegisterRootCoreProfile;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Role as RegisterRole;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Widgets as RegisterAdminWidgets;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Widgets as RegisterCoreWidgets;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Schedules as RegisterSchedules;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Tasks as RegisterTasks;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Workers as RegisterWorkers;
 use System\Base\Installer\Packages\Setup\Register\Modules\Component as RegisterComponent;
 use System\Base\Installer\Packages\Setup\Register\Modules\Middleware as RegisterMiddleware;
 use System\Base\Installer\Packages\Setup\Register\Modules\Package as RegisterPackage;
-use System\Base\Installer\Packages\Setup\Register\Modules\Repository as RegisterRepository;
 use System\Base\Installer\Packages\Setup\Register\Modules\View as RegisterView;
-use System\Base\Installer\Packages\Setup\Register\Providers\App as RegisterApp;
+use System\Base\Installer\Packages\Setup\Register\Providers\App as RegisterCoreApp;
+use System\Base\Installer\Packages\Setup\Register\Providers\App\Type as RegisterCoreAppType;
 use System\Base\Installer\Packages\Setup\Register\Providers\Core as RegisterCore;
 use System\Base\Installer\Packages\Setup\Register\Providers\Domain as RegisterDomain;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ActivityLogs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\AddressBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Api\Api;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Api\ApiCalls;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Api\Apis\Repos;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards\Widgets as DashboardsWidgets;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailQueue;
@@ -72,10 +74,10 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Workers;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Components;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Middlewares;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Packages;
-use System\Base\Installer\Packages\Setup\Schema\Modules\Repositories;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\IpFilter;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\Types;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Cache;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Core;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Domains;
@@ -285,6 +287,7 @@ class Setup
 
 		$this->db->createTable('service_provider_core', $dbName, (new Core)->columns());
 		$this->db->createTable('service_provider_apps', $dbName, (new Apps)->columns());
+		$this->db->createTable('service_provider_apps_types', $dbName, (new Types)->columns());
 		$this->db->createTable('service_provider_apps_ip_filter', $dbName, (new IpFilter)->columns());
 		$this->db->createTable('service_provider_domains', $dbName, (new Domains)->columns());
 		$this->db->createTable('service_provider_logs', $dbName, (new Logs)->columns());
@@ -294,7 +297,6 @@ class Setup
 		$this->db->createTable('modules_packages', $dbName, (new Packages)->columns());
 		$this->db->createTable('modules_middlewares', $dbName, (new Middlewares)->columns());
 		$this->db->createTable('modules_views', $dbName, (new Views)->columns());
-		$this->db->createTable('modules_repositories', $dbName, (new Repositories)->columns());
 
 		$this->db->createTable('basepackages_email_services', $dbName, (new EmailServices)->columns());
 		$this->db->createTable('basepackages_email_queue', $dbName, (new EmailQueue)->columns());
@@ -332,21 +334,22 @@ class Setup
 		$this->db->createTable('basepackages_dashboards', $dbName, (new Dashboards)->columns());
 		$this->db->createTable('basepackages_dashboards_widgets', $dbName, (new DashboardsWidgets)->columns());
 		$this->db->createTable('basepackages_widgets', $dbName, (new Widgets)->columns());
-		$this->db->createTable('basepackages_api_calls', $dbName, (new ApiCalls)->columns());
-		$this->db->createTable('basepackages_api', $dbName, (new Api)->columns());
 		$this->db->createTable('basepackages_messenger', $dbName, (new Messenger)->columns());
+		$this->db->createTable('basepackages_api', $dbName, (new Api)->columns());
+		$this->db->createTable('basepackages_api_calls', $dbName, (new ApiCalls)->columns());
+		$this->db->createTable('basepackages_api_apis_repos', $dbName, (new Repos)->columns());
 
 		if ($this->postData['dev'] == 'true') {
-			$this->db->createTable('apps_dash_devtools_api_contracts', $dbName, (new DevtoolsApiContracts)->columns());
-			$this->db->createTable('apps_dash_devtools_api_enums', $dbName, (new DevtoolsApiEnums)->columns());
+			$this->db->createTable('apps_core_devtools_api_contracts', $dbName, (new DevtoolsApiContracts)->columns());
+			$this->db->createTable('apps_core_devtools_api_enums', $dbName, (new DevtoolsApiEnums)->columns());
 		}
 
 		return true;
 	}
 
-	protected function registerRepository()
+	protected function registerRepos()
 	{
-		(new RegisterRepository())->register($this->db);
+		(new RegisterRepos())->register($this->db);
 
 		return true;
 	}
@@ -372,21 +375,21 @@ class Setup
 		return true;
 	}
 
-	protected function registerApp()
+	protected function registerCoreAppType()
 	{
-		return $this->registerAdminApp();
+		return (new RegisterCoreAppType())->register($this->db);
 	}
 
-	protected function registerAdminApp()
+	protected function registerCoreApp()
 	{
-		return (new RegisterApp())->register($this->db);
+		return (new RegisterCoreApp())->register($this->db);
 	}
 
 	protected function registerModule($type)
 	{
 		if ($type === 'components') {
 
-			$adminComponents = $this->basepackages->utils->init($this->container)->scanDir('apps/Dash/Components/', true);
+			$adminComponents = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Components/', true);
 
 			if (!$adminComponents || count($adminComponents) === 0) {
 				return false;
@@ -411,25 +414,25 @@ class Setup
 					}
 
 					if ($jsonFile['menu'] && $jsonFile['menu'] !== 'false') {
-						$menuId = $this->registerAdminMenu($jsonFile['app_type'], $jsonFile['menu']);
+						$menuId = $this->registerCoreMenu($jsonFile['app_type'], $jsonFile['menu']);
 					} else {
 						$menuId = null;
 					}
 
-					$registeredComponentId = $this->registerAdminComponent($jsonFile, $menuId);
+					$registeredComponentId = $this->registerCoreComponent($jsonFile, $menuId);
 
 					if ($jsonFile['route'] === 'dashboards') {
-						$this->registerAdminDashboard($jsonFile);
+						$this->registerCoreDashboard($jsonFile);
 					}
 
 					if (isset($jsonFile['widgets']) && count($jsonFile['widgets']) > 0) {
-						$this->registerAdminWidgets($jsonFile, $registeredComponentId, $adminComponent);
+						$this->registerCoreWidgets($jsonFile, $registeredComponentId, $adminComponent);
 					}
 				}
 			}
 		} else if ($type === 'packages') {
 
-			$adminPackages = $this->basepackages->utils->init($this->container)->scanDir('apps/Dash/Packages/', true);
+			$adminPackages = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Packages/', true);
 
 			$adminPackages =
 				array_merge_recursive(
@@ -464,11 +467,11 @@ class Setup
 						$this->registerStorages($jsonFile);
 					}
 
-					$this->registerAdminPackage($jsonFile);
+					$this->registerCorePackage($jsonFile);
 				}
 			}
 		} else if ($type === 'middlewares') {
-			$adminMiddlewares = $this->basepackages->utils->init($this->container)->scanDir('apps/Dash/Middlewares/', true);
+			$adminMiddlewares = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Middlewares/', true);
 
 			foreach ($adminMiddlewares['files'] as $adminMiddlewareKey => $adminMiddleware) {
 				if (strpos($adminMiddleware, 'middleware.json')) {
@@ -488,13 +491,13 @@ class Setup
 						continue;
 					}
 
-					$this->registerAdminMiddleware($jsonFile);
+					$this->registerCoreMiddleware($jsonFile);
 				}
 			}
 		} else if ($type === 'views') {
 			$jsonFile =
 				json_decode(
-					$this->localContent->read('apps/Dash/Views/Default/view.json'),
+					$this->localContent->read('apps/Core/Views/Default/view.json'),
 					true
 				);
 
@@ -508,56 +511,56 @@ class Setup
 				return;
 			}
 
-			$this->registerAdminView($jsonFile);
+			$this->registerCoreView($jsonFile);
 		}
 
 		return true;
 	}
 
-	protected function registerAdminComponent(array $componentFile, $menuId)
+	protected function registerCoreComponent(array $componentFile, $menuId)
 	{
-		$installedFiles = $this->basepackages->utils->init($this->container)->scanDir('apps/Dash/Components/' . $componentFile['name'], true);
+		$installedFiles = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Components/' . $componentFile['name'], true);
 
 		return (new RegisterComponent())->register($this->db, $componentFile, $installedFiles, $menuId);
 	}
 
-	protected function registerAdminDashboard(array $componentFile)
+	protected function registerCoreDashboard(array $componentFile)
 	{
-		return (new RegisterAdminDashboard())->register($this->db, $componentFile);
+		return (new RegisterCoreDashboard())->register($this->db, $componentFile);
 	}
 
-	protected function registerAdminWidgets(array $componentFile, $registeredComponentId, $path)
+	protected function registerCoreWidgets(array $componentFile, $registeredComponentId, $path)
 	{
-		return (new RegisterAdminWidgets())->register($this->db, $componentFile, $registeredComponentId, $path, $this->localContent);
+		return (new RegisterCoreWidgets())->register($this->db, $componentFile, $registeredComponentId, $path, $this->localContent);
 	}
 
-	protected function updateAdminAppComponents()
+	protected function updateCoreAppComponents()
 	{
-		return (new RegisterApp())->update($this->db);
+		return (new RegisterCoreApp())->update($this->db);
 	}
 
-	protected function registerAdminMenu($appType, array $menu)
+	protected function registerCoreMenu($appType, array $menu)
 	{
 		return (new RegisterMenu())->register($this->db, $appType, $menu);
 	}
 
-	protected function registerAdminPackage(array $packageFile)
+	protected function registerCorePackage(array $packageFile)
 	{
-		$installedFiles = $this->basepackages->utils->init($this->container)->scanDir('apps/Dash/Packages/' . $packageFile['name'], true);
+		$installedFiles = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Packages/' . $packageFile['name'], true);
 
 		return (new RegisterPackage())->register($this->db, $packageFile, $installedFiles);
 	}
 
-	protected function registerAdminMiddleware(array $middlewareFile)
+	protected function registerCoreMiddleware(array $middlewareFile)
 	{
-		$installedFiles = $this->basepackages->utils->init($this->container)->scanDir('apps/Dash/Middlewares/' . $middlewareFile['name'], true);
+		$installedFiles = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Middlewares/' . $middlewareFile['name'], true);
 
 		return (new RegisterMiddleware())->register($this->db, $middlewareFile, $installedFiles);
 	}
 
-	protected function registerAdminView(array $viewFile)
+	protected function registerCoreView(array $viewFile)
 	{
-		$appInstalledFiles = $this->basepackages->utils->init($this->container)->scanDir('apps/Dash/Views/', true, ['Html_compiled', 'linter-backup']);
+		$appInstalledFiles = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Views/', true, ['Html_compiled', 'linter-backup']);
 		$publicInstalledFiles = $this->basepackages->utils->init($this->container)->scanDir('public/dash/', true, ['linter-backup']);
 
 		$installedFiles = array_merge($appInstalledFiles, $publicInstalledFiles);
@@ -584,9 +587,9 @@ class Setup
 		}
 	}
 
-	protected function registerRootAdminRole()
+	protected function registerCoreRole()
 	{
-		return (new RegisterRole())->registerAdminRole($this->db);
+		return (new RegisterRole())->registerCoreRole($this->db);
 	}
 
 	protected function registerRegisteredUserAndGuestRoles()
@@ -594,16 +597,16 @@ class Setup
 		return (new RegisterRole())->registerRegisteredUserAndGuestRoles($this->db);
 	}
 
-	protected function registerAdminAccount($adminRoleId, $workFactor = 12)
+	protected function registerCoreAccount($adminRoleId, $workFactor = 12)
 	{
 		$password = $this->container['security']->hash($this->postData['pass'], $workFactor);
 
-		return (new RegisterRootAdminAccount())->register($this->db, $this->postData['email'], $password, $adminRoleId);
+		return (new RegisterRootCoreAccount())->register($this->db, $this->postData['email'], $password, $adminRoleId);
 	}
 
-	protected function registerAdminProfile($adminAccountId)
+	protected function registerCoreProfile($adminAccountId)
 	{
-		return (new RegisterRootAdminProfile())->register($this->db, $adminAccountId);
+		return (new RegisterRootCoreProfile())->register($this->db, $adminAccountId);
 	}
 
 	protected function registerExcludeAutoGeneratedFilters()

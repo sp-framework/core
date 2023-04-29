@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\AccessServiceProvider;
 
-use Apps\Dash\Packages\System\Tools\Qrcodes\Qrcodes;
+use Apps\Core\Packages\System\Tools\Qrcodes\Qrcodes;
 use OTPHP\TOTP;
 use ParagonIE\ConstantTime\Base32;
 use Phalcon\Helper\Json;

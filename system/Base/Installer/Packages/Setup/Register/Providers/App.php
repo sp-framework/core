@@ -12,10 +12,10 @@ class App
 		$insertApp = $db->insertAsDict(
 			'service_provider_apps',
 			[
-				'name' 						=> 'Admin',
-				'route' 					=> 'admin',
-				'description' 				=> 'Admin App',
-				'app_type'       			=> 'dash',
+				'name' 						=> 'Core',
+				'route' 					=> 'core',
+				'description' 				=> 'Core App',
+				'app_type'       			=> 'core',
 				'default_component'			=> 0,
 				'errors_component'			=> 0,
 				'can_login_role_ids'		=> Json::encode(['1']),

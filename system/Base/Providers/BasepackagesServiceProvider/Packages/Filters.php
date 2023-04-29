@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Apps\Dash\Packages\Hrms\Employees\Employees;
+use Apps\Core\Packages\Hrms\Employees\Employees;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
@@ -62,10 +62,10 @@ class Filters extends BasePackage
     {
         $component = $this->modules->components->getComponentById($componentId);
 
-        $employeesPackage = $this->init()->checkPackage('Apps\Dash\Packages\Hrms\Employees\Employees');
+        $employeesPackage = $this->init()->checkPackage('Apps\Core\Packages\Hrms\Employees\Employees');
 
         if ($employeesPackage) {
-            $employeesPackage = new \Apps\Dash\Packages\Hrms\Employees\Employees;
+            $employeesPackage = new \Apps\Core\Packages\Hrms\Employees\Employees;
         }
 
         if ($account && isset($account['id'])) {

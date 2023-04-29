@@ -1706,7 +1706,7 @@ abstract class BasePackage extends Controller
 			if (isset($data['entity_id'])) {
 				$packageName = Arr::last($this->getClassName());
 
-				$entitiesPackage = new \Apps\Dash\Packages\Business\Entities\Entities;
+				$entitiesPackage = new \Apps\Core\Packages\Business\Entities\Entities;
 
 				$entities = $entitiesPackage->getAll()->entities;
 

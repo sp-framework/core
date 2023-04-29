@@ -1,0 +1,14 @@
+{
+    "route": "system/users/accounts",
+    "name": "User Accounts",
+    "description": "List accounts via this component",
+    "app_type": "core",
+    "category": "system",
+    "sub_category": "admin",
+    "version": "0.0.1",
+    "repo": "https://.../dash-component-system-admin-accounts",
+    "class": "Apps\\Core\\Components\\System\\Users\\Accounts\\AccountsComponent",
+    "dependencies": {"core":{"name":"Core","version":"0.0.1","repo":"https://.../"},"components":[],"packages":[],"middlewares":[{"name":"Auth","version":"0.0.1","repo":"https://.../dash-middleware-system-tools-auth"},{"name":"Acl","version":"0.0.1","repo":"https://.../dash-middleware-system-tools-acl"}],"views":[{"name":"Default","version":"0.0.1","repo":"https://.../"}]},
+    "menu": {"seq":6,"system":{"icon":"cogs","title":"system","childs":{"users":{"title":"users","icon":"users","childs":{"accounts":{"title":"Accounts","link":"system/users/accounts"}}}}}},
+    "settings": {"mandatory":{"admin":true},"export":true,"import":true,"importexportPackage":"Accounts","importMethod":"Account"}
+}

@@ -2,7 +2,7 @@
     "name"          : "Filters",
     "display_name"  : "Filters",
     "description"   : "Basepackage Filters",
-    "app_type"      : "dash",
+    "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",
     "version"       : "0.0.1",

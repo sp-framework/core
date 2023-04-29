@@ -1,0 +1,373 @@
+{% set locationDisabled = false %}
+{% if api['id'] is defined %}
+    {% set apiId = api['id'] %}
+    {% set apiCategoryId = api['api_category_id'] %}
+    {% set apiName = api['name'] %}
+    {% set apiProvider = api['provider']|lower %}
+    {% set apiInUse = api['in_use'] %}
+    {% set apiUsedBy = api['used_by'] %}
+    {% set apiSetup = api['setup'] %}
+    {% set apiLocation = api['location'] %}
+    {% set apiDescription = api['description'] %}
+    {% set apiRepoUrl = api['repo_url'] %}
+    {% set apiSiteUrl = api['site_url'] %}
+    {% set apiBranch = api['branch'] %}
+    {% set apiAuthType = api['auth_type'] %}
+    {% set apiUsername = api['username'] %}
+    {% set apiPassword = api['password'] %}
+    {% set apiToken = api['token'] %}
+    {% set apiAuthorization = api['authorization'] %}
+    {% set locationDisabled = true %}
+{% else %}
+    {% set apiId = '' %}
+    {% set apiCategoryId = '' %}
+    {% set apiName = '' %}
+    {% set apiProvider = api['provider']|lower %}
+    {% set apiInUse = '' %}
+    {% set apiUsedBy = '' %}
+    {% set apiSetup = '4' %}
+    {% set apiLocation = '' %}
+    {% set apiDescription = '' %}
+    {% set apiRepoUrl = '' %}
+    {% set apiSiteUrl = '' %}
+    {% set apiBranch = '' %}
+    {% set apiAuthType = 'none' %}
+    {% set apiUsername = '' %}
+    {% set apiPassword = '' %}
+    {% set apiToken = '' %}
+    {% set apiAuthorization = '' %}
+{% endif %}
+{% if apiAuthType === 'auth' %}
+    {% set authDisabled = false %}
+    {% set authoDisabled = true %}
+    {% set tokenDisabled = true %}
+{% elseif apiAuthType === 'token' %}
+    {% set authDisabled = true %}
+    {% set authoDisabled = true %}
+    {% set tokenDisabled = false %}
+{% elseif apiAuthType === 'autho' %}
+    {% set authDisabled = true %}
+    {% set authoDisabled = false %}
+    {% set tokenDisabled = true %}
+{% else %}
+    {% set authDisabled = true %}
+    {% set authoDisabled = true %}
+    {% set tokenDisabled = true %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        {% include 'api/apis/common.html' %}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'repo_url',
+                        'fieldLabel'                     : 'API Repo Url',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'API Repo URL',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldValue'                     : apiRepoUrl
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'branch',
+                        'fieldLabel'                     : 'API Repo Branch',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'API Repo Branch',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldValue'                     : apiBranch
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'site_url',
+                        'fieldLabel'                     : 'API Site Url',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'API Site URL',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldValue'                     : apiSiteUrl
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-4">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'auth_type',
+                        'fieldLabel'                     : 'Auth/Token/Authorization?',
+                        'fieldType'                      : 'radio',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select either basic user authentication is used or user token/authorization is used.',
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true,
+                        'fieldRadioButtons'              :
+                            [
+                                'none' :
+                                    [
+                                        'title'                           : 'None',
+                                        'type'                            : 'secondary',
+                                        'dataValue'                       : 'none'
+                                    ],
+                                'auth' :
+                                    [
+                                        'title'                           : 'Auth',
+                                        'type'                            : 'primary',
+                                        'dataValue'                       : 'auth'
+                                    ],
+                                'token' :
+                                    [
+                                        'title'                           : 'Token',
+                                        'type'                            : 'primary',
+                                        'dataValue'                       : 'token'
+                                    ],
+                                'autho' :
+                                    [
+                                        'title'                           : 'Authorization',
+                                        'type'                            : 'primary',
+                                        'dataValue'                       : 'autho'
+                                    ]
+                            ],
+                        'fieldRadioChecked'              : apiAuthType
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'username',
+                                'fieldLabel'                     : 'Username',
+                                'fieldType'                      : 'input',
+                                'fieldRequired'                  : true,
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Username',
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldBazScan'                   : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 50,
+                                'fieldDisabled'                  : authDisabled,
+                                'fieldValue'                     : apiUsername
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'password',
+                                'fieldLabel'                            : 'Password',
+                                'fieldType'                             : 'input',
+                                'fieldInputType'                        : 'password',
+                                'fieldHelp'                             : true,
+                                'fieldInputPasswordToggleVisibility'    : true,
+                                'fieldHelpTooltipContent'               : 'Password',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDisabled'                         : authDisabled,
+                                'fieldValue'                            : apiPassword
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'token',
+                                'fieldLabel'                            : 'Token',
+                                'fieldType'                             : 'input',
+                                'fieldInputType'                        : 'password',
+                                'fieldInputPasswordToggleVisibility'    : true,
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Token',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDisabled'                         : tokenDisabled,
+                                'fieldValue'                            : apiToken
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'authorization',
+                                'fieldLabel'                            : 'Authorization Code',
+                                'fieldType'                             : 'input',
+                                'fieldInputType'                        : 'password',
+                                'fieldHelp'                             : true,
+                                'fieldInputPasswordToggleVisibility'    : true,
+                                'fieldHelpTooltipContent'               : 'Authorization Code',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDisabled'                         : authoDisabled,
+                                'fieldValue'                            : apiAuthorization
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                  : { },
+        '{{componentId}}-{{sectionId}}-api_category_id'                     : { },
+        '{{componentId}}-{{sectionId}}-setup'                               : { },
+        '{{componentId}}-{{sectionId}}-provider'                            : { },
+        '{{componentId}}-{{sectionId}}-name'                                : { },
+        '{{componentId}}-{{sectionId}}-category'                            : {
+            placeholder : 'SELECT API CATEGORY'
+        },
+        '{{componentId}}-{{sectionId}}-location'                            : {
+            placeholder : 'SELECT API LOCATION'
+        },
+        '{{componentId}}-{{sectionId}}-in_use'                              : { },
+        '{{componentId}}-{{sectionId}}-used_by'                             : { },
+        '{{componentId}}-{{sectionId}}-description'                         : { },
+        '{{componentId}}-{{sectionId}}-repo_url'                            : { },
+        '{{componentId}}-{{sectionId}}-branch'                              : { },
+        '{{componentId}}-{{sectionId}}-site_url'                            : { },
+        '{{componentId}}-{{sectionId}}-auth_type'                           : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-auth_type').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'none') {
+                        $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password, #{{componentId}}-{{sectionId}}-token, #{{componentId}}-{{sectionId}}-authorization').attr('disabled', true);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'auth') {
+                        $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-token, #{{componentId}}-{{sectionId}}-authorization').attr('disabled', true);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'token') {
+                        $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password, #{{componentId}}-{{sectionId}}-authorization').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-token').attr('disabled', false);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'autho') {
+                        $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password, #{{componentId}}-{{sectionId}}-token').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-authorization').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-username'                            : { },
+        '{{componentId}}-{{sectionId}}-password'                            : { },
+        '{{componentId}}-{{sectionId}}-token'                               : { },
+        '{{componentId}}-{{sectionId}}-authorization'                       : { },
+        '{{componentId}}-{{sectionId}}-form'                                : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                        : 'required',
+                '{{componentId}}-{{sectionId}}-category'                    : 'required',
+                '{{componentId}}-{{sectionId}}-location'                    : 'required',
+                '{{componentId}}-{{sectionId}}-repo_url'                    : 'required',
+                '{{componentId}}-{{sectionId}}-site_url'                    : 'required',
+                '{{componentId}}-{{sectionId}}-username'                    : 'required',
+                '{{componentId}}-{{sectionId}}-password'                    : 'required',
+                '{{componentId}}-{{sectionId}}-token'                       : 'required',
+                '{{componentId}}-{{sectionId}}-authorization'               : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                        : 'Please enter api name',
+                '{{componentId}}-{{sectionId}}-category'                    : 'Please enter api category',
+                '{{componentId}}-{{sectionId}}-location'                    : 'Please enter api location',
+                '{{componentId}}-{{sectionId}}-repo_url'                    : 'Please enter repo url',
+                '{{componentId}}-{{sectionId}}-site_url'                    : 'Please enter site url',
+                '{{componentId}}-{{sectionId}}-username'                    : 'Please enter username',
+                '{{componentId}}-{{sectionId}}-password'                    : 'Please enter password',
+                '{{componentId}}-{{sectionId}}-token'                       : 'Please enter api token',
+                '{{componentId}}-{{sectionId}}-authorization'               : 'Please enter api authorization code'
+            }
+        }
+    });
+</script>

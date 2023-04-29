@@ -2,10 +2,13 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base;
 
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\BaseDebugger;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\HttpHandler;
 
 class BaseFunctions
 {
+    public static $STRICT_PROPERTY_TYPES = true;
+
     /**
      * Returns a description of the type for the passed value.
      *
@@ -91,6 +94,10 @@ class BaseFunctions
      */
     public static function checkPropertyType($type)
     {
+        if (self::$STRICT_PROPERTY_TYPES) {
+            return true;
+        }
+
         switch ($type) {
             case 'integer':
             case 'int':
@@ -102,6 +109,21 @@ class BaseFunctions
                 return false;
             default:
                 return true;
+        }
+    }
+
+    /**
+     * Applies the default debugger if required.
+     *
+     * @param mixed $value XeroDebugger options.
+     * @param array &$configuration The configuration array where the resolved debugger will be stored.
+     */
+    public static function applyDebug($value, array &$configuration)
+    {
+        if ($value !== false) {
+            $configuration['debug'] = new BaseDebugger($value === true ? [] : $value);
+        } else {
+            $configuration['debug'] = false;
         }
     }
 }

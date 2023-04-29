@@ -6,6 +6,8 @@ class BaseDebugger
 {
     private $config;
 
+    private $credentialsStrings = [];
+
     public function __construct(array $config)
     {
         $this->config = $config + [
@@ -16,7 +18,7 @@ class BaseDebugger
             'scrub_strings' => []
         ];
 
-        $this->config['scrub_strings'] += self::$credentialsStrings;
+        $this->config['scrub_strings'] += $this->credentialsStrings;
     }
 
     /**
@@ -29,6 +31,7 @@ class BaseDebugger
                 $info = preg_replace($pattern, $replacement, $info);
             }
         }
+
         $this->config['logfn']($info);
     }
 }

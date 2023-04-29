@@ -1,0 +1,61 @@
+{
+    "route"         : "system/tools/importexport",
+    "name"          : "Import/Export",
+    "description"   : "Import/Export data via this component",
+    "app_type"      : "core",
+    "category"      : "system",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-system-admin-tools-importexport",
+    "class"         : "Apps\\Core\\Components\\System\\Tools\\Importexport\\ImportexportComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "ImportExport",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-system-admin-tools-importexport"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 6,
+        "system"      : {
+            "icon"      : "cogs",
+            "title"     : "system",
+            "childs"    : {
+                "tools" : {
+                    "title"     : "Tools",
+                    "icon"      : "wrench",
+                    "childs"    : {
+                        "importexport" : {
+                            "title"     : "Import/Export",
+                            "icon"      : "exchange-alt",
+                            "link"      : "system/tools/importexport"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+        "mandatory"     : {
+            "admin"     : true
+        }
+    }
+}

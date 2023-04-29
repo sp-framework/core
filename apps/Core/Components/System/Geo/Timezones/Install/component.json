@@ -1,0 +1,426 @@
+{
+    "route"         : "system/geo/timezones",
+    "name"          : "Geo Timezones",
+    "description"   : "Manage geo timezones via this component",
+    "app_type"      : "core",
+    "category"      : "system",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-system-admin-geo-timezones",
+    "class"         : "Apps\\Core\\Components\\System\\Geo\\Timezones\\TimezonesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 6,
+        "system"      : {
+            "icon"      : "cogs",
+            "title"     : "system",
+            "childs"    : {
+                "geolocations" : {
+                    "title"     : "Geo Locations",
+                    "icon"      : "globe",
+                    "childs"    : {
+                        "timezones" : {
+                            "title"     : "Time Zones",
+                            "link"      : "system/geo/timezones"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+        "mandatory"     : {
+            "admin"     : true
+        }
+    },
+    "widgets"       :
+    [
+        {
+            "name"          : "World Clock",
+            "method"        : "worldClock",
+            "multiple"      : true,
+            "max_multiple"  : 5,
+            "settings"      : {
+                "clocks"    : {
+                    "gmt"       : {
+                        "id"    : "gmt",
+                        "name"  : "GMT",
+                        "offset": 0,
+                        "region": "Greenwich"
+                    },
+                    "vancouver"     : {
+                        "id"    : "vancouver",
+                        "name"  : "Vancouver",
+                        "offset": -8,
+                        "region": "NAmerica"
+                    },
+                    "sanfrancisco"      : {
+                        "id"    : "sanfrancisco",
+                        "name"  : "San Francisco",
+                        "offset": -8,
+                        "region": "NAmerica"
+                    },
+                    "seattle"       : {
+                        "id"    : "seattle",
+                        "name"  : "Seattle",
+                        "offset": -8,
+                        "region": "NAmerica"
+                    },
+                    "losangeles"        : {
+                        "id"    : "losangeles",
+                        "name"  : "Los Angeles",
+                        "offset": -8,
+                        "region": "NAmerica"
+                    },
+                    "denver"        : {
+                        "id"    : "denver",
+                        "name"  : "Denver",
+                        "offset": -7,
+                        "region": "NAmerica"
+                    },
+                    "mexicocity"        : {
+                        "id"    : "mexicocity",
+                        "name"  : "Mexico City",
+                        "offset": -6,
+                        "region": "NAmerica"
+                    },
+                    "houston"       : {
+                        "id"    : "houston",
+                        "name"  : "Houston",
+                        "offset": -6,
+                        "region": "NAmerica"
+                    },
+                    "minneapolis"       : {
+                        "id"    : "minneapolis",
+                        "name"  : "Minneapolis",
+                        "offset": -6,
+                        "region": "NAmerica"
+                    },
+                    "neworleans"        : {
+                        "id"    : "neworleans",
+                        "name"  : "New Orleans",
+                        "offset": -6,
+                        "region": "NAmerica"
+                    },
+                    "chicago"       : {
+                        "id"    : "chicago",
+                        "name"  : "Chicago",
+                        "offset": -6,
+                        "region": "NAmerica"
+                    },
+                    "montgomery"        : {
+                        "id"    : "montgomery",
+                        "name"  : "Montgomery",
+                        "offset": -6,
+                        "region": "NAmerica"
+                    },
+                    "indianapolis"      : {
+                        "id"    : "indianapolis",
+                        "name"  : "Indianapolis",
+                        "offset": -5,
+                        "region": "NAmerica"
+                    },
+                    "atlanta"       : {
+                        "id"    : "atlanta",
+                        "name"  : "Atlanta",
+                        "offset": -5,
+                        "region": "NAmerica"
+                    },
+                    "detroit"       : {
+                        "id"    : "detroit",
+                        "name"  : "Detroit",
+                        "offset": -5,
+                        "region": "NAmerica"
+                    },
+                    "miami"     : {
+                        "id"    : "miami",
+                        "name"  : "Miami",
+                        "offset": -5,
+                        "region": "NAmerica"
+                    },
+                    "washingtondc"      : {
+                        "id"    : "washingtondc",
+                        "name"  : "Washington DC",
+                        "offset": -5,
+                        "region": "NAmerica"
+                    },
+                    "philadelphia"      : {
+                        "id"    : "philadelphia",
+                        "name"  : "Philadelphia",
+                        "offset": -5,
+                        "region": "NAmerica"
+                    },
+                    "newyork"       : {
+                        "id"    : "newyork",
+                        "name"  : "NewYork",
+                        "offset": -5,
+                        "region": "NAmerica"
+                    },
+                    "montreal"      : {
+                        "id"    : "montreal",
+                        "name"  : "Montreal",
+                        "offset": -5,
+                        "region": "NAmerica"
+                    },
+                    "boston"        : {
+                        "id"    : "boston",
+                        "name"  : "Boston",
+                        "offset": -5,
+                        "region": "NAmerica"
+                    },
+                    "buenosaires"       : {
+                        "id"    : "buenosaires",
+                        "name"  : "Buenos Aires",
+                        "offset": -3,
+                        "region": "BuenosAires"
+                    },
+                    "saopaulo"      : {
+                        "id"    : "saopaulo",
+                        "name"  : "Sao Paulo",
+                        "offset": -3,
+                        "region": "SAmerica"
+                    },
+                    "riodejaneiro"      : {
+                        "id"    : "riodejaneiro",
+                        "name"  : "Rio DeJaneiro",
+                        "offset": -3,
+                        "region": "SAmerica"
+                    },
+                    "lisbon"        : {
+                        "id"    : "lisbon",
+                        "name"  : "Lisbon",
+                        "offset": 0,
+                        "region": "Europe"
+                    },
+                    "dublin"        : {
+                        "id"    : "dublin",
+                        "name"  : "Dublin",
+                        "offset": 0,
+                        "region": "Europe"
+                    },
+                    "london"        : {
+                        "id"    : "london",
+                        "name"  : "London",
+                        "offset": 0,
+                        "region": "Europe"
+                    },
+                    "madrid"        : {
+                        "id"    : "madrid",
+                        "name"  : "Madrid",
+                        "offset": 1,
+                        "region": "Europe"
+                    },
+                    "barcelona"     : {
+                        "id"    : "barcelona",
+                        "name"  : "Barcelona",
+                        "offset": 1,
+                        "region": "Europe"
+                    },
+                    "paris"     : {
+                        "id"    : "paris",
+                        "name"  : "Paris",
+                        "offset": 1,
+                        "region": "Europe"
+                    },
+                    "brussels"      : {
+                        "id"    : "brussels",
+                        "name"  : "Brussels",
+                        "offset": 1,
+                        "region": "Europe"
+                    },
+                    "amsterdam"     : {
+                        "id"    : "amsterdam",
+                        "name"  : "Amsterdam",
+                        "offset": 1,
+                        "region": "Europe"
+                    },
+                    "frankfurt"     : {
+                        "id"    : "frankfurt",
+                        "name"  : "Frankfurt",
+                        "offset": 1,
+                        "region": "Europe"
+                    },
+                    "rome"      : {
+                        "id"    : "rome",
+                        "name"  : "Rome",
+                        "offset": 1,
+                        "region": "Europe"
+                    },
+                    "berlin"        : {
+                        "id"    : "berlin",
+                        "name"  : "Berlin",
+                        "offset": 1,
+                        "region": "Europe"
+                    },
+                    "prague"        : {
+                        "id"    : "prague",
+                        "name"  : "Prague",
+                        "offset": 1,
+                        "region": "Europe"
+                    },
+                    "vienna"        : {
+                        "id"    : "vienna",
+                        "name"  : "Vienna",
+                        "offset": 1,
+                        "region": "Europe"
+                    },
+                    "stockholm"     : {
+                        "id"    : "stockholm",
+                        "name"  : "Stockholm",
+                        "offset": 1,
+                        "region": "Europe"
+                    },
+                    "athens"        : {
+                        "id"    : "athens",
+                        "name"  : "Athens",
+                        "offset": 2,
+                        "region": "Europe"
+                    },
+                    "helsinki"      : {
+                        "id"    : "helsinki",
+                        "name"  : "Helsinki",
+                        "offset": 2,
+                        "region": "Europe"
+                    },
+                    "minsk"     : {
+                        "id"    : "minsk",
+                        "name"  : "Minsk",
+                        "offset": 2,
+                        "region": "Europe"
+                    },
+                    "istanbul"      : {
+                        "id"    : "istanbul",
+                        "name"  : "Istanbul",
+                        "offset": 2,
+                        "region": "Europe"
+                    },
+                    "cairo"     : {
+                        "id"    : "cairo",
+                        "name"  : "Cairo",
+                        "offset": 2,
+                        "region": "Cairo"
+                    },
+                    "jerusalem"     : {
+                        "id"    : "jerusalem",
+                        "name"  : "Jerusalem",
+                        "offset": 2,
+                        "region": "Israel"
+                    },
+                    "beirut"        : {
+                        "id"    : "beirut",
+                        "name"  : "Beirut",
+                        "offset": 2,
+                        "region": "Beirut"
+                    },
+                    "moscow"        : {
+                        "id"    : "moscow",
+                        "name"  : "Moscow",
+                        "offset": 3,
+                        "region": "Europe"
+                    },
+                    "baghdad"       : {
+                        "id"    : "baghdad",
+                        "name"  : "Baghdad",
+                        "offset": 3,
+                        "region": "Baghdad"
+                    },
+                    "dubai"     : {
+                        "id"    : "dubai",
+                        "name"  : "Dubai",
+                        "offset": 4,
+                        "region": "Dubai"
+                    },
+                    "bangkok"       : {
+                        "id"    : "bangkok",
+                        "name"  : "Bangkok",
+                        "offset": 7,
+                        "region": "Bangkok"
+                    },
+                    "jakarta"       : {
+                        "id"    : "jakarta",
+                        "name"  : "Jakarta",
+                        "offset": 7,
+                        "region": "Jakarta"
+                    },
+                    "hongkong"      : {
+                        "id"    : "hongkong",
+                        "name"  : "HongKong",
+                        "offset": 8,
+                        "region": "HongKong"
+                    },
+                    "beijing"       : {
+                        "id"    : "beijing",
+                        "name"  : "Beijing",
+                        "offset": 8,
+                        "region": "Beijing"
+                    },
+                    "shanghai"      : {
+                        "id"    : "shanghai",
+                        "name"  : "Shanghai",
+                        "offset": 8,
+                        "region": "Shanghai"
+                    },
+                    "seoul"     : {
+                        "id"    : "seoul",
+                        "name"  : "Seoul",
+                        "offset": 9,
+                        "region": "Seoul"
+                    },
+                    "tokyo"     : {
+                        "id"    : "tokyo",
+                        "name"  : "Tokyo",
+                        "offset": 9,
+                        "region": "Tokyo"
+                    },
+                    "melbourne"     : {
+                        "id"    : "melbourne",
+                        "name"  : "Melbourne",
+                        "offset": 10,
+                        "region": "Australia"
+                    },
+                    "sydney"        : {
+                        "id"    : "sydney",
+                        "name"  : "Sydney",
+                        "offset": 10,
+                        "region": "Australia"
+                    },
+                    "brisbane"      : {
+                        "id"    : "brisbane",
+                        "name"  : "Brisbane",
+                        "offset": 10,
+                        "region": "Brisbane"
+                    },
+                    "vladivostok"       : {
+                        "id"    : "vladivostok",
+                        "name"  : "Vladivostok",
+                        "offset": 10,
+                        "region": "Europe"
+                    },
+                    "kamchatka"     : {
+                        "id"    : "kamchatka",
+                        "name"  : "Kamchatka",
+                        "offset": 12,
+                        "region": "Europe"
+                    }
+                }
+            }
+        }
+    ]
+}

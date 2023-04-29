@@ -1,11 +1,9 @@
 <?php
-
 /**
  * Base class for objects that correspond to token types in the XML.
  *
  * @property string $value
  */
-
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Types;
 
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Types\BaseType;

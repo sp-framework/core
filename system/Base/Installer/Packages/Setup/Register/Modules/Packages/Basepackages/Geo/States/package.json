@@ -2,7 +2,7 @@
     "name"          : "GeoStates",
     "display_name"  : "Geo States",
     "description"   : "Basepackage Geo States",
-    "app_type"      : "dash",
+    "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",
     "version"       : "0.0.1",

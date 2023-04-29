@@ -5,13 +5,12 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Api;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\ApiStats;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Api\BasepackagesApi;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Api\BasepackagesApiCalls;
 
 class Api extends BasePackage
 {
-    protected $statsDirectory = 'var/api/callStats/';
-
     protected $modelToUse = BasepackagesApi::class;
 
     protected $packageName = 'api';
@@ -22,6 +21,10 @@ class Api extends BasePackage
 
     public $apiCategories = null;
 
+    public $apiLocations = null;
+
+    public $apiStats;
+
     public function init()
     {
         $this->modelToUse = BasepackagesApi::class;
@@ -29,8 +32,14 @@ class Api extends BasePackage
         $this->packageName = 'api';
 
         if (!$this->apiCategories) {
-            $this->registerApisCategories();
+            $this->registerApiCategories();
         }
+
+        if (!$this->apiLocations) {
+            $this->registerApiLocations();
+        }
+
+        $this->apiStats = new ApiStats;
 
         return $this;
     }
@@ -38,7 +47,7 @@ class Api extends BasePackage
     public function getApiById(int $id, bool $resetCache = false, bool $enableCache = true)
     {
         if ($id) {
-            $this->init();
+            $this->switchApiModel();
 
             $api = $this->getById($id, false, false);
 
@@ -48,7 +57,7 @@ class Api extends BasePackage
 
             $this->switchApiModel($api);
 
-            $apiData = $this->getById($api['api_id'], false, false);
+            $apiData = $this->getById($api['api_category_id'], false, false);
 
             if (!$apiData) {
                 return false;
@@ -66,7 +75,7 @@ class Api extends BasePackage
         throw new \Exception('getById needs id parameter to be set.');
     }
 
-    protected function registerApisCategories()
+    protected function registerApiCategories()
     {
         try {
             $this->apiCategories = [];
@@ -90,6 +99,23 @@ class Api extends BasePackage
         }
     }
 
+    protected function registerApiLocations()
+    {
+        $this->apiLocations =
+            [
+                'system'    =>
+                    [
+                        'id'    => 'system',
+                        'name'  => 'System'
+                    ],
+                'apps'    =>
+                    [
+                        'id'    => 'apps',
+                        'name'  => 'Apps'
+                    ]
+            ];
+    }
+
     protected function registerApis($categories)
     {
         foreach ($categories as $item) {
@@ -99,7 +125,11 @@ class Api extends BasePackage
                 $folderName = Arr::last($path);
 
                 if (!isset($this->apiCategories[$folderName])) {
-                    $this->apiCategories[strtolower($folderName)] = [];
+                    $this->apiCategories[strtolower($folderName)] =
+                        [
+                            'id'    => strtolower($folderName),
+                            'name'  => $folderName
+                        ];
                 }
 
                 $category = $this->localContent->listContents($item->path());
@@ -110,8 +140,12 @@ class Api extends BasePackage
 
                         $subCategoryFolderName = Arr::last($path);
 
-                        if (!isset($this->apiCategories[strtolower($folderName)][$subCategoryFolderName])) {
-                            array_push($this->apiCategories[strtolower($folderName)], strtolower($subCategoryFolderName));
+                        if (!isset($this->apiCategories[strtolower($folderName)]['childs'][$subCategoryFolderName])) {
+                            $this->apiCategories[strtolower($folderName)]['childs'][strtolower($subCategoryFolderName)] =
+                                [
+                                    'id'    => strtolower($subCategoryFolderName),
+                                    'name'  => $subCategoryFolderName
+                                ];
                         }
                     }
                 }
@@ -119,19 +153,25 @@ class Api extends BasePackage
         }
     }
 
-    protected function switchApiModel($api)
+    protected function switchApiModel($api = null)
     {
-        if ($api['type'] === 'system') {
-            $modelClass = 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Api\\Apis\\' . ucfirst($api['category']) . '\\' . ucfirst($api['provider_name']) . '\\';
+        if ($api) {
+            if ($api['location'] === 'system') {
+                $modelClass = 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Model\\Api\\Apis\\' . ucfirst($api['category']) . '\\';
 
-            $this->modelToUse = $modelClass . 'Model\\BasepackagesApi' . ucfirst($api['api_type']);
-        } else if ($api['type'] === 'apps') {
-            $modelClass = 'Apps\\Dash\\Packages\\System\\Api\\Apis\\' . ucfirst($api['category']) . '\\' . ucfirst($api['provider_name']) . '\\';
+                $this->modelToUse = $modelClass . 'BasepackagesApiApis' . ucfirst($api['category']) . ucfirst($api['provider']);
+            } else if ($api['location'] === 'apps') {
+                $modelClass = 'Apps\\Core\\Packages\\System\\Api\\Apis\\' . ucfirst($api['category']) . '\\' . ucfirst($api['provider']) . '\\';
 
-            $this->modelToUse = $modelClass . 'Model\\SystemApi' . ucfirst($api['api_type']);
+                $this->modelToUse = $modelClass . 'Model\\SystemApiApis' . ucfirst($api['category']) . ucfirst($api['provider']);
+            }
+
+            $this->packageName = 'apiApis' . ucfirst($api['category']) . ucfirst($api['provider']);
+        } else {
+            $this->modelToUse = $modelToUse = BasepackagesApi::class;
+
+            $this->packageName = 'api';
         }
-
-        $this->packageName = 'api' . ucfirst($api['provider_name']);
     }
 
     /**
@@ -139,57 +179,26 @@ class Api extends BasePackage
      */
     public function addApi(array $data)
     {
-        $data['api_type'] = strtolower($data['api_type']);
-
-        $data['setup'] = 1;
+        $data['provider'] = strtolower($data['provider']);
 
         $this->switchApiModel($data);
 
-        $api = $this->initApi($data);
-
-        $data = $api->add($data);
-
-        if ($apiData['api_type'] === 'ebay' ||
-            $apiData['api_type'] === 'xero'
-        ) {
-            if (isset($api['user_credentials_scopes']) && $api['user_credentials_scopes'] !== '') {
-                $scopes = explode(',', $api['user_credentials_scopes']);
-                if (count($scopes) > 0) {
-                    foreach ($scopes as &$scope) {
-                        $scope = trim($scope);
-                    }
-
-                    if ($api['api_type'] === 'ebay') {
-                        $api['user_credentials_scopes'] = implode(',', $scopes);
-                    } else if ($api['api_type'] === 'xero') {
-                        $api['user_credentials_scopes'] = implode(' ', $scopes);
-                    }
-                } else {
-                    $api['user_credentials_scopes'] = '';
-                }
-            } else {
-                $api['user_credentials_scopes'] = '';
-            }
-        }
-
         if ($this->add($data)) {
-            $data['api_id'] = $this->packagesData->last['id'];
+            $data['api_category_id'] = $this->packagesData->last['id'];
 
-            $this->init();
+            $apiId = $this->packagesData->last['id'];
+
+            $this->switchApiModel();
 
             if ($this->add($data)) {
 
-                $this->initApiCallStats($data);
+                $data['id'] = $apiId;
 
-                $this->packagesData->responseCode = 0;
+                $this->apiStats->initApiCallStats($data);
 
-                $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' API';
-
-                return true;
+                $this->addResponse('Added ' . $data['name'] . ' API');
             } else {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'Error adding new API.';
+                $this->addResponse('Error adding new API.', 1);
             }
         }
     }
@@ -199,7 +208,9 @@ class Api extends BasePackage
      */
     public function updateApi(array $data)
     {
-        $data['api_type'] = strtolower($data['api_type']);
+        $data['provider'] = strtolower($data['provider']);
+
+        $this->switchApiModel($data);
 
         $api = $this->getById($data['id'], false, false);
 
@@ -207,48 +218,19 @@ class Api extends BasePackage
 
         if ($this->update($api)) {
 
-            $this->initApiCallStats($api);
+            $this->apiStats->initApiCallStats($api);
 
-            $api = $this->switchApiModel($api);
+            $this->switchApiModel();
 
-            $api['id'] = $api['api_id'];
-
-            if ($api['api_type'] === 'ebay' ||
-                $api['api_type'] === 'xero'
-            ) {
-                if (!isset($api['credentials'])) { // Data is coming from EbayAPI, no need to update scopes.
-                    if (isset($api['user_credentials_scopes']) && $api['user_credentials_scopes'] !== '') {
-                        $scopes = explode(',', $api['user_credentials_scopes']);
-                        if (count($scopes) > 0) {
-                            foreach ($scopes as &$scope) {
-                                $scope = trim($scope);
-                            }
-                            if ($api['api_type'] === 'ebay') {
-                                $api['user_credentials_scopes'] = implode(',', $scopes);
-                            } else if ($api['api_type'] === 'xero') {
-                                $api['user_credentials_scopes'] = implode(' ', $scopes);
-                            }
-                        } else {
-                            $api['user_credentials_scopes'] = '';
-                        }
-                    } else {
-                        $api['user_credentials_scopes'] = '';
-                    }
-                }
-            }
+            $api['id'] = $api['api_category_id'];
 
             if ($this->update($api)) {
-                $this->packagesData->responseCode = 0;
-
-                $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' API';
-
-                return true;
+                $this->addResponse('Updated ' . $data['name'] . ' API');
+            } else {
+                $this->addResponse('Error updating API.', 1);
             }
-
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating API.';
+            $this->addResponse('Error updating API.', 1);
         }
     }
 
@@ -260,34 +242,26 @@ class Api extends BasePackage
         $api = $this->getById($data['id'], false, false);
 
         if ($api['in_use'] == '1') {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'API in use, error removing API.';
+            $this->addResponse('API in use, error removing API.', 1);
 
             return;
         }
 
         $this->switchApiModel($api);
 
-        if ($this->remove($api['api_id'])) {
+        if ($this->remove($api['api_category_id'])) {
 
-            $this->removeApiCallStats($api);
+            $this->apiStats->removeApiCallStats($api);
 
-            $this->init();
+            $this->switchApiModel();
 
             if ($this->remove($data['id'])) {
-                $this->packagesData->responseCode = 0;
-
-                $this->packagesData->responseMessage = 'Removed API';
+                $this->addResponse('Removed API');
             } else {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'Error removing API.';
+                $this->addResponse('Error removing API.', 1);
             }
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error removing API.';
+            $this->addResponse('Error removing API.', 1);
         }
     }
 
@@ -317,50 +291,52 @@ class Api extends BasePackage
         $this->addToNotification('error', $messageTitle, $messageDetails, 'api', $id);
     }
 
-    public function useApi(array $data)
+    public function useApi($data)//or ID (integer/string)
     {
         $this->apiConfig = null;
 
-        if (isset($data['state'])) {
-            if (strpos($data['_url'], 'ebay')) {
-                $this->switchApiModel(['api_type' => 'ebay']);
-            } else if (strpos($data['_url'], 'xero')) {
-                $this->switchApiModel(['api_type' => 'xero']);
-            }
+        if (is_array($data)) {
+            if (isset($data['state'])) {
+                if (strpos($data['_url'], 'ebay')) {
+                    $this->switchApiModel(['provider' => 'ebay']);
+                } else if (strpos($data['_url'], 'xero')) {
+                    $this->switchApiModel(['provider' => 'xero']);
+                }
 
-            $api = $this->getByParams(
-                [
-                    'conditions'    => 'identifier = :identifier:',
-                    'bind'          =>
-                        [
-                            'identifier'    => $data['state']
-                        ]
-                ], false, false
-            );
-
-            if ($api && count($api) === 1) {
-                $apiId = $api[0]['id'];
-
-                $this->init();
-
-                $apiApi = $this->getByParams(
+                $api = $this->getByParams(
                     [
-                        'conditions'    => 'api_id = :id:',
+                        'conditions'    => 'identifier = :identifier:',
                         'bind'          =>
                             [
-                                'id'    => $apiId
+                                'identifier'    => $data['state']
                             ]
                     ], false, false
                 );
 
-                if (count($apiApi) === 1) {
-                    $this->apiConfig = $this->getApiById($apiApi[0]['id']);
+                if ($api && count($api) === 1) {
+                    $apiId = $api[0]['id'];
+
+                    $this->switchApiModel();
+
+                    $apiApi = $this->getByParams(
+                        [
+                            'conditions'    => 'id = :id:',
+                            'bind'          =>
+                                [
+                                    'id'    => $apiId
+                                ]
+                        ], false, false
+                    );
+
+                    if (count($apiApi) === 1) {
+                        $this->apiConfig = $this->getApiById($apiApi[0]['id']);
+                    }
                 }
+            } else if (isset($data['config'])) {
+                $this->apiConfig = $data['config'];
             }
-        } else if (isset($data['api_id'])) {
-            $this->apiConfig = $this->getApiById($data['api_id']);
-        } else if (isset($data['config'])) {
-            $this->apiConfig = $data['config'];
+        } else if (is_int($data) || is_string($data)) {
+            $this->apiConfig = $this->getApiById((int) $data);
         }
 
         if ($this->apiConfig) {
@@ -381,9 +357,7 @@ class Api extends BasePackage
             }
         }
 
-        $this->packagesData->responseCode = 1;
-
-        $this->packagesData->responseMessage = 'API Id/Config missing...';
+        $this->addResponse('API Id/Config missing...', 1);
 
         return false;
     }
@@ -395,37 +369,32 @@ class Api extends BasePackage
         }
 
         try {
-            $apiClass = $this->getApiClass($config['api_type']);
+            $apiClass = $this->getApiClass($config['category'], $config['provider']);
 
-            return (new $apiClass($config, $this))->init();
+            return (new $apiClass())->init($config, $this);
+        } catch (\throwable $e) {
+            try {
+                $apiClass = $this->getApiClass($config['category'], $config['provider'], false);
 
-        } catch (\Exception $e) {
-            throw $e;
-        }
-    }
-
-    public function getApiClass($api, $basepackages = true)
-    {
-        $path = explode('/', $api);
-
-        $apiClass = '';
-
-        if (count($path) > 1) {
-            foreach ($path as $value) {
-                $apiClass .= '\\' . ucfirst($value);
+                return (new $apiClass())->init($config, $this);
+            } catch (\throwable $e) {
+                return false;
             }
-        } else {
-            $apiClass .= '\\' . ucfirst($api);
-        }
 
-        if ($basepackages) {
-            return 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Api\\Apis' . $apiClass;
+            return false;
         }
-
-        return 'Apps\\Dash\\Packages\\System\\Api\\Apis' . $apiClass;
     }
 
-    public function getApiByType($type, $inuse = null)
+    public function getApiClass($category, $provider, $basepackages = true)
+    {
+        if ($basepackages) {
+            return 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Api\\Apis\\' . ucfirst($category) . '\\' . ucfirst($provider) . '\\' . ucfirst($provider);
+        }
+
+        return 'Apps\\Core\\Packages\\System\\Api\\Apis' . ucfirst($category) . '\\' . ucfirst($provider) . '\\' . ucfirst($provider);
+    }
+
+    public function getApiByProvider($provider, $inuse = null)
     {
         $this->getAll();
 
@@ -437,9 +406,9 @@ class Api extends BasePackage
             }
             $filter =
                 $this->model->filter(
-                    function($api) use ($type, $inUse) {
+                    function($api) use ($provider, $inUse) {
                         $api = $api->toArray();
-                        if ($api['api_type'] === strtolower($type) &&
+                        if ($api['provider'] === strtolower($provider) &&
                             $api['in_use'] == $inUse
                         ) {
                             return $api;
@@ -449,9 +418,9 @@ class Api extends BasePackage
         } else {
             $filter =
                 $this->model->filter(
-                    function($api) use ($type) {
+                    function($api) use ($provider) {
                         $api = $api->toArray();
-                        if ($api['api_type'] == $type) {
+                        if ($api['provider'] == $provider) {
                             return $api;
                         }
                     }
@@ -459,108 +428,5 @@ class Api extends BasePackage
         }
 
         return $filter;
-    }
-
-    protected function initApiCallStats(array $data)
-    {
-        if ($this->localContent->fileExists($this->statsDirectory . $data['api_type'] . '.json')) {
-            $callStats =
-                Json::decode($this->localContent->read($this->statsDirectory . $data['api_type'] . '.json'), true);
-        }
-
-        if (!isset($callStats[$data['api_id']])) {
-            $callStats[$data['api_id']] = [];
-        }
-
-        $this->localContent->write($this->statsDirectory . $data['api_type'] . '.json', Json::encode($callStats));
-    }
-
-    protected function removeApiCallStats(array $data)
-    {
-        $callStats = [];
-
-        if ($this->localContent->fileExists($this->statsDirectory . $data['api_type'] . '.json')) {
-            $callStats =
-                Json::decode($this->localContent->read($this->statsDirectory . $data['api_type'] . '.json'), true);
-        }
-
-        if (isset($callStats[$data['api_id']])) {
-            unset($callStats[$data['api_id']]);
-        }
-
-        $this->localContent->write($this->statsDirectory . $data['api_type'] . '.json', Json::encode($callStats));
-    }
-
-    public function getApiCallStats(array $data)
-    {
-        if ($this->localContent->fileExists($this->statsDirectory . $data['api_type'] . '.json')) {
-            $callStats =
-                Json::decode($this->localContent->read($this->statsDirectory . $data['api_type'] . '.json'), true);
-        }
-
-        if (isset($callStats[$data['api_id']])) {
-            return $callStats[$data['api_id']];
-        }
-
-        return [];
-    }
-
-    public function setApiCallStats($data, array $callData)
-    {
-        if ($this->localContent->fileExists($this->statsDirectory . $data['api_type'] . '.json')) {
-            $callStats =
-                Json::decode($this->localContent->read($this->statsDirectory . $data['api_type'] . '.json'), true);
-        }
-
-        $callStats[$data['api_id']]['timestamp'] = new \DateTime('now');
-
-        $callStats[$data['api_id']]['rateLimits'] = $callData['rateLimits'];
-
-        $this->localContent->write($this->statsDirectory . $data['api_type'] . '.json', Json::encode($callStats));
-    }
-
-    public function updateApiCallStats($callMethod, $apiId, $callStats)
-    {
-        $this->modelToUse = BasepackagesApiCalls::class;
-
-        $data['call_method'] = $callMethod;
-        $data['api_id'] = $apiId;
-        $data['call_exec_time'] = $callStats['total_time'];
-        $data['call_response_code'] = $callStats['http_code'];
-        $data['api_id'] = $apiId;
-        $data['call_stats'] = Json::encode($callStats);
-
-        $this->add($data);
-    }
-
-    public function getApiCallMethodStat($callMethod, $apiId)
-    {
-        $api = new BasepackagesApiCalls;
-
-        $methodEntry = $api::findFirst(
-            [
-                'conditions' => 'call_method = :cm: AND api_id = :aid: AND call_response_code = :crc:',
-                'bind'       =>
-                    [
-                        'cm'    => $callMethod,
-                        'aid'   => $apiId,
-                        'crc'   => 200
-                    ],
-                'order'     => 'id desc'
-            ]
-        );
-
-        if ($methodEntry) {
-
-            $methodEntry = $methodEntry->toArray();
-
-            if ($this->apiConfig['api_type'] === 'xero') {
-                return \Carbon\Carbon::parse($methodEntry['called_at'])->setTimezone('UTC')->toDateTimeString();
-            }
-
-            return $methodEntry['called_at'];
-        }
-
-        return false;
     }
 }

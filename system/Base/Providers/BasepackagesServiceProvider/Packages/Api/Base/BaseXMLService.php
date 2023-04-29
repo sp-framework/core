@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Base;
+namespace Apps\Core\Packages\System\Api\Base;
 
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;

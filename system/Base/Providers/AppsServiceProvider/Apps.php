@@ -4,7 +4,7 @@ namespace System\Base\Providers\AppsServiceProvider;
 
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\AppsServiceProvider\Apps\Types;
+use System\Base\Providers\AppsServiceProvider\Types;
 use System\Base\Providers\AppsServiceProvider\Exceptions\AppNotFoundException;
 use System\Base\Providers\AppsServiceProvider\IpFilter;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderApps;
@@ -29,7 +29,7 @@ class Apps extends BasePackage
 
 	public function init(bool $resetCache = false)
 	{
-		$this->types = $this->getAppTypes();
+		$this->types = (new Types)->init($resetCache)->types;
 
 		$this->reservedRoutes = $this->getReservedRoutes();
 
@@ -317,7 +317,7 @@ class Apps extends BasePackage
 	{
 		return
 			[
-				'admin', 'dash', 'ecom', 'pos', 'cms', 'api', 'pusher', 'messenger'
+				'core', 'dash', 'api', 'pusher', 'messenger'
 			];
 	}
 

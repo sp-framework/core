@@ -2,7 +2,7 @@
     "name"          : "AddressBook",
     "display_name"  : "Address Book",
     "description"   : "Basepackage Address Book",
-    "app_type"      : "dash",
+    "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",
     "version"       : "0.0.1",

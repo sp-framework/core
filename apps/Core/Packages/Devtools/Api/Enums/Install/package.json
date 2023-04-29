@@ -1,0 +1,12 @@
+{
+    "name"          : "Enums",
+    "display_name"   : "Enums",
+    "description"   : "Package for Enums component",
+    "version"       : "0.0.1",
+    "app_type"      : "core",
+    "category"      : "system",
+    "sub_category"  : "devtools",
+    "repo"          : "https://.../dash-package-system-devtools-api-enums",
+    "class"         : "Apps\\Core\\Packages\\Devtools\\Api\\Enums\\Enums",
+    "settings"      : { }
+}

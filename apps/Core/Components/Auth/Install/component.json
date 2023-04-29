@@ -1,0 +1,41 @@
+{
+    "route"         : "auth",
+    "name"          : "Auth",
+    "description"   : "Manage dash auth via this component",
+    "app_type"      : "core",
+    "category"      : "system",
+    "sub_category"  : "tools",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../",
+    "class"         : "Apps\\Core\\Components\\Auth\\AuthComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   :
+        [
+            {
+                "name"      : "Auth",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../"
+            }
+        ],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../"
+            }
+        ]
+    },
+    "menu"              : false,
+    "settings"          : {
+        "mandatory"     : true,
+        "needAuth"      : "disabled"
+    }
+}

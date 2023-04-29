@@ -1,11 +1,9 @@
 <?php
-
 /**
  * Base class for objects that correspond to double types in the XML.
  *
  * @property double $value
  */
-
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Types;
 
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Types\BaseType;

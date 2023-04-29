@@ -356,7 +356,7 @@ Class Setup
 
 				$this->setupPackage->buildSchema();
 
-				$this->setupPackage->registerRepository();
+				$this->setupPackage->registerRepos();
 
 				$this->setupPackage->registerDomain();
 
@@ -364,13 +364,15 @@ Class Setup
 
 				$this->setupPackage->registerCore($baseConfig);
 
-				$adminAppId = $this->setupPackage->registerApp();
+				$this->setupPackage->registerCoreAppType();
 
-				if ($adminAppId) {
+				$coreAppId = $this->setupPackage->registerCoreApp();
+
+				if ($coreAppId) {
 
 					$this->setupPackage->registerModule('components');
 
-					$this->setupPackage->updateAdminAppComponents();
+					$this->setupPackage->updateCoreAppComponents();
 
 					$this->setupPackage->registerModule('packages');
 
@@ -378,17 +380,17 @@ Class Setup
 
 					$this->setupPackage->registerModule('views');
 
-					$adminRoleId = $this->setupPackage->registerRootAdminRole();
+					$coreRoleId = $this->setupPackage->registerCoreRole();
 
-					if ($adminRoleId) {
-						$adminAccountId =
-						$this->setupPackage->registerAdminAccount(
-							$adminRoleId, $baseConfig['settings']['security']['passwordWorkFactor']
+					if ($coreRoleId) {
+						$coreAccountId =
+						$this->setupPackage->registerCoreAccount(
+							$coreRoleId, $baseConfig['settings']['security']['passwordWorkFactor']
 						);
 					}
 
-					if ($adminAccountId) {
-						$this->setupPackage->registerAdminProfile($adminAccountId);
+					if ($coreAccountId) {
+						$this->setupPackage->registerCoreProfile($coreAccountId);
 					}
 
 					$this->setupPackage->registerRegisteredUserAndGuestRoles();
@@ -571,8 +573,8 @@ Class Setup
 					'text'		=> 'Building database schema...'
 				],
 				[
-					'method'	=> 'registerRepository',
-					'text'		=> 'Registering repository...'
+					'method'	=> 'registerRepos',
+					'text'		=> 'Registering repositories...'
 				],
 				[
 					'method'	=> 'registerDomain',
@@ -587,16 +589,20 @@ Class Setup
 					'text'		=> 'Registering core...'
 				],
 				[
-					'method'	=> 'registerApp',
-					'text'		=> 'Registering apps...'
+					'method'	=> 'registerCoreAppType',
+					'text'		=> 'Registering core app type...'
+				],
+				[
+					'method'	=> 'registerCoreApp',
+					'text'		=> 'Registering core app...'
 				],
 				[
 					'method'	=> 'registerModule',
 					'text'		=> 'Registering components modules...'
 				],
 				[
-					'method'	=> 'updateAdminAppComponents',
-					'text'		=> 'Updating admin app components...'
+					'method'	=> 'updateCoreAppComponents',
+					'text'		=> 'Updating core app components...'
 				],
 				[
 					'method'	=> 'registerModule',
@@ -611,16 +617,16 @@ Class Setup
 					'text'		=> 'Registering views modules...'
 				],
 				[
-					'method'	=> 'registerRootAdminRole',
-					'text'		=> 'Registering admin role...'
+					'method'	=> 'registerCoreRole',
+					'text'		=> 'Registering core role...'
 				],
 				[
-					'method'	=> 'registerAdminAccount',
-					'text'		=> 'Registering admin account...'
+					'method'	=> 'registerCoreAccount',
+					'text'		=> 'Registering core account...'
 				],
 				[
-					'method'	=> 'registerAdminProfile',
-					'text'		=> 'Registering admin profile...'
+					'method'	=> 'registerCoreProfile',
+					'text'		=> 'Registering core profile...'
 				],
 				[
 					'method'	=> 'registerRegisteredUserAndGuestRoles',

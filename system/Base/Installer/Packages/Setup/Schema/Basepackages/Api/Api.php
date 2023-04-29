@@ -14,16 +14,16 @@ class Api
                 new Column(
                     'id',
                     [
-                        'type'          => Column::TYPE_TINYINTEGER,
+                        'type'          => Column::TYPE_SMALLINTEGER,
                         'notNull'       => true,
                         'autoIncrement' => true,
                         'primary'       => true,
                     ]
                 ),
                 new Column(
-                    'api_id',
+                    'api_category_id',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
+                        'type'    => Column::TYPE_SMALLINTEGER,
                         'notNull' => true,
                     ]
                 ),
@@ -44,15 +44,7 @@ class Api
                     ]
                 ),
                 new Column(
-                    'provider_name',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 50,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'type',
+                    'provider',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 50,
@@ -78,6 +70,14 @@ class Api
                     'setup',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => true
+                    ]
+                ),
+                new Column(
+                    'location',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
                         'notNull' => true
                     ]
                 ),

@@ -1,0 +1,42 @@
+{
+	"route"			: "modules",
+	"name"			: "Modules",
+	"description"	: "Manage core modules via this component",
+	"app_type"      : "core",
+	"category"      : "system",
+	"sub_category"  : "admin",
+	"version"		: "0.0.1",
+	"repo"			: "https://.../",
+	"class"         : "Apps\\Core\\Components\\Modules\\ModulesComponent",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://.../"
+		},
+		"components"	: [],
+		"packages"		: [],
+		"middlewares"	: [],
+		"views"         :
+		[
+			{
+				"name"      : "Default",
+				"version"   : "0.0.1",
+				"repo"      : "https://.../"
+			}
+		]
+	},
+	"menu"				: {
+		"seq"			: 3,
+		"modules"		: {
+			"title"		: "modules",
+			"icon"		: "th",
+			"link"		: "modules"
+		}
+	},
+	"settings"          : {
+		"mandatory"     : {
+			"admin"     : true
+		}
+	}
+}
