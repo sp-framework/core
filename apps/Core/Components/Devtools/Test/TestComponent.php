@@ -55,11 +55,11 @@ class TestComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $responseArr = $this->basepackages->api->useApi(1)->useMethod('UserApi', 'userListRepos', ['sp-core']);
-        foreach ($responseArr as $key => $response) {
-            var_dump(Json::decode($response->__toString(), true));
-        }
-        die();
+        $api = $this->basepackages->api->useApi(1);
+
+        $responseArr = $api->useMethod('UserApi', 'userListRepos', [$api->getApiConfig()['org_user']])->getResponse(true);
+        var_dump($responseArr);die();
+
         // try {
         //     $response = $gitea->userListRepos();
         // } catch (\throwable $e) {

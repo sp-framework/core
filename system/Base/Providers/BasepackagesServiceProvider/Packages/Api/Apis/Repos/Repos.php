@@ -3,6 +3,7 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\Repos;
 
 use GuzzleHttp\TransferStats;
+use Phalcon\Helper\Json;
 use Phalcon\Helper\Str;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Configuration;
@@ -18,6 +19,8 @@ class Repos extends BasePackage
     protected $api;
 
     protected $serviceClass;
+
+    protected $response;
 
     protected $httpOptions = [
         'debug'           => false,
@@ -100,9 +103,52 @@ class Repos extends BasePackage
 
             $collectionClass = new $class($this->remoteWebContent, $this->config);
 
-            return call_user_func_array([$collectionClass, $method], $methodArgs);
+            $this->response = call_user_func_array([$collectionClass, $method], $methodArgs);
+
+            return $this;
         } catch (\Exception $e) {
             throw $e;
         }
+    }
+
+    public function getResponse($toArray = false)
+    {
+        if ($this->response) {
+            if ($toArray) {
+                return $this->toArray();
+            }
+
+            return $this->response;
+        }
+
+        return false;
+    }
+
+    public function toArray()
+    {
+        $responseArr = [];
+
+        if ($this->response && is_array($this->response)) {
+            foreach ($this->response as $key => $response) {
+                $responseArr[$key] = Json::decode($response->__toString(), true);
+            }
+        }
+
+        return $responseArr;
+    }
+
+    public function getApi()
+    {
+        return $this->api;
+    }
+
+    public function getApiConfig()
+    {
+        return $this->apiConfig;
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
     }
 }
