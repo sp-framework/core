@@ -90,4 +90,19 @@ class Repos extends BasePackage
             $this->config->setApiKeyPrefix('Authorization', 'token');
         }
     }
+
+    public function useMethod($collection, $method, $methodArgs = [])
+    {
+        $this->initRemoteWebContent($collection . ':' . $method, $this->apiConfig);
+
+        try {
+            $class = $this->serviceClass . $collection;
+
+            $collectionClass = new $class($this->remoteWebContent, $this->config);
+
+            return call_user_func_array([$collectionClass, $method], $methodArgs);
+        } catch (\Exception $e) {
+            throw $e;
+        }
+    }
 }

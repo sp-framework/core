@@ -6,18 +6,10 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\Repos\Re
 
 class Gitea extends Repos
 {
-    public function useMethod($method, $operation, $operationArr = [])
+    public function init($apiConfig = null, $api = null, $httpOptions = null)
     {
-        $this->initRemoteWebContent($method . ':' . $operation, $this->apiConfig);
+        parent::init($apiConfig, $api, $httpOptions);
 
-        try {
-            $class = $this->serviceClass . $method;
-
-            $this->method = new $class($this->remoteWebContent, $this->config);
-
-            return call_user_func_array([$this->method, $operation], $operationArr);
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        return $this;
     }
 }
