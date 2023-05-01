@@ -2,11 +2,12 @@
     "name": "Maintenance",
     "display_name": "Maintenance Mode",
     "description": "This middleware is used when you want to perform any maintenance on this app. It blocks every connection to this app.",
+    "module_type"   : "middleware",
     "app_type": "core",
     "category": "system",
     "sub_category": "tools",
     "version": "0.0.1",
-    "repo": "https://.../dash-middleware-system-tools-maintenance",
+    "repo": "https://.../",
     "class": "Apps\\Core\\Middlewares\\Maintenance\\Maintenance",
     "settings": {}
 }

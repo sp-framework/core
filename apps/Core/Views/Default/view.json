@@ -2,6 +2,7 @@
     "name"          : "Default",
     "display_name"  : "Bazaari Dashboard Default View",
     "description"   : "Default Dashboard View",
+    "module_type"   : "view",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

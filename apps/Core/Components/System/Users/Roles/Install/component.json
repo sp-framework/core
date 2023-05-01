@@ -2,6 +2,7 @@
     "route": "system/users/roles",
     "name": "User Roles",
     "description": "Manage user roles via this component",
+    "module_type"   : "component",
     "app_type": "core",
     "category": "system",
     "sub_category": "admin",

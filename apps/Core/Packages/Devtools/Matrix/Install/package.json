@@ -2,11 +2,12 @@
     "name"          : "Matrix",
     "display_name"  : "Matrix",
     "description"   : "Package for Matrix component",
+    "module_type"   : "package",
     "version"       : "0.0.1",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "devtools",
-    "repo"          : "https://.../dash-package-system-devtools-matrix",
+    "repo"          : "https://.../",
     "class"         : "Apps\\Core\\Packages\\Devtools\\Matrix\\Matrix",
     "settings"      : { }
 }

@@ -2,6 +2,7 @@
 	"route"			: "devtools/api/enums",
 	"name"			: "Devtools Enums",
 	"description"	: "Enums generate enums constants for a contract",
+	"module_type"   : "component",
 	"app_type"      : "core",
 	"category"      : "system",
 	"sub_category"  : "devtools",

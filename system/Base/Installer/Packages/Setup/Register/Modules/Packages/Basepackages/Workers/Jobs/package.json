@@ -2,6 +2,7 @@
     "name"          : "Jobs",
     "display_name"  : "Jobs",
     "description"   : "Basepackage Jobs",
+    "module_type"   : "package",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "admin",

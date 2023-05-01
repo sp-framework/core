@@ -2,13 +2,16 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
+use GuzzleHttp\Exception\ClientException;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Manager extends BasePackage
 {
-    protected $repository;
+    protected $api;
+
+    protected $apiConfig;
 
     protected $localModules = [];
 
@@ -28,25 +31,32 @@ class Manager extends BasePackage
 
     public function syncRemoteWithLocal($id)
     {
-        $repository = $this->modules->repositories->getById($id);
+        $this->api = $this->basepackages->api->useApi($id, true);
 
-        if ($repository['auth_token'] == 1 && (!$repository['password'] || $repository['password']=== '')) {
+        $this->apiConfig = $this->api->getApiConfig();
 
-            $this->addResponse('Password missing, cannot sync', 1);
+        if ($this->apiConfig['auth_type'] === 'auth' &&
+            ((!$this->apiConfig['username'] || $this->apiConfig['username'] === '') &&
+             (!$this->apiConfig['password'] || $this->apiConfig['password'] === ''))
+        ) {
+            $this->addResponse('Username/Password missing, cannot sync', 1);
 
             return;
-        } else if ($repository['auth_token'] == 2 && (!$repository['token'] || $repository['token'] === '')) {
+        } else if ($this->apiConfig['auth_type'] === 'access_token' &&
+                   (!$this->apiConfig['access_token'] || $this->apiConfig['access_token'] === '')
+        ) {
+            $this->addResponse('Access token missing, cannot sync', 1);
 
-            $this->addResponse('Token missing, cannot sync', 1);
+            return;
+        } else if ($this->apiConfig['auth_type'] === 'autho' &&
+                   (!$this->apiConfig['authorization'] || $this->apiConfig['authorization'] === '')
+        ) {
+            $this->addResponse('Authorization token missing, cannot sync', 1);
 
             return;
         }
 
-        $repository = $this->decryptPassToken($repository);
-
-        $this->repository = $repository;
-
-        var_dump($this->getModulesData(null, true));
+        // var_dump($this->getModulesData(null, true));
         //populate localModules so that we can compare with remoteModules
         // $this->getModulesData(null, true);
 
@@ -75,245 +85,186 @@ class Manager extends BasePackage
         return true;
     }
 
-    public function getLocalModules($filter = null, $inclCore = false, $getFresh = false)
-    {
-        $this->packagesData->appInfo = $this->app;
+    // public function getLocalModules($filter = null, $inclCore = false, $getFresh = false)
+    // {
+    //     $this->packagesData->appInfo = $this->app;
 
-        if ($getFresh) {
-            $this->core = $this->modules->core->init(true)->core;
-        } else {
-            $this->core = $this->modules->core->core;
-        }
+    //     if ($getFresh) {
+    //         $this->core = $this->modules->core->init(true)->core;
+    //     } else {
+    //         $this->core = $this->modules->core->core;
+    //     }
 
-        if ($filter === 'core') {
-            $this->localModules['core'][$this->core[0]['id']] = $this->core[0];
-            return;
-        }
+    //     if ($filter === 'core') {
+    //         $this->localModules['core'][$this->core[0]['id']] = $this->core[0];
+    //         return;
+    //     }
 
-        if ($inclCore) {
-            $this->localModules['core'][$this->core[0]['id']] = $this->core[0];
-        }
+    //     if ($inclCore) {
+    //         $this->localModules['core'][$this->core[0]['id']] = $this->core[0];
+    //     }
 
-        $this->applyFilters($filter, $getFresh);
+    //     // $this->applyFilters($filter, $getFresh);
 
-        if (count($this->components) > 0) {
-            foreach ($this->components as $componentKey => $component) {
-                $this->localModules['components'][$component['id']] = $component;
-                $this->localModules['components'][$component['id']]['settings']
-                    = Json::decode($component['settings'], true);
-                $this->localModules['components'][$component['id']]['dependencies']
-                    = Json::decode($component['dependencies'], true);
+    //     if (count($this->components) > 0) {
+    //         foreach ($this->components as $componentKey => $component) {
+    //             $this->localModules['components'][$component['id']] = $component;
+    //             $this->localModules['components'][$component['id']]['settings']
+    //                 = Json::decode($component['settings'], true);
+    //             $this->localModules['components'][$component['id']]['dependencies']
+    //                 = Json::decode($component['dependencies'], true);
 
-                if ($component['installed'] == 0) {
-                    $updatedOnDate = new \DateTime($component['updated_on']);
-                    $now = new \DateTime('now');
-                    $diff = date_diff($updatedOnDate, $now);
-                    if ($diff->h < 24) {
-                        $this->localModules['components'][$component['id']]['new'] = true;
-                    }
-                }
-            }
-        } else {
-            $this->localModules['components'] = [];
-        }
+    //             if ($component['installed'] == 0) {
+    //                 $updatedOnDate = new \DateTime($component['updated_on']);
+    //                 $now = new \DateTime('now');
+    //                 $diff = date_diff($updatedOnDate, $now);
+    //                 if ($diff->h < 24) {
+    //                     $this->localModules['components'][$component['id']]['new'] = true;
+    //                 }
+    //             }
+    //         }
+    //     } else {
+    //         $this->localModules['components'] = [];
+    //     }
 
-        if (count($this->packages) > 0) {
-            foreach ($this->packages as $packagesKey => $packages) {
-                $this->localModules['packages'][$packages['id']] = $packages;
-                $this->localModules['packages'][$packages['id']]['settings']
-                    = Json::decode($packages['settings'], true);
+    //     if (count($this->packages) > 0) {
+    //         foreach ($this->packages as $packagesKey => $packages) {
+    //             $this->localModules['packages'][$packages['id']] = $packages;
+    //             $this->localModules['packages'][$packages['id']]['settings']
+    //                 = Json::decode($packages['settings'], true);
 
-                if ($packages['installed'] == 0) {
-                    $updatedOnDate = new \DateTime($packages['updated_on']);
-                    $now = new \DateTime('now');
-                    $diff = date_diff($updatedOnDate, $now);
-                    if ($diff->h < 24) {
-                        $this->localModules['packages'][$packages['id']]['new'] = true;
-                    }
-                }
-            }
-        } else {
-            $this->localModules['packages'] = [];
-        }
+    //             if ($packages['installed'] == 0) {
+    //                 $updatedOnDate = new \DateTime($packages['updated_on']);
+    //                 $now = new \DateTime('now');
+    //                 $diff = date_diff($updatedOnDate, $now);
+    //                 if ($diff->h < 24) {
+    //                     $this->localModules['packages'][$packages['id']]['new'] = true;
+    //                 }
+    //             }
+    //         }
+    //     } else {
+    //         $this->localModules['packages'] = [];
+    //     }
 
-        if (count($this->middlewares) > 0) {
-            foreach ($this->middlewares as $middlewareKey => $middleware) {
-                $this->localModules['middlewares'][$middleware['id']] = $middleware;
-                $this->localModules['middlewares'][$middleware['id']]['settings']
-                    = Json::decode($middleware['settings'], true);
+    //     if (count($this->middlewares) > 0) {
+    //         foreach ($this->middlewares as $middlewareKey => $middleware) {
+    //             $this->localModules['middlewares'][$middleware['id']] = $middleware;
+    //             $this->localModules['middlewares'][$middleware['id']]['settings']
+    //                 = Json::decode($middleware['settings'], true);
 
-                if ($middleware['installed'] == 0) {
-                    $updatedOnDate = new \DateTime($middleware['updated_on']);
-                    $now = new \DateTime('now');
-                    $diff = date_diff($updatedOnDate, $now);
-                    if ($diff->h < 24) {
-                        $this->localModules['middlewares'][$middleware['id']]['new'] = true;
-                    }
-                }
-            }
-        } else {
-            $this->localModules['middlewares'] = [];
-        }
+    //             if ($middleware['installed'] == 0) {
+    //                 $updatedOnDate = new \DateTime($middleware['updated_on']);
+    //                 $now = new \DateTime('now');
+    //                 $diff = date_diff($updatedOnDate, $now);
+    //                 if ($diff->h < 24) {
+    //                     $this->localModules['middlewares'][$middleware['id']]['new'] = true;
+    //                 }
+    //             }
+    //         }
+    //     } else {
+    //         $this->localModules['middlewares'] = [];
+    //     }
 
-        if (count($this->views) > 0) {
-            foreach ($this->views as $viewKey => $view) {
-                $this->localModules['views'][$view['id']] = $view;
-                $this->localModules['views'][$view['id']]['settings']
-                    = Json::decode($view['settings'], true);
-                $this->localModules['views'][$view['id']]['dependencies']
-                    = Json::decode($view['dependencies'], true);
+    //     if (count($this->views) > 0) {
+    //         foreach ($this->views as $viewKey => $view) {
+    //             $this->localModules['views'][$view['id']] = $view;
+    //             $this->localModules['views'][$view['id']]['settings']
+    //                 = Json::decode($view['settings'], true);
+    //             $this->localModules['views'][$view['id']]['dependencies']
+    //                 = Json::decode($view['dependencies'], true);
 
-                if ($middleware['installed'] == 0) {
-                    $updatedOnDate = new \DateTime($view['updated_on']);
-                    $now = new \DateTime('now');
-                    $diff = date_diff($updatedOnDate, $now);
-                    if ($diff->h < 24) {
-                        $this->localModules['views'][$view['id']]['new'] = true;
-                    }
-                }
-            }
-        } else {
-            $this->localModules['views'] = [];
-        }
+    //             if ($middleware['installed'] == 0) {
+    //                 $updatedOnDate = new \DateTime($view['updated_on']);
+    //                 $now = new \DateTime('now');
+    //                 $diff = date_diff($updatedOnDate, $now);
+    //                 if ($diff->h < 24) {
+    //                     $this->localModules['views'][$view['id']]['new'] = true;
+    //                 }
+    //             }
+    //         }
+    //     } else {
+    //         $this->localModules['views'] = [];
+    //     }
 
-        $this->packagesData->responseCode = 0;
+    //     $this->packagesData->responseCode = 0;
 
-        $this->packagesData->modulesData = $this->localModules;
-    }
+    //     $this->packagesData->modulesData = $this->localModules;
+    // }
 
-    protected function applyFilters($filter = null, $getFresh = false)
-    {
-        if ($filter) {
-            $app = $this->apps->getById($filter);
+    // protected function applyFilters($filter = null, $getFresh = false)
+    // {
+    //     if ($filter) {
+    //         $app = $this->apps->getById($filter);
 
-            if ($getFresh) {
-                $this->components =
-                    $this->modules->components->init(true)
-                    // ->getComponentsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getComponentsForAppType($app['app_type']);
+    //         if ($getFresh) {
+    //             $this->components =
+    //                 $this->modules->components->init(true)
+    //                 // ->getComponentsForCategoryAndSubcategory($app['category'], $app['sub_category']);
+    //                 ->getComponentsForAppType($app['app_type']);
 
-                $this->packages =
-                    $this->modules->packages->init(true)
-                    // ->getPackagesForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getPackagesForAppType($app['app_type']);
+    //             $this->packages =
+    //                 $this->modules->packages->init(true)
+    //                 // ->getPackagesForCategoryAndSubcategory($app['category'], $app['sub_category']);
+    //                 ->getPackagesForAppType($app['app_type']);
 
-                $this->middlewares =
-                    $this->modules->middlewares->init(true)
-                    // ->getMiddlewaresForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getMiddlewaresForAppType($app['app_type']);
+    //             $this->middlewares =
+    //                 $this->modules->middlewares->init(true)
+    //                 // ->getMiddlewaresForCategoryAndSubcategory($app['category'], $app['sub_category']);
+    //                 ->getMiddlewaresForAppType($app['app_type']);
 
-                $this->views =
-                    $this->modules->views->init(true)
-                    // ->getViewsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getViewsForAppType($app['app_type']);
-            } else {
-                $this->components =
-                    $this->modules->components
-                    // ->getComponentsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getComponentsForAppType($app['app_type']);
+    //             $this->views =
+    //                 $this->modules->views->init(true)
+    //                 // ->getViewsForCategoryAndSubcategory($app['category'], $app['sub_category']);
+    //                 ->getViewsForAppType($app['app_type']);
+    //         } else {
+    //             $this->components =
+    //                 $this->modules->components
+    //                 // ->getComponentsForCategoryAndSubcategory($app['category'], $app['sub_category']);
+    //                 ->getComponentsForAppType($app['app_type']);
 
-                $this->packages =
-                    $this->modules->packages
-                    // ->getPackagesForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getPackagesForAppType($app['app_type']);
+    //             $this->packages =
+    //                 $this->modules->packages
+    //                 // ->getPackagesForCategoryAndSubcategory($app['category'], $app['sub_category']);
+    //                 ->getPackagesForAppType($app['app_type']);
 
-                $this->middlewares =
-                    $this->modules->middlewares
-                    // ->getMiddlewaresForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getMiddlewaresForAppType($app['app_type']);
+    //             $this->middlewares =
+    //                 $this->modules->middlewares
+    //                 // ->getMiddlewaresForCategoryAndSubcategory($app['category'], $app['sub_category']);
+    //                 ->getMiddlewaresForAppType($app['app_type']);
 
-                $this->views =
-                    $this->modules->views
-                    // ->getViewsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getViewsForAppType($app['app_type']);
-            }
-        } else {
-            $this->components = $this->modules->components->components;
+    //             $this->views =
+    //                 $this->modules->views
+    //                 // ->getViewsForCategoryAndSubcategory($app['category'], $app['sub_category']);
+    //                 ->getViewsForAppType($app['app_type']);
+    //         }
+    //     } else {
+    //         $this->components = $this->modules->components->components;
 
-            $this->packages = $this->modules->packages->packages;
+    //         $this->packages = $this->modules->packages->packages;
 
-            $this->middlewares = $this->modules->middlewares->middlewares;
+    //         $this->middlewares = $this->modules->middlewares->middlewares;
 
-            $this->views = $this->modules->views->views;
-        }
-    }
+    //         $this->views = $this->modules->views->views;
+    //     }
+    // }
 
     protected function getRemoteModules()
     {
-        $repoUrl = $this->repository['repo_url'];
-
-        if ($this->repository['repo_provider'] === '1') {//Gitea
-            $headers =
-                [
-                    'headers'   =>
-                        [
-                            'accept'    =>  'app/json'
-                        ]
-                ];
-            $siteUrl = $this->repository['site_url'];
-
-            $branch = '/raw/branch/' . $this->repository['branch'] . '/';
-        } else if ($this->repository['repo_provider'] === '2') {//Github
-            $headers =
-                [
-                    'headers'   =>
-                        [
-                            'accept'    =>  'app/vnd.github.mercy-preview+json'
-                        ]
-                ];
-            $siteUrl = $this->repository['site_url'];//https://raw.githubusercontent.com/
-
-            $branch = '/' . $this->repository['branch'] . '/';
-        }
-
-        if ($this->repository['auth_token'] === '1') {//Auth
-            $headers['auth'] =
-                [
-                    $this->repository['username'],
-                    $this->repository['password']
-                ];
-
-        } else if ($this->repository['auth_token'] === '2') {//Token
-            if ($this->repository['repo_provider'] === '1') {//Gitea
-
-               $headers['headers']['Authorization'] = 'token ' . $this->repository['token'];
-
-            } else if ($this->repository['repo_provider'] === '2') {//Github
+        try {
+            if (strtolower($this->apiConfig['provider']) === 'gitea') {
+                $modulesArr = $this->api->useMethod('UserApi', 'userListRepos', [$this->apiConfig['org_user']])->getResponse();
+            } else if (strtolower($this->apiConfig['provider']) === 'github') {
                 //
             }
-        }
-        // https://docs.guzzlephp.org/en/stable/request-options.html#verify-option
-        // We need to download the CS certificate from Firefox and load it in the php.ini file.
-        $headers['verify'] = false;
-
-        try {
-            $body = Json::decode($this->remoteWebContent->get($repoUrl, $headers)->getBody()->getContents());
-
-        } catch (ClientException $e) {
-            $body = null;
-
-            $this->packagesData->responseCode = 1;
-
-            if ($e->getResponse()->getStatusCode() === 403) {
-                $this->packagesData->responseMessage = 'Add username and password to repository.<br>' . $e->getMessage();
-            } else {
-                $this->packagesData->responseMessage = $e->getMessage();
-            }
-
-            return false;
-        } catch (ConnectException $e) {
-
-            $body = null;
-
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = $e->getMessage();
+        } catch (\Exception | ClientException $e) {
+            $this->addResponse($e->getMessage(), 1);
 
             return false;
         }
-        if ($body) {
-            foreach ($body as $key => $value) {
 
+        die(var_dump($modulesArr));
+        if ($modulesArr) {
+            foreach ($modulesArr as $key => $value) {
                 $names = explode('-', $value->name);
 
                 if (count($names) > 0) {
@@ -448,9 +399,11 @@ class Manager extends BasePackage
                     }
                 }
             }
+            return true;
+
         }
 
-        return true;
+        return false;
     }
 
     protected function getNamesPathString($names)
@@ -792,16 +745,5 @@ class Manager extends BasePackage
                 return true;
             }
         }
-    }
-
-    protected function decryptPassToken(array $data)
-    {
-        if ($data['auth_token'] == 1) {
-            $data['password'] = $this->crypt->decryptBase64($data['password'], $this->secTools->getSigKey());
-        } else if ($data['auth_token'] == 2) {
-            $data['token'] = $this->crypt->decryptBase64($data['token'], $this->secTools->getSigKey());
-        }
-
-        return $data;
     }
 }

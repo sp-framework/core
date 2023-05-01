@@ -2,6 +2,7 @@
     "name"          : "EmailServices",
     "display_name"  : "Email Services",
     "description"   : "Basepackage Email Services",
+    "module_type"   : "package",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

@@ -391,9 +391,9 @@ class Jstree
                         "case_sensitive" : "' . $this->fieldParams['fieldJstreeSearchCaseSensitive'] . '"
                     },
                     "checkbox": {
-                        "whole_node": false,
+                        "whole_node" : false,
                         "keep_selected_style" : false,
-                        "tie_selection": false
+                        "tie_selection" : false
                     }
                 }
             });

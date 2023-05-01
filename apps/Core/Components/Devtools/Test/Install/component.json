@@ -2,6 +2,7 @@
     "route"         : "devtools/test",
     "name"          : "Test",
     "description"   : "Test anything in this component.",
+    "module_type"   : "component",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "devtools",

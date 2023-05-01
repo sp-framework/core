@@ -2,6 +2,7 @@
     "route"         : "auth",
     "name"          : "Auth",
     "description"   : "Manage dash auth via this component",
+    "module_type"   : "component",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

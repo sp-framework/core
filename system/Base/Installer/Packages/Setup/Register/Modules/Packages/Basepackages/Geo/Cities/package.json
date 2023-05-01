@@ -2,6 +2,7 @@
     "name"          : "GeoCities",
     "display_name"  : "Geo Cities",
     "description"   : "Basepackage Geo Cities",
+    "module_type"   : "package",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

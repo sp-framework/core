@@ -2,11 +2,12 @@
     "name": "Auth",
     "display_name": "Authentication",
     "description": "This middleware is used by authentication package. Once enabled, user need to authentication to this app to access any resource.",
+    "module_type"   : "middleware",
     "app_type": "core",
     "category": "system",
     "sub_category": "tools",
     "version": "0.0.1",
-    "repo": "https://.../dash-middleware-system-tools-auth",
+    "repo": "https://.../",
     "class": "Apps\\Core\\Middlewares\\Auth\\Auth",
     "settings"          : {
         "mandatory"     : {

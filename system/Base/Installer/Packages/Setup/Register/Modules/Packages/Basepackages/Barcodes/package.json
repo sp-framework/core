@@ -2,6 +2,7 @@
     "name"          : "Barcodes",
     "display_name"  : "Barcodes Package",
     "description"   : "Package for generating and validating Barcodes",
+    "module_type"   : "package",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

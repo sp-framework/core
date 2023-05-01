@@ -2,6 +2,7 @@
     "name"          : "Storages",
     "display_name"  : "Storages",
     "description"   : "Basepackage Storages",
+    "module_type"   : "package",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

@@ -2,6 +2,7 @@
     "name"          : "GeoTimezones",
     "display_name"  : "Geo Timezones",
     "description"   : "Basepackage Geo Timezones",
+    "module_type"   : "package",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

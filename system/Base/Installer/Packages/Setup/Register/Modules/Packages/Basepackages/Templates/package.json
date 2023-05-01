@@ -2,6 +2,7 @@
     "name"          : "Templates",
     "display_name"  : "Templates",
     "description"   : "Basepackage Templates",
+    "module_type"   : "package",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

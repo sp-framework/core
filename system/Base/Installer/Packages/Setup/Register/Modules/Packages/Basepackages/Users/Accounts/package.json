@@ -2,6 +2,7 @@
     "name"          : "Accounts",
     "display_name"  : "Accounts",
     "description"   : "Basepackage Accounts",
+    "module_type"   : "package",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

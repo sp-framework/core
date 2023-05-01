@@ -26,6 +26,7 @@ class Component
 				'name' 					=> $componentFile['name'],
 				'route'					=> $componentFile['route'],
 				'description' 			=> $componentFile['description'],
+				'module_type' 			=> $componentFile['module_type'],
 				'app_type' 				=> $componentFile['app_type'],
 				'category'  			=> $componentFile['category'],
 				'sub_category'  		=> $componentFile['sub_category'],
@@ -41,6 +42,7 @@ class Component
 					Json::encode($componentFile['menu']) :
 					false,
 				'menu_id'				=> $menuId,
+				'api_id'				=> 1,
 				'installed'				=> 1,
 				'apps'					=>
 					Json::encode($componentApp),

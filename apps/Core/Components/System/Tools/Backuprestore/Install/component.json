@@ -2,6 +2,7 @@
     "route"         : "system/tools/backuprestore",
     "name"          : "Backup/Restore",
     "description"   : "Backup/Restore data via this component",
+    "module_type"   : "component",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "admin",

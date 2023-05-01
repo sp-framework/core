@@ -2,6 +2,7 @@
     "route"         : "system/tools/importexport",
     "name"          : "Import/Export",
     "description"   : "Import/Export data via this component",
+    "module_type"   : "component",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "admin",

@@ -1,4 +1,4 @@
-{% if modulesData is defined %}
+{# {% if modulesData is defined %}
     {% set data =
         [
             'filters'       : filters,
@@ -13,7 +13,7 @@
             'repositories'  : repositories
         ]
     %}
-{% endif %}
+{% endif %} #}
 {{adminltetags.useTag('content',
     [
         'component'                   : component,
@@ -29,7 +29,6 @@
         'cardAdditionalClass'         : 'rounded-0',
         'cardCollapsed'               : false,
         'cardBodyInclude'             : 'modules/modules',
-        'cardBodyIncludeParams'       : data,
         'cardShowTools'               : ['maximize']
     ]
 )}}

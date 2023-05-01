@@ -2,11 +2,12 @@
     "name": "IpFilter",
     "display_name": "IP Filter",
     "description": "This middleware is used to allow/block IP based access to an app.",
+    "module_type"   : "middleware",
     "app_type": "core",
     "category": "system",
     "sub_category": "tools",
     "version": "0.0.1",
-    "repo": "https://.../dash-middleware-system-tools-ipfilter",
+    "repo": "https://.../",
     "class": "Apps\\Core\\Middlewares\\IpFilter\\IpFilter",
     "settings": {}
 }

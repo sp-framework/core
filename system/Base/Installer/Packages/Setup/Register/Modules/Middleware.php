@@ -22,6 +22,7 @@ class Middleware
 				'name' 					=> $middlewareFile['name'],
 				'display_name' 			=> $middlewareFile['display_name'],
 				'description' 			=> $middlewareFile['description'],
+				'module_type'			=> $middlewareFile['module_type'],
 				'app_type' 				=> $middlewareFile['app_type'],
 				'category'  			=> $middlewareFile['category'],
 				'sub_category'  		=> $middlewareFile['sub_category'],
@@ -33,6 +34,7 @@ class Middleware
 					Json::encode($middlewareFile['settings']) :
 					null,
 				'apps'					=> $apps,
+				'api_id'				=> 1,
 				'installed'				=> 1,
 				'files'					=> Json::encode($installedFiles),
 				'updated_by'			=> 0

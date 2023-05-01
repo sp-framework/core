@@ -2,11 +2,12 @@
     "name": "Acl",
     "display_name": "Access Control List",
     "description": "This middleware is used by user roles. It checks the role configuration and allows/blocks user's connection to a particular resource.",
+    "module_type"   : "middleware",
     "app_type": "core",
     "category": "system",
     "sub_category": "tools",
     "version": "0.0.1",
-    "repo": "https://.../dash-middleware-acl",
+    "repo": "https://.../",
     "class": "Apps\\Core\\Middlewares\\Acl\\Acl",
     "settings": {}
 }

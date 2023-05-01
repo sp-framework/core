@@ -1,12 +1,13 @@
 {
     "name"          : "Contracts",
-    "display_name"   : "Contracts",
+    "display_name"  : "Contracts",
     "description"   : "Package for Contracts component",
+    "module_type"   : "package",
     "version"       : "0.0.1",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "devtools",
-    "repo"          : "https://.../dash-package-system-devtools-api-contracts",
+    "repo"          : "https://.../",
     "class"         : "Apps\\Core\\Packages\\Devtools\\Api\\Contracts\\Contracts",
     "settings"      : {
         "categories" :

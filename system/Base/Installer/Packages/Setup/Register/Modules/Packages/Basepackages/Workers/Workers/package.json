@@ -2,6 +2,7 @@
     "name"          : "Workers",
     "display_name"  : "Workers",
     "description"   : "Basepackage Workers",
+    "module_type"   : "package",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "admin",

@@ -14,6 +14,7 @@ class View
 				'name' 					=> $viewFile['name'],
 				'display_name' 			=> $viewFile['display_name'],
 				'description' 			=> $viewFile['description'],
+				'module_type' 			=> $viewFile['module_type'],
 				'app_type' 				=> $viewFile['app_type'],
 				'category'  			=> $viewFile['category'],
 				'sub_category'  		=> $viewFile['sub_category'],
@@ -29,6 +30,7 @@ class View
 					null,
 				'apps'					=>
 					Json::encode(['1'=>['enabled'=>true]]),
+				'api_id'				=> 1,
 				'installed'				=> 1,
 				'files'					=> Json::encode($installedFiles),
 				'updated_by'			=> 0

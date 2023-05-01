@@ -2,6 +2,7 @@
     "route"         : "system/workers/schedules",
     "name"          : "Schedules",
     "description"   : "Manage admin workers schedules via this component",
+    "module_type"   : "component",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "admin",

@@ -31,6 +31,10 @@ class Repos extends BasePackage
 
     public function init($apiConfig = null, $api = null, $httpOptions = null)
     {
+        if (isset($apiConfig['test']) && $apiConfig['test'] === true) {
+            return $this;
+        }
+
         $apiConfig['category'] = ucfirst($apiConfig['category']);
         $apiConfig['provider'] = ucfirst($apiConfig['provider']);
 
@@ -80,6 +84,7 @@ class Repos extends BasePackage
 
         if (isset($this->apiConfig['debug']) && $this->apiConfig['debug'] === true) {
             $this->config->setDebug(true);
+            $this->config->setDebugFile(base_path('var/log/api.log'));
             $this->httpOptions['debug'] = true;
         }
 

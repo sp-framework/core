@@ -23,6 +23,8 @@ class Api extends BasePackage
 
     public $apiLocations = null;
 
+    public $apiLocation = null;
+
     public $apiStats;
 
     public function init()
@@ -68,6 +70,8 @@ class Api extends BasePackage
             if ($apiData) {
                 $api = array_merge($api, $apiData);
             }
+
+            $api = $this->decryptPassToken($api);
 
             return $api;
         }
@@ -179,6 +183,8 @@ class Api extends BasePackage
      */
     public function addApi(array $data)
     {
+        $data = $this->encryptPassToken($data);
+
         $data['provider'] = strtolower($data['provider']);
 
         $this->switchApiModel($data);
@@ -208,6 +214,8 @@ class Api extends BasePackage
      */
     public function updateApi(array $data)
     {
+        $data = $this->encryptPassToken($data);
+
         $data['provider'] = strtolower($data['provider']);
 
         $this->switchApiModel($data);
@@ -291,7 +299,7 @@ class Api extends BasePackage
         $this->addToNotification('error', $messageTitle, $messageDetails, 'api', $id);
     }
 
-    public function useApi($data, $debug = false)//or ID (integer/string)
+    public function useApi($data)//or ID (integer/string)
     {
         $this->apiConfig = null;
 
@@ -339,7 +347,7 @@ class Api extends BasePackage
             $this->apiConfig = $this->getApiById((int) $data);
         }
 
-        if ($debug) {
+        if ($this->config->debug) {
             $this->apiConfig['debug'] = true;
         }
 
@@ -380,10 +388,52 @@ class Api extends BasePackage
     public function getApiClass($category, $provider, $basepackages = true)
     {
         if ($basepackages) {
+            $this->apiLocation = 'system';
+
             return 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Api\\Apis\\' . ucfirst($category) . '\\' . ucfirst($provider) . '\\' . ucfirst($provider);
         }
 
+        $this->apiLocation = 'apps';
+
         return 'Apps\\Core\\Packages\\System\\Api\\Apis' . ucfirst($category) . '\\' . ucfirst($provider) . '\\' . ucfirst($provider);
+    }
+
+    public function getApiByCategory($category, $inuse = null)
+    {
+        $this->getAll();
+
+        if (isset($inuse)) {
+            if ($inuse === true) {
+                $inUse = '1';
+            } else {
+                $inUse = '0'|null;
+            }
+            $filter =
+                $this->model->filter(
+                    function($api) use ($category, $inUse) {
+                        $api = $this->getApiById($api->id);
+
+                        if ($api['category'] === strtolower($category) &&
+                            $api['in_use'] == $inUse
+                        ) {
+                            return $api;
+                        }
+                    }
+                );
+        } else {
+            $filter =
+                $this->model->filter(
+                    function($api) use ($category) {
+                        $api = $this->getApiById($api->id);
+
+                        if ($api['category'] === strtolower($category)) {
+                            return $api;
+                        }
+                    }
+                );
+        }
+
+        return $filter;
     }
 
     public function getApiByProvider($provider, $inuse = null)
@@ -399,7 +449,8 @@ class Api extends BasePackage
             $filter =
                 $this->model->filter(
                     function($api) use ($provider, $inUse) {
-                        $api = $api->toArray();
+                        $api = $this->getApiById($api->id);
+
                         if ($api['provider'] === strtolower($provider) &&
                             $api['in_use'] == $inUse
                         ) {
@@ -411,8 +462,9 @@ class Api extends BasePackage
             $filter =
                 $this->model->filter(
                     function($api) use ($provider) {
-                        $api = $api->toArray();
-                        if ($api['provider'] == $provider) {
+                        $api = $this->getApiById($api->id);
+
+                        if ($api['provider'] === strtolower($provider)) {
                             return $api;
                         }
                     }
@@ -420,5 +472,35 @@ class Api extends BasePackage
         }
 
         return $filter;
+    }
+
+    protected function encryptPassToken(array $data)
+    {
+        if (isset($data['auth_type'])) {
+            if ($data['auth_type'] == 'auth') {
+                $data['password'] = $this->crypt->encryptBase64($data['password'], $this->secTools->getSigKey());
+            } else if ($data['auth_type'] == 'access_token') {
+                $data['access_token'] = $this->crypt->encryptBase64($data['access_token'], $this->secTools->getSigKey());
+            } else if ($data['auth_type'] == 'autho') {
+                $data['authorization'] = $this->crypt->encryptBase64($data['authorization'], $this->secTools->getSigKey());
+            }
+        }
+
+        return $data;
+    }
+
+    protected function decryptPassToken(array $data)
+    {
+        if (isset($data['auth_type'])) {
+            if ($data['auth_type'] == 'auth') {
+                $data['password'] = $this->crypt->decryptBase64($data['password'], $this->secTools->getSigKey());
+            } else if ($data['auth_type'] == 'access_token') {
+                $data['access_token'] = $this->crypt->decryptBase64($data['access_token'], $this->secTools->getSigKey());
+            } else if ($data['auth_type'] == 'autho') {
+                $data['authorization'] = $this->crypt->decryptBase64($data['authorization'], $this->secTools->getSigKey());
+            }
+        }
+
+        return $data;
     }
 }

@@ -2,6 +2,7 @@
     "name"          : "BackupRestore",
     "display_name"  : "Backup/Restore Tool",
     "description"   : "Package for taking system backups and restoring them.",
+    "module_type"   : "package",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "admin",

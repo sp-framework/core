@@ -2,6 +2,7 @@
     "route"         : "system/progress",
     "name"          : "Progress",
     "description"   : "Manage progress of execution via this component",
+    "module_type"   : "component",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "admin",

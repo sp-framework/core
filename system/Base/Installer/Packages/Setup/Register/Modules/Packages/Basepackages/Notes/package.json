@@ -2,6 +2,7 @@
     "name"              : "Notes",
     "display_name"      : "Notes",
     "description"       : "Basepackage Notes",
+    "module_type"       : "package",
     "app_type"          : "core",
     "category"          : "system",
     "sub_category"      : "tools",

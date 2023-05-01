@@ -2,6 +2,7 @@
     "name"          : "Notifications",
     "display_name"  : "Notifications",
     "description"   : "Basepackage Notifications",
+    "module_type"   : "package",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

@@ -14,6 +14,7 @@ class Package
 				'name' 					=> $packageFile['name'],
 				'display_name'			=> $packageFile['display_name'],
 				'description' 			=> $packageFile['description'],
+				'module_type'	 		=> $packageFile['module_type'],
 				'app_type'		 		=> $packageFile['app_type'],
 				'category'				=> $packageFile['category'],
 				'sub_category'			=> $packageFile['sub_category'],
@@ -26,6 +27,7 @@ class Package
 					null,
 				'apps'					=>
 					Json::encode(['1'=>['enabled'=>true]]),
+				'api_id'				=> 1,
 				'installed'				=> 1,
 				'files'					=> Json::encode($installedFiles),
 				'updated_by'			=> 0

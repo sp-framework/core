@@ -45,6 +45,14 @@ class Middlewares
 						]
 					),
 					new Column(
+						'module_type',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'	  => 50,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'app_type',
 						[
 							'type'    => Column::TYPE_VARCHAR,
@@ -119,6 +127,13 @@ class Middlewares
 						[
 							'type'    => Column::TYPE_TEXT,
 							'notNull' => false,
+						]
+					),
+					new Column(
+						'api_id',
+						[
+							'type'    => Column::TYPE_TINYINTEGER,
+							'notNull' => true,
 						]
 					),
 					new Column(

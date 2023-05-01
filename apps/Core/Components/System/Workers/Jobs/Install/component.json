@@ -2,6 +2,7 @@
     "route"         : "system/workers/jobs",
     "name"          : "Jobs",
     "description"   : "Manage admin workers jobs via this component",
+    "module_type"   : "component",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "admin",

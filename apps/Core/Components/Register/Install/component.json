@@ -2,6 +2,7 @@
     "route"         : "register",
     "name"          : "Register",
     "description"   : "New user registration via this component",
+    "module_type"   : "component",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

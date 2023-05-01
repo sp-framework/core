@@ -23,7 +23,7 @@
     {% set apiId = '' %}
     {% set apiCategoryId = '' %}
     {% set apiName = '' %}
-    {% set apiProvider = api['provider']|lower %}
+    {% set apiProvider = '' %}
     {% set apiInUse = '' %}
     {% set apiUsedBy = '' %}
     {% set apiSetup = '4' %}
@@ -157,6 +157,41 @@
         </div>
         <hr>
         <div class="row">
+            <div class="col-md-3">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'provider',
+                        'fieldLabel'                     : 'Repository Provider?',
+                        'fieldType'                      : 'radio',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select api provider.',
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true,
+                        'fieldRadioButtons'              :
+                            [
+                                'gitea' :
+                                    [
+                                        'title'                           : 'Gitea',
+                                        'type'                            : 'info',
+                                        'dataValue'                       : 'gitea'
+                                    ],
+                                'github' :
+                                    [
+                                        'title'                           : 'Github',
+                                        'type'                            : 'info',
+                                        'dataValue'                       : 'github'
+                                    ]
+                            ],
+                        'fieldRadioChecked'              : apiProvider
+                    ]
+                )}}
+            </div>
             <div class="col-md-4">
                 {{adminltetags.useTag('fields',
                     [
