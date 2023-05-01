@@ -165,6 +165,13 @@ class Views
 							'notNull' => true,
 							'default' => 'CURRENT_TIMESTAMP',
 						]
+					),
+					new Column(
+						'repo_details',
+						[
+							'type'    => Column::TYPE_JSON,
+							'notNull' => false,
+						]
 					)
 				]
 			];

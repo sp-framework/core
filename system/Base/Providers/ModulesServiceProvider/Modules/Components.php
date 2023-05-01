@@ -30,6 +30,19 @@ class Components extends BasePackage
 		return false;
 	}
 
+	public function getComponentsByApiId($id)
+	{
+		$components = [];
+
+		foreach($this->components as $component) {
+			if ($component['api_id'] == $id) {
+				array_push($components, $component);
+			}
+		}
+
+		return $components;
+	}
+
 	public function getComponentByRoute($route)
 	{
 		foreach($this->components as $component) {

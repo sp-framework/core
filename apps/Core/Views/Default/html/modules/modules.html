@@ -5,7 +5,7 @@
 </div>
 <hr>
 <div class="row vdivide">
-    <div class="col">
+    <div class="col-md-3 vdivide-resizable">
         {{adminltetags.useTag('fields',
             [
                 'component'                                 : component,
@@ -30,7 +30,7 @@
                 'fieldJstreeFirstOpen'                      : true,
                 'fieldJstreeAllOpen'                        : false,
                 'fieldJstreeAllChecked'                     : false,
-                'fieldJstreeRootIcon'                       : 'folder-tree',
+                'fieldJstreeRootIcon'                       : 'th',
                 'fieldJstreeToggleAllChildren'              : true,
                 'fieldJstreeIncludeRootInPath'              : true,
                 'fieldJstreeSelectEndNodeOnly'              : true,
@@ -42,23 +42,595 @@
                 'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
                 'fieldJstreeHideJstreeIcons'                : false,
                 'fieldJstreeReplaceIdWithDataField'         : 'moduleid',
-                'fieldJstreePlugins'                        : ["search", "types"]
+                'fieldJstreePlugins'                        : ["search", "types"],
+                'fieldJstreeAdditionalClass'                : 'text-uppercase'
             ]
         )}}
     </div>
     <div class="col">
-        Info
+        <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-error" hidden>
+            <div class="col">
+                <h6><i class="fa fa-fw fa-info-circle text-danger"></i> Error loading module information. Please contact administrator.</h6>
+            </div>
+        </div>
+        <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-noinfo" hidden>
+            <div class="col">
+                <h6><i class="fa fa-fw fa-info-circle text-info"></i> Select module from tree to see it's details.</h6>
+            </div>
+        </div>
+        <div class="row text-center" id="{{componentId}}-{{sectionId}}-moduleinfo-loader">
+            <div class="col">
+                <i class="fa fa-cog fa-spin"></i> Loading module information...
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div id="{{componentId}}-{{sectionId}}-moduleinfo-info" hidden>
+                    <div class="row">
+                        <div class="col">
+                            <label>NAME: </label>
+                            <span class="text-uppercase" id="display_name"></span>
+                        </div>
+                        <div class="col">
+                            <label>INSTALLED: </label>
+                            <span class="text-uppercase" style="top: -1px;position: relative;" id="installed"></span>
+                        </div>
+                        <div class="col">
+                            <label>VERSION: </label>
+                            <span class="text-uppercase" style="top: -1px;position: relative;" id="version"></span>
+                        </div>
+                    </div>
+                    <hr class="mt-1">
+                    <div class="row">
+                        <div class="col small">
+                            <label>APP TYPE: </label>
+                            <span class="text-uppercase" id="app_type"></span>
+                        </div>
+                        <div class="col small">
+                            <label>CATEGORY: </label>
+                            <span class="text-uppercase" id="category"></span>
+                        </div>
+                        <div class="col small">
+                            <label>SUB CATEGORY: </label>
+                            <span class="text-uppercase" id="sub_category"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col small">
+                            <label>UPDATE AVAILABLE: </label>
+                            <span id="update_available"></span>
+                        </div>
+                        <div class="col small">
+                            <label>UPDATE VERSION: </label>
+                            <span id="update_version"></span>
+                        </div>
+                        <div class="col small">
+                            <label>UPDATED ON: </label>
+                            <span id="updated_on"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col small">
+                            <label>INSTALLED/UPDATED BY: </label>
+                            <span id="updated_by"></span>
+                        </div>
+                        <div class="col small">
+                            <label>MODULE TYPE: </label>
+                            <span class="text-uppercase" id="module_type"></span>
+                        </div>
+                        <div class="col small">
+                            <span class="text-uppercase" id="module_id" hidden></span>
+                        </div>
+                    </div>
+                    <hr class="mt-1">
+                    <div class="row">
+                        <div class="col">
+                            <p id="description"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="mt-1">
+        <div class="row">
+            <div class="col" id="module-buttons">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : sectionId,
+                        'buttonType'                    : 'button',
+                        'buttons'                       :
+                            [
+                                'repo-sync'        : [
+                                    'title'             : false,
+                                    'size'              : 'xs',
+                                    'icon'              : 'sync-alt',
+                                    'position'          : 'right'
+                                ],
+                                'install-update'        : [
+                                    'title'             : 'Install',
+                                    'size'              : 'xs',
+                                    'hidden'            : true,
+                                    'disabled'          : true
+                                ],
+                                'cancel'        : [
+                                    'title'             : 'Cancel Install / Update',
+                                    'type'              : 'danger',
+                                    'size'              : 'xs',
+                                    'hidden'            : true,
+                                    'disabled'          : true
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
     </div>
 </div>
 <hr>
-<div id="installer-progress" class="mb-3" hidden></div>
+<div class="row">
+    <div class="col-md-6">
+        <div id="installer-progress" class="mb-3"></div>
+    </div>
+    <div class="col">
+        <span class="text-uppercase float-right">Install / Update Queue:
+            <span style="top: -2px;position: relative;" class="badge badge-info" id="queue-counter">0</span>
+        </span>
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                    [
+                        'process-queue'     : [
+                            'title'             : 'Process Queue',
+                            'position'          : 'right',
+                            'size'              : 'xs',
+                            'disabled'          : true
+                        ],
+                        'clear-queue'       : [
+                            'title'             : 'Clear Queue',
+                            'position'          : 'right',
+                            'type'              : 'danger',
+                            'size'              : 'xs',
+                            'disabled'          : true
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
 <script>
-/*global PNotify */
+/*global PNotify BazProgress Swal */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['funcs'] = { };
+
+dataCollectionSectionForm['vars']['modules'] = { };
+dataCollectionSectionForm['vars']['module'] = { };
+dataCollectionSectionForm['vars']['queue'] = { };
+dataCollectionSectionForm['vars']['queue']['count'] = 0;
+dataCollectionSectionForm['vars']['queue']['install_update'] = { };
+
+$('#{{componentId}}-{{sectionId}}-repositories').on('focus', function(e) {
+    dataCollectionSectionForm['vars']['previous'] = this.value;
+});
+
+$('#{{componentId}}-{{sectionId}}-repositories').on('change', function(e) {
+    //eslint-disable-next-line
+    console.log(e);
+    Swal.fire({
+        title                       : '<span class="text-warning"> Switch Repository? It will reset the queue.</span>',
+        icon                        : 'question',
+        background                  : 'rgba(0,0,0,.8)',
+        backdrop                    : 'rgba(0,0,0,.6)',
+        buttonsStyling              : false,
+        confirmButtonText           : 'Switch',
+        customClass                 : {
+            'confirmButton'             : 'btn btn-warning text-uppercase',
+            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+        },
+        showCancelButton            : true,
+        keydownListenerCapture      : true,
+        allowOutsideClick           : false,
+        allowEscapeKey              : false,
+        didOpen                     : function() {
+            window['dataCollection'].env.sounds.swalSound.play();
+        }
+    }).then((result) => {
+        if (result.value) {
+            dataCollectionSectionForm['vars']['queue'] = { };
+            dataCollectionSectionForm['vars']['queue']['count'] = 0;
+            dataCollectionSectionForm['vars']['queue']['install_update'] = { };
+            $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-process-queue').off();
+            $('#{{componentId}}-{{sectionId}}-clear-queue').off();
+            $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
+            $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().destroy();
+            if ($('#{{componentId}}-{{sectionId}}-modules-empty').length > 0) {
+                $('#{{componentId}}-{{sectionId}}-modules-empty').remove();
+            }
+
+            $('#{{componentId}}-{{sectionId}}-modules').append(
+                '<div id="{{componentId}}-{{sectionId}}-modules-empty" class="text-center">' +
+                    '<i class="fa fa-cog fa-spin"></i> Loading modules...' +
+                '</div>'
+            );
+
+            dataCollectionSectionForm['funcs']['getRepositoryModules']($(this).find(":selected").data('value'));
+        } else {
+            $('#{{componentId}}-{{sectionId}}-repositories').val(dataCollectionSectionForm['vars']['previous']);
+        }
+    });
+});
+
 $('#{{componentId}}-{{sectionId}}-modules').on('select_node.jstree', function() {
     var selected = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected();
 
-    //eslint-disable-next-line
-    console.log(selected);
+    if (selected[0].startsWith('j')) {
+        return false;
+    }
+
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', false);
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-error').attr('hidden', true);
+
+    dataCollectionSectionForm['funcs']['getSelectedModuleInfo'](selected);
 });
+
+$('#{{componentId}}-{{sectionId}}-modules').on('ready.jstree', function() {
+    var coreTree = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {flat:true});
+
+    var selected = [];
+
+    $(coreTree).each(function(i, v) {
+        if (v.text === 'Core') {
+            selected.push(v.id);
+            return false;
+        }
+    });
+
+    dataCollectionSectionForm['funcs']['getSelectedModuleInfo'](selected);
+    dataCollectionSectionForm['funcs']['applyColorsToIcons']();
+});
+
+dataCollectionSectionForm['funcs']['getRepositoryModules'] = function(repositoryId) {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['api_id'] = repositoryId;
+
+    $.post('{{links.url("modules/getRepositoryModules")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+        //eslint-disable-next-line
+        console.log(response);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-repo-sync').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
+
+        if (response.responseCode == 0) {
+            if (response.responseData.modules) {
+                dataCollectionSectionForm['vars']['modules'] = response.responseData.modules;
+            }
+            if (response.responseData.modules_html && response.responseData.modules_html !== '') {
+                var modulesHtml =
+                    '<div id="{{componentId}}-{{sectionId}}-modules">' +
+                        '<ul>' +
+                            '<li data-jstree="{&quot;icon&quot; : &quot;fa fa-fw fa-th text-sm&quot;}">' +
+                                '<ul>' +
+                                    response.responseData.modules_html +
+                                '</ul>' +
+                            '</li>' +
+                        '</ul>' +
+                    '</div>';
+
+                $('#{{componentId}}-{{sectionId}}-modules-tree-div').empty().html(modulesHtml);
+                //eslint-disable-next-line
+                console.log($('#{{componentId}}-{{sectionId}}-modules-tree-div'));
+            }
+
+            $('#{{componentId}}-{{sectionId}}-modules').jstree();
+
+        } else if (response.responseCode == 1) {
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+            $('#module-buttons').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+        }
+    }, 'json');
+}
+
+dataCollectionSectionForm['funcs']['getSelectedModuleInfo'] = function(selected) {
+    var splitModule, moduleType, moduleId;
+
+    if (selected.length === 1) {
+        splitModule = selected[0].split('-');
+        moduleId = splitModule[1];
+
+        if (selected[0].startsWith('component')) {
+            moduleType = 'component';
+        } else if (selected[0].startsWith('package')) {
+            moduleType = 'package';
+        } else if (selected[0].startsWith('middleware')) {
+            moduleType = 'middleware';
+        } else if (selected[0].startsWith('view')) {
+            moduleType = 'view';
+        }
+    }
+    //eslint-disable-next-line
+    console.log(selected, splitModule, moduleType, moduleId);
+
+    if (moduleType && moduleId) {
+        dataCollectionSectionForm['funcs']['getModuleInfo'](moduleType, moduleId);
+    }
+}
+
+dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, moduleId, sync = false) {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['module_type'] = moduleType;
+    postData['module_id'] = moduleId;
+    if (sync) {
+        postData['sync'] = true;
+    }
+
+    $.post('{{links.url("modules/getModuleInfo")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+        //eslint-disable-next-line
+        console.log(response);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-repo-sync').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
+
+        if (response.responseCode == 0) {
+            if (response.responseData.module) {
+
+                dataCollectionSectionForm['vars']['module'] = response.responseData.module;
+
+                dataCollectionSectionForm['funcs']['processModuleInfo'](response.responseData.module);
+            }
+        } else if (response.responseCode == 1) {
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-error').attr('hidden', false);
+        } else if (response.responseCode == 2) {
+            PNotify.error({text: response.responseMessage});
+            if (response.responseData.module) {
+                dataCollectionSectionForm['vars']['module'] = response.responseData.module;
+                dataCollectionSectionForm['funcs']['processModuleInfo'](response.responseData.module);
+            }
+        }
+    }, 'json');
+}
+
+dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
+    var moduleData = { };
+
+    for (var m in moduleInfo) {
+        if (moduleInfo[m] === '' || moduleInfo[m] === null) {
+            moduleData[m] = '-';
+        } else {
+            moduleData[m] = moduleInfo[m];
+        }
+    }
+
+    if (moduleData['installed'] == 1) {
+        moduleData['installed'] = '<span class="badge badge-success">Yes</span>';
+        if (moduleData['update_available'] == 1) {
+            $('#{{componentId}}-{{sectionId}}-install-update').html('UPDATE');
+            $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
+            $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
+        }
+    } else {
+        moduleData['installed'] = '<span class="badge badge-secondary">No</span>';
+        $('#{{componentId}}-{{sectionId}}-install-update').html('INSTALL');
+        $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
+    }
+
+    if (moduleData['update_available'] !== '-' && moduleData['update_available'] == 1) {
+        moduleData['update_available'] = '<span class="badge badge-warning">Yes</span>';
+    }
+    if (moduleData['update_version'] !== '-') {
+        moduleData['update_version'] = '<span class="badge badge-warning">' + moduleData['update_version'] + '</span>';
+    }
+
+    moduleData['version'] = '<span class="badge badge-info">' + moduleData['version'] + '</span>';
+
+    $('#app_type').html(moduleData.app_type);
+    $('#category').html(moduleData.category);
+    $('#sub_category').html(moduleData.sub_category);
+    $('#update_available').html(moduleData.update_available);
+    $('#update_version').html(moduleData.update_version);
+    $('#updated_on').html(moduleData.updated_on);
+    $('#installed').html(moduleData.installed);
+    $('#version').html(moduleData.version);
+    $('#updated_by').html(moduleData.updated_by);
+    $('#module_type').html(moduleData.module_type);
+    $('#display_name').html(moduleData.display_name);
+    $('#module_id').html(moduleData.id);
+    $('#description').html(moduleData.description);
+
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', false);
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-error').attr('hidden', true);
+
+    dataCollectionSectionForm['funcs']['initModuleButtons']();
+}
+
+dataCollectionSectionForm['funcs']['initModuleButtons'] = function() {
+    $('#{{componentId}}-{{sectionId}}-install-update').off();
+    $('#{{componentId}}-{{sectionId}}-install-update').click(function(e) {
+        e.preventDefault();
+
+        $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
+        dataCollectionSectionForm['funcs']['updateQueue']($('#module_id').html(), $('#module_type').html());
+        dataCollectionSectionForm['funcs']['applyColorsToIcons']($('#module_type').html() + '-' + $('#module_id').html(), true);
+    });
+
+    $('#{{componentId}}-{{sectionId}}-cancel').off();
+    $('#{{componentId}}-{{sectionId}}-cancel').click(function(e) {
+        e.preventDefault();
+
+        $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
+        dataCollectionSectionForm['funcs']['updateQueue']($('#module_id').html(), $('#module_type').html(), false);
+        dataCollectionSectionForm['funcs']['applyColorsToIcons']($('#module_type').html() + '-' + $('#module_id').html());
+    });
+
+    $('#{{componentId}}-{{sectionId}}-repo-sync').off();
+    $('#{{componentId}}-{{sectionId}}-repo-sync').click(function(e) {
+        e.preventDefault();
+
+        $(this).attr('disabled', true);
+        $(this).children("i").removeClass("fa-sync-alt").addClass("fa-cog fa-spin");
+
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-error').attr('hidden', true);
+        dataCollectionSectionForm['funcs']['getModuleInfo']($('#module_type').html(), $('#module_id').html(), true);
+    });
+}
+
+dataCollectionSectionForm['funcs']['updateQueue'] = function(id, type, add = true) {
+    if (!dataCollectionSectionForm['vars']['queue']['install_update'][type]) {
+        dataCollectionSectionForm['vars']['queue']['install_update'][type] = [];
+    }
+
+    dataCollectionSectionForm['vars']['queue']['install_update'][type].push(id);
+
+    if (add) {
+        dataCollectionSectionForm['vars']['queue']['count'] = dataCollectionSectionForm['vars']['queue']['count'] + 1;
+    } else {
+        dataCollectionSectionForm['vars']['queue']['count'] = dataCollectionSectionForm['vars']['queue']['count'] - 1;
+    }
+
+    $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
+
+    if (dataCollectionSectionForm['vars']['queue']['count'] > 0) {
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', false);
+
+        $('#{{componentId}}-{{sectionId}}-process-queue').off();
+        $('#{{componentId}}-{{sectionId}}-process-queue').click(function(e) {
+            e.preventDefault();
+
+            dataCollectionSectionForm['funcs']['processQueue']();
+        });
+        $('#{{componentId}}-{{sectionId}}-clear-queue').off();
+        $('#{{componentId}}-{{sectionId}}-clear-queue').click(function(e) {
+            e.preventDefault();
+
+            dataCollectionSectionForm['funcs']['clearQueue']();
+        });
+    } else {
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
+
+        $('#{{componentId}}-{{sectionId}}-process-queue').off();
+        $('#{{componentId}}-{{sectionId}}-clear-queue').off();
+    }
+}
+
+dataCollectionSectionForm['funcs']['processQueue'] = function() {
+    //
+}
+
+dataCollectionSectionForm['funcs']['clearQueue'] = function() {
+    dataCollectionSectionForm['vars']['queue'] = { };
+    dataCollectionSectionForm['vars']['queue']['count'] = 0;
+    dataCollectionSectionForm['vars']['queue']['install_update'] = { };
+    $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+    $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
+    $('#{{componentId}}-{{sectionId}}-process-queue').off();
+    $('#{{componentId}}-{{sectionId}}-clear-queue').off();
+    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
+    $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
+
+    if (dataCollectionSectionForm['vars']['module']['installed'] == 1) {
+        if (dataCollectionSectionForm['vars']['module']['update_available'] == 1) {
+            $('#{{componentId}}-{{sectionId}}-install-update').html('UPDATE');
+            $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
+            $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
+        }
+    } else {
+        $('#{{componentId}}-{{sectionId}}-install-update').html('INSTALL');
+        $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
+    }
+
+    $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
+    dataCollectionSectionForm['funcs']['applyColorsToIcons']();
+}
+
+dataCollectionSectionForm['funcs']['applyColorsToIcons'] = function(nodeId = null, installUpdate = false) {
+    var allNodes;
+
+    if (nodeId) {
+        allNodes = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_node(nodeId);
+    } else {
+        allNodes = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {'flat':true});
+    }
+
+    $(allNodes).each(function(i, node) {
+        if (node.id.startsWith('j')) {
+            return true;
+        }
+
+        if (installUpdate) {
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-plus text-info');
+        } else {
+            if (node.data.installed == 1) {
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-check text-success');
+            }
+
+            if (node.data.update_available && node.data.update_available == 1) {
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-warning');
+            }
+        }
+    });
+}
+
+BazProgress.buildProgressBar($('#installer-progress'));
 </script>
 {% include 'modules/modal.html' %}

@@ -116,11 +116,13 @@ class Repos extends BasePackage
         }
     }
 
-    public function getResponse($toArray = false)
+    public function getResponse($toArray = false, $toJson = false)
     {
         if ($this->response) {
             if ($toArray) {
                 return $this->toArray();
+            } else if ($toJson) {
+                return $this->response->__toString();
             }
 
             return $this->response;
@@ -137,6 +139,8 @@ class Repos extends BasePackage
             foreach ($this->response as $key => $response) {
                 $responseArr[$key] = Json::decode($response->__toString(), true);
             }
+        } else {
+            $responseArr = Json::decode($this->response->__toString(), true);
         }
 
         return $responseArr;

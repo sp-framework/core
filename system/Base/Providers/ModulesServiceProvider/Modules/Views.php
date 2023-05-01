@@ -255,6 +255,19 @@ class Views extends BasePackage
         return false;
     }
 
+    public function getViewsByApiId($id)
+    {
+        $views = [];
+
+        foreach($this->views as $view) {
+            if ($view['api_id'] == $id) {
+                array_push($views, $view);
+            }
+        }
+
+        return $views;
+    }
+
     public function getNameViews($name)
     {
         foreach($this->views as $view) {

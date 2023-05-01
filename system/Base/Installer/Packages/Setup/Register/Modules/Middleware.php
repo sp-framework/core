@@ -6,7 +6,7 @@ use Phalcon\Helper\Json;
 
 class Middleware
 {
-	public function register($db, $middlewareFile, $installedFiles)
+	public function register($db, $middlewareFile)
 	{
 		if ($middlewareFile['name'] === 'Auth') {
 			$apps = Json::encode(['1' => ['enabled' => true, 'sequence' => 1]]);
@@ -36,7 +36,10 @@ class Middleware
 				'apps'					=> $apps,
 				'api_id'				=> 1,
 				'installed'				=> 1,
-				'files'					=> Json::encode($installedFiles),
+				'files'					=>
+					isset($middlewareFile['files']) ?
+					Json::encode($middlewareFile['files']) :
+					Json::encode([]),
 				'updated_by'			=> 0
 			]
 		);

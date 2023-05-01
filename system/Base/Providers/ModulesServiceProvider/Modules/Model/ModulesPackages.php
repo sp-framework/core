@@ -40,5 +40,7 @@ class ModulesPackages extends BaseModel
 
     public $updated_on;
 
+    public $repo_details;
+
     public $notification_subscriptions;
 }

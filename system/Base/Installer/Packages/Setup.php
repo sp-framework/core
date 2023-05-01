@@ -363,14 +363,7 @@ class Setup
 
 	protected function registerCore(array $baseConfig)
 	{
-		$installedFiles = [];
-
-		$installedFiles =
-			array_merge_recursive($this->basepackages->utils->init($this->container)->scanDir('system/Base', true), $this->basepackages->utils->init($this->container)->scanDir('system/Configs', true));
-
-		array_push($installedFiles['files'], 'index.php', 'core.json', 'system/bootstrap.php');
-
-		(new RegisterCore())->register($installedFiles, $baseConfig, $this->db);
+		(new RegisterCore())->register($baseConfig, $this->db);
 
 		return true;
 	}
@@ -388,7 +381,6 @@ class Setup
 	protected function registerModule($type)
 	{
 		if ($type === 'components') {
-
 			$adminComponents = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Components/', true);
 
 			if (!$adminComponents || count($adminComponents) === 0) {
@@ -431,7 +423,6 @@ class Setup
 				}
 			}
 		} else if ($type === 'packages') {
-
 			$adminPackages = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Packages/', true);
 
 			$adminPackages =
@@ -465,6 +456,13 @@ class Setup
 
 					if ($jsonFile['name'] === 'Storages') {
 						$this->registerStorages($jsonFile);
+					}
+
+					$jsonFile['files'] = [];
+
+					if ($jsonFile['name'] === 'Core') {
+						$jsonFile['files'] =
+							array_merge_recursive($this->basepackages->utils->init($this->container)->scanDir('system/', true), $this->basepackages->utils->init($this->container)->scanDir('apps/', true));
 					}
 
 					$this->registerCorePackage($jsonFile);
@@ -519,9 +517,7 @@ class Setup
 
 	protected function registerCoreComponent(array $componentFile, $menuId)
 	{
-		$installedFiles = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Components/' . $componentFile['name'], true);
-
-		return (new RegisterComponent())->register($this->db, $componentFile, $installedFiles, $menuId);
+		return (new RegisterComponent())->register($this->db, $componentFile, $menuId);
 	}
 
 	protected function registerCoreDashboard(array $componentFile)
@@ -546,26 +542,17 @@ class Setup
 
 	protected function registerCorePackage(array $packageFile)
 	{
-		$installedFiles = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Packages/' . $packageFile['name'], true);
-
-		return (new RegisterPackage())->register($this->db, $packageFile, $installedFiles);
+		return (new RegisterPackage())->register($this->db, $packageFile);
 	}
 
 	protected function registerCoreMiddleware(array $middlewareFile)
 	{
-		$installedFiles = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Middlewares/' . $middlewareFile['name'], true);
-
-		return (new RegisterMiddleware())->register($this->db, $middlewareFile, $installedFiles);
+		return (new RegisterMiddleware())->register($this->db, $middlewareFile);
 	}
 
 	protected function registerCoreView(array $viewFile)
 	{
-		$appInstalledFiles = $this->basepackages->utils->init($this->container)->scanDir('apps/Core/Views/', true, ['Html_compiled', 'linter-backup']);
-		$publicInstalledFiles = $this->basepackages->utils->init($this->container)->scanDir('public/dash/', true, ['linter-backup']);
-
-		$installedFiles = array_merge($appInstalledFiles, $publicInstalledFiles);
-
-		return (new RegisterView())->register($this->db, $viewFile, $installedFiles);
+		return (new RegisterView())->register($this->db, $viewFile);
 	}
 
 	public function validateData()

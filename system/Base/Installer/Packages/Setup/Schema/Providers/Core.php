@@ -66,44 +66,6 @@ class Core
 							'type'    => Column::TYPE_TEXT,
 							'notNull' => true,
 						]
-					),
-					new Column(
-						'files',
-						[
-							'type'    => Column::TYPE_MEDIUMTEXT,
-							'notNull' => false,
-						]
-					),
-					new Column(
-						'update_available',
-						[
-							'type'    => Column::TYPE_TINYINTEGER,
-							'size'    => 1,
-							'notNull' => false,
-						]
-					),
-					new Column(
-						'update_version',
-						[
-							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 15,
-							'notNull' => false,
-						]
-					),
-					new Column(
-						'updated_by',
-						[
-							'type'    => Column::TYPE_INTEGER,
-							'notNull' => true,
-						]
-					),
-					new Column(
-						'updated_on',
-						[
-							'type'    => Column::TYPE_TIMESTAMP,
-							'notNull' => true,
-							'default' => 'CURRENT_TIMESTAMP',
-						]
 					)
 				]
 			];

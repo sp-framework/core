@@ -6,7 +6,7 @@ use Phalcon\Helper\Json;
 
 class View
 {
-	public function register($db, $viewFile, $installedFiles)
+	public function register($db, $viewFile)
 	{
 		return $db->insertAsDict(
 			'modules_views',
@@ -32,7 +32,10 @@ class View
 					Json::encode(['1'=>['enabled'=>true]]),
 				'api_id'				=> 1,
 				'installed'				=> 1,
-				'files'					=> Json::encode($installedFiles),
+				'files'					=>
+					isset($viewFile['files']) ?
+					Json::encode($viewFile['files']) :
+					Json::encode([]),
 				'updated_by'			=> 0
 			]
 		);

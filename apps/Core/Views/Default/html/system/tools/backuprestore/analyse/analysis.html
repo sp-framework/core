@@ -1,128 +1,128 @@
 <div class="row">
     <div class="col">
-        <label>TAKEN AT: </label>
-        <span>{{backupInfoFile['takenAt']}}</span>
+        <label class="text-sm">TAKEN AT: </label>
+        <span class="text-sm">{{backupInfoFile['takenAt']}}</span>
     </div>
     <div class="col">
-        <label>CREATED BY: </label>
-        <span>{{backupInfoFile['createdBy']}}</span>
+        <label class="text-sm">CREATED BY: </label>
+        <span class="text-sm">{{backupInfoFile['createdBy']}}</span>
     </div>
     <div class="col">
-        <label>BACKUP NAME: </label>
-        <span>{{backupInfoFile['backupName']}}</span>
+        <label class="text-sm">BACKUP NAME: </label>
+        <span class="text-sm">{{backupInfoFile['backupName']}}</span>
     </div>
 </div>
 <div class="row">
     <div class="col">
-        <label>BACKUP APPS DIRECTORY: </label>
+        <label class="text-sm">BACKUP APPS DIRECTORY: </label>
         {% if backupInfoFile['request']['apps_dir'] == 'true' %}
-            <span>Yes</span>
+            <span class="text-sm">Yes</span>
         {% else %}
-            <span>No</span>
+            <span class="text-sm">No</span>
         {% endif %}
     </div>
     <div class="col">
-        <label>BACKUP SYSTEMS DIRECTORY: </label>
+        <label class="text-sm">BACKUP SYSTEMS DIRECTORY: </label>
         {% if backupInfoFile['request']['systems_dir'] == 'true' %}
-            <span>Yes</span>
+            <span class="text-sm">Yes</span>
         {% else %}
-            <span>No</span>
+            <span class="text-sm">No</span>
         {% endif %}
     </div>
     <div class="col">
-        <label>BACKUP PUBLIC DIRECTORY: </label>
+        <label class="text-sm">BACKUP PUBLIC DIRECTORY: </label>
         {% if backupInfoFile['request']['public_dir'] == 'true' %}
-            <span>Yes</span>
+            <span class="text-sm">Yes</span>
         {% else %}
-            <span>No</span>
+            <span class="text-sm">No</span>
         {% endif %}
     </div>
 </div>
 <div class="row">
     <div class="col">
-        <label>BACKUP PRIVATE DIRECTORY: </label>
+        <label class="text-sm">BACKUP PRIVATE DIRECTORY: </label>
         {% if backupInfoFile['request']['private_dir'] == 'true' %}
-            <span>Yes</span>
+            <span class="text-sm">Yes</span>
         {% else %}
-            <span>No</span>
+            <span class="text-sm">No</span>
         {% endif %}
     </div>
     <div class="col">
-        <label>BACKUP EXTERNAL DIRECTORY: </label>
+        <label class="text-sm">BACKUP EXTERNAL DIRECTORY: </label>
         {% if backupInfoFile['request']['external_dir'] == 'true' %}
-            <span>Yes</span>
+            <span class="text-sm">Yes</span>
         {% else %}
-            <span>No</span>
+            <span class="text-sm">No</span>
         {% endif %}
     </div>
     <div class="col">
-        <label>COMPILED HTML DIRECTORY: </label>
+        <label class="text-sm">COMPILED HTML DIRECTORY: </label>
         {% if backupInfoFile['request']['html_compiled'] == 'true' %}
-            <span>Yes</span>
+            <span class="text-sm">Yes</span>
         {% else %}
-            <span>No</span>
+            <span class="text-sm">No</span>
         {% endif %}
     </div>
 </div>
 <div class="row">
     <div class="col">
-        <label>VAR DIRECTORY: </label>
+        <label class="text-sm">VAR DIRECTORY: </label>
         {% if backupInfoFile['request']['var_dir'] == 'true' %}
-            <span>Yes</span>
+            <span class="text-sm">Yes</span>
         {% else %}
-            <span>No</span>
+            <span class="text-sm">No</span>
         {% endif %}
     </div>
     <div class="col">
-        <label>BACKUP EXTERNAL VENDOR DIRECTORY: </label>
+        <label class="text-sm">BACKUP EXTERNAL VENDOR DIRECTORY: </label>
         {% if backupInfoFile['request']['external_vendor_dir'] == 'true' %}
-            <span>Yes</span>
+            <span class="text-sm">Yes</span>
         {% else %}
-            <span>No</span>
+            <span class="text-sm">No</span>
         {% endif %}
     </div>
     <div class="col">
-        <label>OLD BACKUP FILES: </label>
+        <label class="text-sm">OLD BACKUP FILES: </label>
         {% if backupInfoFile['request']['old_backups'] == 'true' %}
-            <span>Yes</span>
+            <span class="text-sm">Yes</span>
         {% else %}
-            <span>No</span>
+            <span class="text-sm">No</span>
         {% endif %}
     </div>
 </div>
 <div class="row">
     <div class="col">
-        <label>DATABASE: </label>
+        <label class="text-sm">DATABASE: </label>
         {% if backupInfoFile['request']['database'] == 'true' %}
-            <span>Yes</span>
+            <span class="text-sm">Yes</span>
         {% else %}
-            <span>No</span>
+            <span class="text-sm">No</span>
         {% endif %}
     </div>
     <div class="col">
-        <label>SECURITY/DB KEYS: </label>
+        <label class="text-sm">SECURITY/DB KEYS: </label>
         {% if backupInfoFile['request']['keys'] == 'true' %}
-            <span>Yes</span>
+            <span class="text-sm">Yes</span>
         {% else %}
-            <span>No</span>
+            <span class="text-sm">No</span>
         {% endif %}
     </div>
     <div class="col">
-        <label>PASSWORD PROTECTED: </label>
+        <label class="text-sm">PASSWORD PROTECTED: </label>
         {% if backupInfoFile['request']['password_protect'] is defined and backupInfoFile['request']['password_protect'] !== '' %}
-            <span>Yes</span>
+            <span class="text-sm">Yes</span>
         {% else %}
-            <span>No</span>
+            <span class="text-sm">No</span>
         {% endif %}
     </div>
 </div>
 <div class="row">
     <div class="col">
-        <label>NOTES: </label>
+        <label class="text-sm">NOTES: </label>
         {% if backupInfoFile['request']['notes'] is defined and backupInfoFile['request']['notes'] != '' %}
             <p>{{backupInfoFile['request']['notes']}}</p>
         {% else %}
-            <span>-</span>
+            <span class="text-sm">-</span>
         {% endif %}
     </div>
 </div>

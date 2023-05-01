@@ -6,7 +6,7 @@ use Phalcon\Helper\Json;
 
 class Component
 {
-	public function register($db, $componentFile, $installedFiles, $menuId)
+	public function register($db, $componentFile, $menuId)
 	{
 		$componentApp = ['1'=>['enabled'=>true]];
 
@@ -46,7 +46,10 @@ class Component
 				'installed'				=> 1,
 				'apps'					=>
 					Json::encode($componentApp),
-				'files'					=> Json::encode($installedFiles),
+				'files'					=>
+					isset($componentFile['files']) ?
+					Json::encode($componentFile['files']) :
+					Json::encode([]),
 				'settings'				=>
 					isset($componentFile['settings']) ?
 					Json::encode($componentFile['settings']) :

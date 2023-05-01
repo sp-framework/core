@@ -39,4 +39,6 @@ class ModulesViews extends BaseModel
     public $updated_by;
 
     public $updated_on;
+
+    public $repo_details;
 }

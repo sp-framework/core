@@ -55,9 +55,29 @@ class TestComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $api = $this->basepackages->api->useApi(1);
+        $api = $this->basepackages->api->useApi(2);
 
         $responseArr = $api->useMethod('UserApi', 'userListRepos', [$api->getApiConfig()['org_user']])->getResponse(true);
+
+        // $responseArr = $api->useMethod('IssueApi', 'issueListIssues',
+        //     [
+        //         $api->getApiConfig()['org_user'],
+        //         $responseArr[0]['name'],
+        //         $state = 'open',
+        //         $labels = null,
+        //         $q = null,
+        //         $type = null,
+        //         $milestones = null,
+        //         $since = null,
+        //         $before = null,
+        //         $created_by = null,
+        //         $assigned_by = null,
+        //         $mentioned_by = null,
+        //         $page = null,
+        //         $limit = 5
+        //     ]
+        // )->getResponse(true);
+
         var_dump($responseArr);die();
 
         // try {

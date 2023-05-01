@@ -27,18 +27,37 @@ class ApiComponent extends BaseComponent
         $this->view->apiLocations = $this->apiPackage->apiLocations;
 
         if (isset($this->getData()['id'])) {
-
             if ($this->getData()['id'] != 0) {
                 $api = $this->apiPackage->getApiById($this->getData()['id']);
+
+                if (isset($this->getData()['repository'])) {
+                    $api['repository'] = true;
+                }
             } else {
                 $api = [];
                 $api['setup'] = 0;
-                $api['category'] = $this->getData()['category'];
-                $api['provider'] = $this->getData()['provider'];
 
-                //Check if provider class exists
-                if (!$this->apiPackage->useApi(['config' => ['category' => $this->getData()['category'], 'provider' => $this->getData()['provider']]])) {
-                    throw new ControllerNotFoundException;
+                if (isset($this->getData()['repository'])) {
+                    $api['category'] = 'repos';
+                    $api['location'] = 'system';
+                    $api['repository'] = true;
+                }
+
+                if (isset($this->getData()['category']) && isset($this->getData()['provider'])) {
+                    $api['category'] = $this->getData()['category'];
+                    $api['provider'] = $this->getData()['provider'];
+
+                    //Check if provider class exists
+                    if (!$this->apiPackage->useApi(['config' =>
+                        ['category' => $this->getData()['category'],
+                         'provider' => $this->getData()['provider'],
+                         'test'     => true
+                        ]
+                    ])) {
+                        throw new ControllerNotFoundException;
+                    }
+
+                    $api['location'] = $this->apiPackage->apiLocation;
                 }
             }
 

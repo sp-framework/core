@@ -147,7 +147,7 @@ class Components
 					new Column(
 						'files',
 						[
-							'type'    => Column::TYPE_TEXT,
+							'type'    => Column::TYPE_MEDIUMTEXT,
 							'notNull' => false,
 						]
 					),
@@ -187,6 +187,13 @@ class Components
 							'type'    => Column::TYPE_TIMESTAMP,
 							'notNull' => true,
 							'default' => 'CURRENT_TIMESTAMP',
+						]
+					),
+					new Column(
+						'repo_details',
+						[
+							'type'    => Column::TYPE_JSON,
+							'notNull' => false,
 						]
 					)
 				],

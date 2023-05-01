@@ -67,41 +67,27 @@ var BazCore = function() {
                         cache: true
                     }).done(function() {
                         $('body').trigger('libsLoadComplete');
-                        // BazLTELayout.init({
-                        //     fixHeightTask       : 'init'
-                        // });
-                        // BazLTEPushMenu.init();
-                        // BazLTETreeView.init();
-                        // BazLTEControlSidebar.init();
                         bazFooterFunctions(_extends(BazCore.defaults, options));
                         dataCollection.env.libsLoaded = true;
                     });
                 });
             }
         } else if (dataCollection.env.libsLoaded === true) {
-            // BazLTELayout.init({
-            //     fixHeightTask       : 'init'
-            // });
-            // BazLTEPushMenu.init();
-            // BazLTETreeView.init();
-            // BazLTEControlSidebar.init();
             bazFooterFunctions(_extends(BazCore.defaults, options));
         }
     }
     //Footer
     function bazFooterFunctions() {
-        // PNotify, global defaults override
-        // $.fn.select2.defaults.set("theme", "bootstrap4");
         PNotify.defaultModules.set(PNotifyBootstrap4, {});
         PNotify.defaultModules.set(PNotifyFontAwesome5, {});
         PNotify.defaultModules.set(PNotifyFontAwesome5Fix, {});
         PNotify.defaultModules.set(PNotifyMobile, {});
-        // PNotify.defaultModules.set(PNotifyDesktop, {});
         PNotify.defaultModules.set(PNotifyPaginate, {});
         Pace.options.ajax.trackWebSockets = false;
         bazContent();
         toolTipsAndPopovers();
         bazUpdateBreadcrumb();
+        initResizeElement();
         openMenu();
 
         if (dataCollection.env.currentRoute.indexOf('auth') === -1) {
@@ -159,34 +145,93 @@ var BazCore = function() {
         $('[data-toggle="popover"]').popover({container:'body', trigger: 'focus'});
     }
 
+    var element = null;
+    var startX, startY, startWidth, startHeight, parentWidth;
+
+    function initResizeElement() {
+        var vdivide = document.getElementsByClassName("vdivide-resizable");
+
+        if (vdivide.length > 0) {
+
+            for (var i = 0; i < vdivide.length; i++) {
+                var p = vdivide[i];
+
+                var right = document.createElement("div");
+                right.className = "resizer-right";
+                p.appendChild(right);
+                right.addEventListener("mousedown", initDrag, false);
+                right.parentPopup = p;
+
+                var bottom = document.createElement("div");
+                bottom.className = "resizer-bottom";
+                p.appendChild(bottom);
+                bottom.addEventListener("mousedown", initDrag, false);
+                bottom.parentPopup = p;
+
+                var both = document.createElement("div");
+                both.className = "resizer-both";
+                p.appendChild(both);
+                both.addEventListener("mousedown", initDrag, false);
+                both.parentPopup = p;
+            }
+        }
+    }
+
+    function initDrag(e) {
+        element = this.parentPopup;
+
+        startX = e.clientX;
+        startY = e.clientY;
+        startWidth = parseInt(
+                              document.defaultView.getComputedStyle(element).width,
+                              10
+                              );
+        startHeight = parseInt(
+                               document.defaultView.getComputedStyle(element).height,
+                               10
+                               );
+        parentWidth = parseInt(
+                               document.defaultView.getComputedStyle(element.parentNode).width,
+                               10
+                               );
+        document.documentElement.addEventListener("mousemove", doDrag, false);
+        document.documentElement.addEventListener("mouseup", stopDrag, false);
+    }
+
+    function doDrag(e) {
+        element.style.width = startWidth + e.clientX - startX + "px";
+        element.style.maxWidth = startWidth + e.clientX - startX + "px";
+        element.style.height = startHeight + e.clientY - startY + "px";
+        for (let sibling of element.parentNode.children) {
+            if (sibling !== element) {
+                sibling.style.maxWidth = parentWidth - (startWidth + e.clientX - startX) + "px";
+                sibling.style.width = parentWidth - (startWidth + e.clientX - startX) + "px";
+            }
+        }
+    }
+
+    function stopDrag() {
+        document.documentElement.removeEventListener("mousemove", doDrag, false);
+        document.documentElement.removeEventListener("mouseup", stopDrag, false);
+    }
+
     //Breadcrumb
     function bazUpdateBreadcrumb() {
-        //eslint-disable-next-line
-        // console.log(dataCollection.env.breadcrumb);
         if (dataCollection.env.breadcrumb) {
             var mainBreadcrumb, titleBreadcrumbArr;
             var breadcrumbArr = dataCollection.env.breadcrumb.split('/');
 
-            //eslint-disable-next-line
-            // console.log(breadcrumbArr);
-            // if (breadcrumbArr.length > 1) {
-                var titleText = breadcrumbArr.pop();
-                $('#content-header-breadcrumb ol.breadcrumb').empty();
-                titleBreadcrumbArr = [];
-                $.each(breadcrumbArr, function(index,path) {
-                    titleBreadcrumbArr.push('<li class="breadcrumb-item text-uppercase">' + path + '</li>');
-                });
-                mainBreadcrumb =
-                    '<li class="breadcrumb-item"><i class="fa fa-home" style="position: relative;top: 4px;"></i></li>' +
-                    titleBreadcrumbArr.join('');
-                $('#content-header-breadcrumb ol.breadcrumb').append(mainBreadcrumb);
-                $('#content-header-breadcrumb ol.breadcrumb').append('<li class="breadcrumb-item text-uppercase font-weight-bolder">' + titleText + '</li>');
-            // } else {
-            //     $('#content-header-breadcrumb ol.breadcrumb').empty().append(
-            //         '<li class="breadcrumb-item"><i class="fa fa-home" style="position: relative;top: 4px;"></i></li>' +
-            //         '<li class="breadcrumb-item text-uppercase">Home</li>'
-            //     );
-            // }
+            var titleText = breadcrumbArr.pop();
+            $('#content-header-breadcrumb ol.breadcrumb').empty();
+            titleBreadcrumbArr = [];
+            $.each(breadcrumbArr, function(index,path) {
+                titleBreadcrumbArr.push('<li class="breadcrumb-item text-uppercase">' + path + '</li>');
+            });
+            mainBreadcrumb =
+                '<li class="breadcrumb-item"><i class="fa fa-home" style="position: relative;top: 4px;"></i></li>' +
+                titleBreadcrumbArr.join('');
+            $('#content-header-breadcrumb ol.breadcrumb').append(mainBreadcrumb);
+            $('#content-header-breadcrumb ol.breadcrumb').append('<li class="breadcrumb-item text-uppercase font-weight-bolder">' + titleText + '</li>');
         } else {
             $('#content-header-breadcrumb ol.breadcrumb').empty().append(
                 '<li class="breadcrumb-item"><i class="fas fa-fw fa-home" style="position: relative;top: 4px;"></i></li>' +
@@ -197,7 +242,6 @@ var BazCore = function() {
 
     //Menu
     function openMenu() {
-
         var currentActiveLocation = $('a[href="/' + dataCollection.env.currentRoute + '"].nav-link');
 
         if (currentActiveLocation.length === 0) {
@@ -215,15 +259,6 @@ var BazCore = function() {
             $(currentActiveLocation).parents('ul.nav-treeview').show();
             $(currentActiveLocation).parents('ul.nav-treeview').siblings('a').addClass('active');
             $(currentActiveLocation).parents('li.has-treeview').addClass('menu-open');
-            if ($(currentActiveLocation).parents('ul.nav-treeview').length > 1) {
-                $(document).ready(function() {
-                    // $(currentActiveLocation).parents('.has-treeview').siblings('.has-treeview').children('.nav-treeview').hide();
-                });
-            } else {
-                $(document).ready(function() {
-                    // $(currentActiveLocation).parent().siblings('.has-treeview').children('.nav-treeview').hide();
-                });
-            }
         } else {
             $(currentActiveLocation).addClass('active');
         }
@@ -284,6 +319,9 @@ var BazCore = function() {
         }
         BazCore.bazContent = function(options) {
             bazContent(_extends(BazCore.defaults, options));
+        }
+        BazCore.initResizeElement = function() {
+            initResizeElement();
         }
     }
 

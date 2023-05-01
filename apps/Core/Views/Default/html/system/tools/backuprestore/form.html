@@ -302,7 +302,7 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
     });
 
     $('#{{componentId}}-analysis-restore-analyse-modal').on('hide.bs.modal', function(e) {
-        $('#{{componentId}}-analysis-restore-analyse-modal .modal-body').empty();
+        $('#{{componentId}}-analysis-analyse-info').empty();
         $('#{{componentId}}-analysis-start-restore').attr('disabled', false);
         $('#{{componentId}}-analysis-start-restore').children('i').attr('hidden', true);
     });

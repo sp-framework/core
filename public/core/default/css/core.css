@@ -41899,7 +41899,12 @@ a.text-muted:hover {
 }
 
 /* VERTICAL DIVIDER */
-.vdivide > div[class*='col']:not(:last-child):after {
+.vdivide-resizable {
+  flex: auto !important;
+}
+
+.vdivide > div[class*='col']:not(:last-child):after,
+.vdivide-resizable > div[class*='col']:not(:last-child):after {
   background: #ccd4d5;
   width: 1px;
   content: "";
@@ -41912,10 +41917,63 @@ a.text-muted:hover {
 }
 
 @media (max-width: 767px) {
-  .vdivide > div[class*='col']:not(:last-child):after {
+  .vdivide-resizable {
+    flex: auto !important;
+  }
+
+  .vdivide > div[class*='col']:not(:last-child):after,
+  .vdivide-resizable > div[class*='col']:not(:last-child):after {
     background: none;
   }
 }
+/*Resizeable*/
+.vdivide-resizable .resizer-right {
+  width: 5px;
+  height: 100%;
+  background: transparent;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: e-resize;
+}
+
+.vdivide-resizable .resizer-bottom {
+  width: 100%;
+  height: 5px;
+  background: transparent;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: n-resize;
+}
+
+.vdivide-resizable .resizer-both {
+  width: 5px;
+  height: 5px;
+  background: transparent;
+  z-index: 10;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: nw-resize;
+}
+
+/*NOSELECT*/
+.vdivide-resizable * {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
 /* VERTICAL DIVIDER END */
 /* DISABLE NUMERIC INPUT SPINNER */
 /* Chrome */

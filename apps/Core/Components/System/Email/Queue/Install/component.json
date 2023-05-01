@@ -7,7 +7,7 @@
     "category"      : "system",
     "sub_category"  : "admin",
     "version"       : "0.0.1",
-    "repo"          : "https://.../dash-component-system-admin-email-queue",
+    "repo"          : "https://.../",
     "class"         : "Apps\\Core\\Components\\System\\Email\\Queue\\QueueComponent",
     "dependencies"  : {
         "core"          : {
@@ -18,14 +18,7 @@
         "components"    : [],
         "packages"      : [],
         "middlewares"   : [],
-        "views"         :
-        [
-            {
-                "name"      : "Default",
-                "version"   : "0.0.1",
-                "repo"      : "https://.../"
-            }
-        ]
+        "views"         : []
     },
     "menu"              : {
         "seq"           : 6,

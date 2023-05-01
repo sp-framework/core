@@ -1,5 +1,5 @@
 /* exported BazContentLoader */
-/* global BazHelpers Swal */
+/* global BazHelpers Swal BazCore */
 /*
 * @title                    : BazContentLoader
 * @description              : Make Ajax Calls and parse content
@@ -275,6 +275,7 @@ var BazContentLoader = function() {
                 } else {
                     window['dataCollection']['env']['wizard'] = false;
                 }
+                BazCore.initResizeElement();
             });
         }, options.ajaxLoadDelay);
 
@@ -357,6 +358,7 @@ var BazContentLoader = function() {
                 $('.tooltip').remove();
                 $('[data-toggle="tooltip"]').tooltip();
                 $('[data-toggle="popover"]').popover('enable');
+                BazCore.initResizeElement();
             });
         }, options.modalLoadDelay);
     }

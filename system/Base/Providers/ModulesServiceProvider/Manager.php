@@ -29,6 +29,59 @@ class Manager extends BasePackage
 
     protected $views;
 
+    public function getModuleInfo($data)
+    {
+        if ($data['module_type'] === 'component') {
+            //
+        } else if ($data['module_type'] === 'package') {
+            $module = $this->modules->packages->getIdPackage($data['module_id']);
+
+            if ($module) {
+                unset($module['notification_subscriptions']);
+                unset($module['files']);
+                unset($module['settings']);
+
+                $moduleUpdatedBy = $module['updated_by'];
+
+                if ($module['updated_by'] == 0) {
+                    $module['updated_by'] = 'System';
+                } else {
+                    $module['updated_by'] = $this->basepackages->accounts->getById($module['updated_by'])['email'];
+                }
+
+                if (isset($data['sync']) && $data['sync'] == true) {
+                    $repoNameArr = explode('/', $module['repo']);
+
+                    try {
+                        $api = $this->basepackages->api->useApi($module['api_id']);
+
+                        $responseArr = $api->useMethod('RepositoryApi', 'repoGet', [$api->getApiConfig()['org_user'], Arr::last($repoNameArr)])->getResponse(true);
+
+                        if ($responseArr && $responseArr !== '') {
+                            $module['repo_details'] = Json::encode($responseArr);
+                            $module['updated_by'] = $moduleUpdatedBy;
+
+                            $this->modules->packages->updatePackage($module);
+                            $module['repo_details'] = $responseArr;
+                        }
+                    } catch (ClientException | \throwable $e) {
+                        $this->addResponse($e->getMessage(), 2, ['module' => $module]);
+
+                        return false;
+                    }
+                }
+
+                $this->addResponse('Module information success.',0, ['module' => $module]);
+            } else {
+                $this->addResponse('Module information failed.', 1, []);
+            }
+        } else if ($data['module_type'] === 'middleware') {
+            //
+        } else if ($data['module_type'] === 'view') {
+            //
+        }
+    }
+
     public function syncRemoteWithLocal($id)
     {
         $this->api = $this->basepackages->api->useApi($id, true);
@@ -74,122 +127,57 @@ class Manager extends BasePackage
         return false;
     }
 
-    public function getModulesData($filter = null, $inclCore = false, $getFresh = false)
+    public function getRepositoryModules($data)
     {
-        $this->getLocalModules($filter, $inclCore, $getFresh);
+        $modules = [];
+        $sortedModules = [];
 
-        $this->packagesData->responseCode = 0;
+        $modules['components'] = $this->modules->components->getComponentsByApiId($data['api_id']);
+        $modules['middlewares'] = $this->modules->middlewares->getMiddlewaresByApiId($data['api_id']);
+        $modules['packages'] = $this->modules->packages->getPackagesByApiId($data['api_id']);
+        $modules['views'] = $this->modules->views->getViewsByApiId($data['api_id']);
 
-        $this->packagesData->modulesData = $this->localModules;
+        foreach ($modules as $moduleType => $modulesArr) {
+            if (count($modulesArr) > 0) {
+                foreach ($modulesArr as $moduleArr) {
+                    if (!isset($sortedModules[$moduleArr['app_type']])) {
+                        $sortedModules[$moduleArr['app_type']] = [];
+                        $sortedModules[$moduleArr['app_type']]['name'] = $moduleArr['app_type'];
+                    }
 
-        return true;
+                    if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']])) {
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']] = [];
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['name'] = $moduleArr['module_type'];
+                    }
+
+                    if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']])) {
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']] = [];
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['name'] = $moduleArr['category'];
+                    }
+
+                    if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']])) {
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']] = [];
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['name'] = $moduleArr['sub_category'];
+
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['childs'] = [];
+                    }
+
+                    $module['id'] = $moduleArr['id'];
+                    $module['name'] = $moduleArr['name'];
+                    if (isset($moduleArr['display_name'])) {
+                        $module['name'] = $moduleArr['display_name'];
+                    }
+                    $module['data']['moduleid'] = $moduleArr['module_type'] . '-' . $moduleArr['id'];
+                    $module['data']['installed'] = $moduleArr['installed'];
+                    $module['data']['update_available'] = $moduleArr['update_available'];
+
+                    array_push($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['childs'], $module);
+                }
+            }
+        }
+
+        $this->addResponse('Ok', 0, ['modules' => $sortedModules]);
     }
-
-    // public function getLocalModules($filter = null, $inclCore = false, $getFresh = false)
-    // {
-    //     $this->packagesData->appInfo = $this->app;
-
-    //     if ($getFresh) {
-    //         $this->core = $this->modules->core->init(true)->core;
-    //     } else {
-    //         $this->core = $this->modules->core->core;
-    //     }
-
-    //     if ($filter === 'core') {
-    //         $this->localModules['core'][$this->core[0]['id']] = $this->core[0];
-    //         return;
-    //     }
-
-    //     if ($inclCore) {
-    //         $this->localModules['core'][$this->core[0]['id']] = $this->core[0];
-    //     }
-
-    //     // $this->applyFilters($filter, $getFresh);
-
-    //     if (count($this->components) > 0) {
-    //         foreach ($this->components as $componentKey => $component) {
-    //             $this->localModules['components'][$component['id']] = $component;
-    //             $this->localModules['components'][$component['id']]['settings']
-    //                 = Json::decode($component['settings'], true);
-    //             $this->localModules['components'][$component['id']]['dependencies']
-    //                 = Json::decode($component['dependencies'], true);
-
-    //             if ($component['installed'] == 0) {
-    //                 $updatedOnDate = new \DateTime($component['updated_on']);
-    //                 $now = new \DateTime('now');
-    //                 $diff = date_diff($updatedOnDate, $now);
-    //                 if ($diff->h < 24) {
-    //                     $this->localModules['components'][$component['id']]['new'] = true;
-    //                 }
-    //             }
-    //         }
-    //     } else {
-    //         $this->localModules['components'] = [];
-    //     }
-
-    //     if (count($this->packages) > 0) {
-    //         foreach ($this->packages as $packagesKey => $packages) {
-    //             $this->localModules['packages'][$packages['id']] = $packages;
-    //             $this->localModules['packages'][$packages['id']]['settings']
-    //                 = Json::decode($packages['settings'], true);
-
-    //             if ($packages['installed'] == 0) {
-    //                 $updatedOnDate = new \DateTime($packages['updated_on']);
-    //                 $now = new \DateTime('now');
-    //                 $diff = date_diff($updatedOnDate, $now);
-    //                 if ($diff->h < 24) {
-    //                     $this->localModules['packages'][$packages['id']]['new'] = true;
-    //                 }
-    //             }
-    //         }
-    //     } else {
-    //         $this->localModules['packages'] = [];
-    //     }
-
-    //     if (count($this->middlewares) > 0) {
-    //         foreach ($this->middlewares as $middlewareKey => $middleware) {
-    //             $this->localModules['middlewares'][$middleware['id']] = $middleware;
-    //             $this->localModules['middlewares'][$middleware['id']]['settings']
-    //                 = Json::decode($middleware['settings'], true);
-
-    //             if ($middleware['installed'] == 0) {
-    //                 $updatedOnDate = new \DateTime($middleware['updated_on']);
-    //                 $now = new \DateTime('now');
-    //                 $diff = date_diff($updatedOnDate, $now);
-    //                 if ($diff->h < 24) {
-    //                     $this->localModules['middlewares'][$middleware['id']]['new'] = true;
-    //                 }
-    //             }
-    //         }
-    //     } else {
-    //         $this->localModules['middlewares'] = [];
-    //     }
-
-    //     if (count($this->views) > 0) {
-    //         foreach ($this->views as $viewKey => $view) {
-    //             $this->localModules['views'][$view['id']] = $view;
-    //             $this->localModules['views'][$view['id']]['settings']
-    //                 = Json::decode($view['settings'], true);
-    //             $this->localModules['views'][$view['id']]['dependencies']
-    //                 = Json::decode($view['dependencies'], true);
-
-    //             if ($middleware['installed'] == 0) {
-    //                 $updatedOnDate = new \DateTime($view['updated_on']);
-    //                 $now = new \DateTime('now');
-    //                 $diff = date_diff($updatedOnDate, $now);
-    //                 if ($diff->h < 24) {
-    //                     $this->localModules['views'][$view['id']]['new'] = true;
-    //                 }
-    //             }
-    //         }
-    //     } else {
-    //         $this->localModules['views'] = [];
-    //     }
-
-    //     $this->packagesData->responseCode = 0;
-
-    //     $this->packagesData->modulesData = $this->localModules;
-    // }
 
     // protected function applyFilters($filter = null, $getFresh = false)
     // {

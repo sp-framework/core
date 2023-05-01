@@ -4,7 +4,7 @@ namespace System\Base\Installer\Packages\Setup\Register\Providers;
 
 class Core
 {
-	public function register($installedFiles, $baseConfig, $db)
+	public function register($baseConfig, $db)
 	{
 		$db->insertAsDict(
 			'service_provider_core',
@@ -17,9 +17,7 @@ class Core
 				'settings'			 	=>
 					isset($baseConfig['settings']) ?
 					json_encode($baseConfig['settings']) :
-					null,
-				'files'					=> json_encode($installedFiles),
-				'updated_by'			=> 0
+					null
 			]
 		);
 	}

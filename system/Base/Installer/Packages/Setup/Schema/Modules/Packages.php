@@ -125,7 +125,7 @@ class Packages
 					new Column(
 						'files',
 						[
-							'type'    => Column::TYPE_TEXT,
+							'type'    => Column::TYPE_MEDIUMTEXT,
 							'notNull' => false,
 						]
 					),
@@ -165,6 +165,13 @@ class Packages
 							'type'    => Column::TYPE_TIMESTAMP,
 							'notNull' => true,
 							'default' => 'CURRENT_TIMESTAMP',
+						]
+					),
+					new Column(
+						'repo_details',
+						[
+							'type'    => Column::TYPE_JSON,
+							'notNull' => false,
 						]
 					),
 					new Column(

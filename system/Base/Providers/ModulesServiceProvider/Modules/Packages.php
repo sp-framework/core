@@ -36,6 +36,19 @@ class Packages extends BasePackage
 		return false;
 	}
 
+	public function getPackagesByApiId($id)
+	{
+		$packages = [];
+
+		foreach($this->packages as $package) {
+			if ($package['api_id'] == $id) {
+				array_push($packages, $package);
+			}
+		}
+
+		return $packages;
+	}
+
 	public function getNamedPackageForRepo($name, $repo)
 	{
 		foreach($this->packages as $package) {

@@ -6,7 +6,7 @@ use Phalcon\Helper\Json;
 
 class Package
 {
-	public function register($db, $packageFile, $installedFiles)
+	public function register($db, $packageFile)
 	{
 		return $db->insertAsDict(
 			'modules_packages',
@@ -29,7 +29,10 @@ class Package
 					Json::encode(['1'=>['enabled'=>true]]),
 				'api_id'				=> 1,
 				'installed'				=> 1,
-				'files'					=> Json::encode($installedFiles),
+				'files'					=>
+					isset($packageFile['files']) ?
+					Json::encode($packageFile['files']) :
+					Json::encode([]),
 				'updated_by'			=> 0
 			]
 		);
