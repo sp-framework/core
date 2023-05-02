@@ -9132,17 +9132,40 @@ var BazContentFields = function() {
         options = $.extend({ }, options);
         // Init
         dataCollection[componentId][sectionId][thisFieldId]['jstree'] = $(fieldId).jstree(options);
+
+        var jstreeElements = $(fieldId).jstree().get_json('#',{'flat':true});
+        if (jstreeElements.length === 0) {
+            $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().addClass('d-none');
+            $('#' + thisFieldId + '-tree-search-input').val('');
+            $('#' + thisFieldId + '-tools-add').attr('hidden', true);
+            $('#' + thisFieldId + '-tools-edit').attr('hidden', true);
+            $('#' + thisFieldId + '-tools-collapse').attr('hidden', true);
+            $('#' + thisFieldId + '-tools-expand').attr('hidden', true);
+
+            $('#' + thisFieldId + '-tree-div').append(
+                'NO ' + $('#' + thisFieldId + '-tree-div').siblings('label').html() + '!'
+            );
+
+            if (options.afterInit) {
+                options.afterInit(dataCollection);
+            }
+            return;
+        }
+
         // Search
         if (options.bazJstreeOptions.search == null || options.bazJstreeOptions.search) {
             $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().removeClass('d-none');
+            $('#' + thisFieldId + '-tree-search-input').off();
             $('#' + thisFieldId + '-tree-search-input').on('keyup', function() {
                 $(fieldId).jstree(true).search($(this).val());
             });
         }
+
         var selectedNode;
         // Add New Node
         if (options.bazJstreeOptions.add == null || options.bazJstreeOptions.add) {
             $('#' + thisFieldId + '-tools-add').attr('hidden', false);
+            $('#' + thisFieldId + '-tools-add').off();
             $('#' + thisFieldId + '-tools-add').click(function(e) {
                 e.preventDefault();
                 var thisFieldId = $(fieldId)[0].id;
@@ -9182,6 +9205,7 @@ var BazContentFields = function() {
         // Edit Selected Node
         if (options.bazJstreeOptions.edit == null || options.bazJstreeOptions.edit) {
             $('#' + thisFieldId + '-tools-edit').attr('hidden', false);
+            $('#' + thisFieldId + '-tools-edit').off();
             $('#' + thisFieldId + '-tools-edit').click(function(e) {
                 e.preventDefault();
                 selectedNode = $(fieldId).jstree('get_selected', true);
@@ -9221,6 +9245,7 @@ var BazContentFields = function() {
         // Collapse all Nodes
         if (options.bazJstreeOptions.collapse == null || options.bazJstreeOptions.collapse) {
             $('#' + thisFieldId + '-tools-collapse').attr('hidden', false);
+            $('#' + thisFieldId + '-tools-collapse').off();
             $('#' + thisFieldId + '-tools-collapse').click(function(e) {
                 e.preventDefault();
                 $(fieldId).jstree('deselect_all');
@@ -9230,6 +9255,7 @@ var BazContentFields = function() {
         // Expand all Nodes
         if (options.bazJstreeOptions.expand == null || options.bazJstreeOptions.expand) {
             $('#' + thisFieldId + '-tools-expand').attr('hidden', false);
+            $('#' + thisFieldId + '-tools-expand').off();
             $('#' + thisFieldId + '-tools-expand').click(function(e) {
                 e.preventDefault();
                 $(fieldId).jstree('deselect_all');

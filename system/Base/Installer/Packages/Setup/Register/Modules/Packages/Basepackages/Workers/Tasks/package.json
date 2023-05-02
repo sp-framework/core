@@ -2,7 +2,7 @@
     "name"          : "Tasks",
     "display_name"  : "Tasks",
     "description"   : "Basepackage Tasks",
-    "module_type"   : "package",
+    "module_type"   : "packages",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "admin",

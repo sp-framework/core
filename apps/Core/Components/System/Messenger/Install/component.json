@@ -2,7 +2,7 @@
     "route": "system/messenger",
     "name": "Messenger",
     "description": "Messenger for collaborating with other users on the system.",
-    "module_type": "component",
+    "module_type": "components",
     "app_type": "core",
     "category": "system",
     "sub_category": "tools",

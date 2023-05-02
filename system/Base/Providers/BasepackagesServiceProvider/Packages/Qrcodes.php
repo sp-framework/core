@@ -77,7 +77,7 @@ class Qrcodes extends BasePackage
         $this->qrcodesPackage['settings'] = Json::encode($this->qrcodesSettings);
 
 
-        $this->modules->packages->updatePackage($this->qrcodesPackage);
+        $this->modules->packages->updatePackages($this->qrcodesPackage);
 
         $this->packagesData->responseCode = $this->modules->packages->packagesData->responseCode;
 

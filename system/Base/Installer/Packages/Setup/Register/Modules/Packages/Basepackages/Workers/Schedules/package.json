@@ -2,7 +2,7 @@
     "name"          : "Schedules",
     "display_name"  : "Schedules",
     "description"   : "Basepackage Schedules",
-    "module_type"   : "package",
+    "module_type"   : "packages",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "admin",

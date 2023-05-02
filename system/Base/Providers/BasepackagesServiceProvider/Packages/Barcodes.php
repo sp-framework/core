@@ -56,7 +56,7 @@ class Barcodes extends BasePackage
 
         $this->barcodesPackage['settings'] = Json::encode($this->barcodesSettings);
 
-        $this->modules->packages->updatePackage($this->barcodesPackage);
+        $this->modules->packages->updatePackages($this->barcodesPackage);
 
         $this->packagesData->responseCode = $this->modules->packages->packagesData->responseCode;
 

@@ -146,7 +146,8 @@ var BazCore = function() {
     }
 
     var element = null;
-    var startX, startY, startWidth, startHeight, parentWidth;
+    var startX, startWidth, parentWidth;
+    // var startY, startHeight;
 
     function initResizeElement() {
         var vdivide = document.getElementsByClassName("vdivide-resizable");
@@ -181,15 +182,15 @@ var BazCore = function() {
         element = this.parentPopup;
 
         startX = e.clientX;
-        startY = e.clientY;
+        // startY = e.clientY;
         startWidth = parseInt(
                               document.defaultView.getComputedStyle(element).width,
                               10
                               );
-        startHeight = parseInt(
-                               document.defaultView.getComputedStyle(element).height,
-                               10
-                               );
+        // startHeight = parseInt(
+        //                        document.defaultView.getComputedStyle(element).height,
+        //                        10
+        //                        );
         parentWidth = parseInt(
                                document.defaultView.getComputedStyle(element.parentNode).width,
                                10
@@ -201,7 +202,7 @@ var BazCore = function() {
     function doDrag(e) {
         element.style.width = startWidth + e.clientX - startX + "px";
         element.style.maxWidth = startWidth + e.clientX - startX + "px";
-        element.style.height = startHeight + e.clientY - startY + "px";
+        // element.style.height = startHeight + e.clientY - startY + "px";
         for (let sibling of element.parentNode.children) {
             if (sibling !== element) {
                 sibling.style.maxWidth = parentWidth - (startWidth + e.clientX - startX) + "px";

@@ -136,7 +136,7 @@ class Packages extends BasePackage
 		}
 	}
 
-	public function updatePackage(array $data)
+	public function updatePackages(array $data)
 	{
 		if ($this->update($data)) {
 			$this->addResponse('Updated ' . $data['name'] . ' package');

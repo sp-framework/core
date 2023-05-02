@@ -2,7 +2,7 @@
 	"route"			: "devtools/api/contracts",
 	"name"			: "Devtools Contracts",
 	"description"	: "Contracts generate API code using openapi standard",
-	"module_type"   : "component",
+	"module_type"   : "components",
 	"app_type"      : "core",
 	"category"      : "system",
 	"sub_category"  : "devtools",

@@ -2,7 +2,7 @@
     "name"          : "AddressBook",
     "display_name"  : "Address Book",
     "description"   : "Basepackage Address Book",
-    "module_type"   : "package",
+    "module_type"   : "packages",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

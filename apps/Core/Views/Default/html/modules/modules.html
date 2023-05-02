@@ -1,139 +1,221 @@
-<div class="row vdivide">
+<div class="row">
     <div id="repo" class="col">
         {% include 'modules/repositories/list.html' %}
     </div>
 </div>
-<hr>
-<div class="row vdivide">
-    <div class="col-md-3 vdivide-resizable">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                                 : component,
-                'componentName'                             : componentName,
-                'componentId'                               : componentId,
-                'sectionId'                                 : sectionId,
-                'fieldId'                                   : 'modules',
-                'fieldLabel'                                : 'Modules',
-                'fieldType'                                 : 'jstree',
-                'fieldHelp'                                 : true,
-                'fieldHelpTooltipContent'                   : 'Available modules on repository.',
-                'fieldRequired'                             : false,
-                'fieldBazScan'                              : true,
-                'fieldJstreeSearch'                         : true,
-                'fieldBazPostOnCreate'                      : false,
-                'fieldBazPostOnUpdate'                      : false,
-                'fieldJstreeDataSrcArr'                     : ["modules":["srcArr" : modules]],
-                'fieldJstreeAdd'                            : false,
-                'fieldJstreeEdit'                           : false,
-                'fieldJstreeExpand'                         : true,
-                'fieldJstreeCollapse'                       : true,
-                'fieldJstreeFirstOpen'                      : true,
-                'fieldJstreeAllOpen'                        : false,
-                'fieldJstreeAllChecked'                     : false,
-                'fieldJstreeRootIcon'                       : 'th',
-                'fieldJstreeToggleAllChildren'              : true,
-                'fieldJstreeIncludeRootInPath'              : true,
-                'fieldJstreeSelectEndNodeOnly'              : true,
-                'fieldJstreeShowDots'                       : true,
-                'fieldJstreeDoubleClickToggle'              : true,
-                'fieldJstreeMultiple'                       : true,
-                'fieldJstreeSearchCaseSensitive'            : false,
-                'fieldJstreeSearchShowOnlyMatches'          : false,
-                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
-                'fieldJstreeHideJstreeIcons'                : false,
-                'fieldJstreeReplaceIdWithDataField'         : 'moduleid',
-                'fieldJstreePlugins'                        : ["search", "types"],
-                'fieldJstreeAdditionalClass'                : 'text-uppercase'
-            ]
-        )}}
-    </div>
+<div id="repo-details" class="row" hidden>
     <div class="col">
-        <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-error" hidden>
-            <div class="col">
-                <h6><i class="fa fa-fw fa-info-circle text-danger"></i> Error loading module information. Please contact administrator.</h6>
+        <hr>
+        <div class="row vdivide">
+            <div class="col-md-3 vdivide-resizable">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                                 : component,
+                        'componentName'                             : componentName,
+                        'componentId'                               : componentId,
+                        'sectionId'                                 : sectionId,
+                        'fieldId'                                   : 'modules',
+                        'fieldLabel'                                : 'Modules',
+                        'fieldType'                                 : 'jstree',
+                        'fieldHelp'                                 : true,
+                        'fieldHelpTooltipContent'                   : 'Available modules on repository.',
+                        'fieldRequired'                             : false,
+                        'fieldBazScan'                              : true,
+                        'fieldJstreeSearch'                         : true,
+                        'fieldBazPostOnCreate'                      : false,
+                        'fieldBazPostOnUpdate'                      : false,
+                        'fieldJstreeDataSrcArr'                     : ["modules":["srcArr" : []]],
+                        'fieldJstreeAdd'                            : false,
+                        'fieldJstreeEdit'                           : false,
+                        'fieldJstreeExpand'                         : true,
+                        'fieldJstreeCollapse'                       : true,
+                        'fieldJstreeFirstOpen'                      : true,
+                        'fieldJstreeAllOpen'                        : true,
+                        'fieldJstreeAllChecked'                     : false,
+                        'fieldJstreeRootIcon'                       : 'th',
+                        'fieldJstreeToggleAllChildren'              : true,
+                        'fieldJstreeIncludeRootInPath'              : true,
+                        'fieldJstreeSelectEndNodeOnly'              : true,
+                        'fieldJstreeShowDots'                       : true,
+                        'fieldJstreeDoubleClickToggle'              : true,
+                        'fieldJstreeMultiple'                       : false,
+                        'fieldJstreeSearchCaseSensitive'            : false,
+                        'fieldJstreeSearchShowOnlyMatches'          : true,
+                        'fieldJstreeSearchShowOnlyMatchesChildren'  : true,
+                        'fieldJstreeHideJstreeIcons'                : false,
+                        'fieldJstreeAdditionalTools'                :
+                            [
+                                'filter-update' :
+                                    [
+                                        'id'        : 'filter-update',
+                                        'tooltip'   : 'Apply Filter (update)',
+                                        'icon'      : 'fas fa-fw fa-circle-up text-warning'
+                                    ],
+                                'filter-install' :
+                                    [
+                                        'id'        : 'filter-install',
+                                        'tooltip'   : 'Apply Filter Install/Update (:install)',
+                                        'icon'      : 'fas fa-fw fa-circle-plus text-info'
+                                    ],
+                                'filter-uninstall' :
+                                    [
+                                        'id'        : 'filter-uninstall',
+                                        'tooltip'   : 'Apply Filter Uninstall (:uninstall)',
+                                        'icon'      : 'fas fa-fw fa-circle-minus text-danger'
+                                    ],
+                                'filter-queue' :
+                                    [
+                                        'id'        : 'filter-queue',
+                                        'tooltip'   : 'Apply Filter In Queue (queue:)',
+                                        'icon'      : 'fas fa-fw fa-list text-purple'
+                                    ]
+                            ],
+                        'fieldJstreeReplaceIdWithDataField'         : 'moduleid',
+                        'fieldJstreePlugins'                        : ["search", "types"],
+                        'fieldJstreeAdditionalClass'                : 'text-uppercase'
+                    ]
+                )}}
             </div>
-        </div>
-        <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-noinfo" hidden>
             <div class="col">
-                <h6><i class="fa fa-fw fa-info-circle text-info"></i> Select module from tree to see it's details.</h6>
-            </div>
-        </div>
-        <div class="row text-center" id="{{componentId}}-{{sectionId}}-moduleinfo-loader">
-            <div class="col">
-                <i class="fa fa-cog fa-spin"></i> Loading module information...
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div id="{{componentId}}-{{sectionId}}-moduleinfo-info" hidden>
-                    <div class="row">
-                        <div class="col">
-                            <label>NAME: </label>
-                            <span class="text-uppercase" id="display_name"></span>
-                        </div>
-                        <div class="col">
-                            <label>INSTALLED: </label>
-                            <span class="text-uppercase" style="top: -1px;position: relative;" id="installed"></span>
-                        </div>
-                        <div class="col">
-                            <label>VERSION: </label>
-                            <span class="text-uppercase" style="top: -1px;position: relative;" id="version"></span>
+                <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-error" hidden>
+                    <div class="col">
+                        <h6><i class="fa fa-fw fa-info-circle text-danger"></i> Error loading module information. Please contact administrator.</h6>
+                    </div>
+                </div>
+                <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-noinfo" hidden>
+                    <div class="col">
+                        <h6><i class="fa fa-fw fa-info-circle text-info"></i> Select module from tree to see it's details.</h6>
+                    </div>
+                </div>
+                <div class="row text-center" id="{{componentId}}-{{sectionId}}-moduleinfo-loader">
+                    <div class="col">
+                        <i class="fa fa-cog fa-spin"></i> Loading module information...
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div id="{{componentId}}-{{sectionId}}-moduleinfo-info" hidden>
+                            <div class="row">
+                                <div class="col">
+                                    <label>NAME: </label>
+                                    <span class="text-uppercase" id="display_name"></span>
+                                </div>
+                                <div class="col">
+                                    <label>INSTALLED: </label>
+                                    <span class="text-uppercase" style="top: -1px;position: relative;" id="installed"></span>
+                                </div>
+                                <div class="col">
+                                    <label>VERSION: </label>
+                                    <span class="text-uppercase" style="top: -1px;position: relative;" id="version"></span>
+                                </div>
+                            </div>
+                            <hr class="mt-1">
+                            <div class="row">
+                                <div class="col small">
+                                    <label>APP TYPE: </label>
+                                    <span class="text-uppercase" id="app_type"></span>
+                                </div>
+                                <div class="col small">
+                                    <label>CATEGORY: </label>
+                                    <span class="text-uppercase" id="category"></span>
+                                </div>
+                                <div class="col small">
+                                    <label>SUB CATEGORY: </label>
+                                    <span class="text-uppercase" id="sub_category"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col small">
+                                    <label>UPDATE AVAILABLE: </label>
+                                    <span id="update_available"></span>
+                                </div>
+                                <div class="col small">
+                                    <label>UPDATE VERSION: </label>
+                                    <span id="update_version"></span>
+                                </div>
+                                <div class="col small">
+                                    <label>UPDATED ON: </label>
+                                    <span id="updated_on"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col small">
+                                    <label>INSTALLED/UPDATED BY: </label>
+                                    <span id="updated_by"></span>
+                                </div>
+                                <div class="col small">
+                                    <label>MODULE TYPE: </label>
+                                    <span class="text-uppercase" id="module_type"></span>
+                                </div>
+                                <div class="col small">
+                                    <span class="text-uppercase" id="module_id" hidden></span>
+                                </div>
+                            </div>
+                            <hr class="mt-1">
+                            <div class="row">
+                                <div class="col">
+                                    <p id="description"></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <hr class="mt-1">
-                    <div class="row">
-                        <div class="col small">
-                            <label>APP TYPE: </label>
-                            <span class="text-uppercase" id="app_type"></span>
-                        </div>
-                        <div class="col small">
-                            <label>CATEGORY: </label>
-                            <span class="text-uppercase" id="category"></span>
-                        </div>
-                        <div class="col small">
-                            <label>SUB CATEGORY: </label>
-                            <span class="text-uppercase" id="sub_category"></span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col small">
-                            <label>UPDATE AVAILABLE: </label>
-                            <span id="update_available"></span>
-                        </div>
-                        <div class="col small">
-                            <label>UPDATE VERSION: </label>
-                            <span id="update_version"></span>
-                        </div>
-                        <div class="col small">
-                            <label>UPDATED ON: </label>
-                            <span id="updated_on"></span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col small">
-                            <label>INSTALLED/UPDATED BY: </label>
-                            <span id="updated_by"></span>
-                        </div>
-                        <div class="col small">
-                            <label>MODULE TYPE: </label>
-                            <span class="text-uppercase" id="module_type"></span>
-                        </div>
-                        <div class="col small">
-                            <span class="text-uppercase" id="module_id" hidden></span>
-                        </div>
-                    </div>
-                    <hr class="mt-1">
-                    <div class="row">
-                        <div class="col">
-                            <p id="description"></p>
-                        </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col" id="module-buttons">
+                        {{adminltetags.useTag('buttons',
+                            [
+                                'component'                     : component,
+                                'componentName'                 : componentName,
+                                'componentId'                   : componentId,
+                                'sectionId'                     : sectionId,
+                                'buttonType'                    : 'button',
+                                'buttons'                       :
+                                    [
+                                        'repo-sync'        : [
+                                            'title'             : false,
+                                            'size'              : 'xs',
+                                            'icon'              : 'sync-alt',
+                                            'position'          : 'right'
+                                        ],
+                                        'install-update'        : [
+                                            'title'             : 'Install',
+                                            'size'              : 'xs',
+                                            'hidden'            : true,
+                                            'disabled'          : true
+                                        ],
+                                        'uninstall'        : [
+                                            'title'             : 'Remove',
+                                            'type'              : 'danger',
+                                            'size'              : 'xs',
+                                            'hidden'            : true,
+                                            'disabled'          : true
+                                        ],
+                                        'cancel'        : [
+                                            'title'             : 'Cancel',
+                                            'type'              : 'secondary',
+                                            'size'              : 'xs',
+                                            'hidden'            : true,
+                                            'disabled'          : true
+                                        ]
+                                    ]
+                            ]
+                        )}}
                     </div>
                 </div>
             </div>
         </div>
-        <hr class="mt-1">
+        <hr>
         <div class="row">
-            <div class="col" id="module-buttons">
+            <div class="col-md-6">
+                <div id="installer-progress" class="mb-3"></div>
+            </div>
+            <div class="col">
+                <span class="text-uppercase float-right">Queue:
+                    <span style="top: -2px;position: relative;" class="badge badge-info" id="queue-counter">0</span>
+                </span>
+            </div>
+            <div class="col">
                 {{adminltetags.useTag('buttons',
                     [
                         'component'                     : component,
@@ -143,23 +225,19 @@
                         'buttonType'                    : 'button',
                         'buttons'                       :
                             [
-                                'repo-sync'        : [
-                                    'title'             : false,
+                                'analyse-queue'     : [
+                                    'title'             : 'Analyse Queue',
+                                    'position'          : 'right',
                                     'size'              : 'xs',
-                                    'icon'              : 'sync-alt',
-                                    'position'          : 'right'
-                                ],
-                                'install-update'        : [
-                                    'title'             : 'Install',
-                                    'size'              : 'xs',
-                                    'hidden'            : true,
+                                    'icon'              : 'fa-cog fa-spin',
+                                    'iconHidden'        : true,
                                     'disabled'          : true
                                 ],
-                                'cancel'        : [
-                                    'title'             : 'Cancel Install / Update',
+                                'clear-queue'       : [
+                                    'title'             : 'Clear Queue',
+                                    'position'          : 'right',
                                     'type'              : 'danger',
                                     'size'              : 'xs',
-                                    'hidden'            : true,
                                     'disabled'          : true
                                 ]
                             ]
@@ -169,46 +247,8 @@
         </div>
     </div>
 </div>
-<hr>
-<div class="row">
-    <div class="col-md-6">
-        <div id="installer-progress" class="mb-3"></div>
-    </div>
-    <div class="col">
-        <span class="text-uppercase float-right">Install / Update Queue:
-            <span style="top: -2px;position: relative;" class="badge badge-info" id="queue-counter">0</span>
-        </span>
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('buttons',
-            [
-                'component'                     : component,
-                'componentName'                 : componentName,
-                'componentId'                   : componentId,
-                'sectionId'                     : sectionId,
-                'buttonType'                    : 'button',
-                'buttons'                       :
-                    [
-                        'process-queue'     : [
-                            'title'             : 'Process Queue',
-                            'position'          : 'right',
-                            'size'              : 'xs',
-                            'disabled'          : true
-                        ],
-                        'clear-queue'       : [
-                            'title'             : 'Clear Queue',
-                            'position'          : 'right',
-                            'type'              : 'danger',
-                            'size'              : 'xs',
-                            'disabled'          : true
-                        ]
-                    ]
-            ]
-        )}}
-    </div>
-</div>
 <script>
-/*global PNotify BazProgress Swal */
+/*global PNotify BazProgress Swal BazContentFields */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -241,14 +281,18 @@ dataCollectionSectionForm['vars']['module'] = { };
 dataCollectionSectionForm['vars']['queue'] = { };
 dataCollectionSectionForm['vars']['queue']['count'] = 0;
 dataCollectionSectionForm['vars']['queue']['install_update'] = { };
+dataCollectionSectionForm['vars']['queue']['uninstall'] = { };
 
 $('#{{componentId}}-{{sectionId}}-repositories').on('focus', function(e) {
     dataCollectionSectionForm['vars']['previous'] = this.value;
 });
 
 $('#{{componentId}}-{{sectionId}}-repositories').on('change', function(e) {
-    //eslint-disable-next-line
-    console.log(e);
+    if (dataCollectionSectionForm['vars']['previous'] == '0') {
+        dataCollectionSectionForm['funcs']['processRepositorySwitch']();
+        return;
+    }
+
     Swal.fire({
         title                       : '<span class="text-warning"> Switch Repository? It will reset the queue.</span>',
         icon                        : 'question',
@@ -269,63 +313,157 @@ $('#{{componentId}}-{{sectionId}}-repositories').on('change', function(e) {
         }
     }).then((result) => {
         if (result.value) {
-            dataCollectionSectionForm['vars']['queue'] = { };
-            dataCollectionSectionForm['vars']['queue']['count'] = 0;
-            dataCollectionSectionForm['vars']['queue']['install_update'] = { };
-            $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
-            $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
-            $('#{{componentId}}-{{sectionId}}-process-queue').off();
-            $('#{{componentId}}-{{sectionId}}-clear-queue').off();
-            $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
-            $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
-            $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
-            $('#{{componentId}}-{{sectionId}}-modules').jstree().destroy();
-            if ($('#{{componentId}}-{{sectionId}}-modules-empty').length > 0) {
-                $('#{{componentId}}-{{sectionId}}-modules-empty').remove();
-            }
-
-            $('#{{componentId}}-{{sectionId}}-modules').append(
-                '<div id="{{componentId}}-{{sectionId}}-modules-empty" class="text-center">' +
-                    '<i class="fa fa-cog fa-spin"></i> Loading modules...' +
-                '</div>'
-            );
-
-            dataCollectionSectionForm['funcs']['getRepositoryModules']($(this).find(":selected").data('value'));
+            dataCollectionSectionForm['funcs']['processRepositorySwitch']();
         } else {
             $('#{{componentId}}-{{sectionId}}-repositories').val(dataCollectionSectionForm['vars']['previous']);
         }
     });
 });
 
-$('#{{componentId}}-{{sectionId}}-modules').on('select_node.jstree', function() {
-    var selected = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected();
-
-    if (selected[0].startsWith('j')) {
-        return false;
+dataCollectionSectionForm['funcs']['processRepositorySwitch'] = function() {
+    $('#repo-details').attr('hidden', false);
+    dataCollectionSectionForm['vars']['queue'] = { };
+    dataCollectionSectionForm['vars']['queue']['count'] = 0;
+    dataCollectionSectionForm['vars']['queue']['install_update'] = { };
+    dataCollectionSectionForm['vars']['queue']['uninstall'] = { };
+    $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+    $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
+    $('#{{componentId}}-{{sectionId}}-process-queue').off();
+    $('#{{componentId}}-{{sectionId}}-clear-queue').off();
+    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
+    $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
+    $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
+    $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
+    $('#{{componentId}}-{{sectionId}}-repo-sync').attr('disabled', true);
+    $('#{{componentId}}-{{sectionId}}-repo-sync').attr('hidden', true);
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+    $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
+    $('#{{componentId}}-{{sectionId}}-modules').jstree().destroy();
+    if ($('#{{componentId}}-{{sectionId}}-modules-empty').length > 0) {
+        $('#{{componentId}}-{{sectionId}}-modules-empty').remove();
     }
 
-    $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', false);
-    $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-    $('#{{componentId}}-{{sectionId}}-moduleinfo-error').attr('hidden', true);
+    $('#{{componentId}}-{{sectionId}}-modules').append(
+        '<div id="{{componentId}}-{{sectionId}}-modules-empty" class="text-center">' +
+            '<i class="fa fa-cog fa-spin"></i> Loading modules...' +
+        '</div>'
+    );
 
-    dataCollectionSectionForm['funcs']['getSelectedModuleInfo'](selected);
-});
+    dataCollectionSectionForm['funcs']['getRepositoryModules']($('#{{componentId}}-{{sectionId}}-repositories').find(":selected").data('value'));
+}
 
-$('#{{componentId}}-{{sectionId}}-modules').on('ready.jstree', function() {
-    var coreTree = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {flat:true});
+dataCollectionSectionForm['funcs']['jstreeSelectNode'] = function() {
+    $('#{{componentId}}-{{sectionId}}-modules').off('select_node.jstree');
+    $('#{{componentId}}-{{sectionId}}-modules').on('select_node.jstree', function() {
+        var selected = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected();
 
-    var selected = [];
-
-    $(coreTree).each(function(i, v) {
-        if (v.text === 'Core') {
-            selected.push(v.id);
+        if (selected[0].startsWith('j')) {
             return false;
+        }
+
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-error').attr('hidden', true);
+
+        dataCollectionSectionForm['funcs']['getSelectedModuleInfo'](selected);
+    });
+}
+dataCollectionSectionForm['funcs']['jstreeSelectNode']();
+
+dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
+    $('#{{componentId}}-{{sectionId}}-modules').off('ready.jstree');
+    $('#{{componentId}}-{{sectionId}}-modules').on('ready.jstree', function() {
+        var coreTree = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {flat:true});
+
+        var selected = [];
+
+        $(coreTree).each(function(i, v) {
+            v.text = v.text.toLowerCase();
+            if (v.text.includes('core')) {
+                selected.push(v.id);
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().select_node(v.id);
+                return false;
+            }
+        });
+
+        dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText'](null, false, false, true);
+    });
+
+    $('#{{componentId}}-{{sectionId}}-modules').on('search.jstree', function(e, res) {
+        if (res.nodes.length === 0) {
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
         }
     });
 
-    dataCollectionSectionForm['funcs']['getSelectedModuleInfo'](selected);
-    dataCollectionSectionForm['funcs']['applyColorsToIcons']();
-});
+    $('#{{componentId}}-{{sectionId}}-modules-filter-update').off();
+    $('#{{componentId}}-{{sectionId}}-modules-filter-update').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['vars']['filter'] = true;
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
+        $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
+        $('#module-buttons').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+    });
+    $('#{{componentId}}-{{sectionId}}-modules-filter-install').off();
+    $('#{{componentId}}-{{sectionId}}-modules-filter-install').click(function(e) {
+        e.preventDefault();
+
+        //We only need this during update so when we click on update the node is hidden from the filter tree.
+        dataCollectionSectionForm['vars']['filter'] = false;
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
+        $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val(':Install');
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().search(':Install');
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
+        $('#module-buttons').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+    });
+
+    $('#{{componentId}}-{{sectionId}}-modules-filter-uninstall').off();
+    $('#{{componentId}}-{{sectionId}}-modules-filter-uninstall').click(function(e) {
+        e.preventDefault();
+
+        //We only need this during update so when we click on update the node is hidden from the filter tree.
+        dataCollectionSectionForm['vars']['filter'] = false;
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
+        $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val(':Uninstall');
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().search(':Uninstall');
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
+        $('#module-buttons').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+    });
+
+    $('#{{componentId}}-{{sectionId}}-modules-filter-queue').off();
+    $('#{{componentId}}-{{sectionId}}-modules-filter-queue').click(function(e) {
+        e.preventDefault();
+
+        //We only need this during update so when we click on update the node is hidden from the filter tree.
+        dataCollectionSectionForm['vars']['filter'] = false;
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
+        $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('in queue:');
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().search('in queue:');
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
+        $('#module-buttons').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+    });
+
+    $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').on('keyup', function() {
+        if ($('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val() === '') {
+            dataCollectionSectionForm['vars']['filter'] = false;
+        } else {
+            dataCollectionSectionForm['vars']['filter'] = true;
+        }
+    });
+}
+dataCollectionSectionForm['funcs']['jstreeReady']();
 
 dataCollectionSectionForm['funcs']['getRepositoryModules'] = function(repositoryId) {
     var postData = { };
@@ -337,8 +475,7 @@ dataCollectionSectionForm['funcs']['getRepositoryModules'] = function(repository
             $('#security-token').attr('name', response.tokenKey);
             $('#security-token').val(response.token);
         }
-        //eslint-disable-next-line
-        console.log(response);
+
         $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', true);
         $('#{{componentId}}-{{sectionId}}-repo-sync').attr('disabled', false);
         $('#{{componentId}}-{{sectionId}}-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
@@ -349,7 +486,7 @@ dataCollectionSectionForm['funcs']['getRepositoryModules'] = function(repository
             }
             if (response.responseData.modules_html && response.responseData.modules_html !== '') {
                 var modulesHtml =
-                    '<div id="{{componentId}}-{{sectionId}}-modules">' +
+                    '<div id="{{componentId}}-{{sectionId}}-modules" data-bazscantype="jstree">' +
                         '<ul>' +
                             '<li data-jstree="{&quot;icon&quot; : &quot;fa fa-fw fa-th text-sm&quot;}">' +
                                 '<ul>' +
@@ -360,12 +497,16 @@ dataCollectionSectionForm['funcs']['getRepositoryModules'] = function(repository
                     '</div>';
 
                 $('#{{componentId}}-{{sectionId}}-modules-tree-div').empty().html(modulesHtml);
-                //eslint-disable-next-line
-                console.log($('#{{componentId}}-{{sectionId}}-modules-tree-div'));
             }
 
-            $('#{{componentId}}-{{sectionId}}-modules').jstree();
+            BazContentFields.init({
+                'componentId'   : '{{componentId}}',
+                'sectionId'     : '{{componentId}}-{{sectionId}}',
+                'fieldId'       : '{{componentId}}-{{sectionId}}-modules'
+            });
 
+            dataCollectionSectionForm['funcs']['jstreeSelectNode']();
+            dataCollectionSectionForm['funcs']['jstreeReady']();
         } else if (response.responseCode == 1) {
             $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
             $('#module-buttons').attr('hidden', true);
@@ -375,6 +516,10 @@ dataCollectionSectionForm['funcs']['getRepositoryModules'] = function(repository
 }
 
 dataCollectionSectionForm['funcs']['getSelectedModuleInfo'] = function(selected) {
+    if (selected.length === 0) {
+        return false;
+    }
+
     var splitModule, moduleType, moduleId;
 
     if (selected.length === 1) {
@@ -391,8 +536,6 @@ dataCollectionSectionForm['funcs']['getSelectedModuleInfo'] = function(selected)
             moduleType = 'view';
         }
     }
-    //eslint-disable-next-line
-    console.log(selected, splitModule, moduleType, moduleId);
 
     if (moduleType && moduleId) {
         dataCollectionSectionForm['funcs']['getModuleInfo'](moduleType, moduleId);
@@ -457,6 +600,10 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
             $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
             $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
         }
+        $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', false);
+        // if (moduleData['app_type'] !== 'core') {
+            $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', false);
+        // }
     } else {
         moduleData['installed'] = '<span class="badge badge-secondary">No</span>';
         $('#{{componentId}}-{{sectionId}}-install-update').html('INSTALL');
@@ -483,12 +630,73 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     $('#version').html(moduleData.version);
     $('#updated_by').html(moduleData.updated_by);
     $('#module_type').html(moduleData.module_type);
-    $('#display_name').html(moduleData.display_name);
+    if (moduleData.display_name) {
+        $('#display_name').html(moduleData.display_name);
+        $('#display_name').html(moduleData.display_name);
+    } else {
+        $('#display_name').html(moduleData.name);
+    }
     $('#module_id').html(moduleData.id);
     $('#description').html(moduleData.description);
 
+    dataCollectionSectionForm['vars']['queue']['uninstall']
     $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', false);
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', true);
     $('#{{componentId}}-{{sectionId}}-moduleinfo-error').attr('hidden', true);
+    $('#{{componentId}}-{{sectionId}}-repo-sync').attr('disabled', false);
+    $('#{{componentId}}-{{sectionId}}-repo-sync').attr('hidden', false);
+
+    if ((dataCollectionSectionForm['vars']['queue']['install_update'][moduleInfo.module_type] &&
+        dataCollectionSectionForm['vars']['queue']['install_update'][moduleInfo.module_type].includes(moduleInfo.id)) ||
+        moduleInfo.installed == '1'
+    ) {
+        if (moduleInfo.update_available == '1') {
+            if (dataCollectionSectionForm['vars']['queue']['install_update'][moduleInfo.module_type] &&
+                dataCollectionSectionForm['vars']['queue']['install_update'][moduleInfo.module_type].includes(moduleInfo.id)
+            ) {
+                $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
+            } else {
+                $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
+                $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
+            }
+        } else {
+            if (dataCollectionSectionForm['vars']['queue']['install_update'][moduleInfo.module_type] &&
+                dataCollectionSectionForm['vars']['queue']['install_update'][moduleInfo.module_type].includes(moduleInfo.id)
+            ) {
+                $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
+            } else {
+                $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', false);
+                $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', false);
+            }
+        }
+
+        if ((dataCollectionSectionForm['vars']['queue']['uninstall'][moduleInfo.module_type] &&
+            dataCollectionSectionForm['vars']['queue']['uninstall'][moduleInfo.module_type].includes(moduleInfo.id))
+        ) {
+            $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', false);
+            $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', false);
+        } else {
+            $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', false);
+            $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', false);
+        }
+    } else {
+        $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
+    }
+
+    $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
+    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
+    $('#module-buttons').attr('hidden', false);
 
     dataCollectionSectionForm['funcs']['initModuleButtons']();
 }
@@ -502,20 +710,57 @@ dataCollectionSectionForm['funcs']['initModuleButtons'] = function() {
         $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', false);
         $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
         $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
-        dataCollectionSectionForm['funcs']['updateQueue']($('#module_id').html(), $('#module_type').html());
-        dataCollectionSectionForm['funcs']['applyColorsToIcons']($('#module_type').html() + '-' + $('#module_id').html(), true);
+        // $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
+        // $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
+        dataCollectionSectionForm['funcs']['updateQueue'](dataCollectionSectionForm['vars']['module']['id'], dataCollectionSectionForm['vars']['module']['module_type']);
+        dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText'](dataCollectionSectionForm['vars']['module']['module_type'] + '-' + dataCollectionSectionForm['vars']['module']['id'], true);
+
+        if ($('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val() === 'update') {
+            $('#module-buttons').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+        }
+    });
+
+    $('#{{componentId}}-{{sectionId}}-uninstall').off();
+    $('#{{componentId}}-{{sectionId}}-uninstall').click(function(e) {
+        e.preventDefault();
+
+        $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
+        dataCollectionSectionForm['funcs']['updateQueue'](dataCollectionSectionForm['vars']['module']['id'], dataCollectionSectionForm['vars']['module']['module_type'], true, true);
+        dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText'](dataCollectionSectionForm['vars']['module']['module_type'] + '-' + dataCollectionSectionForm['vars']['module']['id'], false, true);
+
+        if ($('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val() === 'update') {
+            $('#module-buttons').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+        }
     });
 
     $('#{{componentId}}-{{sectionId}}-cancel').off();
     $('#{{componentId}}-{{sectionId}}-cancel').click(function(e) {
         e.preventDefault();
 
-        $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
-        $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
+        if (dataCollectionSectionForm['vars']['module']['installed'] == '1') {
+            $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', false);
+            $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', false);
+            if (dataCollectionSectionForm['vars']['module']['update_available'] == '1') {
+                $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
+                $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
+            }
+        } else {
+            $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
+            $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
+        }
         $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
         $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
-        dataCollectionSectionForm['funcs']['updateQueue']($('#module_id').html(), $('#module_type').html(), false);
-        dataCollectionSectionForm['funcs']['applyColorsToIcons']($('#module_type').html() + '-' + $('#module_id').html());
+        dataCollectionSectionForm['funcs']['updateQueue'](dataCollectionSectionForm['vars']['module']['id'], dataCollectionSectionForm['vars']['module']['module_type'], false, false);
+        dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText'](dataCollectionSectionForm['vars']['module']['module_type'] + '-' + dataCollectionSectionForm['vars']['module']['id'], false, false);
     });
 
     $('#{{componentId}}-{{sectionId}}-repo-sync').off();
@@ -525,23 +770,83 @@ dataCollectionSectionForm['funcs']['initModuleButtons'] = function() {
         $(this).attr('disabled', true);
         $(this).children("i").removeClass("fa-sync-alt").addClass("fa-cog fa-spin");
 
+        $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
+
         $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', false);
         $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
         $('#{{componentId}}-{{sectionId}}-moduleinfo-error').attr('hidden', true);
-        dataCollectionSectionForm['funcs']['getModuleInfo']($('#module_type').html(), $('#module_id').html(), true);
+        dataCollectionSectionForm['funcs']['getModuleInfo'](dataCollectionSectionForm['vars']['module']['module_type'], dataCollectionSectionForm['vars']['module']['id'], true);
     });
 }
 
-dataCollectionSectionForm['funcs']['updateQueue'] = function(id, type, add = true) {
-    if (!dataCollectionSectionForm['vars']['queue']['install_update'][type]) {
-        dataCollectionSectionForm['vars']['queue']['install_update'][type] = [];
+dataCollectionSectionForm['funcs']['updateQueue'] = function(id, type, install = true, uninstall = false) {
+    var index;
+    var swap = false;
+
+    if (uninstall === true) {
+        if (!dataCollectionSectionForm['vars']['queue']['uninstall'][type]) {
+            dataCollectionSectionForm['vars']['queue']['uninstall'][type] = [];
+        }
+
+        if (dataCollectionSectionForm['vars']['queue']['install_update'][type] &&
+            dataCollectionSectionForm['vars']['queue']['install_update'][type].includes(id)
+        ) {
+            index = dataCollectionSectionForm['vars']['queue']['install_update'][type].indexOf(id);
+
+            if (index > -1) {
+                dataCollectionSectionForm['vars']['queue']['install_update'][type].splice(index, 1);
+            }
+
+            swap = true;
+        }
+
+        dataCollectionSectionForm['vars']['queue']['uninstall'][type].push(id);
+    } else if (install === true) {
+        if (!dataCollectionSectionForm['vars']['queue']['install_update'][type]) {
+            dataCollectionSectionForm['vars']['queue']['install_update'][type] = [];
+        }
+
+        if (dataCollectionSectionForm['vars']['queue']['uninstall'][type] &&
+            dataCollectionSectionForm['vars']['queue']['uninstall'][type].includes(id)
+        ) {
+            index = dataCollectionSectionForm['vars']['queue']['uninstall'][type].indexOf(id);
+
+            if (index > -1) {
+                dataCollectionSectionForm['vars']['queue']['uninstall'][type].splice(index, 1);
+            }
+
+            swap = true;
+        }
+
+        dataCollectionSectionForm['vars']['queue']['install_update'][type].push(id);
+    } else if (install === false && uninstall === false) {//Cancel button
+        if (dataCollectionSectionForm['vars']['queue']['install_update'][type] &&
+            dataCollectionSectionForm['vars']['queue']['install_update'][type].includes(id)
+        ) {
+            index = dataCollectionSectionForm['vars']['queue']['install_update'][type].indexOf(id);
+
+            if (index > -1) {
+                dataCollectionSectionForm['vars']['queue']['install_update'][type].splice(index, 1);
+            }
+        } else if (dataCollectionSectionForm['vars']['queue']['uninstall'][type] &&
+                   dataCollectionSectionForm['vars']['queue']['uninstall'][type].includes(id)
+        ) {
+            index = dataCollectionSectionForm['vars']['queue']['uninstall'][type].indexOf(id);
+
+            if (index > -1) {
+                dataCollectionSectionForm['vars']['queue']['uninstall'][type].splice(index, 1);
+            }
+        }
     }
 
-    dataCollectionSectionForm['vars']['queue']['install_update'][type].push(id);
-
-    if (add) {
+    if ((install === true || uninstall === true) && swap === false) {
         dataCollectionSectionForm['vars']['queue']['count'] = dataCollectionSectionForm['vars']['queue']['count'] + 1;
-    } else {
+    } else if (install === false && uninstall === false) {
         dataCollectionSectionForm['vars']['queue']['count'] = dataCollectionSectionForm['vars']['queue']['count'] - 1;
     }
 
@@ -561,6 +866,10 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, type, add = tru
         $('#{{componentId}}-{{sectionId}}-clear-queue').click(function(e) {
             e.preventDefault();
 
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
+            $('#module-buttons').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
             dataCollectionSectionForm['funcs']['clearQueue']();
         });
     } else {
@@ -580,6 +889,7 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function() {
     dataCollectionSectionForm['vars']['queue'] = { };
     dataCollectionSectionForm['vars']['queue']['count'] = 0;
     dataCollectionSectionForm['vars']['queue']['install_update'] = { };
+    dataCollectionSectionForm['vars']['queue']['uninstall'] = { };
     $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
     $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
     $('#{{componentId}}-{{sectionId}}-process-queue').off();
@@ -593,17 +903,21 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function() {
             $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
             $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
         }
+        $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', false);
     } else {
         $('#{{componentId}}-{{sectionId}}-install-update').html('INSTALL');
         $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
         $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
     }
 
     $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
-    dataCollectionSectionForm['funcs']['applyColorsToIcons']();
+    dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText']();
 }
 
-dataCollectionSectionForm['funcs']['applyColorsToIcons'] = function(nodeId = null, installUpdate = false) {
+dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText'] = function(nodeId = null, installUpdate = false, uninstall = false, init = false) {
     var allNodes;
 
     if (nodeId) {
@@ -612,25 +926,61 @@ dataCollectionSectionForm['funcs']['applyColorsToIcons'] = function(nodeId = nul
         allNodes = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {'flat':true});
     }
 
+    var updateAvailable = false;
+    var nT, nD;
+
     $(allNodes).each(function(i, node) {
         if (node.id.startsWith('j')) {
             return true;
         }
+        nD = node.data;
 
-        if (installUpdate) {
-            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-plus text-info');
+        nT =
+            dataCollectionSectionForm['vars']['modules'][nD.apptype]['childs'][nD.moduletype]['childs'][nD.modulecategory]['childs'][nD.modulesubcategory]['childs'][node.id]['name'];
+
+        if (uninstall === true) {
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-minus text-danger');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Uninstall)');
+            if (nD.update_available && nD.update_available == 1) {
+                updateAvailable = true;
+            }
+        } else if (installUpdate === true) {
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Install)');
+            if (nD.update_available && nD.update_available == 1) {
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-plus text-info');
+                updateAvailable = true;
+            } else {
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-square-plus text-info');
+            }
+        } else if (nodeId && uninstall === false && installUpdate === false && init === false) {
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fa fa-fw fa-circle-dot');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
         } else {
-            if (node.data.installed == 1) {
+            if (nD.installed == 1) {
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-check text-success');
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
+            } else {
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fa fa-fw fa-circle-dot');
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
             }
 
-            if (node.data.update_available && node.data.update_available == 1) {
+            if (nD.update_available && nD.update_available == 1) {
+                updateAvailable = true;
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-warning');
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (Update)');
             }
         }
     });
+
+    if (updateAvailable && (dataCollectionSectionForm['vars']['filter'] === true || init === true)) {
+        dataCollectionSectionForm['vars']['filter'] = true;
+        $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
+    }
 }
 
-BazProgress.buildProgressBar($('#installer-progress'));
+$(document).ready(function() {
+    BazProgress.buildProgressBar($('#installer-progress'));
+});
 </script>
 {% include 'modules/modal.html' %}

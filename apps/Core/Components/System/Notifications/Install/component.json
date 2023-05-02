@@ -2,7 +2,7 @@
     "route"         : "system/notifications",
     "name"          : "Notifications",
     "description"   : "Manage notifications via this component",
-    "module_type"   : "component",
+    "module_type"   : "components",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "admin",

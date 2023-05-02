@@ -2,7 +2,7 @@
     "name"          : "Domains",
     "display_name"  : "Domains",
     "description"   : "Domains",
-    "module_type"   : "package",
+    "module_type"   : "packages",
     "app_type"      : "core",
     "category"      : "base",
     "sub_category"  : "providers",

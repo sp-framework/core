@@ -2,7 +2,7 @@
     "name"                                  : "Core",
     "display_name"                          : "Bazaari Core",
     "description"                           : "Bazaari Framework Core Module",
-    "module_type"                           : "package",
+    "module_type"                           : "packages",
     "app_type"                              : "core",
     "category"                              : "base",
     "sub_category"                          : "providers",

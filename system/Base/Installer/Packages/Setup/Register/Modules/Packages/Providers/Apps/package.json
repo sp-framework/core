@@ -2,7 +2,7 @@
     "name"          : "Apps",
     "display_name"  : "Apps",
     "description"   : "Apps",
-    "module_type"   : "package",
+    "module_type"   : "packages",
     "app_type"      : "core",
     "category"      : "base",
     "sub_category"  : "providers",

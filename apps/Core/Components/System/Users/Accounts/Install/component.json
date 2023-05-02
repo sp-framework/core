@@ -2,7 +2,7 @@
     "route": "system/users/accounts",
     "name": "User Accounts",
     "description": "List accounts via this component",
-    "module_type": "component",
+    "module_type": "components",
     "app_type": "core",
     "category": "system",
     "sub_category": "admin",

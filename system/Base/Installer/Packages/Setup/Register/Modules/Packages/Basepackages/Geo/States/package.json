@@ -2,7 +2,7 @@
     "name"          : "GeoStates",
     "display_name"  : "Geo States",
     "description"   : "Basepackage Geo States",
-    "module_type"   : "package",
+    "module_type"   : "packages",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

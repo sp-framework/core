@@ -2,7 +2,7 @@
     "name"          : "Progress",
     "display_name"  : "Progress",
     "description"   : "Basepackage Progress",
-    "module_type"   : "package",
+    "module_type"   : "packages",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

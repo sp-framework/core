@@ -2,7 +2,7 @@
     "route"         : "system/geo/cities",
     "name"          : "Geo Cities",
     "description"   : "Manage geo cities via this component",
-    "module_type"   : "component",
+    "module_type"   : "components",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "admin",

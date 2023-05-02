@@ -2,7 +2,7 @@
     "route"         : "system/geo/states",
     "name"          : "Geo States",
     "description"   : "Manage geo states via this component",
-    "module_type"   : "component",
+    "module_type"   : "components",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "admin",

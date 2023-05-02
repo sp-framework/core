@@ -1,7 +1,7 @@
 {
     "name"          : "Default",
-    "display_name"  : "Bazaari Dashboard Default View",
-    "description"   : "Default Dashboard View",
+    "display_name"  : "Bazaari Core Default View",
+    "description"   : "Default Core View",
     "module_type"   : "view",
     "app_type"      : "core",
     "category"      : "system",
@@ -25,12 +25,12 @@
         "layout"    : "default",
         "tags"      : "AdminLTETags",
         "head"      : {
-            "title" : "Dashboard",
+            "title" : "Bazaari Core",
             "meta"  : {
                 "charset"       : "UTF-8",
                 "viewport"      : "width=device-width, initial-scale=1, shrink-to-fit=no",
-                "description"   : "Dashboard Views",
-                "author"        : "Guru",
+                "description"   : "Bazaari Core Views",
+                "author"        : "guru@bazaari.com.au",
                 "keywords"      : "HTML, CSS, JavaScript"
             },
             "link"      : {

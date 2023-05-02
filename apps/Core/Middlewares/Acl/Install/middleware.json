@@ -2,7 +2,7 @@
     "name": "Acl",
     "display_name": "Access Control List",
     "description": "This middleware is used by user roles. It checks the role configuration and allows/blocks user's connection to a particular resource.",
-    "module_type"   : "middleware",
+    "module_type"   : "middlewares",
     "app_type": "core",
     "category": "system",
     "sub_category": "tools",

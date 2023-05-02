@@ -2,7 +2,7 @@
     "name"          : "Qrcodes",
     "display_name"  : "Qrcodes Package",
     "description"   : "Package for generating and validating Qrcodes",
-    "module_type"   : "package",
+    "module_type"   : "packages",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

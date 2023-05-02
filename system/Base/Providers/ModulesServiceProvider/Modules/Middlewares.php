@@ -38,6 +38,17 @@ class Middlewares extends BasePackage
 		return false;
 	}
 
+	public function getMiddlewareById($id)
+	{
+		foreach($this->middlewares as $middleware) {
+			if ($middleware['id'] == $id) {
+				return $middleware;
+			}
+		}
+
+		return false;
+	}
+
 	public function getMiddlewaresByApiId($id)
 	{
 		$middlewares = [];

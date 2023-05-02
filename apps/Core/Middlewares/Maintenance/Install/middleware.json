@@ -2,7 +2,7 @@
     "name": "Maintenance",
     "display_name": "Maintenance Mode",
     "description": "This middleware is used when you want to perform any maintenance on this app. It blocks every connection to this app.",
-    "module_type"   : "middleware",
+    "module_type"   : "middlewares",
     "app_type": "core",
     "category": "system",
     "sub_category": "tools",

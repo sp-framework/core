@@ -2,7 +2,7 @@
     "name"          : "GeoCountries",
     "display_name"  : "Geo Countries",
     "description"   : "Basepackage Geo Countries",
-    "module_type"   : "package",
+    "module_type"   : "packages",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",

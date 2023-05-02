@@ -2,7 +2,7 @@
     "name"          : "Enums",
     "display_name"  : "Enums",
     "description"   : "Package for Enums component",
-    "module_type"   : "package",
+    "module_type"   : "packages",
     "version"       : "0.0.1",
     "app_type"      : "core",
     "category"      : "system",

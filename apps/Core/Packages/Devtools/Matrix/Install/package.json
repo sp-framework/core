@@ -2,7 +2,7 @@
     "name"          : "Matrix",
     "display_name"  : "Matrix",
     "description"   : "Package for Matrix component",
-    "module_type"   : "package",
+    "module_type"   : "packages",
     "version"       : "0.0.1",
     "app_type"      : "core",
     "category"      : "system",

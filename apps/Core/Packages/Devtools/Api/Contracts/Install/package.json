@@ -2,7 +2,7 @@
     "name"          : "Contracts",
     "display_name"  : "Contracts",
     "description"   : "Package for Contracts component",
-    "module_type"   : "package",
+    "module_type"   : "packages",
     "version"       : "0.0.1",
     "app_type"      : "core",
     "category"      : "system",

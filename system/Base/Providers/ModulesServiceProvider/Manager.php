@@ -32,54 +32,146 @@ class Manager extends BasePackage
     public function getModuleInfo($data)
     {
         if ($data['module_type'] === 'component') {
-            //
+            $module = $this->modules->components->getComponentById($data['module_id']);
         } else if ($data['module_type'] === 'package') {
             $module = $this->modules->packages->getIdPackage($data['module_id']);
-
-            if ($module) {
-                unset($module['notification_subscriptions']);
-                unset($module['files']);
-                unset($module['settings']);
-
-                $moduleUpdatedBy = $module['updated_by'];
-
-                if ($module['updated_by'] == 0) {
-                    $module['updated_by'] = 'System';
-                } else {
-                    $module['updated_by'] = $this->basepackages->accounts->getById($module['updated_by'])['email'];
-                }
-
-                if (isset($data['sync']) && $data['sync'] == true) {
-                    $repoNameArr = explode('/', $module['repo']);
-
-                    try {
-                        $api = $this->basepackages->api->useApi($module['api_id']);
-
-                        $responseArr = $api->useMethod('RepositoryApi', 'repoGet', [$api->getApiConfig()['org_user'], Arr::last($repoNameArr)])->getResponse(true);
-
-                        if ($responseArr && $responseArr !== '') {
-                            $module['repo_details'] = Json::encode($responseArr);
-                            $module['updated_by'] = $moduleUpdatedBy;
-
-                            $this->modules->packages->updatePackage($module);
-                            $module['repo_details'] = $responseArr;
-                        }
-                    } catch (ClientException | \throwable $e) {
-                        $this->addResponse($e->getMessage(), 2, ['module' => $module]);
-
-                        return false;
-                    }
-                }
-
-                $this->addResponse('Module information success.',0, ['module' => $module]);
-            } else {
-                $this->addResponse('Module information failed.', 1, []);
-            }
         } else if ($data['module_type'] === 'middleware') {
-            //
+            $module = $this->modules->middlewares->getMiddlewareById($data['module_id']);
         } else if ($data['module_type'] === 'view') {
-            //
+            $module = $this->modules->views->getIdViews($data['module_id']);
         }
+
+        if (isset($module) && is_array($module)) {
+            if (isset($module['notification_subscriptions'])) {
+                unset($module['notification_subscriptions']);
+            }
+            if (isset($module['files'])) {
+                unset($module['files']);
+            }
+            if (isset($module['settings'])) {
+                unset($module['settings']);
+            }
+
+            $moduleUpdatedBy = $module['updated_by'];
+
+            if ($module['updated_by'] == 0) {
+                $module['updated_by'] = 'System';
+            } else {
+                $module['updated_by'] = $this->basepackages->accounts->getById($module['updated_by'])['email'];
+            }
+
+            if (isset($data['sync']) && $data['sync'] == true) {
+                $module = $this->updateModuleRepoDetails($module, $moduleUpdatedBy);
+
+                if (!$module) {
+                    return false;
+                }
+            }
+
+            $this->addResponse('Module information success.',0, ['module' => $module]);
+        } else {
+            $this->addResponse('Module information failed.', 1, []);
+        }
+    }
+
+    protected function updateModuleRepoDetails($module, $moduleUpdatedBy)
+    {
+        if ($module['app_type'] === 'core') {
+            $repoNameArr = ['core'];
+        } else {
+            $repoNameArr = explode('/', $module['repo']);
+        }
+
+        try {
+            $api = $this->basepackages->api->useApi($module['api_id']);
+
+            if (strtolower($api->getApiConfig()['provider']) === 'gitea') {
+                $collection = 'RepositoryApi';
+                $method = 'repoGet';
+                $args = [$api->getApiConfig()['org_user'], Arr::last($repoNameArr)];
+            } else if (strtolower($api->getApiConfig()['provider']) === 'github') {
+                //For github
+            }
+            $responseArr = $api->useMethod($collection, $method, $args)->getResponse(true);
+
+            if ($responseArr) {
+                $module['repo_details'] = Json::encode($responseArr);
+                $module['updated_by'] = $moduleUpdatedBy;
+                $module['repo_details'] = $responseArr;
+
+                if ($module['module_type'] === 'component') {
+                    $this->modules->components->update($module);
+                } else if ($module['module_type'] === 'package') {
+                    $this->modules->packages->update($module);
+                } else if ($module['module_type'] === 'middleware') {
+                    $this->modules->middlewares->update($module);
+                } else if ($module['module_type'] === 'view') {
+                    $this->modules->views->update($module);
+                }
+            }
+        } catch (ClientException | \throwable $e) {
+            $this->addResponse($e->getMessage(), 2, ['module' => $module]);
+
+            return false;
+        }
+
+        return $module;
+    }
+
+    public function getRepositoryModules($data)
+    {
+        $modules = [];
+        $sortedModules = [];
+
+        $modules['components'] = $this->modules->components->getComponentsByApiId($data['api_id']);
+        $modules['middlewares'] = $this->modules->middlewares->getMiddlewaresByApiId($data['api_id']);
+        $modules['packages'] = $this->modules->packages->getPackagesByApiId($data['api_id']);
+        $modules['views'] = $this->modules->views->getViewsByApiId($data['api_id']);
+
+        foreach ($modules as $moduleType => $modulesArr) {
+            if (count($modulesArr) > 0) {
+                foreach ($modulesArr as $moduleArr) {
+                    if (!isset($sortedModules[$moduleArr['app_type']])) {
+                        $sortedModules[$moduleArr['app_type']] = [];
+                        $sortedModules[$moduleArr['app_type']]['name'] = $moduleArr['app_type'];
+                    }
+
+                    if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']])) {
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']] = [];
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['name'] = $moduleArr['module_type'];
+                    }
+
+                    if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']])) {
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']] = [];
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['name'] = $moduleArr['category'];
+                    }
+
+                    if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']])) {
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']] = [];
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['name'] = $moduleArr['sub_category'];
+
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['childs'] = [];
+                    }
+
+                    $module['id'] = $moduleArr['id'];
+                    $module['name'] = $moduleArr['name'];
+                    if (isset($moduleArr['display_name'])) {
+                        $module['name'] = $moduleArr['display_name'];
+                    }
+                    $module['data']['apptype'] = $moduleArr['app_type'];
+                    $module['data']['moduletype'] = $moduleArr['module_type'];
+                    $module['data']['modulecategory'] = $moduleArr['category'];
+                    $module['data']['modulesubcategory'] = $moduleArr['sub_category'];
+                    $module['data']['moduleid'] = $moduleArr['module_type'] . '-' . $moduleArr['id'];
+                    $module['data']['installed'] = $moduleArr['installed'];
+                    $module['data']['update_available'] = $moduleArr['update_available'];
+
+                    $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['childs'][$module['data']['moduleid']] = $module;
+                }
+            }
+        }
+
+        $this->addResponse('Ok', 0, ['modules' => $sortedModules]);
     }
 
     public function syncRemoteWithLocal($id)
@@ -126,115 +218,6 @@ class Manager extends BasePackage
 
         return false;
     }
-
-    public function getRepositoryModules($data)
-    {
-        $modules = [];
-        $sortedModules = [];
-
-        $modules['components'] = $this->modules->components->getComponentsByApiId($data['api_id']);
-        $modules['middlewares'] = $this->modules->middlewares->getMiddlewaresByApiId($data['api_id']);
-        $modules['packages'] = $this->modules->packages->getPackagesByApiId($data['api_id']);
-        $modules['views'] = $this->modules->views->getViewsByApiId($data['api_id']);
-
-        foreach ($modules as $moduleType => $modulesArr) {
-            if (count($modulesArr) > 0) {
-                foreach ($modulesArr as $moduleArr) {
-                    if (!isset($sortedModules[$moduleArr['app_type']])) {
-                        $sortedModules[$moduleArr['app_type']] = [];
-                        $sortedModules[$moduleArr['app_type']]['name'] = $moduleArr['app_type'];
-                    }
-
-                    if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']])) {
-                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']] = [];
-                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['name'] = $moduleArr['module_type'];
-                    }
-
-                    if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']])) {
-                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']] = [];
-                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['name'] = $moduleArr['category'];
-                    }
-
-                    if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']])) {
-                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']] = [];
-                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['name'] = $moduleArr['sub_category'];
-
-                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['childs'] = [];
-                    }
-
-                    $module['id'] = $moduleArr['id'];
-                    $module['name'] = $moduleArr['name'];
-                    if (isset($moduleArr['display_name'])) {
-                        $module['name'] = $moduleArr['display_name'];
-                    }
-                    $module['data']['moduleid'] = $moduleArr['module_type'] . '-' . $moduleArr['id'];
-                    $module['data']['installed'] = $moduleArr['installed'];
-                    $module['data']['update_available'] = $moduleArr['update_available'];
-
-                    array_push($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['childs'], $module);
-                }
-            }
-        }
-
-        $this->addResponse('Ok', 0, ['modules' => $sortedModules]);
-    }
-
-    // protected function applyFilters($filter = null, $getFresh = false)
-    // {
-    //     if ($filter) {
-    //         $app = $this->apps->getById($filter);
-
-    //         if ($getFresh) {
-    //             $this->components =
-    //                 $this->modules->components->init(true)
-    //                 // ->getComponentsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-    //                 ->getComponentsForAppType($app['app_type']);
-
-    //             $this->packages =
-    //                 $this->modules->packages->init(true)
-    //                 // ->getPackagesForCategoryAndSubcategory($app['category'], $app['sub_category']);
-    //                 ->getPackagesForAppType($app['app_type']);
-
-    //             $this->middlewares =
-    //                 $this->modules->middlewares->init(true)
-    //                 // ->getMiddlewaresForCategoryAndSubcategory($app['category'], $app['sub_category']);
-    //                 ->getMiddlewaresForAppType($app['app_type']);
-
-    //             $this->views =
-    //                 $this->modules->views->init(true)
-    //                 // ->getViewsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-    //                 ->getViewsForAppType($app['app_type']);
-    //         } else {
-    //             $this->components =
-    //                 $this->modules->components
-    //                 // ->getComponentsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-    //                 ->getComponentsForAppType($app['app_type']);
-
-    //             $this->packages =
-    //                 $this->modules->packages
-    //                 // ->getPackagesForCategoryAndSubcategory($app['category'], $app['sub_category']);
-    //                 ->getPackagesForAppType($app['app_type']);
-
-    //             $this->middlewares =
-    //                 $this->modules->middlewares
-    //                 // ->getMiddlewaresForCategoryAndSubcategory($app['category'], $app['sub_category']);
-    //                 ->getMiddlewaresForAppType($app['app_type']);
-
-    //             $this->views =
-    //                 $this->modules->views
-    //                 // ->getViewsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-    //                 ->getViewsForAppType($app['app_type']);
-    //         }
-    //     } else {
-    //         $this->components = $this->modules->components->components;
-
-    //         $this->packages = $this->modules->packages->packages;
-
-    //         $this->middlewares = $this->modules->middlewares->middlewares;
-
-    //         $this->views = $this->modules->views->views;
-    //     }
-    // }
 
     protected function getRemoteModules()
     {

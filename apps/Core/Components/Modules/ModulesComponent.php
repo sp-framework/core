@@ -13,14 +13,14 @@ class ModulesComponent extends BaseComponent
 	{
 		$this->view->repositories = $this->modules->repositories->repositories;
 
-		$core = $this->modules->packages->getNamePackage('core');
-		$module['id'] = $core['id'];
-		$module['name'] = $core['display_name'];
-		$module['data']['moduleid'] = $core['module_type'] . '-' . $core['id'];
-		$module['data']['installed'] = $core['installed'];
-		$module['data']['update_available'] = $core['update_available'];
-		$modules['childs'] = [$module];
-		$this->view->modules = $modules;
+		// $core = $this->modules->packages->getNamePackage('core');
+		// $module['id'] = $core['id'];
+		// $module['name'] = $core['display_name'];
+		// $module['data']['moduleid'] = $core['module_type'] . '-' . $core['id'];
+		// $module['data']['installed'] = $core['installed'];
+		// $module['data']['update_available'] = $core['update_available'];
+		// $modules['childs'] = [$module];
+		// $this->view->modules = $modules;
 	}
 
 	/**
@@ -215,12 +215,12 @@ class ModulesComponent extends BaseComponent
 						[
 							'treeMode'      => 'jstree',
 							'treeData'      => $modulesTree,
-							'groupIcon' 	=> '{"icon" : "fa fa-fw fa-modules text-sm"}',
+							'groupIcon' 	=> '{"icon" : "fas fa-fw fa-modules text-sm"}',
 							'itemIcon' 		=> '{"icon" : "fas fa-fw fa-circle-dot text-sm"}'
 						]
 					);
 
-				$responseData = ['modules' => $modulesTree, 'modules_html' => $treeData];
+				$responseData = array_merge($modulesTree, ['modules_html' => $treeData]);
 
 				$this->addResponse(
 					$this->modules->manager->packagesData->responseMessage,
