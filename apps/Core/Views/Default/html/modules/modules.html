@@ -600,10 +600,6 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
             $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
             $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
         }
-        $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', false);
-        // if (moduleData['app_type'] !== 'core') {
-            $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', false);
-        // }
     } else {
         moduleData['installed'] = '<span class="badge badge-secondary">No</span>';
         $('#{{componentId}}-{{sectionId}}-install-update').html('INSTALL');
@@ -697,6 +693,18 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
     $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
     $('#module-buttons').attr('hidden', false);
+
+    if (moduleData['app_type'] === 'core') {
+        if (moduleInfo['name'] === 'Core') {
+            $('#{{componentId}}-{{sectionId}}-repo-sync').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-repo-sync').attr('hidden', false);
+            $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
+        } else {
+            $('#module-buttons').attr('hidden', true);
+        }
+    }
+
 
     dataCollectionSectionForm['funcs']['initModuleButtons']();
 }
