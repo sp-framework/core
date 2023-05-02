@@ -18,7 +18,6 @@ class Repos
             ]
         );
 
-
         if ($newApi) {
             $db->insertAsDict(
                 'basepackages_api',

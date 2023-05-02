@@ -65,18 +65,18 @@
 )}}
 <script>
 /*global PNotify Swal initModuleButtons */
-initSync('1');
-
 function initSync(val) {
     $('#{{componentId}}-{{sectionId}}-sync').off();
 
     changeRepoButtons(val);
 
     $('#{{componentId}}-{{sectionId}}-sync').click(function() {
-        $('#{{componentId}}-{{sectionId}}-sync, ' +
-          '#{{componentId}}-{{sectionId}}-delete, ' +
-          '#{{componentId}}-{{sectionId}}-add').attr('disabled', true);
-        $('#{{componentId}}-{{sectionId}}-edit').addClass('disabled');
+        // $('#{{componentId}}-{{sectionId}}-sync, ' +
+        //   '#{{componentId}}-{{sectionId}}-delete, ' +
+        //   '#{{componentId}}-{{sectionId}}-add').attr('disabled', true);
+        // $('#{{componentId}}-{{sectionId}}-edit').addClass('disabled');
+
+        // $('#{{componentId}}-{{sectionId}}-sync').children("i").removeClass("fa-sync-alt").addClass("fa-cog fa-spin");
 
         var postData = { };
         postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -171,7 +171,7 @@ function changeRepoButtons(val = '0') {
     } else if (val == '0') {
         $('#{{componentId}}-{{sectionId}}-sync, #{{componentId}}-{{sectionId}}-delete').attr('disabled', true);
         $('#{{componentId}}-{{sectionId}}-edit').addClass('disabled');
-    } else if (val != '1' || val != '2') {
+    } else {
         $('#{{componentId}}-{{sectionId}}-sync, #{{componentId}}-{{sectionId}}-delete').attr('disabled', false);
         $('#{{componentId}}-{{sectionId}}-edit').removeClass('disabled');
         $('#{{componentId}}-{{sectionId}}-edit').attr('href', url);

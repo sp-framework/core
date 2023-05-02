@@ -283,12 +283,17 @@ dataCollectionSectionForm['vars']['queue']['count'] = 0;
 dataCollectionSectionForm['vars']['queue']['install_update'] = { };
 dataCollectionSectionForm['vars']['queue']['uninstall'] = { };
 
-$('#{{componentId}}-{{sectionId}}-repositories').on('focus', function(e) {
+$('#{{componentId}}-{{sectionId}}-repositories').on('focus', function() {
     dataCollectionSectionForm['vars']['previous'] = this.value;
-});
+}).change(function() {
+    if (this.value == '0') {
+        dataCollectionSectionForm['vars']['previous'] = this.value;
+        $('#repo-details').attr('hidden', true);
+        return;
+    }
 
-$('#{{componentId}}-{{sectionId}}-repositories').on('change', function(e) {
     if (dataCollectionSectionForm['vars']['previous'] == '0') {
+        dataCollectionSectionForm['vars']['previous'] = this.value;
         dataCollectionSectionForm['funcs']['processRepositorySwitch']();
         return;
     }
@@ -321,7 +326,10 @@ $('#{{componentId}}-{{sectionId}}-repositories').on('change', function(e) {
 });
 
 dataCollectionSectionForm['funcs']['processRepositorySwitch'] = function() {
+    var selectedRepository = $('#{{componentId}}-{{sectionId}}-repositories').find(":selected").data('value');
+
     $('#repo-details').attr('hidden', false);
+
     dataCollectionSectionForm['vars']['queue'] = { };
     dataCollectionSectionForm['vars']['queue']['count'] = 0;
     dataCollectionSectionForm['vars']['queue']['install_update'] = { };
@@ -350,7 +358,7 @@ dataCollectionSectionForm['funcs']['processRepositorySwitch'] = function() {
         '</div>'
     );
 
-    dataCollectionSectionForm['funcs']['getRepositoryModules']($('#{{componentId}}-{{sectionId}}-repositories').find(":selected").data('value'));
+    dataCollectionSectionForm['funcs']['getRepositoryModules'](selectedRepository);
 }
 
 dataCollectionSectionForm['funcs']['jstreeSelectNode'] = function() {

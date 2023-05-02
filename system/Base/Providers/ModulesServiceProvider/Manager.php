@@ -118,60 +118,62 @@ class Manager extends BasePackage
         return $module;
     }
 
-    public function getRepositoryModules($data)
+    public function getRepositoryModules($data, $returnSorted = true)
     {
-        $modules = [];
+        $this->localModules = [];
         $sortedModules = [];
 
-        $modules['components'] = $this->modules->components->getComponentsByApiId($data['api_id']);
-        $modules['middlewares'] = $this->modules->middlewares->getMiddlewaresByApiId($data['api_id']);
-        $modules['packages'] = $this->modules->packages->getPackagesByApiId($data['api_id']);
-        $modules['views'] = $this->modules->views->getViewsByApiId($data['api_id']);
+        $this->localModules['components'] = $this->modules->components->getComponentsByApiId($data['api_id']);
+        $this->localModules['middlewares'] = $this->modules->middlewares->getMiddlewaresByApiId($data['api_id']);
+        $this->localModules['packages'] = $this->modules->packages->getPackagesByApiId($data['api_id']);
+        $this->localModules['views'] = $this->modules->views->getViewsByApiId($data['api_id']);
 
-        foreach ($modules as $moduleType => $modulesArr) {
-            if (count($modulesArr) > 0) {
-                foreach ($modulesArr as $moduleArr) {
-                    if (!isset($sortedModules[$moduleArr['app_type']])) {
-                        $sortedModules[$moduleArr['app_type']] = [];
-                        $sortedModules[$moduleArr['app_type']]['name'] = $moduleArr['app_type'];
+        if ($returnSorted) {
+            foreach ($this->localModules as $moduleType => $modulesArr) {
+                if (count($modulesArr) > 0) {
+                    foreach ($modulesArr as $moduleArr) {
+                        if (!isset($sortedModules[$moduleArr['app_type']])) {
+                            $sortedModules[$moduleArr['app_type']] = [];
+                            $sortedModules[$moduleArr['app_type']]['name'] = $moduleArr['app_type'];
+                        }
+
+                        if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']])) {
+                            $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']] = [];
+                            $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['name'] = $moduleArr['module_type'];
+                        }
+
+                        if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']])) {
+                            $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']] = [];
+                            $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['name'] = $moduleArr['category'];
+                        }
+
+                        if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']])) {
+                            $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']] = [];
+                            $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['name'] = $moduleArr['sub_category'];
+
+                            $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['childs'] = [];
+                        }
+
+                        $module['id'] = $moduleArr['id'];
+                        $module['name'] = $moduleArr['name'];
+                        if (isset($moduleArr['display_name'])) {
+                            $module['name'] = $moduleArr['display_name'];
+                        }
+                        $module['data']['apptype'] = $moduleArr['app_type'];
+                        $module['data']['moduletype'] = $moduleArr['module_type'];
+                        $module['data']['modulecategory'] = $moduleArr['category'];
+                        $module['data']['modulesubcategory'] = $moduleArr['sub_category'];
+                        $module['data']['moduleid'] = $moduleArr['module_type'] . '-' . $moduleArr['id'];
+                        $module['data']['installed'] = $moduleArr['installed'];
+                        $module['data']['update_available'] = $moduleArr['update_available'];
+
+                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['childs'][$module['data']['moduleid']] = $module;
                     }
-
-                    if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']])) {
-                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']] = [];
-                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['name'] = $moduleArr['module_type'];
-                    }
-
-                    if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']])) {
-                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']] = [];
-                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['name'] = $moduleArr['category'];
-                    }
-
-                    if (!isset($sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']])) {
-                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']] = [];
-                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['name'] = $moduleArr['sub_category'];
-
-                        $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['childs'] = [];
-                    }
-
-                    $module['id'] = $moduleArr['id'];
-                    $module['name'] = $moduleArr['name'];
-                    if (isset($moduleArr['display_name'])) {
-                        $module['name'] = $moduleArr['display_name'];
-                    }
-                    $module['data']['apptype'] = $moduleArr['app_type'];
-                    $module['data']['moduletype'] = $moduleArr['module_type'];
-                    $module['data']['modulecategory'] = $moduleArr['category'];
-                    $module['data']['modulesubcategory'] = $moduleArr['sub_category'];
-                    $module['data']['moduleid'] = $moduleArr['module_type'] . '-' . $moduleArr['id'];
-                    $module['data']['installed'] = $moduleArr['installed'];
-                    $module['data']['update_available'] = $moduleArr['update_available'];
-
-                    $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['childs'][$module['data']['moduleid']] = $module;
                 }
             }
-        }
 
-        $this->addResponse('Ok', 0, ['modules' => $sortedModules]);
+            $this->addResponse('Ok', 0, ['modules' => $sortedModules]);
+        }
     }
 
     public function syncRemoteWithLocal($id)
@@ -201,9 +203,8 @@ class Manager extends BasePackage
             return;
         }
 
-        // var_dump($this->getModulesData(null, true));
         //populate localModules so that we can compare with remoteModules
-        // $this->getModulesData(null, true);
+        $this->getRepositoryModules(['api_id' => $id], false);
 
         if ($this->getRemoteModules() === true && $this->updateRemoteModulesToDB() === true) {
 
@@ -223,7 +224,7 @@ class Manager extends BasePackage
     {
         try {
             if (strtolower($this->apiConfig['provider']) === 'gitea') {
-                $modulesArr = $this->api->useMethod('UserApi', 'userListRepos', [$this->apiConfig['org_user']])->getResponse();
+                $modulesArr = $this->api->useMethod('UserApi', 'userListRepos', [$this->apiConfig['org_user']])->getResponse(true);
             } else if (strtolower($this->apiConfig['provider']) === 'github') {
                 //
             }
@@ -233,12 +234,11 @@ class Manager extends BasePackage
             return false;
         }
 
-        die(var_dump($modulesArr));
         if ($modulesArr) {
             foreach ($modulesArr as $key => $value) {
-                $names = explode('-', $value->name);
+                $names = explode('-', $value['name']);
 
-                if (count($names) > 0) {
+                if (count($names) > 1) {
                     if (count($names) === 1 && $names[0] === 'core') {
                         $url = $siteUrl . $value->full_name . $branch . 'core.json';
 
@@ -368,11 +368,22 @@ class Manager extends BasePackage
                             return false;
                         }
                     }
+                } else {
+                    if ($names[0] === 'core') {
+                        $this->remoteModules['packages'] = [$value];
+
+                        return true;
+                    }
+
+                    $this->addResponse('Unable to Sync with remote server', 1);
+
+                    return false;
                 }
             }
             return true;
-
         }
+
+        $this->addResponse('Unable to Sync with remote server', 1);
 
         return false;
     }
@@ -399,17 +410,16 @@ class Manager extends BasePackage
         $counter['update'] = 0;
 
         foreach ($this->remoteModules as $remoteModulesType => $remoteModules) {
-            if ($remoteModulesType === 'core') {
+            // if ($remoteModulesType === 'core') {
+            //     $remoteCore = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
 
-                $remoteCore = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
-
-                if (count($remoteCore['update']) > 0) {
-                    foreach ($remoteCore['update'] as $updateRemoteCoreKey => $updateRemoteCore) {
-                        $this->modules->core->update($updateRemoteCore);
-                        $counter['update'] = $counter['update'] + 1;
-                    }
-                }
-            }
+            //     if (count($remoteCore['update']) > 0) {
+            //         foreach ($remoteCore['update'] as $updateRemoteCoreKey => $updateRemoteCore) {
+            //             $this->core->update($updateRemoteCore);
+            //             $counter['update'] = $counter['update'] + 1;
+            //         }
+            //     }
+            // }
 
             if ($remoteModulesType === 'components') {
 
@@ -492,7 +502,6 @@ class Manager extends BasePackage
             }
 
             if ($remoteModulesType === 'packages') {
-
                 if (count($this->localModules[$remoteModulesType]) > 0) {
                     $remotePackages = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
                 } else {
@@ -502,12 +511,6 @@ class Manager extends BasePackage
 
                 if (count($remotePackages['update']) > 0) {
                     foreach ($remotePackages['update'] as $updateRemotePackageKey => $updateRemotePackage) {
-
-                        $updateRemotePackage['settings'] =
-                            isset($updateRemotePackage['settings']) ?
-                            Json::encode($updateRemotePackage['settings']) :
-                            Json::encode([]);
-
                         $this->modules->packages->update($updateRemotePackage);
 
                         $counter['update'] = $counter['update'] + 1;
@@ -643,12 +646,15 @@ class Manager extends BasePackage
     {
         $modules = [];
         $modules['update'] = [];
-
+        // var_dump($remoteModules, $localModules);die();
         foreach ($remoteModules as $remoteModuleKey => $remoteModule) {
             foreach ($localModules as $localModuleKey => $localModule) {
-
-                if ($localModule['repo'] === $remoteModule['repo']) {
-
+                if (isset($remoteModule['repo'])) {
+                    $repoUrl = $remoteModule['repo'];
+                } else if (isset($remoteModule['html_url'])) {
+                    $repoUrl = $remoteModule['html_url'];
+                }
+                if ($localModule['repo'] === $repoUrl) {
                     if ($this->moduleNeedsUpgrade($localModule, $remoteModule)) {
 
                         // if ($localModule['installed'] === '0') {
@@ -681,6 +687,7 @@ class Manager extends BasePackage
                     unset($remoteModules[$remoteModuleKey]);
                 }
             }
+            die();
         }
 
         $modules['register'] = $remoteModules;
@@ -690,13 +697,26 @@ class Manager extends BasePackage
 
     protected function moduleNeedsUpgrade($localModule, $remoteModule)
     {
-        if ($localModule['version'] !== $remoteModule['version'] &&
-            $localModule['update_version'] !== $remoteModule['version']
+        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+            $collection = 'RepositoryApi';
+            $method = 'repoGetLatestRelease';
+            $args = [$this->apiConfig['org_user'], $remoteModule['name']];
+        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+            //For github
+        }
+
+        $latestRelease = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+
+        if (!$latestRelease) {
+            return false;
+        }
+
+        if ($localModule['version'] !== $latestRelease['name'] &&
+            $localModule['update_version'] !== $latestRelease['name']
            ) {
-
             $installedModuleVersion = explode('.', $localModule['version']);
-
-            $newModuleVersion = explode('.', $remoteModule['version']);
+            $newModuleVersion = explode('.', $latestRelease['name']);
+        var_dump($installedModuleVersion, $newModuleVersion);die();
 
             if ($newModuleVersion[0] > $installedModuleVersion[0]) {
 
