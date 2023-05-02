@@ -49,6 +49,17 @@ class Packages extends BasePackage
 		return $packages;
 	}
 
+	public function getPackageByRepo($repo)
+	{
+		foreach($this->packages as $package) {
+			if ($package['repo'] == $repo) {
+				return $package;
+			}
+		}
+
+		return false;
+	}
+
 	public function getNamedPackageForRepo($name, $repo)
 	{
 		foreach($this->packages as $package) {

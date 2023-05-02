@@ -255,6 +255,17 @@ class Views extends BasePackage
         return false;
     }
 
+    public function getViewByRepo($repo)
+    {
+        foreach($this->views as $view) {
+            if ($view['repo'] == $repo) {
+                return $view;
+            }
+        }
+
+        return false;
+    }
+
     public function getViewsByApiId($id)
     {
         $views = [];

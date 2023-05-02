@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit457848ca63180f6aa7e3ea7cda1ed088
+class ComposerStaticInit70540b19ee82c33a44d9162b6f81cf71
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -26,6 +26,10 @@ class ComposerStaticInit457848ca63180f6aa7e3ea7cda1ed088
     );
 
     public static $prefixLengthsPsr4 = array (
+        'z' => 
+        array (
+            'z4kn4fein\\SemVer\\' => 17,
+        ),
         'Z' => 
         array (
             'ZxcvbnPhp\\' => 10,
@@ -107,6 +111,10 @@ class ComposerStaticInit457848ca63180f6aa7e3ea7cda1ed088
     );
 
     public static $prefixDirsPsr4 = array (
+        'z4kn4fein\\SemVer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/z4kn4fein/php-semver/src',
+        ),
         'ZxcvbnPhp\\' => 
         array (
             0 => __DIR__ . '/..' . '/bjeavons/zxcvbn-php/src',
@@ -338,10 +346,10 @@ class ComposerStaticInit457848ca63180f6aa7e3ea7cda1ed088
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit457848ca63180f6aa7e3ea7cda1ed088::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit457848ca63180f6aa7e3ea7cda1ed088::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit457848ca63180f6aa7e3ea7cda1ed088::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit457848ca63180f6aa7e3ea7cda1ed088::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit70540b19ee82c33a44d9162b6f81cf71::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit70540b19ee82c33a44d9162b6f81cf71::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit70540b19ee82c33a44d9162b6f81cf71::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit70540b19ee82c33a44d9162b6f81cf71::$classMap;
 
         }, null, ClassLoader::class);
     }

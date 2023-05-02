@@ -43,6 +43,17 @@ class Components extends BasePackage
 		return $components;
 	}
 
+	public function getComponentByRepo($repo)
+	{
+		foreach($this->components as $component) {
+			if ($component['repo'] == $repo) {
+				return $component;
+			}
+		}
+
+		return false;
+	}
+
 	public function getComponentByRoute($route)
 	{
 		foreach($this->components as $component) {
