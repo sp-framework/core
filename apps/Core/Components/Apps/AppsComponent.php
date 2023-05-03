@@ -15,7 +15,7 @@ class AppsComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $typesArr = $this->apps->types;
+        $typesArr = $this->apps->types->types;
 
         $this->view->types = $typesArr;
 

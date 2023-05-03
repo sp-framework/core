@@ -59,11 +59,21 @@ class Jstree
 
             if (isset($this->params['fieldJstreeAdditionalTools']) && is_array($this->params['fieldJstreeAdditionalTools'])) {
                 foreach ($this->params['fieldJstreeAdditionalTools'] as $fieldKey => $field) {
-                    $this->content .=
-                        '<a href="#" ' . $this->fieldParams['fieldId'] . '-' . $field['id'] . '" data-container="body" data-placement="auto" data-toggle="tooltip" data-html="true" title="' . $field['tooltip'] . '">
-                            <i class="' . $field['icon'] . '"></i>
-                        </a>';
+                    $fieldDisabled = '';
+                    if (isset($field['disabled']) && $field['disabled'] === true) {
+                        $fieldDisabled = 'disabled text-disabled';
+                    }
+
+                    if ($fieldKey === 'divider') {
+                        $this->content .= ' | ';
+                    } else {
+                        $this->content .=
+                            '<a href="#" ' . $this->fieldParams['fieldId'] . '-' . $field['id'] . '" data-container="body" data-placement="auto" data-toggle="tooltip" data-html="true" title="' . $field['tooltip'] . '" class="' . $fieldDisabled . '">
+                                <i class="' . $field['icon'] . '"></i>
+                            </a>';
+                    }
                 }
+                $this->content .= ' | ';
             }
         $this->content .=
                 '<a href="#" ' . $this->fieldParams['fieldId'] . '-tools-add" class="text-primary" data-container="body" data-placement="auto" data-toggle="tooltip" data-html="true" title="Add new ' . $this->params['fieldLabel'] . '" hidden>

@@ -11,16 +11,7 @@ class ModulesComponent extends BaseComponent
 	 */
 	public function viewAction()
 	{
-		$this->view->repositories = $this->modules->repositories->repositories;
-
-		// $core = $this->modules->packages->getNamePackage('core');
-		// $module['id'] = $core['id'];
-		// $module['name'] = $core['display_name'];
-		// $module['data']['moduleid'] = $core['module_type'] . '-' . $core['id'];
-		// $module['data']['installed'] = $core['installed'];
-		// $module['data']['update_available'] = $core['update_available'];
-		// $modules['childs'] = [$module];
-		// $this->view->modules = $modules;
+		$this->view->modules = $this->modules->manager->getRepositoryModules();
 	}
 
 	/**
@@ -151,12 +142,14 @@ class ModulesComponent extends BaseComponent
 				$counter = null;
 
 				if ($this->modules->manager->syncRemoteWithLocal($this->postData()['repoId'])) {
+
 					$counter = $this->modules->manager->packagesData->counter;
+					$modulesTree = $this->modules->manager->packagesData->responseData;
 
 					$this->addResponse(
 						$this->modules->manager->packagesData->responseMessage,
 						$this->modules->manager->packagesData->responseCode,
-						['counter' => $counter]
+						[$modulesTree, 'counter' => $counter, 'modules_html' => $this->generateTree($modulesTree)]
 					);
 
 					return true;
@@ -209,18 +202,7 @@ class ModulesComponent extends BaseComponent
 
 				$modulesTree = $this->modules->manager->packagesData->responseData;
 
-				$treeData =
-					$this->adminltetags->useTag(
-						'tree',
-						[
-							'treeMode'      => 'jstree',
-							'treeData'      => $modulesTree,
-							'groupIcon' 	=> '{"icon" : "fas fa-fw fa-modules text-sm"}',
-							'itemIcon' 		=> '{"icon" : "fas fa-fw fa-circle-dot text-sm"}'
-						]
-					);
-
-				$responseData = array_merge($modulesTree, ['modules_html' => $treeData]);
+				$responseData = array_merge($modulesTree, ['modules_html' => $this->generateTree($modulesTree)]);
 
 				$this->addResponse(
 					$this->modules->manager->packagesData->responseMessage,
@@ -233,5 +215,18 @@ class ModulesComponent extends BaseComponent
 		} else {
 			$this->addResponse('Method Not Allowed', 1);
 		}
+	}
+
+	private function generateTree($modulesTree)
+	{
+		return $this->adminltetags->useTag(
+			'tree',
+			[
+				'treeMode'      => 'jstree',
+				'treeData'      => $modulesTree,
+				'groupIcon' 	=> '{"icon" : "fas fa-fw fa-modules text-sm"}',
+				'itemIcon' 		=> '{"icon" : "fas fa-fw fa-circle-dot text-sm"}'
+			]
+		);
 	}
 }

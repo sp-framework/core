@@ -19,4 +19,45 @@ class Types extends BasePackage
 
         return $this;
     }
+
+    public function getIdAppType($id)
+    {
+        foreach($this->types as $type) {
+            if ($type['id'] == $id) {
+                return $type;
+            }
+        }
+
+        return false;
+    }
+
+    public function getTypeAppType($app_type)
+    {
+        foreach($this->types as $type) {
+            if ($type['app_type'] === strtolower($app_type)) {
+                return $type;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @notification(name=update)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
+    public function updateAppsType(array $data)
+    {
+        $appType = $this->getIdAppType($data['id']);
+
+        $appType['name'] = $data['name'];
+        $appType['description'] = $data['description'];
+
+        if ($this->update($appType)) {
+            $this->addResponse('Updated ' . $appType['name'] . ' app type');
+        } else {
+            $this->addResponse('Error updating app type.', 1);
+        }
+    }
 }

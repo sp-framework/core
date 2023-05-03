@@ -39,6 +39,18 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base;
  */
 class ObjectSerializer
 {
+    protected static $urlEncoding = true;
+
+    public static function setUrlEncoding(bool $encoding)
+    {
+        self::$urlEncoding = $encoding;
+    }
+
+    public static function getUrlEncoding()
+    {
+        return self::$urlEncoding;
+    }
+
     /**
      * Serialize data
      *
@@ -114,7 +126,11 @@ class ObjectSerializer
      */
     public static function toPathValue($value)
     {
-        return rawurlencode(self::toString($value));
+        if (self::$urlEncoding) {
+            return rawurlencode(self::toString($value));
+        }
+
+        return self::toString($value);
     }
 
     /**

@@ -29,7 +29,7 @@ class Apps extends BasePackage
 
 	public function init(bool $resetCache = false)
 	{
-		$this->types = (new Types)->init($resetCache)->types;
+		$this->types = (new Types)->init($resetCache);
 
 		$this->reservedRoutes = $this->getReservedRoutes();
 

@@ -27624,7 +27624,8 @@ class RepositoryApi
      */
     public function repoGetRawFile($owner, $repo, $filepath, $ref = null)
     {
-        $this->repoGetRawFileWithHttpInfo($owner, $repo, $filepath, $ref);
+        list($response) = $this->repoGetRawFileWithHttpInfo($owner, $repo, $filepath, $ref);
+        return $response;
     }
 
     /**
@@ -27674,7 +27675,11 @@ class RepositoryApi
                 );
             }
 
-            return [null, $statusCode, $response->getHeaders()];
+            return [
+                $response->getBody(),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
 
         } catch (ApiException $e) {
             switch ($e->getCode()) {

@@ -18,14 +18,7 @@
         "components"    : [],
         "packages"      : [],
         "middlewares"   : [],
-        "views"         :
-        [
-            {
-                "name"      : "Default",
-                "version"   : "0.0.1",
-                "repo"      : "https://.../"
-            }
-        ]
+        "views"         : []
     },
     "menu"              : {
         "seq"           : 2,
@@ -37,7 +30,7 @@
     },
     "settings"          : {
         "mandatory"     : {
-            "admin"     : true
+            "core"      : true
         }
     }
 }

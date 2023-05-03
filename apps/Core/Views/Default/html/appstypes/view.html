@@ -1,0 +1,25 @@
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'th-large',
+        'cardTitle'                     : 'Apps Type (' ~ appsType['name'] ~ ')',
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'appstypes/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : appsType['id'],
+            'updateActionUrl'               : 'appstypes/update',
+            'updateSuccessRedirectUrl'      : 'appstypes',
+            'cancelActionUrl'               : 'appstypes',
+            'closeActionUrl'                : 'appstypes'
+        ]
+    ]
+)}}

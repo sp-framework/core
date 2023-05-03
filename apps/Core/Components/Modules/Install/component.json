@@ -15,17 +15,10 @@
 			"version"	: "0.0.1",
 			"repo"		: "https://.../"
 		},
-		"components"	: [],
-		"packages"		: [],
-		"middlewares"	: [],
-		"views"         :
-		[
-			{
-				"name"      : "Default",
-				"version"   : "0.0.1",
-				"repo"      : "https://.../"
-			}
-		]
+		"components"    : [],
+		"packages"      : [],
+		"middlewares"   : [],
+		"views"         : []
 	},
 	"menu"				: {
 		"seq"			: 3,

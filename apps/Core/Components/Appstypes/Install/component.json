@@ -1,14 +1,14 @@
 {
-    "route"         : "auth",
-    "name"          : "Auth",
-    "description"   : "Manage dash auth via this component",
+    "route"         : "appstypes",
+    "name"          : "Apps Types",
+    "description"   : "List apps types via this component",
     "module_type"   : "components",
     "app_type"      : "core",
     "category"      : "system",
-    "sub_category"  : "tools",
+    "sub_category"  : "admin",
     "version"       : "0.0.1",
     "repo"          : "https://.../",
-    "class"         : "Apps\\Core\\Components\\Auth\\AuthComponent",
+    "class"         : "Apps\\Core\\Components\\Appstypes\\AppstypesComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
@@ -22,7 +22,8 @@
     },
     "menu"              : false,
     "settings"          : {
-        "mandatory"     : true,
-        "needAuth"      : "disabled"
+        "mandatory"     : {
+            "core"      : true
+        }
     }
 }
