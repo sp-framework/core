@@ -68,6 +68,12 @@
                                         'id'        : 'filter-queue',
                                         'tooltip'   : 'Apply Filter In Queue (queue:)',
                                         'icon'      : 'fas fa-fw fa-list text-purple'
+                                    ],
+                                'filter-clear' :
+                                    [
+                                        'id'        : 'filter-clear',
+                                        'tooltip'   : 'Clear all filters',
+                                        'icon'      : 'fas fa-fw fa-times text-secondary'
                                     ]
                             ],
                         'fieldJstreeReplaceIdWithDataField'         : 'moduleid',
@@ -282,6 +288,7 @@ dataCollectionSectionForm['vars']['queue'] = { };
 dataCollectionSectionForm['vars']['queue']['count'] = 0;
 dataCollectionSectionForm['vars']['queue']['install_update'] = { };
 dataCollectionSectionForm['vars']['queue']['uninstall'] = { };
+dataCollectionSectionForm['vars']['initJstree'] = false;
 
 $('#{{componentId}}-{{sectionId}}-repositories').on('focus', function() {
     dataCollectionSectionForm['vars']['previous'] = this.value;
@@ -290,39 +297,41 @@ $('#{{componentId}}-{{sectionId}}-repositories').on('focus', function() {
         dataCollectionSectionForm['vars']['previous'] = this.value;
         $('#repo-details').attr('hidden', true);
         return;
-    }
-
-    if (dataCollectionSectionForm['vars']['previous'] == '0') {
-        dataCollectionSectionForm['vars']['previous'] = this.value;
+    } else {
         dataCollectionSectionForm['funcs']['processRepositorySwitch']();
-        return;
     }
 
-    Swal.fire({
-        title                       : '<span class="text-warning"> Switch Repository? It will reset the queue.</span>',
-        icon                        : 'question',
-        background                  : 'rgba(0,0,0,.8)',
-        backdrop                    : 'rgba(0,0,0,.6)',
-        buttonsStyling              : false,
-        confirmButtonText           : 'Switch',
-        customClass                 : {
-            'confirmButton'             : 'btn btn-warning text-uppercase',
-            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-        },
-        showCancelButton            : true,
-        keydownListenerCapture      : true,
-        allowOutsideClick           : false,
-        allowEscapeKey              : false,
-        didOpen                     : function() {
-            window['dataCollection'].env.sounds.swalSound.play();
-        }
-    }).then((result) => {
-        if (result.value) {
-            dataCollectionSectionForm['funcs']['processRepositorySwitch']();
-        } else {
-            $('#{{componentId}}-{{sectionId}}-repositories').val(dataCollectionSectionForm['vars']['previous']);
-        }
-    });
+    // if (dataCollectionSectionForm['vars']['previous'] == '0') {
+    //     dataCollectionSectionForm['vars']['previous'] = this.value;
+    //     dataCollectionSectionForm['funcs']['processRepositorySwitch']();
+    //     return;
+    // }
+
+    // Swal.fire({
+    //     title                       : '<span class="text-warning"> Switch Repository? It will reset the queue.</span>',
+    //     icon                        : 'question',
+    //     background                  : 'rgba(0,0,0,.8)',
+    //     backdrop                    : 'rgba(0,0,0,.6)',
+    //     buttonsStyling              : false,
+    //     confirmButtonText           : 'Switch',
+    //     customClass                 : {
+    //         'confirmButton'             : 'btn btn-warning text-uppercase',
+    //         'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+    //     },
+    //     showCancelButton            : true,
+    //     keydownListenerCapture      : true,
+    //     allowOutsideClick           : false,
+    //     allowEscapeKey              : false,
+    //     didOpen                     : function() {
+    //         window['dataCollection'].env.sounds.swalSound.play();
+    //     }
+    // }).then((result) => {
+    //     if (result.value) {
+    //         dataCollectionSectionForm['funcs']['processRepositorySwitch']();
+    //     } else {
+    //         $('#{{componentId}}-{{sectionId}}-repositories').val(dataCollectionSectionForm['vars']['previous']);
+    //     }
+    // });
 });
 
 dataCollectionSectionForm['funcs']['processRepositorySwitch'] = function() {
@@ -403,6 +412,13 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
             $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('');
             $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
         }
+
+        if (dataCollectionSectionForm['vars']['initJstree'] === true) {
+            PNotify.info({
+                text        : res.nodes.length + ' new updates available.',
+                textTrusted : true
+            });
+        }
     });
 
     $('#{{componentId}}-{{sectionId}}-modules-filter-update').off();
@@ -457,6 +473,20 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
         $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
         $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('in queue:');
         $('#{{componentId}}-{{sectionId}}-modules').jstree().search('in queue:');
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
+        $('#module-buttons').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+    });
+
+    $('#{{componentId}}-{{sectionId}}-modules-filter-clear').off();
+    $('#{{componentId}}-{{sectionId}}-modules-filter-clear').click(function(e) {
+        e.preventDefault();
+
+        //We only need this during update so when we click on update the node is hidden from the filter tree.
+        dataCollectionSectionForm['vars']['filter'] = false;
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
+        $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('');
         $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
         $('#module-buttons').attr('hidden', true);
         $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
@@ -534,14 +564,14 @@ dataCollectionSectionForm['funcs']['getSelectedModuleInfo'] = function(selected)
         splitModule = selected[0].split('-');
         moduleId = splitModule[1];
 
-        if (selected[0].startsWith('component')) {
-            moduleType = 'component';
-        } else if (selected[0].startsWith('package')) {
-            moduleType = 'package';
-        } else if (selected[0].startsWith('middleware')) {
-            moduleType = 'middleware';
-        } else if (selected[0].startsWith('view')) {
-            moduleType = 'view';
+        if (selected[0].startsWith('components')) {
+            moduleType = 'components';
+        } else if (selected[0].startsWith('packages')) {
+            moduleType = 'packages';
+        } else if (selected[0].startsWith('middlewares')) {
+            moduleType = 'middlewares';
+        } else if (selected[0].startsWith('views')) {
+            moduleType = 'views';
         }
     }
 
@@ -933,67 +963,235 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function() {
     dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText']();
 }
 
-dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText'] = function(nodeId = null, installUpdate = false, uninstall = false, init = false) {
-    var allNodes;
+dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText'] =
+    function(nodeId = null, installUpdate = false, uninstall = false, init = false) {
+        var allNodes;
 
-    if (nodeId) {
-        allNodes = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_node(nodeId);
-    } else {
-        allNodes = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {'flat':true});
-    }
-
-    var updateAvailable = false;
-    var nT, nD;
-
-    $(allNodes).each(function(i, node) {
-        if (node.id.startsWith('j')) {
-            return true;
-        }
-        nD = node.data;
-
-        nT =
-            dataCollectionSectionForm['vars']['modules'][nD.apptype]['childs'][nD.moduletype]['childs'][nD.modulecategory]['childs'][nD.modulesubcategory]['childs'][node.id]['name'];
-
-        if (uninstall === true) {
-            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-minus text-danger');
-            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Uninstall)');
-            if (nD.update_available && nD.update_available == 1) {
-                updateAvailable = true;
-            }
-        } else if (installUpdate === true) {
-            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Install)');
-            if (nD.update_available && nD.update_available == 1) {
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-plus text-info');
-                updateAvailable = true;
-            } else {
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-square-plus text-info');
-            }
-        } else if (nodeId && uninstall === false && installUpdate === false && init === false) {
-            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fa fa-fw fa-circle-dot');
-            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
+        if (nodeId) {
+            allNodes = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_node(nodeId);
         } else {
-            if (nD.installed == 1) {
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-check text-success');
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
-            } else {
+            allNodes = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {'flat':true});
+        }
+
+        var updateAvailable = false;
+        var nT, nD;
+
+        $(allNodes).each(function(i, node) {
+            if (node.id.startsWith('j')) {
+                return true;
+            }
+            nD = node.data;
+
+            nT =
+                dataCollectionSectionForm['vars']['modules'][nD.apptype]['childs'][nD.moduletype]['childs'][nD.modulecategory]['childs'][nD.modulesubcategory]['childs'][node.id]['name'];
+
+            if (uninstall === true) {
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-minus text-danger');
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Uninstall)');
+                if (nD.update_available && nD.update_available == 1) {
+                    updateAvailable = true;
+                }
+            } else if (installUpdate === true) {
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Install)');
+                if (nD.update_available && nD.update_available == 1) {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-plus text-info');
+                    updateAvailable = true;
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-square-plus text-info');
+                }
+            } else if (nodeId && uninstall === false && installUpdate === false && init === false) {
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fa fa-fw fa-circle-dot');
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
-            }
+            } else {
+                if (nD.installed == 1) {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-check text-success');
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fa fa-fw fa-circle-dot');
+                    if (nD.isnew && nD.isnew == 1) {
+                        $('#{{componentId}}-{{sectionId}}-modules')
+                        .jstree()
+                        .set_text(
+                            node,
+                            nT +
+                                ' <span class="text-uppercase" style="top: -2px;position: relative;"><span class="badge badge-info">NEW</span></span>'
+                        );
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
+                    }
+                }
 
-            if (nD.update_available && nD.update_available == 1) {
-                updateAvailable = true;
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-warning');
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (Update)');
+                if (nD.update_available && nD.update_available == 1) {
+                    updateAvailable = true;
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-warning');
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (Update)');
+                }
             }
+        });
+
+        if (updateAvailable && (dataCollectionSectionForm['vars']['filter'] === true || init === true)) {
+            if (init === true) {
+                dataCollectionSectionForm['vars']['initJstree'] = true;
+            }
+            dataCollectionSectionForm['vars']['filter'] = true;
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
         }
-    });
+    }
 
-    if (updateAvailable && (dataCollectionSectionForm['vars']['filter'] === true || init === true)) {
-        dataCollectionSectionForm['vars']['filter'] = true;
-        $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
-        $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
+dataCollectionSectionForm['funcs']['changeRepoButtons'] = function(val = '0') {
+    var url = "{{links.url('system/api/q/repository/true/id/')}}" + val;
+
+    if (val == '1' || val == '2') {
+        $('#{{componentId}}-{{sectionId}}-sync').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-delete').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-edit').removeClass('disabled');
+        $('#{{componentId}}-{{sectionId}}-edit').attr('href', url);
+    } else if (val == '0') {
+        $('#{{componentId}}-{{sectionId}}-sync, #{{componentId}}-{{sectionId}}-delete').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-edit').addClass('disabled');
+    } else {
+        $('#{{componentId}}-{{sectionId}}-sync, #{{componentId}}-{{sectionId}}-delete').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-edit').removeClass('disabled');
+        $('#{{componentId}}-{{sectionId}}-edit').attr('href', url);
     }
 }
+
+dataCollectionSectionForm['funcs']['deleteRepo'] = function(repoName, repoId) {
+    Swal.fire({
+        title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2">' +
+                                      '</i> <span style="font-size:40px;" class="text-danger"> Delete Repo ' +
+                                      repoName + '?</span>',
+        icon                        : 'question',
+        background                  : 'rgba(0,0,0,.8)',
+        backdrop                    : 'rgba(0,0,0,.6)',
+        buttonsStyling              : false,
+        confirmButtonText           : 'Delete',
+        customClass                 : {
+            'confirmButton'             : 'btn btn-danger text-uppercase',
+            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+        },
+        showCancelButton            : true,
+        keydownListenerCapture      : true,
+        allowOutsideClick           : false,
+        allowEscapeKey              : false,
+        didOpen                     : function() {
+            window.dataCollection.env.sounds.swalSound.play();
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var postData = { };
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+            postData['id'] = repoId;
+
+            $.post('{{links.url("system/api/remove")}}', postData,
+                    function(response) {
+                        if (response.responseCode == 0) {
+                            $('#{{componentId}}-{{sectionId}}-repositories').find('[data-value="' + repoId + '"]').remove();
+                        } else {
+                            PNotify.error({
+                                text        : response.responseMessage,
+                                textTrusted : true
+                            });
+                        }
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+                    },
+                    'json'
+                );
+        }
+    });
+}
+$('#{{componentId}}-{{sectionId}}-delete').click(function() {
+    var repoName = $('#{{componentId}}-{{sectionId}}-repositories option:selected').html();
+    var repoId = $('#{{componentId}}-{{sectionId}}-repositories option:selected').val();
+
+    dataCollectionSectionForm['funcs']['deleteRepo'](repoName, repoId);
+});
+
+dataCollectionSectionForm['funcs']['initSync'] = function(val) {
+    $('#{{componentId}}-{{sectionId}}-sync').off();
+
+    dataCollectionSectionForm['funcs']['changeRepoButtons'](val);
+
+    $('#{{componentId}}-{{sectionId}}-sync').click(function() {
+        $('#{{componentId}}-{{sectionId}}-sync, ' +
+          '#{{componentId}}-{{sectionId}}-delete, ' +
+          '#{{componentId}}-{{sectionId}}-add').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-edit').addClass('disabled');
+
+        $('#{{componentId}}-{{sectionId}}-sync').children("i").removeClass("fa-sync-alt").addClass("fa-cog fa-spin");
+
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+        postData['repoId'] = $('#{{componentId}}-{{sectionId}}-repositories option:selected').val();
+
+        $.post('{{links.url("modules/sync")}}', postData, function(response) {
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+
+            if (response.responseCode == 0) {
+                if (response.responseData && response.responseData.register !== 'undefined' && response.responseData.update !== 'undefined') {
+                    var text, registerCounter, updateCounter;
+
+                    registerCounter = response.responseData.counter.register;
+                    updateCounter = response.responseData.counter.update;
+
+                    if (registerCounter > 0 || updateCounter > 0) {
+                        if (registerCounter !== 0 && updateCounter === 0) {
+                            text =
+                                'Sync Complete.<br>' + registerCounter + ' new modules available.<br> No updates available.';
+                        } else if (registerCounter === 0 && updateCounter !== 0) {
+                            text =
+                                'Sync Complete.<br>' + updateCounter + ' new updates available.<br> No new modules available.';
+                        } else if (registerCounter !== 0 && updateCounter !== 0) {
+                            text =
+                                'Sync Complete.<br>' + updateCounter + ' new updates available.<br>' + registerCounter + ' new modules available.';
+                        }
+
+                        if (updateCounter > 0) {
+                            dataCollectionSectionForm['vars']['filter'] = true;
+                            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
+                            $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
+                        }
+                    } else {
+                        text = 'Sync Complete.<br>No new modules or updates available.';
+                    }
+
+                    PNotify.info({
+                        text        : text,
+                        textTrusted : true
+                    });
+                }
+            } else {
+                PNotify.error({
+                    text        : response.responseMessage,
+                    textTrusted : true
+                });
+                $('#modules-data').attr('hidden', false);
+                $('#modules-loader').attr('hidden', true);
+                $('#repository-sync').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-sync, #{{componentId}}-{{sectionId}}-edit, #{{componentId}}-{{sectionId}}-delete, #{{componentId}}-{{sectionId}}-add').attr('disabled', false);
+            }
+
+            $('#{{componentId}}-{{sectionId}}-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
+            $('#{{componentId}}-{{sectionId}}-sync, ' +
+              '#{{componentId}}-{{sectionId}}-add').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-edit').removeClass('disabled');
+
+            if (postData['repoId'] != '1' && postData['repoId'] != '2') {
+                $('#{{componentId}}-{{sectionId}}-delete').attr('disabled', false);
+            }
+        }, 'json');
+    });
+}
+$('#{{componentId}}-{{sectionId}}-repositories').change(function() {
+    dataCollectionSectionForm['funcs']['initSync']($(this).val());
+});
 
 $(document).ready(function() {
     BazProgress.buildProgressBar($('#installer-progress'));

@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
+use Carbon\Carbon;
 use GuzzleHttp\Exception\ClientException;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
@@ -30,16 +31,15 @@ class Manager extends BasePackage
 
     public function getModuleInfo($data)
     {
-        if ($data['module_type'] === 'component') {
+        if ($data['module_type'] === 'components') {
             $module = $this->modules->components->getComponentById($data['module_id']);
-        } else if ($data['module_type'] === 'package') {
+        } else if ($data['module_type'] === 'packages') {
             $module = $this->modules->packages->getIdPackage($data['module_id']);
-        } else if ($data['module_type'] === 'middleware') {
+        } else if ($data['module_type'] === 'middlewares') {
             $module = $this->modules->middlewares->getMiddlewareById($data['module_id']);
-        } else if ($data['module_type'] === 'view') {
+        } else if ($data['module_type'] === 'views') {
             $module = $this->modules->views->getIdViews($data['module_id']);
         }
-
         if (isset($module) && is_array($module)) {
             if (isset($module['notification_subscriptions'])) {
                 unset($module['notification_subscriptions']);
@@ -164,6 +164,23 @@ class Manager extends BasePackage
                     $module['data']['moduleid'] = $moduleArr['module_type'] . '-' . $moduleArr['id'];
                     $module['data']['installed'] = $moduleArr['installed'];
                     $module['data']['update_available'] = $moduleArr['update_available'];
+                    $module['data']['isnew'] = '0';
+                    if ($moduleArr['installed'] == '0') {
+                        if (isset($moduleArr['updated_on']) &&
+                            ($moduleArr['updated_on'] !== null || $moduleArr['updated_on'] !== '')
+                        ) {
+                            try {
+                                $updatedOn = Carbon::parse($moduleArr['updated_on']);
+                                $days = $updatedOn->diffInDays(Carbon::now());
+
+                                if ($days < 7) {
+                                    $module['data']['isnew'] = '1';
+                                }
+                            } catch (\throwable $e) {
+                                $module['data']['isnew'] = '0';
+                            }
+                        }
+                    }
 
                     $sortedModules[$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['childs'][$module['data']['moduleid']] = $module;
                 }
@@ -200,16 +217,8 @@ class Manager extends BasePackage
             return;
         }
 
-        //populate localModules so that we can compare with remoteModules
-        // $this->getRepositoryModules(['api_id' => $id], false);
-
         if ($this->getRemoteModules() === true && $this->updateRemoteModulesToDB() === true) {
-
-            //generate localModules with updated Data
-            // $this->getModulesData(null, true, true);
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Synced successfully';
+            $this->addResponse('Synced successfully');
 
             return true;
         }
@@ -225,8 +234,12 @@ class Manager extends BasePackage
             } else if (strtolower($this->apiConfig['provider']) === 'github') {
                 //
             }
-        } catch (\Exception | ClientException $e) {
+        } catch (\throwable | ClientException $e) {
             $this->addResponse($e->getMessage(), 1);
+
+            if (str_contains($e->getMessage(), 'token')) {
+                $this->addResponse('API Authentication failed!', 1);
+            }
 
             return false;
         }
@@ -407,232 +420,209 @@ class Manager extends BasePackage
         $counter['update'] = 0;
 
         foreach ($this->remoteModules as $remoteModulesType => $remoteModules) {
-            // if ($remoteModulesType === 'core') {
-            //     $remoteCore = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
+            $remotePackages = $this->findRemoteInLocal($remoteModules, $remoteModulesType);
 
-            //     if (count($remoteCore['update']) > 0) {
-            //         foreach ($remoteCore['update'] as $updateRemoteCoreKey => $updateRemoteCore) {
-            //             $this->core->update($updateRemoteCore);
+            if (count($remotePackages['update']) > 0) {
+                foreach ($remotePackages['update'] as $updateRemotePackageKey => $updateRemotePackage) {
+                    $this->modules->packages->update($updateRemotePackage);
+
+                    $counter['update'] = $counter['update'] + 1;
+                }
+            }
+
+            if (count($remotePackages['register']) > 0) {
+                foreach ($remotePackages['register'] as $registerRemotePackageKey => $registerRemotePackage) {
+
+                    $registerRemotePackage['settings'] =
+                        isset($registerRemotePackage['settings']) ?
+                        Json::encode($registerRemotePackage['settings']) :
+                        Json::encode([]);
+
+                    $registerRemotePackage['apps'] = Json::encode([]);
+
+                    $registerRemotePackage['installed'] = 0;
+
+                    if ($this->auth->account()) {
+                        $registerRemotePackage['updated_by'] = $this->auth->account()['id'];
+                    } else {
+                        $registerRemotePackage['updated_by'] = 0;
+                    }
+
+                    $this->modules->packages->add($registerRemotePackage);
+
+                    $counter['register'] = $counter['register'] + 1;
+                }
+            }
+            // if ($remoteModulesType === 'components') {
+
+            //     if (count($this->localModules[$remoteModulesType]) > 0) {
+            //         $remoteComponents = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
+            //     } else {
+            //         $remoteComponents['update'] = [];
+            //         $remoteComponents['register'] = $remoteModules;
+            //     }
+
+            //     if (count($remoteComponents['update']) > 0) {
+            //         foreach ($remoteComponents['update'] as $updateRemoteComponentKey => $updateRemoteComponent) {
+
+            //             $updateRemoteComponent['settings'] =
+            //                 isset($updateRemoteComponent['settings']) ?
+            //                 Json::encode($updateRemoteComponent['settings']) :
+            //                 Json::encode([]);
+
+            //             $updateRemoteComponent['dependencies'] =
+            //                 isset($updateRemoteComponent['dependencies']) ?
+            //                 Json::encode($updateRemoteComponent['dependencies']) :
+            //                 Json::encode([]);
+
+            //             $this->modules->components->update($updateRemoteComponent);
+
             //             $counter['update'] = $counter['update'] + 1;
             //         }
             //     }
+
+            //     if (count($remoteComponents['register']) > 0) {
+            //         foreach ($remoteComponents['register'] as $registerRemoteComponentKey => $registerRemoteComponent) {
+            //             $registerRemoteComponent['dependencies'] =
+            //                 isset($registerRemoteComponent['dependencies']) ?
+            //                 Json::encode($registerRemoteComponent['dependencies']) :
+            //                 Json::encode([]);
+
+            //             if ($registerRemoteComponent['menu']) {
+            //                 if (isset($registerRemoteComponent['menu']['seq'])) {
+            //                     $sequence = $registerRemoteComponent['menu']['seq'];
+            //                     unset($registerRemoteComponent['menu']['seq']);
+            //                 } else {
+            //                     $sequence = 99;
+            //                 }
+            //                 $menu['menu'] = Json::encode($registerRemoteComponent['menu']);
+            //                 $menu['sequence'] = $sequence;
+            //                 $menu['apps'] = Json::encode([]);
+
+            //                 $this->basepackages->menus->add($menu);
+
+            //                 $registerRemoteComponent['menu_id'] = $this->basepackages->menus->packagesData->last['id'];
+
+            //                 $this->basepackages->menus->init(true);//Reset Cache
+
+            //                 $registerRemoteComponent['menu'] = Json::encode($registerRemoteComponent['menu']);
+            //             } else {
+            //                 $registerRemoteComponent['menu'] = false;
+            //             }
+
+            //             $registerRemoteComponent['settings'] =
+            //                 isset($registerRemoteComponent['settings']) ?
+            //                 Json::encode($registerRemoteComponent['settings']) :
+            //                 Json::encode([]);
+
+            //             $registerRemoteComponent['apps'] =
+            //                 Json::encode([]);
+
+            //             $registerRemoteComponent['installed'] = 0;
+
+            //             if ($this->auth->account()) {
+            //                 $registerRemoteComponent['updated_by'] = $this->auth->account()['id'];
+            //             } else {
+            //                 $registerRemoteComponent['updated_by'] = 0;
+            //             }
+
+            //             $this->modules->components->add($registerRemoteComponent);
+
+            //             $counter['register'] = $counter['register'] + 1;
+            //         }
+            //     }
+            // } else if ($remoteModulesType === 'packages') {
+            // } else if ($remoteModulesType === 'middlewares') {
+
+            //     if (count($this->localModules[$remoteModulesType]) > 0) {
+            //         $remoteMiddlewares = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
+            //     } else {
+            //         $remoteMiddlewares['update'] = [];
+            //         $remoteMiddlewares['register'] = $remoteModules;
+            //     }
+
+            //     if (count($remoteMiddlewares['update']) > 0) {
+            //         foreach ($remoteMiddlewares['update'] as $updateRemoteMiddlewareKey => $updateRemoteMiddleware) {
+
+            //             $updateRemoteMiddleware['settings'] =
+            //                 isset($updateRemoteMiddleware['settings']) ?
+            //                 Json::encode($updateRemoteMiddleware['settings']) :
+            //                 Json::encode([]);
+
+            //             $this->modules->middlewares->update($updateRemoteMiddleware);
+
+            //             $counter['update'] = $counter['update'] + 1;
+            //         }
+            //     }
+
+            //     if (count($remoteMiddlewares['register']) > 0) {
+            //         foreach ($remoteMiddlewares['register'] as $registerRemoteMiddlewareKey => $registerRemoteMiddleware) {
+
+            //             $registerRemoteMiddleware['settings'] =
+            //                 isset($registerRemoteMiddleware['settings']) ?
+            //                 Json::encode($registerRemoteMiddleware['settings']) :
+            //                 Json::encode([]);
+
+            //             $registerRemoteMiddleware['apps'] = Json::encode([]);
+
+            //             $registerRemoteMiddleware['installed'] = 0;
+
+            //             if ($this->auth->account()) {
+            //                 $registerRemoteMiddleware['updated_by'] = $this->auth->account()['id'];
+            //             } else {
+            //                 $registerRemoteMiddleware['updated_by'] = 0;
+            //             }
+
+            //             $this->modules->middlewares->add($registerRemoteMiddleware);
+
+            //             $counter['register'] = $counter['register'] + 1;
+            //         }
+            //     }
+            // } else if ($remoteModulesType === 'views') {
+
+            //     if (count($this->localModules[$remoteModulesType]) > 0) {
+            //         $remoteViews = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
+            //     } else {
+            //         $remoteViews['update'] = [];
+            //         $remoteViews['register'] = $remoteModules;
+            //     }
+
+            //     if (count($remoteViews['update']) > 0) {
+            //         foreach ($remoteViews['update'] as $updateRemoteViewKey => $updateRemoteView) {
+            //             $this->modules->views->update($updateRemoteView);
+            //             $counter['update'] = $counter['update'] + 1;
+            //         }
+            //     }
+
+            //     if (count($remoteViews['register']) > 0) {
+            //         foreach ($remoteViews['register'] as $registerRemoteViewKey => $registerRemoteView) {
+            //             $registerRemoteView['dependencies'] =
+            //                 isset($registerRemoteView['dependencies']) ?
+            //                 Json::encode($registerRemoteView['dependencies']) :
+            //                 Json::encode([]);
+
+            //             $registerRemoteView['settings'] =
+            //                 isset($registerRemoteView['settings']) ?
+            //                 Json::encode($registerRemoteView['settings']) :
+            //                 Json::encode([]);
+
+            //             $registerRemoteView['apps'] =
+            //                 Json::encode([]);
+
+            //             $registerRemoteView['installed'] = 0;
+
+            //             if ($this->auth->account()) {
+            //                 $registerRemoteView['updated_by'] = $this->auth->account()['id'];
+            //             } else {
+            //                 $registerRemoteView['updated_by'] = 0;
+            //             }
+
+            //             $this->modules->views->add($registerRemoteView);
+
+            //             $counter['register'] = $counter['register'] + 1;
+            //         }
+            //     }
             // }
-
-            if ($remoteModulesType === 'components') {
-
-                if (count($this->localModules[$remoteModulesType]) > 0) {
-                    $remoteComponents = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
-                } else {
-                    $remoteComponents['update'] = [];
-                    $remoteComponents['register'] = $remoteModules;
-                }
-
-                if (count($remoteComponents['update']) > 0) {
-                    foreach ($remoteComponents['update'] as $updateRemoteComponentKey => $updateRemoteComponent) {
-
-                        $updateRemoteComponent['settings'] =
-                            isset($updateRemoteComponent['settings']) ?
-                            Json::encode($updateRemoteComponent['settings']) :
-                            Json::encode([]);
-
-                        $updateRemoteComponent['dependencies'] =
-                            isset($updateRemoteComponent['dependencies']) ?
-                            Json::encode($updateRemoteComponent['dependencies']) :
-                            Json::encode([]);
-
-                        $this->modules->components->update($updateRemoteComponent);
-
-                        $counter['update'] = $counter['update'] + 1;
-                    }
-                }
-
-                if (count($remoteComponents['register']) > 0) {
-                    foreach ($remoteComponents['register'] as $registerRemoteComponentKey => $registerRemoteComponent) {
-                        $registerRemoteComponent['dependencies'] =
-                            isset($registerRemoteComponent['dependencies']) ?
-                            Json::encode($registerRemoteComponent['dependencies']) :
-                            Json::encode([]);
-
-                        if ($registerRemoteComponent['menu']) {
-                            if (isset($registerRemoteComponent['menu']['seq'])) {
-                                $sequence = $registerRemoteComponent['menu']['seq'];
-                                unset($registerRemoteComponent['menu']['seq']);
-                            } else {
-                                $sequence = 99;
-                            }
-                            $menu['menu'] = Json::encode($registerRemoteComponent['menu']);
-                            $menu['sequence'] = $sequence;
-                            $menu['apps'] = Json::encode([]);
-
-                            $this->basepackages->menus->add($menu);
-
-                            $registerRemoteComponent['menu_id'] = $this->basepackages->menus->packagesData->last['id'];
-
-                            $this->basepackages->menus->init(true);//Reset Cache
-
-                            $registerRemoteComponent['menu'] = Json::encode($registerRemoteComponent['menu']);
-                        } else {
-                            $registerRemoteComponent['menu'] = false;
-                        }
-
-                        $registerRemoteComponent['settings'] =
-                            isset($registerRemoteComponent['settings']) ?
-                            Json::encode($registerRemoteComponent['settings']) :
-                            Json::encode([]);
-
-                        $registerRemoteComponent['apps'] =
-                            Json::encode([]);
-
-                        $registerRemoteComponent['installed'] = 0;
-
-                        if ($this->auth->account()) {
-                            $registerRemoteComponent['updated_by'] = $this->auth->account()['id'];
-                        } else {
-                            $registerRemoteComponent['updated_by'] = 0;
-                        }
-
-                        $this->modules->components->add($registerRemoteComponent);
-
-                        $counter['register'] = $counter['register'] + 1;
-                    }
-                }
-            }
-
-            if ($remoteModulesType === 'packages') {
-                // if (count($this->localModules[$remoteModulesType]) > 0) {
-                    $remotePackages = $this->findRemoteInLocal($remoteModules, $remoteModulesType);
-                    // dump($remotePackages);die();
-                // } else {
-                //     $remotePackages['update'] = [];
-                //     $remotePackages['register'] = $remoteModules;
-                // }
-
-                if (count($remotePackages['update']) > 0) {
-                    foreach ($remotePackages['update'] as $updateRemotePackageKey => $updateRemotePackage) {
-                        $this->modules->packages->update($updateRemotePackage);
-
-                        $counter['update'] = $counter['update'] + 1;
-                    }
-                }
-
-                if (count($remotePackages['register']) > 0) {
-                    foreach ($remotePackages['register'] as $registerRemotePackageKey => $registerRemotePackage) {
-
-                        $registerRemotePackage['settings'] =
-                            isset($registerRemotePackage['settings']) ?
-                            Json::encode($registerRemotePackage['settings']) :
-                            Json::encode([]);
-
-                        $registerRemotePackage['apps'] = Json::encode([]);
-
-                        $registerRemotePackage['installed'] = 0;
-
-                        if ($this->auth->account()) {
-                            $registerRemotePackage['updated_by'] = $this->auth->account()['id'];
-                        } else {
-                            $registerRemotePackage['updated_by'] = 0;
-                        }
-
-                        $this->modules->packages->add($registerRemotePackage);
-
-                        $counter['register'] = $counter['register'] + 1;
-                    }
-                }
-            }
-
-            if ($remoteModulesType === 'middlewares') {
-
-                if (count($this->localModules[$remoteModulesType]) > 0) {
-                    $remoteMiddlewares = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
-                } else {
-                    $remoteMiddlewares['update'] = [];
-                    $remoteMiddlewares['register'] = $remoteModules;
-                }
-
-                if (count($remoteMiddlewares['update']) > 0) {
-                    foreach ($remoteMiddlewares['update'] as $updateRemoteMiddlewareKey => $updateRemoteMiddleware) {
-
-                        $updateRemoteMiddleware['settings'] =
-                            isset($updateRemoteMiddleware['settings']) ?
-                            Json::encode($updateRemoteMiddleware['settings']) :
-                            Json::encode([]);
-
-                        $this->modules->middlewares->update($updateRemoteMiddleware);
-
-                        $counter['update'] = $counter['update'] + 1;
-                    }
-                }
-
-                if (count($remoteMiddlewares['register']) > 0) {
-                    foreach ($remoteMiddlewares['register'] as $registerRemoteMiddlewareKey => $registerRemoteMiddleware) {
-
-                        $registerRemoteMiddleware['settings'] =
-                            isset($registerRemoteMiddleware['settings']) ?
-                            Json::encode($registerRemoteMiddleware['settings']) :
-                            Json::encode([]);
-
-                        $registerRemoteMiddleware['apps'] = Json::encode([]);
-
-                        $registerRemoteMiddleware['installed'] = 0;
-
-                        if ($this->auth->account()) {
-                            $registerRemoteMiddleware['updated_by'] = $this->auth->account()['id'];
-                        } else {
-                            $registerRemoteMiddleware['updated_by'] = 0;
-                        }
-
-                        $this->modules->middlewares->add($registerRemoteMiddleware);
-
-                        $counter['register'] = $counter['register'] + 1;
-                    }
-                }
-            }
-
-            if ($remoteModulesType === 'views') {
-
-                if (count($this->localModules[$remoteModulesType]) > 0) {
-                    $remoteViews = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
-                } else {
-                    $remoteViews['update'] = [];
-                    $remoteViews['register'] = $remoteModules;
-                }
-
-                if (count($remoteViews['update']) > 0) {
-                    foreach ($remoteViews['update'] as $updateRemoteViewKey => $updateRemoteView) {
-                        $this->modules->views->update($updateRemoteView);
-                        $counter['update'] = $counter['update'] + 1;
-                    }
-                }
-
-                if (count($remoteViews['register']) > 0) {
-                    foreach ($remoteViews['register'] as $registerRemoteViewKey => $registerRemoteView) {
-                        $registerRemoteView['dependencies'] =
-                            isset($registerRemoteView['dependencies']) ?
-                            Json::encode($registerRemoteView['dependencies']) :
-                            Json::encode([]);
-
-                        $registerRemoteView['settings'] =
-                            isset($registerRemoteView['settings']) ?
-                            Json::encode($registerRemoteView['settings']) :
-                            Json::encode([]);
-
-                        $registerRemoteView['apps'] =
-                            Json::encode([]);
-
-                        $registerRemoteView['installed'] = 0;
-
-                        if ($this->auth->account()) {
-                            $registerRemoteView['updated_by'] = $this->auth->account()['id'];
-                        } else {
-                            $registerRemoteView['updated_by'] = 0;
-                        }
-
-                        $this->modules->views->add($registerRemoteView);
-
-                        $counter['register'] = $counter['register'] + 1;
-                    }
-                }
-            }
         }
 
         $this->packagesData->counter = $counter;
@@ -663,6 +653,7 @@ class Manager extends BasePackage
             }
 
             if ($localModule) {
+                $localModule['repo_details'] = [];
                 $localModule['repo_details']['details'] = $remoteModule;
                 $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($localModule, $remoteModule);
 

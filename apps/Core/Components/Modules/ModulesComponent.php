@@ -156,7 +156,7 @@ class ModulesComponent extends BaseComponent
 					$this->addResponse(
 						$this->modules->manager->packagesData->responseMessage,
 						$this->modules->manager->packagesData->responseCode,
-						$counter
+						['counter' => $counter]
 					);
 
 					return true;
