@@ -155,7 +155,11 @@ class Input
                 $this->content .= '</div>';
             }
         } else {
-            $this->Input();
+            if ($this->fieldParams['fieldInputType'] === 'select') {
+                $this->select();
+            } else {
+                $this->Input();
+            }
         }
     }
 

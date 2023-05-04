@@ -1,0 +1,86 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'parentComponentId'                     : parent,
+                'fieldId'                               : 'level_of_update',
+                'fieldLabel'                            : 'Level Of Update',
+                'fieldType'                             : 'select2',
+                'fieldAdditionalClass'                  : 'mb-1',
+                'fieldInputType'                        : 'select',
+                'fieldHelp'                             : true,
+                'fieldDataSelect2Options'               :
+                    [
+                        '1'     :
+                            [
+                                'id'        : '1',
+                                'name'      : 'Major Release'
+                            ],
+                        '2'     :
+                            [
+                                'id'        : '2',
+                                'name'      : 'Major + Minor Releases'
+                            ],
+                        '3'     :
+                            [
+                                'id'        : '3',
+                                'name'      : 'Major + Minor + Patch Releases'
+                            ]
+                    ],
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsSelected'       : '1',
+                'fieldBazScan'                          : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'auto_update',
+                'fieldLabel'                     : 'AUTO UPDATE MODULE',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Auto update module via update task?',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'info',
+                'fieldCheckboxChecked'           : false,
+                'fieldBazJstreeSearch'           : false,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                    [
+                        'save-settings'     : [
+                            'title'             : 'Save Settings',
+                            'position'          : 'right',
+                            'size'              : 'xs',
+                            'icon'              : 'save'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>

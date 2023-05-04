@@ -217,6 +217,28 @@ class ModulesComponent extends BaseComponent
 		}
 	}
 
+	public function saveModuleSettingsAction()
+	{
+		if ($this->request->isPost()) {
+			if (!$this->checkCSRF()) {
+				return;
+			}
+
+			if (isset($this->postData()['module_id']) && isset($this->postData()['module_type'])) {
+				$this->modules->manager->saveModuleSettings($this->postData());
+
+				$this->addResponse(
+					$this->modules->manager->packagesData->responseMessage,
+					$this->modules->manager->packagesData->responseCode
+				);
+			} else {
+				$this->addResponse('Please provide module type and module id', 1);
+			}
+		} else {
+			$this->addResponse('Method Not Allowed', 1);
+		}
+	}
+
 	private function generateTree($modulesTree)
 	{
 		return $this->adminltetags->useTag(

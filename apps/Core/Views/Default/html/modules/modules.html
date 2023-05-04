@@ -3,308 +3,216 @@
         {% include 'modules/repositories/list.html' %}
     </div>
 </div> #}
-<div id="repo-details" class="row">
-    <div class="col">
-        {# <hr> #}
-        <div class="row vdivide">
-            <div class="col-md-4 vdivide-resizable">
-                {{adminltetags.useTag('fields',
+<div class="row vdivide">
+    <div class="col-md-4 vdivide-resizable">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'modules',
+                'fieldLabel'                                : 'Modules',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Available modules on repository.',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldJstreeDataSrcArr'                     : ["modules":["srcArr" : modules]],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : true,
+                'fieldJstreeAllChecked'                     : false,
+                'fieldJstreeRootIcon'                       : 'th',
+                'fieldJstreeToggleAllChildren'              : true,
+                'fieldJstreeIncludeRootInPath'              : false,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : true,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : true,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : true,
+                'fieldJstreeHideJstreeIcons'                : false,
+                'fieldJstreeAdditionalTools'                :
                     [
-                        'component'                                 : component,
-                        'componentName'                             : componentName,
-                        'componentId'                               : componentId,
-                        'sectionId'                                 : sectionId,
-                        'fieldId'                                   : 'modules',
-                        'fieldLabel'                                : 'Modules',
-                        'fieldType'                                 : 'jstree',
-                        'fieldHelp'                                 : true,
-                        'fieldHelpTooltipContent'                   : 'Available modules on repository.',
-                        'fieldRequired'                             : false,
-                        'fieldBazScan'                              : true,
-                        'fieldJstreeSearch'                         : true,
-                        'fieldBazPostOnCreate'                      : false,
-                        'fieldBazPostOnUpdate'                      : false,
-                        'fieldJstreeDataSrcArr'                     : ["modules":["srcArr" : modules]],
-                        'fieldJstreeAdd'                            : false,
-                        'fieldJstreeEdit'                           : false,
-                        'fieldJstreeExpand'                         : true,
-                        'fieldJstreeCollapse'                       : true,
-                        'fieldJstreeFirstOpen'                      : true,
-                        'fieldJstreeAllOpen'                        : true,
-                        'fieldJstreeAllChecked'                     : false,
-                        'fieldJstreeRootIcon'                       : 'th',
-                        'fieldJstreeToggleAllChildren'              : true,
-                        'fieldJstreeIncludeRootInPath'              : false,
-                        'fieldJstreeSelectEndNodeOnly'              : false,
-                        'fieldJstreeShowDots'                       : true,
-                        'fieldJstreeDoubleClickToggle'              : true,
-                        'fieldJstreeMultiple'                       : false,
-                        'fieldJstreeSearchCaseSensitive'            : false,
-                        'fieldJstreeSearchShowOnlyMatches'          : true,
-                        'fieldJstreeSearchShowOnlyMatchesChildren'  : true,
-                        'fieldJstreeHideJstreeIcons'                : false,
-                        'fieldJstreeAdditionalTools'                :
+                        'repo-sync' :
                             [
-                                'repo-sync' :
-                                    [
-                                        'id'        : 'repo-sync',
-                                        'tooltip'   : 'Sync',
-                                        'icon'      : 'fas fa-fw fa-sync-alt text-secondary',
-                                        'iconColor' : 'secondary',
-                                        'disabled'  : true
-                                    ],
-                                'filter-update-available' :
-                                    [
-                                        'id'        : 'filter-update-available',
-                                        'tooltip'   : 'Apply Filter (update)',
-                                        'icon'      : 'fas fa-fw fa-circle-up',
-                                        'iconColor' : 'secondary',
-                                        'disabled'  : true
-                                    ],
-                                '0'       :
-                                    [
-                                        'id'        : 'divider'
-                                    ],
-                                'filter-update' :
-                                    [
-                                        'id'        : 'filter-update',
-                                        'tooltip'   : 'Apply Filter (:update)',
-                                        'icon'      : 'fas fa-fw fa-circle-up',
-                                        'iconColor' : 'secondary',
-                                        'disabled'  : true
-                                    ],
-                                'filter-install' :
-                                    [
-                                        'id'        : 'filter-install',
-                                        'tooltip'   : 'Apply Filter Install/Update (:install)',
-                                        'icon'      : 'fas fa-fw fa-circle-plus',
-                                        'iconColor' : 'secondary',
-                                        'disabled'  : true
-                                    ],
-                                'filter-uninstall' :
-                                    [
-                                        'id'        : 'filter-uninstall',
-                                        'tooltip'   : 'Apply Filter Uninstall (:uninstall)',
-                                        'icon'      : 'fas fa-fw fa-circle-minus',
-                                        'iconColor' : 'secondary',
-                                        'disabled'  : true
-                                    ],
-                                'filter-remove' :
-                                    [
-                                        'id'        : 'filter-remove',
-                                        'tooltip'   : 'Apply Filter Remove (:remove)',
-                                        'icon'      : 'fas fa-fw fa-circle-xmark',
-                                        'iconColor' : 'secondary',
-                                        'disabled'  : true
-                                    ],
-                                '1'       :
-                                    [
-                                        'id'        : 'divider'
-                                    ],
-                                'filter-queue' :
-                                    [
-                                        'id'        : 'filter-queue',
-                                        'tooltip'   : 'Apply Filter In Queue (queue:)',
-                                        'icon'      : 'fas fa-fw fa-list',
-                                        'iconColor' : 'secondary',
-                                        'disabled'  : true
-                                    ],
-                                'filter-clear' :
-                                    [
-                                        'id'        : 'filter-clear',
-                                        'tooltip'   : 'Clear all filters',
-                                        'icon'      : 'fas fa-fw fa-times',
-                                        'iconColor' : 'primary'
-                                    ]
+                                'id'        : 'repo-sync',
+                                'tooltip'   : 'Sync',
+                                'icon'      : 'fas fa-fw fa-sync-alt text-secondary',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
                             ],
-                        'fieldJstreeReplaceIdWithDataField'         : 'moduleid',
-                        'fieldJstreePlugins'                        : ["search", "types"],
-                        'fieldJstreeAdditionalClass'                : 'text-uppercase'
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-error" hidden>
-                    <div class="col">
-                        <h6><i class="fa fa-fw fa-info-circle text-danger"></i> Error loading module information. Please contact administrator.</h6>
-                    </div>
-                </div>
-                <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-noinfo">
-                    <div class="col">
-                        <h6><i class="fa fa-fw fa-info-circle text-info"></i> Select module from the tree to see it's details.</h6>
-                    </div>
-                </div>
-                <div class="row text-center" id="{{componentId}}-{{sectionId}}-moduleinfo-loader" hidden>
-                    <div class="col">
-                        <i class="fa fa-cog fa-spin"></i> Loading module information...
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <div id="{{componentId}}-{{sectionId}}-moduleinfo-info" hidden>
-                            <div class="row">
-                                <div class="col">
-                                    <label>NAME: </label>
-                                    <span class="text-uppercase" id="display_name"></span>
-                                </div>
-                                <div class="col">
-                                    <label>INSTALLED: </label>
-                                    <span class="text-uppercase" style="top: -1px;position: relative;" id="installed"></span>
-                                </div>
-                                <div class="col">
-                                    <label>VERSION: </label>
-                                    <span class="text-uppercase" style="top: -1px;position: relative;" id="version"></span>
-                                </div>
-                            </div>
-                            <hr class="mt-1">
-                            <div class="row">
-                                <div class="col small">
-                                    <label>APP TYPE: </label>
-                                    <span class="text-uppercase" id="app_type"></span>
-                                </div>
-                                <div class="col small">
-                                    <label>CATEGORY: </label>
-                                    <span class="text-uppercase" id="category"></span>
-                                </div>
-                                <div class="col small">
-                                    <label>SUB CATEGORY: </label>
-                                    <span class="text-uppercase" id="sub_category"></span>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col small">
-                                    <label>UPDATE AVAILABLE: </label>
-                                    <span id="update_available"></span>
-                                </div>
-                                <div class="col small">
-                                    <label>UPDATE VERSION: </label>
-                                    <span id="update_version"></span>
-                                </div>
-                                <div class="col small">
-                                    <label>UPDATED ON: </label>
-                                    <span id="updated_on"></span>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col small">
-                                    <label>INSTALLED/UPDATED BY: </label>
-                                    <span id="updated_by"></span>
-                                </div>
-                                <div class="col small">
-                                    <label>MODULE TYPE: </label>
-                                    <span class="text-uppercase" id="module_type"></span>
-                                </div>
-                                <div class="col small">
-                                    <span class="text-uppercase" id="module_id" hidden></span>
-                                </div>
-                            </div>
-                            <hr class="mt-1">
-                            <div class="row">
-                                <div class="col">
-                                    <p id="description"></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row" id="{{componentId}}-{{sectionId}}-moduleinfo-buttons" hidden>
-                    <hr>
-                    <div class="col">
-                        {{adminltetags.useTag('buttons',
+                        'filter-update-available' :
                             [
-                                'component'                     : component,
-                                'componentName'                 : componentName,
-                                'componentId'                   : componentId,
-                                'sectionId'                     : sectionId,
-                                'buttonType'                    : 'button',
-                                'buttons'                       :
-                                    [
-                                        'moduleinfo-repo-sync'  : [
-                                            'title'             : false,
-                                            'size'              : 'xs',
-                                            'icon'              : 'sync-alt',
-                                            'hidden'            : true,
-                                            'position'          : 'right'
-                                        ],
-                                        'moduleinfo-install'    : [
-                                            'title'             : 'Install',
-                                            'size'              : 'xs',
-                                            'icon'              : 'plus',
-                                            'hidden'            : true
-                                        ],
-                                        'moduleinfo-update'     : [
-                                            'title'             : 'Update',
-                                            'size'              : 'xs',
-                                            'icon'              : 'arrow-up',
-                                            'hidden'            : true
-                                        ],
-                                        'moduleinfo-uninstall'  : [
-                                            'title'             : 'Uninstall',
-                                            'type'              : 'danger',
-                                            'size'              : 'xs',
-                                            'icon'              : 'minus',
-                                            'hidden'            : true
-                                        ],
-                                        'moduleinfo-remove'     : [
-                                            'title'             : 'Remove',
-                                            'type'              : 'danger',
-                                            'size'              : 'xs',
-                                            'icon'              : 'xmark',
-                                            'hidden'            : true
-                                        ],
-                                        'moduleinfo-cancel'     : [
-                                            'title'             : 'Cancel',
-                                            'type'              : 'secondary',
-                                            'size'              : 'xs',
-                                            'hidden'            : true
-                                        ]
-                                    ]
+                                'id'        : 'filter-update-available',
+                                'tooltip'   : 'Apply Filter (update)',
+                                'icon'      : 'fas fa-fw fa-circle-up',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
+                            ],
+                        '0'       :
+                            [
+                                'id'        : 'divider'
+                            ],
+                        'filter-update' :
+                            [
+                                'id'        : 'filter-update',
+                                'tooltip'   : 'Apply Filter (:update)',
+                                'icon'      : 'fas fa-fw fa-circle-up',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
+                            ],
+                        'filter-install' :
+                            [
+                                'id'        : 'filter-install',
+                                'tooltip'   : 'Apply Filter Install/Update (:install)',
+                                'icon'      : 'fas fa-fw fa-circle-plus',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
+                            ],
+                        'filter-uninstall' :
+                            [
+                                'id'        : 'filter-uninstall',
+                                'tooltip'   : 'Apply Filter Uninstall (:uninstall)',
+                                'icon'      : 'fas fa-fw fa-circle-minus',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
+                            ],
+                        'filter-remove' :
+                            [
+                                'id'        : 'filter-remove',
+                                'tooltip'   : 'Apply Filter Remove (:remove)',
+                                'icon'      : 'fas fa-fw fa-circle-xmark',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
+                            ],
+                        '1'       :
+                            [
+                                'id'        : 'divider'
+                            ],
+                        'filter-queue' :
+                            [
+                                'id'        : 'filter-queue',
+                                'tooltip'   : 'Apply Filter In Queue (queue:)',
+                                'icon'      : 'fas fa-fw fa-list',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
+                            ],
+                        'filter-clear' :
+                            [
+                                'id'        : 'filter-clear',
+                                'tooltip'   : 'Clear all filters',
+                                'icon'      : 'fas fa-fw fa-times',
+                                'iconColor' : 'primary'
                             ]
-                        )}}
-                    </div>
-                </div>
+                    ],
+                'fieldJstreeReplaceIdWithDataField'         : 'moduleid',
+                'fieldJstreePlugins'                        : ["search", "types"],
+                'fieldJstreeAdditionalClass'                : 'text-uppercase'
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-error" hidden>
+            <div class="col">
+                <h6><i class="fa fa-fw fa-info-circle text-danger"></i> Error loading module information. Please contact administrator.</h6>
             </div>
         </div>
-        <hr>
-        <div class="row">
-            <div class="col-md-6">
-                <div id="installer-progress" class="mb-3"></div>
-            </div>
+        <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-noinfo">
             <div class="col">
-                <span class="text-uppercase float-right">Queue:
-                    <span style="top: -2px;position: relative;" class="badge badge-info" id="queue-counter">0</span>
-                </span>
+                <h6><i class="fa fa-fw fa-info-circle text-info"></i> Select module from the tree to see it's details.</h6>
             </div>
+        </div>
+        <div class="row text-center" id="{{componentId}}-{{sectionId}}-moduleinfo-loader" hidden>
             <div class="col">
-                {{adminltetags.useTag('buttons',
+                <i class="fa fa-cog fa-spin"></i> Loading module information...
+            </div>
+        </div>
+        <div class="row" id="{{componentId}}-{{sectionId}}-moduleinfo-info" hidden>
+            <div class="col">
+                {{adminltetags.useTag('tabs',
                     [
                         'component'                     : component,
                         'componentName'                 : componentName,
                         'componentId'                   : componentId,
                         'sectionId'                     : sectionId,
-                        'buttonType'                    : 'button',
-                        'buttons'                       :
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
                             [
-                                'analyse-queue'     : [
-                                    'title'             : 'Analyse Queue',
-                                    'position'          : 'right',
-                                    'size'              : 'xs',
-                                    'icon'              : 'fa-cog fa-spin',
-                                    'iconHidden'        : true,
-                                    'disabled'          : true
+                                'info'   :
+                                [
+                                    'tabTitle'          : 'Info',
+                                    'tabInclude'        : 'modules/modules/info'
                                 ],
-                                'clear-queue'       : [
-                                    'title'             : 'Clear Queue',
-                                    'position'          : 'right',
-                                    'type'              : 'danger',
-                                    'size'              : 'xs',
-                                    'disabled'          : true
+                                'description'   :
+                                [
+                                    'tabTitle'          : 'Description',
+                                    'tabInclude'        : 'modules/modules/description'
+                                ],
+                                'changelogs'   :
+                                [
+                                    'tabTitle'          : 'Change logs',
+                                    'tabInclude'        : 'modules/modules/changelogs'
+                                ],
+                                'settings'   :
+                                [
+                                    'tabTitle'          : 'Settings',
+                                    'tabInclude'        : 'modules/modules/settings'
                                 ]
                             ]
                     ]
                 )}}
             </div>
         </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-md-6">
+        <div id="installer-progress" class="mb-3"></div>
+    </div>
+    <div class="col">
+        <span class="text-uppercase float-right">Queue:
+            <span style="top: -2px;position: relative;" class="badge badge-info" id="queue-counter">0</span>
+        </span>
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                    [
+                        'analyse-queue'     : [
+                            'title'             : 'Analyse Queue',
+                            'position'          : 'right',
+                            'size'              : 'xs',
+                            'icon'              : 'fa-cog fa-spin',
+                            'iconHidden'        : true,
+                            'disabled'          : true
+                        ],
+                        'clear-queue'       : [
+                            'title'             : 'Clear Queue',
+                            'position'          : 'right',
+                            'type'              : 'danger',
+                            'size'              : 'xs',
+                            'disabled'          : true
+                        ]
+                    ]
+            ]
+        )}}
     </div>
 </div>
 {% set modules = json_encode(modules, 16) %}
@@ -333,6 +241,52 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
     dataCollectionSectionForm =
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-level_of_update'             : {
+            placeholder: 'SELECT LEVEL OF UPDATE'
+        },
+        '{{componentId}}-{{sectionId}}-auto_update'                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-save-settings').off();
+                $('#{{componentId}}-{{sectionId}}-save-settings').click(function() {
+                    $('#{{componentId}}-{{sectionId}}-save-settings').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-save-settings').children("i").removeClass("fa-save").addClass("fa-cog fa-spin");
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['module_id'] = dataCollectionSectionForm['vars']['module']['id'];
+                    postData['module_type'] = dataCollectionSectionForm['vars']['module']['module_type'];
+                    postData['level_of_update'] = $('#{{componentId}}-{{sectionId}}-level_of_update').val();
+                    postData['auto_update'] = '0';
+                    if ($('#{{componentId}}-{{sectionId}}-auto_update')[0].checked === true) {
+                        postData['auto_update'] = '1';
+                    }
+
+                    $.post('{{links.url("modules/saveModuleSettings")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            PNotify.success({text: response.responseMessage});
+                        } else if (response.responseCode == 1) {
+                            PNotify.error({text: response.responseMessage});
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-save-settings').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-save-settings').children("i").removeClass("fa-cog fa-spin").addClass("fa-save");
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form'                        : {
+            rules: { },
+            messages: { }
+        }
+    });
 
 dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['rootTree'] = [];
@@ -819,6 +773,35 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     }
     $('#module_id').html(moduleData.id);
     $('#description').html(moduleData.description);
+
+    //This is for Gitea, github will change
+    if (moduleData.repo_details.latestRelease && moduleData.repo_details.latestRelease.body) {
+        var changelogText;
+        if (moduleData.repo_details.latestRelease.prerelease === false) {
+            changelogText =
+                'Version: ' + moduleInfo.version +
+                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-success">STABLE</span></span>';
+        } else {
+            changelogText =
+                'Version: ' + moduleInfo.version +
+                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-danger">UNSTABLE</span></span>';
+        }
+        $('#changelogs-version').html(changelogText);
+        $('#changelogs').html(moduleData.repo_details.latestRelease.body);
+    }
+
+    $('#{{componentId}}-{{sectionId}}-auto_update')[0].checked = false;
+    if (moduleInfo.auto_update !== 'null') {
+        if (moduleInfo.auto_update == '0') {
+            $('#{{componentId}}-{{sectionId}}-auto_update')[0].checked = false;
+        } else if (moduleInfo.auto_update == '1') {
+            $('#{{componentId}}-{{sectionId}}-auto_update')[0].checked = true;
+        }
+    }
+
+    if (moduleInfo.level_of_update !== 'null') {
+        $('#{{componentId}}-{{sectionId}}-level_of_update').val(moduleInfo.level_of_update).trigger('change');
+    }
 
     if (moduleInfo.installed == '1') {
         if (moduleInfo.update_available == '1') {

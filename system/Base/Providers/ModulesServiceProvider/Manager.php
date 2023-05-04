@@ -32,6 +32,33 @@ class Manager extends BasePackage
 
     protected $views;
 
+    public function saveModuleSettings($data)
+    {
+        if ($data['module_type'] === 'components') {
+            $module = $this->modules->components->getComponentById($data['module_id']);
+        } else if ($data['module_type'] === 'packages') {
+            $module = $this->modules->packages->getIdPackage($data['module_id']);
+        } else if ($data['module_type'] === 'middlewares') {
+            $module = $this->modules->middlewares->getMiddlewareById($data['module_id']);
+        } else if ($data['module_type'] === 'views') {
+            $module = $this->modules->views->getIdViews($data['module_id']);
+        }
+
+        if ($module) {
+            $module = array_merge($module, $data);
+
+            try {
+                $this->modules->{$data['module_type']}->update($module);
+            } catch (\Exception $e) {
+                $this->logger->log->debug($e->getMessage());
+
+                $this->addResponse('Can update settings, contact administrator.', 1);
+            }
+
+            $this->addResponse('Settings updated.');
+        }
+    }
+
     public function getModuleInfo($data)
     {
         if ($data['module_type'] === 'components') {
@@ -72,6 +99,15 @@ class Manager extends BasePackage
 
                 if (!$module) {
                     return false;
+                }
+            }
+
+            if ($module['repo_details']) {
+                try {
+                    $module['repo_details'] = Json::decode($module['repo_details'], true);
+                    $module['repo_details']['latestRelease']['body'] = $this->escaper->escapeHtml($module['repo_details']['latestRelease']['body']);
+                } catch (\Exception $e) {
+                    $module['repo_details'] = null;
                 }
             }
 
@@ -389,7 +425,7 @@ class Manager extends BasePackage
 
             if (count($remotePackages['update']) > 0) {
                 foreach ($remotePackages['update'] as $updateRemotePackageKey => $updateRemotePackage) {
-                    $this->modules->packages->update($updateRemotePackage);
+                    $this->modules->$remoteModulesType->update($updateRemotePackage);
 
                     $counter['update'] = $counter['update'] + 1;
                 }
@@ -397,7 +433,10 @@ class Manager extends BasePackage
 
             if (count($remotePackages['register']) > 0) {
                 foreach ($remotePackages['register'] as $registerRemotePackageKey => $registerRemotePackage) {
+                    $repo_details = $registerRemotePackage['repo_details'];
+
                     $registerRemotePackage = $this->remoteModulesJson[$registerRemotePackage['name']];
+                    $registerRemotePackage['repo_details'] = $repo_details;
 
                     if (!$this->apps->types->getTypeAppType($registerRemotePackage['app_type'])) {
                         if (!checkCtype($registerRemotePackage['app_type'], 'alpha')) {
@@ -454,6 +493,7 @@ class Manager extends BasePackage
     {
         $modules = [];
         $modules['update'] = [];
+        $modules['register'] = [];
 
         foreach ($remoteModules as $remoteModuleKey => $remoteModule) {
             if (isset($remoteModule['repo'])) {
@@ -477,7 +517,7 @@ class Manager extends BasePackage
                 $localModule['repo_details']['details'] = $remoteModule;
 
                 $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($localModule, $remoteModule);
-
+                var_dump($moduleNeedsUpgrade);die();
                 if ($moduleNeedsUpgrade) {
                     $localModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
                     if ($localModule['installed'] == '0') {
@@ -492,6 +532,11 @@ class Manager extends BasePackage
                     unset($remoteModules[$remoteModuleKey]);
                 }
             } else {
+                $remoteModule['repo_details'] = [];
+                $remoteModule['repo_details']['details'] = $remoteModule;
+                $moduleNeedsUpgrade = $this->moduleNeedsUpgrade(null, $remoteModule);
+                $remoteModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
+
                 $modules['register'][$remoteModuleKey] = $remoteModule;
             }
         }
@@ -499,7 +544,7 @@ class Manager extends BasePackage
         return $modules;
     }
 
-    protected function moduleNeedsUpgrade($localModule, $remoteModule)
+    protected function moduleNeedsUpgrade($localModule = null, $remoteModule)
     {
         if (strtolower($this->apiConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';
@@ -515,7 +560,36 @@ class Manager extends BasePackage
             return false;
         }
 
-        if (Version::greaterThan($latestRelease['name'], $localModule['version'])) {
+        if ($localModule) {
+            if (array_key_exists('level_of_update', $localModule)) {
+                $localVersion = Version::parse($localModule['version']);
+                $latestReleaseVersion = Version::parse($latestRelease['tag_name']);
+
+                if ($localModule['level_of_update'] == '1') {//Only Major
+                    if ((int) $latestReleaseVersion->getMajor() > (int) $localVersion->getMajor()) {
+                        return $latestRelease;
+                    }
+                } else if ($localModule['level_of_update'] == '2') {//Major & Minor
+                    if ((int) $latestReleaseVersion->getMinor() > (int) $localVersion->getMinor() ||
+                        (int) $latestReleaseVersion->getMajor() > (int) $localVersion->getMajor()
+                    ) {
+                        return $latestRelease;
+                    }
+                } else if ($localModule['level_of_update'] == '3') {//Major & Minor & Patch
+                    if ((int) $latestReleaseVersion->getPatch() > (int) $localVersion->getPatch() ||
+                        (int) $latestReleaseVersion->getMinor() > (int) $localVersion->getMinor()
+                    ) {
+                        return $latestRelease;
+                    }
+                }
+
+                return false;
+            } else {
+                if (Version::greaterThan($latestRelease['tag_name'], $localModule['version'])) {
+                    return $latestRelease;
+                }
+            }
+        } else {
             return $latestRelease;
         }
     }

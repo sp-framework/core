@@ -168,6 +168,20 @@ class Middlewares
 						]
 					),
 					new Column(
+						'level_of_update',
+						[
+							'type'    => Column::TYPE_INTEGER,
+							'notNull' => false,
+						]
+					),
+					new Column(
+						'auto_update',
+						[
+							'type'    => Column::TYPE_BOOLEAN,
+							'notNull' => false,
+						]
+					),
+					new Column(
 						'repo_details',
 						[
 							'type'    => Column::TYPE_JSON,
