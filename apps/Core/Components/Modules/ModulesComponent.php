@@ -141,7 +141,7 @@ class ModulesComponent extends BaseComponent
 			if (isset($this->postData()['repoId'])) {
 				$counter = null;
 
-				if ($this->modules->manager->syncRemoteWithLocal($this->postData()['repoId'])) {
+				if ($this->modules->manager->syncRemoteWithLocal($this->postData()['repoId'], $this->postData()['getRepositoryModules'])) {
 
 					$counter = $this->modules->manager->packagesData->counter;
 					$modulesTree = $this->modules->manager->packagesData->responseData;

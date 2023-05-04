@@ -269,7 +269,7 @@ class Manager extends BasePackage
         return $sortedModules;
     }
 
-    public function syncRemoteWithLocal($id)
+    public function syncRemoteWithLocal($id, $getRepositoryModules = false)
     {
         $this->api = $this->basepackages->api->useApi($id, true);
 
@@ -298,12 +298,15 @@ class Manager extends BasePackage
 
         try {
             if ($this->getRemoteModules() === true && $this->updateRemoteModulesToDB() === true) {
-                $this->getRepositoryModules(['api_id' => $this->apiConfig['id']]);
+                if ($getRepositoryModules) {
+                    $this->getRepositoryModules();
+                } else {
+                    $this->getRepositoryModules(['api_id' => $this->apiConfig['id']]);
+                }
 
                 return true;
             }
         } catch (ClientException | \throwable $e) {
-            var_dump($e);die();
             $this->addResponse($e->getMessage(), 1);
 
             return false;
@@ -427,7 +430,9 @@ class Manager extends BasePackage
                 foreach ($remotePackages['update'] as $updateRemotePackageKey => $updateRemotePackage) {
                     $this->modules->$remoteModulesType->update($updateRemotePackage);
 
-                    $counter['update'] = $counter['update'] + 1;
+                    if ($updateRemotePackage['installed'] == '1') {
+                        $counter['update'] = $counter['update'] + 1;
+                    }
                 }
             }
 
@@ -517,7 +522,7 @@ class Manager extends BasePackage
                 $localModule['repo_details']['details'] = $remoteModule;
 
                 $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($localModule, $remoteModule);
-                var_dump($moduleNeedsUpgrade);die();
+
                 if ($moduleNeedsUpgrade) {
                     $localModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
                     if ($localModule['installed'] == '0') {
@@ -576,7 +581,8 @@ class Manager extends BasePackage
                         return $latestRelease;
                     }
                 } else if ($localModule['level_of_update'] == '3') {//Major & Minor & Patch
-                    if ((int) $latestReleaseVersion->getPatch() > (int) $localVersion->getPatch() ||
+                    if ((int) $latestReleaseVersion->getMajor() > (int) $localVersion->getMajor() ||
+                        (int) $latestReleaseVersion->getPatch() > (int) $localVersion->getPatch() ||
                         (int) $latestReleaseVersion->getMinor() > (int) $localVersion->getMinor()
                     ) {
                         return $latestRelease;
