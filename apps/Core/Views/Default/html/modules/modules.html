@@ -49,38 +49,72 @@
                                     [
                                         'id'        : 'repo-sync',
                                         'tooltip'   : 'Sync',
-                                        'icon'      : 'fas fa-fw fa-sync-alt text-primary'
+                                        'icon'      : 'fas fa-fw fa-sync-alt text-secondary',
+                                        'iconColor' : 'secondary',
+                                        'disabled'  : true
                                     ],
-                                'divider'       : [],
+                                'filter-update-available' :
+                                    [
+                                        'id'        : 'filter-update-available',
+                                        'tooltip'   : 'Apply Filter (update)',
+                                        'icon'      : 'fas fa-fw fa-circle-up',
+                                        'iconColor' : 'secondary',
+                                        'disabled'  : true
+                                    ],
+                                '0'       :
+                                    [
+                                        'id'        : 'divider'
+                                    ],
                                 'filter-update' :
                                     [
                                         'id'        : 'filter-update',
-                                        'tooltip'   : 'Apply Filter (update)',
-                                        'icon'      : 'fas fa-fw fa-circle-up text-warning'
+                                        'tooltip'   : 'Apply Filter (:update)',
+                                        'icon'      : 'fas fa-fw fa-circle-up',
+                                        'iconColor' : 'secondary',
+                                        'disabled'  : true
                                     ],
                                 'filter-install' :
                                     [
                                         'id'        : 'filter-install',
                                         'tooltip'   : 'Apply Filter Install/Update (:install)',
-                                        'icon'      : 'fas fa-fw fa-circle-plus text-info'
+                                        'icon'      : 'fas fa-fw fa-circle-plus',
+                                        'iconColor' : 'secondary',
+                                        'disabled'  : true
                                     ],
                                 'filter-uninstall' :
                                     [
                                         'id'        : 'filter-uninstall',
                                         'tooltip'   : 'Apply Filter Uninstall (:uninstall)',
-                                        'icon'      : 'fas fa-fw fa-circle-minus text-danger'
+                                        'icon'      : 'fas fa-fw fa-circle-minus',
+                                        'iconColor' : 'secondary',
+                                        'disabled'  : true
+                                    ],
+                                'filter-remove' :
+                                    [
+                                        'id'        : 'filter-remove',
+                                        'tooltip'   : 'Apply Filter Remove (:remove)',
+                                        'icon'      : 'fas fa-fw fa-circle-xmark',
+                                        'iconColor' : 'secondary',
+                                        'disabled'  : true
+                                    ],
+                                '1'       :
+                                    [
+                                        'id'        : 'divider'
                                     ],
                                 'filter-queue' :
                                     [
                                         'id'        : 'filter-queue',
                                         'tooltip'   : 'Apply Filter In Queue (queue:)',
-                                        'icon'      : 'fas fa-fw fa-list text-purple'
+                                        'icon'      : 'fas fa-fw fa-list',
+                                        'iconColor' : 'secondary',
+                                        'disabled'  : true
                                     ],
                                 'filter-clear' :
                                     [
                                         'id'        : 'filter-clear',
                                         'tooltip'   : 'Clear all filters',
-                                        'icon'      : 'fas fa-fw fa-times text-secondary'
+                                        'icon'      : 'fas fa-fw fa-times',
+                                        'iconColor' : 'primary'
                                     ]
                             ],
                         'fieldJstreeReplaceIdWithDataField'         : 'moduleid',
@@ -173,7 +207,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row" id="module-buttons" hidden>
+                <div class="row" id="{{componentId}}-{{sectionId}}-moduleinfo-buttons" hidden>
                     <hr>
                     <div class="col">
                         {{adminltetags.useTag('buttons',
@@ -185,32 +219,44 @@
                                 'buttonType'                    : 'button',
                                 'buttons'                       :
                                     [
-                                        'repo-sync'        : [
+                                        'moduleinfo-repo-sync'  : [
                                             'title'             : false,
                                             'size'              : 'xs',
                                             'icon'              : 'sync-alt',
                                             'hidden'            : true,
                                             'position'          : 'right'
                                         ],
-                                        'install-update'        : [
+                                        'moduleinfo-install'    : [
                                             'title'             : 'Install',
                                             'size'              : 'xs',
-                                            'hidden'            : true,
-                                            'disabled'          : true
+                                            'icon'              : 'plus',
+                                            'hidden'            : true
                                         ],
-                                        'uninstall'        : [
+                                        'moduleinfo-update'     : [
+                                            'title'             : 'Update',
+                                            'size'              : 'xs',
+                                            'icon'              : 'arrow-up',
+                                            'hidden'            : true
+                                        ],
+                                        'moduleinfo-uninstall'  : [
+                                            'title'             : 'Uninstall',
+                                            'type'              : 'danger',
+                                            'size'              : 'xs',
+                                            'icon'              : 'minus',
+                                            'hidden'            : true
+                                        ],
+                                        'moduleinfo-remove'     : [
                                             'title'             : 'Remove',
                                             'type'              : 'danger',
                                             'size'              : 'xs',
-                                            'hidden'            : true,
-                                            'disabled'          : true
+                                            'icon'              : 'xmark',
+                                            'hidden'            : true
                                         ],
-                                        'cancel'        : [
+                                        'moduleinfo-cancel'     : [
                                             'title'             : 'Cancel',
                                             'type'              : 'secondary',
                                             'size'              : 'xs',
-                                            'hidden'            : true,
-                                            'disabled'          : true
+                                            'hidden'            : true
                                         ]
                                     ]
                             ]
@@ -289,155 +335,40 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 }
 
 dataCollectionSectionForm['vars'] = { };
-dataCollectionSectionForm['funcs'] = { };
-
+dataCollectionSectionForm['vars']['rootTree'] = [];
+dataCollectionSectionForm['vars']['org_update_available'] = 0;
+dataCollectionSectionForm['vars']['update_available'] = 0;
 dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modules}}');
 dataCollectionSectionForm['vars']['module'] = { };
 dataCollectionSectionForm['vars']['queue'] = { };
 dataCollectionSectionForm['vars']['queue']['count'] = 0;
-dataCollectionSectionForm['vars']['queue']['install_update'] = { };
+dataCollectionSectionForm['vars']['queue']['install'] = { };
 dataCollectionSectionForm['vars']['queue']['uninstall'] = { };
+dataCollectionSectionForm['vars']['queue']['update'] = { };
+dataCollectionSectionForm['vars']['queue']['remove'] = { };
 dataCollectionSectionForm['vars']['initJstree'] = false;
 
-// $('#{{componentId}}-{{sectionId}}-repositories').on('focus', function() {
-//     dataCollectionSectionForm['vars']['previous'] = this.value;
-// }).change(function() {
-//     if (this.value == '0') {
-//         dataCollectionSectionForm['vars']['previous'] = this.value;
-//         $('#repo-details').attr('hidden', true);
-//         return;
-//     } else {
-//         dataCollectionSectionForm['funcs']['processRepositorySwitch']();
-//     }
-
-//     // if (dataCollectionSectionForm['vars']['previous'] == '0') {
-//     //     dataCollectionSectionForm['vars']['previous'] = this.value;
-//     //     dataCollectionSectionForm['funcs']['processRepositorySwitch']();
-//     //     return;
-//     // }
-
-//     // Swal.fire({
-//     //     title                       : '<span class="text-warning"> Switch Repository? It will reset the queue.</span>',
-//     //     icon                        : 'question',
-//     //     background                  : 'rgba(0,0,0,.8)',
-//     //     backdrop                    : 'rgba(0,0,0,.6)',
-//     //     buttonsStyling              : false,
-//     //     confirmButtonText           : 'Switch',
-//     //     customClass                 : {
-//     //         'confirmButton'             : 'btn btn-warning text-uppercase',
-//     //         'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-//     //     },
-//     //     showCancelButton            : true,
-//     //     keydownListenerCapture      : true,
-//     //     allowOutsideClick           : false,
-//     //     allowEscapeKey              : false,
-//     //     didOpen                     : function() {
-//     //         window['dataCollection'].env.sounds.swalSound.play();
-//     //     }
-//     // }).then((result) => {
-//     //     if (result.value) {
-//     //         dataCollectionSectionForm['funcs']['processRepositorySwitch']();
-//     //     } else {
-//     //         $('#{{componentId}}-{{sectionId}}-repositories').val(dataCollectionSectionForm['vars']['previous']);
-//     //     }
-//     // });
-// });
-
-// dataCollectionSectionForm['funcs']['processRepositorySwitch'] = function() {
-//     var selectedRepository = $('#{{componentId}}-{{sectionId}}-repositories').find(":selected").data('value');
-
-//     $('#repo-details').attr('hidden', false);
-
-//     // dataCollectionSectionForm['vars']['queue'] = { };
-//     // dataCollectionSectionForm['vars']['queue']['count'] = 0;
-//     // dataCollectionSectionForm['vars']['queue']['install_update'] = { };
-//     // dataCollectionSectionForm['vars']['queue']['uninstall'] = { };
-//     $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
-//     $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
-//     $('#{{componentId}}-{{sectionId}}-process-queue').off();
-//     $('#{{componentId}}-{{sectionId}}-clear-queue').off();
-//     $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
-//     $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
-//     $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
-//     $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
-//     $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
-//     $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
-//     $('#{{componentId}}-{{sectionId}}-repo-sync').attr('disabled', true);
-//     $('#{{componentId}}-{{sectionId}}-repo-sync').attr('hidden', true);
-//     $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-//     $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
-//     $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
-//     $('#{{componentId}}-{{sectionId}}-modules').jstree().destroy();
-//     if ($('#{{componentId}}-{{sectionId}}-modules-empty').length > 0) {
-//         $('#{{componentId}}-{{sectionId}}-modules-empty').remove();
-//     }
-
-//     $('#{{componentId}}-{{sectionId}}-modules').append(
-//         '<div id="{{componentId}}-{{sectionId}}-modules-empty" class="text-center">' +
-//             '<i class="fa fa-cog fa-spin"></i> Loading modules...' +
-//         '</div>'
-//     );
-
-//     dataCollectionSectionForm['funcs']['getRepositoryModules'](selectedRepository);
-// }
-
-dataCollectionSectionForm['funcs']['jstreeSelectNode'] = function() {
-    $('#{{componentId}}-{{sectionId}}-modules').off('select_node.jstree');
-    $('#{{componentId}}-{{sectionId}}-modules').on('select_node.jstree', function() {
-        var selected = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true);
-
-        if (selected[0].id.startsWith('j')) {
-            if (selected[0].data.type !== 'repo') {
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_node(selected);
-
-                $('#{{componentId}}-{{sectionId}}-modules-repo-sync').addClass('disabled');
-                $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children('i').removeClass('text-primary').addClass('text-secondary');
-                return false;
-            } else {
-                $('#{{componentId}}-{{sectionId}}-modules-repo-sync').removeClass('disabled');
-                $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children('i').removeClass('text-secondary').addClass('text-primary');
-            }
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-error').attr('hidden', true);
-            $('#module-buttons').attr('hidden', true);
-        } else {
-            $('#{{componentId}}-{{sectionId}}-modules-repo-sync').addClass('disabled');
-            $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children('i').removeClass('text-primary').addClass('text-secondary');
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', false);
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-error').attr('hidden', true);
-            dataCollectionSectionForm['funcs']['getSelectedModuleInfo']([selected[0].id]);
-        }
-    });
-}
-dataCollectionSectionForm['funcs']['jstreeSelectNode']();
+dataCollectionSectionForm['funcs'] = { };
 
 dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
     $('#{{componentId}}-{{sectionId}}-modules').off('ready.jstree');
     $('#{{componentId}}-{{sectionId}}-modules').on('ready.jstree', function() {
-        var coreTree = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {flat:true});
+        dataCollectionSectionForm['vars']['rootTree'] = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {flat:true});
 
-        var selected = [];
+        var selected;
 
-        $(coreTree).each(function(i, v) {
+        $(dataCollectionSectionForm['vars']['rootTree']).each(function(i, v) {
             v.text = v.text.toLowerCase();
-            if (v.text.includes('core')) {
-                selected.push(v.id);
+            if (v.data.apiid == '1' && v.data.type === 'repo' && v.text.includes('core')) {
+                selected = v.id;
+
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().select_node(v.id);
+
                 return false;
             }
         });
 
-        $('#{{componentId}}-{{sectionId}}-modules-filter-update, ' +
-          '#{{componentId}}-{{sectionId}}-modules-filter-install, ' +
-          '#{{componentId}}-{{sectionId}}-modules-filter-uninstall, ' +
-          '#{{componentId}}-{{sectionId}}-modules-filter-queue, ' +
-          '#{{componentId}}-{{sectionId}}-modules-filter-clear').addClass('disabled');
-
-        dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText'](null, false, false, true);
+        dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](null, false, false, false, true);
     });
 
     $('#{{componentId}}-{{sectionId}}-modules').on('search.jstree', function(e, res) {
@@ -455,20 +386,38 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
                 textTrusted : true
             });
         }
+
+        if (dataCollectionSectionForm['vars']['update_available'] > 0) {
+            dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', 'warning', false);
+        }
+    });
+    $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').on('keyup', function() {
+        if ($('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val() === '') {
+            dataCollectionSectionForm['vars']['filter'] = false;
+        } else {
+            dataCollectionSectionForm['vars']['filter'] = true;
+        }
     });
 
-    $('#{{componentId}}-{{sectionId}}-modules-repo-sync').off();
+    $('#{{componentId}}-{{sectionId}}-modules-repo-sync, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-update, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-install, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-uninstall, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-uninstall, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-queue, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-clear').off();
+
     $('#{{componentId}}-{{sectionId}}-modules-repo-sync').click(function(e) {
         e.preventDefault();
 
-        $(this).addClass('disabled');
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']($(this)[0].id);
 
-        var selected = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true);
-        dataCollectionSectionForm['funcs']['initSync'](selected[0].data.apiid);
+        dataCollectionSectionForm['funcs']['initSync'](
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true)[0].data.apiid
+        );
     });
 
-    $('#{{componentId}}-{{sectionId}}-modules-filter-update').off();
-    $('#{{componentId}}-{{sectionId}}-modules-filter-update').click(function(e) {
+    $('#{{componentId}}-{{sectionId}}-modules-filter-update-available').click(function(e) {
         e.preventDefault();
 
         dataCollectionSectionForm['vars']['filter'] = true;
@@ -476,11 +425,20 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
         $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
         $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
         $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
-        $('#module-buttons').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+        dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo'], []);
     });
-    $('#{{componentId}}-{{sectionId}}-modules-filter-install').off();
+
+    $('#{{componentId}}-{{sectionId}}-modules-filter-update').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['vars']['filter'] = true;
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
+        $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val(':update');
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().search(':update');
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
+        dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo'], []);
+    });
+
     $('#{{componentId}}-{{sectionId}}-modules-filter-install').click(function(e) {
         e.preventDefault();
 
@@ -490,12 +448,9 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
         $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val(':Install');
         $('#{{componentId}}-{{sectionId}}-modules').jstree().search(':Install');
         $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
-        $('#module-buttons').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+        dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo'], []);
     });
 
-    $('#{{componentId}}-{{sectionId}}-modules-filter-uninstall').off();
     $('#{{componentId}}-{{sectionId}}-modules-filter-uninstall').click(function(e) {
         e.preventDefault();
 
@@ -505,12 +460,21 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
         $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val(':Uninstall');
         $('#{{componentId}}-{{sectionId}}-modules').jstree().search(':Uninstall');
         $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
-        $('#module-buttons').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+        dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo'], []);
     });
 
-    $('#{{componentId}}-{{sectionId}}-modules-filter-queue').off();
+    $('#{{componentId}}-{{sectionId}}-modules-filter-remove').click(function(e) {
+        e.preventDefault();
+
+        //We only need this during update so when we click on update the node is hidden from the filter tree.
+        dataCollectionSectionForm['vars']['filter'] = false;
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
+        $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val(':Remove');
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().search(':Remove');
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
+        dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo'], []);
+    });
+
     $('#{{componentId}}-{{sectionId}}-modules-filter-queue').click(function(e) {
         e.preventDefault();
 
@@ -520,12 +484,9 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
         $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('in queue:');
         $('#{{componentId}}-{{sectionId}}-modules').jstree().search('in queue:');
         $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
-        $('#module-buttons').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+        dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo'], []);
     });
 
-    $('#{{componentId}}-{{sectionId}}-modules-filter-clear').off();
     $('#{{componentId}}-{{sectionId}}-modules-filter-clear').click(function(e) {
         e.preventDefault();
 
@@ -534,20 +495,169 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
         $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
         $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('');
         $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
-        $('#module-buttons').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().open_all();
+        dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo'], []);
     });
+}
+dataCollectionSectionForm['funcs']['jstreeReady']();//We start here
 
-    $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').on('keyup', function() {
-        if ($('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val() === '') {
-            dataCollectionSectionForm['vars']['filter'] = false;
+dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
+    function(nodeId = null, install = false, uninstall = false, remove = false, init = false) {
+        var allNodes;
+
+        if (nodeId) {
+            allNodes = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_node(nodeId);
         } else {
+            allNodes = dataCollectionSectionForm['vars']['rootTree']
+        }
+
+        var updateAvailable = false;
+        var nT, nD, index;
+
+        $(allNodes).each(function(i, node) {
+            if (node.id.startsWith('j')) {
+                if (node.data.type === 'repo') {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-cloud-arrow-down text-primary');
+                }
+                return true;
+            }
+
+            nD = node.data;
+
+            nT =
+                dataCollectionSectionForm['vars']['modules'][nD.apiid]['childs'][nD.apptype]['childs'][nD.moduletype]['childs'][nD.modulecategory]['childs'][nD.modulesubcategory]['childs'][node.id]['name'];
+
+            if (install === true) {
+                if (nD.update_available && nD.update_available == 1) {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-plus text-info');
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Update)');
+                    updateAvailable = true;
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-square-plus text-info');
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Install)');
+                }
+            } else if (uninstall === true) {
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-minus text-danger');
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Uninstall)');
+                if (nD.update_available && nD.update_available == 1) {
+                    updateAvailable = true;
+                }
+            } else if (remove === true) {
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-xmark text-danger');
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Remove)');
+            } else {
+                if (nD.installed == 1) {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-check text-success');
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fa fa-fw fa-circle-dot');
+                    if (nD.isnew && nD.isnew == 1) {
+                        $('#{{componentId}}-{{sectionId}}-modules')
+                        .jstree()
+                        .set_text(
+                            node,
+                            nT +
+                                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-info">NEW</span></span>'
+                        );
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
+                    }
+                }
+
+                if (nD.update_available && nD.update_available == 1) {
+                    updateAvailable = true;
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-warning');
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (Update Available)');
+
+                    if (dataCollectionSectionForm['vars']['queue']['update'][nD.moduletype] &&
+                        dataCollectionSectionForm['vars']['queue']['update'][nD.moduletype].includes(nD.id.toString())
+                    ) {
+                        index = dataCollectionSectionForm['vars']['queue']['update'][nD.moduletype].indexOf(nD.id.toString());
+
+                        if (index > -1) {
+                            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-info');
+                            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Update)');
+                        }
+                    }
+                }
+            }
+        });
+
+        if (updateAvailable && (dataCollectionSectionForm['vars']['filter'] === true || init === true)) {
+            if (init === true) {
+                dataCollectionSectionForm['vars']['initJstree'] = true;
+            } else {
+                dataCollectionSectionForm['vars']['initJstree'] = false;
+            }
+
             dataCollectionSectionForm['vars']['filter'] = true;
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
+        }
+}
+
+dataCollectionSectionForm['funcs']['jstreeSelectNode'] = function() {
+    $('#{{componentId}}-{{sectionId}}-modules').off('select_node.jstree');
+    $('#{{componentId}}-{{sectionId}}-modules').on('select_node.jstree', function() {
+        var selected = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true);
+
+        if (selected[0].id.startsWith('j')) {
+            if (selected[0].data.type !== 'repo') {
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_node(selected);
+
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
+                dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
+                return false;
+            } else if (selected[0].data.type === 'repo') {
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync', 'primary', false);
+            }
+
+            dataCollectionSectionForm['funcs']['moduleinfo']();
+        } else {
+            dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
+            dataCollectionSectionForm['funcs']['moduleinfo'](['loader']);
+            dataCollectionSectionForm['funcs']['getSelectedModuleInfo'](selected[0].id);
         }
     });
 }
-dataCollectionSectionForm['funcs']['jstreeReady']();
+dataCollectionSectionForm['funcs']['jstreeSelectNode']();//Enable selection of modules
+
+dataCollectionSectionForm['funcs']['toggleJstreeTool'] = function(toolId, textColor = 'secondary', isDisabled = true) {
+    if (isDisabled) {
+        $('#' + toolId).addClass('disabled');
+        $('#' + toolId).children('i').removeClass(function (index, className) {
+            return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+        }).addClass('text-secondary');
+    } else {
+        $('#' + toolId).removeClass('disabled');
+        $('#' + toolId).children('i').removeClass(function (index, className) {
+            return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+        }).addClass('text-' + textColor);
+    }
+}
+dataCollectionSectionForm['funcs']['moduleinfo'] = function(show = ['noinfo'], showButtons = ['cancel']) {
+    if (show.length > 0) {
+        var moduleinfos = ['loader', 'info', 'noinfo', 'error', 'buttons'];
+        $(moduleinfos).each(function(e, moduleinfo) {
+            if (show.includes(moduleinfo)) {
+                $('#{{componentId}}-{{sectionId}}-moduleinfo-' + moduleinfo).attr('hidden', false);
+            } else {
+                $('#{{componentId}}-{{sectionId}}-moduleinfo-' + moduleinfo).attr('hidden', true);
+            }
+        });
+    }
+
+    if (showButtons.length > 0) {
+        var modulebuttons = ['install', 'update', 'uninstall', 'remove', 'cancel', 'repo-sync'];
+        $(modulebuttons).each(function(e, modulebutton) {
+            if (showButtons.includes(modulebutton)) {
+                $('#{{componentId}}-{{sectionId}}-moduleinfo-' + modulebutton).attr('hidden', false);
+            } else {
+                $('#{{componentId}}-{{sectionId}}-moduleinfo-' + modulebutton).attr('hidden', true);
+            }
+        });
+    }
+}
 
 dataCollectionSectionForm['funcs']['getRepositoryModules'] = function(repositoryId) {
     var postData = { };
@@ -561,8 +671,8 @@ dataCollectionSectionForm['funcs']['getRepositoryModules'] = function(repository
         }
 
         $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-repo-sync').attr('disabled', false);
-        $('#{{componentId}}-{{sectionId}}-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
 
         if (response.responseCode == 0) {
             if (response.responseData.modules) {
@@ -589,37 +699,39 @@ dataCollectionSectionForm['funcs']['getRepositoryModules'] = function(repository
             dataCollectionSectionForm['funcs']['jstreeReady']();
         } else if (response.responseCode == 1) {
             $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-            $('#module-buttons').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-buttons').attr('hidden', true);
             $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
         }
     }, 'json');
 }
 
 dataCollectionSectionForm['funcs']['getSelectedModuleInfo'] = function(selected) {
-    if (selected.length === 0) {
+    if (!selected) {
         return false;
     }
 
     var splitModule, moduleType, moduleId;
 
-    if (selected.length === 1) {
-        splitModule = selected[0].split('-');
-        moduleId = splitModule[1];
+    splitModule = selected.split('-');
+    moduleId = splitModule[1];
 
-        if (selected[0].startsWith('components')) {
-            moduleType = 'components';
-        } else if (selected[0].startsWith('packages')) {
-            moduleType = 'packages';
-        } else if (selected[0].startsWith('middlewares')) {
-            moduleType = 'middlewares';
-        } else if (selected[0].startsWith('views')) {
-            moduleType = 'views';
-        }
+    if (selected.startsWith('components')) {
+        moduleType = 'components';
+    } else if (selected.startsWith('packages')) {
+        moduleType = 'packages';
+    } else if (selected.startsWith('middlewares')) {
+        moduleType = 'middlewares';
+    } else if (selected.startsWith('views')) {
+        moduleType = 'views';
     }
 
     if (moduleType && moduleId) {
         dataCollectionSectionForm['funcs']['getModuleInfo'](moduleType, moduleId);
+
+        return true;
     }
+
+    return false;
 }
 
 dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, moduleId, sync = false) {
@@ -639,8 +751,8 @@ dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, modul
         //eslint-disable-next-line
         console.log(response);
         $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-repo-sync').attr('disabled', false);
-        $('#{{componentId}}-{{sectionId}}-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
 
         if (response.responseCode == 0) {
             if (response.responseData.module) {
@@ -664,6 +776,7 @@ dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, modul
 
 dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     var moduleData = { };
+    var index;
 
     for (var m in moduleInfo) {
         if (moduleInfo[m] === '' || moduleInfo[m] === null) {
@@ -675,16 +788,8 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
 
     if (moduleData['installed'] == 1) {
         moduleData['installed'] = '<span class="badge badge-success">Yes</span>';
-        if (moduleData['update_available'] == 1) {
-            $('#{{componentId}}-{{sectionId}}-install-update').html('UPDATE');
-            $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
-            $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
-        }
     } else {
         moduleData['installed'] = '<span class="badge badge-secondary">No</span>';
-        $('#{{componentId}}-{{sectionId}}-install-update').html('INSTALL');
-        $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
-        $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
     }
 
     if (moduleData['update_available'] !== '-' && moduleData['update_available'] == 1) {
@@ -715,144 +820,159 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     $('#module_id').html(moduleData.id);
     $('#description').html(moduleData.description);
 
-    dataCollectionSectionForm['vars']['queue']['uninstall']
-    $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', false);
-    $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', true);
-    $('#{{componentId}}-{{sectionId}}-moduleinfo-error').attr('hidden', true);
-    $('#{{componentId}}-{{sectionId}}-repo-sync').attr('disabled', false);
-    $('#{{componentId}}-{{sectionId}}-repo-sync').attr('hidden', false);
-
-    if ((dataCollectionSectionForm['vars']['queue']['install_update'][moduleInfo.module_type] &&
-        dataCollectionSectionForm['vars']['queue']['install_update'][moduleInfo.module_type].includes(moduleInfo.id)) ||
-        moduleInfo.installed == '1'
-    ) {
+    if (moduleInfo.installed == '1') {
         if (moduleInfo.update_available == '1') {
-            if (dataCollectionSectionForm['vars']['queue']['install_update'][moduleInfo.module_type] &&
-                dataCollectionSectionForm['vars']['queue']['install_update'][moduleInfo.module_type].includes(moduleInfo.id)
+            if (dataCollectionSectionForm['vars']['queue']['update'][moduleInfo.module_type] &&
+                dataCollectionSectionForm['vars']['queue']['update'][moduleInfo.module_type].includes(moduleInfo.id)
             ) {
-                $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
-                $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
             } else {
-                $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
-                $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
+            //eslint-disable-next-line
+            console.log(moduleInfo.installed);
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'remove', 'repo-sync']);
             }
         } else {
-            if (dataCollectionSectionForm['vars']['queue']['install_update'][moduleInfo.module_type] &&
-                dataCollectionSectionForm['vars']['queue']['install_update'][moduleInfo.module_type].includes(moduleInfo.id)
+            if (dataCollectionSectionForm['vars']['queue']['install'][moduleInfo.module_type] &&
+                dataCollectionSectionForm['vars']['queue']['install'][moduleInfo.module_type].includes(moduleInfo.id)
             ) {
-                $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
-                $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
-                $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
-                $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
             } else {
-                $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
-                $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
-                $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', false);
-                $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', false);
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['uninstall', 'remove', 'repo-sync']);
             }
         }
 
-        if ((dataCollectionSectionForm['vars']['queue']['uninstall'][moduleInfo.module_type] &&
-            dataCollectionSectionForm['vars']['queue']['uninstall'][moduleInfo.module_type].includes(moduleInfo.id))
-        ) {
-            $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
-            $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', false);
-            $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', false);
-        } else {
-            $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', false);
-            $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', false);
-        }
+        // if ((dataCollectionSectionForm['vars']['queue']['uninstall'][moduleInfo.module_type] &&
+        //     dataCollectionSectionForm['vars']['queue']['uninstall'][moduleInfo.module_type].includes(moduleInfo.id))
+        // ) {
+        //     $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('hidden', true);
+        //     $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('disabled', true);
+        //     $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('hidden', false);
+        //     $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('disabled', false);
+        // } else {
+        //     $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('hidden', false);
+        //     $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('disabled', false);
+        // }
     } else {
-        $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
-        $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
-        $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
+        if (dataCollectionSectionForm['vars']['queue']['install'][moduleData.module_type]) {
+            index = dataCollectionSectionForm['vars']['queue']['install'][moduleData.module_type].indexOf(moduleData.id);
+        }
+
+        if (index !== 'undefined' && index > -1) {
+            dataCollectionSectionForm['funcs']['moduleinfo']([], ['cancel', 'repo-sync']);
+        } else {
+            dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
+        }
     }
 
-    $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
-    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
-    $('#module-buttons').attr('hidden', false);
+    dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], []);
 
     if (moduleData['app_type'] === 'core') {
-        if (moduleInfo['name'] === 'Core') {
-            $('#{{componentId}}-{{sectionId}}-repo-sync').attr('disabled', false);
-            $('#{{componentId}}-{{sectionId}}-repo-sync').attr('hidden', false);
-            $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
+        if (moduleInfo['name'] !== 'Core') {
+            dataCollectionSectionForm['funcs']['moduleinfo'](['info'], []);
         } else {
-            $('#module-buttons').attr('hidden', true);
+            if (dataCollectionSectionForm['vars']['queue']['update'][moduleData.module_type]) {
+                index = dataCollectionSectionForm['vars']['queue']['update'][moduleData.module_type].indexOf(moduleData.id);
+            }
+
+            if (index !== 'undefined' && index > -1) {
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
+            } else {
+                dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'repo-sync']);
+            }
         }
     }
-
 
     dataCollectionSectionForm['funcs']['initModuleButtons']();
 }
 
 dataCollectionSectionForm['funcs']['initModuleButtons'] = function() {
-    $('#{{componentId}}-{{sectionId}}-install-update').off();
-    $('#{{componentId}}-{{sectionId}}-install-update').click(function(e) {
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-install, ' +
+      '#{{componentId}}-{{sectionId}}-moduleinfo-update, ' +
+      '#{{componentId}}-{{sectionId}}-moduleinfo-uninstall, ' +
+      '#{{componentId}}-{{sectionId}}-moduleinfo-remove, ' +
+      '#{{componentId}}-{{sectionId}}-moduleinfo-cancel, ' +
+      '#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').off();
+
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-install').click(function(e) {
         e.preventDefault();
 
-        $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', false);
-        $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', false);
-        $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
-        // $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
-        // $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
-        dataCollectionSectionForm['funcs']['updateQueue'](dataCollectionSectionForm['vars']['module']['id'], dataCollectionSectionForm['vars']['module']['module_type']);
-        dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText'](dataCollectionSectionForm['vars']['module']['module_type'] + '-' + dataCollectionSectionForm['vars']['module']['id'], true);
+        dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
 
-        if ($('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val() === 'update') {
-            $('#module-buttons').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
-        }
+        dataCollectionSectionForm['funcs']['updateQueue'](
+            dataCollectionSectionForm['vars']['module']['id'],
+            dataCollectionSectionForm['vars']['module']['module_type'],
+            'install'
+        );
+
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install', 'info', false);
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
     });
 
-    $('#{{componentId}}-{{sectionId}}-uninstall').off();
-    $('#{{componentId}}-{{sectionId}}-uninstall').click(function(e) {
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-update').click(function(e) {
         e.preventDefault();
 
-        $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', false);
-        $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', false);
+        dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
+
+        dataCollectionSectionForm['funcs']['updateQueue'](
+            dataCollectionSectionForm['vars']['module']['id'],
+            dataCollectionSectionForm['vars']['module']['module_type'],
+            'update'
+        );
+
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update', 'info', false);
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
+    });
+
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').click(function(e) {
+        e.preventDefault();
+
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('disabled', false);
         $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
         $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
-        $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('disabled', true);
         dataCollectionSectionForm['funcs']['updateQueue'](dataCollectionSectionForm['vars']['module']['id'], dataCollectionSectionForm['vars']['module']['module_type'], true, true);
-        dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText'](dataCollectionSectionForm['vars']['module']['module_type'] + '-' + dataCollectionSectionForm['vars']['module']['id'], false, true);
+        dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](dataCollectionSectionForm['vars']['module']['module_type'] + '-' + dataCollectionSectionForm['vars']['module']['id'], false, true);
 
         if ($('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val() === 'update') {
-            $('#module-buttons').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-buttons').attr('hidden', true);
             $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
             $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
         }
     });
 
-    $('#{{componentId}}-{{sectionId}}-cancel').off();
-    $('#{{componentId}}-{{sectionId}}-cancel').click(function(e) {
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-remove').click(function(e) {
         e.preventDefault();
 
-        if (dataCollectionSectionForm['vars']['module']['installed'] == '1') {
-            $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', false);
-            $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', false);
-            if (dataCollectionSectionForm['vars']['module']['update_available'] == '1') {
-                $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
-                $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
-            }
-        } else {
-            $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
-            $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
-        }
-        $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
-        dataCollectionSectionForm['funcs']['updateQueue'](dataCollectionSectionForm['vars']['module']['id'], dataCollectionSectionForm['vars']['module']['module_type'], false, false);
-        dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText'](dataCollectionSectionForm['vars']['module']['module_type'] + '-' + dataCollectionSectionForm['vars']['module']['id'], false, false);
+        dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel']);
+
+        dataCollectionSectionForm['funcs']['updateQueue'](
+            dataCollectionSectionForm['vars']['module']['id'],
+            dataCollectionSectionForm['vars']['module']['module_type'],
+            'remove'
+        );
+
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-remove', 'danger', false);
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
     });
 
-    $('#{{componentId}}-{{sectionId}}-repo-sync').off();
-    $('#{{componentId}}-{{sectionId}}-repo-sync').click(function(e) {
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['funcs']['clearQueue'](
+            false,
+            dataCollectionSectionForm['vars']['module']['id'],
+            dataCollectionSectionForm['vars']['module']['module_type'],
+            'install'
+        );
+
+        dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](
+            dataCollectionSectionForm['vars']['module']['module_type'] + '-' + dataCollectionSectionForm['vars']['module']['id']
+        );
+    });
+
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').click(function(e) {
         e.preventDefault();
 
         $(this).attr('disabled', true);
@@ -860,10 +980,10 @@ dataCollectionSectionForm['funcs']['initModuleButtons'] = function() {
 
         $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
         $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
-        $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
-        $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('disabled', true);
 
         $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', false);
         $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
@@ -872,131 +992,30 @@ dataCollectionSectionForm['funcs']['initModuleButtons'] = function() {
     });
 }
 
-dataCollectionSectionForm['funcs']['updateQueue'] = function(id, type, install = true, uninstall = false) {
+dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, addToQueue = 'install') {
     var index;
-    var swap = false;
 
-    if (uninstall === true) {
-        if (!dataCollectionSectionForm['vars']['queue']['uninstall'][type]) {
-            dataCollectionSectionForm['vars']['queue']['uninstall'][type] = [];
-        }
-
-        if (dataCollectionSectionForm['vars']['queue']['install_update'][type] &&
-            dataCollectionSectionForm['vars']['queue']['install_update'][type].includes(id)
-        ) {
-            index = dataCollectionSectionForm['vars']['queue']['install_update'][type].indexOf(id);
-
-            if (index > -1) {
-                dataCollectionSectionForm['vars']['queue']['install_update'][type].splice(index, 1);
-            }
-
-            swap = true;
-        }
-
-        dataCollectionSectionForm['vars']['queue']['uninstall'][type].push(id);
-    } else if (install === true) {
-        if (!dataCollectionSectionForm['vars']['queue']['install_update'][type]) {
-            dataCollectionSectionForm['vars']['queue']['install_update'][type] = [];
-        }
-
-        if (dataCollectionSectionForm['vars']['queue']['uninstall'][type] &&
-            dataCollectionSectionForm['vars']['queue']['uninstall'][type].includes(id)
-        ) {
-            index = dataCollectionSectionForm['vars']['queue']['uninstall'][type].indexOf(id);
-
-            if (index > -1) {
-                dataCollectionSectionForm['vars']['queue']['uninstall'][type].splice(index, 1);
-            }
-
-            swap = true;
-        }
-
-        dataCollectionSectionForm['vars']['queue']['install_update'][type].push(id);
-    } else if (install === false && uninstall === false) {//Cancel button
-        if (dataCollectionSectionForm['vars']['queue']['install_update'][type] &&
-            dataCollectionSectionForm['vars']['queue']['install_update'][type].includes(id)
-        ) {
-            index = dataCollectionSectionForm['vars']['queue']['install_update'][type].indexOf(id);
-
-            if (index > -1) {
-                dataCollectionSectionForm['vars']['queue']['install_update'][type].splice(index, 1);
-            }
-        } else if (dataCollectionSectionForm['vars']['queue']['uninstall'][type] &&
-                   dataCollectionSectionForm['vars']['queue']['uninstall'][type].includes(id)
-        ) {
-            index = dataCollectionSectionForm['vars']['queue']['uninstall'][type].indexOf(id);
-
-            if (index > -1) {
-                dataCollectionSectionForm['vars']['queue']['uninstall'][type].splice(index, 1);
-            }
-        }
+    if (!dataCollectionSectionForm['vars']['queue'][addToQueue][moduleType]) {
+        dataCollectionSectionForm['vars']['queue'][addToQueue][moduleType] = [];
     }
 
-    if ((install === true || uninstall === true) && swap === false) {
-        dataCollectionSectionForm['vars']['queue']['count'] = dataCollectionSectionForm['vars']['queue']['count'] + 1;
-        if (install === true) {
-            dataCollectionSectionForm['vars']['update_available'] = dataCollectionSectionForm['vars']['update_available'] - 1;
-        }
-    } else if (install === false && uninstall === false) {
-        dataCollectionSectionForm['vars']['queue']['count'] = dataCollectionSectionForm['vars']['queue']['count'] - 1;
-        dataCollectionSectionForm['vars']['update_available'] = dataCollectionSectionForm['vars']['update_available'] + 1;
+    if (dataCollectionSectionForm['vars']['queue'][addToQueue][moduleType] &&
+        dataCollectionSectionForm['vars']['queue'][addToQueue][moduleType].includes(id)
+    ) {
+        return;
     }
+
+    dataCollectionSectionForm['vars']['queue'][addToQueue][moduleType].push(id);
+    dataCollectionSectionForm['vars']['queue']['count'] = dataCollectionSectionForm['vars']['queue']['count'] + 1;
 
     $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
 
-    if (dataCollectionSectionForm['vars']['queue']['count'] > 0) {
-        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', false);
-        $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', false);
-
-        $('#{{componentId}}-{{sectionId}}-process-queue').off();
-        $('#{{componentId}}-{{sectionId}}-process-queue').click(function(e) {
-            e.preventDefault();
-
-            dataCollectionSectionForm['funcs']['processQueue']();
-        });
-        $('#{{componentId}}-{{sectionId}}-clear-queue').off();
-        $('#{{componentId}}-{{sectionId}}-clear-queue').click(function(e) {
-            e.preventDefault();
-
-            $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
-            $('#module-buttons').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
-            dataCollectionSectionForm['funcs']['clearQueue']();
-        });
-
-        if (Object.keys(dataCollectionSectionForm['vars']['queue']['install_update']).length > 0) {
-            $('#{{componentId}}-{{sectionId}}-modules-filter-install, ' +
-              '#{{componentId}}-{{sectionId}}-modules-filter-queue, ' +
-              '#{{componentId}}-{{sectionId}}-modules-filter-clear').removeClass('disabled');
-        } else {
-            $('#{{componentId}}-{{sectionId}}-modules-filter-install, ' +
-              '#{{componentId}}-{{sectionId}}-modules-filter-queue, ' +
-              '#{{componentId}}-{{sectionId}}-modules-filter-clear').addClass('disabled');
-        }
-
-        if (Object.keys(dataCollectionSectionForm['vars']['queue']['uninstall']).length > 0) {
-            $('#{{componentId}}-{{sectionId}}-modules-filter-uninstall, ' +
-              '#{{componentId}}-{{sectionId}}-modules-filter-queue, ' +
-              '#{{componentId}}-{{sectionId}}-modules-filter-clear').removeClass('disabled');
-        } else {
-            $('#{{componentId}}-{{sectionId}}-modules-filter-uninstall, ' +
-              '#{{componentId}}-{{sectionId}}-modules-filter-queue, ' +
-              '#{{componentId}}-{{sectionId}}-modules-filter-clear').addClass('disabled');
-        }
-        if (dataCollectionSectionForm['vars']['update_available'] === 0) {
-            $('#{{componentId}}-{{sectionId}}-modules-filter-update').addClass('disabled');
-        //eslint-disable-next-line
-        console.log($('#{{componentId}}-{{sectionId}}-modules-filter-update'));
-        } else {
-            $('#{{componentId}}-{{sectionId}}-modules-filter-update').removeClass('disabled');
-        }
-    } else {
-        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
-        $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
-
-        $('#{{componentId}}-{{sectionId}}-process-queue').off();
-        $('#{{componentId}}-{{sectionId}}-clear-queue').off();
+    if (addToQueue === 'install') {
+        dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, true);
+    } else if (addToQueue === 'update') {
+        dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id);
+    } else if (addToQueue === 'remove') {
+        dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, false, false, true);
     }
 }
 
@@ -1004,144 +1023,109 @@ dataCollectionSectionForm['funcs']['processQueue'] = function() {
     //
 }
 
-dataCollectionSectionForm['funcs']['clearQueue'] = function() {
-    dataCollectionSectionForm['vars']['queue'] = { };
-    dataCollectionSectionForm['vars']['queue']['count'] = 0;
-    dataCollectionSectionForm['vars']['queue']['install_update'] = { };
-    dataCollectionSectionForm['vars']['queue']['uninstall'] = { };
-    dataCollectionSectionForm['vars']['update_available'] = dataCollectionSectionForm['vars']['org_update_available'];
-    $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
-    $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
-    $('#{{componentId}}-{{sectionId}}-process-queue').off();
-    $('#{{componentId}}-{{sectionId}}-clear-queue').off();
-    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
-    $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
+dataCollectionSectionForm['funcs']['clearQueue'] = function(clearAll = false, id = false, moduleType = false) {
+    var index;
 
-    if (dataCollectionSectionForm['vars']['module']['installed'] == 1) {
-        if (dataCollectionSectionForm['vars']['module']['update_available'] == 1) {
-            $('#{{componentId}}-{{sectionId}}-install-update').html('UPDATE');
+    if (clearAll) {
+        dataCollectionSectionForm['vars']['queue'] = { };
+        dataCollectionSectionForm['vars']['queue']['count'] = 0;
+        dataCollectionSectionForm['vars']['queue']['install_update'] = { };
+        dataCollectionSectionForm['vars']['queue']['uninstall'] = { };
+        dataCollectionSectionForm['vars']['update_available'] = dataCollectionSectionForm['vars']['org_update_available'];
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-process-queue').off();
+        $('#{{componentId}}-{{sectionId}}-clear-queue').off();
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('hidden', true);
+
+        if (dataCollectionSectionForm['vars']['module']['installed'] == 1) {
+            if (dataCollectionSectionForm['vars']['module']['update_available'] == 1) {
+                $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
+                $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
+            }
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('hidden', false);
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('disabled', false);
+        } else {
             $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
             $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('disabled', true);
         }
-        $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', false);
-        $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', false);
     } else {
-        $('#{{componentId}}-{{sectionId}}-install-update').html('INSTALL');
-        $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', false);
-        $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', false);
-        $('#{{componentId}}-{{sectionId}}-uninstall').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-uninstall').attr('disabled', true);
-    }
+        if (id && moduleType) {
+            var actionTypes = ['install', 'update', 'uninstall', 'remove'];
 
-    $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
-    dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText']();
-}
+            var foundIn;
+            var disableFilterIcons = [];
 
-dataCollectionSectionForm['funcs']['applyColorsToIconsAndUpdateText'] =
-    function(nodeId = null, installUpdate = false, uninstall = false, init = false) {
-        var allNodes;
+            $(actionTypes).each(function(i, actionType) {
+                if (dataCollectionSectionForm['vars']['queue'][actionType][moduleType]) {
+                    if (dataCollectionSectionForm['vars']['queue'][actionType][moduleType].includes(id)) {
+                        index = dataCollectionSectionForm['vars']['queue'][actionType][moduleType].indexOf(id);
 
-        if (nodeId) {
-            allNodes = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_node(nodeId);
-        } else {
-            allNodes = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {'flat':true});
-        }
+                        if (index > -1) {
+                            dataCollectionSectionForm['vars']['queue'][actionType][moduleType].splice(index, 1);
 
-        var updateAvailable = false;
-        var nT, nD;
+                            foundIn = actionType;
+                        }
+                    }
 
-        $(allNodes).each(function(i, node) {
-            if (node.id.startsWith('j')) {
-                if (node.data.type === 'repo') {
-                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-cloud-arrow-down text-primary');
+                    if (dataCollectionSectionForm['vars']['queue'][actionType][moduleType].length === 0) {
+                        delete dataCollectionSectionForm['vars']['queue'][actionType][moduleType];
+                    }
+
+                    if (Object.keys(dataCollectionSectionForm['vars']['queue'][actionType]).length === 0) {
+                        disableFilterIcons.push(actionType);
+                    }
                 }
-                return true;
-            }
-
-            nD = node.data;
-
-            nT =
-                dataCollectionSectionForm['vars']['modules'][nD.apiid]['childs'][nD.apptype]['childs'][nD.moduletype]['childs'][nD.modulecategory]['childs'][nD.modulesubcategory]['childs'][node.id]['name'];
-
-            if (uninstall === true) {
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-minus text-danger');
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Uninstall)');
-                if (nD.update_available && nD.update_available == 1) {
-                    updateAvailable = true;
-                }
-            } else if (installUpdate === true) {
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Install)');
-                if (nD.update_available && nD.update_available == 1) {
-                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-plus text-info');
-                    updateAvailable = true;
-                } else {
-                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-square-plus text-info');
-                }
-            } else if (nodeId && uninstall === false && installUpdate === false && init === false) {
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fa fa-fw fa-circle-dot');
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
-            } else {
-                if (nD.installed == 1) {
-                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-check text-success');
-                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
-                } else {
-                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fa fa-fw fa-circle-dot');
-                    if (nD.isnew && nD.isnew == 1) {
-                        $('#{{componentId}}-{{sectionId}}-modules')
-                        .jstree()
-                        .set_text(
-                            node,
-                            nT +
-                                ' <span class="text-uppercase" style="top: -2px;position: relative;"><span class="badge badge-info">NEW</span></span>'
-                        );
+            });
+            //eslint-disable-next-line
+            console.log(foundIn, disableFilterIcons);
+            if (foundIn) {
+                if (foundIn === 'install') {
+                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
+                } else if (foundIn === 'update') {
+                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'remove', 'repo-sync']);
+                } else if (foundIn === 'uninstall') {
+                    if (dataCollectionSectionForm['vars']['module']['update_available'] == '1') {
+                        dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'remove', 'repo-sync']);
                     } else {
-                        $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
+                        dataCollectionSectionForm['funcs']['moduleinfo']([], ['uninstall', 'remove', 'repo-sync']);
+                    }
+                } else if (foundIn === 'remove') {
+                    if (dataCollectionSectionForm['vars']['module']['update_available'] == '1') {
+                        dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'remove', 'repo-sync']);
+                    } else if (dataCollectionSectionForm['vars']['module']['installed'] == '1') {
+                        dataCollectionSectionForm['funcs']['moduleinfo']([], ['uninstall', 'remove', 'repo-sync']);
+                    } else {
+                        dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
                     }
                 }
 
-                if (nD.update_available && nD.update_available == 1) {
-                    updateAvailable = true;
-                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-warning');
-                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (Update)');
+                if (dataCollectionSectionForm['vars']['module']['app_type'] === 'core') {
+                    if (dataCollectionSectionForm['vars']['module']['name'] !== 'Core') {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], []);
+                    } else {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['update', 'repo-sync']);
+                    }
                 }
             }
-        });
 
-        if (updateAvailable && (dataCollectionSectionForm['vars']['filter'] === true || init === true)) {
-            if (init === true) {
-                dataCollectionSectionForm['vars']['initJstree'] = true;
-            } else {
-                dataCollectionSectionForm['vars']['initJstree'] = false;
+            if (disableFilterIcons.length > 0) {
+                $(disableFilterIcons).each(function(i, filterIcon) {
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-' + filterIcon);
+                });
             }
-
-            dataCollectionSectionForm['vars']['filter'] = true;
-            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
-            $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
-
-            if (dataCollectionSectionForm['vars']['update_available'] > 0) {
-                $('#{{componentId}}-{{sectionId}}-modules-filter-update').removeClass('disabled');
-            }
-            $('#{{componentId}}-{{sectionId}}-modules-filter-clear').removeClass('disabled');
         }
+
+        dataCollectionSectionForm['vars']['queue']['count'] = dataCollectionSectionForm['vars']['queue']['count'] - 1;
     }
 
-// dataCollectionSectionForm['funcs']['changeRepoButtons'] = function(val = '0') {
-//     var url = "{{links.url('system/api/q/repository/true/id/')}}" + val;
+    $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
 
-//     if (val == '1' || val == '2') {
-//         $('#{{componentId}}-{{sectionId}}-sync').attr('disabled', false);
-//         $('#{{componentId}}-{{sectionId}}-delete').attr('disabled', true);
-//         $('#{{componentId}}-{{sectionId}}-edit').removeClass('disabled');
-//         $('#{{componentId}}-{{sectionId}}-edit').attr('href', url);
-//     } else if (val == '0') {
-//         $('#{{componentId}}-{{sectionId}}-sync, #{{componentId}}-{{sectionId}}-delete').attr('disabled', true);
-//         $('#{{componentId}}-{{sectionId}}-edit').addClass('disabled');
-//     } else {
-//         $('#{{componentId}}-{{sectionId}}-sync, #{{componentId}}-{{sectionId}}-delete').attr('disabled', false);
-//         $('#{{componentId}}-{{sectionId}}-edit').removeClass('disabled');
-//         $('#{{componentId}}-{{sectionId}}-edit').attr('href', url);
-//     }
-// }
+    dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText']();
+}
 
 dataCollectionSectionForm['funcs']['deleteRepo'] = function(repoName, repoId) {
     Swal.fire({
@@ -1273,12 +1257,114 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
         }, 'json');
     // });
 }
-// $('#{{componentId}}-{{sectionId}}-repositories').change(function() {
-//     dataCollectionSectionForm['funcs']['initSync']($(this).val());
-// });
 
 $(document).ready(function() {
     BazProgress.buildProgressBar($('#installer-progress'));
 });
+
+// $('#{{componentId}}-{{sectionId}}-repositories').change(function() {
+//     dataCollectionSectionForm['funcs']['initSync']($(this).val());
+// });
+
+
+// $('#{{componentId}}-{{sectionId}}-repositories').on('focus', function() {
+//     dataCollectionSectionForm['vars']['previous'] = this.value;
+// }).change(function() {
+//     if (this.value == '0') {
+//         dataCollectionSectionForm['vars']['previous'] = this.value;
+//         $('#repo-details').attr('hidden', true);
+//         return;
+//     } else {
+//         dataCollectionSectionForm['funcs']['processRepositorySwitch']();
+//     }
+
+//     // if (dataCollectionSectionForm['vars']['previous'] == '0') {
+//     //     dataCollectionSectionForm['vars']['previous'] = this.value;
+//     //     dataCollectionSectionForm['funcs']['processRepositorySwitch']();
+//     //     return;
+//     // }
+
+//     // Swal.fire({
+//     //     title                       : '<span class="text-warning"> Switch Repository? It will reset the queue.</span>',
+//     //     icon                        : 'question',
+//     //     background                  : 'rgba(0,0,0,.8)',
+//     //     backdrop                    : 'rgba(0,0,0,.6)',
+//     //     buttonsStyling              : false,
+//     //     confirmButtonText           : 'Switch',
+//     //     customClass                 : {
+//     //         'confirmButton'             : 'btn btn-warning text-uppercase',
+//     //         'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+//     //     },
+//     //     showCancelButton            : true,
+//     //     keydownListenerCapture      : true,
+//     //     allowOutsideClick           : false,
+//     //     allowEscapeKey              : false,
+//     //     didOpen                     : function() {
+//     //         window['dataCollection'].env.sounds.swalSound.play();
+//     //     }
+//     // }).then((result) => {
+//     //     if (result.value) {
+//     //         dataCollectionSectionForm['funcs']['processRepositorySwitch']();
+//     //     } else {
+//     //         $('#{{componentId}}-{{sectionId}}-repositories').val(dataCollectionSectionForm['vars']['previous']);
+//     //     }
+//     // });
+// });
+
+// dataCollectionSectionForm['funcs']['processRepositorySwitch'] = function() {
+//     var selectedRepository = $('#{{componentId}}-{{sectionId}}-repositories').find(":selected").data('value');
+
+//     $('#repo-details').attr('hidden', false);
+
+//     // dataCollectionSectionForm['vars']['queue'] = { };
+//     // dataCollectionSectionForm['vars']['queue']['count'] = 0;
+//     // dataCollectionSectionForm['vars']['queue']['install_update'] = { };
+//     // dataCollectionSectionForm['vars']['queue']['uninstall'] = { };
+//     $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+//     $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
+//     $('#{{componentId}}-{{sectionId}}-process-queue').off();
+//     $('#{{componentId}}-{{sectionId}}-clear-queue').off();
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('disabled', true);
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('hidden', true);
+//     $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
+//     $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('disabled', true);
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('hidden', true);
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').attr('disabled', true);
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').attr('hidden', true);
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+//     $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
+//     $('#{{componentId}}-{{sectionId}}-modules').jstree().destroy();
+//     if ($('#{{componentId}}-{{sectionId}}-modules-empty').length > 0) {
+//         $('#{{componentId}}-{{sectionId}}-modules-empty').remove();
+//     }
+
+//     $('#{{componentId}}-{{sectionId}}-modules').append(
+//         '<div id="{{componentId}}-{{sectionId}}-modules-empty" class="text-center">' +
+//             '<i class="fa fa-cog fa-spin"></i> Loading modules...' +
+//         '</div>'
+//     );
+
+//     dataCollectionSectionForm['funcs']['getRepositoryModules'](selectedRepository);
+// }
+
+// dataCollectionSectionForm['funcs']['changeRepoButtons'] = function(val = '0') {
+//     var url = "{{links.url('system/api/q/repository/true/id/')}}" + val;
+
+//     if (val == '1' || val == '2') {
+//         $('#{{componentId}}-{{sectionId}}-sync').attr('disabled', false);
+//         $('#{{componentId}}-{{sectionId}}-delete').attr('disabled', true);
+//         $('#{{componentId}}-{{sectionId}}-edit').removeClass('disabled');
+//         $('#{{componentId}}-{{sectionId}}-edit').attr('href', url);
+//     } else if (val == '0') {
+//         $('#{{componentId}}-{{sectionId}}-sync, #{{componentId}}-{{sectionId}}-delete').attr('disabled', true);
+//         $('#{{componentId}}-{{sectionId}}-edit').addClass('disabled');
+//     } else {
+//         $('#{{componentId}}-{{sectionId}}-sync, #{{componentId}}-{{sectionId}}-delete').attr('disabled', false);
+//         $('#{{componentId}}-{{sectionId}}-edit').removeClass('disabled');
+//         $('#{{componentId}}-{{sectionId}}-edit').attr('href', url);
+//     }
+// }
 </script>
 {% include 'modules/modal.html' %}

@@ -43,14 +43,15 @@ class Manager extends BasePackage
         } else if ($data['module_type'] === 'views') {
             $module = $this->modules->views->getIdViews($data['module_id']);
         }
+
         if (isset($module) && is_array($module)) {
-            if (isset($module['notification_subscriptions'])) {
+            if (array_key_exists('notification_subscriptions', $module)) {
                 unset($module['notification_subscriptions']);
             }
-            if (isset($module['files'])) {
+            if (array_key_exists('files', $module)) {
                 unset($module['files']);
             }
-            if (isset($module['settings'])) {
+            if (array_key_exists('settings', $module)) {
                 unset($module['settings']);
             }
 

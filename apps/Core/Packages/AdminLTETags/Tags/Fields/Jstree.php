@@ -58,34 +58,35 @@ class Jstree
             <div ' . $this->fieldParams['fieldId'] . '-tree-tools" class="mb-2 float-right">';
 
             if (isset($this->params['fieldJstreeAdditionalTools']) && is_array($this->params['fieldJstreeAdditionalTools'])) {
+
                 foreach ($this->params['fieldJstreeAdditionalTools'] as $fieldKey => $field) {
                     $fieldDisabled = '';
                     if (isset($field['disabled']) && $field['disabled'] === true) {
-                        $fieldDisabled = 'disabled text-disabled';
+                        $fieldDisabled = 'disabled';
                     }
 
-                    if ($fieldKey === 'divider') {
+                    if ($field['id'] === 'divider') {
                         $this->content .= ' | ';
                     } else {
                         $this->content .=
-                            '<a href="#" ' . $this->fieldParams['fieldId'] . '-' . $field['id'] . '" data-container="body" data-placement="auto" data-toggle="tooltip" data-html="true" title="' . $field['tooltip'] . '" class="' . $fieldDisabled . '">
-                                <i class="' . $field['icon'] . '"></i>
+                            '<a href="#" ' . $this->fieldParams['fieldId'] . '-' . $field['id'] . '" data-container="body" data-placement="bottom" data-toggle="tooltip" data-html="true" title="' . $field['tooltip'] . '" class="' . $fieldDisabled . '">
+                                <i class="' . $field['icon'] . ' text-' . $field['iconColor'] . '"></i>
                             </a>';
                     }
                 }
                 $this->content .= ' | ';
             }
         $this->content .=
-                '<a href="#" ' . $this->fieldParams['fieldId'] . '-tools-add" class="text-primary" data-container="body" data-placement="auto" data-toggle="tooltip" data-html="true" title="Add new ' . $this->params['fieldLabel'] . '" hidden>
+                '<a href="#" ' . $this->fieldParams['fieldId'] . '-tools-add" class="text-primary" data-container="body" data-placement="bottom" data-toggle="tooltip" data-html="true" title="Add new ' . $this->params['fieldLabel'] . '" hidden>
                     <i class="fa fa-fw fa-plus text-success"></i>
                 </a>
-                <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-edit" class="text-primary ml-1" data-container="body" data-placement="auto" data-toggle="tooltip" data-html="true" title="Edit selected ' . $this->params['fieldLabel'] . '" hidden>
+                <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-edit" class="text-primary ml-1" data-container="body" data-placement="bottom" data-toggle="tooltip" data-html="true" title="Edit selected ' . $this->params['fieldLabel'] . '" hidden>
                     <i class="fa fa-fw fa-edit text-warning"></i>
                 </a>
-                <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-collapse" class="text-primary ml-1" data-container="body" data-placement="auto" data-toggle="tooltip" data-html="true" title="Collapse All" hidden>
+                <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-collapse" class="text-primary ml-1" data-container="body" data-placement="bottom" data-toggle="tooltip" data-html="true" title="Collapse All" hidden>
                     <i class="fa fa-fw fa-compress-arrows-alt text-primary"></i>
                 </a>
-                <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-expand" class="text-primary ml-1" data-container="body" data-placement="auto" data-toggle="tooltip" data-html="true" title="Expand All" hidden>
+                <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-expand" class="text-primary ml-1" data-container="body" data-placement="bottom" data-toggle="tooltip" data-html="true" title="Expand All" hidden>
                     <i class="fa fa-fw fa-expand-arrows-alt text-primary"></i>
                 </a>
             </div>';
