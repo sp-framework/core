@@ -203,11 +203,16 @@ class Modal extends AdminLTETags
                     if (isset($this->params['modalHeader']) && $this->params['modalHeader'] === true) {
                         $this->content .=
                             '<div class="modal-header bg-' . $this->modalParams['modalType'] .' rounded-0">
-                                <h6 class="modal-title" id="' . $this->modalParams['modalId'] . '-label">' . $this->modalParams['modalTitle'] . '</h6>
-                                <button type="button" class="close modal-close text-white ' . $this->params['modalId'] . '-close" data-dismiss="modal" aria-label="Close">
+                                <h6 class="modal-title" id="' . $this->modalParams['modalId'] . '-label">' . $this->modalParams['modalTitle'] . '</h6>';
+
+                        if (isset($this->params['modalHeaderCloseButton']) && $this->params['modalHeaderCloseButton'] === true) {
+                            $this->content .=
+                                '<button type="button" class="close modal-close text-white ' . $this->params['modalId'] . '-close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>';
+                                </button>';
+                        }
+                        $this->content .=
+                            '</div>';
                     }
 
         $this->content .=

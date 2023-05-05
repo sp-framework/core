@@ -65,11 +65,19 @@ class Jstree
                         $fieldDisabled = 'disabled';
                     }
 
+                    if (isset($field['url'])) {
+                        $fieldDisabled .= ' contentAjaxLink';
+
+                        $url = $field['url'];
+                    } else {
+                        $url = '#';
+                    }
+
                     if ($field['id'] === 'divider') {
                         $this->content .= ' | ';
                     } else {
                         $this->content .=
-                            '<a href="#" ' . $this->fieldParams['fieldId'] . '-' . $field['id'] . '" data-container="body" data-placement="bottom" data-toggle="tooltip" data-html="true" title="' . $field['tooltip'] . '" class="' . $fieldDisabled . '">
+                            '<a href="' . $url . '" ' . $this->fieldParams['fieldId'] . '-' . $field['id'] . '" data-container="body" data-placement="bottom" data-toggle="tooltip" data-html="true" title="' . $field['tooltip'] . '" class="' . $fieldDisabled . '">
                                 <i class="' . $field['icon'] . ' text-' . $field['iconColor'] . '"></i>
                             </a>';
                     }

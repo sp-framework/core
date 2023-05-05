@@ -6,6 +6,8 @@ use System\Base\BasePackage;
 
 class Installer extends BasePackage
 {
+    protected $downloadLocation = '.backups/';
+
     protected $token = 'f21251a1fd1d764a7cca2ad127f16521aa76ea2d';
 
     protected $appName = null;
@@ -18,25 +20,29 @@ class Installer extends BasePackage
 
     protected $zip;
 
-    protected $backupLocation;
-
-    protected $downloadLocation;
-
     protected $dependenciesToDownload = [];
 
     protected $modulesToInstall = [];
 
-    public function onConstruct()
+    protected $precheckProgressMethods;
+
+    protected $processQueueProgressMethods;
+
+    public function init($process = 'precheck')
     {
         $this->zip = new \ZipArchive;
 
-        if (!$this->localContent->fileExists('.backups')) {
-            $this->localContent->createDirectory('.backups');
+        if (!$this->localContent->fileExists($this->downloadLocation)) {
+            $this->localContent->createDirectory($this->downloadLocation);
         }
 
-        if (!$this->localContent->fileExists('.downloads')) {
-            $this->localContent->createDirectory('.downloads');
+        if ($process === 'precheck') {
+            $this->registerPrecheckProgressMethods();
+        } else if ($process === 'processQueue') {
+            $this->registerProcessQueueProgressMethods();
         }
+
+        return $this;
     }
 
     public function runProcess(array $postData)
@@ -177,6 +183,7 @@ class Installer extends BasePackage
             // );
         }
     }
+
     protected function checkDependencies()
     {
         // $this->getLatestRepositoryModulesData();
@@ -567,138 +574,49 @@ class Installer extends BasePackage
         //
     }
 
+    protected function registerPrecheckProgressMethods()
+    {
+        $this->precheckProgressMethods =
+            [
+                [
+                    'method'    => 'generateStructure',
+                    'text'      => 'Generate backup file structure...'
+                ],
+                [
+                    'method'    => 'performDbBackup',
+                    'text'      => 'Performing Database Backup...'
+                ],
+                [
+                    'method'    => 'zipBackupFiles',
+                    'text'      => 'Generate backup zip file...'
+                ],
+                [
+                    'method'    => 'finishBackup',
+                    'text'      => 'Fnishing up...'
+                ]
+            ];
 
-    // protected function getPostDataArr()
-    // {
-    //  if ($this->postData['type'] === 'apps') {
-    //      $this->appName = $this->postData['name'];
-    //  }
+        $this->basepackages->progress->registerMethods($this->precheckProgressMethods);
+    }
 
-    //  $this->postDataArr = [];
+    protected function registerProcessQueueProgressMethods()
+    {
+        $this->processQueueProgressMethods =
+            [
+                [
+                    'method'    => 'unzipBackupFiles',
+                    'text'      => 'Unzipping backup file...'
+                ],
+                [
+                    'method'    => 'performStructureRestore',
+                    'text'      => 'Restore file structure...'
+                ],
+                [
+                    'method'    => 'performDbRestore',
+                    'text'      => 'Restore databases...'
+                ]
+            ];
 
-    //  if (isset($this->postData['dependencies'])) {
-    //      foreach ($this->postData as $postDataKey => $postDataValue) {
-    //          if ($postDataKey !== 'dependencies' || $postDataValue === '') {
-    //              $this->postDataArr[0][$postDataKey] = $postDataValue;
-    //          } else if ($postDataKey === 'dependencies' & $postDataValue !== '') {
-    //              $dependenciesCount = 1;
-    //              foreach ($postDataValue as $dependenciesKey => $dependenciesValue) {
-    //                  $this->postDataArr[$dependenciesCount]['name'] = $dependenciesValue['name'];
-    //                  $this->postDataArr[$dependenciesCount]['version'] = $dependenciesValue['version'];
-    //                  $this->postDataArr[$dependenciesCount]['repo'] = $dependenciesValue['repo'];
-
-    //                  $repo = explode('/', $this->postDataArr[$dependenciesCount]['repo']);
-    //                  $this->postDataArr[$dependenciesCount]['modulereponame']
-    //                      = end($repo);
-
-    //                  if ($dependenciesKey !== 'core') {
-    //                      $this->postDataArr[$dependenciesCount]['type'] = $dependenciesKey . 's';
-    //                  } else {
-    //                      $this->postDataArr[$dependenciesCount]['type'] = $dependenciesKey;
-    //                  }
-
-    //                  if ($dependenciesKey === 'app') {
-    //                      $this->appName = $dependenciesValue['name'];
-    //                  }
-
-    //                  $dependenciesCount = $dependenciesCount + 1;
-    //              }
-    //          }
-    //      }
-    //  }
-
-    //  $this->packagesData->responseCode = 0;
-    // }
-
-    // protected function checkDuplicateInstalledModules()
-    // {
-    //  $installedCore = $this->core->getCoreInfo();
-    //  $installedApps = $this->apps->getAllApps();
-    //  $installedComponents = $this->components->getAllComponents();
-    //  $installedPackages = $this->packages->getAllPackages();
-    //  $installedViews = $this->views->getAllViews();
-
-    //  //$this->postDataArr[0]['type'] !== 'apps' = New app dont need to check components and views.
-    //  foreach ($this->postDataArr as $postDataKey => $postDataValue) {
-    //      if ($postDataValue['type'] === 'core') {
-    //          foreach ($installedCore as $installedCoreKey => $core) {
-    //              if ($core->get('name') === $postDataValue['name'] &&
-    //                  $core->get('repo') === $postDataValue['repo']
-    //                 ) {
-    //                  if (!$this->moduleNeedsUpgrade($postDataValue, $core)) {
-    //                      unset($this->postDataArr[$postDataKey]);
-    //                  }
-    //              }
-    //          }
-    //      } else if ($postDataValue['type'] === 'apps') {
-    //          foreach ($installedApps as $installedAppKey => $installedApp) {
-    //              if ($installedApp->get('name') === $postDataValue['name'] &&
-    //                  $installedApp->get('repo') === $postDataValue['repo']
-    //                 ) {
-    //                  if (!$this->moduleNeedsUpgrade($postDataValue, $installedApp)) {
-    //                      unset($this->postDataArr[$postDataKey]);
-    //                  }
-    //              }
-    //          }
-    //      } else if ($this->postDataArr[0]['type'] !== 'apps' && $postDataValue['type'] === 'components') {
-    //          foreach ($installedComponents as $installedComponentKey => $installedComponent) {
-    //              if ($installedComponent->get('name') === $postDataValue['name'] &&
-    //                  $installedComponent->get('repo') === $postDataValue['repo']
-    //                 ) {
-    //                  if (!$this->moduleNeedsUpgrade($postDataValue, $installedComponent)) {
-    //                      unset($this->postDataArr[$postDataKey]);
-    //                  }
-    //              }
-    //          }
-    //      } else if ($postDataValue['type'] === 'packages') {
-    //          foreach ($installedPackages as $installedPackageKey => $installedPackage) {
-    //              if ($installedPackage->get('name') === $postDataValue['name'] &&
-    //                  $installedPackage->get('repo') === $postDataValue['repo']
-    //                 ) {
-    //                  if (!$this->moduleNeedsUpgrade($postDataValue, $installedPackage)) {
-    //                      unset($this->postDataArr[$postDataKey]);
-    //                  }
-    //              }
-    //          }
-    //      } else if ($this->postDataArr[0]['type'] !== 'apps' && $postDataValue['type'] === 'views') {
-    //          foreach ($installedViews as $installedViewKey => $installedView) {
-    //              if ($installedView->get('name') === $postDataValue['name'] &&
-    //                  $installedView->get('repo') === $postDataValue['repo']
-    //                 ) {
-    //                  if (!$this->moduleNeedsUpgrade($postDataValue, $installedView)) {
-    //                      unset($this->postDataArr[$postDataKey]);
-    //                  }
-    //              }
-    //          }
-    //      }
-    //  }
-    //  // var_dump($this->postDataArr);
-    // }
-
-    // protected function moduleNeedsUpgrade($newModule, $installedModule)
-    // {
-    //  if ($newModule['version'] !== $installedModule->getAllArr()['version']) {
-
-    //      $newModuleVersion = explode('.', $newModule['version']);
-
-    //      $installedModuleVersion = explode('.', $installedModule->getAllArr()['version']);
-
-    //      if ($newModuleVersion[0] > $installedModuleVersion[0]) {
-    //          return true;
-    //      } else if ($newModuleVersion[0] === $installedModuleVersion[0] &&
-    //                 $newModuleVersion[1] > $installedModuleVersion[1]
-    //                ) {
-    //          return true;
-    //      } else if ($newModuleVersion[0] === $installedModuleVersion[0] &&
-    //                 $newModuleVersion[1] === $installedModuleVersion[1] &&
-    //                 $newModuleVersion[2] > $installedModuleVersion[2]
-    //              ) {
-    //          return true;
-    //      }
-    //  } else {
-    //      return false;
-    //  }
-    // }
-    //
-
+        $this->basepackages->progress->registerMethods($this->processQueueProgressMethods);
+    }
 }

@@ -217,6 +217,25 @@ class ModulesComponent extends BaseComponent
 		}
 	}
 
+	public function performPrecheckAction()
+	{
+		if ($this->request->isPost()) {
+			if (!$this->checkCSRF()) {
+				return;
+			}
+
+			$this->modules->manager->installer->init()->performPrecheck($this->postData());
+
+			$this->addResponse(
+				$this->modules->manager->packagesData->responseMessage,
+				$this->modules->manager->packagesData->responseCode,
+				$this->modules->manager->packagesData->responseData
+			);
+		} else {
+			$this->addResponse('Method Not Allowed', 1);
+		}
+	}
+
 	public function saveModuleSettingsAction()
 	{
 		if ($this->request->isPost()) {

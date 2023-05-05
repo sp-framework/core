@@ -77,14 +77,15 @@ class Counters
         if ($col === 12) {
             $this->content .=
                 '<div ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="row ' . $this->fieldParams['fieldCountersAdditionalClass'] . '" ' . $this->fieldParams['fieldId'] . '">
-                    <div id="' . $counter['id'] . '" ' . $hasDataValue . ' class="col-md-12 pt-2">';
-
+                    <div id="' . $this->fieldParams['fieldId'] . '" class="col pt-2">';
         } else {
             $this->content .=
                 '<div ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="row vdivide ' . $this->fieldParams['fieldCountersAdditionalClass'] . '" ' . $this->fieldParams['fieldId'] . '">';
         }
 
         foreach ($this->params['fieldCounters'] as $counterKey => $counter) {
+            $counter['id'] = $this->params['componentId'] . '-' . $this->params['sectionId'] . '-' . $this->params['fieldId'] . '-' . $counter['id'];
+
             if (isset($counter['value'])) {
                 $counterValue = $counter['value'];
                 $hasDataValue = 'data-value="' . $counter['value'] . '"';
@@ -101,8 +102,12 @@ class Counters
 
             if ($col === 12) {
                 $this->content .=
-                    '<label class="text-uppercase">' . $counter['title'] . '</label>
-                    <span class="badge badge-' . $hasType . ' float-right mt-1">' . $counterValue . '</span>';
+                    '<div class="row">
+                        <div id="' . $counter['id'] . '" ' . $hasDataValue . ' class="col">
+                            <label class="text-uppercase">' . $counter['title'] . '</label>
+                            <span class="badge badge-' . $hasType . ' float-right mt-1">' . $counterValue . '</span>
+                        </div>
+                    </div>';
             } else {
                 $this->content .=
                     '<div id="' . $counter['id'] . '" ' . $hasDataValue . ' class="col-md-' . $col . ' pt-2">

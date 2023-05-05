@@ -42,13 +42,35 @@
                 'fieldJstreeHideJstreeIcons'                : false,
                 'fieldJstreeAdditionalTools'                :
                     [
+                        'repo-add' :
+                            [
+                                'id'        : 'repo-add',
+                                'tooltip'   : 'Repo Add',
+                                'icon'      : 'fas fa-fw fa-circle-plus',
+                                'iconColor' : 'success',
+                                'disabled'  : true,
+                                'url'       : links.url('system/api/q/repository/true/id/0')
+                            ],
+                        'repo-update' :
+                            [
+                                'id'        : 'repo-update',
+                                'tooltip'   : 'Repo Update',
+                                'icon'      : 'fas fa-fw fa-edit',
+                                'iconColor' : 'warning',
+                                'disabled'  : true,
+                                'url'       : links.url('system/api/q/repository/true/id/')
+                            ],
                         'repo-sync' :
                             [
                                 'id'        : 'repo-sync',
-                                'tooltip'   : 'Sync',
-                                'icon'      : 'fas fa-fw fa-sync-alt text-secondary',
+                                'tooltip'   : 'Repo Sync',
+                                'icon'      : 'fas fa-fw fa-sync-alt',
                                 'iconColor' : 'secondary',
                                 'disabled'  : true
+                            ],
+                        '0'       :
+                            [
+                                'id'        : 'divider'
                             ],
                         'filter-update-available' :
                             [
@@ -58,7 +80,7 @@
                                 'iconColor' : 'secondary',
                                 'disabled'  : true
                             ],
-                        '0'       :
+                        '1'       :
                             [
                                 'id'        : 'divider'
                             ],
@@ -94,7 +116,7 @@
                                 'iconColor' : 'secondary',
                                 'disabled'  : true
                             ],
-                        '1'       :
+                        '2'       :
                             [
                                 'id'        : 'divider'
                             ],
@@ -177,11 +199,8 @@
 </div>
 <hr>
 <div class="row">
-    <div class="col-md-6">
-        <div id="installer-progress" class="mb-3"></div>
-    </div>
     <div class="col">
-        <span class="text-uppercase float-right">Queue:
+        <span class="text-uppercase">Queue:
             <span style="top: -2px;position: relative;" class="badge badge-info" id="queue-counter">0</span>
         </span>
     </div>
@@ -289,6 +308,7 @@ dataCollectionSection =
     });
 
 dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['sync'] = false;
 dataCollectionSectionForm['vars']['rootTree'] = [];
 dataCollectionSectionForm['vars']['org_update_available'] = 0;
 dataCollectionSectionForm['vars']['update_available'] = 0;
@@ -296,10 +316,16 @@ dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modules}}');
 dataCollectionSectionForm['vars']['module'] = { };
 dataCollectionSectionForm['vars']['queue'] = { };
 dataCollectionSectionForm['vars']['queue']['count'] = 0;
-dataCollectionSectionForm['vars']['queue']['install'] = { };
-dataCollectionSectionForm['vars']['queue']['uninstall'] = { };
-dataCollectionSectionForm['vars']['queue']['update'] = { };
-dataCollectionSectionForm['vars']['queue']['remove'] = { };
+dataCollectionSectionForm['vars']['queue']['ids'] = { };
+dataCollectionSectionForm['vars']['queue']['ids']['install'] = { };
+dataCollectionSectionForm['vars']['queue']['ids']['uninstall'] = { };
+dataCollectionSectionForm['vars']['queue']['ids']['update'] = { };
+dataCollectionSectionForm['vars']['queue']['ids']['remove'] = { };
+dataCollectionSectionForm['vars']['queue']['data'] = { };
+dataCollectionSectionForm['vars']['queue']['data']['install'] = { };
+dataCollectionSectionForm['vars']['queue']['data']['uninstall'] = { };
+dataCollectionSectionForm['vars']['queue']['data']['update'] = { };
+dataCollectionSectionForm['vars']['queue']['data']['remove'] = { };
 dataCollectionSectionForm['vars']['initJstree'] = false;
 
 dataCollectionSectionForm['funcs'] = { };
@@ -381,6 +407,10 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
     .click(function(e) {
         e.preventDefault();
 
+        if (dataCollectionSectionForm['vars']['sync'] === true) {
+            return;
+        }
+
         dataCollectionSectionForm['vars']['filter'] = false;
 
         $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
@@ -445,9 +475,9 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
                 var tasks = ['install', 'update', 'uninstall', 'remove'];
 
                 $(tasks).each(function(i, task) {
-                    if (Object.keys(dataCollectionSectionForm['vars']['queue'][task]).length > 0) {
-                        if (dataCollectionSectionForm['vars']['queue'][task][nD.moduletype] &&
-                            dataCollectionSectionForm['vars']['queue'][task][nD.moduletype].includes(nD.id.toString())
+                    if (Object.keys(dataCollectionSectionForm['vars']['queue']['ids'][task]).length > 0) {
+                        if (dataCollectionSectionForm['vars']['queue']['ids'][task][nD.moduletype] &&
+                            dataCollectionSectionForm['vars']['queue']['ids'][task][nD.moduletype].includes(nD.id.toString())
                         ) {
                             if (task === 'install') {
                                 install = true;
@@ -477,9 +507,6 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
             } else if (uninstall === true) {
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-minus text-danger');
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Uninstall)');
-                if (nD.update_available && nD.update_available == 1) {
-                    updateAvailable = true;
-                }
             } else if (remove === true) {
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-xmark text-danger');
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Remove)');
@@ -507,10 +534,10 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
                     $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-warning');
                     $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (Update Available)');
 
-                    if (dataCollectionSectionForm['vars']['queue']['update'][nD.moduletype] &&
-                        dataCollectionSectionForm['vars']['queue']['update'][nD.moduletype].includes(nD.id.toString())
+                    if (dataCollectionSectionForm['vars']['queue']['ids']['update'][nD.moduletype] &&
+                        dataCollectionSectionForm['vars']['queue']['ids']['update'][nD.moduletype].includes(nD.id.toString())
                     ) {
-                        index = dataCollectionSectionForm['vars']['queue']['update'][nD.moduletype].indexOf(nD.id.toString());
+                        index = dataCollectionSectionForm['vars']['queue']['ids']['update'][nD.moduletype].indexOf(nD.id.toString());
 
                         if (index > -1) {
                             $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-info');
@@ -543,15 +570,28 @@ dataCollectionSectionForm['funcs']['jstreeSelectNode'] = function() {
             if (selected[0].data.type !== 'repo') {
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_node(selected);
 
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-add');
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-update');
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
                 dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
                 return false;
             } else if (selected[0].data.type === 'repo') {
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-add', 'success', false);
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-update', 'warning', false);
+                $('#{{componentId}}-{{sectionId}}-modules-repo-update').attr(
+                    'href', '{{links.url("system/api/q/repository/true/id/' + selected[0].data.apiid + '")}}'
+                );
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync', 'primary', false);
             }
 
             dataCollectionSectionForm['funcs']['moduleinfo']();
         } else {
+            if (selected[0].data.type !== 'repo') {
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-add');
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-update');
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
+            }
+
             dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
             dataCollectionSectionForm['funcs']['moduleinfo'](['loader']);
             dataCollectionSectionForm['funcs']['getSelectedModuleInfo'](selected[0].id);
@@ -639,6 +679,7 @@ dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, modul
     postData['module_type'] = moduleType;
     postData['module_id'] = moduleId;
     if (sync) {
+        dataCollectionSectionForm['vars']['sync'] = true;
         postData['sync'] = true;
     }
 
@@ -647,9 +688,7 @@ dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, modul
             $('#security-token').attr('name', response.tokenKey);
             $('#security-token').val(response.token);
         }
-        //eslint-disable-next-line
-        console.log(response);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', true);
+
         $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').attr('disabled', false);
         $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
 
@@ -661,8 +700,7 @@ dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, modul
                 dataCollectionSectionForm['funcs']['processModuleInfo'](response.responseData.module);
             }
         } else if (response.responseCode == 1) {
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-error').attr('hidden', false);
+            dataCollectionSectionForm['funcs']['moduleinfo'](['error']);
         } else if (response.responseCode == 2) {
             PNotify.error({text: response.responseMessage});
             if (response.responseData.module) {
@@ -670,6 +708,7 @@ dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, modul
                 dataCollectionSectionForm['funcs']['processModuleInfo'](response.responseData.module);
             }
         }
+        dataCollectionSectionForm['vars']['sync'] = false;
     }, 'json');
 }
 
@@ -750,8 +789,8 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
 
     if (moduleInfo.installed == '1') {
         if (moduleInfo.update_available == '1') {
-            if (dataCollectionSectionForm['vars']['queue']['update'][moduleInfo.module_type] &&
-                dataCollectionSectionForm['vars']['queue']['update'][moduleInfo.module_type].includes(moduleInfo.id)
+            if (dataCollectionSectionForm['vars']['queue']['ids']['update'][moduleInfo.module_type] &&
+                dataCollectionSectionForm['vars']['queue']['ids']['update'][moduleInfo.module_type].includes(moduleInfo.id)
             ) {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
             } else {
@@ -760,8 +799,8 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'remove', 'repo-sync']);
             }
         } else {
-            if (dataCollectionSectionForm['vars']['queue']['install'][moduleInfo.module_type] &&
-                dataCollectionSectionForm['vars']['queue']['install'][moduleInfo.module_type].includes(moduleInfo.id)
+            if (dataCollectionSectionForm['vars']['queue']['ids']['install'][moduleInfo.module_type] &&
+                dataCollectionSectionForm['vars']['queue']['ids']['install'][moduleInfo.module_type].includes(moduleInfo.id)
             ) {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
             } else {
@@ -769,8 +808,8 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
             }
         }
     } else {
-        if (dataCollectionSectionForm['vars']['queue']['install'][moduleData.module_type]) {
-            index = dataCollectionSectionForm['vars']['queue']['install'][moduleData.module_type].indexOf(moduleData.id);
+        if (dataCollectionSectionForm['vars']['queue']['ids']['install'][moduleData.module_type]) {
+            index = dataCollectionSectionForm['vars']['queue']['ids']['install'][moduleData.module_type].indexOf(moduleData.id);
         }
 
         if (index !== 'undefined' && index > -1) {
@@ -786,8 +825,8 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
         if (moduleInfo['name'] !== 'Core') {
             dataCollectionSectionForm['funcs']['moduleinfo'](['info'], []);
         } else {
-            if (dataCollectionSectionForm['vars']['queue']['update'][moduleData.module_type]) {
-                index = dataCollectionSectionForm['vars']['queue']['update'][moduleData.module_type].indexOf(moduleData.id);
+            if (dataCollectionSectionForm['vars']['queue']['ids']['update'][moduleData.module_type]) {
+                index = dataCollectionSectionForm['vars']['queue']['ids']['update'][moduleData.module_type].indexOf(moduleData.id);
             }
 
             if (index !== 'undefined' && index > -1) {
@@ -846,20 +885,16 @@ dataCollectionSectionForm['funcs']['initModuleButtons'] = function() {
     $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').click(function(e) {
         e.preventDefault();
 
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('hidden', false);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('disabled', false);
-        $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('disabled', true);
-        dataCollectionSectionForm['funcs']['updateQueue'](dataCollectionSectionForm['vars']['module']['id'], dataCollectionSectionForm['vars']['module']['module_type'], true, true);
-        dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](dataCollectionSectionForm['vars']['module']['module_type'] + '-' + dataCollectionSectionForm['vars']['module']['id'], false, true);
+        dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
 
-        if ($('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val() === 'update') {
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-buttons').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
-        }
+        dataCollectionSectionForm['funcs']['updateQueue'](
+            dataCollectionSectionForm['vars']['module']['id'],
+            dataCollectionSectionForm['vars']['module']['module_type'],
+            'uninstall'
+        );
+
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall', 'danger', false);
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
     });
 
     $('#{{componentId}}-{{sectionId}}-moduleinfo-remove').click(function(e) {
@@ -897,34 +932,35 @@ dataCollectionSectionForm['funcs']['initModuleButtons'] = function() {
         $(this).attr('disabled', true);
         $(this).children("i").removeClass("fa-sync-alt").addClass("fa-cog fa-spin");
 
-        // $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
-        // $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
-        // $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('hidden', true);
-        // $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('disabled', true);
-        // $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('hidden', true);
-        // $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('disabled', true);
+        dataCollectionSectionForm['funcs']['moduleinfo'](['loader', 'buttons'], ['repo-sync']);
 
-        // $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', false);
-        // $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
-        // $('#{{componentId}}-{{sectionId}}-moduleinfo-error').attr('hidden', true);
-        // dataCollectionSectionForm['funcs']['getModuleInfo'](dataCollectionSectionForm['vars']['module']['module_type'], dataCollectionSectionForm['vars']['module']['id'], true);
+        dataCollectionSectionForm['funcs']['getModuleInfo'](
+            dataCollectionSectionForm['vars']['module']['module_type'],
+            dataCollectionSectionForm['vars']['module']['id'],
+            true
+        );
     });
 }
 
 dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, addToQueue = 'install') {
     var index;
 
-    if (!dataCollectionSectionForm['vars']['queue'][addToQueue][moduleType]) {
-        dataCollectionSectionForm['vars']['queue'][addToQueue][moduleType] = [];
+    if (!dataCollectionSectionForm['vars']['queue']['ids'][addToQueue][moduleType]) {
+        dataCollectionSectionForm['vars']['queue']['ids'][addToQueue][moduleType] = [];
+    }
+    if (!dataCollectionSectionForm['vars']['queue']['data'][addToQueue][moduleType]) {
+        dataCollectionSectionForm['vars']['queue']['data'][addToQueue][moduleType] = { };
     }
 
-    if (dataCollectionSectionForm['vars']['queue'][addToQueue][moduleType] &&
-        dataCollectionSectionForm['vars']['queue'][addToQueue][moduleType].includes(id)
+    if (dataCollectionSectionForm['vars']['queue']['ids'][addToQueue][moduleType] &&
+        dataCollectionSectionForm['vars']['queue']['ids'][addToQueue][moduleType].includes(id)
     ) {
         return;
     }
 
-    dataCollectionSectionForm['vars']['queue'][addToQueue][moduleType].push(id);
+    dataCollectionSectionForm['vars']['queue']['ids'][addToQueue][moduleType].push(id);
+    dataCollectionSectionForm['vars']['queue']['data'][addToQueue][moduleType][id] = dataCollectionSectionForm['vars']['module'];
+
     dataCollectionSectionForm['vars']['queue']['count'] = dataCollectionSectionForm['vars']['queue']['count'] + 1;
 
     $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
@@ -933,6 +969,8 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, add
         dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, true);
     } else if (addToQueue === 'update') {
         dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id);
+    } else if (addToQueue === 'uninstall') {
+        dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, false, true);
     } else if (addToQueue === 'remove') {
         dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, false, false, true);
     }
@@ -944,7 +982,10 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
         $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', false);
 
         $('#{{componentId}}-{{sectionId}}-analyse-queue, ' +
-          '#{{componentId}}-{{sectionId}}-clear-queue').off();
+          '#{{componentId}}-{{sectionId}}-clear-queue' +
+          '#{{componentId}}-{{sectionId}}-perform-precheck' +
+          '#{{componentId}}-{{sectionId}}-process-queue'
+          ).off();
 
         $('#{{componentId}}-{{sectionId}}-clear-queue').click(function(e) {
             e.preventDefault();
@@ -952,27 +993,95 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
             dataCollectionSectionForm['funcs']['clearQueue'](true);
         });
 
+        $('#{{componentId}}-{{sectionId}}-analyse-queue').click(function(e) {
+            e.preventDefault();
+
+            dataCollectionSectionForm['funcs']['analyseQueue']();
+        });
+
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').click(function(e) {
+            e.preventDefault();
+
+            dataCollectionSectionForm['funcs']['performPrecheck']();
+        });
+
+        $('#{{componentId}}-{{sectionId}}-process-queue').click(function(e) {
+            e.preventDefault();
+
+            dataCollectionSectionForm['funcs']['processQueue']();
+        });
     } else {
         $('#{{componentId}}-{{sectionId}}-analyse-queue').attr('disabled', true);
         $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
     }
 }
 dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
-    //
+    var moduleHtml = '';
+    for (var q in dataCollectionSectionForm['vars']['queue']['ids']) {
+        var count = 0;
+
+        if (q === 'install' || q === 'uninstall' || q === 'update' || q === 'remove') {
+            if (Object.keys(dataCollectionSectionForm['vars']['queue']['ids'][q]).length > 0) {
+                for (var installTypes in dataCollectionSectionForm['vars']['queue']['ids'][q]) {
+                    if (dataCollectionSectionForm['vars']['queue']['ids'][q][installTypes].length > 0) {
+                        count = count + dataCollectionSectionForm['vars']['queue']['ids'][q][installTypes].length;
+
+                        $(dataCollectionSectionForm['vars']['queue']['ids'][q][installTypes]).each(function(i, id) {
+                            var name = dataCollectionSectionForm['vars']['queue']['data'][q][installTypes][id]['name'];
+                            var repo = dataCollectionSectionForm['vars']['queue']['data'][q][installTypes][id]['repo'];
+                            var color = 'info';
+
+                            if (dataCollectionSectionForm['vars']['queue']['data'][q][installTypes][id]['display_name']) {
+                                name = dataCollectionSectionForm['vars']['queue']['data'][q][installTypes][id]['display_name'];
+                            }
+
+                            if (q === 'update') {
+                                color = 'warning';
+                            } else if (q === 'uninstall' || q === 'remove') {
+                                color = 'danger';
+                            }
+                            moduleHtml +=
+                            '       <tr>' +
+                            '           <td>' +  name + '</td>' +
+                            '           <td>' +  repo + '</td>' +
+                            '           <td>' +  '<span class="badge badge-' + color + ' mt-1 text-xs text-uppercase">' + q + '</span></td>' +
+                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' + id + '"></td>' +
+                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' + id + '"></td>' +
+                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' + id + '"></td>' +
+                            '       </tr>';
+
+                        });
+                    }
+                }
+            }
+
+            $('#{{componentId}}-{{sectionId}}-queue-' + q).children('span').html(count);
+        }
+    }
+
+    $('#{{componentId}}-{{sectionId}}-queue-table tbody').html(moduleHtml);
+    $('#{{componentId}}-{{sectionId}}-queue-analyse-modal').modal('show');
 }
 dataCollectionSectionForm['funcs']['clearQueue'] = function(clearAll = false, id = false, moduleType = false) {
     var index;
 
     if (clearAll) {
+        dataCollectionSectionForm['vars']['sync'] = false;
         dataCollectionSectionForm['vars']['initJstree'] = false;
         dataCollectionSectionForm['vars']['module'] = { };
         dataCollectionSectionForm['vars']['update_available'] = 0;
         dataCollectionSectionForm['vars']['queue'] = { };
         dataCollectionSectionForm['vars']['queue']['count'] = 0;
-        dataCollectionSectionForm['vars']['queue']['install'] = { };
-        dataCollectionSectionForm['vars']['queue']['uninstall'] = { };
-        dataCollectionSectionForm['vars']['queue']['update'] = { };
-        dataCollectionSectionForm['vars']['queue']['remove'] = { };
+        dataCollectionSectionForm['vars']['queue']['ids'] = { };
+        dataCollectionSectionForm['vars']['queue']['ids']['install'] = { };
+        dataCollectionSectionForm['vars']['queue']['ids']['uninstall'] = { };
+        dataCollectionSectionForm['vars']['queue']['ids']['update'] = { };
+        dataCollectionSectionForm['vars']['queue']['ids']['remove'] = { };
+        dataCollectionSectionForm['vars']['queue']['data'] = { };
+        dataCollectionSectionForm['vars']['queue']['data']['install'] = { };
+        dataCollectionSectionForm['vars']['queue']['data']['uninstall'] = { };
+        dataCollectionSectionForm['vars']['queue']['data']['update'] = { };
+        dataCollectionSectionForm['vars']['queue']['data']['remove'] = { };
         dataCollectionSectionForm['funcs']['initQueueButtons'](false);
         dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](null, false, false, false, true);
         dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install');
@@ -988,23 +1097,33 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function(clearAll = false, id
             var disableFilterIcons = [];
 
             $(actionTypes).each(function(i, actionType) {
-                if (dataCollectionSectionForm['vars']['queue'][actionType][moduleType]) {
-                    if (dataCollectionSectionForm['vars']['queue'][actionType][moduleType].includes(id)) {
-                        index = dataCollectionSectionForm['vars']['queue'][actionType][moduleType].indexOf(id);
+                if (dataCollectionSectionForm['vars']['queue']['ids'][actionType][moduleType]) {
+                    if (dataCollectionSectionForm['vars']['queue']['ids'][actionType][moduleType].includes(id)) {
+                        index = dataCollectionSectionForm['vars']['queue']['ids'][actionType][moduleType].indexOf(id);
 
                         if (index > -1) {
-                            dataCollectionSectionForm['vars']['queue'][actionType][moduleType].splice(index, 1);
+                            dataCollectionSectionForm['vars']['queue']['ids'][actionType][moduleType].splice(index, 1);
 
                             foundIn = actionType;
                         }
                     }
 
-                    if (dataCollectionSectionForm['vars']['queue'][actionType][moduleType].length === 0) {
-                        delete dataCollectionSectionForm['vars']['queue'][actionType][moduleType];
+                    if (dataCollectionSectionForm['vars']['queue']['ids'][actionType][moduleType].length === 0) {
+                        delete dataCollectionSectionForm['vars']['queue']['ids'][actionType][moduleType];
                     }
 
-                    if (Object.keys(dataCollectionSectionForm['vars']['queue'][actionType]).length === 0) {
+                    if (Object.keys(dataCollectionSectionForm['vars']['queue']['ids'][actionType]).length === 0) {
                         disableFilterIcons.push(actionType);
+                    }
+                }
+
+                if (dataCollectionSectionForm['vars']['queue']['data'][actionType][moduleType] &&
+                    dataCollectionSectionForm['vars']['queue']['data'][actionType][moduleType][id]
+                ) {
+                    delete dataCollectionSectionForm['vars']['queue']['data'][actionType][moduleType][id];
+
+                    if (Object.keys(dataCollectionSectionForm['vars']['queue']['data'][actionType][moduleType]).length === 0) {
+                        delete dataCollectionSectionForm['vars']['queue']['data'][actionType][moduleType];
                     }
                 }
             });
@@ -1053,6 +1172,34 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function(clearAll = false, id
 
     dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText']();
 }
+dataCollectionSectionForm['funcs']['performPrecheck'] = function() {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['queue'] = dataCollectionSectionForm['vars']['queue']['ids'];
+
+    $.post('{{links.url("modules/performPrecheck")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            PNotify.success({
+                text        : response.responseMessage,
+                textTrusted : true
+            });
+        } else {
+            PNotify.error({
+                text        : response.responseMessage,
+                textTrusted : true
+            });
+        }
+    });
+}
+dataCollectionSectionForm['funcs']['processQueue'] = function() {
+    //
+}
+
 
 dataCollectionSectionForm['funcs']['initSync'] = function(val) {
     $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children("i").removeClass("fa-sync-alt").addClass("fa-cog fa-spin");
@@ -1164,7 +1311,32 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
 
 $(document).ready(function() {
     BazProgress.buildProgressBar($('#installer-progress'));
+
+    // var dataSet = [];
+    // dataCollectionSection['{{componentId}}-{{sectionId}}-queue'] = { };
+
+    // if (!$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
+    //     dataCollectionSection['{{componentId}}-{{sectionId}}-queue']['datatable'] =
+    //     $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({
+    //             "responsive": true,
+    //             "columns": [
+    //                 { data : 'name'},
+    //                 { data : 'repo'},
+    //                 { data : 'task'},
+    //                 { data : 'precheck'},
+    //                 { data : 'completed'},
+    //                 { data : 'logs'},
+    //             ],
+    //             "data": dataSet
+    //         }
+    //     );
+
+    //     dataCollectionSection['{{componentId}}-{{sectionId}}-queue']['datatable'].on( 'draw', function () {
+    //         dataCollectionSection['{{componentId}}-{{sectionId}}-queue']['datatable'].columns.adjust().responsive.recalc();
+    //     });
+    // }
 });
+
 // dataCollectionSectionForm['funcs']['deleteRepo'] = function(repoName, repoId) {
 //     Swal.fire({
 //         title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2">' +
@@ -1370,4 +1542,46 @@ $(document).ready(function() {
 //     }, 'json');
 // }
 </script>
-{% include 'modules/modal.html' %}
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'queue-analyse-modal',
+            'modalBodyInclude'          : 'modules/analyse/view',
+            'modalSize'                 : 'xl',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-th"></i> ANALYSE QUEUE',
+            'modalFooterButtons'        :
+                [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'parentComponentId'             : parent,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                        [
+                            'perform-precheck' : [
+                                'title'                   : 'Perform Precheck',
+                                'type'                    : 'primary',
+                                'position'                : 'right',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true
+                            ],
+                            'process-queue' : [
+                                'title'                   : 'Process Queue',
+                                'type'                    : 'primary',
+                                'position'                : 'right',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true,
+                                'hidden'                  : true
+                            ]
+                        ]
+                ]
+        ]
+    )}}
+</div>

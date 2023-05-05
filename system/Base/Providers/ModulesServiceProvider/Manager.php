@@ -8,6 +8,7 @@ use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\ObjectSerializer;
+use System\Base\Providers\ModulesServiceProvider\Installer;
 use z4kn4fein\SemVer\Version;
 
 class Manager extends BasePackage
@@ -31,6 +32,15 @@ class Manager extends BasePackage
     protected $middlewares;
 
     protected $views;
+
+    public $installer;
+
+    public function init()
+    {
+        $this->installer = new Installer();
+
+        return $this;
+    }
 
     public function saveModuleSettings($data)
     {
@@ -103,11 +113,13 @@ class Manager extends BasePackage
             }
 
             if ($module['repo_details']) {
-                try {
-                    $module['repo_details'] = Json::decode($module['repo_details'], true);
-                    $module['repo_details']['latestRelease']['body'] = $this->escaper->escapeHtml($module['repo_details']['latestRelease']['body']);
-                } catch (\Exception $e) {
-                    $module['repo_details'] = null;
+                if (is_string($module['repo_details'])) {
+                    try {
+                        $module['repo_details'] = Json::decode($module['repo_details'], true);
+                        $module['repo_details']['latestRelease']['body'] = $this->escaper->escapeHtml($module['repo_details']['latestRelease']['body']);
+                    } catch (\Exception $e) {
+                        $module['repo_details'] = null;
+                    }
                 }
             }
 
