@@ -37,8 +37,6 @@ class Manager extends BasePackage
 
     public function init()
     {
-        $this->installer = new Installer();
-
         return $this;
     }
 
@@ -124,9 +122,13 @@ class Manager extends BasePackage
             }
 
             $this->addResponse('Module information success.',0, ['module' => $module]);
+
+            return $module;
         } else {
-            $this->addResponse('Module information failed.', 1, []);
+           $this->addResponse('Module information failed.', 1, []);
         }
+
+        return false;
     }
 
     protected function updateModuleRepoDetails($module, $moduleUpdatedBy)
@@ -138,31 +140,29 @@ class Manager extends BasePackage
         }
 
         try {
-            $api = $this->basepackages->api->useApi($module['api_id']);
+            if (!$this->initApi($module['api_id'])) {
+                return false;
+            }
 
-            if (strtolower($api->getApiConfig()['provider']) === 'gitea') {
+            if (strtolower($this->apiConfig['provider']) === 'gitea') {
                 $collection = 'RepositoryApi';
                 $method = 'repoGet';
-                $args = [$api->getApiConfig()['org_user'], Arr::last($repoNameArr)];
-            } else if (strtolower($api->getApiConfig()['provider']) === 'github') {
+                $args = [$this->apiConfig['org_user'], Arr::last($repoNameArr)];
+            } else if (strtolower($this->apiConfig['provider']) === 'github') {
                 //For github
             }
-            $responseArr = $api->useMethod($collection, $method, $args)->getResponse(true);
+
+            $responseArr = $this->api->useMethod($collection, $method, $args)->getResponse(true);
 
             if ($responseArr) {
-                $module['repo_details'] = Json::encode($responseArr);
-                $module['updated_by'] = $moduleUpdatedBy;
-                $module['repo_details'] = $responseArr;
+                $module['repo_details']['details'] = $responseArr;
 
-                if ($module['module_type'] === 'components') {
-                    $this->modules->components->update($module);
-                } else if ($module['module_type'] === 'packages') {
-                    $this->modules->packages->update($module);
-                } else if ($module['module_type'] === 'middlewares') {
-                    $this->modules->middlewares->update($module);
-                } else if ($module['module_type'] === 'views') {
-                    $this->modules->views->update($module);
-                }
+                $this->remoteModules[$module['module_type']] = [$responseArr];
+
+                $module['repo_details']['latestRelease'] = $this->moduleNeedsUpgrade($module, $responseArr, true);
+                $module['updated_by'] = $moduleUpdatedBy;
+
+                $this->modules->{$module['module_type']}->update($module);
             }
         } catch (ClientException | \throwable $e) {
             $this->addResponse($e->getMessage(), 2, ['module' => $module]);
@@ -281,7 +281,7 @@ class Manager extends BasePackage
         return $sortedModules;
     }
 
-    public function syncRemoteWithLocal($id, $getRepositoryModules = false)
+    protected function initApi($id)
     {
         $this->api = $this->basepackages->api->useApi($id, true);
 
@@ -293,19 +293,28 @@ class Manager extends BasePackage
         ) {
             $this->addResponse('Username/Password missing, cannot sync', 1);
 
-            return;
+            return false;
         } else if ($this->apiConfig['auth_type'] === 'access_token' &&
                    (!$this->apiConfig['access_token'] || $this->apiConfig['access_token'] === '')
         ) {
             $this->addResponse('Access token missing, cannot sync', 1);
 
-            return;
+            return false;
         } else if ($this->apiConfig['auth_type'] === 'autho' &&
                    (!$this->apiConfig['authorization'] || $this->apiConfig['authorization'] === '')
         ) {
             $this->addResponse('Authorization token missing, cannot sync', 1);
 
-            return;
+            return false;
+        }
+
+        return true;
+    }
+
+    public function syncRemoteWithLocal($id, $getRepositoryModules = false)
+    {
+        if (!$this->initApi($id)) {
+            return false;
         }
 
         try {
@@ -561,7 +570,7 @@ class Manager extends BasePackage
         return $modules;
     }
 
-    protected function moduleNeedsUpgrade($localModule = null, $remoteModule)
+    protected function moduleNeedsUpgrade($localModule = null, $remoteModule, $returnLatestReleaseOnly = false)
     {
         if (strtolower($this->apiConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';
@@ -575,6 +584,10 @@ class Manager extends BasePackage
 
         if (!$latestRelease) {
             return false;
+        }
+
+        if ($returnLatestReleaseOnly) {
+            return $latestRelease;
         }
 
         if ($localModule) {

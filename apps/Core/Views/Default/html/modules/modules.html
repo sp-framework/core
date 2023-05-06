@@ -436,7 +436,6 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
             $('#{{componentId}}-{{sectionId}}-modules').jstree().search('in queue:');
         } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-modules-filter-clear') {
             $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('');
-            $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
             $('#{{componentId}}-{{sectionId}}-modules').jstree().open_all();
         }
 
@@ -982,8 +981,8 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
         $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', false);
 
         $('#{{componentId}}-{{sectionId}}-analyse-queue, ' +
-          '#{{componentId}}-{{sectionId}}-clear-queue' +
-          '#{{componentId}}-{{sectionId}}-perform-precheck' +
+          '#{{componentId}}-{{sectionId}}-clear-queue, ' +
+          '#{{componentId}}-{{sectionId}}-perform-precheck, ' +
           '#{{componentId}}-{{sectionId}}-process-queue'
           ).off();
 
@@ -1002,13 +1001,13 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
         $('#{{componentId}}-{{sectionId}}-perform-precheck').click(function(e) {
             e.preventDefault();
 
-            dataCollectionSectionForm['funcs']['performPrecheck']();
+            dataCollectionSectionForm['funcs']['processQueue']();
         });
 
         $('#{{componentId}}-{{sectionId}}-process-queue').click(function(e) {
             e.preventDefault();
 
-            dataCollectionSectionForm['funcs']['processQueue']();
+            dataCollectionSectionForm['funcs']['processQueue']('process');
         });
     } else {
         $('#{{componentId}}-{{sectionId}}-analyse-queue').attr('disabled', true);
@@ -1068,6 +1067,7 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function(clearAll = false, id
     if (clearAll) {
         dataCollectionSectionForm['vars']['sync'] = false;
         dataCollectionSectionForm['vars']['initJstree'] = false;
+        dataCollectionSectionForm['vars']['filter'] = false;
         dataCollectionSectionForm['vars']['module'] = { };
         dataCollectionSectionForm['vars']['update_available'] = 0;
         dataCollectionSectionForm['vars']['queue'] = { };
@@ -1089,6 +1089,8 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function(clearAll = false, id
         dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-remove');
         dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall');
         dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue');
+        dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
     } else {
         if (id && moduleType) {
             var actionTypes = ['install', 'update', 'uninstall', 'remove'];
@@ -1172,12 +1174,16 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function(clearAll = false, id
 
     dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText']();
 }
-dataCollectionSectionForm['funcs']['performPrecheck'] = function() {
+dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck') {
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
     postData['queue'] = dataCollectionSectionForm['vars']['queue']['ids'];
+    postData['process'] = 'runprecheck';
+    if (task === 'process') {
+        postData['process'] = 'runprocess';
+    }
 
-    $.post('{{links.url("modules/performPrecheck")}}', postData, function(response) {
+    $.post('{{links.url("modules/processQueue")}}', postData, function(response) {
         if (response.tokenKey && response.token) {
             $('#security-token').attr('name', response.tokenKey);
             $('#security-token').val(response.token);
@@ -1194,12 +1200,8 @@ dataCollectionSectionForm['funcs']['performPrecheck'] = function() {
                 textTrusted : true
             });
         }
-    });
+    }, 'json');
 }
-dataCollectionSectionForm['funcs']['processQueue'] = function() {
-    //
-}
-
 
 dataCollectionSectionForm['funcs']['initSync'] = function(val) {
     $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children("i").removeClass("fa-sync-alt").addClass("fa-cog fa-spin");
@@ -1554,7 +1556,7 @@ $(document).ready(function() {
             'modalSize'                 : 'xl',
             'modalHeader'               : true,
             'modalFooter'               : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-th"></i> ANALYSE QUEUE',
+            'modalTitle'                : '<i class="fa fas fa-fw fa-th"></i> MODULES IN QUEUE',
             'modalFooterButtons'        :
                 [
                 'component'                     : component,

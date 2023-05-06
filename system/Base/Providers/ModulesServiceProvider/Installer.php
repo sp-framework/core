@@ -2,17 +2,18 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Installer extends BasePackage
 {
-    protected $downloadLocation = '.backups/';
+    protected $process;
+
+    protected $downloadLocation = 'var/tmp/installer/';
 
     protected $token = 'f21251a1fd1d764a7cca2ad127f16521aa76ea2d';
 
     protected $appName = null;
-
-    protected $postData;
 
     protected $downloadClient;
 
@@ -22,88 +23,142 @@ class Installer extends BasePackage
 
     protected $dependenciesToDownload = [];
 
-    protected $modulesToInstall = [];
+    protected $modulesToInstallOrUpdate = [];
 
-    protected $precheckProgressMethods;
+    protected $runProcessPrecheckProgressMethods;
 
-    protected $processQueueProgressMethods;
+    protected $installProgressMethods;
 
     public function init($process = 'precheck')
     {
+        $this->process = $process;
+
         $this->zip = new \ZipArchive;
 
         if (!$this->localContent->fileExists($this->downloadLocation)) {
             $this->localContent->createDirectory($this->downloadLocation);
         }
 
-        if ($process === 'precheck') {
-            $this->registerPrecheckProgressMethods();
-        } else if ($process === 'processQueue') {
-            $this->registerProcessQueueProgressMethods();
+        $this->basepackages->progress->init(null, 'modulesinstaller');
+
+        if ($this->basepackages->progress->checkProgressFile()) {
+            $this->basepackages->progress->deleteProgressFile();
+        }
+
+        if ($process === 'runprecheck') {
+            $this->registerRunProcessPrecheckProgressMethods();
+        } else if ($process === 'runprocess') {
+            $this->registerRunProcessProgressMethods();
         }
 
         return $this;
     }
 
-    public function runProcess(array $postData)
+    protected function withProgress($method, $arguments)
     {
-        $this->postData = $postData;
-
-        if (!$this->{$this->postData['type']}->getById($this->postData['id'])) {
-
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = ucfirst($this->postData['type']) . ' id incorrect!';
-
-            return $this->packagesData;
-        }
-
-        if ($this->postData['type'] === 'core') {
-
-            $this->modulesToInstall[0] =
-                $this->{$this->postData['type']}->getById($this->postData['id'])->getAllArr();
-
-        } else {
-
-            $this->modulesToInstall[0] =
-                $this->{$this->postData['type']}->getById($this->postData['id'])->getAllArr();
-
-            $this->modulesToInstall[0]['type'] = $this->postData['type'];
-
-            if (is_object($this->checkDependencies())) {
-
-                return $this->packagesData;
+        if (method_exists($this, $method)) {
+            if (is_array($arguments)) {
+                $arguments = [$arguments];
             }
 
-            // Sort using type, so we first install app, then components and so on.
-            $this->modulesToInstall =
-                msort(array_merge($this->modulesToInstall, $this->dependenciesToDownload), 'type');
+            $this->basepackages->progress->updateProgress($method, null, false);
+
+            $call = call_user_func_array([$this, $method], $arguments);
+
+            $this->basepackages->progress->updateProgress($method, $call, false);
+
+            return $call;
+        }
+    }
+
+    public function runProcess(array $data)
+    {
+        if (!isset($data['queue']) || isset($data['queue']) && !is_array($data['queue'])) {
+            $this->addResponse('Nothing to process. Add something to queue!', 1);
+
+            $this->basepackages->progress->preCheckComplete(false);
+
+            $this->basepackages->progress->resetProgress();
+
+            return false;
         }
 
-        if (count($this->modulesToInstall) > 0) {
+        set_time_limit(300);//5 mins
 
-            // $this->createBackup();
+        if ($this->process === 'runprecheck') {
+            $this->basepackages->progress->preCheckComplete();
 
-            if ($this->postData['process'] === 'install') {
-                $this->processInstall();
-            } else if ($this->postData['process'] === 'update') {
-                $this->processUpdate();
+            foreach ($this->runProcessPrecheckProgressMethods as $method) {
+                if ($this->withProgress($method['method'], $data) === false) {
+                     return false;
+                }
+
+                usleep(500);
             }
+        }
+    }
 
-            // $this->deleteDownloads();
+    protected function analyseQueueData($data)
+    {
+        foreach ($data['queue'] as $task => $modules) {
+            if ($task === 'install' || $task === 'update') {
+                if (count($modules) > 0) {
+                    foreach ($modules as $moduleType => $moduleList) {
+                        if (count($moduleList) > 0) {
+                            foreach ($moduleList as $module) {
+                                $moduleInfo = $this->modules->$moduleType->getById($module);
 
-            $this->packagesData->responseCode = 0;
+                                if ($moduleInfo) {
+                                    if (array_key_exists('files', $moduleInfo)) {
+                                        unset($moduleInfo['files']);
+                                    }
 
-            $this->packagesData->responseMessage = 'Module & it\'s dependencies installed!';
+                                    if (!$moduleInfo['repo_details']) {
+                                        $moduleName = $moduleInfo['name'];
 
-            return $this->packagesData;
+                                        $moduleInfo = $this->modules->manager->getModuleInfo(
+                                            [
+                                                'module_type'   => $moduleType,
+                                                'module_id'     => $moduleInfo['id'],
+                                                'sync'          => true
+                                            ]
+                                        );
+
+                                        if (!$moduleInfo) {
+                                            $this->addResponse('Could not retrieve repository information for module: ' . $moduleName);
+
+                                            return false;
+                                        }
+                                    } else {
+                                        if (is_string($moduleInfo['repo_details'])) {
+                                            try {
+                                                $moduleInfo['repo_details'] = Json::decode($moduleInfo['repo_details'], true);
+                                            } catch (\Exception $e) {
+                                                $this->addResponse('Could not retrieve repository information for module: ' . $moduleInfo['name']);
+
+                                                return false;
+                                            }
+                                        }
+                                    }
+
+                                    array_push($this->modulesToInstallOrUpdate, $moduleInfo);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
-        $this->packagesData->responseCode = 1;
+        return true;
+    }
 
-        $this->packagesData->responseMessage = 'Nothing to do!';
+    protected function downloadModulesFromRepo($data)
+    {
+        var_dump($this->modulesToInstallOrUpdate);die();
 
-        // return $this->packagesData;
+
+        return true;
     }
 
     protected function processInstall()
@@ -188,11 +243,11 @@ class Installer extends BasePackage
     {
         // $this->getLatestRepositoryModulesData();
 
-        ${$this->postData['type']} =
-            $this->{$this->postData['type']}->getById($this->postData['id'])->getAllArr();
+        ${$this->postData()['type']} =
+            $this->{$this->postData()['type']}->getById($this->postData()['id'])->getAllArr();
 
         $dependencies =
-            json_decode(${$this->postData['type']}['dependencies'], true);
+            json_decode(${$this->postData()['type']}['dependencies'], true);
 
         $checkForDependencies = $this->checkRegisteredDependencies($dependencies);
 
@@ -574,13 +629,17 @@ class Installer extends BasePackage
         //
     }
 
-    protected function registerPrecheckProgressMethods()
+    protected function registerRunProcessPrecheckProgressMethods()
     {
-        $this->precheckProgressMethods =
+        $this->runProcessPrecheckProgressMethods =
             [
                 [
-                    'method'    => 'generateStructure',
-                    'text'      => 'Generate backup file structure...'
+                    'method'    => 'analyseQueueData',
+                    'text'      => 'Analyse Queue...'
+                ],
+                [
+                    'method'    => 'downloadModulesFromRepo',
+                    'text'      => 'Download module files from repository...'
                 ],
                 [
                     'method'    => 'performDbBackup',
@@ -596,12 +655,12 @@ class Installer extends BasePackage
                 ]
             ];
 
-        $this->basepackages->progress->registerMethods($this->precheckProgressMethods);
+        $this->basepackages->progress->registerMethods($this->runProcessPrecheckProgressMethods);
     }
 
-    protected function registerProcessQueueProgressMethods()
+    protected function registerRunProcessProgressMethods()
     {
-        $this->processQueueProgressMethods =
+        $this->runProcessProgressMethods =
             [
                 [
                     'method'    => 'unzipBackupFiles',
@@ -617,6 +676,6 @@ class Installer extends BasePackage
                 ]
             ];
 
-        $this->basepackages->progress->registerMethods($this->processQueueProgressMethods);
+        $this->basepackages->progress->registerMethods($this->runProcessProgressMethods);
     }
 }

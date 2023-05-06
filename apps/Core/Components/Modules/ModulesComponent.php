@@ -217,19 +217,18 @@ class ModulesComponent extends BaseComponent
 		}
 	}
 
-	public function performPrecheckAction()
+	public function processQueueAction()
 	{
 		if ($this->request->isPost()) {
 			if (!$this->checkCSRF()) {
 				return;
 			}
 
-			$this->modules->manager->installer->init()->performPrecheck($this->postData());
+			$this->modules->installer->init($this->postData()['process'])->runProcess($this->postData());
 
 			$this->addResponse(
-				$this->modules->manager->packagesData->responseMessage,
-				$this->modules->manager->packagesData->responseCode,
-				$this->modules->manager->packagesData->responseData
+				$this->modules->installer->packagesData->responseMessage,
+				$this->modules->installer->packagesData->responseCode
 			);
 		} else {
 			$this->addResponse('Method Not Allowed', 1);
