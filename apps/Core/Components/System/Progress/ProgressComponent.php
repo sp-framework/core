@@ -13,13 +13,15 @@ class ProgressComponent extends BaseComponent
                 return;
             }
 
-            $session = $this->session->getId();
+            $fileName = $this->session->getId();
 
             if (isset($this->postData()['session'])) {
-                $session = $this->postData()['session'];
+                $fileName = $this->postData()['session'];
+            } else if (isset($this->postData()['file_name'])) {
+                $fileName = $this->postData()['file_name'];
             }
 
-            $progress = $this->basepackages->progress->getProgress($session);
+            $progress = $this->basepackages->progress->getProgress($fileName);
 
             if ($progress) {
                 $this->addResponse(

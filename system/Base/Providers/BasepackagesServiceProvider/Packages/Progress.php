@@ -12,22 +12,38 @@ use System\Base\BasePackage;
 
 class Progress extends BasePackage
 {
-    protected $notificationTunnel;
+    protected $notificationsTunnel;
 
-    public function init($container = null)
+    protected $progressFileName;
+
+    public function init($container = null, $fileName = null)
     {
         if ($container) {
             $this->container = $container;
         }
 
+        if ($fileName) {
+            $this->progressFileName = $fileName;
+        }
+
         $this->checkProgressPath();
+
+        if (!$this->notificationsTunnel) {
+            $this->checkNotificationTunnel();
+        }
+
+        $this->init = true;
 
         return $this;
     }
 
-    public function checkProgressFile($session = null)
+    public function checkProgressFile($fileName = null)
     {
-        if ($this->readProgressFile($session)) {
+        if ($fileName) {
+            $this->progressFileName = $fileName;
+        }
+
+        if ($this->readProgressFile()) {
             return true;
         }
 
@@ -132,6 +148,10 @@ class Progress extends BasePackage
 
     public function updateProgress($method, $callResult = null, $deleteFile = true)
     {
+        if (!$this->progressFileName) {
+            $this->progressFileName = $this->session->getId();
+        }
+
         $progressFile = $this->readProgressFile();
 
         if (isset($progressFile['processes']) && count($progressFile['processes']) > 0) {
@@ -172,28 +192,31 @@ class Progress extends BasePackage
         return false;
     }
 
-    protected function sendNotification($callResult)
+    protected function checkNotificationTunnel()
     {
-        if (!$this->notificationTunnel && isset($this->apps)) {
+        if (!$this->notificationsTunnel && isset($this->apps)) {
             $account =
                 $this->basepackages->accounts->getAccountById(
                     $this->auth->account()['id'], false, false, false, false, false, true
                 );
 
             if ($account && isset($account['notifications_tunnel'])) {
-                $this->notificationTunnel = $account['notifications_tunnel'];
+                $this->notificationsTunnel = $account['notifications_tunnel'];
             }
         } else {
-            $this->notificationTunnel = 0;
+            $this->notificationsTunnel = 0;
         }
+    }
 
-        if ($this->notificationTunnel !== null) {
+    protected function sendNotification($callResult)
+    {
+        if ($this->notificationsTunnel !== null) {
             $progressFile = $this->readProgressFile();
 
             $this->wss->send(
                 [
                     'type'              => 'progress',
-                    'to'                => $this->notificationTunnel,
+                    'to'                => $this->notificationsTunnel,
                     'response'          => [
                         'responseCode'      => 0,
                         'responseMessage'   => 'Ok',
@@ -249,17 +272,17 @@ class Progress extends BasePackage
         return true;
     }
 
-    protected function readProgressFile($session = null)
+    protected function readProgressFile()
     {
-        if (!$session) {
-            $session = $this->session->getId();
+        if (!$this->progressFileName) {
+            $this->progressFileName = $this->session->getId();
         }
 
         if ($this->opCache) {
-            return $this->opCache->getCache($session, 'progress');
+            return $this->opCache->getCache($this->progressFileName, 'progress');
         } else {
             try {
-                return Json::decode($this->localContent->read('/var/progress/' . $session . '.json'), true);
+                return Json::decode($this->localContent->read('/var/progress/' . $this->progressFileName . '.json'), true);
             } catch (\ErrorException | FilesystemException | UnableToReadFile | \InvalidArgumentException $exception) {
                 return false;
             }
@@ -325,15 +348,17 @@ class Progress extends BasePackage
             $file['processes'] = $methods;
         }
 
+        $file['notifications_tunnel'] = $this->notificationsTunnel;
+
         if ($this->opCache) {
             if ($progressFile) {
-                $this->opCache->resetCache($this->session->getId(), $file, 'progress');
+                $this->opCache->resetCache($this->progressFileName, $file, 'progress');
             } else {
-                $this->opCache->setCache($this->session->getId(), $file, 'progress');
+                $this->opCache->setCache($this->progressFileName, $file, 'progress');
             }
         } else {
             try {
-                $this->localContent->write('var/progress/' . $this->session->getId() . '.json' , Json::encode($file));
+                $this->localContent->write('var/progress/' . $this->progressFileName . '.json' , Json::encode($file));
             } catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
                 throw $exception;
             }
@@ -342,11 +367,15 @@ class Progress extends BasePackage
 
     public function deleteProgressFile()
     {
+        if (!$this->progressFileName) {
+            $this->progressFileName = $this->session->getId();
+        }
+
         if ($this->opCache) {
-            $this->opCache->removeCache($this->session->getId(), 'progress');
+            $this->opCache->removeCache($this->progressFileName, 'progress');
         } else {
             try {
-                $this->localContent->delete('var/progress/' . $this->session->getId() . '.json');
+                $this->localContent->delete('var/progress/' . $this->progressFileName . '.json');
             } catch (\ErrorException | FilesystemException | UnableToDeleteFile $exception) {
                 throw $exception;
             }
