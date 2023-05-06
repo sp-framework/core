@@ -16,20 +16,28 @@ class ErrorsComponent extends BaseComponent
     public function controllerNotFoundAction()
     {
         $this->view->pick('common/errors/controllernotfound');
+
+        $this->addResponse('Component Not Found', 1);
     }
 
     public function actionNotFoundAction()
     {
         $this->view->pick('common/errors/actionnotfound');
+
+        $this->addResponse('Component Action Not Found', 1);
     }
 
     public function routeNotFoundAction()
     {
         $this->view->pick('common/errors/routenotfound');
+
+        $this->addResponse('Route Not Found', 1);
     }
 
     public function idNotFoundAction()
     {
         $this->view->pick('common/errors/idnotfound');
+
+        $this->addResponse('Id Not Found', 1);
     }
 }
