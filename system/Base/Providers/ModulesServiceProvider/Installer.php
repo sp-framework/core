@@ -7,21 +7,17 @@ use System\Base\BasePackage;
 
 class Installer extends BasePackage
 {
+    protected $api;
+
+    protected $apiConfig;
+
     protected $process;
 
     protected $downloadLocation = 'var/tmp/installer/';
 
-    protected $token = 'f21251a1fd1d764a7cca2ad127f16521aa76ea2d';
-
-    protected $appName = null;
-
-    protected $downloadClient;
-
-    protected $fileSystem;
-
     protected $zip;
 
-    protected $dependenciesToDownload = [];
+    protected $zipFiles = [];
 
     protected $modulesToInstallOrUpdate = [];
 
@@ -155,8 +151,81 @@ class Installer extends BasePackage
 
     protected function downloadModulesFromRepo($data)
     {
-        var_dump($this->modulesToInstallOrUpdate);die();
+        //Needs subProgress for downloading multiple modules from different repos
+        foreach ($this->modulesToInstallOrUpdate as $key => $moduleToInstallOrUpdate) {
+            //remove old data so there is no conflict
+            $files = $this->basepackages->utils->scanDir($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name']);
+            if (count($files['files']) > 0) {
+                foreach ($files['files'] as $file) {
+                    $this->localContent->delete($file);
+                }
+            }
+            if (count($files['dirs']) > 0) {
+                foreach ($files['dirs'] as $dir) {
+                    $this->localContent->deleteDirectory($dir);
+                }
+            }
 
+            $this->localContent->createDirectory($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name']);
+
+            if (!$this->initApi($moduleToInstallOrUpdate['api_id'])) {
+                $this->basepackages->progress->resetProgress();
+
+                return false;
+            }
+
+            if (strtolower($this->apiConfig['provider']) === 'gitea') {
+                $collection = 'RepositoryApi';
+                $method = 'repoGetArchive';
+                $args = [$this->apiConfig['org_user'], $moduleToInstallOrUpdate['repo_details']['details']['name'], $moduleToInstallOrUpdate['repo_details']['latestRelease']['tag_name'] . '.zip'];
+            } else if (strtolower($this->apiConfig['provider']) === 'github') {
+                //For github
+            }
+
+            $latestRelease = $this->api->useMethod($collection, $method, $args)->getResponse();
+            $file = $this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name'] . '/' . $moduleToInstallOrUpdate['repo_details']['latestRelease']['tag_name'] . '.zip';
+
+            try {
+                $this->localContent->write($file, $latestRelease->getContents());
+            } catch (\throwable $e) {
+                $this->basepackages->progress->resetProgress();
+
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
+
+            $this->zipFiles[$key]['location'] = base_path($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name'] . '/');
+            $this->zipFiles[$key]['file'] = base_path($file);
+            $this->zipFiles[$key]['name'] = $moduleToInstallOrUpdate['repo_details']['details']['name'];
+        }
+
+        return true;
+    }
+
+    protected function extractModulesDownloadedFromRepo()
+    {
+        if (count($this->zipFiles) === 0) {
+            return true;
+        }
+
+        foreach ($this->zipFiles as $key => $fileInformation) {
+            if (!$this->zip->open($fileInformation['file'])) {
+                $this->addResponse('Error reading downloaded zip file for module : ' . $fileInformation['name'], 1);
+
+                $this->basepackages->progress->resetProgress();
+
+                return false;
+            }
+
+            if (!$this->zip->extractTo($fileInformation['location'])) {
+                $this->addResponse('Error unzipping downloaded file for module : ' . $fileInformation['name'], 1);
+
+                $this->basepackages->progress->resetProgress();
+
+                return false;
+            }
+        }
 
         return true;
     }
@@ -642,15 +711,11 @@ class Installer extends BasePackage
                     'text'      => 'Download module files from repository...'
                 ],
                 [
-                    'method'    => 'performDbBackup',
-                    'text'      => 'Performing Database Backup...'
+                    'method'    => 'extractModulesDownloadedFromRepo',
+                    'text'      => 'Extract downloaded module zip files...'
                 ],
                 [
-                    'method'    => 'zipBackupFiles',
-                    'text'      => 'Generate backup zip file...'
-                ],
-                [
-                    'method'    => 'finishBackup',
+                    'method'    => 'finishPrecheck',
                     'text'      => 'Fnishing up...'
                 ]
             ];
@@ -677,5 +742,35 @@ class Installer extends BasePackage
             ];
 
         $this->basepackages->progress->registerMethods($this->runProcessProgressMethods);
+    }
+
+    protected function initApi($id)
+    {
+        $this->api = $this->basepackages->api->useApi($id, true);
+
+        $this->apiConfig = $this->api->getApiConfig();
+
+        if ($this->apiConfig['auth_type'] === 'auth' &&
+            ((!$this->apiConfig['username'] || $this->apiConfig['username'] === '') &&
+             (!$this->apiConfig['password'] || $this->apiConfig['password'] === ''))
+        ) {
+            $this->addResponse('Username/Password missing, cannot sync', 1);
+
+            return false;
+        } else if ($this->apiConfig['auth_type'] === 'access_token' &&
+                   (!$this->apiConfig['access_token'] || $this->apiConfig['access_token'] === '')
+        ) {
+            $this->addResponse('Access token missing, cannot sync', 1);
+
+            return false;
+        } else if ($this->apiConfig['auth_type'] === 'autho' &&
+                   (!$this->apiConfig['authorization'] || $this->apiConfig['authorization'] === '')
+        ) {
+            $this->addResponse('Authorization token missing, cannot sync', 1);
+
+            return false;
+        }
+
+        return true;
     }
 }

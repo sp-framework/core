@@ -20191,7 +20191,8 @@ class RepositoryApi
      */
     public function repoGetArchive($owner, $repo, $archive)
     {
-        $this->repoGetArchiveWithHttpInfo($owner, $repo, $archive);
+        list($response) = $this->repoGetArchiveWithHttpInfo($owner, $repo, $archive);
+        return $response;
     }
 
     /**
@@ -20240,7 +20241,11 @@ class RepositoryApi
                 );
             }
 
-            return [null, $statusCode, $response->getHeaders()];
+            return [
+                $response->getBody(),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
 
         } catch (ApiException $e) {
             switch ($e->getCode()) {
