@@ -327,6 +327,7 @@ dataCollectionSectionForm['vars']['queue']['data']['uninstall'] = { };
 dataCollectionSectionForm['vars']['queue']['data']['update'] = { };
 dataCollectionSectionForm['vars']['queue']['data']['remove'] = { };
 dataCollectionSectionForm['vars']['initJstree'] = false;
+dataCollectionSectionForm['vars']['searchInfo'] = '';
 
 dataCollectionSectionForm['funcs'] = { };
 
@@ -357,14 +358,28 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
             $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
         }
 
+        if (dataCollectionSectionForm['vars']['searchInfo'] === '') {
+            $(res.nodes).each(function(i, node) {
+                var updateNode = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_node(node);
+                var apiNode = updateNode.parents[updateNode.parents.length - 2];
+                var apiNodeObj = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_node(apiNode);
+                var update = 'update';
+                if (res.nodes.length > 1) {
+                    update = 'updates';
+                }
+                dataCollectionSectionForm['vars']['searchInfo'] += apiNodeObj.text + ' has ' + res.nodes.length + ' new ' + update + ' available.<br>';
+            });
+        }
+
         if (dataCollectionSectionForm['vars']['initJstree'] === true) {
             dataCollectionSectionForm['vars']['org_update_available'] = res.nodes.length;
             dataCollectionSectionForm['vars']['update_available'] = res.nodes.length;
             dataCollectionSectionForm['vars']['initJstree'] = false;
             PNotify.info({
-                text        : res.nodes.length + ' new updates available.',
+                text        : dataCollectionSectionForm['vars']['searchInfo'],
                 textTrusted : true
             });
+            dataCollectionSectionForm['vars']['searchInfo'] = '';
         }
 
         if (dataCollectionSectionForm['vars']['update_available'] > 0) {
@@ -1082,6 +1097,7 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function(clearAll = false, id
         dataCollectionSectionForm['vars']['queue']['data']['uninstall'] = { };
         dataCollectionSectionForm['vars']['queue']['data']['update'] = { };
         dataCollectionSectionForm['vars']['queue']['data']['remove'] = { };
+        dataCollectionSectionForm['vars']['searchInfo'] = '';
         dataCollectionSectionForm['funcs']['initQueueButtons'](false);
         dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](null, false, false, false, true);
         dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install');
@@ -1214,7 +1230,8 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
     dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', null, true);
     dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-clear', null, true);
 
-    $('#{{componentId}}-{{sectionId}}-modules').jstree().destroy();
+    $('#{{componentId}}-{{sectionId}}-modules').children('ul').hide();
+
     if ($('#{{componentId}}-{{sectionId}}-modules-empty').length > 0) {
         $('#{{componentId}}-{{sectionId}}-modules-empty').remove();
     }
@@ -1237,38 +1254,48 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
         }
 
         if (response.responseCode == 0) {
-            if (response.responseData && response.responseData.register !== 'undefined' && response.responseData.update !== 'undefined') {
-                var text, registerCounter, updateCounter;
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().destroy();
 
-                registerCounter = response.responseData.counter.register;
-                updateCounter = response.responseData.counter.update;
+            if (response.responseData) {
+                var text = 'Sync Complete.<br>';
+                var newCounter = 0;
+                var updatesCounter = 0;
+                var newModule = 'new module';
+                var update = 'update';
 
-                if (registerCounter > 0 || updateCounter > 0) {
-                    if (registerCounter !== 0 && updateCounter === 0) {
-                        text =
-                            'Sync Complete.<br>' + registerCounter + ' new modules available.<br> No updates available.';
-                    } else if (registerCounter === 0 && updateCounter !== 0) {
-                        text =
-                            'Sync Complete.<br>' + updateCounter + ' new updates available.<br> No new modules available.';
-                    } else if (registerCounter !== 0 && updateCounter !== 0) {
-                        text =
-                            'Sync Complete.<br>' + updateCounter + ' new updates available.<br>' + registerCounter + ' new modules available.';
+                if (response.responseData.counter.new && response.responseData.counter.new.count) {
+                    newCounter = response.responseData.counter.new.count;
+
+                    if (response.responseData.counter.new.api && response.responseData.counter.new.api.name) {
+                            text += response.responseData.counter.new.api.name + ' has '
                     }
-
-                    if (updateCounter > 0) {
-                        dataCollectionSectionForm['vars']['update_available'] = updateCounter;
-                        dataCollectionSectionForm['vars']['filter'] = true;
-                        $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
-                        $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
-                    }
-                } else {
-                    text = 'Sync Complete.<br>No new modules or updates available.';
                 }
 
-                PNotify.info({
-                    text        : text,
-                    textTrusted : true
-                });
+                if (response.responseData.counter.updates && response.responseData.counter.updates.count) {
+                    updatesCounter = response.responseData.counter.updates.count;
+
+                    if (response.responseData.counter.updates.api && response.responseData.counter.updates.api.name) {
+                        text += response.responseData.counter.updates.api.name + ' has '
+                    }
+                }
+
+                if (newCounter > 0 || updatesCounter > 0) {
+                    if (newCounter > 1) {
+                        newModule = 'new modules';
+                    }
+                    if (updatesCounter > 1) {
+                        update = 'updates';
+                    }
+                    if (newCounter !== 0 && updatesCounter === 0) {
+                        text += newCounter + ' ' + newModule + ' available.<br> No ' + update + ' available.';
+                    } else if (newCounter === 0 && updatesCounter !== 0) {
+                        text += updatesCounter + ' new ' + update + ' available.<br> No ' + newModule + ' available.';
+                    } else if (newCounter !== 0 && updatesCounter !== 0) {
+                        text += updatesCounter + ' new ' + update + ' available.<br>' + newCounter + ' ' + newModule + ' available.';
+                    }
+                } else {
+                    text = 'Sync Complete.<br>No ' + newModule + ' or ' + update + ' available.';
+                }
 
                 if (response.responseData.modules) {
                     dataCollectionSectionForm['vars']['modules'] = response.responseData.modules;
@@ -1292,12 +1319,27 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
 
                 dataCollectionSectionForm['funcs']['jstreeSelectNode']();
                 dataCollectionSectionForm['funcs']['jstreeReady']();
+
+                if (updatesCounter > 0) {
+                    dataCollectionSectionForm['vars']['update_available'] = updatesCounter;
+                    dataCollectionSectionForm['vars']['filter'] = true;
+                    dataCollectionSectionForm['vars']['initJstree'] = false;
+                    dataCollectionSectionForm['vars']['searchInfo'] = text;
+                    $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
+                }
             }
         } else {
             PNotify.error({
                 text        : response.responseMessage,
                 textTrusted : true
             });
+
+            if ($('#{{componentId}}-{{sectionId}}-modules-empty').length > 0) {
+                $('#{{componentId}}-{{sectionId}}-modules-empty').remove();
+            }
+
+            $('#{{componentId}}-{{sectionId}}-modules').children('ul').show();
         }
 
         $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");

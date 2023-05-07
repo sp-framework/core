@@ -163,8 +163,11 @@ class Manager extends BasePackage
                 $module['updated_by'] = $moduleUpdatedBy;
 
                 $this->modules->{$module['module_type']}->update($module);
+            } else {
+                $module['repo_details'] = false;
             }
         } catch (ClientException | \throwable $e) {
+            var_dump($e);die();
             $this->addResponse($e->getMessage(), 2, ['module' => $module]);
 
             return false;
@@ -328,6 +331,7 @@ class Manager extends BasePackage
                 return true;
             }
         } catch (ClientException | \throwable $e) {
+            var_dump($e);die();
             $this->addResponse($e->getMessage(), 1);
 
             return false;
@@ -364,10 +368,10 @@ class Manager extends BasePackage
                             continue;//Dont add as there are no releases.
                         }
 
-                        if (isset($this->remoteModules[$names[1] . 's'])) {
-                            array_push($this->remoteModules[$names[1] . 's'], $module);
+                        if (isset($this->remoteModules[$names[1]])) {
+                            array_push($this->remoteModules[$names[1]], $module);
                         } else {
-                            $this->remoteModules[$names[1] . 's'] = [$module];
+                            $this->remoteModules[$names[1]] = [$module];
                         }
 
                         try {
@@ -383,23 +387,17 @@ class Manager extends BasePackage
 
                             if ($jsonFile) {
                                 $this->remoteModulesJson[$module['name']] = $jsonFile;
-
-                                return true;
                             }
-                        } catch (ClientException $e) {
-                            //Do nothing, if Jsonfile is false, that means error.
+                        } catch (ClientException | \throwable $e) {
+                            $this->logger->log->debug(
+                                'Reading component ' . $module['name'] . ' install JSON file resulted in error. ' .
+                                $e->getMessage()
+                            );
+
+                            unset($this->remoteModules[$names[1]]);
                         }
 
-                        $this->addResponse(
-                            'Reading component ' . $module['name'] . ' install JSON file resulted in error ' .
-                            $e->getResponse()->getStatusCode() .
-                            '. Sync Halted! Please contact remote administrator or developer.',
-                            1
-                        );
-
-                        $this->logger->log->debug($e->getMessage());
-
-                        return false;
+                        return true;
                     }
                 } else {
                     if ($names[0] === 'core') {
@@ -441,24 +439,36 @@ class Manager extends BasePackage
     protected function updateRemoteModulesToDB()
     {
         $counter = [];
-        $counter['register'] = 0;
-        $counter['update'] = 0;
 
         foreach ($this->remoteModules as $remoteModulesType => $remoteModules) {
             $remotePackages = $this->findRemoteInLocal($remoteModules, $remoteModulesType);
 
-            if (count($remotePackages['update']) > 0) {
-                foreach ($remotePackages['update'] as $updateRemotePackageKey => $updateRemotePackage) {
+            if (count($remotePackages['updates']) > 0) {
+                foreach ($remotePackages['updates'] as $updateRemotePackageKey => $updateRemotePackage) {
+                    if (!isset($counter['updates'])) {
+                        $counter['updates'] = [];
+                        $counter['updates']['api']['id'] = $this->apiConfig['id'];
+                        $counter['updates']['api']['name'] = $this->apiConfig['name'];
+                        $counter['updates']['count'] = 0;
+                    }
+
                     $this->modules->$remoteModulesType->update($updateRemotePackage);
 
                     if ($updateRemotePackage['installed'] == '1') {
-                        $counter['update'] = $counter['update'] + 1;
+                        $counter['updates']['count'] = $counter['updates']['count'] + 1;
                     }
                 }
             }
 
-            if (count($remotePackages['register']) > 0) {
-                foreach ($remotePackages['register'] as $registerRemotePackageKey => $registerRemotePackage) {
+            if (count($remotePackages['new']) > 0) {
+                foreach ($remotePackages['new'] as $registerRemotePackageKey => $registerRemotePackage) {
+                    if (!isset($counter['new'])) {
+                        $counter['new'] = [];
+                        $counter['new']['api']['id'] = $this->apiConfig['id'];
+                        $counter['new']['api']['name'] = $this->apiConfig['name'];
+                        $counter['new']['count'] = 0;
+                    }
+
                     $repo_details = $registerRemotePackage['repo_details'];
 
                     $registerRemotePackage = $this->remoteModulesJson[$registerRemotePackage['name']];
@@ -505,7 +515,7 @@ class Manager extends BasePackage
 
                     $this->modules->$remoteModulesType->add($registerRemotePackage);
 
-                    $counter['register'] = $counter['register'] + 1;
+                    $counter['new']['count'] = $counter['new']['count'] + 1;
                 }
             }
         }
@@ -518,8 +528,8 @@ class Manager extends BasePackage
     protected function findRemoteInLocal($remoteModules, $remoteModulesType)
     {
         $modules = [];
-        $modules['update'] = [];
-        $modules['register'] = [];
+        $modules['updates'] = [];
+        $modules['new'] = [];
 
         foreach ($remoteModules as $remoteModuleKey => $remoteModule) {
             if (isset($remoteModule['repo'])) {
@@ -553,7 +563,7 @@ class Manager extends BasePackage
                         $localModule['update_version'] = $moduleNeedsUpgrade['name'];
                     }
 
-                    $modules['update'][$localModule['id']] = $localModule;
+                    $modules['updates'][$localModule['id']] = $localModule;
 
                     unset($remoteModules[$remoteModuleKey]);
                 }
@@ -563,7 +573,7 @@ class Manager extends BasePackage
                 $moduleNeedsUpgrade = $this->moduleNeedsUpgrade(null, $remoteModule);
                 $remoteModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
 
-                $modules['register'][$remoteModuleKey] = $remoteModule;
+                $modules['new'][$remoteModuleKey] = $remoteModule;
             }
         }
 
