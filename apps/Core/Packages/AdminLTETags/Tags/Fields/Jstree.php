@@ -77,9 +77,17 @@ class Jstree
                         $this->content .= ' | ';
                     } else {
                         $this->content .=
-                            '<a href="' . $url . '" ' . $this->fieldParams['fieldId'] . '-' . $field['id'] . '" data-container="body" data-placement="bottom" data-toggle="tooltip" data-html="true" title="' . $field['tooltip'] . '" class="' . $fieldDisabled . '">
-                                <i class="' . $field['icon'] . ' text-' . $field['iconColor'] . '"></i>
-                            </a>';
+                            '<a href="' . $url . '" ' . $this->fieldParams['fieldId'] . '-' . $field['id'] . '" data-container="body" data-placement="bottom" data-toggle="tooltip" data-html="true" title="' . $field['tooltip'] . '" class="' . $fieldDisabled . '">';
+
+                            if (isset($field['icon']) && isset($field['iconColor'])) {
+                        $this->content .=
+                                '<i class="' . $field['icon'] . ' text-' . $field['iconColor'] . '"></i>';
+                            } else if (isset($field['text']) && isset($field['textColor'])) {
+                        $this->content .=
+                                '<span class="text-uppercase ml-1" style="top: -1px;position: relative;"><span class="badge badge-' . $field['textColor'] . '">' . $field['text'] . '</span></span>';
+                            }
+                        $this->content .=
+                            '</a>';
                     }
                 }
                 $this->content .= ' | ';

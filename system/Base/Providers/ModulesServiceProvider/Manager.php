@@ -368,12 +368,6 @@ class Manager extends BasePackage
                             continue;//Dont add as there are no releases.
                         }
 
-                        if (isset($this->remoteModules[$names[1]])) {
-                            array_push($this->remoteModules[$names[1]], $module);
-                        } else {
-                            $this->remoteModules[$names[1]] = [$module];
-                        }
-
                         try {
                             ObjectSerializer::setUrlEncoding(false);
 
@@ -381,20 +375,24 @@ class Manager extends BasePackage
                                 [
                                     $this->apiConfig['org_user'],
                                     $module['name'],
-                                    'Install/' . $names[1] . '.json'
+                                    'Install/' . substr($names[1], 0, -1) . '.json'//remove "s" from the name
                                 ]
                             )->getResponse(true);
 
                             if ($jsonFile) {
                                 $this->remoteModulesJson[$module['name']] = $jsonFile;
                             }
+
+                            if (isset($this->remoteModules[$names[1]])) {
+                                array_push($this->remoteModules[$names[1]], $module);
+                            } else {
+                                $this->remoteModules[$names[1]] = [$module];
+                            }
                         } catch (ClientException | \throwable $e) {
                             $this->logger->log->debug(
                                 'Reading component ' . $module['name'] . ' install JSON file resulted in error. ' .
                                 $e->getMessage()
                             );
-
-                            unset($this->remoteModules[$names[1]]);
                         }
 
                         return true;
