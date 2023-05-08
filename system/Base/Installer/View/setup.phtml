@@ -47,135 +47,218 @@
                                     <div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase rounded-0">Bazaari Framework Core Setup</div>
                                 <?php } ?>
                                 <div class="card-body bg-white">
-                                    <div class="row vdivide justify-content-center">
-                                        <div class="col-6 p-3">
-                                            <legend class="text-uppercase">Database</legend>
-                                            <div class="row">
-                                                <div class="col">
-                                                    <div class="form-group">
-                                                        <label class="text-uppercase text-xs" for="host">Host *</label>
-                                                        <div class="input-group input-group-sm">
-                                                            <input type="text" name="host" id="host" class="form-control rounded-0" value="localhost">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="form-group">
-                                                        <label class="text-uppercase text-xs" for="port">Port *</label>
-                                                        <div class="input-group input-group-sm">
-                                                            <input type="text" name="port" id="port" class="form-control rounded-0" value="3306">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col">
-                                                    <div class="form-group">
-                                                        <label class="text-uppercase text-xs" for="dbname">Database Name *</label>
-                                                        <div class="input-group input-group-sm">
-                                                            <input type="text" name="dbname" id="dbname" class="form-control rounded-0" value="sp">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="form-group">
-                                                        <label class="text-uppercase text-xs" for="charset">Database Charset *</label>
-                                                        <div class="input-group input-group-sm">
-                                                            <input type="text" name="charset" id="charset" class="form-control rounded-0" value="utf8mb4">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="form-group">
-                                                        <label class="text-uppercase text-xs" for="collation">Database Collation *</label>
-                                                        <div class="input-group input-group-sm">
-                                                            <input type="text" name="collation" id="collation" class="form-control rounded-0" value="utf8mb4_general_ci">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col">
-                                                    <div class="form-group">
-                                                        <label class="text-uppercase text-xs" for="username">Database Username *</label>
-                                                        <div class="input-group input-group-sm">
-                                                            <input type="text" name="username" id="username" class="form-control rounded-0" value="sp">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="form-group mb-0">
-                                                        <label class="text-uppercase text-xs" for="password">Database Password *</label>
-                                                        <div class="input-group input-group-sm">
-                                                            <div class="input-group-prepend">
-                                                                <button class="btn btn-sm btn-primary rounded-0" id="generate_db_password_button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="">
-                                                                    <i class="fas fa-fw fa-cog fa-spin" hidden=""></i> <i class="fas fa-fw fa-wand-magic-sparkles"></i>
-                                                                </button>
-                                                            </div>
-                                                            <input type="password" name="password" id="password" class="form-control rounded-0">
-                                                            <div class="input-group-append">
-                                                                <button id="password-visibility" class="btn btn-primary rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" data-original-title="">
-                                                                    <i class="fas fa-fw fa-eye-slash"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <div id="db_password_strength_meter"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <?php if (!$onlyUpdateDb) { ?>
+                                    <?php if (!$precheckFail) { ?>
+                                        <div class="row vdivide justify-content-center">
+                                            <div class="col-6 p-3">
+                                                <legend class="text-uppercase">Database</legend>
                                                 <div class="row">
                                                     <div class="col">
                                                         <div class="form-group">
-                                                            <div class="checkbox icheck-danger">
-                                                                <input type="checkbox" name="drop" id="drop">
-                                                                <label class="text-uppercase text-xs" for="drop">
-                                                                    Drop tables if exists
-                                                                </label>
+                                                            <label class="text-uppercase text-xs" for="host">Host *</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="text" name="host" id="host" class="form-control rounded-0" value="localhost">
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="col">
                                                         <div class="form-group">
-                                                            <div class="checkbox icheck-success">
-                                                                <input type="checkbox" name="create" id="create">
-                                                                <label class="text-uppercase text-xs" for="create">
-                                                                    Create new database
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col">
-                                                        <div class="form-group">
-                                                            <div class="checkbox icheck-success">
-                                                                <input type="checkbox" name="create-grant" id="create-grant">
-                                                                <label class="text-uppercase text-xs" for="create-grant">
-                                                                    Create new user/grant permissions
-                                                                </label>
+                                                            <label class="text-uppercase text-xs" for="port">Port *</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="text" name="port" id="port" class="form-control rounded-0" value="3306">
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="row" id="create-user">
+                                                <div class="row">
                                                     <div class="col">
                                                         <div class="form-group">
-                                                            <label class="text-uppercase text-xs" for="create-username">Database Username (With create permission) *</label>
+                                                            <label class="text-uppercase text-xs" for="dbname">Database Name *</label>
                                                             <div class="input-group input-group-sm">
-                                                                <input type="text" name="create-username" id="create-username" class="form-control rounded-0" disabled>
+                                                                <input type="text" name="dbname" id="dbname" class="form-control rounded-0" value="sp">
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="col">
                                                         <div class="form-group">
-                                                            <label class="text-uppercase text-xs" for="create-password">Database Password (With create permission) *</label>
+                                                            <label class="text-uppercase text-xs" for="charset">Database Charset *</label>
                                                             <div class="input-group input-group-sm">
-                                                                <input type="password" name="create-password" id="create-password" class="form-control rounded-0" disabled>
+                                                                <input type="text" name="charset" id="charset" class="form-control rounded-0" value="utf8mb4">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <label class="text-uppercase text-xs" for="collation">Database Collation *</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="text" name="collation" id="collation" class="form-control rounded-0" value="utf8mb4_general_ci">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <label class="text-uppercase text-xs" for="username">Database Username *</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="text" name="username" id="username" class="form-control rounded-0" value="sp">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <div class="form-group mb-0">
+                                                            <label class="text-uppercase text-xs" for="password">Database Password *</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <div class="input-group-prepend">
+                                                                    <button class="btn btn-sm btn-primary rounded-0" id="generate_db_password_button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="">
+                                                                        <i class="fas fa-fw fa-cog fa-spin" hidden=""></i> <i class="fas fa-fw fa-wand-magic-sparkles"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <input type="password" name="password" id="password" class="form-control rounded-0">
                                                                 <div class="input-group-append">
-                                                                    <button id="create-password-visibility" class="btn btn-primary rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" data-original-title="">
+                                                                    <button id="password-visibility" class="btn btn-primary rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" data-original-title="">
                                                                         <i class="fas fa-fw fa-eye-slash"></i>
                                                                     </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div id="db_password_strength_meter"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <?php if (!$onlyUpdateDb) { ?>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <div class="checkbox icheck-danger">
+                                                                    <input type="checkbox" name="drop" id="drop">
+                                                                    <label class="text-uppercase text-xs" for="drop">
+                                                                        Drop tables if exists
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <div class="checkbox icheck-success">
+                                                                    <input type="checkbox" name="create" id="create">
+                                                                    <label class="text-uppercase text-xs" for="create">
+                                                                        Create new database
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <div class="checkbox icheck-success">
+                                                                    <input type="checkbox" name="create-grant" id="create-grant">
+                                                                    <label class="text-uppercase text-xs" for="create-grant">
+                                                                        Create new user/grant permissions
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" id="create-user">
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <label class="text-uppercase text-xs" for="create-username">Database Username (With create permission) *</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <input type="text" name="create-username" id="create-username" class="form-control rounded-0" disabled>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <label class="text-uppercase text-xs" for="create-password">Database Password (With create permission) *</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <input type="password" name="create-password" id="create-password" class="form-control rounded-0" disabled>
+                                                                    <div class="input-group-append">
+                                                                        <button id="create-password-visibility" class="btn btn-primary rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" data-original-title="">
+                                                                            <i class="fas fa-fw fa-eye-slash"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                <?php } ?>
+                                            </div>
+                                            <?php if (!$onlyUpdateDb) { ?>
+                                                <div class="col-6 p-3">
+                                                    <legend class="text-uppercase">Admin Account</legend>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <label class="text-uppercase text-xs" for="email">Email *</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <input type="text" name="email" id="email" class="form-control rounded-0">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="form-group mb-0">
+                                                                <label class="text-uppercase text-xs" for="pass">Password *</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <div class="input-group-prepend">
+                                                                        <button class="btn btn-sm btn-primary rounded-0" id="generate_user_password_button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="">
+                                                                            <i class="fas fa-fw fa-cog fa-spin" hidden=""></i> <i class="fas fa-fw fa-wand-magic-sparkles"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                    <input type="password" name="pass" id="pass" class="form-control rounded-0">
+                                                                    <div class="input-group-append">
+                                                                        <button id="pass-visibility" class="btn btn-primary rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" data-original-title="">
+                                                                            <i class="fas fa-fw fa-eye-slash"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div id="user_password_strength_meter"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <legend class="text-uppercase">Security</legend>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <label class="text-uppercase text-xs" for="pwf">Password Encryption Level *</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <input type="number" min="4" max="16" name="pwf" id="pwf" class="form-control rounded-0" value="8" disabled>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <label class="text-uppercase text-xs" for="cwf">Cookies Encryption Level *</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <input type="number" min="4" max="16" name="cwf" id="cwf" class="form-control rounded-0" value="8" disabled>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <div class="form-group mb-2">
+                                                                <div class="checkbox icheck-success">
+                                                                    <input type="checkbox" name="auto-encrypt-level" id="auto-encrypt-level" checked>
+                                                                    <label class="text-uppercase text-xs" for="auto-encrypt-level">
+                                                                        Calculate level as per system configuration
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <small class="text-danger">Note: Higher the number, better the security but, slower the performance. Range: 4-16</small>
+                                                    <legend class="mt-3">Development</legend>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <div class="checkbox icheck-warning">
+                                                                    <input type="checkbox" name="dev" id="dev">
+                                                                    <label class="text-uppercase text-xs" for="dev">
+                                                                        Dev Mode?
+                                                                    </label>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -183,88 +266,15 @@
                                                 </div>
                                             <?php } ?>
                                         </div>
-                                        <?php if (!$onlyUpdateDb) { ?>
-                                            <div class="col-6 p-3">
-                                                <legend class="text-uppercase">Admin Account</legend>
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <div class="form-group">
-                                                            <label class="text-uppercase text-xs" for="email">Email *</label>
-                                                            <div class="input-group input-group-sm">
-                                                                <input type="text" name="email" id="email" class="form-control rounded-0">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col">
-                                                        <div class="form-group mb-0">
-                                                            <label class="text-uppercase text-xs" for="pass">Password *</label>
-                                                            <div class="input-group input-group-sm">
-                                                                <div class="input-group-prepend">
-                                                                    <button class="btn btn-sm btn-primary rounded-0" id="generate_user_password_button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="">
-                                                                        <i class="fas fa-fw fa-cog fa-spin" hidden=""></i> <i class="fas fa-fw fa-wand-magic-sparkles"></i>
-                                                                    </button>
-                                                                </div>
-                                                                <input type="password" name="pass" id="pass" class="form-control rounded-0">
-                                                                <div class="input-group-append">
-                                                                    <button id="pass-visibility" class="btn btn-primary rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" data-original-title="">
-                                                                        <i class="fas fa-fw fa-eye-slash"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <div id="user_password_strength_meter"></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <legend class="text-uppercase">Security</legend>
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <div class="form-group">
-                                                            <label class="text-uppercase text-xs" for="pwf">Password Encryption Level *</label>
-                                                            <div class="input-group input-group-sm">
-                                                                <input type="number" min="4" max="16" name="pwf" id="pwf" class="form-control rounded-0" value="8" disabled>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col">
-                                                        <div class="form-group">
-                                                            <label class="text-uppercase text-xs" for="cwf">Cookies Encryption Level *</label>
-                                                            <div class="input-group input-group-sm">
-                                                                <input type="number" min="4" max="16" name="cwf" id="cwf" class="form-control rounded-0" value="8" disabled>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <div class="form-group mb-2">
-                                                            <div class="checkbox icheck-success">
-                                                                <input type="checkbox" name="auto-encrypt-level" id="auto-encrypt-level" checked>
-                                                                <label class="text-uppercase text-xs" for="auto-encrypt-level">
-                                                                    Calculate level as per system configuration
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <small class="text-danger">Note: Higher the number, better the security but, slower the performance. Range: 4-16</small>
-                                                <legend class="mt-3">Development</legend>
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <div class="form-group">
-                                                            <div class="checkbox icheck-warning">
-                                                                <input type="checkbox" name="dev" id="dev">
-                                                                <label class="text-uppercase text-xs" for="dev">
-                                                                    Dev Mode?
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                    <?php } ?>
+                                    <?php if ($precheckFail) { ?>
+                                        <div class="row vdivide justify-content-center">
+                                            <div class="col">
+                                                Bazaari Framework requires some external dependencies which are not available on this system. You can either install those dependencies using CLI if you have access to the server using the command <span class="text-info">./composer install"</span> in the <span class="text-info">external/ folder</span>. That will install the required dependencies and you can then run this setup again.<br><br>
+                                                If in case you do not have access to the server via CLI, you can click "Download & Install Dependencies" button and the framework will try and install the files for you.
                                             </div>
-                                        <?php } ?>
-                                    </div>
+                                        </div>
+                                    <?php } ?>
                                     <hr>
                                     <div id="installer-progress" class="mb-3" hidden></div>
                                     <div class="row text-center p-3">
@@ -272,7 +282,11 @@
                                             <div class="col" id="submit-div">
                                                 <button id="submit" class="btn btn-primary">
                                                     <i id="submit-spinner" class="fa fa-cog fa-spin" hidden></i>
-                                                    Setup
+                                                    <?php if (!$precheckFail) { ?>
+                                                        Setup
+                                                    <?php } else { ?>
+                                                        Download & Install Dependencies
+                                                    <?php } ?>
                                                 </button>
                                             </div>
                                         <?php } else { ?>
@@ -283,9 +297,15 @@
                                                 </button>
                                             </div>
                                         <?php } ?>
-                                        <div class="col" id="access-div" hidden>
-                                            <a href='/' id="access" class="btn" disabled=""><i class="fa"></i> Access Admin</a>
-                                        </div>
+                                        <?php if (!$precheckFail) { ?>
+                                            <div class="col" id="access-div" hidden>
+                                                <a href='/' id="access" class="btn" disabled=""><i class="fa"></i> Access Admin</a>
+                                            </div>
+                                        <?php } else { ?>
+                                            <div class="col" id="access-div" hidden>
+                                                <a href='/' id="access" class="btn" disabled="">Run Setup</a>
+                                            </div>
+                                        <?php } ?>
                                     </div>
                                     <div class="row">
                                         <div class="col" id="external-div" hidden>
@@ -309,7 +329,11 @@
             <script src="/core/default/js/footer/jsFooterPlugins.js"></script>
         </footer>
         <script type="text/javascript">
-            BazProgress.buildProgressBar($('#installer-progress'));
+            <?php if ($precheckFail) { ?>
+                BazProgress.buildProgressBar($('#installer-progress'), true);
+            <?php } else { ?>
+                BazProgress.buildProgressBar($('#installer-progress'));
+            <?php } ?>
             BazTunnels.initPusherTunnel({'tunnelsToInit' : ['progress']});
 
             $('#create, #create-grant').click(function() {
@@ -420,7 +444,7 @@
                             "create-user"           : $('#create-grant')[0].checked
                         });
                     }
-                <?php if (!$onlyUpdateDb) { ?>
+                <?php if (!$onlyUpdateDb && !$precheckFail) { ?>
                     data = $.extend(data,
                         {
                             "drop"                  : $('#drop')[0].checked,
@@ -471,8 +495,7 @@
                                 }).addClass('alert-danger').html(data.responseMessage);
                                 $('#submit, #update').attr('disabled', false);
                                 $('#submit-spinner, #update-spinner').attr('hidden', true);
-                                $('#external-div').attr('hidden', true);
-                                $('#external-data').val('Downloading & installing external packages...');
+
                                 if (data.responseCode === 3) {
                                     BazProgress.getProgress({
                                         'url' : '/',
@@ -521,7 +544,7 @@
             });
 
             BazProgress.setCallable({
-                beforeProcess : function getComposerProgress(response) {
+                beforeProcess : function(response) {
                     if (response.responseCode !== 0) {
                         return;
                     }
@@ -534,38 +557,28 @@
                         responseData = response.responseData;
                     }
 
-                    if (responseData['preCheckComplete'] == false) {
-                        if (responseData.composer) {
-                            $('#external-data').val(responseData.composer);
-                            $('#external-data').scrollTop($('#external-data')[0].scrollHeight);
-                            $('#external-div').attr('hidden', false);
-                        }
-                        if (responseData.composer_error) {
-                            $('.progress-bar').removeClass('progress-bar-animated');
-                            $('.installer-progress-progress-span').html('Error installing external packages. Please resolve errors and try again.');
-                            $('.installer-progress-bar').removeClass(function (index, className) {
-                                return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
-                            }).addClass('bg-danger');
-                            $('.installer-progress-bar').css('width', '100%');
-                            $('.installer-progress-bar').attr('aria-valuenow', 100);
-                        }
-                        return false;
-                    } else {
-                        if (responseData['runners'] &&
-                            responseData['runners']['running'] &&
-                            responseData['runners']['running']['method'] === 'executeComposer'
-                        ) {
-                            $('#external-div').attr('hidden', false);
-                        }
-                        if (responseData.composer) {
-                            $('#external-data').val(responseData.composer);
-                            $('#external-data').scrollTop($('#external-data')[0].scrollHeight);
-                        }
+                    if (responseData['runners'] &&
+                        responseData['runners']['running'] &&
+                        responseData['runners']['running']['method'] === 'executeComposer'
+                    ) {
+                        $('#installer-progress').attr('hidden', true);
+                        $('#external-div').attr('hidden', false);
                     }
+                    if (responseData.composer) {
+                        $('#external-data').val(responseData.composer);
+                        $('#external-data').scrollTop($('#external-data')[0].scrollHeight);
+                    }
+
                     return true;
                 },
                 afterProcess : function(response) {
                     if (response.responseCode !== 0) {
+                        if (response.responseData.composer_error && response.responseData.composer_error == true) {
+                            $('#external-data').val(response.responseData.composer);
+                            $('#external-data').scrollTop($('#external-data')[0].scrollHeight);
+                            $('#external-div').attr('hidden', false);
+                        }
+
                         return;
                     }
 
@@ -616,19 +629,14 @@
                 },
                 onComplete : function(response) {
                     BazHelpers.setTimeoutTimers.stopAll();
-                    setTimeout(function() {
-                        $('.progress-bar').removeClass('progress-bar-animated');
-                        $('.installer-progress-bar').css('width', '100%');
-                        $('.installer-progress-bar').attr('aria-valuenow', 100);
-                        $('.installer-progress-progress-span').html('Done (100%)');
-                        $('.installer-progress-bar').removeClass(function (index, className) {
-                            return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
-                        }).addClass('bg-success');
-                        $('#access').addClass('btn-success');
-                        $('#access').children('i').addClass('fa-check');
-                        $('#access-div').attr('hidden', false);
-                        $('#submit-div').attr('hidden', true);
-                    }, 500);
+                    if (response.responseCode == 0) {
+                        setTimeout(function() {
+                            $('#access').addClass('btn-success');
+                            $('#access').children('i').addClass('fa-check');
+                            $('#access-div').attr('hidden', false);
+                            $('#submit-div').attr('hidden', true);
+                        }, 500);
+                    }
                 }
             });
 

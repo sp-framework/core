@@ -13,9 +13,9 @@ var/*
 .vscode*
 linter-backup*
 repos/*
-external/vendor/*
-!external/vendor/guzzlehttp
-!external/vendor/psr
+# external/vendor/*
+# !external/vendor/guzzlehttp
+# !external/vendor/psr
 external/cache/*
 external/base.lock
 ignore/*

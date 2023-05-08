@@ -107,11 +107,9 @@ class Setup
 
 	protected $configs;
 
-	public function __construct($container, $postData)
+	public function __construct($container, $postData, $precheckFail = false)
 	{
 		$this->container = $container;
-
-		$this->localContent = $this->container['localContent'];
 
 		$this->request = $this->container->getShared('request');
 
@@ -125,7 +123,7 @@ class Setup
 
 		$this->cookies = $this->container->getShared('cookies');
 
-		if ($this->request->isPost()) {
+		if ($this->request->isPost() && !$precheckFail) {
 			$this->dbConfig =
 					[
 						'db' =>
@@ -164,6 +162,10 @@ class Setup
 		$this->basepackages = $this->container->getShared('basepackages');
 
 		$this->progress = $this->basepackages->progress;
+
+		if (!$precheckFail) {
+			$this->localContent = $this->container['localContent'];
+		}
 	}
 
 	public function __call($method, $arguments)

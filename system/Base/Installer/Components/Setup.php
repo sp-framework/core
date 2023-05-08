@@ -35,116 +35,127 @@ Class Setup
 
 	public function __construct($session, $configsObj)
 	{
-		$container = new FactoryDefault();
+		try {
+			$container = new FactoryDefault();
 
-		$container->setShared(
-			'view',
-			function () {
-				$view = new Simple();
-
-				$view->setViewsDir(base_path('system/Base/Installer/View/'));
-
-				return $view;
-			}
-		);
-
-		$container->setShared(
-			'basepackages',
-			function () {
-				return new Basepackages();
-			}
-		);
-
-		$container->setShared(
-			'localContent',
-			function () use ($container) {
-				return (new LocalContent($container))->init();
-			}
-		);
-
-		$container->setShared(
-			'validation',
-			function () {
-				return (new Validation())->init();
-			}
-		);
-
-		$container->setShared(
-			'security',
-			function () {
-				return (new Security())->init();
-			}
-		);
-
-		$container->setShared(
-			'crypt',
-			function () {
-				return (new Crypt())->init();
-			}
-		);
-
-		$container->setShared(
-			'random',
-			function () {
-				return (new Random())->init();
-			}
-		);
-
-		$container->setShared(
-			'cookies',
-			function () {
-				return new Cookies();
-			}
-		);
-
-		if (extension_loaded('Zend OPcache')) {
 			$container->setShared(
-				'opCache',
+				'view',
 				function () {
-					return (new OpCache())->init();
+					$view = new Simple();
+
+					$view->setViewsDir(base_path('system/Base/Installer/View/'));
+
+					return $view;
 				}
 			);
-		} else {
+
 			$container->setShared(
-				'opCache',
+				'basepackages',
 				function () {
-					return false;
+					return new Basepackages();
 				}
 			);
+
+			$container->setShared(
+				'validation',
+				function () {
+					return (new Validation())->init();
+				}
+			);
+
+			$container->setShared(
+				'security',
+				function () {
+					return (new Security())->init();
+				}
+			);
+
+			$container->setShared(
+				'crypt',
+				function () {
+					return (new Crypt())->init();
+				}
+			);
+
+			$container->setShared(
+				'random',
+				function () {
+					return (new Random())->init();
+				}
+			);
+
+			$container->setShared(
+				'cookies',
+				function () {
+					return new Cookies();
+				}
+			);
+
+			if (extension_loaded('Zend OPcache')) {
+				$container->setShared(
+					'opCache',
+					function () {
+						return (new OpCache())->init();
+					}
+				);
+			} else {
+				$container->setShared(
+					'opCache',
+					function () {
+						return false;
+					}
+				);
+			}
+
+			$container->setShared(
+				'wss',
+				function () use ($configsObj) {
+					return (new Wss($configsObj))->init();
+				}
+			);
+
+			$container->setShared(
+				'localContent',
+				function () use ($container) {
+					return (new LocalContent($container))->init();
+				}
+			);
+
+			$container->setShared('session', $session);
+
+			$this->container = $container;
+
+			$this->response = $this->container->getShared('response');
+			$this->response->setContentType('application/json', 'UTF-8');
+			$this->response->setHeader('Cache-Control', 'no-store');
+
+			$this->request = $this->container->getShared('request');
+			$this->postData = $this->request->getPost();
+
+			$this->security = $this->container->getShared('security');
+			$this->random = $this->container->getShared('random');
+			$this->session = $this->container->getShared('session');
+			$this->cookies = $this->container->getShared('cookies');
+
+			$this->view = $this->container->getShared('view');
+
+			$this->basepackages = $this->container->getShared('basepackages');
+
+			$this->progress = $this->basepackages->progress->init($this->container);
+
+			$this->config = $configsObj->toArray();
+
+			$this->localContent = $this->container->getShared('localContent');
+		} catch (\throwable $e) {
+			if (str_contains($e->getMessage(), 'Class')) {
+				$this->renderView(true);
+
+				exit;
+			}
+
+			throw $e;
 		}
 
-		$container->setShared(
-			'wss',
-			function () use ($configsObj) {
-				return (new Wss($configsObj))->init();
-			}
-		);
-
-		$container->setShared('session', $session);
-
-		$this->container = $container;
-
-		$this->response = $this->container->getShared('response');
-		$this->response->setContentType('application/json', 'UTF-8');
-		$this->response->setHeader('Cache-Control', 'no-store');
-
-		$this->request = $this->container->getShared('request');
-		$this->postData = $this->request->getPost();
-
-		$this->security = $this->container->getShared('security');
-		$this->random = $this->container->getShared('random');
-		$this->session = $this->container->getShared('session');
-		$this->cookies = $this->container->getShared('cookies');
-
-		$this->view = $this->container->getShared('view');
-
-		$this->localContent = $this->container->getShared('localContent');
-
-		$this->basepackages = $this->container->getShared('basepackages');
-
-		$this->progress = $this->basepackages->progress->init($this->container);
-
-		$this->config = $configsObj->toArray();
 	}
 
 	public function run($onlyUpdateDb = false, $message = null)
@@ -332,28 +343,6 @@ Class Setup
 
 				$this->progress->preCheckComplete();
 
-				$this->setupPackage->executeComposer();
-
-				do {
-					$callResult = $this->progress->getCallResult('executeComposer');
-
-					if ($callResult === false) {
-						$this->progress->resetProgress();
-
-						$this->view->responseCode = 3;
-
-						$this->view->responseMessage = 'External packages installation error!';
-
-						if ($this->response->isSent() !== true) {
-							$this->response->setJsonContent($this->view->getParamsToView());
-
-							return $this->response->send();
-						}
-					}
-
-					sleep(1);
-				} while ($callResult === null);
-
 				$this->setupPackage->buildSchema();
 
 				$this->setupPackage->registerRepos();
@@ -472,39 +461,6 @@ Class Setup
 					$this->view->responseCode = 1;
 					$this->view->responseMessage = 'Error retrieving new pass.';
 				}
-			} else {
-				$progress = $this->progress->getProgress($this->postData['session'], true);
-
-				if (isset($this->postData['composer'])) {
-					$callResult = $this->progress->getCallResult('executeComposer');
-
-					if ($callResult === false) {
-						$progress = array_merge($progress, ['composer_error' => true]);
-					}
-					try {
-						$composerInstall = $this->localContent->read('external/composer.install');
-						if (strpos($composerInstall, 'curl error') !== false) {
-							$progress = array_merge($progress, ['composer' => $composerInstall, 'composer_error' => true]);
-						} else if (strpos($composerInstall, 'requirements could not be resolved') !== false) {
-							$progress = array_merge($progress, ['composer' => $composerInstall, 'composer_error' => true]);
-						} else {
-							$progress = array_merge($progress, ['composer' => $composerInstall]);
-						}
-					} catch (FilesystemException | UnableToReadFile $exception) {
-						$progress = array_merge($progress, ['composer' => 'Error retrieving external packages installer information...']);
-					}
-
-					$progress = Json::encode($progress);
-				}
-
-				if ($progress) {
-					$this->view->responseCode = 0;
-					$this->view->responseMessage = 'Ok';
-					$this->view->responseData = $progress;
-				} else {
-					$this->view->responseCode = 1;
-					$this->view->responseMessage = 'Error retrieving progress.';
-				}
 			}
 
 			$this->response->setContentType('application/json', 'UTF-8');
@@ -516,35 +472,7 @@ Class Setup
 				return $this->response->send();
 			}
 		} else {
-			$this->cookies->useEncryption(false);
-
-			$this->cookies->set(
-				'Installer',
-				$this->session->getId(),
-				time() + 600,
-				'/',
-				null,
-				null,
-				true,
-				[
-					'samesite'	=> 'Strict'
-				]
-			);
-
-			$this->cookies->send();
-
-			$this->cookies->useEncryption(true);
-
-			echo $this->container->getShared('view')->render(
-				'setup',
-				[
-					'onlyUpdateDb' 	=> $onlyUpdateDb,
-					'message' 		=> $message,
-					'request'		=> $this->request,
-					'security'		=> $this->security,
-					'session'		=> $this->session
-				]
-			);
+			$this->renderView(false, $onlyUpdateDb, $message);
 		}
 	}
 
@@ -563,10 +491,6 @@ Class Setup
 				[
 					'method'	=> 'checkDbEmpty',
 					'text'		=> 'Checking if db is empty...'
-				],
-				[
-					'method'	=> 'executeComposer',
-					'text'		=> 'Downloading & installing external packages...'
 				],
 				[
 					'method'	=> 'buildSchema',
@@ -683,5 +607,134 @@ Class Setup
 		}
 
 		return false;
+	}
+
+	protected function renderView($precheckFail = false, $onlyUpdateDb = false, $message = null)
+	{
+		if ($precheckFail) {
+			if ($this->request->isPost()) {
+				if (isset($this->postData['composer'])) {
+					$callResult = $this->progress->getCallResult('executeComposer');
+
+					$progress = [];
+
+					if ($callResult === false) {
+						$progress = array_merge($progress, ['composer_error' => true]);
+					} else {
+						$progress = $this->progress->getProgress($this->postData['session'], true);
+					}
+
+					try {
+						$composerInstall = file_get_contents(base_path('external/composer.install'));
+
+						if (strpos($composerInstall, 'curl error') !== false) {
+							$progress = array_merge($progress, ['composer' => $composerInstall, 'composer_error' => true]);
+						} else if (strpos($composerInstall, 'requirements could not be resolved') !== false) {
+							$progress = array_merge($progress, ['composer' => $composerInstall, 'composer_error' => true]);
+						} else {
+							$progress = array_merge($progress, ['composer' => $composerInstall]);
+						}
+
+						if ($callResult) {
+							$this->view->responseCode = 0;
+							$this->view->responseMessage = 'External packages installation success!';
+						} else {
+							$this->view->responseCode = 1;
+							$this->view->responseMessage = 'External packages installation error!';
+						}
+
+						$this->view->responseData = $progress;
+					} catch (\throwable $exception) {
+						$progress = array_merge($progress, ['composer' => 'Error retrieving external packages installer information...']);
+
+						$this->view->responseCode = 1;
+						$this->view->responseMessage = 'External packages installation error!';
+					}
+				} else {
+					$this->setupPackage = new SetupPackage($this->container, $this->postData, $precheckFail);
+
+					$this->setupPackage->executeComposer();
+
+					do {
+						$callResult = $this->progress->getCallResult('executeComposer');
+
+						if ($callResult === false) {
+							$this->progress->resetProgress();
+
+							$this->view->responseCode = 3;
+
+							$this->view->responseMessage = 'External packages installation error!';
+
+							if ($this->response->isSent() !== true) {
+								$this->response->setJsonContent($this->view->getParamsToView());
+
+								return $this->response->send();
+							}
+						} else {
+							$this->view->responseCode = 0;
+
+							$this->view->responseMessage = 'External packages installation success!';
+						}
+
+						sleep(1);
+					} while ($callResult === null);
+				}
+
+				$this->response->setContentType('application/json', 'UTF-8');
+				$this->response->setHeader('Cache-Control', 'no-store');
+
+				if ($this->response->isSent() !== true) {
+					$this->response->setJsonContent($this->view->getParamsToView());
+
+					return $this->response->send();
+				}
+			} else {
+				if ($this->progress->checkProgressFile()) {
+					$this->progress->deleteProgressFile();
+				}
+
+				$this->progress->registerMethods(
+					[
+						[
+							'method'	=> 'executeComposer',
+							'text'		=> 'Downloading & installing external packages...'
+						]
+					]
+				);
+
+				$this->progress->preCheckComplete();
+			}
+		}
+
+		$this->cookies->useEncryption(false);
+
+		$this->cookies->set(
+			'Installer',
+			$this->session->getId(),
+			time() + 600,
+			'/',
+			null,
+			null,
+			true,
+			[
+				'samesite'	=> 'Strict'
+			]
+		);
+
+		$this->cookies->send();
+
+		$this->cookies->useEncryption(true);
+
+		echo $this->container->getShared('view')->render(
+			'setup',
+			[
+				'precheckFail'	=> $precheckFail,
+				'onlyUpdateDb' 	=> $onlyUpdateDb,
+				'message' 		=> $message,
+				'request'		=> $this->request,
+				'security'		=> $this->security,
+				'session'		=> $this->session
+			]
+		);
 	}
 }
