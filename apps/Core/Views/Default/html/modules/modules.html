@@ -46,7 +46,7 @@
                             [
                                 'id'        : 'repo-add',
                                 'tooltip'   : 'Repo Add',
-                                'icon'      : 'fas fa-fw fa-circle-plus',
+                                'icon'      : 'circle-plus',
                                 'iconColor' : 'success',
                                 'disabled'  : true,
                                 'url'       : links.url('system/api/q/repository/true/id/0')
@@ -55,7 +55,7 @@
                             [
                                 'id'        : 'repo-update',
                                 'tooltip'   : 'Repo Update',
-                                'icon'      : 'fas fa-fw fa-edit',
+                                'icon'      : 'edit',
                                 'iconColor' : 'warning',
                                 'disabled'  : true,
                                 'url'       : links.url('system/api/q/repository/true/id/')
@@ -64,7 +64,7 @@
                             [
                                 'id'        : 'repo-sync',
                                 'tooltip'   : 'Repo Sync',
-                                'icon'      : 'fas fa-fw fa-sync-alt',
+                                'icon'      : 'sync-alt',
                                 'iconColor' : 'secondary',
                                 'disabled'  : true
                             ],
@@ -76,7 +76,7 @@
                             [
                                 'id'        : 'filter-update-available',
                                 'tooltip'   : 'Apply Filter (update)',
-                                'icon'      : 'fas fa-fw fa-circle-up',
+                                'icon'      : 'circle-up',
                                 'iconColor' : 'secondary',
                                 'disabled'  : true
                             ],
@@ -84,8 +84,8 @@
                             [
                                 'id'        : 'filter-new-available',
                                 'tooltip'   : 'Apply Filter (new)',
-                                'text'      : ' N',
-                                'textColor' : 'secondary',
+                                'icon'      : 'star',
+                                'iconColor' : 'secondary',
                                 'disabled'  : true
                             ],
                         '1'       :
@@ -96,7 +96,7 @@
                             [
                                 'id'        : 'filter-update',
                                 'tooltip'   : 'Apply Filter (:update)',
-                                'icon'      : 'fas fa-fw fa-circle-up',
+                                'icon'      : 'circle-up',
                                 'iconColor' : 'secondary',
                                 'disabled'  : true
                             ],
@@ -104,7 +104,7 @@
                             [
                                 'id'        : 'filter-install',
                                 'tooltip'   : 'Apply Filter Install/Update (:install)',
-                                'icon'      : 'fas fa-fw fa-circle-plus',
+                                'icon'      : 'circle-plus',
                                 'iconColor' : 'secondary',
                                 'disabled'  : true
                             ],
@@ -112,7 +112,7 @@
                             [
                                 'id'        : 'filter-uninstall',
                                 'tooltip'   : 'Apply Filter Uninstall (:uninstall)',
-                                'icon'      : 'fas fa-fw fa-circle-minus',
+                                'icon'      : 'circle-minus',
                                 'iconColor' : 'secondary',
                                 'disabled'  : true
                             ],
@@ -120,7 +120,7 @@
                             [
                                 'id'        : 'filter-remove',
                                 'tooltip'   : 'Apply Filter Remove (:remove)',
-                                'icon'      : 'fas fa-fw fa-circle-xmark',
+                                'icon'      : 'circle-xmark',
                                 'iconColor' : 'secondary',
                                 'disabled'  : true
                             ],
@@ -132,7 +132,7 @@
                             [
                                 'id'        : 'filter-queue',
                                 'tooltip'   : 'Apply Filter In Queue (queue:)',
-                                'icon'      : 'fas fa-fw fa-list',
+                                'icon'      : 'list',
                                 'iconColor' : 'secondary',
                                 'disabled'  : true
                             ],
@@ -140,7 +140,7 @@
                             [
                                 'id'        : 'filter-clear',
                                 'tooltip'   : 'Clear all filters',
-                                'icon'      : 'fas fa-fw fa-times',
+                                'icon'      : 'times',
                                 'iconColor' : 'primary'
                             ]
                     ],
@@ -394,10 +394,6 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
     dataCollectionSectionForm['funcs']['initJstreeButtons']();
 }
 dataCollectionSectionForm['funcs']['initJstreeButtons'] = function() {
-    //eslint-disable-next-line
-    console.log('memememe');
-    //eslint-disable-next-line
-    console.log(dataCollectionSectionForm['vars']['sync']);
     $('#{{componentId}}-{{sectionId}}-modules-repo-sync, ' +
       '#{{componentId}}-{{sectionId}}-modules-filter-update-available, ' +
       '#{{componentId}}-{{sectionId}}-modules-filter-new-available, ' +
@@ -627,8 +623,7 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
             dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
             dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-clear', 'primary', false);
         }
-        //eslint-disable-next-line
-        console.log(dataCollectionSectionForm['vars']['new_available']);
+
         if (dataCollectionSectionForm['vars']['new_available'] > 0) {
             dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-new-available', 'info', false);
         }
@@ -874,8 +869,6 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
             ) {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
             } else {
-            //eslint-disable-next-line
-            console.log(moduleInfo.installed);
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'remove', 'repo-sync']);
             }
         } else {

@@ -81,10 +81,10 @@ class Jstree
 
                             if (isset($field['icon']) && isset($field['iconColor'])) {
                         $this->content .=
-                                '<i class="' . $field['icon'] . ' text-' . $field['iconColor'] . '"></i>';
+                                '<i class="fas fa-fw fa-' . $field['icon'] . ' text-' . $field['iconColor'] . '"></i>';
                             } else if (isset($field['text']) && isset($field['textColor'])) {
                         $this->content .=
-                                '<span class="text-uppercase ml-1" style="top: -1px;position: relative;"><span class="badge badge-' . $field['textColor'] . '">' . $field['text'] . '</span></span>';
+                                '<span class="text-uppercase ml-1" style="top: -1px;position: relative;"><span class="badge badge-' . $field['badgeColor'] . '">' . $field['badge'] . '</span></span>';
                             }
                         $this->content .=
                             '</a>';
