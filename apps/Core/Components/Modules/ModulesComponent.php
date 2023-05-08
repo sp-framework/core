@@ -149,7 +149,7 @@ class ModulesComponent extends BaseComponent
 					$this->addResponse(
 						$this->modules->manager->packagesData->responseMessage,
 						$this->modules->manager->packagesData->responseCode,
-						[$modulesTree, 'counter' => $counter, 'modules_html' => $this->generateTree($modulesTree)]
+						array_merge($modulesTree, ['counter' => $counter, 'modules_html' => $this->generateTree($modulesTree)])
 					);
 
 					return true;

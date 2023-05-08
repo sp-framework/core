@@ -383,8 +383,9 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
                 text        : dataCollectionSectionForm['vars']['searchInfo'],
                 textTrusted : true
             });
-            dataCollectionSectionForm['vars']['searchInfo'] = '';
         }
+
+        dataCollectionSectionForm['vars']['searchInfo'] = '';
 
         if (dataCollectionSectionForm['vars']['update_available'] > 0) {
             dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', 'warning', false);
@@ -556,6 +557,7 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
                             ' (In Queue:Install) ' +
                             ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-info">NEW</span></span>'
                         );
+                        dataCollectionSectionForm['vars']['new_available'] = 1;
                     } else {
                         $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Install)');
                     }
@@ -617,6 +619,10 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
             dataCollectionSectionForm['vars']['filter'] = true;
             $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
             $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
+        } else if (dataCollectionSectionForm['vars']['new_available'] == 1) {
+            dataCollectionSectionForm['vars']['filter'] = true;
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('new');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().search('new');
         }
 
         if (dataCollectionSectionForm['vars']['queue']['count'] > 0) {
@@ -1392,6 +1398,11 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
                     dataCollectionSectionForm['vars']['initJstree'] = false;
                     $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
                     $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
+                } else {
+                    PNotify.info({
+                        text        : dataCollectionSectionForm['vars']['searchInfo'],
+                        textTrusted : true
+                    });
                 }
             }
         } else {

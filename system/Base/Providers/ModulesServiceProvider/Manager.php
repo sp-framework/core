@@ -203,15 +203,15 @@ class Manager extends BasePackage
         }
 
         if (isset($data['api_id'])) {
-            $localModules['components'] = $this->modules->components->getComponentsByApiId($data['api_id']);
-            $localModules['middlewares'] = $this->modules->middlewares->getMiddlewaresByApiId($data['api_id']);
-            $localModules['packages'] = $this->modules->packages->getPackagesByApiId($data['api_id']);
-            $localModules['views'] = $this->modules->views->getViewsByApiId($data['api_id']);
+            $localModules['components'] = $this->modules->components->init(true)->getComponentsByApiId($data['api_id']);
+            $localModules['middlewares'] = $this->modules->middlewares->init(true)->getMiddlewaresByApiId($data['api_id']);
+            $localModules['packages'] = $this->modules->packages->init(true)->getPackagesByApiId($data['api_id']);
+            $localModules['views'] = $this->modules->views->init(true)->getViewsByApiId($data['api_id']);
         } else {
-            $localModules['components'] = $this->modules->components->getAll()->components;
-            $localModules['middlewares'] = $this->modules->middlewares->getAll()->middlewares;
-            $localModules['packages'] = $this->modules->packages->getAll()->packages;
-            $localModules['views'] = $this->modules->views->getAll()->views;
+            $localModules['components'] = $this->modules->components->init(true)->components;
+            $localModules['middlewares'] = $this->modules->middlewares->init(true)->middlewares;
+            $localModules['packages'] = $this->modules->packages->init(true)->packages;
+            $localModules['views'] = $this->modules->views->init(true)->views;
         }
 
         foreach ($localModules as $moduleType => $modulesArr) {
@@ -322,7 +322,7 @@ class Manager extends BasePackage
 
         try {
             if ($this->getRemoteModules() === true && $this->updateRemoteModulesToDB() === true) {
-                if ($getRepositoryModules) {
+                if ($getRepositoryModules == true) {
                     $this->getRepositoryModules();
                 } else {
                     $this->getRepositoryModules(['api_id' => $this->apiConfig['id']]);
