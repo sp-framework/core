@@ -148,6 +148,8 @@ Class Setup
 			$this->localContent = $this->container->getShared('localContent');
 		} catch (\throwable $e) {
 			if (str_contains($e->getMessage(), 'Class')) {
+				$this->populateComposerJsonFile();
+
 				$this->renderView(true);
 
 				exit;
@@ -736,5 +738,35 @@ Class Setup
 				'session'		=> $this->session
 			]
 		);
+	}
+
+	protected function populateComposerJsonFile()
+	{
+		$this->view->responseCode = 0;
+
+		try {
+			$composerJsonFile = Json::decode(file_get_contents(base_path('external/composer.json')), true);
+		} catch (\throwable $exception) {
+			$this->view->responseCode = 1;
+
+			$this->view->responseMessage = 'Error reading Composer Json File. Please download Core again from repository.';
+		}
+
+		try {
+			$coreJsonFile = Json::decode(file_get_contents(base_path('system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json')), true);
+
+			foreach ($coreJsonFile['dependencies']['external'] as $external => $version) {
+				if (!isset($composerJsonFile['require'][$external])) {
+					$composerJsonFile['require'][$external] = $version;
+				}
+			}
+
+			file_put_contents(base_path('external/composer.json'), Json::encode($composerJsonFile, JSON_PRETTY_PRINT));
+		} catch (\throwable $exception) {
+			$this->view->responseCode = 1;
+
+			$this->view->responseMessage = 'Error reading Core Json File. Please download Core again from repository.';
+		}
+
 	}
 }

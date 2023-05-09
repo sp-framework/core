@@ -269,26 +269,39 @@
                                     <?php } ?>
                                     <?php if ($precheckFail) { ?>
                                         <div class="row vdivide justify-content-center">
-                                            <div class="col">
-                                                Bazaari Framework requires some external dependencies which are not available on this system. You can either install those dependencies using CLI if you have access to the server using the command <span class="text-info">./composer install"</span> in the <span class="text-info">external/ folder</span>. That will install the required dependencies and you can then run this setup again.<br><br>
-                                                If in case you do not have access to the server via CLI, you can click "Download & Install Dependencies" button and the framework will try and install the files for you.
-                                            </div>
+                                            <?php if ($responseCode == '1') { ?>
+                                                <div class="col">
+                                                    <span class="text-danger"><?php echo $responseMessage; ?></span>
+                                                </div>
+                                            <?php } else { ?>
+                                                <div class="col">
+                                                    Bazaari Framework requires some external dependencies which are not available on this system. You can either install those dependencies using CLI if you have access to the server using the command <span class="text-info">./composer install"</span> in the <span class="text-info">external/ folder</span>. That will install the required dependencies and you can then run this setup again.<br><br>
+                                                    If in case you do not have access to the server via CLI, you can click "Download & Install Dependencies" button and the framework will try and install the files for you.
+                                                </div>
+                                            <?php } ?>
                                         </div>
                                     <?php } ?>
                                     <hr>
                                     <div id="installer-progress" class="mb-3" hidden></div>
                                     <div class="row text-center p-3">
                                         <?php if (!$onlyUpdateDb) { ?>
-                                            <div class="col" id="submit-div">
-                                                <button id="submit" class="btn btn-primary">
-                                                    <i id="submit-spinner" class="fa fa-cog fa-spin" hidden></i>
-                                                    <?php if (!$precheckFail) { ?>
-                                                        Setup
-                                                    <?php } else { ?>
-                                                        Download & Install Dependencies
-                                                    <?php } ?>
-                                                </button>
-                                            </div>
+                                            <?php if (!$precheckFail) { ?>
+                                                <div class="col" id="submit-div">
+                                                    <button id="submit" class="btn btn-primary">
+                                                        <i id="submit-spinner" class="fa fa-cog fa-spin" hidden></i>
+                                                            Setup
+                                                        </button>
+                                                    </div>
+                                            <?php } else { ?>
+                                                <?php if ($responseCode != '1') { ?>
+                                                    <div class="col" id="submit-div">
+                                                        <button id="submit" class="btn btn-primary">
+                                                            <i id="submit-spinner" class="fa fa-cog fa-spin" hidden></i>
+                                                                Download & Install Dependencies
+                                                        </button>
+                                                    </div>
+                                                <?php } ?>
+                                            <?php } ?>
                                         <?php } else { ?>
                                             <div class="col" id="update-div">
                                                 <button id="update" class="btn btn-primary">
