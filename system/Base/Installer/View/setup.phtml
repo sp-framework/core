@@ -482,24 +482,23 @@
                         success: function (data) {
                             if (data && data.responseCode === 0) {
                                 var alert = 'alert-success';
-                                setTimeout(function() {
-                                    $('#alert').attr('hidden', false);
-                                    $('#alert').html('');
-                                    if ($('#access').is('.btn-warning')) {
-                                        alert = 'alert-warning';
-                                    }
-                                    $('#alert').removeClass(function (index, className) {
-                                        return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
-                                    }).addClass(alert).html(data.responseMessage);
-                                    $('#access').attr('disabled', false);
-                                    <?php if ($onlyUpdateDb) { ?>
-                                        $('#access-div').attr('hidden', false);
-                                        $('#access').addClass('btn-success');
-                                        $('#access').children('i').addClass('fa-check');
-                                    <?php } ?>
-                                    $('#update-div').attr('hidden', true);
-                                    $('#submit-spinner, #update-spinner').attr('hidden', true);
-                                }, 1000);
+
+                                $('#alert').attr('hidden', false);
+                                $('#alert').html('');
+                                if ($('#access').is('.btn-warning')) {
+                                    alert = 'alert-warning';
+                                }
+                                $('#alert').removeClass(function (index, className) {
+                                    return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
+                                }).addClass(alert).html(data.responseMessage);
+                                $('#access').attr('disabled', false);
+                                <?php if ($onlyUpdateDb) { ?>
+                                    $('#access-div').attr('hidden', false);
+                                    $('#access').addClass('btn-success');
+                                    $('#access').children('i').addClass('fa-check');
+                                <?php } ?>
+                                $('#update-div').attr('hidden', true);
+                                $('#submit-spinner, #update-spinner').attr('hidden', true);
                             } else if (data.responseCode === 1 || data.responseCode === 2 || data.responseCode === 3) {
                                 $('#alert').attr('hidden', false);
                                 $('#alert').html('');
@@ -648,7 +647,7 @@
                             $('#access').children('i').addClass('fa-check');
                             $('#access-div').attr('hidden', false);
                             $('#submit-div').attr('hidden', true);
-                        }, 500);
+                        }, 1000);
                     }
                 }
             });

@@ -744,6 +744,10 @@ Class Setup
 	{
 		$this->view->responseCode = 0;
 
+		if (file_exists(base_path('external/composer.lock'))) {
+			unlink(base_path('external/composer.lock'));
+		}
+
 		try {
 			$composerJsonFile = Json::decode(file_get_contents(base_path('external/composer.json')), true);
 		} catch (\throwable $exception) {
