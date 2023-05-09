@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {{get_doctype()}}
 <html lang="en">
     <head>
@@ -71,7 +71,13 @@ if (!window.dataCollection) {
     dataCollection.env.libsLoaded = false;
     var uri = window.location.href.replace(dataCollection.env.rootPath, '');
     var splitUri = uri.split('/q/');
-    dataCollection.env.currentRoute = splitUri[0];
+    dataCollection.env.currentRoute = '/' + splitUri[0];
+    if (splitUri[1]) {
+        dataCollection.env.currentQuery = splitUri[1];
+    } else {
+        dataCollection.env.currentQuery = '';
+    }
+
     dataCollection.env.currentId = "{{currentId}}";
 }
 </script>
@@ -82,3 +88,4 @@ if (!window.dataCollection) {
         {{content()}}
     </body>
 </html>
+<!-- htmlmin:ignore -->

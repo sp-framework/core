@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Core\Packages\Devtools\Matrix;
+namespace Apps\Core\Packages\Devtools\Modules;
 
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
@@ -11,9 +11,9 @@ use Phalcon\Helper\Json;
 use Phalcon\Helper\Str;
 use System\Base\BasePackage;
 
-class Matrix extends BasePackage
+class Modules extends BasePackage
 {
-    public function updateMatrix(array $data)
+    public function updateModules(array $data)
     {
         if ($data['type'] === 'core') {
             $this->updateCore($data);

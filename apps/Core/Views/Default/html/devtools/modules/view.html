@@ -10,17 +10,17 @@
             'cardHeader'                    : true,
             'cardFooter'                    : true,
             'cardType'                      : 'primary',
-            'cardIcon'                      : 'random',
-            'cardTitle'                     : 'Matrix : ' ~ module['name'] ~ ' (' ~ type ~ ')',
+            'cardIcon'                      : 'th',
+            'cardTitle'                     : 'Modules : ' ~ module['name'] ~ ' (' ~ type ~ ')',
             'cardAdditionalClass'           : 'rounded-0',
-            'cardBodyInclude'               : 'matrix/module/' ~ type,
+            'cardBodyInclude'               : 'modules/module/' ~ type,
             'formButtons'                   :
             [
                 'updateButtonId'                : module['id'],
-                'updateActionUrl'               : 'devtools/matrix/update',
-                'updateSuccessRedirectUrl'      : 'devtools/matrix',
-                'cancelActionUrl'               : 'devtools/matrix',
-                'closeActionUrl'                : 'devtools/matrix'
+                'updateActionUrl'               : 'devtools/modules/update',
+                'updateSuccessRedirectUrl'      : 'devtools/modules',
+                'cancelActionUrl'               : 'devtools/modules',
+                'closeActionUrl'                : 'devtools/modules'
             ]
         ]
     )}}
@@ -36,10 +36,10 @@
             'cardHeader'                    : true,
             'cardFooter'                    : false,
             'cardType'                      : 'primary',
-            'cardIcon'                      : 'random',
-            'cardTitle'                     : 'Matrix',
+            'cardIcon'                      : 'th',
+            'cardTitle'                     : 'Modules',
             'cardAdditionalClass'           : 'rounded-0',
-            'cardBodyInclude'               : 'matrix/select'
+            'cardBodyInclude'               : 'modules/select'
         ]
     )}}
 {% endif %}

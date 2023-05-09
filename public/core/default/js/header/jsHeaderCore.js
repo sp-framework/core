@@ -367,6 +367,11 @@ var BazContentLoader = function() {
         var dataCollection = window.dataCollection;
         var uri = url.replace(dataCollection.env.rootPath, '');
         var splitUri = uri.split('/q/');
+        if (splitUri[1]) {
+            dataCollection.env.currentQuery = splitUri[1];
+        } else {
+            dataCollection.env.currentQuery = '';
+        }
         return splitUri[0];
     }
 
