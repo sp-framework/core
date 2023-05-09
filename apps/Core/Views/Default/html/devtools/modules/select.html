@@ -20,6 +20,48 @@
             ]
         )}}
     </div>
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'componentId'                       : componentId,
+                'sectionId'                         : sectionId,
+                'buttonType'                        : 'DropdownSplitButtons',
+                'dropdownButtonId'                  : 'main',
+                'dropdownButtonTitle'               : 'Add New Module',
+                'dropdownButtonIcon'                : 'plus',
+                'dropdownButtonAdditionalClass'     : 'text-uppercase',
+                'buttonPosition'                    : 'right',
+                'dropdownAlign'                     : 'right',
+                'buttons'                           :
+                    {
+                        'components' : {
+                            'title'                   : 'Component',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : links.url('devtools/modules/q/module/true/type/components/id/0')
+                        },
+                        'packages' : {
+                            'title'                   : 'Package',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : links.url('devtools/modules/q/module/true/type/packages/id/0')
+                        },
+                        'middlewares' : {
+                            'title'                   : 'Middleware',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : links.url('devtools/modules/q/module/true/type/middlewares/id/0')
+                        },
+                        'views' : {
+                            'title'                   : 'View',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : links.url('devtools/modules/q/module/true/type/views/id/0')
+                        }
+                    }
+            ]
+        )}}
+    </div>
 </div>
 <div class="row">
     <div class="col">
@@ -132,17 +174,19 @@ dataCollectionSection =
     });
 
 dataCollectionSectionForm['funcs']['loadAjax'] = function(id = null, label = null, includecoremodules = false) {
+    //eslint-disable-next-line
+    console.log(dataCollectionSectionForm['vars']['url']);
     if (id && label) {
         if (dataCollectionSectionForm['vars']['url'].includes('/q/')) {
-            dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/module/true/type/' + label + '/id/' + id;
+            dataCollectionSectionForm['vars']['url'] = '{{links.url("module/true/type/' + label + '/id/' + id + '")}}';
         } else {
-            dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/q/module/true/type/' + label + '/id/' + id;
+            dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/module/true/type/' + label + '/id/' + id + '")}}';
         }
     } else if (includecoremodules) {
         if (dataCollectionSectionForm['vars']['url'].includes('/q/')) {
-            dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/includecoremodules/true';
+            dataCollectionSectionForm['vars']['url'] = '{{links.url("includecoremodules/true")}}';
         } else {
-            dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/q/includecoremodules/true';
+            dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/includecoremodules/true")}}';
         }
     } else {
         dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];

@@ -1,4 +1,8 @@
-{# {{dump(module)}} #}
+{% if module['id'] is defined %}
+    {% set moduleDependencies = module['dependencies'] %}
+{% else %}
+    {% set moduleDependencies = json_encode([], 16) %}
+{% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         {{adminltetags.useTag('tabs',
@@ -52,7 +56,7 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 }
 
 var modules = JSON.parse('{{modulesJson}}');
-var moduleDependencies = JSON.parse('{{module["dependencies"]}}');
+var moduleDependencies = JSON.parse('{{moduleDependencies}}');
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {

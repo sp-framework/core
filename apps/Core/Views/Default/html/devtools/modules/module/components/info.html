@@ -1,3 +1,36 @@
+{% if module['id'] is defined %}
+    {% set moduleId = module['id'] %}
+    {% set moduleName = module['name'] %}
+    {% set moduleRoute = module['route'] %}
+    {% set moduleDisplay_name = module['display_name'] %}
+    {% set moduleDescription = module['description'] %}
+    {% set moduleApp_type = module['app_type'] %}
+    {% set moduleCategory = module['category'] %}
+    {% set moduleSub_category = module['sub_category'] %}
+    {% set moduleVersion = module['version'] %}
+    {% set moduleRepo = module['repo'] %}
+    {% set moduleClass = module['class'] %}
+    {% set moduleSettings = module['settings'] %}
+    {% set moduleMenu_id = module['menu_id'] %}
+    {% set moduleMenu = module['menu'] %}
+    {% set moduleApps = module['apps'] %}
+{% else %}
+    {% set moduleId = '' %}
+    {% set moduleName = '' %}
+    {% set moduleRoute = '' %}
+    {% set moduleDisplay_name = '' %}
+    {% set moduleDescription = '' %}
+    {% set moduleApp_type = '' %}
+    {% set moduleCategory = '' %}
+    {% set moduleSub_category = '' %}
+    {% set moduleVersion = '' %}
+    {% set moduleRepo = '' %}
+    {% set moduleClass = '' %}
+    {% set moduleSettings = '' %}
+    {% set moduleMenu_id = '' %}
+    {% set moduleMenu = '' %}
+    {% set moduleApps = '' %}
+{% endif %}
 {% if type === 'components' %}
     {% set title = 'component' %}
 {% elseif type === 'views' %}
@@ -22,7 +55,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldHidden'                    : true,
                 'fieldDisabled'                  : true,
-                'fieldValue'                     : module['id']
+                'fieldValue'                     : moduleId
             ]
         )}}
         {{adminltetags.useTag('fields',
@@ -65,7 +98,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 50,
-                'fieldValue'                     : module['name']
+                'fieldValue'                     : moduleName
             ]
         )}}
     </div>
@@ -87,7 +120,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 50,
-                'fieldValue'                     : module['route']
+                'fieldValue'                     : moduleRoute
             ]
         )}}
     </div>
@@ -110,7 +143,7 @@
                     'fieldBazPostOnUpdate'           : true,
                     'fieldDataInputMinLength'        : 1,
                     'fieldDataInputMaxLength'        : 50,
-                    'fieldValue'                     : module['display_name']
+                    'fieldValue'                     : moduleDisplay_name
                 ]
             )}}
         </div>
@@ -135,7 +168,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMaxLength'        : 1024,
                 'fieldTextareaRows'              : 2,
-                'fieldValue'                     : module['description']
+                'fieldValue'                     : moduleDescription
             ]
         )}}
     </div>
@@ -158,7 +191,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 50,
-                'fieldValue'                     : module['app_type']
+                'fieldValue'                     : moduleApp_type
             ]
         )}}
     </div>
@@ -179,7 +212,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 50,
-                'fieldValue'                     : module['category']
+                'fieldValue'                     : moduleCategory
             ]
         )}}
     </div>
@@ -200,7 +233,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 50,
-                'fieldValue'                     : module['sub_category']
+                'fieldValue'                     : moduleSub_category
             ]
         )}}
     </div>
@@ -223,7 +256,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 50,
-                'fieldValue'                     : module['version']
+                'fieldValue'                     : moduleVersion
             ]
         )}}
     </div>
@@ -244,7 +277,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 1024,
-                'fieldValue'                     : module['repo']
+                'fieldValue'                     : moduleRepo
             ]
         )}}
     </div>
@@ -268,7 +301,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 2048,
-                'fieldValue'                     : module['class']
+                'fieldValue'                     : moduleClass
             ]
         )}}
     </div>
@@ -298,7 +331,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMaxLength'        : 1024,
                 'fieldTextareaRows'              : rows,
-                'fieldValue'                     : module['settings']
+                'fieldValue'                     : moduleSettings
             ]
         )}}
     </div>
@@ -322,7 +355,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 50,
-                'fieldValue'                     : module['menu_id']
+                'fieldValue'                     : moduleMenu_id
             ]
         )}}
     </div>
@@ -344,7 +377,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMaxLength'        : 2048,
                 'fieldTextareaRows'              : 2,
-                'fieldValue'                     : module['menu']
+                'fieldValue'                     : moduleMenu
             ]
         )}}
     </div>
@@ -369,7 +402,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMaxLength'        : 2048,
                 'fieldTextareaRows'              : 2,
-                'fieldValue'                     : module['apps']
+                'fieldValue'                     : moduleApps
             ]
         )}}
     </div>

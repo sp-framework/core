@@ -1,3 +1,8 @@
+{% if module['id'] is defined %}
+    {% set moduleDependencies = module['dependencies'] %}
+{% else %}
+    {% set moduleDependencies = json_encode([], 16) %}
+{% endif %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -138,7 +143,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMaxLength'        : 10000,
                 'fieldTextareaRows'              : 32,
-                'fieldValue'                     : module['dependencies']
+                'fieldValue'                     : moduleDependencies
             ]
         )}}
     </div>

@@ -112,9 +112,10 @@ class ModulesComponent extends BaseComponent
 		) {
 			$type = strtolower($this->getData()['type']);
 
-			if ($this->getData()['id'] != 0) {
-				$this->view->type = $type;
+			$this->view->type = $type;
+			$this->view->module = null;
 
+			if ($this->getData()['id'] != 0) {
 				if ($type === 'core') {
 					$core = $this->core->core;
 
@@ -146,11 +147,10 @@ class ModulesComponent extends BaseComponent
 					$view['dependencies'] = Json::encode($view['dependencies'], JSON_UNESCAPED_SLASHES);
 
 					$this->view->module = $view;
-
 				}
 			}
-
-			return;
+		} else {
+			$this->view->pick('modules/list');
 		}
 	}
 
