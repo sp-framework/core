@@ -108,6 +108,13 @@ class Middlewares
 						]
 					),
 					new Column(
+						'user_settings',
+						[
+							'type'    => Column::TYPE_JSON,
+							'notNull' => false,
+						]
+					),
+					new Column(
 						'apps',
 						[
 							'type'    => Column::TYPE_VARCHAR,

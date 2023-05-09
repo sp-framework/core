@@ -103,8 +103,15 @@ class Components
 					new Column(
 						'settings',
 						[
-							'type'    => Column::TYPE_TEXT,
+							'type'    => Column::TYPE_JSON,
 							'notNull' => true,
+						]
+					),
+					new Column(
+						'user_settings',
+						[
+							'type'    => Column::TYPE_JSON,
+							'notNull' => false,
 						]
 					),
 					new Column(
