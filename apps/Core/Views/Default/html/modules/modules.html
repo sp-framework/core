@@ -609,21 +609,21 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
             }
         });
 
-        // if (updateAvailable && (dataCollectionSectionForm['vars']['filter'] === true || init === true)) {
-        //     if (init === true) {
-        //         dataCollectionSectionForm['vars']['initJstree'] = true;
-        //     } else {
-        //         dataCollectionSectionForm['vars']['initJstree'] = false;
-        //     }
+        if (updateAvailable && (dataCollectionSectionForm['vars']['filter'] === true || init === true)) {
+            if (init === true) {
+                dataCollectionSectionForm['vars']['initJstree'] = true;
+            } else {
+                dataCollectionSectionForm['vars']['initJstree'] = false;
+            }
 
-        //     dataCollectionSectionForm['vars']['filter'] = true;
-        //     $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
-        //     $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
-        // } else if (dataCollectionSectionForm['vars']['new_available'] == 1) {
-        //     dataCollectionSectionForm['vars']['filter'] = true;
-        //     $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('new');
-        //     $('#{{componentId}}-{{sectionId}}-modules').jstree().search('new');
-        // }
+            dataCollectionSectionForm['vars']['filter'] = true;
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
+        } else if (dataCollectionSectionForm['vars']['new_available'] == 1) {
+            dataCollectionSectionForm['vars']['filter'] = true;
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('new');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().search('new');
+        }
 
         if (dataCollectionSectionForm['vars']['queue']['count'] > 0) {
             dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
@@ -632,6 +632,7 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
 
         if (dataCollectionSectionForm['vars']['new_available'] > 0) {
             dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-new-available', 'info', false);
+            dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-clear', 'primary', false);
         }
 }
 
@@ -1107,6 +1108,7 @@ dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
 
                         $(dataCollectionSectionForm['vars']['queue']['ids'][q][installTypes]).each(function(i, id) {
                             var name = dataCollectionSectionForm['vars']['queue']['data'][q][installTypes][id]['name'];
+                            var moduleType = dataCollectionSectionForm['vars']['queue']['data'][q][installTypes][id]['module_type'];
                             var repo = dataCollectionSectionForm['vars']['queue']['data'][q][installTypes][id]['repo'];
                             var color = 'info';
 
@@ -1122,6 +1124,7 @@ dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
                             moduleHtml +=
                             '       <tr>' +
                             '           <td>' +  name + '</td>' +
+                            '           <td>' +  moduleType + '</td>' +
                             '           <td>' +  repo + '</td>' +
                             '           <td>' +  '<span class="badge badge-' + color + ' mt-1 text-xs text-uppercase">' + q + '</span></td>' +
                             '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' + id + '"></td>' +

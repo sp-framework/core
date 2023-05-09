@@ -54,6 +54,11 @@ class Core extends BasePackage
 		return $this;
 	}
 
+	public function getVersion()
+	{
+		return $this->core['version'];
+	}
+
 	public function dbBackup($data)
 	{
 		if (!isset($data['db'])) {

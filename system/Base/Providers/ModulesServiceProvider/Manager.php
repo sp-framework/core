@@ -90,20 +90,20 @@ class Manager extends BasePackage
                 unset($module['settings']);
             }
 
-            $moduleUpdatedBy = $module['updated_by'];
+            // $moduleUpdatedBy = $module['updated_by'];
 
-            if ($module['installed'] == '1') {
-                if ($module['updated_by'] == 0) {
-                    $module['updated_by'] = 'System';
-                } else {
-                    $module['updated_by'] = $this->basepackages->accounts->getById($module['updated_by'])['email'];
-                }
-            } else {
-                $module['updated_by'] = 'System';
-            }
+            // if ($module['installed'] == '1') {
+            //     if ($module['updated_by'] == 0) {
+            //         $module['updated_by'] = 'System';
+            //     } else {
+            //         $module['updated_by'] = $this->basepackages->accounts->getById($module['updated_by'])['email'];
+            //     }
+            // } else {
+            //     $module['updated_by'] = 'System';
+            // }
 
             if (isset($data['sync']) && $data['sync'] == true) {
-                $module = $this->updateModuleRepoDetails($module, $moduleUpdatedBy);
+                $module = $this->updateModuleRepoDetails($module);
 
                 if (!$module) {
                     return false;
@@ -131,7 +131,7 @@ class Manager extends BasePackage
         return false;
     }
 
-    protected function updateModuleRepoDetails($module, $moduleUpdatedBy)
+    public function updateModuleRepoDetails($module)
     {
         if ($module['app_type'] === 'core') {
             $repoNameArr = ['core'];
@@ -163,9 +163,13 @@ class Manager extends BasePackage
 
                 $this->remoteModules[$module['module_type']] = [$responseArr];
 
-                $module['repo_details']['latestRelease'] = $this->moduleNeedsUpgrade($module, $responseArr, true);
-                $module['version'] = $module['repo_details']['latestRelease']['name'];
-                $module['updated_by'] = $moduleUpdatedBy;
+                $latestRelease = $this->moduleNeedsUpgrade($module, $responseArr);
+
+                if ($latestRelease) {
+                    $module['repo_details']['latestRelease'] = $latestRelease;
+                    $module['update_available'] = '1';
+                    $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                }
 
                 $this->modules->{$module['module_type']}->update($module);
             } else {
@@ -439,7 +443,7 @@ class Manager extends BasePackage
             }
         } catch (ClientException | \throwable $e) {
             $this->logger->log->debug(
-                'Reading component ' . $module['name'] . ' install JSON file resulted in error. ' .
+                'Reading module ' . $module['name'] . ' install JSON file resulted in error. ' .
                 $e->getMessage()
             );
         }
@@ -481,7 +485,7 @@ class Manager extends BasePackage
                     }
 
                     $repo_details = $registerRemotePackage['repo_details'];
-                    $version = $registerRemotePackage['version'];
+                    $version = $registerRemotePackage['repo_details']['latestRelease']['tag_name'];
 
                     $registerRemotePackage = $this->remoteModulesJson[$registerRemotePackage['name']];
                     $registerRemotePackage['repo_details'] = $repo_details;

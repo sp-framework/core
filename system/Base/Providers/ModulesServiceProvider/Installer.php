@@ -4,6 +4,7 @@ namespace System\Base\Providers\ModulesServiceProvider;
 
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
+use z4kn4fein\SemVer\Version;
 
 class Installer extends BasePackage
 {
@@ -19,11 +20,17 @@ class Installer extends BasePackage
 
     protected $zipFiles = [];
 
+    protected $modulesToProcess = [];
+
+    protected $preCheckResult = [];
+
     protected $modulesToInstallOrUpdate = [];
 
     protected $runProcessPrecheckProgressMethods;
 
     protected $installProgressMethods;
+
+    protected $updatedBy;
 
     public function init($process = 'precheck')
     {
@@ -45,6 +52,12 @@ class Installer extends BasePackage
             $this->registerRunProcessPrecheckProgressMethods();
         } else if ($process === 'runprocess') {
             $this->registerRunProcessProgressMethods();
+        }
+
+        if ($this->auth->account()) {//For Autoupdate
+            $this->updatedBy = $this->auth->account()['id'];
+        } else {
+            $this->updatedBy = '0';
         }
 
         return $this;
@@ -154,19 +167,19 @@ class Installer extends BasePackage
         //Needs subProgress for downloading multiple modules from different repos
         foreach ($this->modulesToInstallOrUpdate as $key => $moduleToInstallOrUpdate) {
             //remove old data so there is no conflict
-            $files = $this->basepackages->utils->scanDir($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name']);
-            if (count($files['files']) > 0) {
-                foreach ($files['files'] as $file) {
-                    $this->localContent->delete($file);
-                }
-            }
-            if (count($files['dirs']) > 0) {
-                foreach ($files['dirs'] as $dir) {
-                    $this->localContent->deleteDirectory($dir);
-                }
-            }
+            // $files = $this->basepackages->utils->scanDir($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name']);
+            // if (count($files['files']) > 0) {
+            //     foreach ($files['files'] as $file) {
+            //         $this->localContent->delete($file);
+            //     }
+            // }
+            // if (count($files['dirs']) > 0) {
+            //     foreach ($files['dirs'] as $dir) {
+            //         $this->localContent->deleteDirectory($dir);
+            //     }
+            // }
 
-            $this->localContent->createDirectory($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name']);
+            // $this->localContent->createDirectory($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name']);
 
             if (!$this->initApi($moduleToInstallOrUpdate['api_id'])) {
                 $this->basepackages->progress->resetProgress();
@@ -198,6 +211,10 @@ class Installer extends BasePackage
             $this->zipFiles[$key]['location'] = base_path($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name'] . '/');
             $this->zipFiles[$key]['file'] = base_path($file);
             $this->zipFiles[$key]['name'] = $moduleToInstallOrUpdate['repo_details']['details']['name'];
+
+            $this->modulesToProcess[$moduleToInstallOrUpdate['repo_details']['details']['name']]['location'] =
+                $this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name'] . '/' . $moduleToInstallOrUpdate['repo_details']['details']['name'] . '/';
+            $this->modulesToProcess[$moduleToInstallOrUpdate['repo_details']['details']['name']]['module'] = $moduleToInstallOrUpdate;
         }
 
         return true;
@@ -230,86 +247,69 @@ class Installer extends BasePackage
         return true;
     }
 
-    protected function processInstall()
-    {
-        foreach ($this->modulesToInstall as $moduleToInstallKey => $moduleToInstall) {
-
-            $repoNameArr = explode('/', $moduleToInstall['repo']);
-            $repoName = end($repoNameArr);
-
-            $this->downloadPackagesAndDependencies($moduleToInstall);
-
-            $contents = $this->extractDownloadedPackagesAndDependencies(
-                $moduleToInstall['name'],
-                $repoName,
-                $moduleToInstall['type']
-            );
-
-            if ($contents) {
-                $files = $this->copyFilesToDestination(
-                    $contents,
-                    $moduleToInstall['name'],
-                    $repoName,
-                    $moduleToInstall['type']
-                );
-            }
-
-
-            $this->{$moduleToInstall['type']}->update(
-                [
-                    'id'        => $moduleToInstall['id'],
-                    'installed' => 1,
-                    'files'     => json_encode($files),
-                ]
-            );
-        }
-    }
-
-    protected function processUpdate()
-    {
-        $files = [];
-
-        foreach ($this->modulesToInstall as $moduleToInstallKey => $moduleToInstall) {
-            //
-            //Delete only files first
-            //Check if directory is empty, then delete directory
-            //check if directory is html_compiled, if so, then scan directory, delete all files first and then all directories.
-            //Copy all files.
-            //
-            var_dump(json_decode($this->{$moduleToInstall['type']}->getById($moduleToInstall['id'])->getAllArr()['files'], true));
-            // $repoNameArr = explode('/', $moduleToInstall['repo']);
-            // $repoName = end($repoNameArr);
-
-            // $this->downloadPackagesAndDependencies($moduleToInstall);
-
-            // $contents = $this->extractDownloadedPackagesAndDependencies(
-            //  $moduleToInstall['name'],
-            //  $repoName,
-            //  $moduleToInstall['type']
-            // );
-
-            // if ($contents) {
-            //  $files = $this->copyFilesToDestination(
-            //      $contents,
-            //      $moduleToInstall['name'],
-            //      $repoName,
-            //      $moduleToInstall['type']
-            //  );
-            // }
-
-
-            // $this->{$moduleToInstall['type']}->update(
-            //  [
-            //      'id'        => $moduleToInstall['id'],
-            //      'installed' => 1,
-            //      'files'     => json_encode($files),
-            //  ]
-            // );
-        }
-    }
-
     protected function checkDependencies()
     {
+        if (count($this->modulesToProcess) === 0) {
+            return true;
+        }
+
+        // var_dump($this->modulesToProcess);die();
+        foreach ($this->modulesToProcess as $moduleName => $module) {
+            $this->preCheckResult[$moduleName] = [];
+            $this->preCheckResult[$moduleName]['module'] = $module['module'];
+            $this->preCheckResult[$moduleName]['result'] = 'success';
+            $this->preCheckResult[$moduleName]['logs'] = '';
+
+            $names = explode('-', $moduleName);
+
+            try {
+                $jsonFile = Json::decode($this->localContent->read($module['location'] . 'Install/' . substr($names[1], 0, -1) . '.json'), true);
+            } catch (\throwable $e) {
+                $this->preCheckResult[$moduleName]['result'] = 'error';
+                $this->preCheckResult[$moduleName]['logs'] .= 'Reading module ' . $moduleName . ' install JSON file resulted in error. ';
+
+                continue;//move onto the next one.
+            }
+
+            // Make sure we have an entry for all module dependencies. Even if there are no dependencies, we need to make sure we have empty array for them.
+            if (!isset($jsonFile['dependencies']) ||
+                (isset($jsonFile['dependencies']) &&
+                 (!isset($jsonFile['dependencies']['core']) ||
+                  !isset($jsonFile['dependencies']['components']) ||
+                  !isset($jsonFile['dependencies']['packages']) ||
+                  !isset($jsonFile['dependencies']['middlewares']) ||
+                  !isset($jsonFile['dependencies']['views'])))
+            ) {
+                $this->preCheckResult[$moduleName]['result'] = 'error';
+                $this->preCheckResult[$moduleName]['logs'] .= 'Reading module ' . $moduleName . ' dependencies resulted in error. ';
+
+                continue;//move onto the next one.
+            }
+
+            //Check Core dependency
+            if (Version::greaterThan($jsonFile['dependencies']['core']['version'], $this->core->getVersion())) {
+                //Lets check for latest release on Core as required version is greater than installed version.
+                $core = $this->modules->packages->getNamePackage('core');
+                $core = $this->modules->manager->updateModuleRepoDetails($core);
+
+                if ($core) {
+                    $this->preCheckResult[$moduleName]['result'] = 'warning';
+                    $this->preCheckResult[$moduleName]['logs'] .= 'Module ' . $moduleName . ' needs core version : ' . $core['update_version'] . '. Installed version of core is : ' . $core['version'] . '. Adding Core to list of updates. ';
+
+                    $this->preCheckResult['core'] = [];
+                    $this->preCheckResult['core']['module'] = $core;
+                    $this->preCheckResult['core']['result'] = 'warning';
+                    $name = $module['module']['name'];
+                    if (isset($module['module']['display_name'])) {
+                        $name = $module['module']['display_name'];
+                    }
+                    $this->preCheckResult['core']['logs'] = 'Added to queue as required by module : ' . $name;
+                }
+            }
+
+        }
+
+        var_dump($this->preCheckResult);die();
         // $this->getLatestRepositoryModulesData();
 
         ${$this->postData()['type']} =
@@ -331,27 +331,6 @@ class Installer extends BasePackage
         }
 
         return true;
-    }
-
-    protected function getLatestRepositoryModulesData()
-    {
-        $repositories = getAllArr($this->repositories->getAll());
-
-        if (count($repositories) > 0) {
-            $modules = $this->packages->use(Modules::class);
-
-            foreach ($repositories as $repositoryKey => $repositoryValue) {
-                $sync = $modules->syncRemoteWithLocal($repositoryValue['id']);
-
-                if ($sync->packagesData['responseCode'] === 1) {
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'Error Syncing with repository ' . $repositoryValue['name'];
-
-                    return $this->packagesData;
-                }
-            }
-        }
     }
 
     protected function checkRegisteredDependencies($dependencies)
@@ -472,6 +451,27 @@ class Installer extends BasePackage
         return $found;
     }
 
+    protected function getLatestRepositoryModulesData()
+    {
+        $repositories = getAllArr($this->repositories->getAll());
+
+        if (count($repositories) > 0) {
+            $modules = $this->packages->use(Modules::class);
+
+            foreach ($repositories as $repositoryKey => $repositoryValue) {
+                $sync = $modules->syncRemoteWithLocal($repositoryValue['id']);
+
+                if ($sync->packagesData['responseCode'] === 1) {
+                    $this->packagesData->responseCode = 1;
+
+                    $this->packagesData->responseMessage = 'Error Syncing with repository ' . $repositoryValue['name'];
+
+                    return $this->packagesData;
+                }
+            }
+        }
+    }
+
     protected function createBackup()
     {
         $this->backupLocation = '.backups/';
@@ -532,83 +532,81 @@ class Installer extends BasePackage
         $this->packagesData->responseCode = 0;
     }
 
-    protected function downloadPackagesAndDependencies($module)
+    protected function processInstall()
     {
-        try {
-            $downloadedContents = $this->remoteWebContent
-                    ->request('GET', $module['repo'] . '/archive/master.zip')
-                    ->getBody()
-                    ->getContents();
+        foreach ($this->modulesToInstall as $moduleToInstallKey => $moduleToInstall) {
 
-        } catch (\Exception $e) {
-            $this->packagesData->responseCode = 1;
+            $repoNameArr = explode('/', $moduleToInstall['repo']);
+            $repoName = end($repoNameArr);
 
-            $this->packagesData->responseMessage = $e->getMessage();
+            $this->downloadPackagesAndDependencies($moduleToInstall);
 
-            return $this->packagesData;
-        }
+            $contents = $this->extractDownloadedPackagesAndDependencies(
+                $moduleToInstall['name'],
+                $repoName,
+                $moduleToInstall['type']
+            );
 
-        $this->downloadLocation = '.downloads/';
-
-        if (!$this->localContent->fileExists($this->downloadLocation . ucfirst($module['type']))) {
-            $this->localContent->createDirectory($this->downloadLocation . ucfirst($module['type']));
-            $this->downloadLocation = $this->downloadLocation . ucfirst($module['type']);
-        } else {
-            $this->downloadLocation = $this->downloadLocation . ucfirst($module['type']);
-        }
-
-        if (!$this->localContent->fileExists($this->downloadLocation . '/' . $module['name'])) {
-            $this->localContent->createDirectory($this->downloadLocation . '/' . $module['name']);
-            $this->downloadLocation = $this->downloadLocation . '/' . $module['name'];
-        } else {
-            $this->downloadLocation = $this->downloadLocation . '/' . $module['name'];
-        }
-
-        if (!$this->localContent->fileExists($this->downloadLocation . '/' . $module['version'])) {
-            $this->localContent->createDirectory($this->downloadLocation . '/' . $module['version']);
-            $this->downloadLocation = $this->downloadLocation . '/' . $module['version'];
-        } else {
-            $this->downloadLocation = $this->downloadLocation . '/' . $module['version'];
-        }
-
-        // if (!$this->localContent->fileExists($this->downloadLocation . '/' . $module['repobranch'])) {
-        //  $this->localContent->createDirectory($this->downloadLocation . '/' . $module['repobranch']);
-        //  $this->downloadLocation = $this->downloadLocation . '/' . $module['repobranch'];
-        // } else {
-        //  $this->downloadLocation = $this->downloadLocation . '/' . $module['repobranch'];
-        // }
-
-        // var_dump($this->downloadLocation);
-
-        $this->localContent->write(
-            $this->downloadLocation . '/master.zip',
-            $downloadedContents
-        );
-    }
-
-    protected function extractDownloadedPackagesAndDependencies($name, $repoName, $type)
-    {
-        if ($this->zip->open($this->downloadLocation . '/master.zip')) {
-            $this->zip->extractTo($this->downloadLocation);
-
-            if ($type === 'core') {
-                $extractedLocation
-                    = $this->downloadLocation . '/' . strtolower($repoName) .
-                    '-master/';
-            } else if ($type === 'app') {
-                $extractedLocation
-                    = $this->downloadLocation . '/' . strtolower($repoName) .
-                    '-master/' . $type . 's/';
-            } else {
-                $extractedLocation
-                    = $this->downloadLocation . '/' . strtolower($repoName) .
-                    '-master/' . $type . '/';
+            if ($contents) {
+                $files = $this->copyFilesToDestination(
+                    $contents,
+                    $moduleToInstall['name'],
+                    $repoName,
+                    $moduleToInstall['type']
+                );
             }
 
-            return $this->localContent->listContents($extractedLocation, true);
-        } else {
 
-            return false;
+            $this->{$moduleToInstall['type']}->update(
+                [
+                    'id'        => $moduleToInstall['id'],
+                    'installed' => 1,
+                    'files'     => json_encode($files),
+                ]
+            );
+        }
+    }
+
+    protected function processUpdate()
+    {
+        $files = [];
+
+        foreach ($this->modulesToInstall as $moduleToInstallKey => $moduleToInstall) {
+            //
+            //Delete only files first
+            //Check if directory is empty, then delete directory
+            //check if directory is html_compiled, if so, then scan directory, delete all files first and then all directories.
+            //Copy all files.
+            //
+            var_dump(json_decode($this->{$moduleToInstall['type']}->getById($moduleToInstall['id'])->getAllArr()['files'], true));
+            // $repoNameArr = explode('/', $moduleToInstall['repo']);
+            // $repoName = end($repoNameArr);
+
+            // $this->downloadPackagesAndDependencies($moduleToInstall);
+
+            // $contents = $this->extractDownloadedPackagesAndDependencies(
+            //  $moduleToInstall['name'],
+            //  $repoName,
+            //  $moduleToInstall['type']
+            // );
+
+            // if ($contents) {
+            //  $files = $this->copyFilesToDestination(
+            //      $contents,
+            //      $moduleToInstall['name'],
+            //      $repoName,
+            //      $moduleToInstall['type']
+            //  );
+            // }
+
+
+            // $this->{$moduleToInstall['type']}->update(
+            //  [
+            //      'id'        => $moduleToInstall['id'],
+            //      'installed' => 1,
+            //      'files'     => json_encode($files),
+            //  ]
+            // );
         }
     }
 
@@ -710,9 +708,13 @@ class Installer extends BasePackage
                     'method'    => 'downloadModulesFromRepo',
                     'text'      => 'Download module files from repository...'
                 ],
+                // [
+                //     'method'    => 'extractModulesDownloadedFromRepo',
+                //     'text'      => 'Extract downloaded module zip files...'
+                // ],
                 [
-                    'method'    => 'extractModulesDownloadedFromRepo',
-                    'text'      => 'Extract downloaded module zip files...'
+                    'method'    => 'checkDependencies',
+                    'text'      => 'Checking dependencies...'
                 ],
                 [
                     'method'    => 'finishPrecheck',
@@ -773,4 +775,84 @@ class Installer extends BasePackage
 
         return true;
     }
+
+    // protected function downloadPackagesAndDependencies($module)
+    // {
+    //     try {
+    //         $downloadedContents = $this->remoteWebContent
+    //                 ->request('GET', $module['repo'] . '/archive/master.zip')
+    //                 ->getBody()
+    //                 ->getContents();
+
+    //     } catch (\Exception $e) {
+    //         $this->packagesData->responseCode = 1;
+
+    //         $this->packagesData->responseMessage = $e->getMessage();
+
+    //         return $this->packagesData;
+    //     }
+
+    //     $this->downloadLocation = '.downloads/';
+
+    //     if (!$this->localContent->fileExists($this->downloadLocation . ucfirst($module['type']))) {
+    //         $this->localContent->createDirectory($this->downloadLocation . ucfirst($module['type']));
+    //         $this->downloadLocation = $this->downloadLocation . ucfirst($module['type']);
+    //     } else {
+    //         $this->downloadLocation = $this->downloadLocation . ucfirst($module['type']);
+    //     }
+
+    //     if (!$this->localContent->fileExists($this->downloadLocation . '/' . $module['name'])) {
+    //         $this->localContent->createDirectory($this->downloadLocation . '/' . $module['name']);
+    //         $this->downloadLocation = $this->downloadLocation . '/' . $module['name'];
+    //     } else {
+    //         $this->downloadLocation = $this->downloadLocation . '/' . $module['name'];
+    //     }
+
+    //     if (!$this->localContent->fileExists($this->downloadLocation . '/' . $module['version'])) {
+    //         $this->localContent->createDirectory($this->downloadLocation . '/' . $module['version']);
+    //         $this->downloadLocation = $this->downloadLocation . '/' . $module['version'];
+    //     } else {
+    //         $this->downloadLocation = $this->downloadLocation . '/' . $module['version'];
+    //     }
+
+    //     // if (!$this->localContent->fileExists($this->downloadLocation . '/' . $module['repobranch'])) {
+    //     //  $this->localContent->createDirectory($this->downloadLocation . '/' . $module['repobranch']);
+    //     //  $this->downloadLocation = $this->downloadLocation . '/' . $module['repobranch'];
+    //     // } else {
+    //     //  $this->downloadLocation = $this->downloadLocation . '/' . $module['repobranch'];
+    //     // }
+
+    //     // var_dump($this->downloadLocation);
+
+    //     $this->localContent->write(
+    //         $this->downloadLocation . '/master.zip',
+    //         $downloadedContents
+    //     );
+    // }
+
+    // protected function extractDownloadedPackagesAndDependencies($name, $repoName, $type)
+    // {
+    //     if ($this->zip->open($this->downloadLocation . '/master.zip')) {
+    //         $this->zip->extractTo($this->downloadLocation);
+
+    //         if ($type === 'core') {
+    //             $extractedLocation
+    //                 = $this->downloadLocation . '/' . strtolower($repoName) .
+    //                 '-master/';
+    //         } else if ($type === 'app') {
+    //             $extractedLocation
+    //                 = $this->downloadLocation . '/' . strtolower($repoName) .
+    //                 '-master/' . $type . 's/';
+    //         } else {
+    //             $extractedLocation
+    //                 = $this->downloadLocation . '/' . strtolower($repoName) .
+    //                 '-master/' . $type . '/';
+    //         }
+
+    //         return $this->localContent->listContents($extractedLocation, true);
+    //     } else {
+
+    //         return false;
+    //     }
+    // }
 }
