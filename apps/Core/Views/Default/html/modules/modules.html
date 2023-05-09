@@ -1141,7 +1141,7 @@ dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
         }
     }
 
-    $('#{{componentId}}-{{sectionId}}-queue-table tbody').html(moduleHtml);
+    $('#{{componentId}}-{{sectionId}}-queue-table tbody').empty().html(moduleHtml);
     $('#{{componentId}}-{{sectionId}}-queue-analyse-modal').modal('show');
 }
 dataCollectionSectionForm['funcs']['clearQueue'] = function(clearAll = false, id = false, moduleType = false) {

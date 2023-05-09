@@ -6,13 +6,13 @@
 	"app_type"      : "core",
 	"category"      : "system",
 	"sub_category"  : "devtools",
-	"version"		: "0.0.1",
+	"version"		: "0.0.0",
 	"repo"			: "https://.../dash-component-system-devtools-api-contracts",
 	"class"			: "Apps\\Core\\Components\\Devtools\\Api\\Contracts\\ContractsComponent",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",
-			"version"	: "0.0.1",
+			"version"	: "0.0.0",
 			"repo"		: "https://.../"
 		},
 		"components"	: [],
@@ -20,7 +20,7 @@
 		[
 			{
 				"name"      : "Contracts",
-				"version"   : "0.0.1",
+				"version"   : "0.0.0",
 				"repo"      : "https://.../dash-package-system-devtools-api-contracts"
 			}
 		],

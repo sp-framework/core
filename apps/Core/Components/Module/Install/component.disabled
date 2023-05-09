@@ -3,31 +3,31 @@
 	"name"			: "Module",
 	"displayName" 	: "Admin Module Management",
 	"description"	: "Manage admin modules module via this component",
-	"version"		: "0.0.1",
+	"version"		: "0.0.0",
 	"repo"			: "https://github.com/h-w-f/component-admin-module",
 	"class"         : "Apps\\Core\\Components\\Module\\ModuleComponent",
 	"type"          : "system",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",
-			"version"	: "0.0.1",
+			"version"	: "0.0.0",
 			"repo"		: "https://github.com/h-w-f/core"
 		},
 		"app" : {
 			"name"		: "Admin",
-			"version"	: "0.0.1",
+			"version"	: "0.0.0",
 			"repo"		: "https://github.com/h-w-f/app-admin"
 		},
 		"components"	:
 		[{
 			"name"		: "Modules",
-			"version"	: "0.0.1",
+			"version"	: "0.0.0",
 			"repo"		: "https://github.com/h-w-f/component-admin-modules"
 		}],
 		"packages"		:
 		[{
 			"name"		: "Modules",
-			"version"	: "0.0.1",
+			"version"	: "0.0.0",
 			"repo"		: "https://github.com/h-w-f/package-admin-module"
 		}],
 		"middlewares"	: [],

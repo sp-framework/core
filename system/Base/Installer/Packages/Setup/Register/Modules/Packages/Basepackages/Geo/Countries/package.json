@@ -6,7 +6,7 @@
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",
-    "version"       : "0.0.1",
+    "version"       : "0.0.0",
     "repo"          : "https://.../",
     "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Geo\\GeoCountries",
     "settings"      : { }

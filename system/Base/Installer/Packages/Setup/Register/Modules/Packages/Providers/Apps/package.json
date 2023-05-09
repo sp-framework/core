@@ -6,7 +6,7 @@
     "app_type"      : "core",
     "category"      : "base",
     "sub_category"  : "providers",
-    "version"       : "0.0.1",
+    "version"       : "0.0.0",
     "repo"          : "https://.../",
     "class"         : "System\\Base\\Providers\\AppsServiceProvider\\Apps",
     "settings"      : {"componentRoute":"apps"}

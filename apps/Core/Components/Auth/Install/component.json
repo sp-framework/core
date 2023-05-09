@@ -6,13 +6,13 @@
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",
-    "version"       : "0.0.1",
+    "version"       : "0.0.0",
     "repo"          : "https://.../",
     "class"         : "Apps\\Core\\Components\\Auth\\AuthComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
-            "version"   : "0.0.1",
+            "version"   : "0.0.0",
             "repo"      : "https://.../"
         },
         "components"    : [],
