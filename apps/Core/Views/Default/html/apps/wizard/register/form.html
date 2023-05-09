@@ -5,6 +5,7 @@
     {% set appType = app['app_type'] %}
     {% set appTypeDisabled = true %}
     {% set appDescription = app['description'] %}
+    {% set registrationEnabled = false %}
     {% for middleware in middlewares %}
         {% if middleware['name'] === 'Auth' %}
             {% if middleware['enabled'] == 1 %}

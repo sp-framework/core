@@ -270,7 +270,7 @@ class Apps extends BasePackage
 
 	protected function checkType($data)
 	{
-		$typesArr = $this->types;
+		$typesArr = $this->types->types;
 
 		foreach ($typesArr as $key => $type) {
 			if (strtolower($data['route']) === $type['app_type'] ||

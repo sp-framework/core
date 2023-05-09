@@ -37,9 +37,13 @@
         )}}
     </div>
     {% set ipFilterTabHidden = true %}
+    {% set authTabHidden = true %}
     {% for middleware in middlewares %}
         {% if middleware['name'] == 'IpFilter' and middleware['enabled'] == true %}
             {% set ipFilterTabHidden = false %}
+        {% endif %}
+        {% if middleware['name'] == 'Auth' and middleware['enabled'] == true %}
+            {% set authTabHidden = false %}
         {% endif %}
     {% endfor %}
     <div class="col">
@@ -68,7 +72,8 @@
                             'permissions'   :
                             [
                                 'tabTitle'          : 'Permissions',
-                                'tabInclude'        : 'apps/wizard/permissions/form'
+                                'tabInclude'        : 'apps/wizard/permissions/form',
+                                'tabHidden'         : authTabHidden
                             ],
                             'filters'   :
                             [
@@ -132,6 +137,17 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-enforce_2fa')[0].checked = false;
                         $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-registration_role_id').val(null).trigger('change');
+                    }
+                });
+
+                $("#{{componentId}}-{{sectionId}}-middleware-Auth").click(function() {
+                    if ($(this).is(':checked') === true) {
+                        $("a.nav-link:contains('Permissions')").parent('li').attr('hidden', false);
+                        $("#{{componentId}}-{{sectionId}}-tabs-permissions").attr('hidden', false);
+                    } else {
+                        $("a.nav-link:contains('Permissions')").parent('li').attr('hidden', true);
+                        $("#{{componentId}}-{{sectionId}}-tabs-permissions").attr('hidden', true);
+                        $("#{{componentId}}-{{sectionId}}-middleware-Auth").prop('checked', false);
                     }
                 });
             }
