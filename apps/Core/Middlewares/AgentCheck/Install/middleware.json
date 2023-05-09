@@ -9,5 +9,18 @@
     "version": "0.0.1",
     "repo": "https://.../",
     "class": "Apps\\Core\\Middlewares\\AgentCheck\\AgentCheck",
-    "settings": {"dependencies":["Auth"]}
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "settings": {
+        "dependencies": ["Auth"]
+    }
 }

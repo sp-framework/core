@@ -9,5 +9,16 @@
     "version": "0.0.1",
     "repo": "https://.../",
     "class": "Apps\\Core\\Middlewares\\Acl\\Acl",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
     "settings": {}
 }

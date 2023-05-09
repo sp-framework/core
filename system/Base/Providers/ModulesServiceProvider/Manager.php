@@ -155,11 +155,16 @@ class Manager extends BasePackage
             $responseArr = $this->api->useMethod($collection, $method, $args)->getResponse(true);
 
             if ($responseArr) {
+                if (is_string($module['repo_details'])) {
+                    $module['repo_details'] = Json::decode($module['repo_details'], true);
+                }
+
                 $module['repo_details']['details'] = $responseArr;
 
                 $this->remoteModules[$module['module_type']] = [$responseArr];
 
                 $module['repo_details']['latestRelease'] = $this->moduleNeedsUpgrade($module, $responseArr, true);
+                $module['version'] = $module['repo_details']['latestRelease']['name'];
                 $module['updated_by'] = $moduleUpdatedBy;
 
                 $this->modules->{$module['module_type']}->update($module);
@@ -167,7 +172,6 @@ class Manager extends BasePackage
                 $module['repo_details'] = false;
             }
         } catch (ClientException | \throwable $e) {
-            var_dump($e);die();
             $this->addResponse($e->getMessage(), 2, ['module' => $module]);
 
             return false;
@@ -368,34 +372,9 @@ class Manager extends BasePackage
                             continue;//Dont add as there are no releases.
                         }
 
-                        try {
-                            ObjectSerializer::setUrlEncoding(false);
-
-                            $jsonFile = $this->api->useMethod('RepositoryApi', 'repoGetRawFile',
-                                [
-                                    $this->apiConfig['org_user'],
-                                    $module['name'],
-                                    'Install/' . substr($names[1], 0, -1) . '.json'//remove "s" from the name
-                                ]
-                            )->getResponse(true);
-
-                            if ($jsonFile) {
-                                $this->remoteModulesJson[$module['name']] = $jsonFile;
-                            }
-
-                            if (isset($this->remoteModules[$names[1]])) {
-                                array_push($this->remoteModules[$names[1]], $module);
-                            } else {
-                                $this->remoteModules[$names[1]] = [$module];
-                            }
-                        } catch (ClientException | \throwable $e) {
-                            $this->logger->log->debug(
-                                'Reading component ' . $module['name'] . ' install JSON file resulted in error. ' .
-                                $e->getMessage()
-                            );
+                        if ($this->getRemoteModuleJson($names[1], $module)) {
+                            return true;
                         }
-
-                        return true;
                     }
                 } else {
                     if ($names[0] === 'core') {
@@ -434,6 +413,40 @@ class Manager extends BasePackage
         return $path;
     }
 
+    protected function getRemoteModuleJson($moduleType, $module, $onlyJson = false)
+    {
+        try {
+            ObjectSerializer::setUrlEncoding(false);
+
+            $jsonFile = $this->api->useMethod('RepositoryApi', 'repoGetRawFile',
+                [
+                    $this->apiConfig['org_user'],
+                    $module['name'],
+                    'Install/' . substr($moduleType, 0, -1) . '.json'//remove "s" from the name
+                ]
+            )->getResponse(true);
+
+            if ($jsonFile) {
+                $this->remoteModulesJson[$module['name']] = $jsonFile;
+            }
+
+            if (!$onlyJson) {
+                if (isset($this->remoteModules[$moduleType])) {
+                    array_push($this->remoteModules[$moduleType], $module);
+                } else {
+                    $this->remoteModules[$moduleType] = [$module];
+                }
+            }
+        } catch (ClientException | \throwable $e) {
+            $this->logger->log->debug(
+                'Reading component ' . $module['name'] . ' install JSON file resulted in error. ' .
+                $e->getMessage()
+            );
+        }
+
+        return true;
+    }
+
     protected function updateRemoteModulesToDB()
     {
         $counter = [];
@@ -468,9 +481,11 @@ class Manager extends BasePackage
                     }
 
                     $repo_details = $registerRemotePackage['repo_details'];
+                    $version = $registerRemotePackage['version'];
 
                     $registerRemotePackage = $this->remoteModulesJson[$registerRemotePackage['name']];
                     $registerRemotePackage['repo_details'] = $repo_details;
+                    $registerRemotePackage['version'] = $version;
 
                     if (!$this->apps->types->getTypeAppType($registerRemotePackage['app_type'])) {
                         if (!checkCtype($registerRemotePackage['app_type'], 'alpha')) {
@@ -553,6 +568,12 @@ class Manager extends BasePackage
                 $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($localModule, $remoteModule);
 
                 if ($moduleNeedsUpgrade) {
+                    if ($this->getRemoteModuleJson($remoteModulesType, $localModule, true)) {
+                        if (isset($this->remoteModulesJson[$remoteModule['name']])) {
+                            $localModule = array_merge($localModule, $this->remoteModulesJson[$remoteModule['name']]);
+                        }
+                    }
+
                     $localModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
                     if ($localModule['installed'] == '0') {
                         $localModule['version'] = $moduleNeedsUpgrade['name'];
@@ -599,7 +620,7 @@ class Manager extends BasePackage
         }
 
         if ($localModule) {
-            if (array_key_exists('level_of_update', $localModule)) {
+            if (array_key_exists('level_of_update', $localModule) && $localModule['level_of_update'] !== null) {
                 $localVersion = Version::parse($localModule['version']);
                 $latestReleaseVersion = Version::parse($latestRelease['tag_name']);
 
