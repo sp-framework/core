@@ -26,8 +26,21 @@ class ModulesComponent extends BaseComponent
 
 		$modules = [];
 
+		try {
+			$coreJson = $this->modulesPackage->validateJson(
+				[
+					'json' => $this->localContent->read('system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json'),
+					'returnJson' => 'array'
+				]
+			);
+
+			$coreJson['id'] = $this->core->core['id'];
+		} catch (\throwable $e) {
+			throw new \Exception($e->getMessage());
+		}
+
 		$modules['core']['value'] = 'Core';
-		$modules['core']['childs'][1] = $this->core->core;
+		$modules['core']['childs'][1] = $coreJson;
 
 		$componentsArr = msort($this->modules->components->components, 'name');
 		foreach ($componentsArr as $key => &$component) {
@@ -117,13 +130,14 @@ class ModulesComponent extends BaseComponent
 
 			if ($this->getData()['id'] != 0) {
 				if ($type === 'core') {
-					$core = $this->core->core;
-
-					if (is_array($core['settings'])) {
-						$core['settings'] = Json::encode($core['settings'], JSON_UNESCAPED_SLASHES);
+					if (is_array($coreJson['settings'])) {
+						$coreJson['settings'] = $this->modulesPackage->formatJson(['json' => $coreJson['settings']]);
+					}
+					if (is_array($coreJson['dependencies'])) {
+						$coreJson['dependencies'] = $this->modulesPackage->formatJson(['json' => $coreJson['dependencies']]);
 					}
 
-					$this->view->module = $core;
+					$this->view->module = $coreJson;
 				} else if ($type === 'components') {
 					$component = $this->modules->components->getById($this->getData()['id']);
 
@@ -163,6 +177,40 @@ class ModulesComponent extends BaseComponent
 			$this->modulesPackage->updateModules($this->postData());
 
 			$this->addResponse($this->modulesPackage->packagesData->responseMessage, $this->modulesPackage->packagesData->responseCode);
+		} else {
+			$this->addResponse('Method Not Allowed', 1);
+		}
+	}
+
+	public function validateJsonAction()
+	{
+		if ($this->request->isPost()) {
+			if (!$this->checkCSRF()) {
+				return;
+			}
+			$this->modulesPackage->updateModules($this->postData());
+
+			$this->addResponse($this->modulesPackage->packagesData->responseMessage, $this->modulesPackage->packagesData->responseCode);
+		} else {
+			$this->addResponse('Method Not Allowed', 1);
+		}
+	}
+
+	public function formatJsonAction()
+	{
+		if ($this->request->isPost()) {
+			if (!$this->checkCSRF()) {
+				return;
+			}
+
+			$this->modulesPackage->formatJson($this->postData());
+
+
+			$this->addResponse(
+				$this->modulesPackage->packagesData->responseMessage,
+				$this->modulesPackage->packagesData->responseCode,
+				$this->modulesPackage->packagesData->responseData
+			);
 		} else {
 			$this->addResponse('Method Not Allowed', 1);
 		}

@@ -1,0 +1,389 @@
+{% if module['id'] is defined %}
+    {% set moduleId = module['id'] %}
+    {% set moduleName = module['name'] %}
+    {% if type !== 'core' %}
+        {% set moduleRoute = module['route'] %}
+    {% endif %}
+    {% set moduleDisplay_name = module['display_name'] %}
+    {% set moduleDescription = module['description'] %}
+    {% set moduleApp_type = module['app_type'] %}
+    {% set moduleCategory = module['category'] %}
+    {% set moduleSub_category = module['sub_category'] %}
+    {% set moduleVersion = module['version'] %}
+    {% set moduleRepo = module['repo'] %}
+    {% set moduleClass = module['class'] %}
+    {% set moduleSettings = module['settings'] %}
+    {% if type === 'components' %}
+        {% set moduleMenu_id = module['menu_id'] %}
+        {% set moduleMenu = module['menu'] %}
+    {% endif %}
+    {% if type !== 'core' %}
+        {% set moduleApps = module['apps'] %}
+    {% endif %}
+{% else %}
+    {% set moduleId = '' %}
+    {% set moduleName = '' %}
+    {% if type !== 'core' %}
+        {% set moduleRoute = module['route'] %}
+    {% endif %}
+    {% set moduleDisplay_name = '' %}
+    {% set moduleDescription = '' %}
+    {% set moduleApp_type = '' %}
+    {% set moduleCategory = '' %}
+    {% set moduleSub_category = '' %}
+    {% set moduleVersion = '' %}
+    {% set moduleRepo = '' %}
+    {% set moduleClass = '' %}
+    {% set moduleSettings = '' %}
+    {% if type === 'components' %}
+        {% set moduleMenu_id = '' %}
+        {% set moduleMenu = '' %}
+    {% endif %}
+    {% if type !== 'core' %}
+        {% set moduleApps = '' %}
+    {% endif %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'id',
+                'fieldLabel'                     : 'Module ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : moduleId
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'type',
+                'fieldLabel'                     : 'Module Type',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module Type',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : type
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'name',
+                'fieldLabel'                     : 'Module Name',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module Name Example: Dashboard',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : moduleName
+            ]
+        )}}
+    </div>
+    {% if module['route'] is defined %}
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'route',
+                'fieldLabel'                     : 'Module Route',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module Route Example: mysite.com/dashboard/accounts "accounts" is the route to access this module.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : moduleRoute
+            ]
+        )}}
+    </div>
+    {% endif %}
+    {% if type === 'views' %}
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'display_name',
+                    'fieldLabel'                     : 'view Display name',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'view Display name',
+                    'fieldRequired'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldDataInputMinLength'        : 1,
+                    'fieldDataInputMaxLength'        : 50,
+                    'fieldValue'                     : moduleDisplay_name
+                ]
+            )}}
+        </div>
+    {% endif %}
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'description',
+                'fieldLabel'                     : 'Module Description',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 1024,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Description of the component',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 1024,
+                'fieldTextareaRows'              : 2,
+                'fieldValue'                     : moduleDescription
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'app_type',
+                'fieldLabel'                     : 'Module App type',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module app type.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : moduleApp_type
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'category',
+                'fieldLabel'                     : 'Module category',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module category.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : moduleCategory
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'sub_category',
+                'fieldLabel'                     : 'Module sub category',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module sub category',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : moduleSub_category
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'version',
+                'fieldLabel'                     : 'Module version',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module version.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : moduleVersion
+            ]
+        )}}
+    </div>
+    <div class="col-md-10">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'repo',
+                'fieldLabel'                     : 'Module repo',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module repo.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 1024,
+                'fieldValue'                     : moduleRepo
+            ]
+        )}}
+    </div>
+</div>
+{% if module['class'] is defined %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'class',
+                'fieldLabel'                     : 'Module class',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module class.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 2048,
+                'fieldValue'                     : moduleClass
+            ]
+        )}}
+    </div>
+</div>
+{% endif %}
+{% if module['menu_id'] is defined %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'menu_id',
+                'fieldLabel'                     : 'Module menu id',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module menu id.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : moduleMenu_id
+            ]
+        )}}
+    </div>
+    <div class="col-md-10">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'menu',
+                'fieldLabel'                     : 'Module Menu',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 2048,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Menu of the component',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 2048,
+                'fieldTextareaRows'              : 2,
+                'fieldValue'                     : moduleMenu
+            ]
+        )}}
+    </div>
+</div>
+{% endif %}
+{% if module['apps'] is defined %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'apps',
+                'fieldLabel'                     : 'Module Apps',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 2048,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Apps of the component',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 2048,
+                'fieldTextareaRows'              : 2,
+                'fieldValue'                     : moduleApps
+            ]
+        )}}
+    </div>
+</div>
+{% endif %}

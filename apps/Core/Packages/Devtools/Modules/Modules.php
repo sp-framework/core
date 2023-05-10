@@ -9,6 +9,8 @@ use League\Flysystem\UnableToWriteFile;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use Phalcon\Helper\Str;
+use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
 use System\Base\BasePackage;
 
 class Modules extends BasePackage
@@ -227,5 +229,115 @@ class Modules extends BasePackage
         } catch (FilesystemException | UnableToWriteFile $exception) {
             throw $exception;
         }
+    }
+
+    public function validateJson($data)
+    {
+        if (!isset($data['json'])) {
+            $this->addResponse('Json data not provided.', 1);
+
+            return;
+        }
+
+        try {
+            $parser = new JsonParser();
+
+            $result = $parser->lint($data['json']);
+
+            $parser->parse($data['json'], JsonParser::DETECT_KEY_CONFLICTS);
+        } catch (ParsingException | \throwable $e) {
+            if ($result === null) {
+                if (defined('JSON_ERROR_UTF8') && JSON_ERROR_UTF8 === json_last_error()) {
+                    $this->addResponse('Json is not UTF-8, could not parse json data.', 1);
+
+                    return;
+                }
+            }
+
+            $this->addResponse($e->getDetails(), 1);
+
+            throw $e;
+        }
+
+        if (isset($data['returnJson']) && $data['returnJson'] === 'array') {
+            $data['json'] = Json::decode($data['json'], true);
+        } else if (isset($data['returnJson']) && $data['returnJson'] === 'formatted') {
+            $data['json'] = $this->formatJson($data);
+        }
+
+        $this->addResponse('Success', 0, ['json' => $data['json']]);
+
+        return $data['json'];
+    }
+
+    public function formatJson($data)
+    {
+        if (!isset($data['json'])) {
+            $this->addResponse('Json data not provided.', 1);
+
+            return;
+        }
+
+        if (is_array($data['json'])) {
+            $data['json'] = Json::encode($data['json'], JSON_UNESCAPED_SLASHES);
+        }
+
+        $return = "\n";
+        $indent = "\t";
+        $formatted_json = '';
+        $quotes = false;
+        $arrayLevel = 0;
+
+        for ($i = 0; $i < strlen($data['json']); $i++) {
+            $prefix = '';
+            $suffix = '';
+
+            switch ($data['json'][$i]) {
+                case '"':
+                    $quotes = !$quotes;
+                    break;
+
+                case '[':
+                    $arrayLevel++;
+                    break;
+
+                case ']':
+                    $arrayLevel--;
+                    $prefix = $return;
+                    $prefix .= str_repeat($indent, $arrayLevel);
+                    break;
+
+                case '{':
+                    $arrayLevel++;
+                    $suffix = $return;
+                    $suffix .= str_repeat($indent, $arrayLevel);
+                    break;
+
+                case ':':
+                    $suffix = ' ';
+                    break;
+
+                case ',':
+                    if (!$quotes) {
+                        $suffix = $return;
+                        $suffix .= str_repeat($indent, $arrayLevel);
+                    }
+                    break;
+
+                case '}':
+                    $arrayLevel--;
+
+                case ']':
+                    $prefix = $return;
+                    $prefix .= str_repeat($indent, $arrayLevel);
+                    break;
+            }
+
+            $formatted_json .= $prefix.$data['json'][$i].$suffix;
+        }
+
+        $this->addResponse('Success', 0, ['formatted_json' => $formatted_json]);
+
+        return $formatted_json;
     }
 }

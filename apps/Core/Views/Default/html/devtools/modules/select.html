@@ -20,17 +20,66 @@
             ]
         )}}
     </div>
+</div>
+<div class="row vdivide">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'modules',
+                'fieldLabel'                           : 'Select Module',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Module',
+                'fieldRequired'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldDataSelect2Options'              : modules,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsSelected'      : ''
+            ]
+        )}}
+        {% set includeCoreModulesChecked = false %}
+        {% if includecoremodules is defined and includecoremodules == true %}
+            {% set includeCoreModulesChecked = true %}
+        {% endif %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'include_core_modules',
+                'fieldLabel'                     : 'Include Core Modules?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Include Core modules in the list of modules?',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'info',
+                'fieldCheckboxChecked'           : includeCoreModulesChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
     <div class="col">
         {{adminltetags.useTag('buttons',
             [
                 'componentId'                       : componentId,
                 'sectionId'                         : sectionId,
                 'buttonType'                        : 'DropdownSplitButtons',
+                'buttonLabel'                       : 'New Module',
                 'dropdownButtonId'                  : 'main',
-                'dropdownButtonTitle'               : 'Add New Module',
+                'dropdownButtonTitle'               : 'Add',
                 'dropdownButtonIcon'                : 'plus',
                 'dropdownButtonAdditionalClass'     : 'text-uppercase',
-                'buttonPosition'                    : 'right',
                 'dropdownAlign'                     : 'right',
                 'buttons'                           :
                     {
@@ -59,57 +108,6 @@
                             'url'                     : links.url('devtools/modules/q/module/true/type/views/id/0')
                         }
                     }
-            ]
-        )}}
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                            : component,
-                'componentName'                        : componentName,
-                'componentId'                          : componentId,
-                'sectionId'                            : sectionId,
-                'fieldId'                              : 'modules',
-                'fieldLabel'                           : 'Select Module',
-                'fieldType'                            : 'select2',
-                'fieldHelp'                            : true,
-                'fieldHelpTooltipContent'              : 'Module',
-                'fieldRequired'                        : true,
-                'fieldBazScan'                         : true,
-                'fieldBazPostOnCreate'                 : true,
-                'fieldBazPostOnUpdate'                 : true,
-                'fieldDataSelect2Options'              : modules,
-                'fieldDataSelect2OptionsKey'           : 'id',
-                'fieldDataSelect2OptionsValue'         : 'name',
-                'fieldDataSelect2OptionsSelected'      : ''
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {% set includeCoreModulesChecked = false %}
-        {% if includecoremodules is defined and includecoremodules == true %}
-            {% set includeCoreModulesChecked = true %}
-        {% endif %}
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'include_core_modules',
-                'fieldLabel'                     : 'Include Core Modules?',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Include Core modules in the list of modules?',
-                'fieldType'                      : 'checkbox',
-                'fieldCheckboxType'              : 'info',
-                'fieldCheckboxChecked'           : includeCoreModulesChecked,
-                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazScan'                   : true
             ]
         )}}
     </div>

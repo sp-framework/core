@@ -3,7 +3,7 @@
     {% set moduleId = module['id'] %}
 {% else %}
     {% set moduleName = 'New' %}
-    {% set moduleId = 0 %}
+    {% set moduleId = '' %}
 {% endif %}
 {{adminltetags.useTag('content',
     [
@@ -19,7 +19,7 @@
         'cardIcon'                      : 'th',
         'cardTitle'                     : 'Modules : ' ~ moduleName ~ ' (' ~ type ~ ')',
         'cardAdditionalClass'           : 'rounded-0',
-        'cardBodyInclude'               : 'modules/module/' ~ type,
+        'cardBodyInclude'               : 'modules/module',
         'formButtons'                   :
         [
             'updateButtonId'                : moduleId,
