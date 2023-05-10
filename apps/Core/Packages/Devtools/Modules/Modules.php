@@ -340,4 +340,52 @@ class Modules extends BasePackage
 
         return $formatted_json;
     }
+
+    public function getModuleTypes()
+    {
+        return
+            [
+                'components'    =>
+                    [
+                        'id'    => 'components',
+                        'name'  => 'Components'
+                    ],
+                'packages'      =>
+                    [
+                        'id'    => 'packages',
+                        'name'  => 'Packages'
+                    ],
+                'middlewares'   =>
+                    [
+                        'id'    => 'middlewares',
+                        'name'  => 'Middlewares'
+                    ],
+                'views'         =>
+                    [
+                        'id'    => 'views',
+                        'name'  => 'Views'
+                    ],
+            ];
+    }
+
+    public function getDefaultSettings($type)
+    {
+        $defaultSettings = [];
+
+        return Json::encode($defaultSettings);
+    }
+
+    public function getDefaultDependencies()
+    {
+        $defaultDependencies =
+            [
+                'components'        => [],
+                'packages'          => [],
+                'middlewares'       => [],
+                'views'             => [],
+                'external'          => []
+            ];
+
+        return Json::encode($defaultDependencies);
+    }
 }

@@ -1,3 +1,8 @@
+{% if module['id'] is defined %}
+    {% set settings = module['settings'] %}
+{% else %}
+    {% set settings = moduleSettings %}
+{% endif %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -17,7 +22,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMaxLength'        : 1024,
                 'fieldTextareaRows'              : 15,
-                'fieldValue'                     : moduleSettings
+                'fieldValue'                     : settings
             ]
         )}}
     </div>

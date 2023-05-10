@@ -6,13 +6,13 @@
     {% endif %}
     {% set moduleDisplay_name = module['display_name'] %}
     {% set moduleDescription = module['description'] %}
+    {% set moduleModule_type = module['module_type'] %}
     {% set moduleApp_type = module['app_type'] %}
     {% set moduleCategory = module['category'] %}
     {% set moduleSub_category = module['sub_category'] %}
     {% set moduleVersion = module['version'] %}
     {% set moduleRepo = module['repo'] %}
     {% set moduleClass = module['class'] %}
-    {% set moduleSettings = module['settings'] %}
     {% if type === 'components' %}
         {% set moduleMenu_id = module['menu_id'] %}
         {% set moduleMenu = module['menu'] %}
@@ -24,17 +24,17 @@
     {% set moduleId = '' %}
     {% set moduleName = '' %}
     {% if type !== 'core' %}
-        {% set moduleRoute = module['route'] %}
+        {% set moduleRoute = '' %}
     {% endif %}
     {% set moduleDisplay_name = '' %}
     {% set moduleDescription = '' %}
+    {% set moduleModule_type = '' %}
     {% set moduleApp_type = '' %}
     {% set moduleCategory = '' %}
     {% set moduleSub_category = '' %}
     {% set moduleVersion = '' %}
     {% set moduleRepo = '' %}
     {% set moduleClass = '' %}
-    {% set moduleSettings = '' %}
     {% if type === 'components' %}
         {% set moduleMenu_id = '' %}
         {% set moduleMenu = '' %}
@@ -132,7 +132,7 @@
         )}}
     </div>
     {% endif %}
-    {% if type === 'views' %}
+    {% if type !== 'components' %}
         <div class="col">
             {{adminltetags.useTag('fields',
                 [
@@ -141,10 +141,10 @@
                     'componentId'                    : componentId,
                     'sectionId'                      : sectionId,
                     'fieldId'                        : 'display_name',
-                    'fieldLabel'                     : 'view Display name',
+                    'fieldLabel'                     : 'Module Display name',
                     'fieldType'                      : 'input',
                     'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : 'view Display name',
+                    'fieldHelpTooltipContent'        : 'Module Display name',
                     'fieldRequired'                  : true,
                     'fieldBazScan'                   : true,
                     'fieldBazPostOnUpdate'           : true,
@@ -181,6 +181,28 @@
     </div>
 </div>
 <div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'module_type',
+                'fieldLabel'                           : 'Module Type',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Module Type',
+                'fieldRequired'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldDataSelect2Options'              : moduleTypes,
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsSelected'      : moduleModule_type
+            ]
+        )}}
+    </div>
     <div class="col">
         {{adminltetags.useTag('fields',
             [

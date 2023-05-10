@@ -128,12 +128,38 @@ class ModulesComponent extends BaseComponent
 			$this->view->type = $type;
 			$this->view->module = null;
 
+			$apisArr = $this->basepackages->api->init()->getAll()->api;
+
+			if (count($apisArr) > 0) {
+				$repos[0]['id'] = 0;
+				$repos[0]['name'] = 'Local Modules';
+				$repos[0]['data']['url'] = 'https://.../';
+
+				foreach ($apisArr as $api) {
+					if ($api['category'] === 'repos') {
+						$useApi = $this->basepackages->api->useApi($api['id'], true);
+						$apiConfig = $useApi->getApiConfig();
+
+						$repos[$api['id']]['id'] = $apiConfig['id'];
+						$repos[$api['id']]['name'] = $apiConfig['name'];
+						$repos[$api['id']]['data']['url'] = $apiConfig['repo_url'] . '/';
+					}
+				}
+			}
+
+			$this->view->repos = $repos;
+			$this->view->moduleTypes = $this->modulesPackage->getModuleTypes();
+			$this->view->moduleSettings = $this->modulesPackage->getDefaultSettings($type);
+			$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies();
+
 			if ($this->getData()['id'] != 0) {
 				if ($type === 'core') {
 					if (is_array($coreJson['settings'])) {
+						$this->view->moduleSettings = Json::encode($coreJson['settings']);
 						$coreJson['settings'] = $this->modulesPackage->formatJson(['json' => $coreJson['settings']]);
 					}
 					if (is_array($coreJson['dependencies'])) {
+						$this->view->moduleDependencies = Json::encode($coreJson['dependencies']);
 						$coreJson['dependencies'] = $this->modulesPackage->formatJson(['json' => $coreJson['dependencies']]);
 					}
 

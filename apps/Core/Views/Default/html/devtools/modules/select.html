@@ -2,84 +2,15 @@
     <div class="col">
         {{adminltetags.useTag('buttons',
             [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'buttonType'                    : 'button',
-                'buttons'                       :
-                    [
-                        'modules-link'    : [
-                            'title'                   : 'link',
-                            'size'                    : 'xs',
-                            'disabled'                : true,
-                            'hidden'                  : true,
-                            'url'                     : '#'
-                        ]
-                    ]
-            ]
-        )}}
-    </div>
-</div>
-<div class="row vdivide">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                            : component,
-                'componentName'                        : componentName,
-                'componentId'                          : componentId,
-                'sectionId'                            : sectionId,
-                'fieldId'                              : 'modules',
-                'fieldLabel'                           : 'Select Module',
-                'fieldType'                            : 'select2',
-                'fieldHelp'                            : true,
-                'fieldHelpTooltipContent'              : 'Module',
-                'fieldRequired'                        : true,
-                'fieldBazScan'                         : true,
-                'fieldBazPostOnCreate'                 : true,
-                'fieldBazPostOnUpdate'                 : true,
-                'fieldDataSelect2Options'              : modules,
-                'fieldDataSelect2OptionsKey'           : 'id',
-                'fieldDataSelect2OptionsValue'         : 'name',
-                'fieldDataSelect2OptionsSelected'      : ''
-            ]
-        )}}
-        {% set includeCoreModulesChecked = false %}
-        {% if includecoremodules is defined and includecoremodules == true %}
-            {% set includeCoreModulesChecked = true %}
-        {% endif %}
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'include_core_modules',
-                'fieldLabel'                     : 'Include Core Modules?',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Include Core modules in the list of modules?',
-                'fieldType'                      : 'checkbox',
-                'fieldCheckboxType'              : 'info',
-                'fieldCheckboxChecked'           : includeCoreModulesChecked,
-                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazScan'                   : true
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('buttons',
-            [
                 'componentId'                       : componentId,
                 'sectionId'                         : sectionId,
                 'buttonType'                        : 'DropdownSplitButtons',
-                'buttonLabel'                       : 'New Module',
+                'buttonLabel'                       : false,
                 'dropdownButtonId'                  : 'main',
                 'dropdownButtonTitle'               : 'Add',
                 'dropdownButtonIcon'                : 'plus',
                 'dropdownButtonAdditionalClass'     : 'text-uppercase',
+                'buttonPosition'                    : 'right',
                 'dropdownAlign'                     : 'right',
                 'buttons'                           :
                     {
@@ -111,6 +42,80 @@
             ]
         )}}
     </div>
+</div>
+<div class="row">
+    <div class="col">
+        {% set includeCoreModulesChecked = false %}
+        {% if includecoremodules is defined and includecoremodules == true %}
+            {% set includeCoreModulesChecked = true %}
+        {% endif %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'include_core_modules',
+                'fieldLabel'                     : 'Include Core Modules?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Include Core modules in the list of modules?',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'info',
+                'fieldCheckboxChecked'           : includeCoreModulesChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'modules',
+                'fieldLabel'                           : 'Select Module',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Module',
+                'fieldRequired'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldDataSelect2Options'              : modules,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsSelected'      : ''
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonLabel'                    : 'Edit Module',
+                'buttonType'                     : 'button',
+                'buttons'                        :
+                    [
+                        'modules-edit'    : [
+                            'title'                   : 'edit',
+                            'size'                    : 'xs',
+                            'disabled'                : true,
+                            'buttonAdditionalClass'         : 'contentAjaxLink',
+                            'url'                     : '#'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+
 </div>
 <script>
 /* globals BazContentLoader Pace BazCore */
@@ -172,8 +177,6 @@ dataCollectionSection =
     });
 
 dataCollectionSectionForm['funcs']['loadAjax'] = function(id = null, label = null, includecoremodules = false) {
-    //eslint-disable-next-line
-    console.log(dataCollectionSectionForm['vars']['url']);
     if (id && label) {
         if (dataCollectionSectionForm['vars']['url'].includes('/q/')) {
             dataCollectionSectionForm['vars']['url'] = '{{links.url("module/true/type/' + label + '/id/' + id + '")}}';
@@ -190,22 +193,23 @@ dataCollectionSectionForm['funcs']['loadAjax'] = function(id = null, label = nul
         dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];
     }
 
-    $('#{{componentId}}-{{sectionId}}-modules-link').attr('href', dataCollectionSectionForm['vars']['url']);
+    $('#{{componentId}}-{{sectionId}}-modules-edit').attr('href', dataCollectionSectionForm['vars']['url']);
+    $('#{{componentId}}-{{sectionId}}-modules-edit').removeClass('disabled');
 
-    BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-modules-link'), {
-        ajaxBefore                      : function () {
-                                            Pace.restart();
-                                            $("#baz-content").empty();
-                                            $("#loader").attr('hidden', false);
-                                        },
-        ajaxFinished                    : function () {
-                                            BazCore.updateBreadcrumb();
-                                            $("#loader").attr('hidden', true);
-                                        },
-        ajaxError                       : function () {
-                                            $("#loader").attr('hidden', true);
-                                            BazCore.updateBreadcrumb();
-                                        }
-    });
+    // BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-modules-link'), {
+    //     ajaxBefore                      : function () {
+    //                                         Pace.restart();
+    //                                         $("#baz-content").empty();
+    //                                         $("#loader").attr('hidden', false);
+    //                                     },
+    //     ajaxFinished                    : function () {
+    //                                         BazCore.updateBreadcrumb();
+    //                                         $("#loader").attr('hidden', true);
+    //                                     },
+    //     ajaxError                       : function () {
+    //                                         $("#loader").attr('hidden', true);
+    //                                         BazCore.updateBreadcrumb();
+    //                                     }
+    // });
 }
 </script>

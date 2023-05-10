@@ -1,6 +1,7 @@
-{% set moduleDependencies = json_encode([], 16) %}
 {% if module['id'] is defined %}
-    {% set moduleDependencies = module['dependencies'] %}
+    {% set dependencies = module['dependencies'] %}
+{% else %}
+    {% set dependencies = moduleDependencies %}
 {% endif %}
 {% if type !== 'core' %}
     <div class="row">
@@ -144,7 +145,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMaxLength'        : 10000,
                 'fieldTextareaRows'              : 15,
-                'fieldValue'                     : moduleDependencies
+                'fieldValue'                     : dependencies
             ]
         )}}
     </div>
