@@ -166,20 +166,20 @@ class Installer extends BasePackage
     {
         //Needs subProgress for downloading multiple modules from different repos
         foreach ($this->modulesToInstallOrUpdate as $key => $moduleToInstallOrUpdate) {
-            //remove old data so there is no conflict
-            // $files = $this->basepackages->utils->scanDir($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name']);
-            // if (count($files['files']) > 0) {
-            //     foreach ($files['files'] as $file) {
-            //         $this->localContent->delete($file);
-            //     }
-            // }
-            // if (count($files['dirs']) > 0) {
-            //     foreach ($files['dirs'] as $dir) {
-            //         $this->localContent->deleteDirectory($dir);
-            //     }
-            // }
+            // remove old data so there is no conflict
+            $files = $this->basepackages->utils->scanDir($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name']);
+            if (count($files['files']) > 0) {
+                foreach ($files['files'] as $file) {
+                    $this->localContent->delete($file);
+                }
+            }
+            if (count($files['dirs']) > 0) {
+                foreach ($files['dirs'] as $dir) {
+                    $this->localContent->deleteDirectory($dir);
+                }
+            }
 
-            // $this->localContent->createDirectory($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name']);
+            $this->localContent->createDirectory($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name']);
 
             if (!$this->initApi($moduleToInstallOrUpdate['api_id'])) {
                 $this->basepackages->progress->resetProgress();
@@ -195,10 +195,10 @@ class Installer extends BasePackage
                 //For github
             }
 
-            $latestRelease = $this->api->useMethod($collection, $method, $args)->getResponse();
-            $file = $this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name'] . '/' . $moduleToInstallOrUpdate['repo_details']['latestRelease']['tag_name'] . '.zip';
-
             try {
+                $latestRelease = $this->api->useMethod($collection, $method, $args)->getResponse();
+                $file = $this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name'] . '/' . $moduleToInstallOrUpdate['repo_details']['latestRelease']['tag_name'] . '.zip';
+
                 $this->localContent->write($file, $latestRelease->getContents());
             } catch (\throwable $e) {
                 $this->basepackages->progress->resetProgress();
@@ -303,10 +303,11 @@ class Installer extends BasePackage
                     if (isset($module['module']['display_name'])) {
                         $name = $module['module']['display_name'];
                     }
-                    $this->preCheckResult['core']['logs'] = 'Added to queue as required by module : ' . $name;
+                    $this->preCheckResult['core']['logs'] = 'Added to queue as required by module : ' . $name . '. ';
                 }
             }
 
+            //
         }
 
         var_dump($this->preCheckResult);die();
@@ -708,10 +709,10 @@ class Installer extends BasePackage
                     'method'    => 'downloadModulesFromRepo',
                     'text'      => 'Download module files from repository...'
                 ],
-                // [
-                //     'method'    => 'extractModulesDownloadedFromRepo',
-                //     'text'      => 'Extract downloaded module zip files...'
-                // ],
+                [
+                    'method'    => 'extractModulesDownloadedFromRepo',
+                    'text'      => 'Extract downloaded module zip files...'
+                ],
                 [
                     'method'    => 'checkDependencies',
                     'text'      => 'Checking dependencies...'
