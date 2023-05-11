@@ -8,6 +8,6 @@
     "category"      : "apps",
     "sub_category"  : "devtools",
     "repo"          : "https://.../",
-    "class"         : "Apps\\Core\\Packages\\Devtools\\Modules\\Modules",
+    "class"         : "Apps\\Core\\Packages\\Devtools\\Modules\\DevtoolsModules",
     "settings"      : { }
 }

@@ -69,8 +69,8 @@ class ModulesComponent extends BaseComponent
 
 		$modulesJson = [];
 
-		foreach ($modules as $moduleKey => $module) {
-			foreach ($module['childs'] as $childKey => $child) {
+		foreach ($modules as $moduleKey => $moduleJson) {
+			foreach ($moduleJson['childs'] as $childKey => $child) {
 				$modulesJson[$moduleKey][$child['id']] =
 					[
 						'name' 		=> $child['name'],

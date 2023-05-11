@@ -4,8 +4,8 @@
 {% else %}
     {% set dependencies = moduleDependencies %}
 {% endif %}
-{% if type !== 'core' %}
-    <div class="row vdivide">
+<div class="row vdivide">
+    {% if type !== 'core' %}
         <div class="col">
             <div class="row">
                 <div class="col">
@@ -128,6 +128,7 @@
                 </div>
             </div>
         </div>
+    {% endif %}
         <div class="col">
             <div class="row">
                 <div class="col">
@@ -203,9 +204,8 @@
                 </div>
             </div>
         </div>
-    </div>
-    <hr>
-{% endif %}
+</div>
+<hr>
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
