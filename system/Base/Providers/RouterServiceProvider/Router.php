@@ -118,7 +118,7 @@ class Router
 				'Apps\\' .
 				ucfirst($this->appDefaults['app_type']) .
 				'\\Components\\' .
-				ucfirst($this->appDefaults['component'])
+				'Home'
 				;
 		} else {
 			if ($this->givenRouteClass !== '') {
@@ -150,7 +150,7 @@ class Router
 		$this->router->add(
 			'/',
 			[
-				'controller'	=> 	strtolower($this->appDefaults['component']),
+				'controller'	=> 'home',
 				'action'		=> 'view'
 			]
 		);
@@ -158,7 +158,7 @@ class Router
 		$this->router->add(
 			'/' . strtolower($this->appInfo['route']),
 			[
-				'controller'	=> 	strtolower($this->appDefaults['component']),
+				'controller'	=> 'home',
 				'action'		=> 'view'
 			]
 		);
@@ -166,7 +166,7 @@ class Router
 		$this->router->add(
 			'/' . strtolower($this->appInfo['route']) . '/',
 			[
-				'controller'	=> 	strtolower($this->appDefaults['component']),
+				'controller'	=> 'home',
 				'action'		=> 'view'
 			]
 		);
