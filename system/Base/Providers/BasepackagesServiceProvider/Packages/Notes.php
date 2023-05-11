@@ -18,7 +18,7 @@ class Notes extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $notesSettings = $this->modules->packages->getNamePackage($this->packageName);
+        $notesSettings = $this->modules->packages->getPackageByName($this->packageName);
 
         if ($notesSettings) {
             $this->notesSettings = Json::decode($notesSettings['settings'], true);

@@ -19,7 +19,7 @@ class Middlewares extends BasePackage
 		return $this;
 	}
 
-	public function getNamedMiddlewareForApp($name, $appId)
+	public function getMiddlewareByNameForAppId($name, $appId)
 	{
 		foreach($this->middlewares as $middleware) {
 			$middleware['apps'] = Json::decode($middleware['apps'], true);
@@ -60,12 +60,12 @@ class Middlewares extends BasePackage
 		return false;
 	}
 
-	public function getMiddlewaresByApiId($id)
+	public function getMiddlewaresByApiId($apiId)
 	{
 		$middlewares = [];
 
 		foreach($this->middlewares as $middleware) {
-			if ($middleware['api_id'] == $id) {
+			if ($middleware['api_id'] == $apiId) {
 				array_push($middlewares, $middleware);
 			}
 		}
@@ -73,7 +73,7 @@ class Middlewares extends BasePackage
 		return $middlewares;
 	}
 
-	public function getMiddlewaresForApp($appId)
+	public function getMiddlewaresForAppId($appId)
 	{
 		$middlewares = [];
 
@@ -125,12 +125,12 @@ class Middlewares extends BasePackage
 		return $middlewares;
 	}
 
-	public function getMiddlewaresForAppType(string $type, $appId = null)
+	public function getMiddlewaresForAppType($appType, $appId = null)
 	{
 		$middlewares = [];
 
 		foreach($this->middlewares as $middleware) {
-			if ($middleware['app_type'] == $type) {
+			if ($middleware['app_type'] == $appType) {
 				$middlewares[$middleware['id']] = $middleware;
 
 				if ($appId) {

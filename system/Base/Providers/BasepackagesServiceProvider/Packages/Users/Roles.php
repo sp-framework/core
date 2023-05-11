@@ -109,7 +109,7 @@ class Roles extends BasePackage
         $appsArr = $this->apps->apps;
 
         foreach ($appsArr as $appKey => $app) {
-            $componentsArr = msort($this->modules->components->getComponentsForApp($app['id']), 'name');
+            $componentsArr = msort($this->modules->components->getComponentsForAppId($app['id']), 'name');
 
             if (count($componentsArr) > 0) {
                 $components[strtolower($app['id'])] =
@@ -153,7 +153,7 @@ class Roles extends BasePackage
                 $permissions = [];
 
                 foreach ($appsArr as $appKey => $app) {
-                    $componentsArr = msort($this->modules->components->getComponentsForApp($app['id']), 'name');
+                    $componentsArr = msort($this->modules->components->getComponentsForAppId($app['id']), 'name');
 
                     foreach ($componentsArr as $key => $component) {
                         if ($component['class'] && $component['class'] !== '') {
@@ -193,7 +193,7 @@ class Roles extends BasePackage
             $permissions = [];
 
             foreach ($appsArr as $appKey => $app) {
-                $componentsArr = msort($this->modules->components->getComponentsForApp($app['id']), 'name');
+                $componentsArr = msort($this->modules->components->getComponentsForAppId($app['id']), 'name');
 
                 foreach ($componentsArr as $key => $component) {
                     //Build ACL Columns

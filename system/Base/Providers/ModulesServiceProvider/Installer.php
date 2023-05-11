@@ -289,7 +289,7 @@ class Installer extends BasePackage
             //Check Core dependency
             if (Version::greaterThan($jsonFile['dependencies']['core']['version'], $this->core->getVersion())) {
                 //Lets check for latest release on Core as required version is greater than installed version.
-                $core = $this->modules->packages->getNamePackage('core');
+                $core = $this->modules->packages->getPackageByName('core');
                 $core = $this->modules->manager->updateModuleRepoDetails($core);
 
                 if ($core) {

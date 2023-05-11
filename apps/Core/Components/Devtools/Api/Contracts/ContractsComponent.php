@@ -52,7 +52,7 @@ class ContractsComponent extends BaseComponent
 		}
 
 		if (isset($this->getData()['id'])) {
-			$contractPackage = $this->modules->packages->getNamePackage('Contracts');
+			$contractPackage = $this->modules->packages->getPackageByName('Contracts');
 
 			$contractPackage['settings'] = Json::decode($contractPackage['settings'], true);
 

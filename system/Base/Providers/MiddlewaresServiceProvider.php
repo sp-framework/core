@@ -30,13 +30,13 @@ class MiddlewaresServiceProvider extends Injectable
         if ($this->data['app']) {
             $middlewares = [];
 
-            $ipFilterMiddleware = $this->modules->middlewares->getNamedMiddlewareForApp('IpFilter', $this->data['app']['id']);
+            $ipFilterMiddleware = $this->modules->middlewares->getMiddlewareByNameForAppId('IpFilter', $this->data['app']['id']);
 
             if ($ipFilterMiddleware) {
                 $middlewares[] = $ipFilterMiddleware;
-                $middlewares = array_merge($middlewares, msort($this->modules->middlewares->getMiddlewaresForApp($this->data['app']['id']), 'sequence'));
+                $middlewares = array_merge($middlewares, msort($this->modules->middlewares->getMiddlewaresForAppId($this->data['app']['id']), 'sequence'));
             } else {
-                $middlewares = msort($this->modules->middlewares->getMiddlewaresForApp($this->data['app']['id']), 'sequence');
+                $middlewares = msort($this->modules->middlewares->getMiddlewaresForAppId($this->data['app']['id']), 'sequence');
             }
 
             foreach ($middlewares as $middleware) {
@@ -86,7 +86,7 @@ class MiddlewaresServiceProvider extends Injectable
         $this->init($data);
 
         if ($this->data['app']) {
-            $middlewares = $this->modules->middlewares->getMiddlewaresForApp($this->data['app']['id']);
+            $middlewares = $this->modules->middlewares->getMiddlewaresForAppId($this->data['app']['id']);
 
             foreach ($middlewares as $middleware) {
                 if ($middleware['name'] !== 'Acl' &&

@@ -48,7 +48,7 @@ class StoragesComponent extends BaseComponent
                     $this->view->storageType = $this->getData()['type'];
                 }
 
-                $storagePackage = $this->modules->packages->getNamePackage('Storages');
+                $storagePackage = $this->modules->packages->getPackageByName('Storages');
 
                 $storagePackage['settings'] = Json::decode($storagePackage['settings'], true);
 

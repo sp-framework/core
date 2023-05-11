@@ -161,7 +161,7 @@ class Acl extends BaseMiddleware
         $controllerName = $this->dispatcher->getControllerName();
 
         $component =
-            $this->modules->components->getNamedComponentForApp(
+            $this->modules->components->getComponentByNameForAppId(
                 $controllerName,
                 $this->app['id']
             );
@@ -182,7 +182,7 @@ class Acl extends BaseMiddleware
             $componentRoute = implode('/', $url);
 
             $component =
-                $this->modules->components->getRouteComponentForApp(
+                $this->modules->components->getComponentByRouteForAppId(
                     strtolower($componentRoute), $this->app['id']
                 );
         }

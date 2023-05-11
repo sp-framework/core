@@ -310,7 +310,7 @@ class Profile extends BasePackage
 
         foreach ($appsArr as $appKey => $app) {
             if (isset($account['can_login'][$app['id']])) {
-                $packagesArr = $this->modules->packages->getPackagesForApp($app['id']);
+                $packagesArr = $this->modules->packages->getPackagesForAppId($app['id']);
 
                 if (count($packagesArr) > 0) {
                     $packages[$app['id']] =
@@ -345,7 +345,7 @@ class Profile extends BasePackage
         foreach ($appsArr as $appKey => $app) {
             if (isset($account['can_login'][$app['id']])) {
 
-                $packagesArr = $this->modules->packages->getPackagesForApp($app['id']);
+                $packagesArr = $this->modules->packages->getPackagesForAppId($app['id']);
 
                 foreach ($packagesArr as $key => $package) {
                     if ($package['class'] && $package['class'] !== '') {

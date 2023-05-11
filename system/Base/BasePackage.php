@@ -1103,7 +1103,7 @@ abstract class BasePackage extends Controller
 	protected function checkPackage($packageClass)
 	{
 		return
-			$this->modules->packages->getNamedPackageForApp(
+			$this->modules->packages->getPackageByNameForAppId(
 				Arr::last(explode('\\', $packageClass)),
 				$this->app['id']
 			);

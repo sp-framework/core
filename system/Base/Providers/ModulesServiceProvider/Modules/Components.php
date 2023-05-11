@@ -30,12 +30,12 @@ class Components extends BasePackage
 		return false;
 	}
 
-	public function getComponentsByApiId($id)
+	public function getComponentsByApiId($apiId)
 	{
 		$components = [];
 
 		foreach($this->components as $component) {
-			if ($component['api_id'] == $id) {
+			if ($component['api_id'] == $apiId) {
 				array_push($components, $component);
 			}
 		}
@@ -65,7 +65,7 @@ class Components extends BasePackage
 		return false;
 	}
 
-	public function getRouteComponentForApp($route, $appId)
+	public function getComponentByRouteForAppId($route, $appId)
 	{
 		foreach($this->components as $component) {
 			$component['apps'] = Json::decode($component['apps'], true);
@@ -83,7 +83,7 @@ class Components extends BasePackage
 		return false;
 	}
 
-	public function getNamedComponentForApp($name, $appId)
+	public function getComponentByNameForAppId($name, $appId)
 	{
 		foreach($this->components as $component) {
 			$component['apps'] = Json::decode($component['apps'], true);
@@ -101,7 +101,7 @@ class Components extends BasePackage
 		return false;
 	}
 
-	public function getComponentsForApp($appId)
+	public function getComponentsForAppId($appId)
 	{
 		$components = [];
 
@@ -118,13 +118,13 @@ class Components extends BasePackage
 		return $components;
 	}
 
-	public function getComponentsForAppAndType($appId, $type)
+	public function getComponentsForAppIdAndAppType($appId, $appType)
 	{
 		$components = [];
 
 		foreach($this->components as $component) {
 			if ($component['app_id'] == $appId &&
-				$component['type'] == $type
+				$component['app_type'] == $appType
 			) {
 				$components[$component['id']] = $component;
 			}
@@ -157,12 +157,12 @@ class Components extends BasePackage
 		return $components;
 	}
 
-	public function getComponentsForAppType(string $type)
+	public function getComponentsForAppType($appType)
 	{
 		$components = [];
 
 		foreach($this->components as $component) {
-			if ($component['app_type'] === $type) {
+			if ($component['app_type'] === $appType) {
 				$components[$component['id']] = $component;
 			}
 		}
@@ -182,7 +182,7 @@ class Components extends BasePackage
 				isset($component['settings']['importexportPackage']) &&
 				isset($component['settings']['importMethod'])
 			) {
-				$package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
+				$package = $this->modules->packages->getPackageByName($component['settings']['importexportPackage']);
 
 				if ($package &&
 					$this->usePackage($package['class']) &&
@@ -211,7 +211,7 @@ class Components extends BasePackage
 				$component['settings']['export'] == 'true' &&
 				isset($component['settings']['importexportPackage'])
 			) {
-				$package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
+				$package = $this->modules->packages->getPackageByName($component['settings']['importexportPackage']);
 
 				if ($package && $this->usePackage($package['class'])) {
 					$availableComponent['id'] = $component['id'];
@@ -259,7 +259,7 @@ class Components extends BasePackage
 
 					foreach ($component['dependencies']['packages'] as $key => $dependencyPackage) {
 
-						$package = $this->modules->packages->getNamedPackageForRepo($dependencyPackage['name'], $dependencyPackage['repo']);
+						$package = $this->modules->packages->getPackageByNameForRepo($dependencyPackage['name'], $dependencyPackage['repo']);
 
 						if ($package) {
 							$package['apps'] = Json::decode($package['apps'], true);

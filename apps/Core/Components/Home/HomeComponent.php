@@ -16,7 +16,7 @@ class HomeComponent extends BaseComponent
             $defaultComponentId = $this->app['default_component'];
 
             if ($this->app['default_component'] == 0) {
-                $dashboardComponent = $this->modules->components->getComponentByRoute('dashboard');
+                $dashboardComponent = $this->modules->components->getComponentByRouteForAppId('dashboards', 1);
 
                 $defaultComponentId = $dashboardComponent['id'];
             }

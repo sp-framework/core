@@ -83,7 +83,7 @@ abstract class BaseComponent extends Controller
 			str_replace('Component', '', $this->reflection->getShortName());
 
 		$this->component =
-			$this->modules->components->getNamedComponentForApp(
+			$this->modules->components->getComponentByNameForAppId(
 				$this->componentName, $this->app['id']
 			);
 
@@ -101,7 +101,7 @@ abstract class BaseComponent extends Controller
 
 		if (!$this->component) {
 			$this->component =
-				$this->modules->components->getRouteComponentForApp(
+				$this->modules->components->getComponentByRouteForAppId(
 					strtolower($this->componentRoute), $this->app['id']
 				);
 		}
@@ -121,7 +121,7 @@ abstract class BaseComponent extends Controller
 			if (class_exists($widgetsClass)) {
 				$route = str_replace('apps/' . $this->app['app_type'] . '/components/', '', strtolower(str_replace('\\', '/', $namespace)));
 
-				$component = $this->modules->components->getRouteComponentForApp($route, $this->app['id']);
+				$component = $this->modules->components->getComponentByRouteForAppId($route, $this->app['id']);
 
 				$this->widgets = (new $widgetsClass())->init($this, $component);
 			}
@@ -780,7 +780,7 @@ abstract class BaseComponent extends Controller
 		}
 
 		if ($getSettings === 'packages' || $getSettings === true) {
-			$packageInfo = $this->modules->packages->getNamePackage($packageClass);
+			$packageInfo = $this->modules->packages->getPackageByName($packageClass);
 			$thisPackage['id'] = $packageInfo['id'];
 			$thisPackage['name'] = $packageInfo['name'];
 			$thisPackage['settings'] = Json::decode($packageInfo['settings'], true);
@@ -835,7 +835,7 @@ abstract class BaseComponent extends Controller
 	protected function checkPackage($packageClass)
 	{
 		return
-			$this->modules->packages->getNamedPackageForApp(
+			$this->modules->packages->getPackageByNameForAppId(
 				Arr::last(explode('\\', $packageClass)),
 				$this->app['id']
 			);
@@ -858,7 +858,7 @@ abstract class BaseComponent extends Controller
 	protected function checkComponent($componentClass)
 	{
 		return
-			$this->modules->components->getNamedComponentForApp(
+			$this->modules->components->getComponentByNameForAppId(
 				str_replace('Component', '', Arr::last(explode('\\', $componentClass))),
 				$this->app['id']
 			);

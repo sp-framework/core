@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
+<!-- htmlhint tag-pair:false -->
 {{get_doctype()}}
 <html lang="en">
     <head>
@@ -102,11 +102,10 @@ if (localStorage.getItem('bazDevMode') === null) {
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/header/view') %}
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/sidebar/view') %}
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/content/view') %}
-            {% if modules.components.getNamedComponentForApp('Messenger', apps.getAppInfo()['id']) %}
+            {% if modules.components.getComponentByNameForAppId('Messenger', apps.getAppInfo()['id']) %}
                 {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/messenger/view') %}
             {% endif %}
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/footer/view') %}
         </div>
     </body>
 </html>
-<!-- htmlmin:ignore -->

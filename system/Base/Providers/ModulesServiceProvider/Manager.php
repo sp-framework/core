@@ -45,11 +45,11 @@ class Manager extends BasePackage
         if ($data['module_type'] === 'components') {
             $module = $this->modules->components->getComponentById($data['module_id']);
         } else if ($data['module_type'] === 'packages') {
-            $module = $this->modules->packages->getIdPackage($data['module_id']);
+            $module = $this->modules->packages->getPackageById($data['module_id']);
         } else if ($data['module_type'] === 'middlewares') {
             $module = $this->modules->middlewares->getMiddlewareById($data['module_id']);
         } else if ($data['module_type'] === 'views') {
-            $module = $this->modules->views->getIdViews($data['module_id']);
+            $module = $this->modules->views->getViewById($data['module_id']);
         }
 
         if ($module) {
@@ -72,11 +72,11 @@ class Manager extends BasePackage
         if ($data['module_type'] === 'components') {
             $module = $this->modules->components->getComponentById($data['module_id']);
         } else if ($data['module_type'] === 'packages') {
-            $module = $this->modules->packages->getIdPackage($data['module_id']);
+            $module = $this->modules->packages->getPackageById($data['module_id']);
         } else if ($data['module_type'] === 'middlewares') {
             $module = $this->modules->middlewares->getMiddlewareById($data['module_id']);
         } else if ($data['module_type'] === 'views') {
-            $module = $this->modules->views->getIdViews($data['module_id']);
+            $module = $this->modules->views->getViewById($data['module_id']);
         }
 
         if (isset($module) && is_array($module)) {

@@ -360,7 +360,7 @@ class IpFilter extends BasePackage
 
     private function ipFilterMiddlewareEnabled($appRoute = null)
     {
-        $middleware = $this->modules->middlewares->getNamedMiddlewareForApp('IpFilter', $this->apps->getAppInfo($appRoute)['id']);
+        $middleware = $this->modules->middlewares->getMiddlewareByNameForAppId('IpFilter', $this->apps->getAppInfo($appRoute)['id']);
 
         if (isset($middleware['apps'][$this->app['id']]['enabled']) &&
             $middleware['apps'][$this->app['id']]['enabled'] === true

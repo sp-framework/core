@@ -176,7 +176,7 @@ class Views extends BasePackage
             if ($this->app &&
                 isset($this->domain['apps'][$this->app['id']]['view'])
             ) {
-                $viewsName = $this->getIdViews($this->domain['apps'][$this->app['id']]['view'])['name'];
+                $viewsName = $this->getViewById($this->domain['apps'][$this->app['id']]['view'])['name'];
             } else {
                 $viewsName =  'Default';
             }
@@ -184,7 +184,7 @@ class Views extends BasePackage
             if (!$this->view) {
                 //Make sure view has proper app ID.
                 if ($this->app) {
-                    $this->view = $this->getAppView($this->app['id'], $viewsName);
+                    $this->view = $this->getViewByNameForAppId($viewsName, $this->app['id']);
                 }
             }
             if ($this->view) {
@@ -205,13 +205,13 @@ class Views extends BasePackage
     protected function checkTagsPackage($packageName)
     {
         return
-            $this->modules->packages->getNamedPackageForApp(
+            $this->modules->packages->getPackageByNameForAppId(
                 Arr::last(explode('\\', $packageName)),
                 $this->apps->getAppInfo()['id']
             );
     }
 
-    public function getAppView($appId, $name)
+    public function getViewByNameForAppId($name, $appId)
     {
         foreach($this->views as $view) {
             $view['apps'] = Json::decode($view['apps'], true);
@@ -227,7 +227,7 @@ class Views extends BasePackage
         return false;
     }
 
-    public function getViewsForApp($appId)
+    public function getViewsForAppId($appId)
     {
         $views = [];
 
@@ -244,7 +244,7 @@ class Views extends BasePackage
         return $views;
     }
 
-    public function getIdViews($id)
+    public function getViewById($id)
     {
         foreach($this->views as $view) {
             if ($view['id'] == $id) {
@@ -266,12 +266,12 @@ class Views extends BasePackage
         return false;
     }
 
-    public function getViewsByApiId($id)
+    public function getViewsByApiId($apiId)
     {
         $views = [];
 
         foreach($this->views as $view) {
-            if ($view['api_id'] == $id) {
+            if ($view['api_id'] == $apiId) {
                 array_push($views, $view);
             }
         }
@@ -279,7 +279,7 @@ class Views extends BasePackage
         return $views;
     }
 
-    public function getNameViews($name)
+    public function getViewByName($name)
     {
         foreach($this->views as $view) {
             if ($view['name'] == $name) {
@@ -305,12 +305,12 @@ class Views extends BasePackage
         return $views;
     }
 
-    public function getViewsForAppType(string $type)
+    public function getViewsForAppType($appType)
     {
         $views = [];
 
         foreach($this->views as $view) {
-            if ($view['app_type'] === $type) {
+            if ($view['app_type'] === $appType) {
                 $views[$view['id']] = $view;
             }
         }
@@ -318,10 +318,10 @@ class Views extends BasePackage
         return $views;
     }
 
-    public function getDefaultViewForAppType(string $type)
+    public function getDefaultViewForAppType($appType)
     {
         foreach($this->views as $view) {
-            if ($view['app_type'] === $type &&
+            if ($view['app_type'] === $appType &&
                 $view['name'] === 'Default'
             ) {
                 return $view;
@@ -351,7 +351,7 @@ class Views extends BasePackage
             $view['settings'] = Json::decode($view['settings'], true);
 
             if (isset($view['settings']['tags'])) {
-                $package = $this->modules->packages->getNamePackage($view['settings']['tags']);
+                $package = $this->modules->packages->getPackageByName($view['settings']['tags']);
 
                 if ($package) {
                     $package['apps'] = Json::decode($package['apps'], true);

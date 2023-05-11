@@ -199,7 +199,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
                 return false;//App not found
             }
 
-            $ipFilterMiddleware = $this->modules->middlewares->getNamedMiddlewareForApp('IpFilter', $app['id']);
+            $ipFilterMiddleware = $this->modules->middlewares->getMiddlewareByNameForAppId('IpFilter', $app['id']);
             if ($ipFilterMiddleware) {
                 $this->apps->ipFilter->setClientAddress($conn->httpRequest->getHeader('X-Forwarded-For')[0]);
 
@@ -228,7 +228,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
 
             if ($this->checkSession($cookies)) {
 
-                $agentCheckMiddleware = $this->modules->middlewares->getNamedMiddlewareForApp('AgentCheck', $app['id']);
+                $agentCheckMiddleware = $this->modules->middlewares->getMiddlewareByNameForAppId('AgentCheck', $app['id']);
                 if ($agentCheckMiddleware) {
                     $agent = $conn->httpRequest->getHeader('User-Agent')[0];
 

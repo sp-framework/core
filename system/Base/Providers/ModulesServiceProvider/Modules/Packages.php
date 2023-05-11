@@ -19,7 +19,7 @@ class Packages extends BasePackage
 		return $this;
 	}
 
-	public function getNamedPackageForApp($name, $appId)
+	public function getPackageByNameForAppId($name, $appId)
 	{
 		foreach($this->packages as $package) {
 			$package['apps'] = Json::decode($package['apps'], true);
@@ -36,12 +36,12 @@ class Packages extends BasePackage
 		return false;
 	}
 
-	public function getPackagesByApiId($id)
+	public function getPackagesByApiId($apiId)
 	{
 		$packages = [];
 
 		foreach($this->packages as $package) {
-			if ($package['api_id'] == $id) {
+			if ($package['api_id'] == $apiId) {
 				array_push($packages, $package);
 			}
 		}
@@ -60,7 +60,7 @@ class Packages extends BasePackage
 		return false;
 	}
 
-	public function getNamedPackageForRepo($name, $repo)
+	public function getPackageByNameForRepo($name, $repo)
 	{
 		foreach($this->packages as $package) {
 			if (strtolower($package['name']) === strtolower($name) &&
@@ -73,7 +73,7 @@ class Packages extends BasePackage
 		return false;
 	}
 
-	public function getIdPackage($id)
+	public function getPackageById($id)
 	{
 		foreach($this->packages as $package) {
 			if ($package['id'] == $id) {
@@ -84,7 +84,7 @@ class Packages extends BasePackage
 		return false;
 	}
 
-	public function getNamePackage($name)
+	public function getPackageByName($name)
 	{
 		foreach($this->packages as $package) {
 			if (strtolower($package['name']) === strtolower($name)) {
@@ -108,12 +108,12 @@ class Packages extends BasePackage
 		return $packages;
 	}
 
-	public function getPackagesForAppType(string $type)
+	public function getPackagesForAppType($appType)
 	{
 		$packages = [];
 
 		foreach($this->packages as $package) {
-			if ($package['app_type'] === $type) {
+			if ($package['app_type'] === $appType) {
 				$packages[$package['id']] = $package;
 			}
 		}
@@ -121,7 +121,7 @@ class Packages extends BasePackage
 		return $packages;
 	}
 
-	public function getPackagesForApp($appId)
+	public function getPackagesForAppId($appId)
 	{
 		$packages = [];
 

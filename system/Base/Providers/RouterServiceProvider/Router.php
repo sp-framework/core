@@ -321,7 +321,7 @@ class Router
 			$this->components->getComponentById($this->appInfo['errors_component'])['route'] :
 			null;
 		$this->appDefaults['view'] =
-			$this->views->getIdViews($this->domain['apps'][$this->appInfo['id']]['view'])['name'];
+			$this->views->getViewById($this->domain['apps'][$this->appInfo['id']]['view'])['name'];
 
 		return true;
 	}

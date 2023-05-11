@@ -90,7 +90,7 @@ class Domains extends BasePackage
 
 			$this->addResponse('Added ' . $data['name'] . ' domain', 0, null, true);
 
-			$this->addToNotification('add', 'Added new domain ' . $data['name'], null, $this->modules->packages->getNamePackage('Domains'));
+			$this->addToNotification('add', 'Added new domain ' . $data['name'], null, $this->modules->packages->getPackageByName('Domains'));
 		} else {
 			$this->addResponse('Error adding new domain.', 1, []);
 		}
@@ -138,7 +138,7 @@ class Domains extends BasePackage
 
 			$this->addResponse('Updated domain ' . $data['name']);
 
-			$this->addToNotification('update', 'Updated domain ' . $data['name'], null, $this->modules->packages->getNamePackage('Domains'));
+			$this->addToNotification('update', 'Updated domain ' . $data['name'], null, $this->modules->packages->getPackageByName('Domains'));
 		} else {
 			$this->addResponse('Error adding new domain.', 1);
 		}
@@ -200,7 +200,7 @@ class Domains extends BasePackage
 		if ($this->remove($domain['id'])) {
 			$this->addResponse('Removed domain ' . $domain['name']);
 
-			$this->addToNotification('remove', 'Removed domain ' . $domain['name'], null, $this->modules->packages->getNamePackage('Domains'));
+			$this->addToNotification('remove', 'Removed domain ' . $domain['name'], null, $this->modules->packages->getPackageByName('Domains'));
 		} else {
 			$this->addResponse('Error removing domain.', 1);
 		}
@@ -244,7 +244,7 @@ class Domains extends BasePackage
 		foreach ($appsArr as $key => $value) {
 			$apps[$value['id']] = $value;
 			$apps[$value['id']]['views'] =
-				$this->modules->views->getViewsForApp($value['id']);
+				$this->modules->views->getViewsForAppId($value['id']);
 		}
 
 		$this->packagesData->apps = $apps;
