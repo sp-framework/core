@@ -2,7 +2,7 @@
 
 namespace Apps\Core\Components\Appstypes;
 
-use Apps\Core\Packages\AdminLTETags\Traits\DynamicTable;
+use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use System\Base\BaseComponent;
 
 class AppstypesComponent extends BaseComponent

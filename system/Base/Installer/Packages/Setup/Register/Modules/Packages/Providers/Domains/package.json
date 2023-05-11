@@ -4,7 +4,7 @@
     "description"   : "Domains",
     "module_type"   : "packages",
     "app_type"      : "core",
-    "category"      : "base",
+    "category"      : "system",
     "sub_category"  : "providers",
     "version"       : "0.0.0",
     "repo"          : "https://.../",

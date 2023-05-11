@@ -2,7 +2,7 @@
 
 namespace Apps\Core\Components\Devtools\Api\Enums;
 
-use Apps\Core\Packages\AdminLTETags\Traits\DynamicTable;
+use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use Apps\Core\Packages\Devtools\Api\Contracts\Contracts;
 use Apps\Core\Packages\Devtools\Api\Enums\Enums;
 use Phalcon\Helper\Json;

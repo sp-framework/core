@@ -8948,6 +8948,26 @@ var BazContentFields = function() {
         options = $.extend({
             placeholder: 'MISSING PLACEHOLDER'
         }, options);
+
+        if ($(fieldId).data('create') && $(fieldId).data('create') === true) {
+            options = $.extend({
+                tags: true,
+                createTag: function(params) {
+                    var term = $.trim(params.term);
+
+                    if (term === '') {
+                        return null;
+                    }
+
+                    return {
+                        id: term.toLowerCase(),
+                        text: term,
+                        newTag: true
+                    }
+                }
+            }, options);
+        }
+
         dataCollection[componentId][sectionId][thisFieldId]['select2'] = $(fieldId).select2(options);
         // validation
         if (dataCollection[componentId][sectionId][sectionId + '-form'] &&

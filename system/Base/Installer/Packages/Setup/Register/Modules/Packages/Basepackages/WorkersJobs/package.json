@@ -1,0 +1,13 @@
+{
+    "name"          : "WorkersJobs",
+    "display_name"  : "Workers Jobs",
+    "description"   : "Basepackage Workers Jobs",
+    "module_type"   : "packages",
+    "app_type"      : "core",
+    "category"      : "system",
+    "sub_category"  : "basepackages",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Workers\\Jobs",
+    "settings"      : {"componentRoute":"system/workers/jobs"}
+}

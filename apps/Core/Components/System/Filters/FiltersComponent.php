@@ -2,7 +2,7 @@
 
 namespace Apps\Core\Components\System\Filters;
 
-use Apps\Core\Packages\AdminLTETags\Traits\DynamicTable;
+use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use Apps\Core\Packages\Hrms\Employees\Employees;
 use System\Base\BaseComponent;
 

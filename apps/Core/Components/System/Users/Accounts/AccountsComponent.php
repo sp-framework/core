@@ -2,7 +2,7 @@
 
 namespace Apps\Core\Components\System\Users\Accounts;
 
-use Apps\Core\Packages\AdminLTETags\Traits\DynamicTable;
+use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use Apps\Core\Packages\Business\Directory\Contacts\Contacts;
 use Apps\Core\Packages\Crms\Customers\Customers;
 use Apps\Core\Packages\Hrms\Employees\Employees;

@@ -5,7 +5,7 @@
     "module_type"   : "packages",
     "app_type"      : "core",
     "category"      : "system",
-    "sub_category"  : "tools",
+    "sub_category"  : "basepackages",
     "version"       : "0.0.0",
     "repo"          : "https://.../",
     "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Email\\EmailServices",

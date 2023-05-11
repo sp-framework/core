@@ -2,7 +2,7 @@
 
 namespace Apps\Core\Components\Devtools\Api\Contracts;
 
-use Apps\Core\Packages\AdminLTETags\Traits\DynamicTable;
+use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use Apps\Core\Packages\Devtools\Api\Contracts\Contracts;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;

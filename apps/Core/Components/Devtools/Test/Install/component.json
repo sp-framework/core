@@ -4,7 +4,7 @@
     "description"   : "Test anything in this component.",
     "module_type"   : "components",
     "app_type"      : "core",
-    "category"      : "system",
+    "category"      : "apps",
     "sub_category"  : "devtools",
     "version"       : "0.0.0",
     "repo"          : "https://.../dash-component-system-devtools-test",

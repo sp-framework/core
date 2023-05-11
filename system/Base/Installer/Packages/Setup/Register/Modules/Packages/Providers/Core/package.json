@@ -4,7 +4,7 @@
     "description"                           : "Bazaari Framework Core Module",
     "module_type"                           : "packages",
     "app_type"                              : "core",
-    "category"                              : "base",
+    "category"                              : "system",
     "sub_category"                          : "providers",
     "class"                                 : "System\\Base\\Providers\\CoreServiceProvider\\Core",
     "version"                               : "0.0.0",

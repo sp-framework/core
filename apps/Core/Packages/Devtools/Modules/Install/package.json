@@ -1,11 +1,11 @@
 {
-    "name"          : "Modules",
+    "name"          : "DevtoolsModules",
     "display_name"  : "Modules",
     "description"   : "Package for Modules component",
     "module_type"   : "packages",
     "version"       : "0.0.0",
     "app_type"      : "core",
-    "category"      : "system",
+    "category"      : "apps",
     "sub_category"  : "devtools",
     "repo"          : "https://.../",
     "class"         : "Apps\\Core\\Packages\\Devtools\\Modules\\Modules",

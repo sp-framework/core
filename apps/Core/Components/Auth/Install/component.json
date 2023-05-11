@@ -4,7 +4,7 @@
     "description"   : "Manage dash auth via this component",
     "module_type"   : "components",
     "app_type"      : "core",
-    "category"      : "system",
+    "category"      : "apps",
     "sub_category"  : "tools",
     "version"       : "0.0.0",
     "repo"          : "https://.../",

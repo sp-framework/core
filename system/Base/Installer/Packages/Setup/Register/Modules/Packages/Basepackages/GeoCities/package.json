@@ -1,0 +1,13 @@
+{
+    "name"          : "GeoCities",
+    "display_name"  : "Geo Cities",
+    "description"   : "Basepackage Geo Cities",
+    "module_type"   : "packages",
+    "app_type"      : "core",
+    "category"      : "system",
+    "sub_category"  : "basepackages",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Geo\\GeoCities",
+    "settings"      : {"componentRoute":"system/geo/cities"}
+}

@@ -2,7 +2,7 @@
 
 namespace Apps\Core\Components\System\Api;
 
-use Apps\Core\Packages\AdminLTETags\Traits\DynamicTable;
+use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use System\Base\BaseComponent;
 use System\Base\Exceptions\ControllerNotFoundException;
 

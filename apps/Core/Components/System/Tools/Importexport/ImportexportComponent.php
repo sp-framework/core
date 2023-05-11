@@ -2,7 +2,7 @@
 
 namespace Apps\Core\Components\System\Tools\Importexport;
 
-use Apps\Core\Packages\AdminLTETags\Traits\DynamicTable;
+use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use Apps\Core\Packages\System\Tools\ImportExport\ImportExport;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;

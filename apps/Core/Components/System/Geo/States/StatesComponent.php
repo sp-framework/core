@@ -2,7 +2,7 @@
 
 namespace Apps\Core\Components\System\Geo\States;
 
-use Apps\Core\Packages\AdminLTETags\Traits\DynamicTable;
+use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use System\Base\BaseComponent;
 
 class StatesComponent extends BaseComponent

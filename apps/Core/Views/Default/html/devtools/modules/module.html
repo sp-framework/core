@@ -59,7 +59,10 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modulesJson}}');
-dataCollectionSectionForm['vars']['moduleDependenciese'] = JSON.parse('{{moduleDependencies}}');
+dataCollectionSectionForm['vars']['moduleDependencies'] = JSON.parse('{{moduleDependencies}}');
+if (!dataCollectionSectionForm['vars']['moduleDependencies']['external']) {
+    dataCollectionSectionForm['vars']['moduleDependencies']['external'] = { };
+}
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
@@ -72,9 +75,45 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-module_type'                         : {
             'placeholder'   : 'SELECT MODULE TYPE'
         },
-        '{{componentId}}-{{sectionId}}-app_type'                            : { },
-        '{{componentId}}-{{sectionId}}-category'                            : { },
-        '{{componentId}}-{{sectionId}}-sub_category'                        : { },
+        '{{componentId}}-{{sectionId}}-app_type'                            : {
+            'placeholder'   : 'SELECT APP TYPE OR CREATE NEW'
+        },
+        '{{componentId}}-{{sectionId}}-category'                            : {
+            'placeholder'   : 'SELECT CATEGORY'
+        },
+        '{{componentId}}-{{sectionId}}-sub_category'                        : {
+            'placeholder'   : 'SELECT SUBCATEGORY OR CREATE NEW'
+        },
+        '{{componentId}}-{{sectionId}}-api_id'                              : {
+            'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY',
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function(e) {
+                    var id, repourl, currenturl, currenturlArr, name, lastCharOfRepourl, moduleRepoUrl;
+
+                    id = e.params.data.id;
+                    repourl = $(e.params.data.element).data('url');
+                    currenturl = $('#{{componentId}}-{{sectionId}}-repo').val();
+
+                    lastCharOfRepourl = repourl.substr(repourl.length - 1);
+
+                    if (currenturl !== '') {
+                        currenturlArr = currenturl.split('/');
+                        name = currenturlArr[currenturlArr.length - 1];
+                        moduleRepoUrl = repourl.toLowerCase() + name.toLowerCase();
+                        if (lastCharOfRepourl !== '/') {
+                            moduleRepoUrl = repourl.toLowerCase() + '/' + name.toLowerCase();
+                        }
+                        $('#{{componentId}}-{{sectionId}}-repo').val(moduleRepoUrl);
+                    } else {
+                        if (lastCharOfRepourl !== '/') {
+                            $('#{{componentId}}-{{sectionId}}-repo').val(repourl + '/');
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-repo').val(repourl);
+                        }
+                    }
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-version'                             : { },
         '{{componentId}}-{{sectionId}}-repo'                                : { },
         '{{componentId}}-{{sectionId}}-class'                               : { },
@@ -84,8 +123,28 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-apps'                                : { },
         '{{componentId}}-{{sectionId}}-dependencies-modules'                : {
             'placeholder'   : 'SELECT MODULE',
+            'allowClear'    : true,
             'afterInit'     : function() {
                 var id, label, moduleData;
+                $('#{{componentId}}-{{sectionId}}-dependencies-external, ' +
+                  '#{{componentId}}-{{sectionId}}-dependencies-external-version'
+                ).on('keyup', function() {
+                    if ($(this).val() !== '') {
+                        label = 'external';
+                        $('#{{componentId}}-{{sectionId}}-dependencies-modules').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-dependencies-external-add, ' +
+                          '#{{componentId}}-{{sectionId}}-dependencies-external-remove').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-dependencies-modules').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-dependencies-external-add, ' +
+                          '#{{componentId}}-{{sectionId}}-dependencies-external-remove').attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-dependencies-modules').on('select2:clear', function(e) {
+                    reset();
+                });
+
                 $('#{{componentId}}-{{sectionId}}-dependencies-modules').on('select2:select', function(e) {
                     id = e.params.data.id;
                     label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
@@ -97,43 +156,68 @@ dataCollectionSection =
 
                     $('#{{componentId}}-{{sectionId}}-dependencies-add, ' +
                       '#{{componentId}}-{{sectionId}}-dependencies-remove').attr('disabled', false);
+
+                    $('#{{componentId}}-{{sectionId}}-dependencies-external, ' +
+                      '#{{componentId}}-{{sectionId}}-dependencies-external-version').attr('disabled', true);
+
+                    $('#selected-module-information').attr('hidden', false);
                 });
 
                 function reset() {
                     $('#{{componentId}}-{{sectionId}}-dependencies-add, ' +
+                      '#{{componentId}}-{{sectionId}}-dependencies-external-add, ' +
+                      '#{{componentId}}-{{sectionId}}-dependencies-external-remove, ' +
                       '#{{componentId}}-{{sectionId}}-dependencies-remove').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-dependencies-external, ' +
+                      '#{{componentId}}-{{sectionId}}-dependencies-external-version, ' +
+                      '#{{componentId}}-{{sectionId}}-dependencies-modules').attr('disabled', false);
 
                     $('#{{componentId}}-{{sectionId}}-dependencies-modulename').val('');
                     $('#{{componentId}}-{{sectionId}}-dependencies-moduleversion').val('');
                     $('#{{componentId}}-{{sectionId}}-dependencies-modulerepo').val('');
+                    $('#{{componentId}}-{{sectionId}}-dependencies-external').val('');
+                    $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val('');
                     $('#{{componentId}}-{{sectionId}}-dependencies-modules').val(0).trigger('change');
+
+                    $('#selected-module-information').attr('hidden', true);
                 }
 
                 function prettyfyDependencies() {
                     $('#{{componentId}}-{{sectionId}}-dependencies')
-                        .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleDependenciese'], null, 4));
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleDependencies'], null, 4));
                 }
 
-                $('#{{componentId}}-{{sectionId}}-dependencies-add').click(function(e) {
+                $('#{{componentId}}-{{sectionId}}-dependencies-add, ' +
+                  '#{{componentId}}-{{sectionId}}-dependencies-external-add').click(function(e) {
                     e.preventDefault();
 
                     var found = false;
 
                     if (label === 'core') {
-                        dataCollectionSectionForm['vars']['moduleDependenciese'][label]['name'] = moduleData['name'];
-                        dataCollectionSectionForm['vars']['moduleDependenciese'][label]['version'] = moduleData['version'];
-                        dataCollectionSectionForm['vars']['moduleDependenciese'][label]['repo'] = moduleData['repo'];
+                        dataCollectionSectionForm['vars']['moduleDependencies'][label] = { };
+                        dataCollectionSectionForm['vars']['moduleDependencies'][label]['name'] = moduleData['name'];
+                        dataCollectionSectionForm['vars']['moduleDependencies'][label]['version'] = moduleData['version'];
+                        dataCollectionSectionForm['vars']['moduleDependencies'][label]['repo'] = moduleData['repo'];
+                    } else if (label === 'external') {
+                        if (dataCollectionSectionForm['vars']['moduleDependencies']['external'].length === 0) {
+                            dataCollectionSectionForm['vars']['moduleDependencies']['external'] = { };
+                        }
+
+                        dataCollectionSectionForm['vars']['moduleDependencies'][label][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]
+                            = $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val();
+
+                        reset();
                     } else {
-                        for (var modules in dataCollectionSectionForm['vars']['moduleDependenciese']) {
+                        for (var modules in dataCollectionSectionForm['vars']['moduleDependencies']) {
                             if (label === modules) {
-                                $.each(dataCollectionSectionForm['vars']['moduleDependenciese'][modules], function(index, mod) {
+                                $.each(dataCollectionSectionForm['vars']['moduleDependencies'][modules], function(index, mod) {
                                     if (mod['name'] === moduleData['name']) {
                                         found = true;
                                     }
                                 });
 
                                 if (!found) {
-                                    dataCollectionSectionForm['vars']['moduleDependenciese'][modules].push(moduleData);
+                                    dataCollectionSectionForm['vars']['moduleDependencies'][modules].push(moduleData);
                                 }
                             }
                         }
@@ -143,20 +227,21 @@ dataCollectionSection =
                     prettyfyDependencies();
                 });
 
-                $('#{{componentId}}-{{sectionId}}-dependencies-remove').click(function(e) {
+                $('#{{componentId}}-{{sectionId}}-dependencies-remove, ' +
+                  '#{{componentId}}-{{sectionId}}-dependencies-external-remove').click(function(e) {
                     e.preventDefault();
 
                     var found = false;
                     var foundIndex;
 
                     if (label === 'core') {
-                        dataCollectionSectionForm['vars']['moduleDependenciese'][label]['name'] = moduleData['name'];
-                        dataCollectionSectionForm['vars']['moduleDependenciese'][label]['version'] = moduleData['version'];
-                        dataCollectionSectionForm['vars']['moduleDependenciese'][label]['repo'] = moduleData['repo'];
+                        dataCollectionSectionForm['vars']['moduleDependencies'][label] = { };
+                    } else if (label === 'external') {
+                        delete dataCollectionSectionForm['vars']['moduleDependencies'][label][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()];
                     } else {
-                        for (var modules in dataCollectionSectionForm['vars']['moduleDependenciese']) {
+                        for (var modules in dataCollectionSectionForm['vars']['moduleDependencies']) {
                             if (label === modules) {
-                                $.each(dataCollectionSectionForm['vars']['moduleDependenciese'][modules], function(index, mod) {
+                                $.each(dataCollectionSectionForm['vars']['moduleDependencies'][modules], function(index, mod) {
                                     if (mod['name'] === moduleData['name']) {
                                         found = true;
                                         foundIndex = index;
@@ -164,7 +249,7 @@ dataCollectionSection =
                                 });
 
                                 if (found) {
-                                    dataCollectionSectionForm['vars']['moduleDependenciese'][modules].splice(foundIndex);
+                                    dataCollectionSectionForm['vars']['moduleDependencies'][modules].splice(foundIndex);
                                 }
                             }
                         }
@@ -181,7 +266,8 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-dependencies-moduleversion'          : { },
         '{{componentId}}-{{sectionId}}-dependencies-modulerepo'             : { },
         '{{componentId}}-{{sectionId}}-dependencies'                        : { },
-        '{{componentId}}-{{sectionId}}-dependencies-pretty'                 : { },
+        '{{componentId}}-{{sectionId}}-dependencies-external'               : { },
+        '{{componentId}}-{{sectionId}}-dependencies-external-version'       : { },
         '{{componentId}}-{{sectionId}}-form'                                : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                        : 'required',
