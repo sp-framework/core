@@ -336,6 +336,12 @@
                     'method'        : 'post',
                     'dataType'      : 'json',
                     'success'       : function(response) {
+                                        if (dataCollection[componentId][sectionId][sectionId + '-form']['onSubmitResponse']) {
+                                            if (!dataCollection[componentId][sectionId][sectionId + '-form']['onSubmitResponse'](response)) {
+                                                return;
+                                            }
+                                        }
+
                                         if (response.responseCode == '0') {
                                             if ($(thisButtonId).data('successnotify') === true) {
                                                 PNotify.success({

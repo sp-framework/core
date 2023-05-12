@@ -395,6 +395,19 @@ var BazContentFields = function() {
             }
         }
 
+        if ($('#' + fieldId.id + '-fieldEdit').length > 0) {
+            $('#' + fieldId.id + '-fieldEdit').off();
+            $('#' + fieldId.id + '-fieldEdit').click(function(e) {
+                e.preventDefault();
+
+                if ($(fieldId).attr('disabled') === 'disabled') {
+                    $(fieldId).attr('disabled', false);
+                } else {
+                    $(fieldId).attr('disabled', true);
+                }
+            });
+        }
+
         maxLength(thisFieldId, options);
         if (options.afterInit) {
             options.afterInit(dataCollection);

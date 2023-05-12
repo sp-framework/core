@@ -1,0 +1,951 @@
+{% if type === 'components' and module['module_details']['menu_id'] is defined %}
+    {% set jsTreeMenu = menuBaseStructure %}
+    <div class="row vdivide">
+        <div class="col-md-4">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                                 : component,
+                    'componentName'                             : componentName,
+                    'componentId'                               : componentId,
+                    'sectionId'                                 : sectionId,
+                    'fieldId'                                   : 'menu_structure',
+                    'fieldLabel'                                : 'App Menu',
+                    'fieldType'                                 : 'jstree',
+                    'fieldHelp'                                 : true,
+                    'fieldHelpTooltipContent'                   : 'App Menu Structure. Select menu item to change menu properties.',
+                    'fieldRequired'                             : false,
+                    'fieldBazScan'                              : true,
+                    'fieldJstreeSearch'                         : true,
+                    'fieldBazPostOnCreate'                      : false,
+                    'fieldBazPostOnUpdate'                      : false,
+                    'fieldJstreeDataSrcArr'                     : ["menus":["srcArr" : jsTreeMenu]],
+                    'fieldJstreeAdd'                            : false,
+                    'fieldJstreeEdit'                           : false,
+                    'fieldJstreeExpand'                         : true,
+                    'fieldJstreeCollapse'                       : true,
+                    'fieldJstreeFirstOpen'                      : true,
+                    'fieldJstreeAllOpen'                        : true,
+                    'fieldJstreeToggleAllChildren'              : true,
+                    'fieldJstreeIncludeRootInPath'              : false,
+                    'fieldJstreeSelectEndNodeOnly'              : false,
+                    'fieldJstreeShowDots'                       : true,
+                    'fieldJstreeDoubleClickToggle'              : true,
+                    'fieldJstreeMultiple'                       : false,
+                    'fieldJstreeSearchCaseSensitive'            : false,
+                    'fieldJstreeSearchShowOnlyMatches'          : false,
+                    'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                    'fieldJstreeHideJstreeIcons'                : false,
+                    'fieldJstreeAdditionalClass'                : 'text-uppercase'
+                ]
+            )}}
+        </div>
+        <div class="col">
+            <div class="row">
+                <div class="col-md-6">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'menu_jstreeid',
+                            'fieldLabel'                     : 'Menu Jstree Id',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Menu Id',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazJstreeSearch'           : false,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 50,
+                            'fieldValue'                     : '',
+                            'fieldDisabled'                  : true,
+                            'fieldHidden'                    : true
+                        ]
+                    )}}
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'menu_title',
+                            'fieldLabel'                     : 'Title',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Menu title',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazJstreeSearch'           : false,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 50,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'is_submenu',
+                            'fieldLabel'                     : 'is Submenu?',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Is the menu item a submenu or a link',
+                            'fieldRequired'                  : false,
+                            'fieldType'                      : 'checkbox',
+                            'fieldCheckboxType'              : 'info',
+                            'fieldCheckboxChecked'           : '',
+                            'fieldBazJstreeSearch'           : false,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldBazScan'                   : true
+                        ]
+                    )}}
+                </div>
+                <div class="col-md-3">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'menu_sequence',
+                            'fieldLabel'                     : 'Sequence',
+                            'fieldType'                      : 'input',
+                            'fieldInputTypeTextFilter'       : 'positiveInt',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Menu sequence',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazJstreeSearch'           : false,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 2,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'menu_parent',
+                            'fieldLabel'                     : 'Parent',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Menu Item Parent',
+                            'fieldBazScan'                   : true,
+                            'fieldBazJstreeSearch'           : false,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldRequired'                  : true,
+                            'fieldDataSelect2Options'        : [],
+                            'fieldDataSelect2OptionsKey'     : 'id',
+                            'fieldDataSelect2OptionsValue'   : 'text',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': ''
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    <div class="row">
+                        <div class="col-md-10">
+                            {% include '../common/fontawesome.html' %}
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'menu_icon',
+                                    'fieldLabel'                     : 'Icon',
+                                    'fieldType'                      : 'select2',
+                                    'fieldHelp'                      : true,
+                                    'fieldHelpTooltipContent'        : 'Menu Item Icon',
+                                    'fieldBazScan'                   : true,
+                                    'fieldBazJstreeSearch'           : false,
+                                    'fieldBazPostOnCreate'           : false,
+                                    'fieldBazPostOnUpdate'           : false,
+                                    'fieldRequired'                  : true,
+                                    'fieldDataSelect2Options'        : fontawesomeIcons,
+                                    'fieldDataSelect2OptionsKey'     : 'id',
+                                    'fieldDataSelect2OptionsValue'   : 'text',
+                                    'fieldDataSelect2OptionsArray'   : true,
+                                    'fieldDataSelect2OptionsSelected': ''
+                                ]
+                            )}}
+                        </div>
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'menu_icon_display',
+                                    'fieldLabel'                     : false,
+                                    'fieldType'                      : 'html',
+                                    'fieldAdditionalClass'           : 'mb-0',
+                                    'fieldHelp'                      : false,
+                                    'fieldHelpTooltipContent'        : 'Components are building blocks of an app. Each component together with their backend packages performs a specific task.',
+                                    'fieldRequired'                  : false,
+                                    'fieldBazJstreeSearch'           : false,
+                                    'fieldBazScan'                   : false,
+                                    'fieldBazPostOnCreate'           : false,
+                                    'fieldBazPostOnUpdate'           : false
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    {{adminltetags.useTag('buttons',
+                        [
+                            'componentId'           : componentId,
+                            'sectionId'             : sectionId,
+                            'buttonType'            : 'button',
+                            'buttons'               :
+                                [
+                                    'generate-menu' : [
+                                        'title'                   : 'Generate Menu',
+                                        'size'                    : 'xs',
+                                        'type'                    : 'primary',
+                                        'position'                : 'left',
+                                        'url'                     : '#'
+                                    ],
+                                    'save-menu-item' : [
+                                        'title'                   : 'Save',
+                                        'size'                    : 'xs',
+                                        'type'                    : 'primary',
+                                        'position'                : 'right',
+                                        'icon'                    : 'floppy-disk',
+                                        'url'                     : '#'
+                                    ],
+                                    'delete-menu-item' : [
+                                        'title'                   : 'Remove',
+                                        'size'                    : 'xs',
+                                        'type'                    : 'danger',
+                                        'position'                : 'right',
+                                        'icon'                    : 'times',
+                                        'url'                     : '#'
+                                    ],
+                                    'cancel-menu-item' : [
+                                        'title'                   : 'Cancel',
+                                        'size'                    : 'xs',
+                                        'type'                    : 'secondary',
+                                        'position'                : 'right',
+                                        'url'                     : '#'
+                                    ]
+                                ]
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'menu_id',
+                            'fieldLabel'                     : 'Module menu id',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Module menu id.',
+                            'fieldRequired'                  : true,
+                            'fieldHidden'                    : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 50,
+                            'fieldValue'                     : moduleMenu_id
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'menu',
+                            'fieldLabel'                     : 'Module Menu',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 2048,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Menu of the component',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 2048,
+                            'fieldTextareaRows'              : 10,
+                            'fieldValue'                     : moduleMenu
+                        ]
+                    )}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col">
+            <h6><i class="fa fa-fw fa-info-circle text-info"></i> Select menu item to edit or add a new child menu item. Drag and drop menu item to change sequence or assign to a new parent. Once done, click on generate menu json.</h6>
+        </div>
+    </div>
+    {% set allMenuItems = json_encode(menuBaseStructure, 16) %}
+    <script>
+/* globals Sortable BazHelpers PNotify Swal */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-menu_id'         : { },
+        '{{componentId}}-{{sectionId}}-menu_jstreeid'   : { },
+        '{{componentId}}-{{sectionId}}-menu_title'      : { },
+        '{{componentId}}-{{sectionId}}-menu_sequence'   : { },
+        '{{componentId}}-{{sectionId}}-is_submenu'      : { },
+        '{{componentId}}-{{sectionId}}-menu_parent'     : {
+            'placeholder'   : 'SELECT PARENT'
+        },
+        '{{componentId}}-{{sectionId}}-menu_icon'       : {
+            'placeholder'   : 'SELECT ICON'
+        },
+    });
+
+dataCollectionSection =
+    $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-menu_structure'], {
+        afterInit: function() {
+            var allMenuItems = [];
+            var swalSound = window['dataCollection'].env.sounds.swalSound;
+
+            JSON.parse('{{allMenuItems}}', function(key, value) {
+                if (key === 'link') {
+                    allMenuItems.push(value);
+                }
+            });
+
+            var menuStructure = window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menu_structure'] = { };
+            var moduleMenu = JSON.parse('{{moduleMenu}}');
+
+            function showHideNodeParent(parent, task) {
+                do {
+                    var allHidden = true;
+
+                    if (parent !== '#') {
+                        $('#' + parent + ' li').each(function(v, li) {
+                            if (task === 'hide') {
+                                if (!$(li).hasClass('jstree-hidden')) {
+                                    allHidden = false;
+                                }
+                            } else if (task === 'show') {
+                                $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().show_node(parent);
+                            }
+                        });
+
+                        if (task === 'hide' &&
+                            allHidden === false
+                        ) {
+                            return;
+                        }
+
+                        if (task === 'hide' &&
+                            allHidden === true &&
+                            !$('#' + parent).data('link') &&
+                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_parent(parent) !== '#'
+                        ) {
+                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().hide_node(parent);
+                        }
+
+                        var node = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(parent);
+                        parent = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_parent(parent);
+
+                        if (parent === '#' && task === 'hide') {
+                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().hide_node(node);
+                        } else if (parent === '#' && task === 'show') {
+                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().show_node(node);
+                        }
+                    }
+                }
+                while (parent !== '#');
+            }
+
+            function extractSturctureData(structureArr) {
+                var newStructure = { };
+
+                for (var structure in structureArr) {
+                    if (!structureArr[structure]['state']['hidden'] ||
+                        (structureArr[structure]['state']['hidden'] && structureArr[structure]['state']['hidden'] === false)
+                    ) {
+                        var structureId;
+                        structureId = structureArr[structure]['text'].toLowerCase();
+                        structureId = structureId.replace(/[^a-z0-9]/g, "");
+
+                        if (!newStructure[structureId]) {
+                            newStructure[structureId] = { };
+                        }
+
+                        newStructure[structureId]['title'] = structureArr[structure]['text'];
+
+                        var iconArr = structureArr[structure]['icon'].split(' ');
+                        if (iconArr.length > 0) {
+                            iconArr.forEach(function(v, i) {
+                                if (v !== 'fa' && v !== 'fa-fw' && v.startsWith("fa-")) {
+                                    newStructure[structureId]['icon'] = v.replace("fa-", "");
+                                }
+                            });
+                        } else {
+                            newStructure[structureId]['icon'] = "circle";
+                        }
+
+                        if (structureArr[structure]['data']['link']) {
+                            newStructure[structureId]['link'] = structureArr[structure]['data']['link'];
+                        }
+                        if (structureArr[structure]['data']['custom_menu']) {
+                            newStructure[structureId]['data'] = { };
+                            newStructure[structureId]['data']['custom_menu'] = true;
+                        }
+
+                        if (structureArr[structure]['data']['sub_menu']) {
+                            if (!newStructure[structureId]['data']) {
+                                newStructure[structureId]['data'] = { };
+                            }
+                            newStructure[structureId]['data']['sub_menu'] = true;
+                        }
+
+                        if (structureArr[structure]['data']['renamed']) {
+                            if (!newStructure[structureId]['data']) {
+                                newStructure[structureId]['data'] = { };
+                            }
+                            newStructure[structureId]['data']['renamed'] = true;
+                        }
+
+                        if (structureArr[structure]['data']['moved']) {
+                            if (!newStructure[structureId]['data']) {
+                                newStructure[structureId]['data'] = { };
+                            }
+                            newStructure[structureId]['data']['moved'] = true;
+                        }
+
+                        newStructure[structureId]['seq'] = parseInt(structure);
+
+                        if (structureArr[structure]['children'].length > 0) {
+                            newStructure[structureId]['childs'] = { };
+
+                            var childs = { };
+
+                            for (var child in structureArr[structure]['children']) {
+                                childs[child] = structureArr[structure]['children'][child];
+                            }
+                            newStructure[structureId]['childs'] = extractSturctureData(childs);
+                        }
+                    }
+                }
+
+                return newStructure;
+            }
+
+            function extractSturctureParentsData(selectParent = '', selectedNode = '') {
+                var menuItemsParents = [];
+                var structureArr = $("#{{componentId}}-{{sectionId}}-menu_structure").jstree().get_json('#', { 'flat': true });
+                var parentItem = { };
+
+                parentItem['id'] = '#';
+                parentItem['text'] = 'ROOT';
+
+                menuItemsParents.push(parentItem);
+
+                for (var structure in structureArr) {
+                    if (!structureArr[structure]['state']['hidden'] ||
+                        (structureArr[structure]['state']['hidden'] && structureArr[structure]['state']['hidden'] === false)
+                    ) {
+                        if ((!structureArr[structure]['data']['link'] || structureArr[structure]['data']['sub_menu']) &&
+                            structureArr[structure]['id'] !== selectedNode
+                        ) {
+                            parentItem = { };
+                            parentItem['id'] = structureArr[structure]['id'];
+                            parentItem['text'] = $("#{{componentId}}-{{sectionId}}-menu_structure").jstree().get_path(structureArr[structure]['id'], ' > ').toUpperCase();
+
+                            menuItemsParents.push(parentItem);
+                        }
+                    }
+                }
+
+                $('#{{componentId}}-{{sectionId}}-menu_parent')
+                    .select2().empty()
+                    .select2({data: menuItemsParents})
+                    .select2({"placeholder" : "SELECT PARENT"}).val(selectParent).trigger('change');
+            }
+
+            function getMenuStructureData(parent = null) {
+                window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menu_structure'] = { };
+                var structureArr = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_json();
+
+                window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menu_structure'] =
+                    extractSturctureData(structureArr);
+
+                extractSturctureParentsData();
+            }
+
+            getMenuStructureData();
+
+            $(document).on('dnd_stop.vakata', function (e, data) {
+                var children = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_children_dom(data.data.nodes[0]);
+                var parentId = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_parent(data.data.nodes[0]);
+                var nodeData = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(data.data.nodes[0]);
+
+                moveNode(data.data.nodes[0], parentId, nodeData, children);
+            });
+
+            $('#{{componentId}}-{{sectionId}}-menu_structure').on('create_node.jstree', function (e, data) {
+                getMenuStructureData();
+            });
+            $('#{{componentId}}-{{sectionId}}-menu_structure').on('rename_node.jstree', function (e, data) {
+                getMenuStructureData();
+            });
+
+            $('#{{componentId}}-{{sectionId}}-menu_structure').on('select_node.jstree', function (e, data) {
+                $('#{{componentId}}-{{sectionId}}-menu_jstreeid').val(data.node.id);
+                $('#{{componentId}}-{{sectionId}}-menu_title').val(data.node.text);
+
+                var iconArr = data.node.icon.split(' ');
+                if (iconArr.length > 0) {
+                    iconArr.forEach(function(v, i) {
+                        if (v !== 'fa' && v !== 'fa-fw' && v !== 'fab' && v.startsWith("fa-")) {
+                            $('#{{componentId}}-{{sectionId}}-menu_icon').val(v.replace("fa-", "")).trigger('change');
+                        }
+                    });
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-menu_icon').val("circle").trigger('change');
+                }
+
+                if (data.node.data && data.node.data.link) {
+                    $('#{{componentId}}-{{sectionId}}-menu_link').val(data.node.data.link);
+                    $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked = false;
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-menu_link').val('');
+                    $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked = true;
+                }
+
+                $('#{{componentId}}-{{sectionId}}-menu_title').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-menu_icon').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-save-menu-item').removeClass('disabled');
+                $('#{{componentId}}-{{sectionId}}-cancel-menu-item').removeClass('disabled');
+                $('#{{componentId}}-{{sectionId}}-menu_parent').attr('disabled', false);
+
+                extractSturctureParentsData(data.node.parent, data.node.id);
+            });
+
+            $('#{{componentId}}-{{sectionId}}-menu_icon').on('select2:select', function(e) {
+                var iconDisplay = document.querySelectorAll('.fa-' + e.params.data.id);
+                var iconType = $(e.params.data.element).data('type');
+                var isBrand = '';
+
+                if (iconType === 'brands') {
+                    isBrand = 'fab';
+                }
+
+                $('#{{componentId}}-{{sectionId}}-menu_icon_display').empty().append(
+                    '<i style="margin-top:1.9rem !important;" class="fa ' + isBrand + ' fa-fw fa-2x fa-' + e.params.data.id + '"></i>'
+                );
+            });
+
+            $('#{{componentId}}-{{sectionId}}-add-menu-item').click(function(e) {
+                e.preventDefault();
+                cleanMenuForm();
+                $('#{{componentId}}-{{sectionId}}-menu_title').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-is_submenu').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-menu_parent').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-menu_icon').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-menu_icon').val('circle').trigger('change');
+                $('#{{componentId}}-{{sectionId}}-save-menu-item').removeClass('disabled');
+                $('#{{componentId}}-{{sectionId}}-cancel-menu-item').removeClass('disabled');
+                extractSturctureParentsData('#');
+            });
+
+            $('#{{componentId}}-{{sectionId}}-delete-menu-item').click(function(e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title                       : '<span class="text-danger"> Delete menu?</span>',
+                    icon                        : 'question',
+                    background                  : 'rgba(0,0,0,.8)',
+                    backdrop                    : 'rgba(0,0,0,.6)',
+                    buttonsStyling              : false,
+                    confirmButtonText           : 'Delete',
+                    customClass                 : {
+                        'confirmButton'             : 'btn btn-danger text-uppercase',
+                        'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                    },
+                    showCancelButton            : true,
+                    keydownListenerCapture      : true,
+                    allowOutsideClick           : true,
+                    allowEscapeKey              : true,
+                    didOpen                     : function() {
+                        swalSound.play();
+                    }
+                }).then((result) => {
+                    if (result.value) {
+                        var selectedNode = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_selected(true);
+
+                        if (selectedNode[0].children.length > 0) {
+                            PNotify.notice({
+                                title: 'Menu item cannot deleted as it has sub menu items. Delete them first.'
+                            });
+                        } else {
+                            var selectedNodeId = selectedNode[0].id;
+
+                            var deleteNode = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().delete_node(selectedNodeId);
+
+                            if (deleteNode) {
+                                cleanMenuForm();
+                                getMenuStructureData();
+                            }
+                        }
+                    }
+                });
+            });
+
+            $('#{{componentId}}-{{sectionId}}-generate-menu').click(function(e) {
+                e.preventDefault();
+
+                var selectedNode = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_selected();
+
+                if (selectedNode.length === 0 || selectedNode.length > 1) {
+                    return;
+                }
+
+                var node = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(selectedNode[0]);
+
+                //This is something odd going on here. When we reverse and store node parents into parents variable and shift(),
+                //it removes array element from node.parents
+                var parents = node.parents.reverse();
+                if (parents[0] === '#') {
+                    var [removed, ...nodeParents] = parents;
+                } else {
+                    parents = node.parents.reverse();
+                    [removed, ...nodeParents] = parents;
+                }
+
+                nodeParents.push(node.id);
+
+                moduleMenu = generateMenuHierarchy(nodeParents);
+                if ($('#{{componentId}}-{{sectionId}}-menu_sequence').val() === '') {
+                    moduleMenu['seq'] = '0';
+                } else {
+                    moduleMenu['seq'] = $('#{{componentId}}-{{sectionId}}-menu_sequence').val();
+                }
+
+                prettyfyJson();
+            });
+
+            function generateMenuHierarchy(parents) {
+                if (parents.length === 0) {
+                    return;
+                }
+
+                var menu = { };
+
+                for (var i = 0; i < parents.length; i++) {
+                    var parentNode = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(parents[i]);
+                    var parentNodeText = parentNode.text.toLowerCase();
+
+                    menu[parentNodeText] = { };
+                    menu[parentNodeText]['title'] = parentNodeText;
+
+                    if (parentNode.icon) {
+                        $(parentNode.icon.split(' ')).each(function(i, iconText) {
+                            if (iconText.startsWith('fa-')) {
+                                if (iconText !== 'fa-fw') {
+                                    menu[parentNodeText]['icon'] = iconText.replace('fa-', '');
+                                }
+                            }
+                        });
+                    }
+
+                    if (parentNode.data && parentNode.data.link) {
+                        menu[parentNodeText]['link'] = parentNode.data.link;
+                    }
+
+                    var [removed, ...nodeParents] = parents;
+                    if (parents.length > 0) {
+                        menu[parentNodeText]['childs'] = generateMenuHierarchy(nodeParents);
+                        break;
+                    }
+                }
+
+                return menu;
+            }
+
+            function cleanMenuForm() {
+                $('#{{componentId}}-{{sectionId}}-menu_jstreeid').val('');
+                $('#{{componentId}}-{{sectionId}}-menu_title').val('');
+                $('#{{componentId}}-{{sectionId}}-menu_title').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-is_submenu').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked = false;
+                $('#{{componentId}}-{{sectionId}}-menu_parent').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-menu_parent').empty().trigger('change');
+                $('#{{componentId}}-{{sectionId}}-menu_icon').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-menu_icon').val('').trigger('change');
+                $('#{{componentId}}-{{sectionId}}-menu_icon_display').empty();
+                $('#{{componentId}}-{{sectionId}}-save-menu-item').addClass('disabled');
+                $('#{{componentId}}-{{sectionId}}-cancel-menu-item').addClass('disabled');
+                $('#{{componentId}}-{{sectionId}}-delete-menu-item').addClass('disabled');
+                $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().deselect_all();
+                $('#{{componentId}}-{{sectionId}}-menu_parent')
+                    .select2().empty()
+                    .select2({"placeholder" : "SELECT PARENT"}).val('').trigger('change');
+            }
+
+            $('#{{componentId}}-{{sectionId}}-save-menu-item, #{{componentId}}-{{sectionId}}-cancel-menu-item').click(function(e) {
+                e.preventDefault();
+
+                var id = $(this)[0].id;
+
+                if (id === "{{componentId}}-{{sectionId}}-cancel-menu-item") {
+                    cleanMenuForm();
+                }
+
+                if (id === "{{componentId}}-{{sectionId}}-save-menu-item") {
+                    if ($('#{{componentId}}-{{sectionId}}-menu_title').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-menu_title').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-menu_title').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if (!$('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked &&
+                               $('#{{componentId}}-{{sectionId}}-menu_link').val() === ''
+                    ) {
+                        $('#{{componentId}}-{{sectionId}}-menu_link').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-menu_link').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else {
+                        var nodeId, nodeData, title, isSubmenu, parentId, parent, icon, iconId, iconType, isBrand, link;
+
+                        nodeId = $('#{{componentId}}-{{sectionId}}-menu_jstreeid').val();
+                        parentId = $('#{{componentId}}-{{sectionId}}-menu_parent').select2('data')[0].id;
+                        parent = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(parentId);
+                        title = $('#{{componentId}}-{{sectionId}}-menu_title').val();
+                        isSubmenu = $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked;
+                        icon = $('#{{componentId}}-{{sectionId}}-menu_icon').select2('data');
+                        iconId = $('#{{componentId}}-{{sectionId}}-menu_icon').select2('data')[0].id;
+                        iconType = $(icon[0].element).data('type');
+                        link = $('#{{componentId}}-{{sectionId}}-menu_link').val();
+
+                        if (isSubmenu) {
+                            link = null;
+                        }
+
+                        if (link === '') {
+                            link = '#';
+                        }
+
+                        if (iconType === 'brands') {
+                            isBrand = 'fab';
+                        } else {
+                            isBrand = 'fa';
+                        }
+
+                        if (nodeId !== '') {
+                            nodeData = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(nodeId);
+
+                            if (!nodeData['data']) {
+                                nodeData['data'] = { };
+                            }
+
+                            if (nodeData['data']['sub_menu'] && nodeData['data']['sub_menu'] === true) {
+                                if (!isSubmenu && nodeData.children.length > 0) {
+                                    PNotify.notice({
+                                        title: 'Menu item cannot be converted to link as its a sub menu.'
+                                    });
+                                    return;
+                                }
+                            }
+
+                            if (checkDuplicate(nodeId, parent, title)) {
+                                PNotify.notice({
+                                    title: 'Duplicate title!'
+                                });
+                                return;
+                            }
+
+                            if (nodeData['text'] !== title) {
+                                $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('rename_node', nodeId, title);
+                                nodeData['data']['renamed'] = true;
+                            }
+
+                            var newIcon = isBrand + ' fa-fw fa-' + iconId + ' text-sm';
+                            if (nodeData['icon'] !== newIcon) {
+                                $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('set_icon', nodeId, newIcon);
+                            }
+
+                            nodeData['data']['link'] = link;
+
+                            if (isSubmenu) {
+                                nodeData['data']['sub_menu'] = true;
+                            } else {
+                                nodeData['data']['sub_menu'] = false;
+                            }
+
+                            if (nodeData['parent'] !== parentId) {
+                                moveNode(nodeId, parentId, nodeData);
+                            } else {
+                                getMenuStructureData();
+                                cleanMenuForm();
+                            }
+                        } else {
+                            if (checkDuplicate(nodeId, parent, title)) {
+                                PNotify.notice({
+                                    title: 'Duplicate title!'
+                                });
+                                return;
+                            }
+
+                            var data = { };
+                            data['link'] = link;
+                            data['custom_menu'] = true;
+                            if (isSubmenu) {
+                                data['sub_menu'] = true;
+                            } else {
+                                data['sub_menu'] = false;
+                            }
+
+                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('create_node',
+                                parentId,
+                                {'text' : title, 'icon' : isBrand + ' fa-fw fa-' + iconId + ' text-sm', 'data' : data},
+                                'last',
+                                function() {
+                                    getMenuStructureData();
+                                    cleanMenuForm();
+                                }
+                            );
+                        }
+                    }
+                }
+            });
+
+            function moveNode(nodeId, parentId, nodeData, children = null) {
+                $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('move_node',
+                    nodeId,
+                    parentId,
+                    'last',
+                    function() {
+                        nodeData['data']['moved'] = true;
+
+                        if (children && children.length > 0) {
+                            for (var child in children) {
+                                if (children[child].nodeName === 'LI') {
+                                    parentId = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_parent(children[child].id);
+                                    nodeData = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(children[child].id);
+
+                                    $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('move_node',
+                                        children[child].id,
+                                        parentId,
+                                        'last',
+                                        function() {
+                                            nodeData['data']['moved'] = true;
+                                        }
+                                    );
+                                }
+                            }
+                        }
+
+                        getMenuStructureData();
+                        cleanMenuForm();
+                });
+            }
+
+            function checkDuplicate(nodeId, parent, title) {
+                if (parent['children'] && parent['children'].length > 0) {
+                    for (var children in parent['children']) {
+                        if (parent['children'][children] !== nodeId) {
+                            var child = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(parent['children'][children]);
+
+                            if (child['text'].toLowerCase() === title.toLowerCase()) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            function selectMenuItem() {
+                if ($('#{{componentId}}-{{sectionId}}-menu_id').val() !== '') {
+                    if ($('#{{componentId}}-{{sectionId}}-route').val() !== '') {
+                        var structureArr = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_json('#', {'flat':true});
+
+                        $(structureArr).each(function(i, node) {
+                            if (node.data.link && node.data.link === $('#{{componentId}}-{{sectionId}}-route').val()) {
+                                $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().select_node(node);
+                            }
+                        });
+                    }
+                }
+            }
+            selectMenuItem();
+
+            function prettyfyJson() {
+                $('#{{componentId}}-{{sectionId}}-menu')
+                    .val(JSON.stringify(moduleMenu, null, 4));
+            }
+            prettyfyJson();
+        },
+        'core' : $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-menu_structure']['core'], {
+            check_callback : function (operation, node, node_parent, node_position, more) {
+                if (operation === 'move_node') {
+                    if (node_parent['id'] !== '#') {
+                        if (node_parent['data']['link']) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        })
+    });
+</script>
+{% endif %}

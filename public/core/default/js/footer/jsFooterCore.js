@@ -3967,6 +3967,12 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                     'method'        : 'post',
                     'dataType'      : 'json',
                     'success'       : function(response) {
+                                        if (dataCollection[componentId][sectionId][sectionId + '-form']['onSubmitResponse']) {
+                                            if (!dataCollection[componentId][sectionId][sectionId + '-form']['onSubmitResponse'](response)) {
+                                                return;
+                                            }
+                                        }
+
                                         if (response.responseCode == '0') {
                                             if ($(thisButtonId).data('successnotify') === true) {
                                                 PNotify.success({
@@ -8931,6 +8937,19 @@ var BazContentFields = function() {
                     }, 'json');
                 });
             }
+        }
+
+        if ($('#' + fieldId.id + '-fieldEdit').length > 0) {
+            $('#' + fieldId.id + '-fieldEdit').off();
+            $('#' + fieldId.id + '-fieldEdit').click(function(e) {
+                e.preventDefault();
+
+                if ($(fieldId).attr('disabled') === 'disabled') {
+                    $(fieldId).attr('disabled', false);
+                } else {
+                    $(fieldId).attr('disabled', true);
+                }
+            });
         }
 
         maxLength(thisFieldId, options);

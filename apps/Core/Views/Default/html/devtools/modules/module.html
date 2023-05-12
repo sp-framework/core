@@ -4,7 +4,22 @@
         [
             'tabTitle'          : 'Info',
             'tabInclude'        : 'modules/module/info'
-        ],
+        ]
+    ]
+%}
+{% if module['module_type'] === 'components' %}
+    {% set tabsData = array_merge(tabsData,
+        [
+            'menu'   :
+            [
+                'tabTitle'          : 'Menu',
+                'tabInclude'        : 'modules/module/menu'
+            ]
+        ])
+    %}
+{% endif %}
+{% set tabsData = array_merge(tabsData,
+    [
         'settings'   :
         [
             'tabTitle'          : 'Settings',
@@ -15,7 +30,7 @@
                 'tabTitle'          : 'Dependencies',
                 'tabInclude'        : 'modules/module/dependencies'
             ]
-    ]
+    ])
 %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -60,6 +75,7 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modulesJson}}');
 dataCollectionSectionForm['vars']['moduleDependencies'] = JSON.parse('{{moduleDependencies}}');
+dataCollectionSectionForm['vars']['moduleSettings'] = JSON.parse('{{moduleSettings}}');
 if (!dataCollectionSectionForm['vars']['moduleDependencies']['external']) {
     dataCollectionSectionForm['vars']['moduleDependencies']['external'] = { };
 }
@@ -179,9 +195,11 @@ dataCollectionSection =
                     $('#selected-module-information').attr('hidden', true);
                 }
 
-                function prettyfyDependencies() {
+                function prettyfyJson() {
                     $('#{{componentId}}-{{sectionId}}-dependencies')
                         .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleDependencies'], null, 4));
+                    $('#{{componentId}}-{{sectionId}}-settings')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleSettings'], null, 4));
                 }
 
                 $('#{{componentId}}-{{sectionId}}-dependencies-add, ' +
@@ -221,7 +239,7 @@ dataCollectionSection =
                     }
 
                     reset();
-                    prettyfyDependencies();
+                    prettyfyJson();
                 });
 
                 $('#{{componentId}}-{{sectionId}}-dependencies-remove, ' +
@@ -253,10 +271,10 @@ dataCollectionSection =
                     }
 
                     reset();
-                    prettyfyDependencies();
+                    prettyfyJson();
                 });
 
-                prettyfyDependencies();
+                prettyfyJson();
             }
         },
         '{{componentId}}-{{sectionId}}-dependencies-modulename'             : { },
@@ -289,6 +307,12 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-settings'                    : 'Please enter settings',
                 '{{componentId}}-{{sectionId}}-menu_id'                     : 'Please enter menu_id',
                 '{{componentId}}-{{sectionId}}-menu'                        : 'Please enter menu'
+            },
+            onSubmitResponse: function(response) {
+                //eslint-disable-next-line
+                console.log(response);
+
+                return false;
             }
         }
     });

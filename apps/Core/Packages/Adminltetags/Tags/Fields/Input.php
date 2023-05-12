@@ -106,6 +106,14 @@ class Input
                         ]
                     ];
             }
+        } else {
+            if (isset($this->params['fieldInputToggleEdit']) &&
+                $this->params['fieldInputToggleEdit'] == true
+            ) {
+                $this->params['fieldGroupPostAddonButtonId'] = 'fieldEdit';
+                $this->params['fieldGroupPostAddonButtonValue'] = '<i class="fas fa-fw fa-edit"></i>';
+                $this->params['fieldGroupPostAddonButtonTooltipTitle'] = false;
+            }
         }
 
         $this->fieldParams['fieldGroupPreAddonTextAdditionalClass'] =

@@ -15,9 +15,9 @@
     {% set moduleVersion = module['version'] %}
     {% set moduleRepo = module['repo'] %}
     {% set moduleClass = module['class'] %}
-    {% if type === 'components' and module['menu_id'] is defined %}
-        {% set moduleMenu_id = module['menu_id'] %}
-        {% set moduleMenu = module['menu'] %}
+    {% if type === 'components' and module['module_details']['menu_id'] is defined %}
+        {% set moduleMenu_id = module['module_details']['menu_id'] %}
+        {% set moduleMenu = module['module_details']['menu'] %}
     {% endif %}
     {% if type !== 'core' %}
         {% set moduleApps = module['module_details']['apps'] %}
@@ -290,6 +290,8 @@
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'Module version. New modules start with 0.0.0(Major.Minor.Patch). We use semantic version system.',
                 'fieldRequired'                  : true,
+                'fieldInputToggleEdit'           : true,
+                'fieldDisabled'                  : true,
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
@@ -311,6 +313,8 @@
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'Module repo.',
                 'fieldRequired'                  : true,
+                'fieldInputToggleEdit'           : true,
+                'fieldDisabled'                  : true,
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
@@ -320,79 +324,32 @@
         )}}
     </div>
 </div>
-{% if module['class'] is defined %}
-    <div class="row">
-        <div class="col">
-            {{adminltetags.useTag('fields',
-                [
-                    'component'                      : component,
-                    'componentName'                  : componentName,
-                    'componentId'                    : componentId,
-                    'sectionId'                      : sectionId,
-                    'fieldId'                        : 'class',
-                    'fieldLabel'                     : 'Module class',
-                    'fieldType'                      : 'input',
-                    'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : 'Module class.',
-                    'fieldRequired'                  : true,
-                    'fieldBazScan'                   : true,
-                    'fieldBazPostOnUpdate'           : true,
-                    'fieldDataInputMinLength'        : 1,
-                    'fieldDataInputMaxLength'        : 2048,
-                    'fieldValue'                     : moduleClass
-                ]
-            )}}
-        </div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'class',
+                'fieldLabel'                     : 'Module class',
+                'fieldType'                      : 'input',
+                'fieldInputToggleEdit'           : true,
+                'fieldDisabled'                  : true,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module class.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 2048,
+                'fieldValue'                     : moduleClass
+            ]
+        )}}
     </div>
-{% endif %}
-{% if type === 'components' and module['menu_id'] is defined %}
-    <div class="row">
-        <div class="col">
-            {{adminltetags.useTag('fields',
-                [
-                    'component'                      : component,
-                    'componentName'                  : componentName,
-                    'componentId'                    : componentId,
-                    'sectionId'                      : sectionId,
-                    'fieldId'                        : 'menu_id',
-                    'fieldLabel'                     : 'Module menu id',
-                    'fieldType'                      : 'input',
-                    'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : 'Module menu id.',
-                    'fieldRequired'                  : true,
-                    'fieldBazScan'                   : true,
-                    'fieldBazPostOnUpdate'           : true,
-                    'fieldDataInputMinLength'        : 1,
-                    'fieldDataInputMaxLength'        : 50,
-                    'fieldValue'                     : moduleMenu_id
-                ]
-            )}}
-        </div>
-        <div class="col-md-10">
-            {{adminltetags.useTag('fields',
-                [
-                    'component'                      : component,
-                    'componentName'                  : componentName,
-                    'componentId'                    : componentId,
-                    'sectionId'                      : sectionId,
-                    'fieldId'                        : 'menu',
-                    'fieldLabel'                     : 'Module Menu',
-                    'fieldType'                      : 'textarea',
-                    'fieldDataMaxLength'             : 2048,
-                    'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : 'Menu of the component',
-                    'fieldRequired'                  : false,
-                    'fieldBazScan'                   : true,
-                    'fieldBazPostOnUpdate'           : true,
-                    'fieldDataInputMaxLength'        : 2048,
-                    'fieldTextareaRows'              : 2,
-                    'fieldValue'                     : moduleMenu
-                ]
-            )}}
-        </div>
-    </div>
-{% endif %}
-{% if module['apps'] is defined %}
+</div>
+{% if type !== 'core' %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -406,8 +363,9 @@
                 'fieldType'                      : 'textarea',
                 'fieldDataMaxLength'             : 2048,
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Apps of the component',
+                'fieldHelpTooltipContent'        : 'Apps of the component. This is set via Apps component. Do not modify this here.',
                 'fieldRequired'                  : false,
+                'fieldDisabled'                  : false,
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMaxLength'        : 2048,

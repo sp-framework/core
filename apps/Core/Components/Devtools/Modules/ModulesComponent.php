@@ -89,6 +89,12 @@ class ModulesComponent extends BaseComponent
 
 			if ($type !== 'core') {
 				$this->view->categoryArr = ${$type . 'CategoryArr'};
+
+				if ($type === 'components') {
+					$baseMenuStructure = $this->basepackages->menus->getMenusForAppType($module['app_type']);
+
+					$this->view->menuBaseStructure = $baseMenuStructure;
+				}
 			} else {
 				$this->view->categoryArr = ['core' => ['id' => 'providers', 'name' => 'Providers']];
 			}
@@ -118,6 +124,7 @@ class ModulesComponent extends BaseComponent
 			$this->view->moduleTypes = $this->modulesPackage->getModuleTypes();
 			$this->view->moduleSettings = $this->modulesPackage->getDefaultSettings($type);
 			$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies();
+			$this->view->moduleMenu = Json::encode([]);
 
 			if ($this->getData()['id'] != 0) {
 				if ($type !== 'core') {
@@ -127,6 +134,7 @@ class ModulesComponent extends BaseComponent
 
 					if ($module['module_details']['module_type'] === 'components') {
 						$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Components/';
+						$this->view->moduleMenu = $module['module_details']['menu'];
 					} else if ($module['module_details']['module_type'] === 'packages') {
 						if ($module['module_details']['app_type'] === 'core' &&
 							($module['module_details']['category'] === 'basepackages' ||
@@ -190,43 +198,13 @@ class ModulesComponent extends BaseComponent
 				}
 
 				if (is_array($module['settings'])) {
-					$this->view->moduleSettings = Json::encode($module['settings']);
-					$module['settings'] = $this->modulesPackage->formatJson(['json' => $module['settings']]);
+					$this->view->moduleSettings = $module['settings'] = Json::encode($module['settings']);
 				}
 				if (is_array($module['dependencies'])) {
-					$this->view->moduleDependencies = Json::encode($module['dependencies']);
-					$module['dependencies'] = $this->modulesPackage->formatJson(['json' => $module['dependencies']]);
+					$this->view->moduleDependencies = $module['dependencies'] = Json::encode($module['dependencies']);
 				}
 
 				$this->view->module = $module;
-
-				// $coreJson['module_details'] = $this->modules->packages->getPackageByName('core');
-
-				// if ($type === 'core') {
-				// } else if ($type === 'components') {
-				// 	$component = $this->modules->components->getById($this->getData()['id']);
-
-				// 	$component['dependencies'] = Json::decode($component['dependencies'], true);
-				// 	$component['dependencies'] = Json::encode($component['dependencies'], JSON_UNESCAPED_SLASHES);
-
-				// 	$this->view->module = $component;
-				// } else if ($type === 'packages') {
-				// 	$package = $this->modules->packages->getById($this->getData()['id']);
-
-				// 	$this->view->module = $package;
-
-				// } else if ($type === 'middlewares') {
-				// 	$middleware = $this->modules->middlewares->getById($this->getData()['id']);
-
-				// 	$this->view->module = $middleware;
-				// } else if ($type === 'views') {
-				// 	$view = $this->modules->views->getById($this->getData()['id']);
-
-				// 	$view['dependencies'] = Json::decode($view['dependencies'], true);
-				// 	$view['dependencies'] = Json::encode($view['dependencies'], JSON_UNESCAPED_SLASHES);
-
-				// 	$this->view->module = $view;
-				// }
 			}
 		} else {
 			$this->view->pick('modules/list');
