@@ -1,16 +1,18 @@
 <?php
 
-namespace System\Base\Providers\ContentServiceProvider\Local;
+namespace System\Base\Providers\ContentServiceProvider\Remote;
 
-use League\Flysystem\Filesystem;
-use League\Flysystem\Local\LocalFilesystemAdapter;
-use System\Base\Providers\ContentServiceProvider\Remote\Dropbox;
+use System\Base\Providers\ContentServiceProvider\Remote\Content\Dropbox;
+use System\Base\Providers\ContentServiceProvider\Remote\Content\Ftp;
+use System\Base\Providers\ContentServiceProvider\Remote\Content\Sftp;
 
 class Content
 {
     protected $dropbox;
 
     protected $ftp;
+
+    protected $sftp;
 
     public function __construct()
     {
@@ -20,6 +22,9 @@ class Content
     {
         return $this;
     }
+
+    // Do manager instead
+// https://flysystem.thephpleague.com/docs/advanced/mount-manager/
 
     public function __get($name)
     {
@@ -37,5 +42,19 @@ class Content
         $this->dropbox = (new Dropbox())->init();
 
         return $this->dropbox;
+    }
+
+    protected function initFtp()
+    {
+        $this->ftp = (new Ftp())->init();
+
+        return $this->ftp;
+    }
+
+    protected function initSftp()
+    {
+        $this->sftp = (new Sftp())->init();
+
+        return $this->sftp;
     }
 }
