@@ -1,4 +1,3 @@
-{# component and views share similar fields, this change in future as I feel we dont need category, sub_category, dependencies in this #}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         {{adminltetags.useTag('tabs',
@@ -63,7 +62,6 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-description'                         : { },
         '{{componentId}}-{{sectionId}}-app_type'                            : { },
         '{{componentId}}-{{sectionId}}-category'                            : { },
-        '{{componentId}}-{{sectionId}}-sub_category'                        : { },
         '{{componentId}}-{{sectionId}}-version'                             : { },
         '{{componentId}}-{{sectionId}}-repo'                                : { },
         '{{componentId}}-{{sectionId}}-class'                               : { },
@@ -176,7 +174,6 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-display_name'                : 'required',
                 '{{componentId}}-{{sectionId}}-app_type'                    : 'required',
                 '{{componentId}}-{{sectionId}}-category'                    : 'required',
-                '{{componentId}}-{{sectionId}}-sub_category'                : 'required',
                 '{{componentId}}-{{sectionId}}-version'                     : 'required',
                 '{{componentId}}-{{sectionId}}-repo'                        : 'required',
                 '{{componentId}}-{{sectionId}}-class'                       : 'required',
@@ -189,7 +186,6 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-display_name'                : 'Please enter display_name',
                 '{{componentId}}-{{sectionId}}-app_type'                    : 'Please enter app_type',
                 '{{componentId}}-{{sectionId}}-category'                    : 'Please enter category',
-                '{{componentId}}-{{sectionId}}-sub_category'                : 'Please enter sub_category',
                 '{{componentId}}-{{sectionId}}-version'                     : 'Please enter version',
                 '{{componentId}}-{{sectionId}}-repo'                        : 'Please enter repo',
                 '{{componentId}}-{{sectionId}}-class'                       : 'Please enter class',

@@ -5,8 +5,7 @@
     "module_type"   : "packages",
     "version"       : "0.0.0",
     "app_type"      : "core",
-    "category"      : "apps",
-    "sub_category"  : "devtools",
+    "category"      : "devtools",
     "repo"          : "https://.../",
     "class"         : "Apps\\Core\\Packages\\Devtools\\Api\\Enums\\Enums",
     "settings"      : { }

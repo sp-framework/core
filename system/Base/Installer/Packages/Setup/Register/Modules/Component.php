@@ -29,7 +29,6 @@ class Component
 				'module_type' 			=> $componentFile['module_type'],
 				'app_type' 				=> $componentFile['app_type'],
 				'category'  			=> $componentFile['category'],
-				'sub_category'  		=> $componentFile['sub_category'],
 				'version'				=> $componentFile['version'],
 				'class'					=> $componentFile['class'],
 				'repo'					=> $componentFile['repo'],

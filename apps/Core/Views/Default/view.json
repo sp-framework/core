@@ -4,8 +4,7 @@
     "description"   : "Default Core View",
     "module_type"   : "view",
     "app_type"      : "core",
-    "category"      : "apps",
-    "sub_category"  : "tools",
+    "category"      : "tools",
     "version"       : "0.0.0",
     "repo"          : "https://.../",
     "dependencies"  : {

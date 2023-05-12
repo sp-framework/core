@@ -17,7 +17,6 @@ class View
 				'module_type' 			=> $viewFile['module_type'],
 				'app_type' 				=> $viewFile['app_type'],
 				'category'  			=> $viewFile['category'],
-				'sub_category'  		=> $viewFile['sub_category'],
 				'version'				=> $viewFile['version'],
 				'repo'		 			=> $viewFile['repo'],
 				'settings'				=>

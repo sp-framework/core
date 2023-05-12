@@ -70,7 +70,6 @@ class DevtoolsModules extends BasePackage
             $jsonContent['description'] = $component['description'];
             $jsonContent['app_type'] = $component['app_type'];
             $jsonContent['category'] = $component['category'];
-            $jsonContent['sub_category'] = $component['sub_category'];
             $jsonContent['version'] = $component['version'];
             $jsonContent['repo'] = $component['repo'];
             $jsonContent['class'] = $component['class'];
@@ -119,7 +118,6 @@ class DevtoolsModules extends BasePackage
         $jsonContent['description'] = $package['description'];
         $jsonContent['app_type'] = $package['app_type'];
         $jsonContent['category'] = $package['category'];
-        $jsonContent['sub_category'] = $package['sub_category'];
         $jsonContent['version'] = $package['version'];
         $jsonContent['repo'] = $package['repo'];
         $jsonContent['class'] = $package['class'];
@@ -166,7 +164,6 @@ class DevtoolsModules extends BasePackage
         $jsonContent['description'] = $middleware['description'];
         $jsonContent['app_type'] = $middleware['app_type'];
         $jsonContent['category'] = $middleware['category'];
-        $jsonContent['sub_category'] = $middleware['sub_category'];
         $jsonContent['version'] = $middleware['version'];
         $jsonContent['repo'] = $middleware['repo'];
         $jsonContent['class'] = $middleware['class'];
@@ -212,7 +209,6 @@ class DevtoolsModules extends BasePackage
         $jsonContent['description'] = $view['description'];
         $jsonContent['app_type'] = $view['app_type'];
         $jsonContent['category'] = $view['category'];
-        $jsonContent['sub_category'] = $view['sub_category'];
         $jsonContent['version'] = $view['version'];
         $jsonContent['repo'] = $view['repo'];
         $jsonContent['dependencies'] = $view['dependencies'];

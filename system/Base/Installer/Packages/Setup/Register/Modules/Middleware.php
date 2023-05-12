@@ -25,7 +25,6 @@ class Middleware
 				'module_type'			=> $middlewareFile['module_type'],
 				'app_type' 				=> $middlewareFile['app_type'],
 				'category'  			=> $middlewareFile['category'],
-				'sub_category'  		=> $middlewareFile['sub_category'],
 				'version'				=> $middlewareFile['version'],
 				'repo'		 			=> $middlewareFile['repo'],
 				'class'					=> $middlewareFile['class'],

@@ -243,14 +243,6 @@ class Manager extends BasePackage
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['data']['type'] = 'category';
                     }
 
-                    if (!isset($sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']])) {
-                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']] = [];
-                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['name'] = $moduleArr['sub_category'];
-                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['data']['type'] = 'sub_category';
-
-                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['childs'] = [];
-                    }
-
                     $module['id'] = $moduleArr['id'];
                     $module['name'] = $moduleArr['name'];
                     if (isset($moduleArr['display_name'])) {
@@ -260,7 +252,6 @@ class Manager extends BasePackage
                     $module['data']['apptype'] = $moduleArr['app_type'];
                     $module['data']['moduletype'] = $moduleArr['module_type'];
                     $module['data']['modulecategory'] = $moduleArr['category'];
-                    $module['data']['modulesubcategory'] = $moduleArr['sub_category'];
                     $module['data']['moduleid'] = $moduleArr['module_type'] . '-' . $moduleArr['id'];
                     $module['data']['installed'] = $moduleArr['installed'];
                     $module['data']['update_available'] = $moduleArr['update_available'];
@@ -282,7 +273,7 @@ class Manager extends BasePackage
                         }
                     }
 
-                    $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$moduleArr['sub_category']]['childs'][$module['data']['moduleid']] = $module;
+                    $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$module['data']['moduleid']] = $module;
                 }
             }
         }

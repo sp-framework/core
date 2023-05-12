@@ -401,7 +401,7 @@ class Setup
 						throw new \Exception('Problem reading component.json at location ' . $adminComponent);
 					}
 
-					if ($jsonFile['sub_category'] === 'devtools' &&
+					if ($jsonFile['category'] === 'devtools' &&
 						$this->postData['dev'] == 'false'
 					) {
 						continue;
@@ -449,8 +449,7 @@ class Setup
 						throw new \Exception('Problem reading package.json at location ' . $adminPackage);
 					}
 
-					if (isset($jsonFile['sub_category']) &&
-						$jsonFile['sub_category'] === 'devtools' &&
+					if ($jsonFile['category'] === 'devtools' &&
 						$this->postData['dev'] == 'false'
 					) {
 						continue;
@@ -485,7 +484,7 @@ class Setup
 						throw new \Exception('Problem reading middleware.json at location ' . $adminMiddleware);
 					}
 
-					if ($jsonFile['sub_category'] === 'devtools' &&
+					if ($jsonFile['category'] === 'devtools' &&
 						$this->postData['dev'] == 'false'
 					) {
 						continue;
@@ -505,7 +504,7 @@ class Setup
 				throw new \Exception('Problem reading view.json');
 			}
 
-			if ($jsonFile['sub_category'] === 'devtools' &&
+			if ($jsonFile['category'] === 'devtools' &&
 				$this->postData['dev'] == 'false'
 			) {
 				return;

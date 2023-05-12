@@ -43,7 +43,6 @@ class Component extends BaseComponent
             'route'                 => $jsonFile['route'],
             'description'           => $jsonFile['description'],
             'category'              => $jsonFile['category'],
-            'sub_category'          => $jsonFile['sub_category'],
             'version'               => $jsonFile['version'],
             'class'                 => $jsonFile['class'],
             'repo'                  => $jsonFile['repo'],

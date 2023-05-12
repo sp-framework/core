@@ -92,13 +92,13 @@ class Middlewares extends BasePackage
 		return $middlewares;
 	}
 
-	public function getMiddlewaresForCategoryAndSubcategory($category, $subCategory, $appId = null)
+	public function getMiddlewaresForCategoryAndSubcategory($category, $appId = null)
 	{
 		$middlewares = [];
 
 		foreach($this->middlewares as $middleware) {
 
-			if ($middleware['category'] === $category && $middleware['sub_category'] === $subCategory) {
+			if ($middleware['category'] === $category) {
 				$middlewares[$middleware['id']] = $middleware;
 
 				if ($appId) {

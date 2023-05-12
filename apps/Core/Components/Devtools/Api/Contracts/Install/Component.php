@@ -46,7 +46,6 @@ class Component extends BaseComponent
             'description'           => $jsonFile['description'],
             'app_type'              => $jsonFile['app_type'],
             'category'              => $jsonFile['category'],
-            'sub_category'          => $jsonFile['sub_category'],
             'version'               => $jsonFile['version'],
             'class'                 => $jsonFile['class'],
             'repo'                  => $jsonFile['repo'],

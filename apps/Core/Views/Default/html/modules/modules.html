@@ -513,7 +513,7 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
             nD = node.data;
 
             nT =
-                dataCollectionSectionForm['vars']['modules'][nD.apiid]['childs'][nD.apptype]['childs'][nD.moduletype]['childs'][nD.modulecategory]['childs'][nD.modulesubcategory]['childs'][node.id]['name'];
+                dataCollectionSectionForm['vars']['modules'][nD.apiid]['childs'][nD.apptype]['childs'][nD.moduletype]['childs'][nD.modulecategory]['childs'][node.id]['name'];
 
             if (dataCollectionSectionForm['vars']['queue']['count'] > 0) {
                 var tasks = ['install', 'update', 'uninstall', 'remove'];
@@ -823,7 +823,6 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
 
     $('#app_type').html(moduleData.app_type);
     $('#category').html(moduleData.category);
-    $('#sub_category').html(moduleData.sub_category);
     $('#update_available').html(moduleData.update_available);
     $('#update_version').html(moduleData.update_version);
     $('#updated_on').html(moduleData.updated_on);

@@ -16,8 +16,6 @@ class ModulesViews extends BaseModel
 
     public $category;
 
-    public $sub_category;
-
     public $version;
 
     public $repo;

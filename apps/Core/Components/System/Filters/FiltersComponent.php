@@ -26,7 +26,7 @@ class FiltersComponent extends BaseComponent
             $components = $this->modules->components->components;
 
             foreach ($components as $key => $component) {
-                $components[$key]['name'] = $component['name'] . ' (' . $component['category'] . '/' . $component['sub_category'] . ')';
+                $components[$key]['name'] = $component['name'] . ' (' . $component['category'] . ')';
             }
 
             $this->view->components = $components;

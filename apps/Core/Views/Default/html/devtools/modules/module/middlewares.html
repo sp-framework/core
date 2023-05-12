@@ -155,27 +155,6 @@
                     ]
                 )}}
             </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'sub_category',
-                        'fieldLabel'                     : 'middleware sub category',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'middleware sub category',
-                        'fieldRequired'                  : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 50,
-                        'fieldValue'                     : module['sub_category']
-                    ]
-                )}}
-            </div>
         </div>
         <div class="row">
             <div class="col">
@@ -328,7 +307,6 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-description'                         : { },
         '{{componentId}}-{{sectionId}}-app_type'                            : { },
         '{{componentId}}-{{sectionId}}-category'                            : { },
-        '{{componentId}}-{{sectionId}}-sub_category'                        : { },
         '{{componentId}}-{{sectionId}}-version'                             : { },
         '{{componentId}}-{{sectionId}}-repo'                                : { },
         '{{componentId}}-{{sectionId}}-class'                               : { },
@@ -341,7 +319,6 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-description'                 : 'required',
                 '{{componentId}}-{{sectionId}}-app_type'                    : 'required',
                 '{{componentId}}-{{sectionId}}-category'                    : 'required',
-                '{{componentId}}-{{sectionId}}-sub_category'                : 'required',
                 '{{componentId}}-{{sectionId}}-version'                     : 'required',
                 '{{componentId}}-{{sectionId}}-repo'                        : 'required',
                 '{{componentId}}-{{sectionId}}-class'                       : 'required',
@@ -354,7 +331,6 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-description'                 : 'Please enter description',
                 '{{componentId}}-{{sectionId}}-app_type'                    : 'Please enter app_type',
                 '{{componentId}}-{{sectionId}}-category'                    : 'Please enter category',
-                '{{componentId}}-{{sectionId}}-sub_category'                : 'Please enter sub_category',
                 '{{componentId}}-{{sectionId}}-version'                     : 'Please enter version',
                 '{{componentId}}-{{sectionId}}-repo'                        : 'Please enter repo',
                 '{{componentId}}-{{sectionId}}-class'                       : 'Please enter class',

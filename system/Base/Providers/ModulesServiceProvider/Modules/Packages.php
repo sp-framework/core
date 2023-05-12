@@ -95,12 +95,12 @@ class Packages extends BasePackage
 		return false;
 	}
 
-	public function getPackagesForCategoryAndSubcategory($category, $subCategory)
+	public function getPackagesForCategory($category)
 	{
 		$packages = [];
 
 		foreach($this->packages as $package) {
-			if ($package['category'] === $category && $package['sub_category'] === $subCategory) {
+			if ($package['category'] === $category) {
 				$packages[$package['id']] = $package;
 			}
 		}

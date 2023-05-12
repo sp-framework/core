@@ -11,7 +11,6 @@
     {% set moduleModule_type = module['module_type'] %}
     {% set moduleApp_type = module['app_type'] %}
     {% set moduleCategory = module['category'] %}
-    {% set moduleSub_category = module['sub_category'] %}
     {% set moduleApiId = module['module_details']['api_id'] %}
     {% set moduleVersion = module['version'] %}
     {% set moduleRepo = module['repo'] %}
@@ -36,7 +35,6 @@
     {% set moduleModule_type = type %}
     {% set moduleApp_type = '' %}
     {% set moduleCategory = '' %}
-    {% set moduleSub_category = '' %}
     {% set moduleApiId = '0' %}
     {% set moduleVersion = '0.0.0' %}
     {% set moduleRepo = 'https://.../' %}
@@ -159,29 +157,6 @@
                 'fieldDataSelect2OptionsKey'           : 'id',
                 'fieldDataSelect2OptionsValue'         : 'name',
                 'fieldDataSelect2OptionsSelected'      : moduleCategory
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                            : component,
-                'componentName'                        : componentName,
-                'componentId'                          : componentId,
-                'sectionId'                            : sectionId,
-                'fieldId'                              : 'sub_category',
-                'fieldLabel'                           : 'Module sub category',
-                'fieldType'                            : 'select2',
-                'fieldHelp'                            : true,
-                'fieldHelpTooltipContent'              : 'Select sub category or enter a new one to create a new sub category.',
-                'fieldRequired'                        : true,
-                'fieldBazScan'                         : true,
-                'fieldDataSelect2OptionsArray'         : true,
-                'fieldDataSelect2Create'               : true,
-                'fieldDataSelect2Options'              : subCategoryArr,
-                'fieldDataSelect2OptionsKey'           : 'id',
-                'fieldDataSelect2OptionsValue'         : 'name',
-                'fieldDataSelect2OptionsSelected'      : moduleSub_category
             ]
         )}}
     </div>

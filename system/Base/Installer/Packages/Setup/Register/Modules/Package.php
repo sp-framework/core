@@ -17,7 +17,6 @@ class Package
 				'module_type'	 		=> $packageFile['module_type'],
 				'app_type'		 		=> $packageFile['app_type'],
 				'category'				=> $packageFile['category'],
-				'sub_category'			=> $packageFile['sub_category'],
 				'version'				=> $packageFile['version'],
 				'repo'					=> $packageFile['repo'],
 				'class'					=> $packageFile['class'],

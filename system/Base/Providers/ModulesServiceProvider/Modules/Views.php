@@ -290,14 +290,12 @@ class Views extends BasePackage
         return false;
     }
 
-    public function getViewsForCategoryAndSubcategory($category, $subCategory)
+    public function getViewsForCategory($category)
     {
         $views = [];
 
         foreach($this->views as $view) {
-            if ($view['category'] === $category &&
-                $view['sub_category'] === $subCategory
-            ) {
+            if ($view['category'] === $category) {
                 $views[$view['id']] = $view;
             }
         }

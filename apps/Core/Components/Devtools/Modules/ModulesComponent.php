@@ -58,7 +58,6 @@ class ModulesComponent extends BaseComponent
 		foreach ($modulesTypeArr as $modulesType) {
 			$modulesArr = $this->processModulesArr(msort($this->modules->{$modulesType}->{$modulesType}, 'name'));
 			${$modulesType . 'CategoryArr'} = $modulesArr['categoryArr'];
-			${$modulesType . 'SubCategoryArr'} = $modulesArr['subCategoryArr'];
 			if (count($modulesArr['modules']) > 0) {
 				$modules[$modulesType]['value'] = ucfirst($modulesType);
 				$modules[$modulesType]['childs'] = $modulesArr['modules'];
@@ -90,10 +89,8 @@ class ModulesComponent extends BaseComponent
 
 			if ($type !== 'core') {
 				$this->view->categoryArr = ${$type . 'CategoryArr'};
-				$this->view->subCategoryArr = ${$type . 'SubCategoryArr'};
 			} else {
-				$this->view->categoryArr = ['core' => ['id' => 'base', 'name' => 'Base']];
-				$this->view->subCategoryArr = ['core' => ['id' => 'providers', 'name' => 'Providers']];
+				$this->view->categoryArr = ['core' => ['id' => 'providers', 'name' => 'Providers']];
 			}
 
 			$this->view->type = $type;
@@ -132,7 +129,7 @@ class ModulesComponent extends BaseComponent
 						$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Components/';
 					} else if ($module['module_details']['module_type'] === 'packages') {
 						if ($module['module_details']['app_type'] === 'core' &&
-							$module['module_details']['sub_category'] === 'basepackages'
+							$module['module_details']['category'] === 'basepackages'
 						) {
 							$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/';
 						} else {
@@ -145,11 +142,11 @@ class ModulesComponent extends BaseComponent
 					}
 
 					if ($module['module_details']['module_type'] === 'packages' &&
-						$module['module_details']['sub_category'] === 'basepackages'
+						$module['module_details']['category'] === 'basepackages'
 					) {
 						$jsonFile =
 							$moduleLocation .
-							ucfirst($module['module_details']['sub_category']) . '/' .
+							ucfirst($module['module_details']['category']) . '/' .
 							ucfirst($module['module_details']['name']) . '/' .
 							substr($module['module_details']['module_type'], 0, -1) . '.json';
 					} else {
@@ -283,16 +280,11 @@ class ModulesComponent extends BaseComponent
 	{
 		$modulesArr['modules'] = $modulesArr;
 		$modulesArr['categoryArr'] = [];
-		$modulesArr['subCategoryArr'] = [];
 
 		foreach ($modulesArr['modules'] as $key => &$module) {
 			if (!isset($modulesArr['categoryArr'][$module['category']])) {
 				$modulesArr['categoryArr'][$module['category']]['id'] = $module['category'];
 				$modulesArr['categoryArr'][$module['category']]['name'] = ucfirst($module['category']);
-			}
-			if (!isset($modulesArr['subCategoryArr'][$module['sub_category']])) {
-				$modulesArr['subCategoryArr'][$module['sub_category']]['id'] = $module['sub_category'];
-				$modulesArr['subCategoryArr'][$module['sub_category']]['name'] = ucfirst($module['sub_category']);
 			}
 
 			if (!isset($this->getData()['includecoremodules'])) {

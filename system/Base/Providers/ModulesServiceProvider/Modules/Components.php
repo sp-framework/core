@@ -142,14 +142,12 @@ class Components extends BasePackage
 		}
 	}
 
-	public function getComponentsForCategoryAndSubcategory($category, $subCategory)
+	public function getComponentsForCategory($category)
 	{
 		$components = [];
 
 		foreach($this->components as $component) {
-			if ($component['category'] === $category &&
-				$component['sub_category'] === $subCategory
-			) {
+			if ($component['category'] === $category) {
 				$components[$component['id']] = $component;
 			}
 		}
