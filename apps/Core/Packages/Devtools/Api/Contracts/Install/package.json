@@ -8,6 +8,18 @@
     "category"      : "devtools",
     "repo"          : "https://.../",
     "class"         : "Apps\\Core\\Packages\\Devtools\\Api\\Contracts\\Contracts",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
     "settings"      : {
         "categories" :
             [

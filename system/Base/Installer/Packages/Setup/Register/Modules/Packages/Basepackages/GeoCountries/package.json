@@ -8,5 +8,17 @@
     "version"       : "0.0.0",
     "repo"          : "https://.../",
     "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Geo\\GeoCountries",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
     "settings"      : { }
 }

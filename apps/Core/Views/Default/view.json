@@ -16,7 +16,8 @@
         "components"    : [],
         "packages"      : [],
         "middlewares"   : [],
-        "views"         : []
+        "views"         : [],
+        "external"      : []
     },
     "settings"      : {
         "mandatory" : true,

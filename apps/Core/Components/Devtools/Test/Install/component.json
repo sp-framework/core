@@ -24,7 +24,8 @@
             }
         ],
         "middlewares"   : [],
-        "views"         : []
+        "views"         : [],
+        "external"      : []
     },
     "menu"              : {
         "seq"           : 99,

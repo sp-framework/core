@@ -129,9 +129,14 @@ class ModulesComponent extends BaseComponent
 						$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Components/';
 					} else if ($module['module_details']['module_type'] === 'packages') {
 						if ($module['module_details']['app_type'] === 'core' &&
-							$module['module_details']['category'] === 'basepackages'
+							($module['module_details']['category'] === 'basepackages' ||
+							 $module['module_details']['category'] === 'providers')
 						) {
-							$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/';
+							if ($module['module_details']['category'] === 'basepackages') {
+								$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/';
+							} else if ($module['module_details']['category'] === 'providers') {
+								$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/';
+							}
 						} else {
 							$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Packages/';
 						}
@@ -142,11 +147,11 @@ class ModulesComponent extends BaseComponent
 					}
 
 					if ($module['module_details']['module_type'] === 'packages' &&
-						$module['module_details']['category'] === 'basepackages'
+						($module['module_details']['category'] === 'basepackages' ||
+						 $module['module_details']['category'] === 'providers')
 					) {
 						$jsonFile =
 							$moduleLocation .
-							ucfirst($module['module_details']['category']) . '/' .
 							ucfirst($module['module_details']['name']) . '/' .
 							substr($module['module_details']['module_type'], 0, -1) . '.json';
 					} else {

@@ -8,6 +8,18 @@
     "version"       : "0.0.0",
     "repo"          : "https://.../",
     "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Qrcodes",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
     "settings"      : {
         "componentRoute"        : "system/tools/qrcodes",
         "availableEncodings"    : {

@@ -18,7 +18,8 @@
         "components"    : [],
         "packages"      : [],
         "middlewares"   : [],
-        "views"         : []
+        "views"         : [],
+        "external"      : []
     },
     "menu":
     {
@@ -49,7 +50,7 @@
     {
         "mandatory":
         {
-            "admin": true
+            "core": true
         },
         "export": true,
         "import": true,

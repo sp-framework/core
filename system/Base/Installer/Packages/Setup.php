@@ -10,6 +10,7 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
 use League\Flysystem\UnableToDeleteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
+use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Api\Apis\Repos as RegisterRepos;
@@ -391,14 +392,14 @@ class Setup
 
 			foreach ($adminComponents['files'] as $adminComponentKey => $adminComponent) {
 				if (strpos($adminComponent, 'component.json')) {
-					$jsonFile =
-						json_decode(
-							$this->localContent->read($adminComponent),
-							true
-						);
-
-					if (!$jsonFile) {
-						throw new \Exception('Problem reading component.json at location ' . $adminComponent);
+					try {
+						$jsonFile =
+							Json::decode(
+								$this->localContent->read($adminComponent),
+								true
+							);
+					} catch (\throwable $e) {
+						throw new \Exception($e->getMessage() . '. Problem reading component.json at location ' . $adminComponent);
 					}
 
 					if ($jsonFile['category'] === 'devtools' &&
@@ -439,14 +440,14 @@ class Setup
 
 			foreach ($adminPackages['files'] as $adminPackageKey => $adminPackage) {
 				if (strpos($adminPackage, 'package.json')) {
-					$jsonFile =
-						json_decode(
-							$this->localContent->read($adminPackage),
-							true
-						);
-
-					if (!$jsonFile) {
-						throw new \Exception('Problem reading package.json at location ' . $adminPackage);
+					try {
+						$jsonFile =
+							Json::decode(
+								$this->localContent->read($adminPackage),
+								true
+							);
+					} catch (\throwable $e) {
+						throw new \Exception($e->getMessage() . '. Problem reading package.json at location ' . $adminPackage);
 					}
 
 					if ($jsonFile['category'] === 'devtools' &&
@@ -474,14 +475,14 @@ class Setup
 
 			foreach ($adminMiddlewares['files'] as $adminMiddlewareKey => $adminMiddleware) {
 				if (strpos($adminMiddleware, 'middleware.json')) {
-					$jsonFile =
-						json_decode(
-							$this->localContent->read($adminMiddleware),
-							true
-						);
-
-					if (!$jsonFile) {
-						throw new \Exception('Problem reading middleware.json at location ' . $adminMiddleware);
+					try {
+						$jsonFile =
+							Json::decode(
+								$this->localContent->read($adminMiddleware),
+								true
+							);
+					} catch (\throwable $e) {
+						throw new \Exception($e->getMessage() . '. Problem reading middleware.json at location ' . $adminMiddleware);
 					}
 
 					if ($jsonFile['category'] === 'devtools' &&
@@ -494,14 +495,14 @@ class Setup
 				}
 			}
 		} else if ($type === 'views') {
-			$jsonFile =
-				json_decode(
-					$this->localContent->read('apps/Core/Views/Default/view.json'),
-					true
-				);
-
-			if (!$jsonFile) {
-				throw new \Exception('Problem reading view.json');
+			try {
+				$jsonFile =
+					Json::decode(
+						$this->localContent->read('apps/Core/Views/Default/view.json'),
+						true
+					);
+			} catch (\throwable $e) {
+				throw new \Exception($e->getMessage() . '. Problem reading view.json');
 			}
 
 			if ($jsonFile['category'] === 'devtools' &&
