@@ -7,7 +7,7 @@
         ]
     ]
 %}
-{% if module['module_type'] === 'components' %}
+{% if module is defined and module['module_type'] === 'components' or type === 'components' %}
     {% set tabsData = array_merge(tabsData,
         [
             'menu'   :
@@ -130,10 +130,217 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-version'                             : { },
         '{{componentId}}-{{sectionId}}-repo'                                : { },
         '{{componentId}}-{{sectionId}}-class'                               : { },
-        '{{componentId}}-{{sectionId}}-settings'                            : { },
+        '{{componentId}}-{{sectionId}}-settings'                            : {
+            'afterInit'     : function() {
+                if (dataCollectionSectionForm['vars']['moduleSettings'].length === 0) {
+                    dataCollectionSectionForm['vars']['moduleSettings'] = { };
+                }
+                function prettyfyJson() {
+                    $('#{{componentId}}-{{sectionId}}-settings')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleSettings'], null, 4));
+                }
+
+                //Components - Mandatory, NeedAuth, ImportExportPackage
+                if (dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] !== 'undefined') {
+                    if (dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] === true) {
+                        $("#forAppType").prop('checked', true);
+                    } else if (typeof dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] === 'object') {
+                        $("#forApp").prop('checked', true);
+                        $("#{{componentId}}-{{sectionId}}-mandatory-apps").attr('disabled', false);
+                        $("#{{componentId}}-{{sectionId}}-mandatory-apps")
+                            .val(Object.keys(dataCollectionSectionForm['vars']['moduleSettings']['mandatory']).join(','));
+                    }
+                } else {
+                    $("#mandatory-no").prop('checked', true);
+                }
+
+                $('#{{componentId}}-{{sectionId}}-mandatory').off();
+                $('#{{componentId}}-{{sectionId}}-mandatory').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'mandatory-no') {
+                        if (dataCollectionSectionForm['vars']['moduleSettings']['mandatory']) {
+                            delete dataCollectionSectionForm['vars']['moduleSettings']['mandatory'];
+                        }
+                        $("#{{componentId}}-{{sectionId}}-mandatory-apps").attr('disabled', true);
+                        $("#{{componentId}}-{{sectionId}}-mandatory-apps").val('');
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'forAppType') {
+                        dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] = true;
+                        $("#{{componentId}}-{{sectionId}}-mandatory-apps").attr('disabled', true);
+                        $("#{{componentId}}-{{sectionId}}-mandatory-apps").val('');
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'forApp') {
+                        dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] = { };
+                        $("#{{componentId}}-{{sectionId}}-mandatory-apps").attr('disabled', false);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-need-auth').off();
+                $('#{{componentId}}-{{sectionId}}-need-auth').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'need-auth-default') {
+                        if (dataCollectionSectionForm['vars']['moduleSettings']['needAuth']) {
+                            delete dataCollectionSectionForm['vars']['moduleSettings']['needAuth'];
+                        }
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'need-auth-yes') {
+                        dataCollectionSectionForm['vars']['moduleSettings']['needAuth'] = true;
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'need-auth-mandatory') {
+                        dataCollectionSectionForm['vars']['moduleSettings']['needAuth'] = 'mandatory';
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'need-auth-disabled') {
+                        dataCollectionSectionForm['vars']['moduleSettings']['needAuth'] = 'disabled';
+                    }
+                });
+
+                if (dataCollectionSectionForm['vars']['moduleSettings']['needAuth'] !== 'undefined') {
+                    if (dataCollectionSectionForm['vars']['moduleSettings']['needAuth'] === true) {
+                        $("#need-auth-yes").prop('checked', true);
+                    } else if (dataCollectionSectionForm['vars']['moduleSettings']['needAuth'] === 'mandatory') {
+                        $("#need-auth-mandatory").prop('checked', true);
+                    } else if (dataCollectionSectionForm['vars']['moduleSettings']['needAuth'] === 'disabled') {
+                        $("#need-auth-disabled").prop('checked', true);
+                    }
+                } else {
+                    $("#need-auth-default").prop('checked', true);
+                }
+
+                $('#{{componentId}}-{{sectionId}}-settings-packages').on('select2:select', function(e) {
+                    if ($(e.params.data.element).data('importexportpackage')) {
+                        dataCollectionSectionForm['vars']['moduleSettings']['importExportPackage'] = $(e.params.data.element).data('importexportpackage');
+                    }
+                });
+                $('#{{componentId}}-{{sectionId}}-settings-packages').on('select2:clear', function(e) {
+                    delete dataCollectionSectionForm['vars']['moduleSettings']['importExportPackage'];
+                });
+                if (dataCollectionSectionForm['vars']['moduleSettings']['importExportPackage']) {
+                    $('#{{componentId}}-{{sectionId}}-settings-packages').find("option").each(function(i, option) {
+                        if ($(option).data('importexportpackage') === dataCollectionSectionForm['vars']['moduleSettings']['importExportPackage']) {
+                            $('#{{componentId}}-{{sectionId}}-settings-packages').val($(option).data('value')).trigger('change');
+                        }
+                    });
+                }
+
+                //Packages - Export, Import, ImportAddMethod, ImportUpdateMethod
+                $('#{{componentId}}-{{sectionId}}-settings-components').on('select2:select', function(e) {
+                    if ($(e.params.data.element).data('route')) {
+                        dataCollectionSectionForm['vars']['moduleSettings']['componentRoute'] = $(e.params.data.element).data('route');
+                    }
+                });
+                $('#{{componentId}}-{{sectionId}}-settings-components').on('select2:clear', function(e) {
+                    delete dataCollectionSectionForm['vars']['moduleSettings']['componentRoute'];
+                });
+                if (dataCollectionSectionForm['vars']['moduleSettings']['componentRoute']) {
+                    $('#{{componentId}}-{{sectionId}}-settings-components').find("option").each(function(i, option) {
+                        if ($(option).data('route') === dataCollectionSectionForm['vars']['moduleSettings']['componentRoute']) {
+                            $('#{{componentId}}-{{sectionId}}-settings-components').val($(option).data('value')).trigger('change');
+                        }
+                    });
+                }
+                if (dataCollectionSectionForm['vars']['moduleSettings']['import'] !== 'undefined' &&
+                    dataCollectionSectionForm['vars']['moduleSettings']['import'] == true
+                ) {
+                    $('#{{componentId}}-{{sectionId}}-import')[0].checked = true;
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-import-add-method, ' +
+                      '#{{componentId}}-{{sectionId}}-import-update-method').attr('disabled', true);
+                }
+                if (dataCollectionSectionForm['vars']['moduleSettings']['export'] !== 'undefined' &&
+                    dataCollectionSectionForm['vars']['moduleSettings']['export'] == true
+                ) {
+                    $('#{{componentId}}-{{sectionId}}-export')[0].checked = true;
+                }
+                if (dataCollectionSectionForm['vars']['moduleSettings']['importAddMethod']) {
+                    $('#{{componentId}}-{{sectionId}}-import-add-method').val(dataCollectionSectionForm['vars']['moduleSettings']['importAddMethod']);
+                }
+                if (dataCollectionSectionForm['vars']['moduleSettings']['importUpdateMethod']) {
+                    $('#{{componentId}}-{{sectionId}}-import-update-method').val(dataCollectionSectionForm['vars']['moduleSettings']['importUpdateMethod']);
+                }
+                $('#{{componentId}}-{{sectionId}}-import').off();
+                $('#{{componentId}}-{{sectionId}}-import').click(function() {
+                    if ($(this)[0].checked === true) {
+                        dataCollectionSectionForm['vars']['moduleSettings']['import'] = true;
+                        $('#{{componentId}}-{{sectionId}}-import-add-method, ' +
+                          '#{{componentId}}-{{sectionId}}-import-update-method').attr('disabled', false);
+                    } else {
+                        delete dataCollectionSectionForm['vars']['moduleSettings']['import'];
+                        delete dataCollectionSectionForm['vars']['moduleSettings']['importAddMethod'];
+                        delete dataCollectionSectionForm['vars']['moduleSettings']['importUpdateMethod'];
+                        $('#{{componentId}}-{{sectionId}}-import-add-method, ' +
+                          '#{{componentId}}-{{sectionId}}-import-update-method').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-import-add-method, ' +
+                          '#{{componentId}}-{{sectionId}}-import-update-method').val('');
+                    }
+                });
+                $('#{{componentId}}-{{sectionId}}-export').off();
+                $('#{{componentId}}-{{sectionId}}-export').click(function() {
+                    if ($(this)[0].checked === true) {
+                        dataCollectionSectionForm['vars']['moduleSettings']['export'] = true;
+                    } else {
+                        delete dataCollectionSectionForm['vars']['moduleSettings']['export'];
+                    }
+                });
+
+
+                $('#{{componentId}}-{{sectionId}}-generate-settings').off();
+                $('#{{componentId}}-{{sectionId}}-generate-settings').click(function() {
+                    if ($($('#{{componentId}}-{{sectionId}}-module_type').find(':selected')[0]).val() === 'components') {
+                        if (typeof dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] === 'object') {
+                            if ($('#{{componentId}}-{{sectionId}}-mandatory-apps').val() === '') {
+                                $('#{{componentId}}-{{sectionId}}-mandatory-apps').addClass('is-invalid');
+                                $('#{{componentId}}-{{sectionId}}-mandatory-apps').focus(function() {
+                                    $(this).removeClass('is-invalid');
+                                });
+                            } else {
+                                var apps = $('#{{componentId}}-{{sectionId}}-mandatory-apps').val().split(',');
+
+                                $(apps).each(function(i, app) {
+                                    dataCollectionSectionForm['vars']['moduleSettings']['mandatory'][app.trim()] = true;
+                                });
+                                prettyfyJson();
+                            }
+                        } else {
+                            prettyfyJson();
+                        }
+                    } else if ($($('#{{componentId}}-{{sectionId}}-module_type').find(':selected')[0]).val() === 'packages') {
+                        if ($('#{{componentId}}-{{sectionId}}-import')[0].checked === true) {
+                            if ($('#{{componentId}}-{{sectionId}}-import-add-method').val() === '') {
+                                $('#{{componentId}}-{{sectionId}}-import-add-method').addClass('is-invalid');
+                                $('#{{componentId}}-{{sectionId}}-import-add-method').focus(function() {
+                                    $(this).removeClass('is-invalid');
+                                });
+                            } else if ($('#{{componentId}}-{{sectionId}}-import-update-method').val() === '') {
+                                $('#{{componentId}}-{{sectionId}}-import-update-method').addClass('is-invalid');
+                                $('#{{componentId}}-{{sectionId}}-import-update-method').focus(function() {
+                                    $(this).removeClass('is-invalid');
+                                });
+                            } else {
+                                dataCollectionSectionForm['vars']['moduleSettings']['importAddMethod']
+                                    = $('#{{componentId}}-{{sectionId}}-import-add-method').val();
+                                dataCollectionSectionForm['vars']['moduleSettings']['importUpdateMethod']
+                                    = $('#{{componentId}}-{{sectionId}}-import-update-method').val();
+                                prettyfyJson();
+                            }
+                        } else {
+                            prettyfyJson();
+                        }
+                    }
+                });
+                prettyfyJson();
+            }
+        },
         '{{componentId}}-{{sectionId}}-menu'                                : { },
         '{{componentId}}-{{sectionId}}-menu_id'                             : { },
         '{{componentId}}-{{sectionId}}-apps'                                : { },
+        '{{componentId}}-{{sectionId}}-settings-components'                 : {
+            'placeholder'   : 'SELECT COMPONENT',
+            'allowClear'    : true
+        },
+        '{{componentId}}-{{sectionId}}-mandatory'                           : { },
+        '{{componentId}}-{{sectionId}}-mandatory-apps'                      : { },
+        '{{componentId}}-{{sectionId}}-need-auth'                           : { },
+        '{{componentId}}-{{sectionId}}-settings-packages'                   : {
+            'placeholder'   : 'SELECT PACKAGE',
+            'allowClear'    : true
+        },
+        '{{componentId}}-{{sectionId}}-import'                              : { },
+        '{{componentId}}-{{sectionId}}-import-add-method'                   : { },
+        '{{componentId}}-{{sectionId}}-import-update-method'                : { },
+        '{{componentId}}-{{sectionId}}-export'                              : { },
         '{{componentId}}-{{sectionId}}-dependencies-modules'                : {
             'placeholder'   : 'SELECT MODULE',
             'allowClear'    : true,
@@ -198,8 +405,6 @@ dataCollectionSection =
                 function prettyfyJson() {
                     $('#{{componentId}}-{{sectionId}}-dependencies')
                         .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleDependencies'], null, 4));
-                    $('#{{componentId}}-{{sectionId}}-settings')
-                        .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleSettings'], null, 4));
                 }
 
                 $('#{{componentId}}-{{sectionId}}-dependencies-add, ' +

@@ -74,6 +74,10 @@ class Radio
             } else {
                 $radioChecked = '';
             }
+
+            if (!isset($radioButton['type'])) {
+                $radioButton['type'] = 'primary';
+            }
             if ($this->fieldParams['fieldRadioPlacementType'] === 'horizontal') {
                 $this->content .= '<div class="col-md-' . $col . '">';
             }

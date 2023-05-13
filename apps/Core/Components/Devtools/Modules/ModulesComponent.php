@@ -61,6 +61,8 @@ class ModulesComponent extends BaseComponent
 			if (count($modulesArr['modules']) > 0) {
 				$modules[$modulesType]['value'] = ucfirst($modulesType);
 				$modules[$modulesType]['childs'] = $modulesArr['modules'];
+			} else {
+				$modules[$modulesType]['childs'] = [];
 			}
 		}
 
@@ -91,9 +93,7 @@ class ModulesComponent extends BaseComponent
 				$this->view->categoryArr = ${$type . 'CategoryArr'};
 
 				if ($type === 'components') {
-					$baseMenuStructure = $this->basepackages->menus->getMenusForAppType($module['app_type']);
-
-					$this->view->menuBaseStructure = $baseMenuStructure;
+					$this->view->menuBaseStructure = $this->basepackages->menus->getMenusForAppType($module['app_type']);
 				}
 			} else {
 				$this->view->categoryArr = ['core' => ['id' => 'providers', 'name' => 'Providers']];
@@ -274,11 +274,50 @@ class ModulesComponent extends BaseComponent
 				if ($module['app_type'] === 'core') {
 					unset($modulesArr['modules'][$key]);
 				}
-			} else {
-				$module['name'] = ucfirst($module['app_type']) . ' : ' . $module['name'];
 			}
 		}
 
 		return $modulesArr;
+	}
+
+	public function getAppTypeMenusAction()
+	{
+		if ($this->request->isPost()) {
+			if (!$this->checkCSRF()) {
+				return;
+			}
+
+			if (isset($this->postData()['app_type'])) {
+				$this->addResponse(
+					'Menu structure for app_type generated', 0,
+					$this->modules->manager->packagesData->responseData =
+						[
+							'menus_html' =>
+								$this->generateTree(
+									$this->basepackages->menus->getMenusForAppType(
+										$this->postData()['app_type']
+									)
+								)
+						]
+				);
+			} else {
+				$this->addResponse('Please provide module type and module id', 1);
+			}
+		} else {
+			$this->addResponse('Method Not Allowed', 1);
+		}
+	}
+
+	private function generateTree($menusTree)
+	{
+		return $this->adminltetags->useTag(
+			'tree',
+			[
+				'treeMode'      => 'jstree',
+				'treeData'      => $menusTree,
+				'groupIcon' 	=> '{"icon" : "fas fa-fw fa-circle-dot text-sm"}',
+				'itemIcon' 		=> '{"icon" : "fas fa-fw fa-circle-dot text-sm"}'
+			]
+		);
 	}
 }

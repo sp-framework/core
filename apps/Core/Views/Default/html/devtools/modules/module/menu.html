@@ -1,4 +1,4 @@
-{% if type === 'components' and module['module_details']['menu_id'] is defined %}
+{% if type === 'components' or module is defined and module['module_details']['menu_id'] is defined %}
     {% set jsTreeMenu = menuBaseStructure %}
     <div class="row vdivide">
         <div class="col-md-4">
@@ -41,6 +41,28 @@
         </div>
         <div class="col">
             <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('buttons',
+                        [
+                            'componentId'           : componentId,
+                            'sectionId'             : sectionId,
+                            'buttonType'            : 'button',
+                            'buttons'               :
+                                [
+                                    'add-menu-item' : [
+                                        'title'                   : 'Add Menu',
+                                        'size'                    : 'xs',
+                                        'type'                    : 'primary',
+                                        'position'                : 'right',
+                                        'icon'                    : 'plus',
+                                        'url'                     : '#'
+                                    ]
+                                ]
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row mt-3">
                 <div class="col-md-6">
                     {{adminltetags.useTag('fields',
                         [
@@ -214,6 +236,33 @@
             </div>
             <div class="row mb-3">
                 <div class="col">
+                    {% set noMenuChecked = false %}
+                    {% if moduleMenu_id === '' %}
+                        {% set noMenuChecked = true %}
+                    {% endif %}
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'no_menu',
+                            'fieldLabel'                     : false,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select if component does not have a menu item.',
+                            'fieldRequired'                  : false,
+                            'fieldType'                      : 'checkbox',
+                            'fieldCheckboxLabel'             : 'NO MENU?',
+                            'fieldCheckboxChecked'           : noMenuChecked,
+                            'fieldCheckboxType'              : 'secondary',
+                            'fieldBazJstreeSearch'           : false,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldBazScan'                   : true
+                        ]
+                    )}}
+                </div>
+                <div class="col">
                     {{adminltetags.useTag('buttons',
                         [
                             'componentId'           : componentId,
@@ -283,6 +332,10 @@
             </div>
             <div class="row">
                 <div class="col">
+                    {% set noMenuDisabled = false %}
+                    {% if moduleMenu_id === '' %}
+                        {% set noMenuDisabled = true %}
+                    {% endif %}
                     {{adminltetags.useTag('fields',
                         [
                             'component'                      : component,
@@ -296,6 +349,7 @@
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Menu of the component',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : noMenuDisabled,
                             'fieldBazScan'                   : true,
                             'fieldBazPostOnCreate'           : true,
                             'fieldBazPostOnUpdate'           : true,
@@ -312,11 +366,12 @@
     <div class="row">
         <div class="col">
             <h6><i class="fa fa-fw fa-info-circle text-info"></i> Select menu item to edit or add a new child menu item. Drag and drop menu item to change sequence or assign to a new parent. Once done, click on generate menu json.</h6>
+            <h6><i class="fa fa-fw fa-info-circle text-info"></i> This tool will help you create a menu json structure that the framework needs. Adding/Removing will not modify the app menu structure.</h6>
         </div>
     </div>
     {% set allMenuItems = json_encode(menuBaseStructure, 16) %}
     <script>
-/* globals Sortable BazHelpers PNotify Swal */
+/* globals Sortable BazHelpers PNotify Swal BazContentFields */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -348,6 +403,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-menu_title'      : { },
         '{{componentId}}-{{sectionId}}-menu_sequence'   : { },
         '{{componentId}}-{{sectionId}}-is_submenu'      : { },
+        '{{componentId}}-{{sectionId}}-no_menu'         : { },
         '{{componentId}}-{{sectionId}}-menu_parent'     : {
             'placeholder'   : 'SELECT PARENT'
         },
@@ -370,48 +426,6 @@ dataCollectionSection =
 
             var menuStructure = window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menu_structure'] = { };
             var moduleMenu = JSON.parse('{{moduleMenu}}');
-
-            function showHideNodeParent(parent, task) {
-                do {
-                    var allHidden = true;
-
-                    if (parent !== '#') {
-                        $('#' + parent + ' li').each(function(v, li) {
-                            if (task === 'hide') {
-                                if (!$(li).hasClass('jstree-hidden')) {
-                                    allHidden = false;
-                                }
-                            } else if (task === 'show') {
-                                $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().show_node(parent);
-                            }
-                        });
-
-                        if (task === 'hide' &&
-                            allHidden === false
-                        ) {
-                            return;
-                        }
-
-                        if (task === 'hide' &&
-                            allHidden === true &&
-                            !$('#' + parent).data('link') &&
-                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_parent(parent) !== '#'
-                        ) {
-                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().hide_node(parent);
-                        }
-
-                        var node = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(parent);
-                        parent = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_parent(parent);
-
-                        if (parent === '#' && task === 'hide') {
-                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().hide_node(node);
-                        } else if (parent === '#' && task === 'show') {
-                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().show_node(node);
-                        }
-                    }
-                }
-                while (parent !== '#');
-            }
 
             function extractSturctureData(structureArr) {
                 var newStructure = { };
@@ -558,23 +572,34 @@ dataCollectionSection =
                             $('#{{componentId}}-{{sectionId}}-menu_icon').val(v.replace("fa-", "")).trigger('change');
                         }
                     });
+                    $('#{{componentId}}-{{sectionId}}-menu_icon_display').empty().append(
+                        '<i style="margin-top:1.9rem !important;" class="' + data.node.icon + '"></i>'
+                    );
+                    $('#{{componentId}}-{{sectionId}}-menu_icon_display').children('i').removeClass('text-sm').addClass('fa-2x');
                 } else {
                     $('#{{componentId}}-{{sectionId}}-menu_icon').val("circle").trigger('change');
+                    $('#{{componentId}}-{{sectionId}}-menu_icon_display').empty().append(
+                        '<i style="margin-top:1.9rem !important;" class="fa fa-fw fa-2x fa-circle"></i>'
+                    );
                 }
 
                 if (data.node.data && data.node.data.link) {
-                    $('#{{componentId}}-{{sectionId}}-menu_link').val(data.node.data.link);
+                    $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked = false;
+                } else if (data.node.data && data.node.data.sub_menu !== 'undefined' && data.node.data.sub_menu == false) {
                     $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked = false;
                 } else {
-                    $('#{{componentId}}-{{sectionId}}-menu_link').val('');
                     $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked = true;
                 }
 
                 $('#{{componentId}}-{{sectionId}}-menu_title').attr('disabled', false);
                 $('#{{componentId}}-{{sectionId}}-menu_icon').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-menu_parent').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-is_submenu').attr('disabled', true);
                 $('#{{componentId}}-{{sectionId}}-save-menu-item').removeClass('disabled');
                 $('#{{componentId}}-{{sectionId}}-cancel-menu-item').removeClass('disabled');
-                $('#{{componentId}}-{{sectionId}}-menu_parent').attr('disabled', false);
+                if(data.node.children.length === 0 && $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked === false) {
+                    $('#{{componentId}}-{{sectionId}}-generate-menu').removeClass('disabled');
+                }
 
                 extractSturctureParentsData(data.node.parent, data.node.id);
             });
@@ -593,6 +618,7 @@ dataCollectionSection =
                 );
             });
 
+            $('#{{componentId}}-{{sectionId}}-add-menu-item').off();
             $('#{{componentId}}-{{sectionId}}-add-menu-item').click(function(e) {
                 e.preventDefault();
                 cleanMenuForm();
@@ -603,9 +629,13 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-menu_icon').val('circle').trigger('change');
                 $('#{{componentId}}-{{sectionId}}-save-menu-item').removeClass('disabled');
                 $('#{{componentId}}-{{sectionId}}-cancel-menu-item').removeClass('disabled');
+                $('#{{componentId}}-{{sectionId}}-menu_icon_display').empty().append(
+                    '<i style="margin-top:1.9rem !important;" class="fa fa-fw fa-2x fa-circle"></i>'
+                );
                 extractSturctureParentsData('#');
             });
 
+            $('#{{componentId}}-{{sectionId}}-delete-menu-item').off();
             $('#{{componentId}}-{{sectionId}}-delete-menu-item').click(function(e) {
                 e.preventDefault();
 
@@ -649,6 +679,7 @@ dataCollectionSection =
                 });
             });
 
+            $('#{{componentId}}-{{sectionId}}-generate-menu').off();
             $('#{{componentId}}-{{sectionId}}-generate-menu').click(function(e) {
                 e.preventDefault();
 
@@ -708,6 +739,13 @@ dataCollectionSection =
 
                     if (parentNode.data && parentNode.data.link) {
                         menu[parentNodeText]['link'] = parentNode.data.link;
+                    } else {
+                        if (parents.length === 1) {
+                            menu[parentNodeText]['link'] = $('#{{componentId}}-{{sectionId}}-route').val();
+                            if ($('#{{componentId}}-{{sectionId}}-route').val() === '') {
+                                PNotify.error({text: 'Link is not added to menu item because component route is missing.'});
+                            }
+                        }
                     }
 
                     var [removed, ...nodeParents] = parents;
@@ -715,6 +753,7 @@ dataCollectionSection =
                         menu[parentNodeText]['childs'] = generateMenuHierarchy(nodeParents);
                         break;
                     }
+
                 }
 
                 return menu;
@@ -725,22 +764,28 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-menu_title').val('');
                 $('#{{componentId}}-{{sectionId}}-menu_title').attr('disabled', true);
                 $('#{{componentId}}-{{sectionId}}-is_submenu').attr('disabled', true);
-                $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked = false;
                 $('#{{componentId}}-{{sectionId}}-menu_parent').attr('disabled', true);
-                $('#{{componentId}}-{{sectionId}}-menu_parent').empty().trigger('change');
                 $('#{{componentId}}-{{sectionId}}-menu_icon').attr('disabled', true);
-                $('#{{componentId}}-{{sectionId}}-menu_icon').val('').trigger('change');
-                $('#{{componentId}}-{{sectionId}}-menu_icon_display').empty();
+                $('#{{componentId}}-{{sectionId}}-generate-menu').addClass('disabled');
                 $('#{{componentId}}-{{sectionId}}-save-menu-item').addClass('disabled');
                 $('#{{componentId}}-{{sectionId}}-cancel-menu-item').addClass('disabled');
                 $('#{{componentId}}-{{sectionId}}-delete-menu-item').addClass('disabled');
+                $('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked = false;
+                $('#{{componentId}}-{{sectionId}}-menu_parent').empty().trigger('change');
+                $('#{{componentId}}-{{sectionId}}-menu_icon').val('').trigger('change');
+                $('#{{componentId}}-{{sectionId}}-menu_icon_display').empty();
                 $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().deselect_all();
                 $('#{{componentId}}-{{sectionId}}-menu_parent')
                     .select2().empty()
                     .select2({"placeholder" : "SELECT PARENT"}).val('').trigger('change');
+                $('#{{componentId}}-{{sectionId}}-menu_title').removeClass('is-invalid');
             }
 
-            $('#{{componentId}}-{{sectionId}}-save-menu-item, #{{componentId}}-{{sectionId}}-cancel-menu-item').click(function(e) {
+            $('#{{componentId}}-{{sectionId}}-save-menu-item, ' +
+              '#{{componentId}}-{{sectionId}}-cancel-menu-item').off();
+            $('#{{componentId}}-{{sectionId}}-save-menu-item, ' +
+              '#{{componentId}}-{{sectionId}}-cancel-menu-item')
+            .click(function(e) {
                 e.preventDefault();
 
                 var id = $(this)[0].id;
@@ -753,13 +798,6 @@ dataCollectionSection =
                     if ($('#{{componentId}}-{{sectionId}}-menu_title').val() === '') {
                         $('#{{componentId}}-{{sectionId}}-menu_title').addClass('is-invalid');
                         $('#{{componentId}}-{{sectionId}}-menu_title').focus(function() {
-                            $(this).removeClass('is-invalid');
-                        });
-                    } else if (!$('#{{componentId}}-{{sectionId}}-is_submenu')[0].checked &&
-                               $('#{{componentId}}-{{sectionId}}-menu_link').val() === ''
-                    ) {
-                        $('#{{componentId}}-{{sectionId}}-menu_link').addClass('is-invalid');
-                        $('#{{componentId}}-{{sectionId}}-menu_link').focus(function() {
                             $(this).removeClass('is-invalid');
                         });
                     } else {
@@ -853,6 +891,10 @@ dataCollectionSection =
                                 data['sub_menu'] = false;
                             }
 
+                            if ($('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_json('#', {'flat':true}).length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-menu_structure-tree-empty').remove();
+                            }
+
                             $('#{{componentId}}-{{sectionId}}-menu_structure').jstree('create_node',
                                 parentId,
                                 {'text' : title, 'icon' : isBrand + ' fa-fw fa-' + iconId + ' text-sm', 'data' : data},
@@ -925,6 +967,8 @@ dataCollectionSection =
                             }
                         });
                     }
+                } else {
+                    cleanMenuForm();
                 }
             }
             selectMenuItem();
@@ -934,6 +978,61 @@ dataCollectionSection =
                     .val(JSON.stringify(moduleMenu, null, 4));
             }
             prettyfyJson();
+
+            // getAppTypeMenus
+            $('#{{componentId}}-{{sectionId}}-app_type').off('select2:select');
+            $('#{{componentId}}-{{sectionId}}-app_type').on('select2:select', function(e) {
+                var postData = { };
+                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                postData['app_type'] = e.params.data.id;
+
+                $.post('{{links.url("devtools/modules/getAppTypeMenus")}}', postData, function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+
+                    if (response.responseCode == 0) {
+                        if (response.responseData && response.responseData.menus_html !== 'undefined') {
+                            $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().destroy();
+                            var menusHtml =
+                                '<div id="{{componentId}}-{{sectionId}}-menu_structure" data-bazscantype="jstree">' +
+                                    '<ul>' +
+                                        response.responseData.menus_html +
+                                    '</ul>' +
+                                '</div>';
+
+                            $('#{{componentId}}-{{sectionId}}-menu_structure-tree-div').empty().html(menusHtml);
+
+                            BazContentFields.init({
+                                'componentId'   : '{{componentId}}',
+                                'sectionId'     : '{{componentId}}-{{sectionId}}',
+                                'fieldId'       : '{{componentId}}-{{sectionId}}-menu_structure'
+                            });
+
+                            cleanMenuForm();
+                        }
+                    } else {
+                        PNotify.error({
+                            text        : response.responseMessage,
+                            textTrusted : true
+                        });
+                    }
+                }, 'json');
+            });
+
+            $('#{{componentId}}-{{sectionId}}-no_menu').off();
+            $('#{{componentId}}-{{sectionId}}-no_menu').click(function() {
+                if ($(this)[0].checked === true) {
+                    $('#{{componentId}}-{{sectionId}}-menu').val('false');
+                    $('#{{componentId}}-{{sectionId}}-menu').attr('disabled', true);
+                    cleanMenuForm();
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-menu').val('');
+                    $('#{{componentId}}-{{sectionId}}-menu').attr('disabled', false);
+                }
+            });
+
         },
         'core' : $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-menu_structure']['core'], {
             check_callback : function (operation, node, node_parent, node_position, more) {

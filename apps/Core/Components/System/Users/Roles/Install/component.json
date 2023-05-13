@@ -52,9 +52,6 @@
         {
             "core": true
         },
-        "export": true,
-        "import": true,
-        "importexportPackage": "Roles",
-        "importMethod": "Role"
+        "importexportPackage": "UsersRoles"
     }
 }

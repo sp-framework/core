@@ -10,12 +10,10 @@ class Component
 	{
 		$componentApp = ['1'=>['enabled'=>true]];
 
-		if (isset($componentFile['settings']['needAuth'])) {
-			if ($componentFile['settings']['needAuth'] === 'mandatory') {
-				$componentApp['1']['needAuth'] = 'mandatory';
-			} else if ($componentFile['settings']['needAuth'] === 'disabled') {
-				$componentApp['1']['needAuth'] = 'disabled';
-			}
+		if (isset($componentFile['settings']['needAuth']) &&
+			$componentFile['settings']['needAuth'] !== true
+		) {
+			$componentApp['1']['needAuth'] = $componentFile['settings']['needAuth'];
 		} else {
 			$componentApp['1']['needAuth'] = true;
 		}

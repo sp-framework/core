@@ -1,7 +1,7 @@
 {% if module['id'] is defined %}
     {% set moduleId = module['id'] %}
     {% set moduleName = module['name'] %}
-    {% if type !== 'core' %}
+    {% if type !== 'core' and type === 'components' %}
         {% set moduleRoute = module['route'] %}
     {% endif %}
     {% if type !== 'components' %}
@@ -15,9 +15,13 @@
     {% set moduleVersion = module['version'] %}
     {% set moduleRepo = module['repo'] %}
     {% set moduleClass = module['class'] %}
-    {% if type === 'components' and module['module_details']['menu_id'] is defined %}
-        {% set moduleMenu_id = module['module_details']['menu_id'] %}
-        {% set moduleMenu = module['module_details']['menu'] %}
+    {% if type === 'components' %}
+        {% set moduleMenu_id = '' %}
+        {% set moduleMenu = '' %}
+        {% if module['module_details']['menu_id'] is defined %}
+            {% set moduleMenu_id = module['module_details']['menu_id'] %}
+            {% set moduleMenu = module['module_details']['menu'] %}
+        {% endif %}
     {% endif %}
     {% if type !== 'core' %}
         {% set moduleApps = module['module_details']['apps'] %}
@@ -33,7 +37,7 @@
     {% endif %}
     {% set moduleDescription = '' %}
     {% set moduleModule_type = type %}
-    {% set moduleApp_type = '' %}
+    {% set moduleApp_type = 'core' %}
     {% set moduleCategory = '' %}
     {% set moduleApiId = '0' %}
     {% set moduleVersion = '0.0.0' %}
@@ -173,7 +177,7 @@
                 'fieldLabel'                     : 'Module Name',
                 'fieldType'                      : 'input',
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Module Name Example: Dashboard',
+                'fieldHelpTooltipContent'        : 'Module Name Example: Dashboard. For Packages name has to be in Pascal Case. Each capital letter donated a directory name. Example UsersAccounts is Users/Accounts and class will be \\Users\\Account\\ and so on.',
                 'fieldRequired'                  : true,
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnUpdate'           : true,

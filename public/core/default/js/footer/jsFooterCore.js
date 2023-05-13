@@ -9182,7 +9182,7 @@ var BazContentFields = function() {
             $('#' + thisFieldId + '-tools-expand').attr('hidden', true);
 
             $('#' + thisFieldId + '-tree-div').append(
-                'NO ' + $('#' + thisFieldId + '-tree-div').siblings('label').html() + '!'
+                '<span id="' + thisFieldId + '-tree-empty">NO ' + $('#' + thisFieldId + '-tree-div').siblings('label').html() + '!</span>'
             );
 
             if (options.afterInit) {

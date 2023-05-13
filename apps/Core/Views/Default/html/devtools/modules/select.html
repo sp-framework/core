@@ -153,7 +153,13 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-modules').on('select2:select', function(e) {
                     var id = e.params.data.id;
                     var label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
-                    dataCollectionSectionForm['funcs']['loadAjax'](id, label);
+                    // dataCollectionSectionForm['funcs']['loadAjax']();
+
+                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, true);
+                    } else {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, false);
+                    }
                 });
 
                 $('#{{componentId}}-{{sectionId}}-include_core_modules').click(function() {
@@ -179,6 +185,9 @@ dataCollectionSectionForm['funcs']['loadAjax'] = function(id = null, label = nul
             dataCollectionSectionForm['vars']['url'] = '{{links.url("module/true/type/' + label + '/id/' + id + '")}}';
         } else {
             dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/module/true/type/' + label + '/id/' + id + '")}}';
+        }
+        if (includecoremodules) {
+            dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/includecoremodules/true';
         }
     } else if (includecoremodules) {
         if (dataCollectionSectionForm['vars']['url'].includes('/q/')) {

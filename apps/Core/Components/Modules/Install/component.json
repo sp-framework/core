@@ -29,7 +29,7 @@
 	},
 	"settings"          : {
 		"mandatory"     : {
-			"admin"     : true
+			"core"      : true
 		}
 	}
 }
