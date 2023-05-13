@@ -379,4 +379,23 @@ class Domains extends BasePackage
 			return [];
 		}
 	}
+
+	public function checkAppsSettings($appId, $settingKey, $settingValue)
+	{
+		foreach ($this->domains as $domain) {
+			if (is_string($domain['apps'])) {
+				$domain['apps'] = Json::decode($domain['apps'], true);
+			}
+
+			if (isset($domain['apps'][$appId])) {
+				if (isset($domain['apps'][$appId][$settingKey]) &&
+					$domain['apps'][$appId][$settingKey] == $settingValue
+				) {
+					return $domain;
+				}
+			}
+		}
+
+		return false;
+	}
 }

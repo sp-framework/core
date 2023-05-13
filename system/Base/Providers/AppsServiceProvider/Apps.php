@@ -229,6 +229,26 @@ class Apps extends BasePackage
 			}
 		}
 
+		if (isset($app['views'])) {
+			$views = Json::decode($app['views'], true);
+
+			foreach ($views as $viewId => $view) {
+				if ($view === false) {
+					$viewInfo = $this->modules->views->getViewById($viewId);
+
+					$domainCheckAppsSettings = $this->domains->checkAppsSettings($app['id'], 'view', $viewId);
+
+					if ($domainCheckAppsSettings) {
+						$this->addResponse('View ' . $viewInfo['display_name'] . ' is being used by Domain ' . $domainCheckAppsSettings['name'], 1);
+
+						return false;
+					}
+				}
+			}
+
+			$this->modules->views->updateViews($app);
+		}
+
 		if (isset($app['components'])) {
 			$this->modules->components->updateComponents($app);
 		}
@@ -239,10 +259,6 @@ class Apps extends BasePackage
 
 		if (isset($app['middlewares'])) {
 			$this->modules->middlewares->updateMiddlewares($app);
-		}
-
-		if (isset($app['views'])) {
-			$this->modules->views->updateViews($app);
 		}
 
 		if ($app['acceptable_usernames']) {
