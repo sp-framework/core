@@ -163,20 +163,24 @@ class AppsComponent extends BaseComponent
 
                 $viewsArr = $this->modules->views->getViewsForAppType($app['app_type']);
 
-                foreach ($viewsArr as $key => &$viewValue) {
-                    if ($viewValue['apps']) {
-                        $viewValue['apps'] = Json::decode($viewValue['apps'], true);
-                    }
-
-                    if ($viewValue['settings']) {
-                        $viewValue['settings'] = Json::decode($viewValue['settings'], true);
-
-                        if (isset($viewValue['settings']['mandatory']) && $viewValue['settings']['mandatory'] == true) {
-                            array_push($mandatoryViews, $viewValue['name']);
+                if (count($viewsArr) === 1) {
+                    array_push($mandatoryViews, Arr::first($viewsArr)['name']);
+                } else {
+                    foreach ($viewsArr as $key => &$viewValue) {
+                        if ($viewValue['apps']) {
+                            $viewValue['apps'] = Json::decode($viewValue['apps'], true);
                         }
-                    }
 
-                    $views[$key] = $viewValue;
+                        if ($viewValue['settings']) {
+                            $viewValue['settings'] = Json::decode($viewValue['settings'], true);
+
+                            if (isset($viewValue['settings']['mandatory']) && $viewValue['settings']['mandatory'] == true) {
+                                array_push($mandatoryViews, $viewValue['name']);
+                            }
+                        }
+
+                        $views[$key] = $viewValue;
+                    }
                 }
 
                 $this->view->components = msort($components, 'name');
