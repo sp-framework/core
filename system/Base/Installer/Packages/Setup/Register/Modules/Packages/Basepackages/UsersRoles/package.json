@@ -20,5 +20,11 @@
         "views"         : [],
         "external"      : []
     },
-    "settings"      : {"componentRoute":"system/users/roles"}
+    "settings"      : {
+        "componentRoute": "system/users/roles",
+        "import": true,
+        "export": true,
+        "importAddMethod": "addRole",
+        "importUpdateMethod": "updateRole"
+    }
 }

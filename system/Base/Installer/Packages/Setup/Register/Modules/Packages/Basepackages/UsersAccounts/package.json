@@ -20,5 +20,11 @@
         "views"         : [],
         "external"      : []
     },
-    "settings"      : {"componentRoute":"system/users/accounts"}
+    "settings"      : {
+        "componentRoute": "system/users/accounts",
+        "import": true,
+        "export": true,
+        "importAddMethod": "addAccount",
+        "importUpdateMethod": "updateAccount"
+    }
 }

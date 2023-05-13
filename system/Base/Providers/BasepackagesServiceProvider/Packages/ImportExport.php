@@ -102,7 +102,7 @@ class ImportExport extends BasePackage
         if ($component) {
             $component['settings'] = Json::decode($component['settings'], true);
 
-            $package = $this->modules->packages->getPackageByName($component['settings']['importexportPackage']);
+            $package = $this->modules->packages->getPackageByName($component['settings']['importExportPackage']);
 
             $packageObj = $this->usePackage($package['class']);
 
@@ -197,7 +197,7 @@ class ImportExport extends BasePackage
         if ($component) {
             $component['settings'] = Json::decode($component['settings'], true);
 
-            $package = $this->modules->packages->getPackageByName($component['settings']['importexportPackage']);
+            $package = $this->modules->packages->getPackageByName($component['settings']['importExportPackage']);
 
             if ($package) {
                 $packageObj = $this->usePackage($package['class']);
@@ -431,7 +431,7 @@ class ImportExport extends BasePackage
                 if ($component) {
                     $component['settings'] = Json::decode($component['settings'], true);
 
-                    $package = $this->modules->packages->getPackageByName($component['settings']['importexportPackage']);
+                    $package = $this->modules->packages->getPackageByName($component['settings']['importExportPackage']);
 
                     $packageObj = $this->usePackage($package['class']);
 
@@ -591,7 +591,7 @@ class ImportExport extends BasePackage
 
         $component['settings'] = Json::decode($component['settings'], true);
 
-        if (!isset($component['settings']['importexportPackage'])) {
+        if (!isset($component['settings']['importExportPackage'])) {
             throw new \Exception("Import package missing");
         }
 
@@ -599,21 +599,21 @@ class ImportExport extends BasePackage
             throw new \Exception("Component import method missing");
         }
 
-        $package = $this->modules->packages->getPackageByName($component['settings']['importexportPackage']);
+        $package = $this->modules->packages->getPackageByName($component['settings']['importExportPackage']);
 
         if ($package) {
             $packageObj = $this->usePackage($package['class']);
 
             if ($packageObj) {
-                if (method_exists($package['class'], 'add' . $component['settings']['importMethod']) &&
-                    method_exists($package['class'], 'update' . $component['settings']['importMethod'])
+                if (method_exists($package['class'], $component['settings']['importAddMethod']) &&
+                    method_exists($package['class'], $component['settings']['importUpdateMethod'])
                 ) {
                     foreach ($rows as $rowKey => $row) {
                         try {
                             if (isset($row['id']) && $row['id'] !== '' ){
-                                $importMethod = 'update' . ucfirst($component['settings']['importMethod']);
+                                $importMethod = $component['settings']['importAddMethod'];
                             } else {
-                                $importMethod = 'add' . ucfirst($component['settings']['importMethod']);
+                                $importMethod = $component['settings']['importUpdateMethod'];
                             }
 
                             $packageObj->$importMethod($row);
@@ -637,7 +637,7 @@ class ImportExport extends BasePackage
 
                     return true;
                 } else {
-                    throw new \Exception('Package import method ' . $component['settings']['importMethod'] . ' does not exists.');
+                    throw new \Exception('Package import method(s) does not exists.');
                 }
             } else {
                 throw new \Exception('Package ' . $package['class'] . ' does not exists.');
