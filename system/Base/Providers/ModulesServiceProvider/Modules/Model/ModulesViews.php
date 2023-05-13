@@ -22,6 +22,8 @@ class ModulesViews extends BaseModel
 
     public $settings;
 
+    public $user_settings;
+
     public $dependencies;
 
     public $apps;

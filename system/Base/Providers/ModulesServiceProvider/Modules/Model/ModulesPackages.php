@@ -26,6 +26,10 @@ class ModulesPackages extends BaseModel
 
     public $settings;
 
+    public $user_settings;
+
+    public $dependencies;
+
     public $apps;
 
     public $installed;

@@ -170,17 +170,20 @@ class ModulesComponent extends BaseComponent
 								$path = ucfirst($path);
 							}
 
-							$routePath = implode('/', $routeArr);
-						} else {
+							$routePath = implode('/', $routeArr) . '/Install/';
+						} else if ($module['module_details']['module_type'] === 'middlewares') {
+							$routePath = $module['module_details']['name'] . '/Install/';
+						} else if ($module['module_details']['module_type'] === 'packages') {
 							$pathArr = preg_split('/(?=[A-Z])/', $module['module_details']['name'], -1, PREG_SPLIT_NO_EMPTY);
 
-							$routePath = implode('/', $pathArr);
+							$routePath = implode('/', $pathArr) . '/Install/';
+						} else if ($module['module_details']['module_type'] === 'views') {
+							$routePath = $module['module_details']['name'] . '/';
 						}
 
 						$jsonFile =
 							$moduleLocation .
-							$routePath . '/' .
-							'Install/' .
+							$routePath .
 							substr($module['module_details']['module_type'], 0, -1) . '.json';
 					}
 					try {

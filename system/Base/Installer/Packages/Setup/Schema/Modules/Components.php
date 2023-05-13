@@ -109,7 +109,7 @@ class Components
 					new Column(
 						'dependencies',
 						[
-							'type'    => Column::TYPE_TEXT,
+							'type'    => Column::TYPE_JSON,
 							'notNull' => true,
 						]
 					),

@@ -278,7 +278,9 @@ dataCollectionSection =
 
                 $('#{{componentId}}-{{sectionId}}-generate-settings').off();
                 $('#{{componentId}}-{{sectionId}}-generate-settings').click(function() {
-                    if ($($('#{{componentId}}-{{sectionId}}-module_type').find(':selected')[0]).val() === 'components') {
+                    if ($($('#{{componentId}}-{{sectionId}}-module_type').find(':selected')[0]).val() === 'components' ||
+                        $($('#{{componentId}}-{{sectionId}}-module_type').find(':selected')[0]).val() === 'middlewares'
+                    ) {
                         if (typeof dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] === 'object') {
                             if ($('#{{componentId}}-{{sectionId}}-mandatory-apps').val() === '') {
                                 $('#{{componentId}}-{{sectionId}}-mandatory-apps').addClass('is-invalid');

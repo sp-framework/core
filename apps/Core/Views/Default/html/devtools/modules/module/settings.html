@@ -4,7 +4,7 @@
 {% else %}
     {% set settings = moduleSettings %}
 {% endif %}
-{% if type === 'components' %}
+{% if type === 'components' or type === 'middlewares' %}
     <div class="row">
         <div class="col">
             {{adminltetags.useTag('fields',
@@ -69,85 +69,87 @@
             )}}
         </div>
     </div>
-    <div class="row">
-        <div class="col">
-            {{adminltetags.useTag('fields',
-                [
-                    'component'                      : component,
-                    'componentName'                  : componentName,
-                    'componentId'                    : componentId,
-                    'sectionId'                      : sectionId,
-                    'fieldId'                        : 'need-auth',
-                    'fieldLabel'                     : 'Component Needs Authentication',
-                    'fieldType'                      : 'radio',
-                    'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : 'Component required user to be authenticated for access.',
-                    'fieldRequired'                  : true,
-                    'fieldBazJstreeSearch'           : true,
-                    'fieldBazPostOnCreate'           : false,
-                    'fieldBazPostOnUpdate'           : true,
-                    'fieldBazScan'                   : true,
-                    'fieldRadioPlacementType'        : 'horizontal',
-                    'fieldRadioButtons'              :
-                        [
-                            'need-auth-default' :
-                                [
-                                    'title'                           : 'DEFAULT (APP CONTROLLED)',
-                                    'dataValue'                       : 'need-auth-default'
-                                ],
-                            'need-auth-yes' :
-                                [
-                                    'title'                           : 'YES',
-                                    'dataValue'                       : 'need-auth-yes'
-                                ],
-                            'need-auth-mandatory' :
-                                [
-                                    'title'                           : 'MANDATORY',
-                                    'dataValue'                       : 'need-auth-mandatory'
-                                ],
-                            'need-auth-disabled' :
-                                [
-                                    'title'                           : 'DISABLED',
-                                    'dataValue'                       : 'need-auth-disabled'
-                                ]
-                        ],
-                    'fieldRadioChecked'              : 'need-auth-default'
-                ]
-            )}}
+    {% if type === 'components' %}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'need-auth',
+                        'fieldLabel'                     : 'Component Needs Authentication',
+                        'fieldType'                      : 'radio',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Component required user to be authenticated for access.',
+                        'fieldRequired'                  : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true,
+                        'fieldRadioPlacementType'        : 'horizontal',
+                        'fieldRadioButtons'              :
+                            [
+                                'need-auth-default' :
+                                    [
+                                        'title'                           : 'DEFAULT (APP CONTROLLED)',
+                                        'dataValue'                       : 'need-auth-default'
+                                    ],
+                                'need-auth-yes' :
+                                    [
+                                        'title'                           : 'YES',
+                                        'dataValue'                       : 'need-auth-yes'
+                                    ],
+                                'need-auth-mandatory' :
+                                    [
+                                        'title'                           : 'MANDATORY',
+                                        'dataValue'                       : 'need-auth-mandatory'
+                                    ],
+                                'need-auth-disabled' :
+                                    [
+                                        'title'                           : 'DISABLED',
+                                        'dataValue'                       : 'need-auth-disabled'
+                                    ]
+                            ],
+                        'fieldRadioChecked'              : 'need-auth-default'
+                    ]
+                )}}
+            </div>
         </div>
-    </div>
-    {% set modulesPackages = [] %}
-    {% if modules['packages']['childs']|length > 0 %}
-        {% for packageKey, package in modules['packages']['childs'] %}
-            {% set modulesPackages['childs'][packageKey]['id'] = package['id'] %}
-            {% set modulesPackages['childs'][packageKey]['name'] = package['name'] %}
-            {% set modulesPackages['childs'][packageKey]['data']['type'] = 'packages' %}
-            {% set modulesPackages['childs'][packageKey]['data']['importexportpackage'] = package['name'] %}
-        {% endfor %}
+        {% set modulesPackages = [] %}
+        {% if modules['packages']['childs']|length > 0 %}
+            {% for packageKey, package in modules['packages']['childs'] %}
+                {% set modulesPackages['childs'][packageKey]['id'] = package['id'] %}
+                {% set modulesPackages['childs'][packageKey]['name'] = package['name'] %}
+                {% set modulesPackages['childs'][packageKey]['data']['type'] = 'packages' %}
+                {% set modulesPackages['childs'][packageKey]['data']['importexportpackage'] = package['name'] %}
+            {% endfor %}
+        {% endif %}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'settings-packages',
+                        'fieldLabel'                           : 'Select Import Export Package',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Module',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldDataSelect2Options'              : modulesPackages,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsSelected'      : ''
+                    ]
+                )}}
+            </div>
+        </div>
     {% endif %}
-    <div class="row">
-        <div class="col">
-            {{adminltetags.useTag('fields',
-                [
-                    'component'                            : component,
-                    'componentName'                        : componentName,
-                    'componentId'                          : componentId,
-                    'sectionId'                            : sectionId,
-                    'fieldId'                              : 'settings-packages',
-                    'fieldLabel'                           : 'Select Import Export Package',
-                    'fieldType'                            : 'select2',
-                    'fieldHelp'                            : true,
-                    'fieldHelpTooltipContent'              : 'Module',
-                    'fieldRequired'                        : true,
-                    'fieldBazScan'                         : true,
-                    'fieldDataSelect2Options'              : modulesPackages,
-                    'fieldDataSelect2OptionsKey'           : 'id',
-                    'fieldDataSelect2OptionsValue'         : 'name',
-                    'fieldDataSelect2OptionsSelected'      : ''
-                ]
-            )}}
-        </div>
-    </div>
 {% elseif type === 'packages' %}
     {% set modulesComponents = [] %}
     {% if modules['components']['childs']|length > 0 %}
@@ -269,7 +271,6 @@
             )}}
         </div>
     </div>
-{% elseif type === 'middlewares' %}
 {% elseif type === 'views' %}
 {% endif %}
 <div class="row">

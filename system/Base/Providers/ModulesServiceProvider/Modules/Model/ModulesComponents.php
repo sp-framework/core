@@ -30,6 +30,8 @@ class ModulesComponents extends BaseModel
 
     public $settings;
 
+    public $user_settings;
+
     public $dependencies;
 
     public $menu;
