@@ -222,20 +222,20 @@ class Middlewares extends BasePackage
 	{
 		$dependencyArray = [];
 
-		if (is_string($middleware['settings'])) {
-			$middleware['settings'] = Json::decode($middleware['settings'], true);
+		if (is_string($middleware['dependencies'])) {
+			$middleware['dependencies'] = Json::decode($middleware['dependencies'], true);
 		}
 
-		if (!isset($middleware['settings']['dependencies'])) {
+		if (!isset($middleware['dependencies']['middlewares'])) {
 			return $dependencyArray;
 		} 
 
-		if (is_array($middleware['settings']['dependencies']) && count($middleware['settings']['dependencies']) === 0) {
+		if (is_array($middleware['dependencies']['middlewares']) && count($middleware['dependencies']['middlewares']) === 0) {
 			return $dependencyArray;
 		}
 
-		foreach ($middleware['settings']['dependencies'] as $key => $dependency) {
-			$dependencyMiddleware = $this->getFirst('name', $dependency, false, true, null, [], true);
+		foreach ($middleware['dependencies']['middlewares'] as $key => $dependency) {
+			$dependencyMiddleware = $this->getFirst('name', $dependency['name'], false, true, null, [], true);
 
 			if ($dependencyMiddleware) {
 				$dependencyMiddleware['apps'] = Json::decode($dependencyMiddleware['apps'], true);

@@ -32,6 +32,10 @@ class Middleware
 					isset($middlewareFile['settings']) ?
 					Json::encode($middlewareFile['settings']) :
 					null,
+				'dependencies'		 	=>
+					isset($middlewareFile['dependencies']) ?
+					Json::encode($middlewareFile['dependencies']) :
+					null,
 				'apps'					=> $apps,
 				'api_id'				=> 1,
 				'installed'				=> 1,

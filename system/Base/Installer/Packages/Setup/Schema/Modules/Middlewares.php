@@ -107,6 +107,13 @@ class Middlewares
 						]
 					),
 					new Column(
+						'dependencies',
+						[
+							'type'    => Column::TYPE_JSON,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'apps',
 						[
 							'type'    => Column::TYPE_VARCHAR,

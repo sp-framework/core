@@ -16,11 +16,15 @@
         },
         "components"    : [],
         "packages"      : [],
-        "middlewares"   : [],
+        "middlewares"   : [
+            {
+                "name": "Auth",
+                "version": "0.0.0",
+                "repo": "https://.../"
+            }
+        ],
         "views"         : [],
         "external"      : []
     },
-    "settings": {
-        "dependencies": ["Auth"]
-    }
+    "settings": { }
 }
