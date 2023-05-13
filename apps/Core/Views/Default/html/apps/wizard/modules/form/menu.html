@@ -681,8 +681,15 @@ dataCollectionSection =
                             $('#{{componentId}}-{{sectionId}}-menu_icon').val(v.replace("fa-", "")).trigger('change');
                         }
                     });
+                    $('#{{componentId}}-{{sectionId}}-menu_icon_display').empty().append(
+                        '<i style="margin-top:1.9rem !important;" class="' + data.node.icon + '"></i>'
+                    );
+                    $('#{{componentId}}-{{sectionId}}-menu_icon_display').children('i').removeClass('text-sm').addClass('fa-2x');
                 } else {
                     $('#{{componentId}}-{{sectionId}}-menu_icon').val("circle").trigger('change');
+                    $('#{{componentId}}-{{sectionId}}-menu_icon_display').empty().append(
+                        '<i style="margin-top:1.9rem !important;" class="fa fa-fw fa-2x fa-circle"></i>'
+                    );
                 }
 
                 if (data.node.data && data.node.data.link) {
