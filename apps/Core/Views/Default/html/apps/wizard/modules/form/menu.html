@@ -761,6 +761,9 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-save-menu-item').removeClass('disabled');
                 $('#{{componentId}}-{{sectionId}}-cancel-menu-item').removeClass('disabled');
                 extractSturctureParentsData('#');
+                $('#{{componentId}}-{{sectionId}}-menu_icon_display').empty().append(
+                    '<i style="margin-top:1.9rem !important;" class="fa fa-fw fa-2x fa-circle"></i>'
+                );
             });
 
             $('#{{componentId}}-{{sectionId}}-delete-menu-item').click(function(e) {
