@@ -1,0 +1,252 @@
+<form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        {% if viewssettings['id'] is defined %}
+            {% set viewsSettings = viewssettings['settings'] %}
+            <div class="row">
+                <div class="col">
+                    <label>DOMAIN: </label>
+                    <span class="text-uppercase" id="domain">{{viewssettings['domain_id']}}</span>
+                </div>
+                <div class="col">
+                    <label>APP: </label>
+                    <span class="text-uppercase" id="app">{{viewssettings['app_id']}}</span>
+                </div>
+                <div class="col">
+                    <label>VIEW: </label>
+                    <span class="text-uppercase" id="view">{{viewssettings['view_id']}}</span>
+                </div>
+            </div>
+        {% else %}
+            {% set viewsSettings = viewssettings %}
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'domain_id',
+                            'fieldLabel'                     : 'Select Domain',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select Domain.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldRequired'                  : true,
+                            'fieldDataSelect2Options'        : domains,
+                            'fieldDataSelect2OptionsKey'     : 'id',
+                            'fieldDataSelect2OptionsValue'   : 'name',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': ''
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'app_id',
+                            'fieldLabel'                     : 'Select App',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select App.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldRequired'                  : true,
+                            'fieldDisabled'                  : true,
+                            'fieldDataSelect2Options'        : apps,
+                            'fieldDataSelect2OptionsKey'     : 'id',
+                            'fieldDataSelect2OptionsValue'   : 'name',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': ''
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'view_id',
+                            'fieldLabel'                     : 'Select View',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select View.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldRequired'                  : true,
+                            'fieldDisabled'                  : true,
+                            'fieldDataSelect2Options'        : [],
+                            'fieldDataSelect2OptionsKey'     : 'id',
+                            'fieldDataSelect2OptionsValue'   : 'name',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': ''
+                        ]
+                    )}}
+                </div>
+            </div>
+        {% endif %}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'settings',
+                        'fieldLabel'                     : 'Views Settings',
+                        'fieldType'                      : 'textarea',
+                        'fieldDataMaxLength'             : 4096,
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Settings of the module. JSON Format',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnAdd'              : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMaxLength'        : 4096,
+                        'fieldTextareaRows'              : 15,
+                        'fieldValue'                     : ''
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+{% set apps = json_encode(apps) %}
+{% set viewsSettings = json_encode(viewsSettings) %}
+<script>
+/* globals PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['apps'] = JSON.parse("{{apps|escape_js}}");
+dataCollectionSectionForm['vars']['viewsSettings'] = JSON.parse("{{viewsSettings|escape_js}}");
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-domain_id'                               : {
+            placeholder: "SELECT DOMAIN",
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-domain_id').on("select2:select", function(e) {
+                    if (e.params.data.id != '0') {
+                        dataCollectionSectionForm['vars']['domain_id'] = e.params.data.id;
+                        $('#{{componentId}}-{{sectionId}}-app_id').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-app_id'                                  : {
+            placeholder: "SELECT APP",
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-app_id').on("select2:select", function(e) {
+                    if (e.params.data.id != '0') {
+                        dataCollectionSectionForm['vars']['app_id'] = e.params.data.id;
+
+                        if (dataCollectionSectionForm['vars']['apps'][e.params.data.id] &&
+                            dataCollectionSectionForm['vars']['apps'][e.params.data.id]['views']
+                        ) {
+                            for (var view in dataCollectionSectionForm['vars']['apps'][e.params.data.id]['views']) {
+                                var newOption
+                                    = new Option(
+                                        dataCollectionSectionForm['vars']['apps'][e.params.data.id]['views'][view].name,
+                                        dataCollectionSectionForm['vars']['apps'][e.params.data.id]['views'][view].id, false, false
+                                    );
+
+                                $('#{{componentId}}-{{sectionId}}-view_id').append(newOption).trigger('change');
+                            }
+                        }
+                        $('#{{componentId}}-{{sectionId}}-view_id').val(0).trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-view_id').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-view_id'                                 : {
+            placeholder: "SELECT VIEW",
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-view_id').on("select2:select", function(e) {
+                    dataCollectionSectionForm['vars']['view_id'] = e.params.data.id;
+                    if (e.params.data.id != '0') {
+                        var postData = { };
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['domain_id'] = dataCollectionSectionForm['vars']['domain_id'];
+                        postData['app_id'] = dataCollectionSectionForm['vars']['app_id'];
+                        postData['view_id'] = dataCollectionSectionForm['vars']['view_id'];
+
+                        $.post('{{links.url("viewssettings/getViewsSettingsByViewIdDomainIdAndAppId")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+
+                            if (response.responseCode == 1) {
+                                PNotify.error({'text': response.responseMessage});
+
+                                $('#{{componentId}}-{{sectionId}}-domain_id').val(0).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-app_id').val(0).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-app_id').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-view_id').val(0).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-view_id').empty().trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-view_id').attr('disabled', true);
+                            }
+                        }, 'json');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-settings'                                : {
+            afterInit: function() {
+                function prettyfyJson() {
+                    $('#{{componentId}}-{{sectionId}}-settings')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['viewsSettings'], null, 4));
+                }
+
+                prettyfyJson();
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-domain_id'                            : 'required',
+                '{{componentId}}-{{sectionId}}-app_id'                               : 'required',
+                '{{componentId}}-{{sectionId}}-view_id'                              : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-domain_id'                            : 'Please select domain',
+                '{{componentId}}-{{sectionId}}-app_id'                               : 'Please select app',
+                '{{componentId}}-{{sectionId}}-view_id'                              : 'Please select view',
+            }
+        }
+    });
+</script>

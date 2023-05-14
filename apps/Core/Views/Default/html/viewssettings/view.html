@@ -1,0 +1,34 @@
+{% if viewssettings['id'] is defined %}
+    {% set viewssettingsId = viewssettings['id'] %}
+    {% set title = 'Views Settings (' ~ viewssettings['id'] ~ ')' %}
+{% else %}
+    {% set viewssettingsId = '' %}
+    {% set title = 'New Views Settings' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'eye',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'viewssettings/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : viewssettingsId,
+            'addActionUrl'                  : 'viewssettings/add',
+            'addSuccessRedirectUrl'         : 'viewssettings',
+            'updateActionUrl'               : 'viewssettings/update',
+            'updateSuccessRedirectUrl'      : 'viewssettings',
+            'cancelActionUrl'               : 'viewssettings',
+            'closeActionUrl'                : 'viewssettings'
+        ]
+    ]
+)}}
