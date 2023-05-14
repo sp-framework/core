@@ -139,9 +139,11 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-cache').click(function() {
                     if ($(this).find('input[type=radio]:checked').data('value') == 'cacheon') {
                         $('#{{componentId}}-{{sectionId}}-cache_timeout').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-cache_service').attr('disabled', false);
                     } else {
                         $('#{{componentId}}-{{sectionId}}-cache_timeout').val('');
                         $('#{{componentId}}-{{sectionId}}-cache_timeout').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-cache_service').attr('disabled', true);
                     }
                 });
             }
