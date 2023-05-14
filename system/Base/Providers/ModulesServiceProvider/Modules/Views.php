@@ -120,13 +120,17 @@ class Views extends BasePackage
     public function setPhalconViewLayoutFile()
     {
         if (!isset($this->phalconViewLayoutFile)) {
-            if ($this->view) {
-                $this->phalconViewLayoutFile =
-                    $this->viewSettings['layout'];
-            } else {
-                $this->phalconViewLayoutFile = 'default';
+            if ($this->viewSettings && isset($this->viewSettings['layouts'])) {
+                foreach ($this->viewSettings['layouts'] as $layout) {
+                    if (isset($layout['active']) && $layout['active'] == true) {
+                        $this->phalconViewLayoutFile = $layout['view'];
+                        break;
+                    }
+                }
             }
-        } else {
+        }
+
+        if (!$this->phalconViewLayoutFile) {
             $this->phalconViewLayoutFile = 'default';
         }
     }
@@ -161,6 +165,11 @@ class Views extends BasePackage
         return $this->view;
     }
 
+    public function getViewSettings()
+    {
+        return $this->viewSettings;
+    }
+
     public function getViewTags()
     {
         return $this->tags;
@@ -177,6 +186,16 @@ class Views extends BasePackage
                 isset($this->domain['apps'][$this->app['id']]['view'])
             ) {
                 $viewsName = $this->getViewById($this->domain['apps'][$this->app['id']]['view'])['name'];
+                //Get views settings
+                $viewsSettings = $this->modules->viewsSettings->getViewsSettingsByViewIdDomainIdAndAppId(
+                    $this->domain['apps'][$this->app['id']]['view'],
+                    $this->domain['id'],
+                    $this->app['id']
+                );
+
+                if ($viewsSettings) {
+                    $this->viewSettings = Json::decode($viewsSettings['settings'], true);
+                }
             } else {
                 $viewsName =  'Default';
             }
@@ -188,9 +207,11 @@ class Views extends BasePackage
                 }
             }
             if ($this->view) {
-                $this->viewSettings = Json::decode($this->view['settings'], true);
+                if (!$this->viewSettings) {
+                    $this->viewSettings = Json::decode($this->view['settings'], true);
+                }
 
-                $this->cache = $this->viewSettings['cache'];
+                $this->cache = $this->config->cache->enabled;
 
                 if (isset($this->viewSettings['tags']) && $this->viewSettings['tags']) {
                     $this->tags = $this->checkTagsPackage($this->viewSettings['tags']);

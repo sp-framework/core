@@ -2,13 +2,14 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
+use System\Base\Providers\ModulesServiceProvider\Installer;
+use System\Base\Providers\ModulesServiceProvider\Manager;
 use System\Base\Providers\ModulesServiceProvider\Modules\Components;
 use System\Base\Providers\ModulesServiceProvider\Modules\Middlewares;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages;
 use System\Base\Providers\ModulesServiceProvider\Modules\Repositories;
 use System\Base\Providers\ModulesServiceProvider\Modules\Views;
-use System\Base\Providers\ModulesServiceProvider\Manager;
-use System\Base\Providers\ModulesServiceProvider\Installer;
+use System\Base\Providers\ModulesServiceProvider\Modules\Views\ViewsSettings;
 
 class Modules
 {
@@ -19,6 +20,8 @@ class Modules
 	protected $middlewares;
 
 	protected $views;
+
+	protected $viewsSettings;
 
 	protected $repositories;
 
@@ -67,6 +70,13 @@ class Modules
 		$this->views = (new Views())->init();
 
 		return $this->views;
+	}
+
+	protected function initViewsSettings()
+	{
+		$this->viewsSettings = (new ViewsSettings())->init();
+
+		return $this->viewsSettings;
 	}
 
 	protected function initRepositories()

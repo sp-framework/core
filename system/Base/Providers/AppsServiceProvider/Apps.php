@@ -218,7 +218,7 @@ class Apps extends BasePackage
 			}
 		}
 
-		if (isset($app['views'])) {
+		if (isset($app['views']) && $app['views'] !== '') {
 			$views = Json::decode($app['views'], true);
 
 			foreach ($views as $viewId => $view) {

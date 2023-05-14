@@ -8,7 +8,7 @@ class View
 {
 	public function register($db, $viewFile)
 	{
-		return $db->insertAsDict(
+		$views = $db->insertAsDict(
 			'modules_views',
 			[
 				'name' 					=> $viewFile['name'],
@@ -36,6 +36,19 @@ class View
 					Json::encode($viewFile['files']) :
 					Json::encode([]),
 				'updated_by'			=> 0
+			]
+		);
+
+		$viewsSettings = $db->insertAsDict(
+			'modules_views_settings',
+			[
+				'view_id'				=> 1,
+				'domain_id' 			=> 1,
+				'app_id'	 			=> 1,
+				'settings'				=>
+					isset($viewFile['settings']) ?
+					Json::encode($viewFile['settings']) :
+					null
 			]
 		);
 	}

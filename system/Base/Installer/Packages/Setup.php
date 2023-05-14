@@ -54,7 +54,6 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Menus;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Messenger;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notifications;
-use System\Base\Installer\Packages\Setup\Schema\Basepackages\Settings;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages\StoragesLocal;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Templates;
@@ -76,6 +75,7 @@ use System\Base\Installer\Packages\Setup\Schema\Modules\Components;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Middlewares;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Packages;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views;
+use System\Base\Installer\Packages\Setup\Schema\Modules\Views\Settings;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\IpFilter;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\Types;
@@ -300,6 +300,7 @@ class Setup
 		$this->db->createTable('modules_packages', $dbName, (new Packages)->columns());
 		$this->db->createTable('modules_middlewares', $dbName, (new Middlewares)->columns());
 		$this->db->createTable('modules_views', $dbName, (new Views)->columns());
+		$this->db->createTable('modules_views_settings', $dbName, (new Settings)->columns());
 
 		$this->db->createTable('basepackages_email_services', $dbName, (new EmailServices)->columns());
 		$this->db->createTable('basepackages_email_queue', $dbName, (new EmailQueue)->columns());
