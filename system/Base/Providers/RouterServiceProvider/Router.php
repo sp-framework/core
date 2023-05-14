@@ -281,7 +281,7 @@ class Router
 		if (isset($this->domain['exclusive_to_default_app']) &&
 			$this->domain['exclusive_to_default_app'] == 1
 		) {
-			$this->appInfo = $this->apps->getIdApp($this->domain['default_app_id']);
+			$this->appInfo = $this->apps->getAppById($this->domain['default_app_id']);
 
 			$this->domainAppExclusive = true;
 

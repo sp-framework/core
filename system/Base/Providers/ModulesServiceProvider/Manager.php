@@ -482,7 +482,7 @@ class Manager extends BasePackage
                     $registerRemotePackage['repo_details'] = $repo_details;
                     $registerRemotePackage['version'] = $version;
 
-                    if (!$this->apps->types->getTypeAppType($registerRemotePackage['app_type'])) {
+                    if (!$this->apps->types->getAppTypeByType($registerRemotePackage['app_type'])) {
                         if (!checkCtype($registerRemotePackage['app_type'], 'alpha')) {
                             $this->addResponse('App Type for package ' . $registerRemotePackage['name'] . ' contains illegal characters.', 1);
 

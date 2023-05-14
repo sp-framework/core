@@ -152,7 +152,7 @@ class ImportexportComponent extends BaseComponent
                 $data['component_id'] = $component['name'] . ' (' . $data['component_id'] . ')';
             }
 
-            $app = $this->apps->getIdApp($data['app_id']);
+            $app = $this->apps->getAppById($data['app_id']);
 
             if ($app) {
                 $data['app_id'] = $app['name'] . ' (' . $data['app_id'] . ')';

@@ -45,7 +45,7 @@ class Apps extends BasePackage
 	public function getAppInfo($route = null)
 	{
 		if (PHP_SAPI === 'cli') {
-			$this->appInfo = $this->getRouteApp($route);
+			$this->appInfo = $this->getAppByRoute($route);
 
 			$this->ipFilter = (new IpFilter())->init($this, $this->appInfo);
 		}
@@ -71,14 +71,14 @@ class Apps extends BasePackage
 
 		if ($uri[0] === '/') {
 			if ($domain) {
-				return $this->getIdApp($domain['default_app_id'])['route'];
+				return $this->getAppById($domain['default_app_id'])['route'];
 			}
 			return null;
 		} else {
 			if (isset($domain['exclusive_to_default_app']) &&
 				$domain['exclusive_to_default_app'] == 1
 			) {
-				return $this->getIdApp($domain['default_app_id'])['route'];
+				return $this->getAppById($domain['default_app_id'])['route'];
 			}
 			return explode('/', $uri[0])[1];
 		}
@@ -86,7 +86,7 @@ class Apps extends BasePackage
 
 	protected function checkAppRegistration($route)
 	{
-		$app = $this->getRouteApp($route);
+		$app = $this->getAppByRoute($route);
 
 		if ($app) {
 			$this->appInfo = $app;
@@ -97,7 +97,7 @@ class Apps extends BasePackage
 		}
 	}
 
-	public function getIdApp($id)
+	public function getAppById($id)
 	{
 		foreach($this->apps as $app) {
 			if ($app['id'] == $id) {
@@ -108,7 +108,7 @@ class Apps extends BasePackage
 		return false;
 	}
 
-	public function getNamedApp($name)
+	public function getAppByName($name)
 	{
 		foreach($this->apps as $app) {
 			if (strtolower($app['name']) === strtolower($name)) {
@@ -119,21 +119,10 @@ class Apps extends BasePackage
 		return false;
 	}
 
-	public function getRouteApp($route)
+	public function getAppByRoute($route)
 	{
 		foreach($this->apps as $app) {
 			if (strtolower($app['route']) == strtolower($route)) {
-				return $app;
-			}
-		}
-
-		return false;
-	}
-
-	public function getDefaultApp()
-	{
-		foreach($this->apps as $app) {
-			if ($app['is_default'] == '1') {
 				return $app;
 			}
 		}
@@ -152,7 +141,7 @@ class Apps extends BasePackage
 			return;
 		}
 
-		if ($this->getRouteApp($data['route'])) {
+		if ($this->getAppByRoute($data['route'])) {
 			$this->addResponse('App route ' . strtolower($data['route']) . ' is used by another app. Please use different route.', 1, []);
 
 			return false;
@@ -195,7 +184,7 @@ class Apps extends BasePackage
 			}
 
 			foreach ($domains as $domain) {
-				$domain = $this->domains->getIdDomain($domain);
+				$domain = $this->domains->getDomainById($domain);
 
 				$domain['apps'] = Json::decode($domain['apps'], true);
 
@@ -337,38 +326,7 @@ class Apps extends BasePackage
 			];
 	}
 
-	public function getAppTypes()
-	{
-		return
-			[
-				'1'   =>
-					[
-						'app_type'      => 'dash',
-						'name'          => 'Dashboard',
-						'description'   => 'Dashboard. Can run modules that require a dashboard, like Admin, Cpanel or Dashboard.',
-					],
-				'2'    =>
-					[
-						'app_type'      => 'ecom',
-						'name'          => 'E-Commerce E-Shop',
-						'description'   => 'Online product catalogue and checkout system.',
-					],
-				'3'    =>
-					[
-						'app_type'      => 'pos',
-						'name'          => 'Point of Sales System',
-						'description'   => 'In-store checkout system.',
-					],
-				'4'    =>
-					[
-						'app_type'      => 'cms',
-						'name'          => 'Content Management System',
-						'description'   => 'App to display any web content. Like a blog.',
-					]
-			];
-	}
-
-	public function getAcceptableUsernames($id)
+	public function getAcceptableUsernamesForAppId($id)
 	{
 		$acceptableUsernames =
 			[

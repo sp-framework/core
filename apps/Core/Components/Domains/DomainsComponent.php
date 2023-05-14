@@ -110,7 +110,7 @@ class DomainsComponent extends BaseComponent
         if ($data['default_app_id'] == '0') {
             $data['default_app_id'] = '<span class="badge badge-danger text-uppercase">ERROR: NO APP</span>';
         } else {
-            $app = $this->apps->getIdApp($data['default_app_id']);
+            $app = $this->apps->getAppById($data['default_app_id']);
 
             if ($app) {
                 $data['default_app_id'] = '<span class="badge badge-primary text-uppercase">' . $app['name'] . '</span>';

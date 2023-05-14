@@ -158,7 +158,7 @@ class Notifications extends BasePackage
         }
 
         if ($domainId) {
-            $domain = $this->domains->getIdDomain($domainId);
+            $domain = $this->domains->getDomainById($domainId);
         } else {
             $domain = $this->domains->getDomain();
         }

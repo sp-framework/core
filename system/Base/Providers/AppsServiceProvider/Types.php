@@ -20,7 +20,7 @@ class Types extends BasePackage
         return $this;
     }
 
-    public function getIdAppType($id)
+    public function getAppTypeById($id)
     {
         foreach($this->types as $type) {
             if ($type['id'] == $id) {
@@ -31,7 +31,7 @@ class Types extends BasePackage
         return false;
     }
 
-    public function getTypeAppType($app_type)
+    public function getAppTypeByType($app_type)
     {
         foreach($this->types as $type) {
             if ($type['app_type'] === strtolower($app_type)) {
@@ -49,7 +49,7 @@ class Types extends BasePackage
      */
     public function updateAppsType(array $data)
     {
-        $appType = $this->getIdAppType($data['id']);
+        $appType = $this->getAppTypeById($data['id']);
 
         $appType['name'] = $data['name'];
         $appType['description'] = $data['description'];

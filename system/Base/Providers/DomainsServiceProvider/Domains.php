@@ -43,7 +43,7 @@ class Domains extends BasePackage
 
 	protected function setDomain()
 	{
-		$this->domain = $this->getNamedDomain($this->request->getHttpHost());
+		$this->domain = $this->getDomainByName($this->request->getHttpHost());
 
 		if ($this->domain) {
 			if ($this->domain['apps'] !== '') {
@@ -206,7 +206,7 @@ class Domains extends BasePackage
 		}
 	}
 
-	public function getNamedDomain($name)
+	public function getDomainByName($name)
 	{
 		if (!$this->domains) {
 			$this->init();
@@ -221,7 +221,7 @@ class Domains extends BasePackage
 		return false;
 	}
 
-	public function getIdDomain($id)
+	public function getDomainById($id)
 	{
 		if (!$this->domains) {
 			$this->init();

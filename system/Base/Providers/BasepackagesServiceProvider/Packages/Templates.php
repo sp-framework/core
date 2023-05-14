@@ -198,7 +198,7 @@ class Templates extends BasePackage
                         <div class="row">
                             <div class="col">
                                 <span class="brand-link">
-                                    <img src="http://' . $this->domains->getIdDomain(1)['name'] . '/dash/default/images/baz/logo/justlogo33x30.png" alt="Bazaari Logo" class="brand-image">
+                                    <img src="http://' . $this->domains->getDomainById(1)['name'] . '/dash/default/images/baz/logo/justlogo33x30.png" alt="Bazaari Logo" class="brand-image">
                                 </span>
                             </div>
                         </div>

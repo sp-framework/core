@@ -44,7 +44,7 @@ class ImportExport extends BasePackage
             }
         } else {
             if ($data['domain_id'] != 0) {
-                $data['email_to'] = 'no-reply@' . $this->domains->getIdDomain($data['domain_id'])['name'];
+                $data['email_to'] = 'no-reply@' . $this->domains->getDomainById($data['domain_id'])['name'];
             } else {
                 $data['email_to'] = 'no-reply@' . $this->domains->domains[0]['name'];
             }
@@ -678,13 +678,13 @@ class ImportExport extends BasePackage
         $emailData['subject'] = ucfirst($task['type']) . ' request complete.';
 
         if ($task['app_id'] != 0) {
-            $route = $this->apps->getIdApp($task['app_id'])['route'];
+            $route = $this->apps->getAppById($task['app_id'])['route'];
         } else {
             $route = 'admin';
         }
 
         if ($task['domain_id'] != 0) {
-            $domain = $this->domains->getIdDomain($task['domain_id'])['name'];
+            $domain = $this->domains->getDomainById($task['domain_id'])['name'];
         } else {
             $domain = $this->domains->domains[0]['name'];
         }

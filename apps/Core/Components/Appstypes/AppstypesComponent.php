@@ -16,7 +16,7 @@ class AppstypesComponent extends BaseComponent
     {
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $appsType = $this->apps->types->getIdAppType($this->getData()['id']);
+                $appsType = $this->apps->types->getAppTypeById($this->getData()['id']);
 
                 if (!$appsType) {
                     return $this->throwIdNotFound();

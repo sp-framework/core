@@ -219,7 +219,7 @@ class Notes extends BasePackage
 
                     if (is_array($note['note_app_visibility']) && count($note['note_app_visibility']) > 0) {
                         foreach ($note['note_app_visibility'] as $appKey => $app) {
-                            $appInfo = $this->apps->getIdApp($app);
+                            $appInfo = $this->apps->getAppById($app);
                             $note['note_app_visibility'][$appKey] = $appInfo['name'];
                         }
                     }

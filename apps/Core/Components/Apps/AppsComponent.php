@@ -3,6 +3,7 @@
 namespace Apps\Core\Components\Apps;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
+use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
@@ -21,7 +22,7 @@ class AppsComponent extends BaseComponent
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $app = $this->apps->getIdApp($this->getData()['id']);
+                $app = $this->apps->getAppById($this->getData()['id']);
 
                 if (!$app) {
                     return $this->throwIdNotFound();
@@ -201,7 +202,7 @@ class AppsComponent extends BaseComponent
 
                     return;
                 }
-                $this->view->acceptableUsernames = $this->apps->getAcceptableUsernames($this->getData()['id']);
+                $this->view->acceptableUsernames = $this->apps->getAcceptableUsernamesForAppId($this->getData()['id']);
             } else {
                 $this->view->app = null;
                 $domains = $this->domains->domains;
