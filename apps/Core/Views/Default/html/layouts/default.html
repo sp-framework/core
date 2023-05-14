@@ -14,8 +14,16 @@
         {{assets.outputJs('headJs')}}
         {{assets.outputInlineCss()}}
     </head>
-    {% if assets.get('body').getCodes()[0].getContent() !== '' %}
-        <body {{assets.get('body').getCodes()[0].getContent()}}>
+    {% set layout = 'default' %}
+    {% if modules.views.getViewSettings()['layouts'] is defined and modules.views.getViewSettings()['layouts']|length > 1 %}
+        {% for layout in modules.views.getViewSettings()['layouts'] %}
+            {% if layout['active'] is defined and layout['view'] === 'topnav' %}
+                {% set layout = 'topnav' %}
+                <body id="body" class="layout-top-nav sidebar-collapse text-sm">
+            {% elseif layout['active'] is defined and layout['view'] === 'default' %}
+                <body id="body" class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm">
+            {% endif %}
+        {% endfor %}
     {% else %}
         <body id="body" class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm">
     {% endif %}
@@ -32,6 +40,7 @@ if (!window.dataCollection) {
     window.dataCollection = { };
     dataCollection = window.dataCollection;
     dataCollection.env = { };
+    dataCollection.env.coreVer = '{{core.getVersion()}}';
     dataCollection.env.wizard = false;
     dataCollection.env.breadcrumb = '{{breadcrumb}}';
     //Paths
@@ -96,7 +105,7 @@ if (localStorage.getItem('bazDevMode') === null) {
 </script>
         {% endif %}
         <script type="text/javascript" charset="utf-8">
-            {{assets.get('body').getCodes()[1].getContent()}}
+            {{assets.get('body').getCodes()[0].getContent()}}
         </script>
         <div class="wrapper">
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/header/view') %}

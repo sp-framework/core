@@ -4,7 +4,8 @@
     "description"   : "Default Core View",
     "module_type"   : "view",
     "app_type"      : "core",
-    "category"      : "tools",
+    "category"      : "system",
+    "sub_category"  : "tools",
     "version"       : "0.0.0",
     "repo"          : "https://.../",
     "dependencies"  : {
@@ -14,15 +15,29 @@
             "repo"      : "https://.../"
         },
         "components"    : [],
-        "packages"      : [],
+        "packages"      : [
+            {
+                "name": "Adminltetags",
+                "version": "0.0.0",
+                "repo": "https://.../"
+            }
+        ],
         "middlewares"   : [],
-        "views"         : [],
-        "external"      : []
+        "views"         : []
     },
     "settings"      : {
         "mandatory" : true,
-        "cache"     : false,
-        "layout"    : "default",
+        "layouts"   : [
+            {
+                "view"      : "default",
+                "name"      : "Default"
+            },
+            {
+                "view"      : "topnav",
+                "name"      : "Top Navigation",
+                "active"    : true
+            }
+        ],
         "tags"      : "Adminltetags",
         "head"      : {
             "title" : "Bazaari Core",
@@ -48,17 +63,20 @@
             }
         },
         "body"          : {
-            "params"    : "",
             "jsscript"  : ""
         },
         "footer"        : {
-            "params"    : "",
             "script"    : {
                 "src"   : [
                     "core/default/js/footer/jsFooterDependencies.js"
                 ]
             },
-            "jsscript"  : ""
+            "jsscript"  : "",
+            "copyright" : {
+                "fromYear"  : "2014",
+                "site"      : "https://www.bazaari.com.au",
+                "name"      : "Bazaari E Trade Pty. Ltd."
+            }
         }
     }
 }

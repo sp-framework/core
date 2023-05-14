@@ -1,20 +1,14 @@
 <!-- htmlhint tag-pair:false -->
-{% if assets.get('footer').getCodes()[0].getContent() !== '' %}
-    <footer {{assets.get('footer').getCodes()[0].getContent()}}>
-{% else %}
-    <footer class="main-footer">
-{% endif %}
+<footer class="main-footer">
     <div class="row">
         <div class="col">
             <strong>Copyright &copy;
-                {% if orgFrom is defined %}
-                    {{orgFrom ~ '-'|default('')}}
+                {% if assets.get('footer').getCodes()[0] is defined %}
+                    {{assets.get('footer').getCodes()[0].getContent() ~ ' -'|default('')}}
                     {{date("Y")}}
                 {% endif %}
-                {% if orgSite is defined and orgName is defined %}
-                    <a target="_blank" href="{{orgSite}}">{{orgName}}</a>.
-                {% elseif perName is defined %}
-                    {{perName}}
+                {% if assets.get('footer').getCodes()[1] is defined and assets.get('footer').getCodes()[2] is defined %}
+                    <a target="_blank" href="{{assets.get('footer').getCodes()[1].getContent()}}">{{assets.get('footer').getCodes()[2].getContent()}}</a>
                 {% endif %}
             </strong> All rights reserved.
             {{assets.outputJs('footerJs')}}

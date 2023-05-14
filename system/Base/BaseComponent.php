@@ -29,9 +29,9 @@ abstract class BaseComponent extends Controller
 
 	protected $views;
 
-	protected $viewName;
-
 	protected $viewSettings;
+
+	protected $viewName;
 
 	protected $assetsCollections = [];
 
@@ -54,23 +54,25 @@ abstract class BaseComponent extends Controller
 
 		$this->views = $this->modules->views->getViewInfo();
 
+		$this->viewSettings = $this->modules->views->getViewSettings();
+
 		$this->setComponent();
 
 		if (!$this->isJson() || $this->request->isAjax()) {
-			if ($this->views) {
+			if (!$this->viewSettings) {
 				$this->viewSettings = json_decode($this->views['settings'], true);
+			}
 
-				$this->checkLayout();
+			$this->checkLayout();
 
-				if (!$this->isJson() && $this->request->isGet()) {
-					$this->setDefaultViewData();
-				}
+			if (!$this->isJson() && $this->request->isGet()) {
+				$this->setDefaultViewData();
+			}
 
-				if ($this->modules->views->getPhalconViewPath() === $this->view->getViewsDir()) {
-					$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
+			if ($this->modules->views->getPhalconViewPath() === $this->view->getViewsDir()) {
+				$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
 
-					$this->viewSimple->setViewsDir($this->view->getViewsDir() . $this->getURI());
-				}
+				$this->viewSimple->setViewsDir($this->view->getViewsDir() . $this->getURI());
 			}
 		}
 	}
@@ -540,7 +542,6 @@ abstract class BaseComponent extends Controller
 				return;
 			}
 		} else if ($this->request->isPost()) {
-
 			if (Arr::has($this->request->getPost(), 'layout')) {
 				if ($this->request->getPost('layout') === '0') {
 					$this->disableViewLevel();
@@ -632,7 +633,7 @@ abstract class BaseComponent extends Controller
 		$this->buildAssetsHeadCss();
 		$this->buildAssetsHeadStyle();
 		$this->buildAssetsHeadJs();
-		$this->buildAssetsBody();
+		// $this->buildAssetsBody();
 		$this->buildAssetsBodyJs();
 		$this->buildAssetsFooter();
 		$this->buildAssetsFooterJs();
@@ -686,7 +687,7 @@ abstract class BaseComponent extends Controller
 		$links = $this->viewSettings['head']['link']['href'];
 		if (count($links) > 0) {
 			foreach ($links as $link) {
-				$this->assetsCollections['headLinks']->addCss($link);
+				$this->assetsCollections['headLinks']->addCss($link, null, true, [], $this->core->getVersion());
 			}
 		}
 	}
@@ -708,26 +709,28 @@ abstract class BaseComponent extends Controller
 
 		if (count($scripts) > 0) {
 			foreach ($scripts as $script) {
-				$this->assetsCollections['headJs']->addJs($script);
+				$this->assetsCollections['headJs']->addJs($script, null, true, [], $this->core->getVersion());
 			}
 		}
 	}
 
-	protected function buildAssetsBody()
-	{
-		$this->assetsCollections['body'] = $this->assets->collection('body');
-		$this->assetsCollections['body']->addInline(new Inline('bodyParams', $this->viewSettings['body']['params']));
-	}
+	// protected function buildAssetsBody()
+	// {
+	// 	$this->assetsCollections['body']->addInline(new Inline('bodyParams', $this->viewSettings['body']['params']));
+	// }
 
 	protected function buildAssetsBodyJs()
 	{
+		$this->assetsCollections['body'] = $this->assets->collection('body');
 		$this->assetsCollections['body']->addInline(new Inline('bodyScript', $this->viewSettings['body']['jsscript']));
 	}
 
 	protected function buildAssetsFooter()
 	{
 		$this->assetsCollections['footer'] = $this->assets->collection('footer');
-		$this->assetsCollections['footer']->addInline(new Inline('footerParams', $this->viewSettings['footer']['params']));
+		$this->assetsCollections['footer']->addInline(new Inline('footerCopyrightfromYear', $this->viewSettings['footer']['copyright']['fromYear']));
+		$this->assetsCollections['footer']->addInline(new Inline('footerCopyrightSite', $this->viewSettings['footer']['copyright']['site']));
+		$this->assetsCollections['footer']->addInline(new Inline('footerCopyrightName', $this->viewSettings['footer']['copyright']['name']));
 	}
 
 	protected function buildAssetsFooterJs()
@@ -736,7 +739,7 @@ abstract class BaseComponent extends Controller
 		$scripts = $this->viewSettings['footer']['script']['src'];
 		if (count($scripts) > 0) {
 			foreach ($scripts as $script) {
-				$this->assetsCollections['footerJs']->addJs($script);
+				$this->assetsCollections['footerJs']->addJs($script, null, true, [], $this->core->getVersion());
 			}
 		}
 	}

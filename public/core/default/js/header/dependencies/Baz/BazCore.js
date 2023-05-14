@@ -36,14 +36,14 @@ var BazCore = function() {
                 $('.pace-loading-text').attr('hidden', false);
                 $($('.pace-loading-text span')[1]).text(' core libs');
                 $.ajax({
-                    url: dataCollection.env.jsPath + 'footer/jsFooterCore.js',
+                    url: dataCollection.env.jsPath + 'footer/jsFooterCore.js?ver=' + dataCollection.env.coreVer,
                     dataType: 'script',
                     async: true,
                     cache: true
                 }).done(function() {
                     $($('.pace-loading-text span')[1]).text(' plugins');
                     $.ajax({
-                        url: dataCollection.env.jsPath + 'footer/jsFooterPlugins.js',
+                        url: dataCollection.env.jsPath + 'footer/jsFooterPlugins.js?ver=' + dataCollection.env.coreVer,
                         dataType: 'script',
                         async: true,
                         cache: true
@@ -55,13 +55,13 @@ var BazCore = function() {
                 });
             } else {
                 $.ajax({
-                    url: dataCollection.env.jsPath + 'footer/jsFooterCore.js',
+                    url: dataCollection.env.jsPath + 'footer/jsFooterCore.js?ver=' + dataCollection.env.coreVer,
                     dataType: 'script',
                     async: true,
                     cache: true
                 }).done(function() {
                     $.ajax({
-                        url: dataCollection.env.jsPath + 'footer/jsFooterPlugins.js',
+                        url: dataCollection.env.jsPath + 'footer/jsFooterPlugins.js?ver=' + dataCollection.env.coreVer,
                         dataType: 'script',
                         async: true,
                         cache: true

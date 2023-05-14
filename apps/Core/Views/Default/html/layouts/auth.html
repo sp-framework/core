@@ -25,6 +25,7 @@ if (!window.dataCollection) {
     window.dataCollection = { };
     dataCollection = window.dataCollection;
     dataCollection.env = { };
+    dataCollection.env.coreVer = '{{core.getVersion()}}';
     dataCollection.env.wizard = false;
     dataCollection.env.breadcrumb = '{{breadcrumb}}';
     //Paths
@@ -82,7 +83,7 @@ if (!window.dataCollection) {
 }
 </script>
         <script type="text/javascript" charset="utf-8">
-            {{assets.get('body').getCodes()[1].getContent()}}
+            {{assets.get('body').getCodes()[0].getContent()}}
         </script>
         <input id="security-token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
         {{content()}}
