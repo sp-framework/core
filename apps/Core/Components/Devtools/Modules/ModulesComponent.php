@@ -249,8 +249,7 @@ class ModulesComponent extends BaseComponent
 				return;
 			}
 
-			$this->modulesPackage->formatJson($this->postData());
-
+			$this->basepackages->utils->formatJson($this->postData());
 
 			$this->addResponse(
 				$this->modulesPackage->packagesData->responseMessage,

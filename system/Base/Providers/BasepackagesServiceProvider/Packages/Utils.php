@@ -3,6 +3,7 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use League\Flysystem\StorageAttributes;
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use ZxcvbnPhp\Zxcvbn;
 
@@ -81,5 +82,76 @@ class Utils extends BasePackage
     public function generateNewPassword()
     {
         $this->addResponse('Password Generate Successfully', 0, ['password' => $this->secTools->random->base62(12)]);
+    }
+
+    public function formatJson($data)
+    {
+        if (!isset($data['json'])) {
+            $this->addResponse('Json data not provided.', 1);
+
+            return;
+        }
+
+        if (is_array($data['json'])) {
+            $data['json'] = Json::encode($data['json'], JSON_UNESCAPED_SLASHES);
+        }
+
+        $return = "\n";
+        $indent = "\t";
+        $formatted_json = '';
+        $quotes = false;
+        $arrayLevel = 0;
+
+        for ($i = 0; $i < strlen($data['json']); $i++) {
+            $prefix = '';
+            $suffix = '';
+
+            switch ($data['json'][$i]) {
+                case '"':
+                    $quotes = !$quotes;
+                    break;
+
+                case '[':
+                    $arrayLevel++;
+                    break;
+
+                case ']':
+                    $arrayLevel--;
+                    $prefix = $return;
+                    $prefix .= str_repeat($indent, $arrayLevel);
+                    break;
+
+                case '{':
+                    $arrayLevel++;
+                    $suffix = $return;
+                    $suffix .= str_repeat($indent, $arrayLevel);
+                    break;
+
+                case ':':
+                    $suffix = ' ';
+                    break;
+
+                case ',':
+                    if (!$quotes) {
+                        $suffix = $return;
+                        $suffix .= str_repeat($indent, $arrayLevel);
+                    }
+                    break;
+
+                case '}':
+                    $arrayLevel--;
+
+                case ']':
+                    $prefix = $return;
+                    $prefix .= str_repeat($indent, $arrayLevel);
+                    break;
+            }
+
+            $formatted_json .= $prefix.$data['json'][$i].$suffix;
+        }
+
+        $this->addResponse('Success', 0, ['formatted_json' => $formatted_json]);
+
+        return $formatted_json;
     }
 }

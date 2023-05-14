@@ -258,83 +258,12 @@ class DevtoolsModules extends BasePackage
         if (isset($data['returnJson']) && $data['returnJson'] === 'array') {
             $data['json'] = Json::decode($data['json'], true);
         } else if (isset($data['returnJson']) && $data['returnJson'] === 'formatted') {
-            $data['json'] = $this->formatJson($data);
+            $data['json'] = $this->basepackages->utils->formatJson($data);
         }
 
         $this->addResponse('Success', 0, ['json' => $data['json']]);
 
         return $data['json'];
-    }
-
-    public function formatJson($data)
-    {
-        if (!isset($data['json'])) {
-            $this->addResponse('Json data not provided.', 1);
-
-            return;
-        }
-
-        if (is_array($data['json'])) {
-            $data['json'] = Json::encode($data['json'], JSON_UNESCAPED_SLASHES);
-        }
-
-        $return = "\n";
-        $indent = "\t";
-        $formatted_json = '';
-        $quotes = false;
-        $arrayLevel = 0;
-
-        for ($i = 0; $i < strlen($data['json']); $i++) {
-            $prefix = '';
-            $suffix = '';
-
-            switch ($data['json'][$i]) {
-                case '"':
-                    $quotes = !$quotes;
-                    break;
-
-                case '[':
-                    $arrayLevel++;
-                    break;
-
-                case ']':
-                    $arrayLevel--;
-                    $prefix = $return;
-                    $prefix .= str_repeat($indent, $arrayLevel);
-                    break;
-
-                case '{':
-                    $arrayLevel++;
-                    $suffix = $return;
-                    $suffix .= str_repeat($indent, $arrayLevel);
-                    break;
-
-                case ':':
-                    $suffix = ' ';
-                    break;
-
-                case ',':
-                    if (!$quotes) {
-                        $suffix = $return;
-                        $suffix .= str_repeat($indent, $arrayLevel);
-                    }
-                    break;
-
-                case '}':
-                    $arrayLevel--;
-
-                case ']':
-                    $prefix = $return;
-                    $prefix .= str_repeat($indent, $arrayLevel);
-                    break;
-            }
-
-            $formatted_json .= $prefix.$data['json'][$i].$suffix;
-        }
-
-        $this->addResponse('Success', 0, ['formatted_json' => $formatted_json]);
-
-        return $formatted_json;
     }
 
     public function getModuleTypes()
