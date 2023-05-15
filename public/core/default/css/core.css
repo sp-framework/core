@@ -42481,3 +42481,62 @@ a.disabled {
 .progress-bar {
   transition: width .5s linear;
 }
+
+/* Bootstrap Navigation Bar FOR TOP NAVIGATION */
+.navbar-content a {
+  color: #1f2d3d !important;
+}
+
+.dropdown-menu {
+  border-radius: 0;
+  min-width: 12rem !important;
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu li.show {
+  background-color: #3498DB !important;
+  color: white !important;
+}
+
+.dropdown-menu {
+  margin-top: 0;
+}
+
+.dropdown-menu .dropdown-toggle::after {
+  border-left: 4px solid;
+  border-bottom: 4px solid transparent;
+  border-top: 4px solid transparent;
+  position: relative;
+  float: right;
+  top: 7px;
+  right: -10px;
+}
+
+.dropdown-menu .dropdown .dropdown-menu {
+  left: 100%;
+  top: 0%;
+  margin: 0 20px;
+  border-width: 0;
+}
+
+.dropdown-menu .dropdown .dropdown-menu.left {
+  right: 100%;
+  left: auto;
+}
+
+@media (min-width: 768px) {
+  .dropdown-menu .dropdown .dropdown-menu {
+    margin: 0;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+
+  .dropdown-menu > li a:hover,
+  .dropdown-menu > li.show {
+    background: #007bff;
+    color: white;
+  }
+
+  .dropdown-menu > li.show > a {
+    color: white;
+  }
+}

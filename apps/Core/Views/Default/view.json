@@ -2,7 +2,7 @@
     "name"          : "Default",
     "display_name"  : "Bazaari Core Default View",
     "description"   : "Default Core View",
-    "module_type"   : "view",
+    "module_type"   : "views",
     "app_type"      : "core",
     "category"      : "system",
     "sub_category"  : "tools",
@@ -36,6 +36,10 @@
                 "view"      : "topnav",
                 "name"      : "Top Navigation",
                 "active"    : true
+            },
+            {
+                "view"      : "topnavsidebar",
+                "name"      : "Top Navigation With Sidebar"
             }
         ],
         "tags"      : "Adminltetags",

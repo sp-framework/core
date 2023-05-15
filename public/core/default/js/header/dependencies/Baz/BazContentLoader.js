@@ -36,14 +36,15 @@ var BazContentLoader = function() {
                     $(this).addClass('active');
                     $(this).parents('.nav-treeview').siblings('a.nav-link').addClass('active');
                     $('[data-widget="pushmenu"]').PushMenu('collapse');
-                }
-                // Close all menu items if root item clicked
-                if (!$(this).parents().is('.treeview')) {
-                    $('.tree').trigger('closeAllMenu');
-                }
-                // Close Dropdown
-                if ($(this).closest('.dropdown').length > 0) {
-                    $(this).closest('.dropdown').dropdown('toggle');
+
+                    // Close all menu items if root item clicked
+                    if (!$(this).parents().is('.treeview')) {
+                        $('.tree').trigger('closeAllMenu');
+                    }
+                    // Close Dropdown
+                    if ($(this).closest('.dropdown').length > 0) {
+                        $(this).closest('.dropdown').dropdown('toggle');
+                    }
                 }
 
                 if (window['dataCollection']['env']['wizard'] === true) {

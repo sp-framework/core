@@ -88,7 +88,9 @@ var BazCore = function() {
         toolTipsAndPopovers();
         bazUpdateBreadcrumb();
         initResizeElement();
-        openMenu();
+        if ($('.navbar-content').length === 0) {
+            openMenu();
+        }
 
         if (dataCollection.env.currentRoute.indexOf('auth') === -1) {
             BazTunnels.init();
@@ -282,7 +284,9 @@ var BazCore = function() {
                                                 bazUpdateBreadcrumb();
                                                 toolTipsAndPopovers();
                                                 $("#loader").attr('hidden', true);
-                                                openMenu();
+                                                if ($('.navbar-content').length === 0) {
+                                                    openMenu();
+                                                }
                                             },
             'ajaxError'                     : function () {
                                                 bazUpdateBreadcrumb();

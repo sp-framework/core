@@ -36,14 +36,15 @@ var BazContentLoader = function() {
                     $(this).addClass('active');
                     $(this).parents('.nav-treeview').siblings('a.nav-link').addClass('active');
                     $('[data-widget="pushmenu"]').PushMenu('collapse');
-                }
-                // Close all menu items if root item clicked
-                if (!$(this).parents().is('.treeview')) {
-                    $('.tree').trigger('closeAllMenu');
-                }
-                // Close Dropdown
-                if ($(this).closest('.dropdown').length > 0) {
-                    $(this).closest('.dropdown').dropdown('toggle');
+
+                    // Close all menu items if root item clicked
+                    if (!$(this).parents().is('.treeview')) {
+                        $('.tree').trigger('closeAllMenu');
+                    }
+                    // Close Dropdown
+                    if ($(this).closest('.dropdown').length > 0) {
+                        $(this).closest('.dropdown').dropdown('toggle');
+                    }
                 }
 
                 if (window['dataCollection']['env']['wizard'] === true) {
@@ -524,7 +525,9 @@ var BazCore = function() {
         toolTipsAndPopovers();
         bazUpdateBreadcrumb();
         initResizeElement();
-        openMenu();
+        if ($('.navbar-content').length === 0) {
+            openMenu();
+        }
 
         if (dataCollection.env.currentRoute.indexOf('auth') === -1) {
             BazTunnels.init();
@@ -718,7 +721,9 @@ var BazCore = function() {
                                                 bazUpdateBreadcrumb();
                                                 toolTipsAndPopovers();
                                                 $("#loader").attr('hidden', true);
-                                                openMenu();
+                                                if ($('.navbar-content').length === 0) {
+                                                    openMenu();
+                                                }
                                             },
             'ajaxError'                     : function () {
                                                 bazUpdateBreadcrumb();

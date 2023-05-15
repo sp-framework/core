@@ -129,7 +129,6 @@ class Tree extends Adminltetags
 
             $this->content .=
                 '</li>';
-
         } else if ($this->treeMode === 'sideMenu') {
             $itemIcon =
                 isset($items['icon']) ?
@@ -161,7 +160,35 @@ class Tree extends Adminltetags
                 $this->content .= $this->getChildsContent();
 
                 $this->content .= '</ul></li>';
+        } else if ($this->treeMode === 'topMenu') {
+            $itemIcon =
+                isset($items['icon']) ?
+                $items['icon'] :
+                'circle-dot';
 
+            $itemTitle =
+                isset($items['title']) ?
+                $items['title'] :
+                $key;
+
+            $this->content .=
+                '<li class="nav-item dropdown">
+                    <a href="/#" class="dropdown-item dropdown-toggle">
+                        <i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
+                    <span class="text-uppercase mb-0">' . $itemTitle . '</span>
+                </a>
+                <ul class="dropdown-menu">';
+
+                $this->generateContent(
+                    [
+                        'treeData' => $items['childs'],
+                        'children' => true
+                    ]
+                );
+
+                $this->content .= $this->getChildsContent();
+
+                $this->content .= '</ul></li>';
         } else if ($this->treeMode === 'select2') {
             if (isset($items['value'])) {
                 $this->content .=
@@ -206,7 +233,6 @@ class Tree extends Adminltetags
                     }
                 }
             }
-
         } else if ($this->treeMode === 'sideMenu') {
             if (is_array($items)) {
                 if (!$children) {
@@ -278,7 +304,76 @@ class Tree extends Adminltetags
                     }
                 }
             }
+        } else if ($this->treeMode === 'topMenu') {
+            if (is_array($items)) {
+                if (!$children) {
+                    $itemIcon =
+                        isset($items['icon']) ?
+                        $items['icon'] :
+                        'circle-dot';
 
+                    $this->content .=
+                        '<li class="nav-item">';
+
+                        if ($this->app['id'] == $this->domains->domain['exclusive_to_default_app']) {
+                            $this->content .=
+                                '<a class="nav-link contentAjaxLink text-center" href="/' . $items['link'] . '">';
+                        } else {
+                            $this->content .=
+                                '<a class="nav-link contentAjaxLink text-center" href="/' . $this->app['route'] . '/' . $items['link'] . '">';
+                        }
+
+                    $this->content .=
+                                '<i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
+                                <span class="text-uppercase mb-0">';
+
+                    if (isset($items['title'])) {
+                        $this->content .= $items['title'];
+                    } else if (isset($items['name'])) {
+                        $this->content .= $items['name'];
+                    } else if (isset($items['entry'])) {
+                        $this->content .= $items['entry'];
+                    }
+
+                    $this->content .= '</span></a></li>';
+                } else if ($children) {
+                    foreach ($items as $itemKey => $itemValue) {
+                        if (isset($itemValue['childs'])) {
+                            $this->content .= $this->treeGroup($itemKey, $itemValue, null, null, null);
+                        } else {
+                            $itemIcon =
+                                isset($itemValue['icon']) ?
+                                $itemValue['icon'] :
+                                'circle-dot';
+
+                            $this->content .=
+                                '<li class="nav-item">';
+
+                                if ($this->app['id'] == $this->domains->domain['exclusive_to_default_app']) {
+                                    $this->content .=
+                                        '<a class="nav-link contentAjaxLink" href="/' . $itemValue['link'] . '">';
+                                } else {
+                                    $this->content .=
+                                        '<a class="nav-link contentAjaxLink" href="/' . $this->app['route'] . '/' . $itemValue['link'] . '">';
+                                }
+
+                            $this->content .=
+                                '<i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
+                                <span class="text-uppercase mb-0">';
+
+                            if (isset($itemValue['title'])) {
+                                $this->content .= $itemValue['title'];
+                            } else if (isset($itemValue['name'])) {
+                                $this->content .= $itemValue['name'];
+                            } else if (isset($itemValue['entry'])) {
+                                $this->content .= $itemValue['entry'];
+                            }
+
+                            $this->content .= '</span></a></li>';
+                        }
+                    }
+                }
+            }
         } else if ($this->treeMode === 'select' || $this->treeMode === 'select2') {
             if ($this->treeMode === 'select') {
                 $selectType = '';

@@ -14,9 +14,12 @@
         {{assets.outputJs('headJs')}}
         {{assets.outputInlineCss()}}
     </head>
-    {% set activeLayout = 'topnavsidebar' %}
     {% if activeLayout is defined and activeLayout === 'topnav' or activeLayout === 'topnavsidebar' %}
-        <body id="body" class="layout-top-nav sidebar-collapse layout-navbar-fixed text-sm">
+        {% if activeLayout === 'topnavsidebar'%}
+            <body id="body" class="layout-top-nav sidebar-collapse layout-navbar-fixed text-sm">
+        {% else %}
+            <body id="body" class="layout-top-nav text-sm">
+        {% endif %}
     {% elseif activeLayout === 'default' %}
         <body id="body" class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm">
     {% else %}
@@ -103,15 +106,15 @@ if (localStorage.getItem('bazDevMode') === null) {
             {{assets.get('body').getCodes()[0].getContent()}}
         </script>
         <div class="wrapper">
-            {% include modules.views.getPhalconViewPath() ~ 'layouts/default/header/view' with ['activeLayout': activeLayout] %}
+            {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/header/view') %}
             {% if activeLayout === 'default' or activeLayout === 'topnavsidebar' %}
-                {% include modules.views.getPhalconViewPath() ~ 'layouts/default/sidebar/view' with ['activeLayout': activeLayout] %}
+                {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/sidebar/view') %}
             {% endif %}
-            {% include modules.views.getPhalconViewPath() ~ 'layouts/default/content/view' with ['activeLayout': activeLayout] %}
+            {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/content/view') %}
             {% if modules.components.getComponentByNameForAppId('Messenger', apps.getAppInfo()['id']) %}
-                {% include modules.views.getPhalconViewPath() ~ 'layouts/default/messenger/view' with ['activeLayout': activeLayout] %}
+                {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/messenger/view') %}
             {% endif %}
-            {% include modules.views.getPhalconViewPath() ~ 'layouts/default/footer/view' with ['activeLayout': activeLayout] %}
+            {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/footer/view') %}
         </div>
     </body>
 </html>
