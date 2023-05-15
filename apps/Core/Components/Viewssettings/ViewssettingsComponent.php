@@ -169,16 +169,15 @@ class ViewssettingsComponent extends BaseComponent
             if (!$this->checkCSRF()) {
                 return;
             }
-            $this->domains->addDomain($this->postData());
 
-            $this->view->responseCode = $this->domains->packagesData->responseCode;
+            $this->modules->viewsSettings->addViewsSettings($this->postData());
 
-            $this->view->responseMessage = $this->domains->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->modules->viewsSettings->packagesData->responseMessage,
+                $this->modules->viewsSettings->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -191,16 +190,15 @@ class ViewssettingsComponent extends BaseComponent
             if (!$this->checkCSRF()) {
                 return;
             }
-            $this->domains->updateDomain($this->postData());
 
-            $this->view->responseCode = $this->domains->packagesData->responseCode;
+            $this->modules->viewsSettings->updateViewsSettings($this->postData());
 
-            $this->view->responseMessage = $this->domains->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->modules->viewsSettings->packagesData->responseMessage,
+                $this->modules->viewsSettings->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -210,17 +208,18 @@ class ViewssettingsComponent extends BaseComponent
     public function removeAction()
     {
         if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
-            $this->domains->removeDomain($this->postData());
+            $this->modules->viewsSettings->removeViewsSettings($this->postData());
 
-            $this->view->responseCode = $this->domains->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->domains->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->modules->viewsSettings->packagesData->responseMessage,
+                $this->modules->viewsSettings->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 

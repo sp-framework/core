@@ -689,7 +689,11 @@ abstract class BaseComponent extends Controller
 		$links = $this->viewSettings['head']['link']['href'];
 		if (count($links) > 0) {
 			foreach ($links as $link) {
-				$this->assetsCollections['headLinks']->addCss($link, null, true, [], $this->core->getVersion());
+				if (!$this->config->dev) {
+					$this->assetsCollections['headLinks']->addCss($link, null, true, [], $this->core->getVersion());
+				} else {
+					$this->assetsCollections['headLinks']->addCss($link);
+				}
 			}
 		}
 	}
@@ -711,7 +715,11 @@ abstract class BaseComponent extends Controller
 
 		if (count($scripts) > 0) {
 			foreach ($scripts as $script) {
-				$this->assetsCollections['headJs']->addJs($script, null, true, [], $this->core->getVersion());
+				if (!$this->config->dev) {
+					$this->assetsCollections['headJs']->addJs($script, null, true, [], $this->core->getVersion());
+				} else {
+					$this->assetsCollections['headJs']->addJs($script);
+				}
 			}
 		}
 	}
@@ -741,7 +749,11 @@ abstract class BaseComponent extends Controller
 		$scripts = $this->viewSettings['footer']['script']['src'];
 		if (count($scripts) > 0) {
 			foreach ($scripts as $script) {
-				$this->assetsCollections['footerJs']->addJs($script, null, true, [], $this->core->getVersion());
+				if (!$this->config->dev) {
+					$this->assetsCollections['footerJs']->addJs($script, null, true, [], $this->core->getVersion());
+				} else {
+					$this->assetsCollections['footerJs']->addJs($script);
+				}
 			}
 		}
 	}

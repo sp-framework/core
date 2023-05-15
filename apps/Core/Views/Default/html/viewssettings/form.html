@@ -16,6 +16,26 @@
                     <span class="text-uppercase" id="view">{{viewssettings['view_id']}}</span>
                 </div>
             </div>
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'id',
+                    'fieldLabel'                     : 'view settings ID',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'view settings ID',
+                    'fieldRequired'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldHidden'                    : true,
+                    'fieldDisabled'                  : true,
+                    'fieldValue'                     : viewssettings['id']
+                ]
+            )}}
         {% else %}
             {% set viewsSettings = viewssettings %}
             <div class="row">
@@ -95,6 +115,108 @@
                 </div>
             </div>
         {% endif %}
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'settings-keys',
+                        'fieldLabel'                           : 'Select Setting',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select setting that you want to modify or add.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldDataSelect2Options'              : [],
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsSelected'      : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row" id="settings-text" hidden>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'settings-text',
+                        'fieldLabel'                     : 'Settings Value',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Enter settings value and save.',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldValue'                     : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row" id="settings-textarea" hidden>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'settings-textarea',
+                        'fieldLabel'                     : 'Settings Value',
+                        'fieldType'                      : 'textarea',
+                        'fieldDataMaxLength'             : 4096,
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Enter settings value and save.',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnAdd'              : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldDataInputMaxLength'        : 4096,
+                        'fieldTextareaRows'              : 5,
+                        'fieldValue'                     : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'buttonType'                    : 'button',
+                        'buttons'                       :
+                            [
+                                'save'    : [
+                                    'title'                   : 'Save',
+                                    'size'                    : 'xs',
+                                    'disabled'                : true,
+                                    'position'                : 'right',
+                                    'type'                    : 'primary',
+                                    'icon'                    : 'floppy-disk'
+                                ],
+                                'cancel'    : [
+                                    'title'                   : 'Cancel',
+                                    'size'                    : 'xs',
+                                    'disabled'                : true,
+                                    'position'                : 'right',
+                                    'type'                    : 'secondary'
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
         <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
@@ -151,8 +273,8 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 }
 
 dataCollectionSectionForm['vars'] = { };
-dataCollectionSectionForm['vars']['apps'] = JSON.parse("{{apps|escape_js}}");
-dataCollectionSectionForm['vars']['viewsSettings'] = JSON.parse("{{viewsSettings|escape_js}}");
+dataCollectionSectionForm['vars']['apps'] = JSON.parse('{{apps}}');
+dataCollectionSectionForm['vars']['viewsSettings'] = JSON.parse('{{viewsSettings}}');
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
@@ -232,20 +354,438 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}-settings')
                         .val(JSON.stringify(dataCollectionSectionForm['vars']['viewsSettings'], null, 4));
                 }
-
                 prettyfyJson();
             }
         },
+        '{{componentId}}-{{sectionId}}-settings-keys'                           : {
+            placeholder: "SELECT SETTING TO MODIFY OR ADD",
+            afterInit: function() {
+                var keys =
+                    [
+                        {
+                            'body-jsscript' : {
+                                'id'    : 'body-jsscript',
+                                'text'  : 'Body Inline Java Script'
+                            }
+                        },
+                        {
+                            'head-link-href' : {
+                                'id'    : 'head-link-href',
+                                'text'  : 'Head CSS Links'
+                            }
+                        },
+                        {
+                            'head-meta-author' : {
+                                'id'    : 'head-meta-author',
+                                'text'  : 'Head Meta Author'
+                            }
+                        },
+                        {
+                            'head-meta-charset' : {
+                                'id'    : 'head-meta-charset',
+                                'text'  : 'Head Meta Charset'
+                            }
+                        },
+                        {
+                            'head-meta-keywords' : {
+                                'id'    : 'head-meta-keywords',
+                                'text'  : 'Head Meta Keywords'
+                            }
+                        },
+                        {
+                            'head-meta-viewport' : {
+                                'id'    : 'head-meta-viewport',
+                                'text'  : 'Head Meta Viewport'
+                            }
+                        },
+                        {
+                            'head-meta-description' : {
+                                'id'    : 'head-meta-description',
+                                'text'  : 'Head Meta Description'
+                            }
+                        },
+                        {
+                            'title' : {
+                                'id'    : 'title',
+                                'text'  : 'Site Title'
+                            }
+                        },
+                        {
+                            'script-src' : {
+                                'id'    : 'script-src',
+                                'text'  : 'Head Java Scripts Source'
+                            }
+                        },
+                        {
+                            'tags' : {
+                                'id'    : 'tags',
+                                'text'  : 'HTML Tags'
+                            }
+                        },
+                        {
+                            'footer-script-src' : {
+                                'id'    : 'footer-script-src',
+                                'text'  : 'Footer Java Scripts Source'
+                            }
+                        },
+                        {
+                            'footer-jsscript' : {
+                                'id'    : 'footer-jsscript',
+                                'text'  : 'Footer Inline Java Script'
+                            }
+                        },
+                        {
+                            'footer-copyright-name' : {
+                                'id'    : 'footer-copyright-name',
+                                'text'  : 'Footer Copyright Name'
+                            }
+                        },
+                        {
+                            'footer-copyright-site' : {
+                                'id'    : 'footer-copyright-site',
+                                'text'  : 'Footer Copyright Website'
+                            }
+                        },
+                        {
+                            'footer-copyright-fromYear' : {
+                                'id'    : 'footer-copyright-fromYear',
+                                'text'  : 'Footer Copyright From Year'
+                            }
+                        },
+                        {
+                            'layouts' : {
+                                'id'    : 'layouts',
+                                'text'  : 'Layouts'
+                            }
+                        },
+                        {
+                            'mandatory' : {
+                                'id'    : 'mandatory',
+                                'text'  : 'View Mandatory'
+                            }
+                        }
+                    ];
+
+                $(keys).each(function(e, key) {
+                    for (var keyId in key) {
+                        var newOption = new Option(key[keyId].text, key[keyId].id, false, false);
+                        $('#{{componentId}}-{{sectionId}}-settings-keys').append(newOption).trigger('change');
+                    }
+                });
+
+                var key, settings, fieldType, type;
+
+                $('#{{componentId}}-{{sectionId}}-settings-keys').on('select2:select', function(e) {
+                    $('#settings-text').attr('hidden', true);
+                    $('#settings-textarea').attr('hidden', true);
+                    $('#settings-select').attr('hidden', true);
+
+                    key = e.params.data.id;
+
+                    switch (key) {
+                        case 'body-jsscript' :
+                            type = 'textarea';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['body']['jsscript']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['body']['jsscript'];
+                            }
+
+                            break;
+                        case 'head-link-href' :
+                            type = 'array';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href'];
+                            }
+
+                            break;
+                        case 'head-meta-author' :
+                            type = 'text';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['author']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['author'];
+                            }
+
+                            break;
+                        case 'head-meta-charset' :
+                            type = 'text';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['charset']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['charset'];
+                            }
+
+                            break;
+                        case 'head-meta-keywords' :
+                            type = 'text';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['keywords']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['keywords'];
+                            }
+
+                            break;
+                        case 'head-meta-viewport' :
+                            type = 'text';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['viewport']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['viewport'];
+                            }
+
+                            break;
+                        case 'head-meta-description' :
+                            type = 'text';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['description']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['description'];
+                            }
+
+                            break;
+                        case 'title' :
+                            type = 'text';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['title']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['title'];
+                            }
+
+                            break;
+                        case 'script-src' :
+                            type = 'array';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src'];
+                            }
+
+                            break;
+                        case 'tags' :
+                            type = 'text';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['tags']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['tags'];
+                            }
+
+                            break;
+                        case 'footer-script-src' :
+                            type = 'textarea';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src'];
+                            }
+
+                            break;
+                        case 'footer-jsscript' :
+                            type = 'textarea';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['jsscript']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['footer']['jsscript'];
+                            }
+
+                            break;
+                        case 'footer-copyright-name' :
+                            type = 'text';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['name']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['name'];
+                            }
+
+                            break;
+                        case 'footer-copyright-site' :
+                            type = 'text';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['site']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['site'];
+                            }
+
+                            break;
+                        case 'footer-copyright-fromYear' :
+                            type = 'text';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['fromYear']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['fromYear'];
+                            }
+
+                            break;
+                        case 'layouts' :
+                            type = 'array';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['layouts']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['layouts'];
+                            }
+
+                            break;
+                        case 'mandatory' :
+                            type = 'boolean';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['mandatory']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['mandatory'];
+                            }
+
+                            break;
+                    }
+                    //eslint-disable-next-line
+                    console.log(type, settings);
+                    if (type === 'text' || type === 'boolean') {
+                        $('#{{componentId}}-{{sectionId}}-settings-text').val(settings);
+
+                        fieldType = 'text';
+                    } else if (type === 'textarea') {
+                        $('#{{componentId}}-{{sectionId}}-settings-textarea').val(settings);
+                        fieldType = 'textarea';
+                    } else if (type === 'array') {
+                        $('#{{componentId}}-{{sectionId}}-settings-textarea').val(JSON.stringify(settings, null, 4));
+
+                        fieldType = 'textarea';
+                    }
+
+                    $('#settings-' + fieldType).attr('hidden', false);
+                    $('#{{componentId}}-{{sectionId}}-save').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', false);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-cancel').off();
+                $('#{{componentId}}-{{sectionId}}-cancel').click(function(e) {
+                    e.preventDefault();
+
+                    $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val('');
+                    $('#settings-' + fieldType).attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-save').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-settings-keys').val(0).trigger('change');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-save').off();
+                $('#{{componentId}}-{{sectionId}}-save').click(function(e) {
+                    e.preventDefault();
+
+                    switch (key) {
+                        case 'body-jsscript' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['body']['jsscript']
+                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                            break;
+                        case 'head-link-href' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']
+                                 = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                            break;
+                        case 'head-meta-author' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['author']
+                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                            break;
+                        case 'head-meta-charset' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['charset']
+                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                            break;
+                        case 'head-meta-keywords' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['keywords']
+                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                            break;
+                        case 'head-meta-viewport' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['viewport']
+                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                            break;
+                        case 'head-meta-description' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['description']
+                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                            break;
+                        case 'title' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['head']['title']
+                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                            break;
+                        case 'script-src' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']
+                                 = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                            break;
+                        case 'tags' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['tags']
+                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                            break;
+                        case 'footer-script-src' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']
+                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                            break;
+                        case 'footer-jsscript' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['footer']['jsscript']
+                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                            break;
+                        case 'footer-copyright-name' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['name']
+                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                            break;
+                        case 'footer-copyright-site' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['site']
+                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                            break;
+                        case 'footer-copyright-fromYear' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['fromYear']
+                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                            break;
+                        case 'layouts' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['layouts']
+                                = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                            break;
+                        case 'mandatory' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['mandatory']
+                                = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                            break;
+                    }
+
+                    $('#{{componentId}}-{{sectionId}}-settings')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['viewsSettings'], null, 4));
+
+                    $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val('');
+                    $('#settings-' + fieldType).attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-save').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-settings-keys').val(0).trigger('change');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-settings-text'                           : { },
+        '{{componentId}}-{{sectionId}}-settings-textarea'                       : { },
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
         '{{componentId}}-{{sectionId}}-form'                                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-domain_id'                            : 'required',
                 '{{componentId}}-{{sectionId}}-app_id'                               : 'required',
                 '{{componentId}}-{{sectionId}}-view_id'                              : 'required',
+                '{{componentId}}-{{sectionId}}-settings'                             : 'required',
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-domain_id'                            : 'Please select domain',
                 '{{componentId}}-{{sectionId}}-app_id'                               : 'Please select app',
                 '{{componentId}}-{{sectionId}}-view_id'                              : 'Please select view',
+                '{{componentId}}-{{sectionId}}-settings'                             : 'Please enter settings',
             }
         }
     });
