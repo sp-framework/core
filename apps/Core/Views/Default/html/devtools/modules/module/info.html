@@ -14,7 +14,9 @@
     {% set moduleApiId = module['module_details']['api_id'] %}
     {% set moduleVersion = module['version'] %}
     {% set moduleRepo = module['repo'] %}
-    {% set moduleClass = module['class'] %}
+    {% if type !== 'views' %}
+        {% set moduleClass = module['class'] %}
+    {% endif %}
     {% if type === 'components' %}
         {% set moduleMenu_id = '' %}
         {% set moduleMenu = '' %}
@@ -328,6 +330,7 @@
         )}}
     </div>
 </div>
+{% if type !== 'views' %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -353,6 +356,7 @@
         )}}
     </div>
 </div>
+{% endif %}
 {% if type !== 'core' %}
 <div class="row">
     <div class="col">
@@ -369,7 +373,7 @@
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'Apps of the component. This is set via Apps component. Do not modify this here.',
                 'fieldRequired'                  : false,
-                'fieldDisabled'                  : false,
+                'fieldDisabled'                  : true,
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMaxLength'        : 2048,

@@ -272,7 +272,109 @@
         </div>
     </div>
 {% elseif type === 'views' %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'settings-keys',
+                'fieldLabel'                           : 'Select Setting',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select setting that you want to modify or add.',
+                'fieldRequired'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldDataSelect2Options'              : [],
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsSelected'      : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row" id="settings-text" hidden>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'settings-text',
+                'fieldLabel'                     : 'Settings Value',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Enter settings value and save.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 1024,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row" id="settings-textarea" hidden>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'settings-textarea',
+                'fieldLabel'                     : 'Settings Value',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 4096,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Enter settings value and save.',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnAdd'              : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldTextareaRows'              : 5,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                    [
+                        'save'    : [
+                            'title'                   : 'Save',
+                            'size'                    : 'xs',
+                            'disabled'                : true,
+                            'position'                : 'right',
+                            'type'                    : 'primary',
+                            'icon'                    : 'floppy-disk'
+                        ],
+                        'cancel'    : [
+                            'title'                   : 'Cancel',
+                            'size'                    : 'xs',
+                            'disabled'                : true,
+                            'position'                : 'right',
+                            'type'                    : 'secondary'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
 {% endif %}
+{% if type === 'components' or type === 'middlewares' or type === 'packages' %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('buttons',
@@ -293,6 +395,7 @@
         )}}
     </div>
 </div>
+{% endif %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
