@@ -23,6 +23,8 @@ class Views extends BasePackage
 
     protected $phalconViewLayoutFile;
 
+    protected $activeLayout;
+
     protected $viewSettings;
 
     protected $cache;
@@ -123,7 +125,7 @@ class Views extends BasePackage
             if ($this->viewSettings && isset($this->viewSettings['layouts'])) {
                 foreach ($this->viewSettings['layouts'] as $layout) {
                     if (isset($layout['active']) && $layout['active'] == true) {
-                        $this->phalconViewLayoutFile = $layout['view'];
+                        $this->activeLayout = $layout['view'];
                         break;
                     }
                 }
@@ -132,6 +134,9 @@ class Views extends BasePackage
 
         if (!$this->phalconViewLayoutFile) {
             $this->phalconViewLayoutFile = 'default';
+        }
+        if (!$this->activeLayout) {
+            $this->activeLayout = 'default';
         }
     }
 
@@ -153,6 +158,11 @@ class Views extends BasePackage
     public function getPhalconViewLayoutFile()
     {
         return $this->phalconViewLayoutFile;
+    }
+
+    public function getActiveLayout()
+    {
+        return $this->activeLayout;
     }
 
     public function getCache()

@@ -386,6 +386,8 @@ abstract class BaseComponent extends Controller
 
 		$this->view->viewName = $this->views['name'];
 
+		$this->view->activeLayout = $this->modules->views->getActiveLayout();
+
 		if ($this->app && isset($this->componentRoute)) {
 			if ($this->componentRoute === '') {
 				$this->view->breadcrumb = 'home';

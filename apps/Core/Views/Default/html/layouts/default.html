@@ -14,16 +14,11 @@
         {{assets.outputJs('headJs')}}
         {{assets.outputInlineCss()}}
     </head>
-    {% set layout = 'default' %}
-    {% if modules.views.getViewSettings()['layouts'] is defined and modules.views.getViewSettings()['layouts']|length > 1 %}
-        {% for layout in modules.views.getViewSettings()['layouts'] %}
-            {% if layout['active'] is defined and layout['view'] === 'topnav' %}
-                {% set layout = 'topnav' %}
-                <body id="body" class="layout-top-nav sidebar-collapse text-sm">
-            {% elseif layout['active'] is defined and layout['view'] === 'default' %}
-                <body id="body" class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm">
-            {% endif %}
-        {% endfor %}
+    {% set activeLayout = 'topnavsidebar' %}
+    {% if activeLayout is defined and activeLayout === 'topnav' or activeLayout === 'topnavsidebar' %}
+        <body id="body" class="layout-top-nav sidebar-collapse layout-navbar-fixed text-sm">
+    {% elseif activeLayout === 'default' %}
+        <body id="body" class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm">
     {% else %}
         <body id="body" class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm">
     {% endif %}
@@ -108,13 +103,15 @@ if (localStorage.getItem('bazDevMode') === null) {
             {{assets.get('body').getCodes()[0].getContent()}}
         </script>
         <div class="wrapper">
-            {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/header/view') %}
-            {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/sidebar/view') %}
-            {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/content/view') %}
-            {% if modules.components.getComponentByNameForAppId('Messenger', apps.getAppInfo()['id']) %}
-                {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/messenger/view') %}
+            {% include modules.views.getPhalconViewPath() ~ 'layouts/default/header/view' with ['activeLayout': activeLayout] %}
+            {% if activeLayout === 'default' or activeLayout === 'topnavsidebar' %}
+                {% include modules.views.getPhalconViewPath() ~ 'layouts/default/sidebar/view' with ['activeLayout': activeLayout] %}
             {% endif %}
-            {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/footer/view') %}
+            {% include modules.views.getPhalconViewPath() ~ 'layouts/default/content/view' with ['activeLayout': activeLayout] %}
+            {% if modules.components.getComponentByNameForAppId('Messenger', apps.getAppInfo()['id']) %}
+                {% include modules.views.getPhalconViewPath() ~ 'layouts/default/messenger/view' with ['activeLayout': activeLayout] %}
+            {% endif %}
+            {% include modules.views.getPhalconViewPath() ~ 'layouts/default/footer/view' with ['activeLayout': activeLayout] %}
         </div>
     </body>
 </html>

@@ -243,7 +243,7 @@ var BazCore = function() {
 
     //Menu
     function openMenu() {
-        var currentActiveLocation = $('a[href="/' + dataCollection.env.currentRoute + '"].nav-link');
+        var currentActiveLocation = $('a[href="' + dataCollection.env.currentRoute + '"].nav-link');
 
         if (currentActiveLocation.length === 0) {
             if (dataCollection.env['parentComponentId']) {

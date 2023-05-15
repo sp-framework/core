@@ -35,6 +35,7 @@ var BazContentLoader = function() {
                     $(this).parents('.sidebar').find('a.active').removeClass('active');
                     $(this).addClass('active');
                     $(this).parents('.nav-treeview').siblings('a.nav-link').addClass('active');
+                    $('[data-widget="pushmenu"]').PushMenu('collapse');
                 }
                 // Close all menu items if root item clicked
                 if (!$(this).parents().is('.treeview')) {
@@ -278,7 +279,6 @@ var BazContentLoader = function() {
                 BazCore.initResizeElement();
             });
         }, options.ajaxLoadDelay);
-
     }
 
     function loadModal(element, options) {
@@ -679,7 +679,7 @@ var BazCore = function() {
 
     //Menu
     function openMenu() {
-        var currentActiveLocation = $('a[href="/' + dataCollection.env.currentRoute + '"].nav-link');
+        var currentActiveLocation = $('a[href="' + dataCollection.env.currentRoute + '"].nav-link');
 
         if (currentActiveLocation.length === 0) {
             if (dataCollection.env['parentComponentId']) {
