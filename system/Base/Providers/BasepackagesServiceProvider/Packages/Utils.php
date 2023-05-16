@@ -142,8 +142,11 @@ class Utils extends BasePackage
                         $prefix .= str_repeat($indent, $arrayLevel);
                     }
                     $arrayLevel++;
-                    $suffix = $return;
-                    $suffix .= str_repeat($indent, $arrayLevel);
+                    if ($data['json'][$i + 1] !== '}') {
+                        $suffix = $return;
+                        $suffix .= str_repeat($indent, $arrayLevel);
+                    }
+
                     break;
 
                 case ':':
