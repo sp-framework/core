@@ -2,6 +2,7 @@
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         {% if viewssettings['id'] is defined %}
             {% set viewsSettings = viewssettings['settings'] %}
+            {% set viewsSettingsId = viewssettings['id'] %}
             <div class="row">
                 <div class="col">
                     <label>DOMAIN: </label>
@@ -197,6 +198,13 @@
                         'buttonType'                    : 'button',
                         'buttons'                       :
                             [
+                                'reset'    : [
+                                    'title'                   : 'Reset',
+                                    'size'                    : 'xs',
+                                    'position'                : 'left',
+                                    'type'                    : 'warning',
+                                    'icon'                    : 'rotate-left'
+                                ],
                                 'save'    : [
                                     'title'                   : 'Save',
                                     'size'                    : 'xs',
@@ -217,6 +225,7 @@
                 )}}
             </div>
         </div>
+        <hr>
         <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
@@ -247,7 +256,7 @@
 {% set apps = json_encode(apps) %}
 {% set viewsSettings = json_encode(viewsSettings) %}
 <script>
-/* globals PNotify */
+/* globals PNotify Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -275,6 +284,7 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['apps'] = JSON.parse('{{apps}}');
 dataCollectionSectionForm['vars']['viewsSettings'] = JSON.parse('{{viewsSettings}}');
+dataCollectionSectionForm['vars']['viewsSettingsId'] = '{{viewsSettingsId}}';
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
@@ -654,6 +664,63 @@ dataCollectionSection =
                     $('#settings-' + fieldType).attr('hidden', false);
                     $('#{{componentId}}-{{sectionId}}-save').attr('disabled', false);
                     $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', false);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-reset').off();
+                $('#{{componentId}}-{{sectionId}}-reset').click(function(e) {
+                    e.preventDefault();
+
+                    var swalSound = window['dataCollection'].env.sounds.swalSound;
+
+                    Swal.fire({
+                        title                       : '<span class="text-warning"> Reset Settings?</span>',
+                        text                        : 'This will reset all settings and grab original settings from the view module.',
+                        icon                        : 'question',
+                        background                  : 'rgba(0,0,0,.8)',
+                        backdrop                    : 'rgba(0,0,0,.6)',
+                        buttonsStyling              : false,
+                        confirmButtonText           : 'Reset',
+                        customClass                 : {
+                            'confirmButton'             : 'btn btn-warning text-uppercase',
+                            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                        },
+                        showCancelButton            : true,
+                        keydownListenerCapture      : true,
+                        allowOutsideClick           : true,
+                        allowEscapeKey              : true,
+                        didOpen                     : function() {
+                            swalSound.play();
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                            var postData = { };
+                            postData[$('#security-token').attr('name')] = $('#security-token').val();
+                            postData['viewsettings_id'] = dataCollectionSectionForm['vars']['viewsSettingsId'];
+
+                            $.post('{{links.url("viewssettings/getViewsSettingsFromViewModule")}}', postData, function(response) {
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+
+                                if (response.responseCode == 0) {
+                                    $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val('');
+                                    $('#{{componentId}}-{{sectionId}}-settings')
+                                        .val(JSON.stringify(response.responseData['settings'], null, 4));
+                                    $('#settings-' + fieldType).attr('hidden', true);
+                                    $('#{{componentId}}-{{sectionId}}-save').attr('disabled', true);
+                                    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
+                                    $('#{{componentId}}-{{sectionId}}-settings-keys').val(0).trigger('change');
+
+                                    PNotify.success({'text': response.responseMessage});
+
+                                    return;
+                                }
+
+                                PNotify.error({'text': response.responseMessage});
+                            }, 'json');
+                        }
+                    });
                 });
 
                 $('#{{componentId}}-{{sectionId}}-cancel').off();

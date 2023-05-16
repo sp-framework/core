@@ -253,4 +253,31 @@ class ViewssettingsComponent extends BaseComponent
             $this->addResponse('Method Not Allowed', 1);
         }
     }
+
+    public function getViewsSettingsFromViewModuleAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->postData()['viewsettings_id']) {
+                $viewsSettings = $this->modules->viewsSettings->getViewsSettingsFromViewModule($this->postData()['viewsettings_id']);
+
+                if ($viewsSettings) {
+                    $this->addResponse(
+                        $this->modules->viewsSettings->packagesData->responseMessage,
+                        0,
+                        $this->modules->viewsSettings->packagesData->responseData,
+                    );
+
+                    return;
+                }
+
+                $this->addResponse('No settings for this view found.', 1, []);
+            }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
 }

@@ -152,4 +152,29 @@ class ViewsSettings extends BasePackage
 
         return false;
     }
+
+    public function getViewsSettingsFromViewModule($viewSettingsId)
+    {
+        if (!$this->viewssettings) {
+            return false;
+        }
+
+        $viewSettings = $this->getViewsSettingsById($viewSettingsId);
+
+        if ($viewSettings) {
+            $viewModule = $this->modules->views->getById($viewSettings['view_id']);
+
+            if ($viewModule) {
+                $viewModule = $this->jsonDecodeData($viewModule);
+
+                $this->addResponse('Loaded settings from modules view.', 0, ['settings' => $viewModule['settings']]);
+
+                return true;
+            }
+        }
+
+        $this->addResponse('Settings not found', 1);
+
+        return false;
+    }
 }
