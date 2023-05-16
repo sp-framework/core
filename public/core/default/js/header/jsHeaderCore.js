@@ -452,7 +452,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 // eslint-disable-next-line no-unused-vars
 var BazCore = function() {
     var BazCore = void 0;
-    var dataCollection, timerId;
+    var dataCollection, timerId, timeout;
 
     // Error
     // function error(errorMsg) {
@@ -466,21 +466,32 @@ var BazCore = function() {
 
     //Load Footer - load scripts if not loaded
     function bazFooter(options) {
+        var url;
         dataCollection = window.dataCollection;
         if (dataCollection.env.libsLoaded === false) {
             Pace.restart();
             if (options.loadFooterAt === 'auth') {
                 $('.pace-loading-text').attr('hidden', false);
                 $($('.pace-loading-text span')[1]).text(' core libs');
+                if (dataCollection.env.devmode && dataCollection.env.devmode == '1') {
+                    url = dataCollection.env.jsPath + 'footer/jsFooterCore.js';
+                } else {
+                    url = dataCollection.env.jsPath + 'footer/jsFooterCore.js?ver=' + dataCollection.env.coreVer;
+                }
                 $.ajax({
-                    url: dataCollection.env.jsPath + 'footer/jsFooterCore.js?ver=' + dataCollection.env.coreVer,
+                    url: url,
                     dataType: 'script',
                     async: true,
                     cache: true
                 }).done(function() {
                     $($('.pace-loading-text span')[1]).text(' plugins');
+                    if (dataCollection.env.devmode && dataCollection.env.devmode == '1') {
+                        url = dataCollection.env.jsPath + 'footer/jsFooterPlugins.js';
+                    } else {
+                        url = dataCollection.env.jsPath + 'footer/jsFooterPlugins.js?ver=' + dataCollection.env.coreVer;
+                    }
                     $.ajax({
-                        url: dataCollection.env.jsPath + 'footer/jsFooterPlugins.js?ver=' + dataCollection.env.coreVer,
+                        url: url,
                         dataType: 'script',
                         async: true,
                         cache: true
@@ -491,14 +502,24 @@ var BazCore = function() {
                     });
                 });
             } else {
+                if (dataCollection.env.devmode && dataCollection.env.devmode == '1') {
+                    url = dataCollection.env.jsPath + 'footer/jsFooterCore.js';
+                } else {
+                    url = dataCollection.env.jsPath + 'footer/jsFooterCore.js?ver=' + dataCollection.env.coreVer;
+                }
                 $.ajax({
-                    url: dataCollection.env.jsPath + 'footer/jsFooterCore.js?ver=' + dataCollection.env.coreVer,
+                    url: url,
                     dataType: 'script',
                     async: true,
                     cache: true
                 }).done(function() {
+                    if (dataCollection.env.devmode && dataCollection.env.devmode == '1') {
+                        url = dataCollection.env.jsPath + 'footer/jsFooterPlugins.js';
+                    } else {
+                        url = dataCollection.env.jsPath + 'footer/jsFooterPlugins.js?ver=' + dataCollection.env.coreVer;
+                    }
                     $.ajax({
-                        url: dataCollection.env.jsPath + 'footer/jsFooterPlugins.js?ver=' + dataCollection.env.coreVer,
+                        url: url,
                         dataType: 'script',
                         async: true,
                         cache: true
@@ -560,9 +581,16 @@ var BazCore = function() {
                 if (timerId) {
                     BazHelpers.setTimeoutTimers.stop(timerId, null, 'ping');
                 }
+
+                if (dataCollection.env.devmode && dataCollection.env.devmode == '1') {
+                    timeout = 60000;
+                } else {
+                    timeout = 600000;
+                }
+
                 BazHelpers.setTimeoutTimers.add(function() {
                     initPings();
-                }, 60000, null, 'ping');
+                }, timeout, null, 'ping');
             } else {
                 //Connection is Dead
                 $('.connectivity-icon').removeClass(function (index, className) {
@@ -571,9 +599,16 @@ var BazCore = function() {
                 if (timerId) {
                     BazHelpers.setTimeoutTimers.stop(timerId, null, 'ping');
                 }
+
+                if (dataCollection.env.devmode && dataCollection.env.devmode == '1') {
+                    timeout = 900000;
+                } else {
+                    timeout = 300000;
+                }
+
                 BazHelpers.setTimeoutTimers.add(function() {
                     initPings();
-                }, 300000, null, 'ping');
+                }, timeout, null, 'ping');
             }
         });
     }

@@ -3924,8 +3924,13 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                     var mainButton = this;
 
                     if (that._validateForm()) {
-                        $(this).children('i').attr('hidden', false);
-                        $(this).attr('disabled', true);
+                        if (dataCollection.env.devmode && dataCollection.env.devmode == '1') {
+                            $(this).children('i').attr('hidden', true);
+                            $(this).attr('disabled', false);
+                        } else {
+                            $(this).children('i').attr('hidden', false);
+                            $(this).attr('disabled', true);
+                        }
                         // if ($('.dz-clickable').length > 0) {
                         //     $('.dz-clickable').each(function(index, dzButton) {
                         //         var dzButtonId = $(dzButton)[0].id;
