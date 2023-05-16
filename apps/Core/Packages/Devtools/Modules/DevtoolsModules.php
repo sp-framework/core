@@ -322,7 +322,7 @@ class DevtoolsModules extends BasePackage
         } else if ($data['module_type'] === 'middlewares') {
         } else if ($data['module_type'] === 'views') {
 
-            $data = $this->jsonDecodeData($data);
+            $data = $this->basepackages->utils->jsonDecodeData($data);
 
             $jsonContent = [];
             $jsonContent["name"] = $data["name"];
