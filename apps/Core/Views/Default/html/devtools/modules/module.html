@@ -80,6 +80,7 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 }
 
 dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['module_type'] = '{{type}}';
 dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modulesJson}}');
 dataCollectionSectionForm['vars']['moduleDependencies'] = JSON.parse('{{moduleDependencies}}');
 dataCollectionSectionForm['vars']['moduleSettings'] = JSON.parse('{{moduleSettings}}');
@@ -114,35 +115,156 @@ dataCollectionSection =
             'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY',
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function(e) {
-                    var id, repourl, currenturl, currenturlArr, name, lastCharOfRepourl, moduleRepoUrl;
+                    var id, repourl;
 
                     id = e.params.data.id;
                     repourl = $(e.params.data.element).data('url');
-                    currenturl = $('#{{componentId}}-{{sectionId}}-repo').val();
 
-                    lastCharOfRepourl = repourl.substr(repourl.length - 1);
+                    repourl =
+                        repourl + '/' +
+                        'apps-' +
+                        $('#{{componentId}}-{{sectionId}}-app_type').val().toLowerCase() + '-' +
+                        $('#{{componentId}}-{{sectionId}}-module_type').val().toLowerCase() + '-' +
+                        $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
 
-                    if (currenturl !== '') {
-                        currenturlArr = currenturl.split('/');
-                        name = currenturlArr[currenturlArr.length - 1];
-                        moduleRepoUrl = repourl.toLowerCase() + name.toLowerCase();
-                        if (lastCharOfRepourl !== '/') {
-                            moduleRepoUrl = repourl.toLowerCase() + '/' + name.toLowerCase();
-                        }
-                        $('#{{componentId}}-{{sectionId}}-repo').val(moduleRepoUrl);
-                    } else {
-                        if (lastCharOfRepourl !== '/') {
-                            $('#{{componentId}}-{{sectionId}}-repo').val(repourl + '/');
-                        } else {
-                            $('#{{componentId}}-{{sectionId}}-repo').val(repourl);
-                        }
-                    }
+                    $('#{{componentId}}-{{sectionId}}-repo').val(repourl);
                 });
             }
         },
         '{{componentId}}-{{sectionId}}-version'                                 : { },
         '{{componentId}}-{{sectionId}}-repo'                                    : { },
-        '{{componentId}}-{{sectionId}}-class'                                   : { },
+        '{{componentId}}-{{sectionId}}-class'                                   : {
+            afterInit: function() {
+                function capitalizeFirstLetter(string) {
+                    return string.charAt(0).toUpperCase() + string.slice(1);
+                }
+
+                var currentClass = $('#{{componentId}}-{{sectionId}}-class').val();
+                var currentClassArr = [];
+                var routeArr = [];
+                var nameArr = [];
+
+                if (currentClass !== '') {
+                    currentClassArr = currentClass.split('\\');
+                } else {
+                    currentClassArr[0] = 'Apps';
+                    currentClassArr[1] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
+                    currentClassArr[2] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-module_type').val());
+                }
+
+                $('#{{componentId}}-{{sectionId}}-app_type').on('change.select2', function() {
+                    var data = $('#{{componentId}}-{{sectionId}}-app_type').select2('data')[0];
+
+                    currentClassArr[1] = data.text
+
+                    $('#{{componentId}}-{{sectionId}}-class').val(currentClassArr.join('\\'));
+                });
+
+                $('#{{componentId}}-{{sectionId}}-name').off();
+                $('#{{componentId}}-{{sectionId}}-name').on('keyup', function() {
+                    extractName();
+                });
+
+                function extractName() {
+                    if ((dataCollectionSectionForm['vars']['module_type'] === 'packages' &&
+                        $('#{{componentId}}-{{sectionId}}-category').select2('data')[0].id !== 'basepackages') ||
+                        dataCollectionSectionForm['vars']['module_type'] === 'middlewares'
+                    ) {
+                        currentClassArr[0] = 'Apps';
+                        currentClassArr[1] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
+                        currentClassArr[2] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-module_type').val());
+                        currentClassArr[3] = '';
+                        currentClassArr[4] = '';
+
+                        if ($('#{{componentId}}-{{sectionId}}-name').val() !== '') {
+                            if (dataCollectionSectionForm['vars']['module_type'] === 'middlewares') {
+                                name = $('#{{componentId}}-{{sectionId}}-name').val();
+                                currentClassArr[3] = capitalizeFirstLetter(name);
+                                currentClassArr[4] = currentClassArr[3];
+                            } else {
+                                nameArr = $('#{{componentId}}-{{sectionId}}-name').val().split(/(?=[A-Z])/);
+
+                                if (nameArr.length === 1) {
+                                    currentClassArr[3] = capitalizeFirstLetter(nameArr[0]);
+                                    currentClassArr[4] = currentClassArr[3];
+                                } else {
+                                    if (nameArr[nameArr.length -1] !== '') {
+                                        $(nameArr).each(function(i, name) {
+                                            if (i !== nameArr.length) {
+                                                i = 3 + i;
+                                                if (dataCollectionSectionForm['vars']['module_type'] === 'packages') {
+                                                    currentClassArr[i] = capitalizeFirstLetter(name);
+                                                    currentClassArr[i + 1] = currentClassArr[i - 1] + capitalizeFirstLetter(name)
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+
+                        } else {
+                            currentClassArr = [];
+                            currentClassArr[0] = 'Apps';
+                            currentClassArr[1] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
+                            currentClassArr[2] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-module_type').val());
+                        }
+                    } else if (dataCollectionSectionForm['vars']['module_type'] === 'packages' &&
+                               $('#{{componentId}}-{{sectionId}}-category').select2('data')[0].id === 'basepackages'
+                    ) {
+                        currentClassArr[5] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-name').val());
+                    }
+
+                    $('#{{componentId}}-{{sectionId}}-class').val(currentClassArr.join('\\'));
+                }
+
+                $('#{{componentId}}-{{sectionId}}-route').off();
+                $('#{{componentId}}-{{sectionId}}-route').on('keyup', function() {
+                    currentClassArr[3] = '';
+                    currentClassArr[4] = '';
+
+                    if ($('#{{componentId}}-{{sectionId}}-route').val() !== '') {
+                        routeArr = $('#{{componentId}}-{{sectionId}}-route').val().split('/');
+                        if (routeArr.length === 1) {
+                            currentClassArr[3] = capitalizeFirstLetter(routeArr[0]);
+                            currentClassArr[4] = capitalizeFirstLetter(routeArr[0]) + 'Component';
+                        } else {
+                            if (routeArr[routeArr.length -1] !== '') {
+                                $(routeArr).each(function(i, route) {
+                                    if (i !== routeArr.length) {
+                                        i = 3 + i;
+                                        currentClassArr[i] = capitalizeFirstLetter(route);
+                                        currentClassArr[i + 1] = capitalizeFirstLetter(route) + 'Component';
+                                    }
+                                });
+                            }
+                        }
+                    } else {
+                        currentClassArr = [];
+                        currentClassArr[0] = 'Apps';
+                        currentClassArr[1] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
+                        currentClassArr[2] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-module_type').val());
+                    }
+
+                    $('#{{componentId}}-{{sectionId}}-class').val(currentClassArr.join('\\'));
+                });
+
+                $('#{{componentId}}-{{sectionId}}-category').on('change.select2', function() {
+                    var data = $('#{{componentId}}-{{sectionId}}-category').select2('data')[0];
+
+                    if (data.id === 'basepackages') {
+                        currentClassArr[0] = 'System';
+                        currentClassArr[1] = 'Base';
+                        currentClassArr[2] = 'Providers';
+                        currentClassArr[3] = 'BasepackagesServiceProvider';
+                        currentClassArr[4] = 'Packages';
+                        currentClassArr[5] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-name').val());
+                        $('#{{componentId}}-{{sectionId}}-class').val(currentClassArr.join('\\'));
+                    } else {
+                        extractName();
+                    }
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-settings'                                : {
             'afterInit'     : function() {
                 if (dataCollectionSectionForm['vars']['moduleSettings'].length === 0) {
@@ -355,7 +477,10 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-settings-keys'                           : {
             placeholder: "SELECT SETTING TO MODIFY OR ADD",
             afterInit: function() {
-                var keys =
+                var keys;
+
+                if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
+                    keys =
                     [
                         {
                             'body-jsscript' : {
@@ -460,6 +585,101 @@ dataCollectionSection =
                             }
                         }
                     ];
+                } else if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
+                    keys =
+                    [
+                        {
+                            'debug' : {
+                                'id'        : 'debug',
+                                'text'      : 'Debug Enabled?'
+                            }
+                        },
+                        {
+                            'cache-enabled' : {
+                                'id'        : 'cache-enabled',
+                                'text'      : 'Cache Enabled?'
+                            }
+                        },
+                        {
+                            'cache-timeout' : {
+                                'id'        : 'cache-timeout',
+                                'text'      : 'Cache Timeout'
+                            }
+                        },
+                        {
+                            'cache-service' : {
+                                'id'        : 'cache-service',
+                                'text'      : 'Cache Service'
+                            }
+                        },
+                        {
+                            'security-passwordWorkFactor' : {
+                                'id'        : 'security-passwordWorkFactor',
+                                'text'      : 'Password Work Factor'
+                            }
+                        },
+                        {
+                            'security-cookiesWorkFactor' : {
+                                'id'        : 'security-cookiesWorkFactor',
+                                'text'      : 'Cookies Work Factor'
+                            }
+                        },
+                        {
+                            'logs-enabled' : {
+                                'id'        : 'logs-enabled',
+                                'text'      : 'Logs Enabled?'
+                            }
+                        },
+                        {
+                            'logs-exceptions' : {
+                                'id'        : 'logs-exceptions',
+                                'text'      : 'Exception Logs Enabled?'
+                            }
+                        },
+                        {
+                            'logs-level' : {
+                                'id'        : 'logs-level',
+                                'text'      : 'Logs Level'
+                            }
+                        },
+                        {
+                            'logs-service' : {
+                                'id'        : 'logs-service',
+                                'text'      : 'Logs Service'
+                            }
+                        },
+                        {
+                            'logs-emergencyLogsEmail' : {
+                                'id'        : 'logs-emergencyLogsEmail',
+                                'text'      : 'Emergency Logs Email Enabled?'
+                            }
+                        },
+                        {
+                            'logs-emergencyLogsEmailAddresses' : {
+                                'id'        : 'logs-emergencyLogsEmailAddresses',
+                                'text'      : 'Emergency Logs Email Addresses'
+                            }
+                        },
+                        {
+                            'websocket-protocol' : {
+                                'id'        : 'websocket-protocol',
+                                'text'      : 'Websocket Protocol'
+                            }
+                        },
+                        {
+                            'websocket-host' : {
+                                'id'        : 'websocket-host',
+                                'text'      : 'Websocket Host'
+                            }
+                        },
+                        {
+                            'websocket-port' : {
+                                'id'        : 'websocket-port',
+                                'text'      : 'Websocket Port'
+                            }
+                        }
+                    ];
+                }
 
                 $(keys).each(function(e, key) {
                     for (var keyId in key) {
@@ -477,160 +697,300 @@ dataCollectionSection =
 
                     key = e.params.data.id;
 
-                    switch (key) {
-                        case 'body-jsscript' :
-                            type = 'textarea';
-                            settings = '';
+                    if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
+                        switch (key) {
+                            case 'body-jsscript' :
+                                type = 'textarea';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['body']['jsscript']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['body']['jsscript'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['body']['jsscript']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['body']['jsscript'];
+                                }
 
-                            break;
-                        case 'head-link-href' :
-                            type = 'array';
-                            settings = '';
+                                break;
+                            case 'head-link-href' :
+                                type = 'array';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href'];
+                                }
 
-                            break;
-                        case 'head-meta-author' :
-                            type = 'text';
-                            settings = '';
+                                break;
+                            case 'head-meta-author' :
+                                type = 'text';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author'];
+                                }
 
-                            break;
-                        case 'head-meta-charset' :
-                            type = 'text';
-                            settings = '';
+                                break;
+                            case 'head-meta-charset' :
+                                type = 'text';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset'];
+                                }
 
-                            break;
-                        case 'head-meta-keywords' :
-                            type = 'text';
-                            settings = '';
+                                break;
+                            case 'head-meta-keywords' :
+                                type = 'text';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['keywords']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['keywords'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['keywords']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['keywords'];
+                                }
 
-                            break;
-                        case 'head-meta-viewport' :
-                            type = 'text';
-                            settings = '';
+                                break;
+                            case 'head-meta-viewport' :
+                                type = 'text';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['viewport']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['viewport'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['viewport']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['viewport'];
+                                }
 
-                            break;
-                        case 'head-meta-description' :
-                            type = 'text';
-                            settings = '';
+                                break;
+                            case 'head-meta-description' :
+                                type = 'text';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['description']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['description'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['description']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['description'];
+                                }
 
-                            break;
-                        case 'title' :
-                            type = 'text';
-                            settings = '';
+                                break;
+                            case 'title' :
+                                type = 'text';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['head']['title']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['title'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['title']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['title'];
+                                }
 
-                            break;
-                        case 'script-src' :
-                            type = 'array';
-                            settings = '';
+                                break;
+                            case 'script-src' :
+                                type = 'array';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src'];
+                                }
 
-                            break;
-                        case 'tags' :
-                            type = 'text';
-                            settings = '';
+                                break;
+                            case 'tags' :
+                                type = 'text';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['tags']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['tags'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['tags']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['tags'];
+                                }
 
-                            break;
-                        case 'footer-script-src' :
-                            type = 'textarea';
-                            settings = '';
+                                break;
+                            case 'footer-script-src' :
+                                type = 'textarea';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src'];
+                                }
 
-                            break;
-                        case 'footer-jsscript' :
-                            type = 'textarea';
-                            settings = '';
+                                break;
+                            case 'footer-jsscript' :
+                                type = 'textarea';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['jsscript']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['jsscript'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['jsscript']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['jsscript'];
+                                }
 
-                            break;
-                        case 'footer-copyright-name' :
-                            type = 'text';
-                            settings = '';
+                                break;
+                            case 'footer-copyright-name' :
+                                type = 'text';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name'];
+                                }
 
-                            break;
-                        case 'footer-copyright-site' :
-                            type = 'text';
-                            settings = '';
+                                break;
+                            case 'footer-copyright-site' :
+                                type = 'text';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['site']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['site'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['site']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['site'];
+                                }
 
-                            break;
-                        case 'footer-copyright-fromYear' :
-                            type = 'text';
-                            settings = '';
+                                break;
+                            case 'footer-copyright-fromYear' :
+                                type = 'text';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear'];
+                                }
 
-                            break;
-                        case 'layouts' :
-                            type = 'array';
-                            settings = '';
+                                break;
+                            case 'layouts' :
+                                type = 'array';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['layouts']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['layouts'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['layouts']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['layouts'];
+                                }
 
-                            break;
-                        case 'mandatory' :
-                            type = 'boolean';
-                            settings = '';
+                                break;
+                            case 'mandatory' :
+                                type = 'boolean';
+                                settings = '';
 
-                            if (dataCollectionSectionForm['vars']['moduleSettings']['mandatory']) {
-                                settings = dataCollectionSectionForm['vars']['moduleSettings']['mandatory'];
-                            }
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['mandatory']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['mandatory'];
+                                }
 
-                            break;
+                                break;
+                        }
+                    } else if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
+                        switch (key) {
+                            case 'debug' :
+                                type = 'boolean';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['debug']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['debug'];
+                                }
+
+                                break;
+                            case 'cache-enabled' :
+                                type = 'boolean';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['cache']['enabled']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['cache']['enabled'];
+                                }
+
+                                break;
+                            case 'cache-timeout' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['cache']['timeout']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['cache']['timeout'];
+                                }
+
+                                break;
+                            case 'cache-service' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['cache']['service']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['cache']['service'];
+                                }
+
+                                break;
+                            case 'security-passwordWorkFactor' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['security']['passwordWorkFactor']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['security']['passwordWorkFactor'];
+                                }
+
+                                break;
+                            case 'security-cookiesWorkFactor' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['security']['cookiesWorkFactor']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['security']['cookiesWorkFactor'];
+                                }
+
+                                break;
+                            case 'logs-enabled' :
+                                type = 'boolean';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['logs']['enabled']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['logs']['enabled'];
+                                }
+
+                                break;
+                            case 'logs-exceptions' :
+                                type = 'boolean';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['logs']['exceptions']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['logs']['exceptions'];
+                                }
+
+                                break;
+                            case 'logs-level' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['logs']['level']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['logs']['level'];
+                                }
+
+                                break;
+                            case 'logs-service' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['logs']['service']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['logs']['service'];
+                                }
+
+                                break;
+                            case 'logs-emergencyLogsEmail' :
+                                type = 'boolean';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['logs']['emergencyLogsEmail']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['logs']['emergencyLogsEmail'];
+                                }
+
+                                break;
+                            case 'logs-emergencyLogsEmailAddresses' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['logs']['emergencyLogsEmailAddresses']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['logs']['emergencyLogsEmailAddresses'];
+                                }
+
+                                break;
+                            case 'websocket-protocol' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['websocket']['protocol']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['websocket']['protocol'];
+                                }
+
+                                break;
+                            case 'websocket-host' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['websocket']['host']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['websocket']['host'];
+                                }
+
+                                break;
+                            case 'websocket-port' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['websocket']['port']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['websocket']['port'];
+                                }
+
+                                break;
+                        }
                     }
 
                     if (type === 'text' || type === 'boolean') {
@@ -666,92 +1026,172 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-save').click(function(e) {
                     e.preventDefault();
 
-                    switch (key) {
-                        case 'body-jsscript' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['body']['jsscript']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                    if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
+                        switch (key) {
+                            case 'body-jsscript' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['body']['jsscript']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
-                            break;
-                        case 'head-link-href' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']
-                                 = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+                                break;
+                            case 'head-link-href' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']
+                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
-                            break;
-                        case 'head-meta-author' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                                break;
+                            case 'head-meta-author' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
-                            break;
-                        case 'head-meta-charset' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                                break;
+                            case 'head-meta-charset' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
-                            break;
-                        case 'head-meta-keywords' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['keywords']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                                break;
+                            case 'head-meta-keywords' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['keywords']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
-                            break;
-                        case 'head-meta-viewport' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['viewport']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                                break;
+                            case 'head-meta-viewport' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['viewport']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
-                            break;
-                        case 'head-meta-description' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['description']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                                break;
+                            case 'head-meta-description' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['description']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
-                            break;
-                        case 'title' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['head']['title']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                                break;
+                            case 'title' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['title']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
-                            break;
-                        case 'script-src' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']
-                                 = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+                                break;
+                            case 'script-src' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']
+                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
-                            break;
-                        case 'tags' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['tags']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                                break;
+                            case 'tags' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['tags']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
-                            break;
-                        case 'footer-script-src' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                                break;
+                            case 'footer-script-src' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
-                            break;
-                        case 'footer-jsscript' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['footer']['jsscript']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                                break;
+                            case 'footer-jsscript' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['jsscript']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
-                            break;
-                        case 'footer-copyright-name' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                                break;
+                            case 'footer-copyright-name' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
-                            break;
-                        case 'footer-copyright-site' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['site']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                                break;
+                            case 'footer-copyright-site' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['site']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
-                            break;
-                        case 'footer-copyright-fromYear' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                                break;
+                            case 'footer-copyright-fromYear' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
-                            break;
-                        case 'layouts' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['layouts']
-                                = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+                                break;
+                            case 'layouts' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['layouts']
+                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
-                            break;
-                        case 'mandatory' :
-                            dataCollectionSectionForm['vars']['moduleSettings']['mandatory']
-                                = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+                                break;
+                            case 'mandatory' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['mandatory']
+                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
-                            break;
+                                break;
+                        }
+                    } else if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
+                        switch (key) {
+                            case 'debug' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['debug']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'cache-enabled' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['cache']['enabled']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'cache-timeout' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['cache']['timeout']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'cache-service' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['cache']['service']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'security-passwordWorkFactor' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['security']['passwordWorkFactor']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'security-cookiesWorkFactor' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['security']['cookiesWorkFactor']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'logs-enabled' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['logs']['enabled']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'logs-exceptions' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['logs']['exceptions']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'logs-level' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['logs']['level']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'logs-service' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['logs']['service']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'logs-emergencyLogsEmail' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['logs']['emergencyLogsEmail']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'logs-emergencyLogsEmailAddresses' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['logs']['emergencyLogsEmailAddresses']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'websocket-protocol' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['websocket']['protocol']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'websocket-host' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['websocket']['host']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'websocket-port' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['websocket']['port']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                        }
                     }
 
                     $('#{{componentId}}-{{sectionId}}-settings')

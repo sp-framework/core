@@ -134,7 +134,7 @@ class ModulesComponent extends BaseComponent
 
 					if ($module['module_details']['module_type'] === 'components') {
 						$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Components/';
-						$this->view->moduleMenu = $module['module_details']['menu'];
+						$this->view->moduleMenu = Json::encode(Json::decode($module['module_details']['menu'], true));
 					} else if ($module['module_details']['module_type'] === 'packages') {
 						if ($module['module_details']['app_type'] === 'core' &&
 							($module['module_details']['category'] === 'basepackages' ||

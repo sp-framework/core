@@ -54,8 +54,7 @@
                                         'size'                    : 'xs',
                                         'type'                    : 'primary',
                                         'position'                : 'right',
-                                        'icon'                    : 'plus',
-                                        'url'                     : '#'
+                                        'icon'                    : 'plus'
                                     ]
                                 ]
                         ]
@@ -236,10 +235,6 @@
             </div>
             <div class="row mb-3">
                 <div class="col">
-                    {% set noMenuChecked = false %}
-                    {% if moduleMenu_id === '' %}
-                        {% set noMenuChecked = true %}
-                    {% endif %}
                     {{adminltetags.useTag('fields',
                         [
                             'component'                      : component,
@@ -253,7 +248,7 @@
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxLabel'             : 'NO MENU?',
-                            'fieldCheckboxChecked'           : noMenuChecked,
+                            'fieldCheckboxChecked'           : false,
                             'fieldCheckboxType'              : 'secondary',
                             'fieldBazJstreeSearch'           : false,
                             'fieldBazPostOnCreate'           : false,
@@ -1026,10 +1021,12 @@ dataCollectionSection =
                 if ($(this)[0].checked === true) {
                     $('#{{componentId}}-{{sectionId}}-menu').val('false');
                     $('#{{componentId}}-{{sectionId}}-menu').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-add-menu-item').attr('disabled', true);
                     cleanMenuForm();
                 } else {
                     $('#{{componentId}}-{{sectionId}}-menu').val('');
                     $('#{{componentId}}-{{sectionId}}-menu').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-add-menu-item').attr('disabled', false);
                 }
             });
 

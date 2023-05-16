@@ -1,88 +1,17 @@
-<div class="row vdivide">
-    <div class="col">
-        <div class="row">
-            <div class="col">
-                {% set includeCoreModulesChecked = false %}
-                {% if includecoremodules is defined and includecoremodules == true %}
-                    {% set includeCoreModulesChecked = true %}
-                {% endif %}
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'include_core_modules',
-                        'fieldLabel'                     : 'Include Core Modules?',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Include Core modules in the list of modules?',
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'info',
-                        'fieldCheckboxChecked'           : includeCoreModulesChecked,
-                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                            : component,
-                        'componentName'                        : componentName,
-                        'componentId'                          : componentId,
-                        'sectionId'                            : sectionId,
-                        'fieldId'                              : 'modules',
-                        'fieldLabel'                           : 'Select Module to edit',
-                        'fieldType'                            : 'select2',
-                        'fieldHelp'                            : true,
-                        'fieldHelpTooltipContent'              : 'Module',
-                        'fieldRequired'                        : true,
-                        'fieldBazScan'                         : true,
-                        'fieldBazPostOnCreate'                 : true,
-                        'fieldBazPostOnUpdate'                 : true,
-                        'fieldDataSelect2Options'              : modules,
-                        'fieldDataSelect2OptionsKey'           : 'id',
-                        'fieldDataSelect2OptionsValue'         : 'name',
-                        'fieldDataSelect2OptionsSelected'      : ''
-                    ]
-                )}}
-                {{adminltetags.useTag('buttons',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'buttonType'                    : 'button',
-                        'buttons'                       :
-                            [
-                                'modules-link'    : [
-                                    'title'                   : 'link',
-                                    'size'                    : 'xs',
-                                    'disabled'                : true,
-                                    'hidden'                  : true,
-                                    'url'                     : '#'
-                                ]
-                            ]
-                    ]
-                )}}
-            </div>
-        </div>
-    </div>
+<div class="row">
     <div class="col">
         {{adminltetags.useTag('buttons',
             [
                 'componentId'                       : componentId,
                 'sectionId'                         : sectionId,
                 'buttonType'                        : 'DropdownSplitButtons',
-                'buttonLabel'                       : 'New Module',
+                'buttonLabel'                       : false,
                 'dropdownButtonId'                  : 'main',
                 'dropdownButtonTitle'               : 'Add new module',
                 'dropdownButtonIcon'                : 'plus',
                 'dropdownButtonAdditionalClass'     : 'text-uppercase',
                 'dropdownAlign'                     : 'right',
+                'buttonPosition'                    : 'right',
                 'buttons'                           :
                     {
                         'components' : {
@@ -110,6 +39,107 @@
                             'url'                     : links.url('devtools/modules/q/module/true/type/views/id/0')
                         }
                     }
+            ]
+        )}}
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-md-3">
+        {% set includeCoreModulesChecked = false %}
+        {% if includecoremodules is defined and includecoremodules == true %}
+            {% set includeCoreModulesChecked = true %}
+        {% endif %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'include_core_modules',
+                'fieldLabel'                     : 'Include Core Modules?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Include Core modules in the list of modules?',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'info',
+                'fieldCheckboxChecked'           : includeCoreModulesChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col-md-9">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'modules',
+                'fieldLabel'                           : 'Select Module',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Module',
+                'fieldRequired'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldDataSelect2Options'              : modules,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsSelected'      : ''
+            ]
+        )}}
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                    [
+                        'modules-link'    : [
+                            'title'                   : 'link',
+                            'size'                    : 'xs',
+                            'disabled'                : true,
+                            'hidden'                  : true,
+                            'url'                     : '#'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'componentId'           : componentId,
+                'sectionId'             : sectionId,
+                'buttonType'            : 'button',
+                'buttons'               :
+                    [
+                        'edit-module' : [
+                            'title'                   : 'Edit Module',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'icon'                    : 'edit',
+                            'position'                : 'left',
+                            'disabled'                : true
+                        ],
+                        'generate-new-release' : [
+                            'title'                   : 'Generate New Release',
+                            'size'                    : 'xs',
+                            'type'                    : 'success',
+                            'position'                : 'right',
+                            'icon'                    : 'wand-magic-sparkles',
+                            'disabled'                : true
+                        ]
+                    ]
             ]
         )}}
     </div>
@@ -150,15 +180,21 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-modules'                              : {
             'placeholder'   : 'SELECT MODULE TO EDIT',
             'afterInit'     : function() {
+                var id, label;
                 $('#{{componentId}}-{{sectionId}}-modules').on('select2:select', function(e) {
-                    var id = e.params.data.id;
-                    var label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
-                    // dataCollectionSectionForm['funcs']['loadAjax']();
+                    id = e.params.data.id;
+                    label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
 
-                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, true);
-                    } else {
-                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, false);
+                    $('#{{componentId}}-{{sectionId}}-edit-module').attr('disabled', false);
+
+                    if (label === 'core') {
+                        $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', false);
+                    } else if (label !== 'core') {
+                        if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === false) {
+                            $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', false);
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', true);
+                        }
                     }
                 });
 
@@ -167,6 +203,24 @@ dataCollectionSection =
                         dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
                     } else {
                         dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-edit-module').off();
+                $('#{{componentId}}-{{sectionId}}-edit-module').click(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, true);
+                    } else {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, false);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-generate-new-release').off();
+                $('#{{componentId}}-{{sectionId}}-generate-new-release').click(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, true, true);
+                    } else {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, false, true);
                     }
                 });
             }
@@ -179,7 +233,7 @@ dataCollectionSection =
         }
     });
 
-dataCollectionSectionForm['funcs']['loadAjax'] = function(id = null, label = null, includecoremodules = false) {
+dataCollectionSectionForm['funcs']['loadAjax'] = function(id = null, label = null, includecoremodules = false, newrelease = false) {
     if (id && label) {
         if (dataCollectionSectionForm['vars']['url'].includes('/q/')) {
             dataCollectionSectionForm['vars']['url'] = '{{links.url("module/true/type/' + label + '/id/' + id + '")}}';
@@ -188,6 +242,9 @@ dataCollectionSectionForm['funcs']['loadAjax'] = function(id = null, label = nul
         }
         if (includecoremodules) {
             dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/includecoremodules/true';
+        }
+        if (newrelease) {
+            dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/newrelease/true';
         }
     } else if (includecoremodules) {
         if (dataCollectionSectionForm['vars']['url'].includes('/q/')) {

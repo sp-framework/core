@@ -39,7 +39,7 @@
     {% endif %}
     {% set moduleDescription = '' %}
     {% set moduleModule_type = type %}
-    {% set moduleApp_type = 'core' %}
+    {% set moduleApp_type = '' %}
     {% set moduleCategory = '' %}
     {% set moduleApiId = '0' %}
     {% set moduleVersion = '0.0.0' %}
@@ -52,6 +52,14 @@
     {% if type !== 'core' %}
         {% set moduleApps = '' %}
     {% endif %}
+{% endif %}
+{% set appTypeDisabled = false %}
+{% set moduleCategoryDisabled = false %}
+{% set nameDisabled = false %}
+{% if type === 'core'%}
+    {% set appTypeDisabled = true %}
+    {% set moduleCategoryDisabled = true %}
+    {% set nameDisabled = true %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -111,9 +119,11 @@
                 'fieldHelp'                            : true,
                 'fieldHelpTooltipContent'              : 'Select app type or enter a new one to create a new type.',
                 'fieldRequired'                        : true,
+                'fieldDisabled'                        : appTypeDisabled,
                 'fieldBazPostOnCreate'                 : true,
                 'fieldBazPostOnUpdate'                 : true,
                 'fieldBazScan'                         : true,
+                'fieldDataSelect2Create'               : true,
                 'fieldDataSelect2OptionsArray'         : true,
                 'fieldDataSelect2Options'              : appTypes,
                 'fieldDataSelect2OptionsKey'           : 'id',
@@ -160,10 +170,12 @@
                 'fieldHelp'                            : true,
                 'fieldHelpTooltipContent'              : 'Select category where the module resides. Either in apps/ or system/.',
                 'fieldRequired'                        : true,
+                'fieldDisabled'                        : moduleCategoryDisabled,
                 'fieldBazScan'                         : true,
                 'fieldBazPostOnCreate'                 : true,
                 'fieldBazPostOnUpdate'                 : true,
                 'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2Create'               : true,
                 'fieldDataSelect2Options'              : categoryArr,
                 'fieldDataSelect2OptionsKey'           : 'id',
                 'fieldDataSelect2OptionsValue'         : 'name',
@@ -186,6 +198,7 @@
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'Module Name Example: Dashboard. For Packages name has to be in Pascal Case. Each capital letter donated a directory name. Example UsersAccounts is Users/Accounts and class will be \\Users\\Account\\ and so on.',
                 'fieldRequired'                  : true,
+                'fieldDisabled'                  : nameDisabled,
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
@@ -364,9 +377,9 @@
                 'fieldDataMaxLength'             : 2048,
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'Apps of the component. This is set via Apps component. Do not modify this here.',
-                'fieldRequired'                  : false,
+                'fieldRequired'                  : true,
                 'fieldHidden'                    : true,
-                'fieldDisabled'                  : true,
+                'fieldDisabled'                  : false,
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,

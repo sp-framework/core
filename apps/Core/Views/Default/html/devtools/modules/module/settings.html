@@ -21,7 +21,7 @@
                     'fieldRequired'                  : true,
                     'fieldBazJstreeSearch'           : true,
                     'fieldBazPostOnCreate'           : false,
-                    'fieldBazPostOnUpdate'           : true,
+                    'fieldBazPostOnUpdate'           : false,
                     'fieldBazScan'                   : true,
                     'fieldRadioPlacementType'        : 'horizontal',
                     'fieldRadioButtons'              :
@@ -62,7 +62,6 @@
                     'fieldDisabled'                         : true,
                     'fieldBazScan'                          : true,
                     'fieldBazJstreeSearch'                  : true,
-                    'fieldBazPostOnUpdate'                  : true,
                     'fieldDataInputMaxLength'               : 100,
                     'fieldValue'                            : ''
                 ]
@@ -86,7 +85,7 @@
                         'fieldRequired'                  : true,
                         'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazPostOnUpdate'           : false,
                         'fieldBazScan'                   : true,
                         'fieldRadioPlacementType'        : 'horizontal',
                         'fieldRadioButtons'              :
@@ -271,7 +270,7 @@
             )}}
         </div>
     </div>
-{% elseif type === 'views' %}
+{% elseif type === 'views' or type === 'core' %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',

@@ -17,32 +17,49 @@ class DevtoolsModules extends BasePackage
 {
     public function addModule($data)
     {
+        $data = $this->checkTypeAndCategory($data);
+
+        $repoMethod = 'get' . ucfirst(substr($data['type'], 0, -1)) . 'ByRepo';
+        $module = $this->modules->{$data['type']}->{$repoMethod}($data['repo']);
+        //Need to add more checks. Repo can be as simple as "https://.../" for local, in that case there should be more checks.
+        if ($module) {
+            $this->addResponse('Module with same repo already exists!', 1);
+
+            return false;
+        }
+        var_dump($repoMethod, $module, $data);die();
         if ($data['type'] === 'core') {
-            $this->updateCore($data);
-        } else if ($data['type'] === 'components') {
-            $this->updateComponent($data);
-        } else if ($data['type'] === 'packages') {
-            $this->updatePackage($data);
-        } else if ($data['type'] === 'middlewares') {
-            $this->updateMiddleware($data);
-        } else if ($data['type'] === 'views') {
-            $this->updateView($data);
+            //
+        } else {
+            //
         }
     }
 
     public function updateModule($data)
     {
+        $data = $this->checkTypeAndCategory($data);
+
         if ($data['type'] === 'core') {
-            $this->updateCore($data);
-        } else if ($data['type'] === 'components') {
-            $this->updateComponent($data);
-        } else if ($data['type'] === 'packages') {
-            $this->updatePackage($data);
-        } else if ($data['type'] === 'middlewares') {
-            $this->updateMiddleware($data);
-        } else if ($data['type'] === 'views') {
-            $this->updateView($data);
+            if ($this->updateModuleJson($data)) {
+                $this->addResponse('Module updated');
+
+                return;
+            }
+        } else {
+            $module = $this->modules->{$data['type']}->getById($data['id']);
+
+            $module = array_merge($module, $data);
+
+            if ($this->modules->{$data['type']}->update($module)) {
+                if ($this->updateModuleJson($data)) {
+                    $this->addResponse('Module updated');
+
+                    return;
+                }
+            }
         }
+
+        $this->addResponse('Error updating Module', 1);
     }
 
     // public function removeModule($data)
@@ -56,173 +73,33 @@ class DevtoolsModules extends BasePackage
     //     }
     // }
 
-    protected function updateCore(array $data)
+    protected function checkTypeAndCategory($data)
     {
-        if ($this->core->update($data)) {
-            $this->addResponse('Updated');
-
-            return;
-        }
-
-        $this->addResponse('Error Updating', 1);
-    }
-
-    protected function updateComponent(array $data)
-    {
-        $component = $this->modules->components->getById($data['id']);
-
-        $component = array_merge($component, $data);
-
-        $this->modules->components->update($component);
-
-        $pathArr = explode('/', str_replace('\\', '/', $data['class']));
-
-        if (Str::endsWith(Arr::last($pathArr), 'Component')) {
-            $pathArr[0] = strtolower($pathArr[0]);
-
-            unset($pathArr[Arr::lastKey($pathArr)]);
-
-            $path = implode('/', $pathArr) . '/Install/component.json';
-
-            try {
-                $jsonFile = $this->localContent->fileExists($path);
-            } catch (FilesystemException | UnableToRetrieveMetadata $exception) {
-                throw $exception;
-            }
-
-            $jsonContent = [];
-            $jsonContent['route'] = $component['route'];
-            $jsonContent['name'] = $component['name'];
-            $jsonContent['description'] = $component['description'];
-            $jsonContent['app_type'] = $component['app_type'];
-            $jsonContent['category'] = $component['category'];
-            $jsonContent['version'] = $component['version'];
-            $jsonContent['repo'] = $component['repo'];
-            $jsonContent['class'] = $component['class'];
-            $jsonContent['dependencies'] = $component['dependencies'];
-            $jsonContent['menu'] = $component['menu'];
-            $jsonContent['settings'] = $component['settings'];
-            $jsonContent = Json::encode($jsonContent, JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT);
-
-            $jsonContent = str_replace('\\"', '"', $jsonContent);
-            $jsonContent = str_replace('"{', '{', $jsonContent);
-            $jsonContent = str_replace('}"', '}', $jsonContent);
-
-            try {
-                $this->localContent->write($path, $jsonContent);
-            } catch (FilesystemException | UnableToWriteFile $exception) {
-                throw $exception;
-            }
-        }
-    }
-
-    protected function updatePackage(array $data)
-    {
-        $package = $this->modules->packages->getById($data['id']);
-
-        $package = array_merge($package, $data);
-
-        $this->modules->packages->update($package);
-
-        $pathArr = explode('/', str_replace('\\', '/', $data['class']));
-
-        $pathArr[0] = strtolower($pathArr[0]);
-
-        unset($pathArr[Arr::lastKey($pathArr)]);
-
-        $path = implode('/', $pathArr) . '/Install/package.json';
-
-        try {
-            $jsonFile = $this->localContent->fileExists($path);
-        } catch (FilesystemException | UnableToRetrieveMetadata $exception) {
-            throw $exception;
-        }
-
-        $jsonContent = [];
-        $jsonContent['name'] = $package['name'];
-        $jsonContent['display_name'] = $package['display_name'];
-        $jsonContent['description'] = $package['description'];
-        $jsonContent['app_type'] = $package['app_type'];
-        $jsonContent['category'] = $package['category'];
-        $jsonContent['version'] = $package['version'];
-        $jsonContent['repo'] = $package['repo'];
-        $jsonContent['class'] = $package['class'];
-        $jsonContent['settings'] = $package['settings'];
-
-        $jsonContent = Json::encode($jsonContent, JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT);
-
-        $jsonContent = str_replace('\\"', '"', $jsonContent);
-        $jsonContent = str_replace('"{', '{', $jsonContent);
-        $jsonContent = str_replace('}"', '}', $jsonContent);
-
-        try {
-            $this->localContent->write($path, $jsonContent);
-        } catch (FilesystemException | UnableToWriteFile $exception) {
-            throw $exception;
-        }
-    }
-
-    protected function updateMiddleware(array $data)
-    {
-        $middleware = $this->modules->middlewares->getById($data['id']);
-
-        $middleware = array_merge($middleware, $data);
-
-        $this->modules->middlewares->update($middleware);
-
-        $pathArr = explode('/', str_replace('\\', '/', $data['class']));
-
-        $pathArr[0] = strtolower($pathArr[0]);
-
-        unset($pathArr[Arr::lastKey($pathArr)]);
-
-        $path = implode('/', $pathArr) . '/Install/middleware.json';
-
-        try {
-            $jsonFile = $this->localContent->fileExists($path);
-        } catch (FilesystemException | UnableToRetrieveMetadata $exception) {
-            throw $exception;
-        }
-
-        $jsonContent = [];
-        $jsonContent['name'] = $middleware['name'];
-        $jsonContent['display_name'] = $middleware['display_name'];
-        $jsonContent['description'] = $middleware['description'];
-        $jsonContent['app_type'] = $middleware['app_type'];
-        $jsonContent['category'] = $middleware['category'];
-        $jsonContent['version'] = $middleware['version'];
-        $jsonContent['repo'] = $middleware['repo'];
-        $jsonContent['class'] = $middleware['class'];
-        $jsonContent['settings'] = $middleware['settings'];
-
-        $jsonContent = Json::encode($jsonContent, JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT);
-
-        $jsonContent = str_replace('\\"', '"', $jsonContent);
-        $jsonContent = str_replace('"{', '{', $jsonContent);
-        $jsonContent = str_replace('}"', '}', $jsonContent);
-
-        try {
-            $this->localContent->write($path, $jsonContent);
-        } catch (FilesystemException | UnableToWriteFile $exception) {
-            throw $exception;
-        }
-    }
-
-    protected function updateView(array $data)
-    {
-        $view = $this->modules->views->getById($data['id']);
-
-        $view = array_merge($view, $data);
-
-        if ($this->modules->views->update($view)) {
-            if ($this->updateModuleJson($data)) {
-                $this->addResponse('Module updated');
-
-                return;
+        if (str_contains($data['app_type'], '"data"')) {
+            $data['app_type'] = Json::decode($data['app_type'], true);
+            if (isset($data['app_type']['data'][0])) {
+                $data['app_type'] = $data['app_type']['data'][0];
+            } else if (isset($data['app_type']['newTags'][0])) {
+                $this->apps->types->add(
+                    [
+                        'app_type'  => strtolower($data['app_type']['newTags'][0]),
+                        'name'      => $data['app_type']['newTags'][0]
+                    ]
+                );
+                $data['app_type'] = strtolower($data['app_type']['newTags'][0]);
             }
         }
 
-        $this->addResponse('Error updating Module', 1);
+        if (str_contains($data['category'], '"data"')) {
+            $data['category'] = Json::decode($data['category'], true);
+            if (isset($data['category']['data'][0])) {
+                $data['category'] = $data['category']['data'][0];
+            } else if (isset($data['category']['newTags'][0])) {
+                $data['category'] = strtolower($data['category']['newTags'][0]);
+            }
+        }
+
+        return $data;
     }
 
     public function validateJson($data)
@@ -317,26 +194,29 @@ class DevtoolsModules extends BasePackage
     {
         $jsonFile = $this->getModuleJsonFileLocation($data);
 
+        $data = $this->basepackages->utils->jsonDecodeData($data);
+
+        $jsonContent = [];
+        $jsonContent["name"] = $data["name"];
         if ($data['module_type'] === 'components') {
-        } else if ($data['module_type'] === 'packages') {
-        } else if ($data['module_type'] === 'middlewares') {
-        } else if ($data['module_type'] === 'views') {
-
-            $data = $this->basepackages->utils->jsonDecodeData($data);
-
-            $jsonContent = [];
-            $jsonContent["name"] = $data["name"];
+            $jsonContent["route"] = $data["route"];
+        } else {
             $jsonContent["display_name"] = $data["display_name"];
-            $jsonContent["description"] = $data["description"];
-            $jsonContent["module_type"] = $data["module_type"];
-            $jsonContent["app_type"] = $data["app_type"];
-            $jsonContent["category"] = $data["category"];
-            $jsonContent["version"] = $data["version"];
-            $jsonContent["repo"] = $data["repo"];
-            $jsonContent["dependencies"] = $data["dependencies"];
-            $jsonContent["settings"] = $data["settings"];
-
         }
+        $jsonContent["description"] = $data["description"];
+        $jsonContent["module_type"] = $data["module_type"];
+        $jsonContent["app_type"] = $data["app_type"];
+        $jsonContent["category"] = $data["category"];
+        $jsonContent["version"] = $data["version"];
+        $jsonContent["repo"] = $data["repo"];
+        if ($data['module_type'] !== 'views') {
+            $jsonContent["class"] = $data["class"];
+        }
+        $jsonContent["dependencies"] = $data["dependencies"];
+        if ($data['module_type'] === 'components') {
+            $jsonContent["menu"] = $data["menu"];
+        }
+        $jsonContent["settings"] = $data["settings"];
 
         $jsonContent = Json::encode($jsonContent, JSON_UNESCAPED_SLASHES);
 
