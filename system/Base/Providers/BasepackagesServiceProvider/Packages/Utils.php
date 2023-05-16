@@ -185,4 +185,11 @@ class Utils extends BasePackage
 
         return $formatted_json;
     }
+
+    public function jsonDecodeData(array $data)
+    {
+        array_walk_recursive($data, 'json_decode_recursive');
+
+        return $data;
+    }
 }
