@@ -635,7 +635,6 @@ abstract class BaseComponent extends Controller
 		$this->buildAssetsHeadCss();
 		$this->buildAssetsHeadStyle();
 		$this->buildAssetsHeadJs();
-		// $this->buildAssetsBody();
 		$this->buildAssetsBodyJs();
 		$this->buildAssetsFooter();
 		$this->buildAssetsFooterJs();
@@ -723,11 +722,6 @@ abstract class BaseComponent extends Controller
 			}
 		}
 	}
-
-	// protected function buildAssetsBody()
-	// {
-	// 	$this->assetsCollections['body']->addInline(new Inline('bodyParams', $this->viewSettings['body']['params']));
-	// }
 
 	protected function buildAssetsBodyJs()
 	{

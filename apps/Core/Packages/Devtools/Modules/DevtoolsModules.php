@@ -15,7 +15,7 @@ use System\Base\BasePackage;
 
 class DevtoolsModules extends BasePackage
 {
-    public function updateModules(array $data)
+    public function addModule($data)
     {
         if ($data['type'] === 'core') {
             $this->updateCore($data);
@@ -29,6 +29,32 @@ class DevtoolsModules extends BasePackage
             $this->updateView($data);
         }
     }
+
+    public function updateModule($data)
+    {
+        if ($data['type'] === 'core') {
+            $this->updateCore($data);
+        } else if ($data['type'] === 'components') {
+            $this->updateComponent($data);
+        } else if ($data['type'] === 'packages') {
+            $this->updatePackage($data);
+        } else if ($data['type'] === 'middlewares') {
+            $this->updateMiddleware($data);
+        } else if ($data['type'] === 'views') {
+            $this->updateView($data);
+        }
+    }
+
+    // public function removeModule($data)
+    // {
+    //     $module = $this->getById($data['id']);
+
+    //     if ($this->remove($module['id'])) {
+    //         $this->addResponse('Removed module ' . $module['name']);
+    //     } else {
+    //         $this->addResponse('Error removing module.', 1);
+    //     }
+    // }
 
     protected function updateCore(array $data)
     {
@@ -188,43 +214,15 @@ class DevtoolsModules extends BasePackage
 
         $view = array_merge($view, $data);
 
-        $this->modules->views->update($view);
+        if ($this->modules->views->update($view)) {
+            if ($this->updateModuleJson($data)) {
+                $this->addResponse('Module updated');
 
-        $pathArr[0] = 'apps';
-        $pathArr[1] = ucfirst($view['app_type']);
-        $pathArr[2] = ucfirst('Views');
-        $pathArr[3] = ucfirst($view['name']);
-
-        $path = implode('/', $pathArr) . '/view.json';
-
-        try {
-            $jsonFile = $this->localContent->fileExists($path);
-        } catch (FilesystemException | UnableToRetrieveMetadata $exception) {
-            throw $exception;
+                return;
+            }
         }
 
-        $jsonContent = [];
-        $jsonContent['name'] = $view['name'];
-        $jsonContent['display_name'] = $view['display_name'];
-        $jsonContent['description'] = $view['description'];
-        $jsonContent['app_type'] = $view['app_type'];
-        $jsonContent['category'] = $view['category'];
-        $jsonContent['version'] = $view['version'];
-        $jsonContent['repo'] = $view['repo'];
-        $jsonContent['dependencies'] = $view['dependencies'];
-        $jsonContent['settings'] = $view['settings'];
-
-        $jsonContent = Json::encode($jsonContent, JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT);
-
-        $jsonContent = str_replace('\\"', '"', $jsonContent);
-        $jsonContent = str_replace('"{', '{', $jsonContent);
-        $jsonContent = str_replace('}"', '}', $jsonContent);
-
-        try {
-            $this->localContent->write($path, $jsonContent);
-        } catch (FilesystemException | UnableToWriteFile $exception) {
-            throw $exception;
-        }
+        $this->addResponse('Error updating Module', 1);
     }
 
     public function validateJson($data)
@@ -313,5 +311,106 @@ class DevtoolsModules extends BasePackage
             ];
 
         return Json::encode($defaultDependencies);
+    }
+
+    protected function updateModuleJson($data)
+    {
+        $jsonFile = $this->getModuleJsonFileLocation($data);
+
+        if ($data['module_type'] === 'components') {
+        } else if ($data['module_type'] === 'packages') {
+        } else if ($data['module_type'] === 'middlewares') {
+        } else if ($data['module_type'] === 'views') {
+
+            $data = $this->jsonDecodeData($data);
+
+            $jsonContent = [];
+            $jsonContent["name"] = $data["name"];
+            $jsonContent["display_name"] = $data["display_name"];
+            $jsonContent["description"] = $data["description"];
+            $jsonContent["module_type"] = $data["module_type"];
+            $jsonContent["app_type"] = $data["app_type"];
+            $jsonContent["category"] = $data["category"];
+            $jsonContent["version"] = $data["version"];
+            $jsonContent["repo"] = $data["repo"];
+            $jsonContent["dependencies"] = $data["dependencies"];
+            $jsonContent["settings"] = $data["settings"];
+
+        }
+
+        $jsonContent = Json::encode($jsonContent, JSON_UNESCAPED_SLASHES);
+
+        $jsonContent = str_replace('\\"', '"', $jsonContent);
+        $jsonContent = str_replace('"{', '{', $jsonContent);
+        $jsonContent = str_replace('}"', '}', $jsonContent);
+        $jsonContent = $this->basepackages->utils->formatJson(['json' => $jsonContent]);
+
+        try {
+            $this->localContent->write($jsonFile, $jsonContent);
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write json content to file: ' . $jsonFile);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function getModuleJsonFileLocation($data)
+    {
+        if ($data['module_type'] === 'components') {
+            $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Components/';
+            $this->view->moduleMenu = $data['menu'];
+        } else if ($data['module_type'] === 'packages') {
+            if ($data['app_type'] === 'core' &&
+                ($data['category'] === 'basepackages' ||
+                 $data['category'] === 'providers')
+            ) {
+                if ($data['category'] === 'basepackages') {
+                    $moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/';
+                } else if ($data['category'] === 'providers') {
+                    $moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/';
+                }
+            } else {
+                $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Packages/';
+            }
+        } else if ($data['module_type'] === 'middlewares') {
+            $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Middlewares/';
+        } else if ($data['module_type'] === 'views') {
+            $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Views/';
+        }
+
+        if ($data['module_type'] === 'packages' &&
+            ($data['category'] === 'basepackages' ||
+             $data['category'] === 'providers')
+        ) {
+            return
+                $moduleLocation .
+                ucfirst($data['name']) . '/' .
+                substr($data['module_type'], 0, -1) . '.json';
+        } else {
+            if ($data['module_type'] === 'components') {
+                $routeArr = explode('/', $data['route']);
+
+                foreach ($routeArr as &$path) {
+                    $path = ucfirst($path);
+                }
+
+                $routePath = implode('/', $routeArr) . '/Install/';
+            } else if ($data['module_type'] === 'middlewares') {
+                $routePath = $data['name'] . '/Install/';
+            } else if ($data['module_type'] === 'packages') {
+                $pathArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
+
+                $routePath = implode('/', $pathArr) . '/Install/';
+            } else if ($data['module_type'] === 'views') {
+                $routePath = $data['name'] . '/';
+            }
+
+            return
+                $moduleLocation .
+                $routePath .
+                substr($data['module_type'], 0, -1) . '.json';
+        }
     }
 }

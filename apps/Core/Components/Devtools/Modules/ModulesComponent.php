@@ -186,6 +186,7 @@ class ModulesComponent extends BaseComponent
 							$routePath .
 							substr($module['module_details']['module_type'], 0, -1) . '.json';
 					}
+
 					try {
 						$module = array_merge($module, $this->modulesPackage->validateJson(
 							[
@@ -214,19 +215,59 @@ class ModulesComponent extends BaseComponent
 		}
 	}
 
+	public function addAction()
+	{
+		if ($this->request->isPost()) {
+			if (!$this->checkCSRF()) {
+				return;
+			}
+
+			$this->modulesPackage->addModule($this->postData());
+
+			$this->addResponse(
+				$this->modulesPackage->packagesData->responseMessage,
+				$this->modulesPackage->packagesData->responseCode
+			);
+		} else {
+			$this->addResponse('Method Not Allowed', 1);
+		}
+	}
+
 	public function updateAction()
 	{
 		if ($this->request->isPost()) {
 			if (!$this->checkCSRF()) {
 				return;
 			}
-			$this->modulesPackage->updateModules($this->postData());
 
-			$this->addResponse($this->modulesPackage->packagesData->responseMessage, $this->modulesPackage->packagesData->responseCode);
+			$this->modulesPackage->updateModule($this->postData());
+
+			$this->addResponse(
+				$this->modulesPackage->packagesData->responseMessage,
+				$this->modulesPackage->packagesData->responseCode
+			);
 		} else {
 			$this->addResponse('Method Not Allowed', 1);
 		}
 	}
+
+	// public function removeAction()
+	// {
+	// 	if ($this->request->isPost()) {
+	// 		if (!$this->checkCSRF()) {
+	// 			return;
+	// 		}
+
+	// 		$this->modulesPackage->removeModule($this->postData());
+
+	// 		$this->addResponse(
+	// 			$this->modulesPackage->packagesData->responseMessage,
+	// 			$this->modulesPackage->packagesData->responseCode
+	// 		);
+	// 	} else {
+	// 		$this->addResponse('Method Not Allowed', 1);
+	// 	}
+	// }
 
 	public function validateJsonAction()
 	{

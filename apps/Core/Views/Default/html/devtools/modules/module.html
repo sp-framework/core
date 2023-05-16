@@ -4,6 +4,11 @@
         [
             'tabTitle'          : 'Info',
             'tabInclude'        : 'modules/module/info'
+        ],
+        'description'   :
+        [
+            'tabTitle'          : 'Description',
+            'tabInclude'        : 'modules/module/description'
         ]
     ]
 %}
@@ -84,22 +89,28 @@ if (!dataCollectionSectionForm['vars']['moduleDependencies']['external']) {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-id'                                  : { },
-        '{{componentId}}-{{sectionId}}-type'                                : { },
-        '{{componentId}}-{{sectionId}}-name'                                : { },
-        '{{componentId}}-{{sectionId}}-display_name'                        : { },
-        '{{componentId}}-{{sectionId}}-route'                               : { },
-        '{{componentId}}-{{sectionId}}-description'                         : { },
-        '{{componentId}}-{{sectionId}}-module_type'                         : {
-            'placeholder'   : 'SELECT MODULE TYPE'
-        },
-        '{{componentId}}-{{sectionId}}-app_type'                            : {
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
+        '{{componentId}}-{{sectionId}}-type'                                    : { },
+        '{{componentId}}-{{sectionId}}-app_type'                                : {
             'placeholder'   : 'SELECT APP TYPE OR CREATE NEW'
         },
-        '{{componentId}}-{{sectionId}}-category'                            : {
+        '{{componentId}}-{{sectionId}}-module_type'                             : {
+            'placeholder'   : 'SELECT MODULE TYPE'
+        },
+        '{{componentId}}-{{sectionId}}-category'                                : {
             'placeholder'   : 'SELECT CATEGORY'
         },
-        '{{componentId}}-{{sectionId}}-api_id'                              : {
+        '{{componentId}}-{{sectionId}}-name'                                    : { },
+        '{{componentId}}-{{sectionId}}-display_name'                            : { },
+        '{{componentId}}-{{sectionId}}-route'                                   : { },
+        '{{componentId}}-{{sectionId}}-description'                             : {
+            afterInit: function() {
+                $("#{{componentId}}-{{sectionId}}-description").closest(".trumbowyg-box").css("min-height", "400px");
+                $("#{{componentId}}-{{sectionId}}-description").prev(".trumbowyg-editor").css("min-height", "400px");
+                $("#{{componentId}}-{{sectionId}}-description").css("min-height", "400px");
+            }
+        },
+        '{{componentId}}-{{sectionId}}-api_id'                                  : {
             'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY',
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function(e) {
@@ -129,10 +140,10 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-version'                             : { },
-        '{{componentId}}-{{sectionId}}-repo'                                : { },
-        '{{componentId}}-{{sectionId}}-class'                               : { },
-        '{{componentId}}-{{sectionId}}-settings'                            : {
+        '{{componentId}}-{{sectionId}}-version'                                 : { },
+        '{{componentId}}-{{sectionId}}-repo'                                    : { },
+        '{{componentId}}-{{sectionId}}-class'                                   : { },
+        '{{componentId}}-{{sectionId}}-settings'                                : {
             'afterInit'     : function() {
                 if (dataCollectionSectionForm['vars']['moduleSettings'].length === 0) {
                     dataCollectionSectionForm['vars']['moduleSettings'] = { };
@@ -327,17 +338,17 @@ dataCollectionSection =
                 prettyfyJson();
             }
         },
-        '{{componentId}}-{{sectionId}}-menu'                                : { },
-        '{{componentId}}-{{sectionId}}-menu_id'                             : { },
-        '{{componentId}}-{{sectionId}}-apps'                                : { },
-        '{{componentId}}-{{sectionId}}-settings-components'                 : {
+        '{{componentId}}-{{sectionId}}-menu'                                    : { },
+        '{{componentId}}-{{sectionId}}-menu_id'                                 : { },
+        '{{componentId}}-{{sectionId}}-apps'                                    : { },
+        '{{componentId}}-{{sectionId}}-settings-components'                     : {
             'placeholder'   : 'SELECT COMPONENT',
             'allowClear'    : true
         },
-        '{{componentId}}-{{sectionId}}-mandatory'                           : { },
-        '{{componentId}}-{{sectionId}}-mandatory-apps'                      : { },
-        '{{componentId}}-{{sectionId}}-need-auth'                           : { },
-        '{{componentId}}-{{sectionId}}-settings-packages'                   : {
+        '{{componentId}}-{{sectionId}}-mandatory'                               : { },
+        '{{componentId}}-{{sectionId}}-mandatory-apps'                          : { },
+        '{{componentId}}-{{sectionId}}-need-auth'                               : { },
+        '{{componentId}}-{{sectionId}}-settings-packages'                       : {
             'placeholder'   : 'SELECT PACKAGE',
             'allowClear'    : true
         },
@@ -621,8 +632,7 @@ dataCollectionSection =
 
                             break;
                     }
-                    //eslint-disable-next-line
-                    console.log(type, settings);
+
                     if (type === 'text' || type === 'boolean') {
                         $('#{{componentId}}-{{sectionId}}-settings-text').val(settings);
 
@@ -757,18 +767,18 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-settings-text'                           : { },
         '{{componentId}}-{{sectionId}}-settings-textarea'                       : { },
-        '{{componentId}}-{{sectionId}}-import'                              : { },
-        '{{componentId}}-{{sectionId}}-import-add-method'                   : { },
-        '{{componentId}}-{{sectionId}}-import-update-method'                : { },
-        '{{componentId}}-{{sectionId}}-export'                              : { },
-        '{{componentId}}-{{sectionId}}-dependencies-modules'                : {
+        '{{componentId}}-{{sectionId}}-import'                                  : { },
+        '{{componentId}}-{{sectionId}}-import-add-method'                       : { },
+        '{{componentId}}-{{sectionId}}-import-update-method'                    : { },
+        '{{componentId}}-{{sectionId}}-export'                                  : { },
+        '{{componentId}}-{{sectionId}}-dependencies-modules'                    : {
             'placeholder'   : 'SELECT MODULE',
             'allowClear'    : true
         },
-        '{{componentId}}-{{sectionId}}-dependencies-modulename'             : { },
-        '{{componentId}}-{{sectionId}}-dependencies-moduleversion'          : { },
-        '{{componentId}}-{{sectionId}}-dependencies-modulerepo'             : { },
-        '{{componentId}}-{{sectionId}}-dependencies'                        : {
+        '{{componentId}}-{{sectionId}}-dependencies-modulename'                 : { },
+        '{{componentId}}-{{sectionId}}-dependencies-moduleversion'              : { },
+        '{{componentId}}-{{sectionId}}-dependencies-modulerepo'                 : { },
+        '{{componentId}}-{{sectionId}}-dependencies'                            : {
             'afterInit'     : function() {
                 var id, label, moduleData;
                 $('#{{componentId}}-{{sectionId}}-dependencies-external, ' +
@@ -907,38 +917,37 @@ dataCollectionSection =
                 prettyfyJson();
             }
         },
-        '{{componentId}}-{{sectionId}}-dependencies-external'               : { },
-        '{{componentId}}-{{sectionId}}-dependencies-external-version'       : { },
-        '{{componentId}}-{{sectionId}}-form'                                : {
+        '{{componentId}}-{{sectionId}}-dependencies-external'                   : { },
+        '{{componentId}}-{{sectionId}}-dependencies-external-version'           : { },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
             rules: {
-                '{{componentId}}-{{sectionId}}-name'                        : 'required',
-                '{{componentId}}-{{sectionId}}-route'                       : 'required',
-                '{{componentId}}-{{sectionId}}-app_type'                    : 'required',
-                '{{componentId}}-{{sectionId}}-category'                    : 'required',
-                '{{componentId}}-{{sectionId}}-version'                     : 'required',
-                '{{componentId}}-{{sectionId}}-repo'                        : 'required',
-                '{{componentId}}-{{sectionId}}-class'                       : 'required',
-                '{{componentId}}-{{sectionId}}-settings'                    : 'required',
-                '{{componentId}}-{{sectionId}}-menu_id'                     : 'required',
-                '{{componentId}}-{{sectionId}}-menu'                        : 'required'
+                '{{componentId}}-{{sectionId}}-app_type'                        : 'required',
+                '{{componentId}}-{{sectionId}}-module_type'                     : 'required',
+                '{{componentId}}-{{sectionId}}-category'                        : 'required',
+                '{{componentId}}-{{sectionId}}-name'                            : 'required',
+                '{{componentId}}-{{sectionId}}-display_name'                    : 'required',
+                '{{componentId}}-{{sectionId}}-route'                           : 'required',
+                '{{componentId}}-{{sectionId}}-version'                         : 'required',
+                '{{componentId}}-{{sectionId}}-repo'                            : 'required',
+                '{{componentId}}-{{sectionId}}-class'                           : 'required',
+                '{{componentId}}-{{sectionId}}-menu_id'                         : 'required',
+                '{{componentId}}-{{sectionId}}-menu'                            : 'required'
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-name'                        : 'Please enter name',
-                '{{componentId}}-{{sectionId}}-route'                       : 'Please enter route',
-                '{{componentId}}-{{sectionId}}-app_type'                    : 'Please enter app_type',
-                '{{componentId}}-{{sectionId}}-category'                    : 'Please enter category',
-                '{{componentId}}-{{sectionId}}-version'                     : 'Please enter version',
-                '{{componentId}}-{{sectionId}}-repo'                        : 'Please enter repo',
-                '{{componentId}}-{{sectionId}}-class'                       : 'Please enter class',
-                '{{componentId}}-{{sectionId}}-settings'                    : 'Please enter settings',
-                '{{componentId}}-{{sectionId}}-menu_id'                     : 'Please enter menu_id',
-                '{{componentId}}-{{sectionId}}-menu'                        : 'Please enter menu'
+                '{{componentId}}-{{sectionId}}-app_type'                        : 'Please select app type',
+                '{{componentId}}-{{sectionId}}-module_type'                     : 'Please select module type',
+                '{{componentId}}-{{sectionId}}-category'                        : 'Please select category',
+                '{{componentId}}-{{sectionId}}-name'                            : 'Please enter module name',
+                '{{componentId}}-{{sectionId}}-display_name'                    : 'Please enter module display name',
+                '{{componentId}}-{{sectionId}}-route'                           : 'Please enter route',
+                '{{componentId}}-{{sectionId}}-version'                         : 'Please enter version',
+                '{{componentId}}-{{sectionId}}-repo'                            : 'Please enter repo',
+                '{{componentId}}-{{sectionId}}-class'                           : 'Please enter class',
+                '{{componentId}}-{{sectionId}}-menu_id'                         : 'Please enter menu_id',
+                '{{componentId}}-{{sectionId}}-menu'                            : 'Please enter menu'
             },
             onSubmitResponse: function(response) {
-                //eslint-disable-next-line
-                console.log(response);
-
-                return false;
+                return true;
             }
         }
     });

@@ -109,26 +109,57 @@ class Utils extends BasePackage
             switch ($data['json'][$i]) {
                 case '"':
                     $quotes = !$quotes;
+                    if ($data['json'][$i - 1] === '[') {
+                        $prefix = $return;
+                        $prefix .= str_repeat($indent, $arrayLevel);
+                    }
                     break;
 
                 case '[':
+                    if ($data['json'][$i + 1] === '{' || $data['json'][$i + 1] === '"') {
+                        $prefix = $return;
+                        $prefix .= str_repeat($indent, $arrayLevel);
+                    }
                     $arrayLevel++;
+
                     break;
 
                 case ']':
                     $arrayLevel--;
-                    $prefix = $return;
-                    $prefix .= str_repeat($indent, $arrayLevel);
+                    if ($data['json'][$i -1] !== '[') {
+                        $prefix = $return;
+                        $prefix .= str_repeat($indent, $arrayLevel);
+                    }
                     break;
 
                 case '{':
+                    if ($data['json'][$i - 1] === '[') {
+                        $prefix = $return;
+                        $prefix .= str_repeat($indent, $arrayLevel);
+                    }
+                    if ($data['json'][$i + 1] === '"') {
+                        $prefix = $return;
+                        $prefix .= str_repeat($indent, $arrayLevel);
+                    }
                     $arrayLevel++;
                     $suffix = $return;
                     $suffix .= str_repeat($indent, $arrayLevel);
                     break;
 
                 case ':':
-                    $suffix = ' ';
+                    if ($data['json'][$i - 1] === '"' &&
+                        ($data['json'][$i + 1] === '"' ||
+                         $data['json'][$i + 1] === '[' ||
+                         $data['json'][$i + 1] === '{' ||
+                         $data['json'][$i + 1] === 't' ||
+                         $data['json'][$i + 1] === 'T' ||
+                         $data['json'][$i + 1] === 'f' ||
+                         $data['json'][$i + 1] === 'F') ||
+                         is_numeric($data['json'][$i + 1])
+                    ) {
+                        $prefix = ' ';
+                        $suffix = ' ';
+                    }
                     break;
 
                 case ',':
