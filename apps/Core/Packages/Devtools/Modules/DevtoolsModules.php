@@ -35,7 +35,7 @@ class DevtoolsModules extends BasePackage
             $moduleMethod = 'get' . ucfirst(substr($data['type'], 0, -1)) . 'ByAppTypeAndRepoAndName';
             $module = $this->modules->{$data['type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['name']);
         }
-        //Need to add more checks. Repo can be as simple as "https://.../" for local, in that case there should be more checks.
+
         if ($module) {
             $this->addResponse('Module already exists!', 1);
 
@@ -47,9 +47,17 @@ class DevtoolsModules extends BasePackage
         $data['installed'] = '1';
         $data['updated_by'] = '0';
 
+        if ($data['type'] === 'views' && $data['base_view_module_id'] == 0) {
+            $data['view_modules_version'] = '0.0.0.0';
+        }
+
+        if ($data['apps'] === '') {
+            $data['apps'] = Json::encode([]);
+        }
+
         if ($this->modules->{$data['type']}->add($data) &&
-            $this->updateModuleJson($data) &&
-            $this->generateNewFiles($data)
+            $this->updateModuleJson($data)
+            // $this->generateNewFiles($data)
         ) {
             $this->addResponse('Module added');
 
@@ -104,12 +112,17 @@ class DevtoolsModules extends BasePackage
             if (isset($data['app_type']['data'][0])) {
                 $data['app_type'] = $data['app_type']['data'][0];
             } else if (isset($data['app_type']['newTags'][0])) {
-                $this->apps->types->add(
-                    [
-                        'app_type'  => strtolower($data['app_type']['newTags'][0]),
-                        'name'      => $data['app_type']['newTags'][0]
-                    ]
-                );
+                $appType = $this->apps->types->getFirst('app_type', strtolower($data['app_type']['newTags'][0]));
+
+                if (!$appType) {
+                    $this->apps->types->add(
+                        [
+                            'app_type'  => strtolower($data['app_type']['newTags'][0]),
+                            'name'      => $data['app_type']['newTags'][0]
+                        ]
+                    );
+                }
+
                 $data['app_type'] = strtolower($data['app_type']['newTags'][0]);
             }
         }

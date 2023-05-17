@@ -1,105 +1,85 @@
-
 {
-	"name" : "Default",
-	"display_name" : "Bazaari Core Default View",
-	"description" : "Default Core View",
-	"module_type" : "views",
-	"app_type" : "core",
-	"category" : "tools",
-	"version" : "0.0.0",
-	"repo" : "https://.../",
-	"dependencies" : 
-	{
-		"core" : 
-		{
-			"name" : "Core",
-			"version" : "0.0.0",
-			"repo" : "https://.../"
-		},
-		"components" : [],
-		"packages" : 
-		[
-			{
-				"name" : "Adminltetags",
-				"version" : "0.0.0",
-				"repo" : "https://.../"
-			}
-		],
-		"middlewares" : [],
-		"views" : [],
-		"external" : []
-	},
-	"settings" : 
-	{
-		"mandatory" : true,
-		"layouts" : 
-		[
-			{
-				"view" : "default",
-				"name" : "Default"
-			},
-			
-			{
-				"view" : "topnav",
-				"name" : "Top Navigation",
-				"active" : true
-			},
-			
-			{
-				"view" : "topnavsidebar",
-				"name" : "Top Navigation With Sidebar"
-			}
-		],
-		"tags" : "Adminltetags",
-		"head" : 
-		{
-			"title" : "Bazaari Core",
-			"meta" : 
-			{
-				"charset" : "UTF-8",
-				"viewport" : "width=device-width, initial-scale=1, shrink-to-fit=no",
-				"description" : "Bazaari Core Views",
-				"author" : "guru@bazaari.com.au",
-				"keywords" : "HTML, CSS, JavaScript"
-			},
-			"link" : 
-			{
-				"href" : 
-				[
-					"core/default/css/plugins.css",
-					"core/default/css/core.css"
-				]
-			},
-			"script" : 
-			{
-				"src" : 
-				[
-					"core/default/js/header/jsHeaderDependencies.js",
-					"core/default/js/header/jsHeaderCore.js",
-					"core/default/js/header/jsHeaderPlugins.js"
-				]
-			}
-		},
-		"body" : 
-		{
-			"jsscript" : ""
-		},
-		"footer" : 
-		{
-			"script" : 
-			{
-				"src" : 
-				[
-					"core/default/js/footer/jsFooterDependencies.js"
-				]
-			},
-			"jsscript" : "",
-			"copyright" : 
-			{
-				"fromYear" : "2014",
-				"site" : "https://www.bazaari.com.au",
-				"name" : "Bazaari E Trade Pty. Ltd."
-			}
-		}
-	}
+    "name"          : "Default",
+    "display_name"  : "Bazaari Core Default View",
+    "description"   : "Default Core View",
+    "module_type"   : "views",
+    "app_type"      : "core",
+    "category"      : "tools",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [
+            {
+                "name": "Adminltetags",
+                "version": "0.0.0",
+                "repo": "https://.../"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "settings"      : {
+        "mandatory" : true,
+        "layouts"   : [
+            {
+                "view"      : "default",
+                "name"      : "Default"
+            },
+            {
+                "view"      : "topnav",
+                "name"      : "Top Navigation",
+                "active"    : true
+            },
+            {
+                "view"      : "topnavsidebar",
+                "name"      : "Top Navigation With Sidebar"
+            }
+        ],
+        "tags"      : "Adminltetags",
+        "head"      : {
+            "title" : "Bazaari Core",
+            "meta"  : {
+                "charset"       : "UTF-8",
+                "viewport"      : "width=device-width, initial-scale=1, shrink-to-fit=no",
+                "description"   : "Bazaari Core Views",
+                "author"        : "guru@bazaari.com.au",
+                "keywords"      : "HTML, CSS, JavaScript"
+            },
+            "link"      : {
+                "href"      : [
+                    "core/default/css/plugins.css",
+                    "core/default/css/core.css"
+                ]
+            },
+            "script"    : {
+                "src"   : [
+                    "core/default/js/header/jsHeaderDependencies.js",
+                    "core/default/js/header/jsHeaderCore.js",
+                    "core/default/js/header/jsHeaderPlugins.js"
+                ]
+            }
+        },
+        "body"          : {
+            "jsscript"  : ""
+        },
+        "footer"        : {
+            "script"    : {
+                "src"   : [
+                    "core/default/js/footer/jsFooterDependencies.js"
+                ]
+            },
+            "jsscript"  : "",
+            "copyright" : {
+                "fromYear"  : "2014",
+                "site"      : "https://www.bazaari.com.au",
+                "name"      : "Bazaari E Trade Pty. Ltd."
+            }
+        }
+    }
 }
