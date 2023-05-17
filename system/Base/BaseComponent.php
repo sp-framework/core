@@ -39,6 +39,8 @@ abstract class BaseComponent extends Controller
 
 	protected $token = null;
 
+	protected $assetsVersion;
+
 	public $widgets;
 
 	protected function onConstruct()
@@ -630,6 +632,20 @@ abstract class BaseComponent extends Controller
 
 	protected function buildAssets()
 	{
+		if (!$this->assetsVersion) {
+			if ($this->app['app_type'] === 'core') {
+				$this->assetsVersion = $this->core->getVersion();
+			} else {
+				if ($this->modules->views->getViewInfo()['view_modules_version'] &&
+					$this->modules->views->getViewInfo()['view_modules_version'] !== '0.0.0.0'
+				) {
+					$this->assetsVersion = $this->modules->views->getViewInfo()['view_modules_version'];
+				} else {
+					$this->assetsVersion = $this->modules->views->getCalculatedAssetsVersion();
+				}
+			}
+		}
+
 		$this->buildAssetsTitle();
 		$this->buildAssetsMeta();
 		$this->buildAssetsHeadCss();
@@ -689,7 +705,7 @@ abstract class BaseComponent extends Controller
 		if (count($links) > 0) {
 			foreach ($links as $link) {
 				if (!$this->config->dev) {
-					$this->assetsCollections['headLinks']->addCss($link, null, true, [], $this->core->getVersion());
+					$this->assetsCollections['headLinks']->addCss($link, null, true, [], $this->assetsVersion);
 				} else {
 					$this->assetsCollections['headLinks']->addCss($link);
 				}
@@ -715,7 +731,7 @@ abstract class BaseComponent extends Controller
 		if (count($scripts) > 0) {
 			foreach ($scripts as $script) {
 				if (!$this->config->dev) {
-					$this->assetsCollections['headJs']->addJs($script, null, true, [], $this->core->getVersion());
+					$this->assetsCollections['headJs']->addJs($script, null, true, [], $this->assetsVersion);
 				} else {
 					$this->assetsCollections['headJs']->addJs($script);
 				}
@@ -744,7 +760,7 @@ abstract class BaseComponent extends Controller
 		if (count($scripts) > 0) {
 			foreach ($scripts as $script) {
 				if (!$this->config->dev) {
-					$this->assetsCollections['footerJs']->addJs($script, null, true, [], $this->core->getVersion());
+					$this->assetsCollections['footerJs']->addJs($script, null, true, [], $this->assetsVersion);
 				} else {
 					$this->assetsCollections['footerJs']->addJs($script);
 				}

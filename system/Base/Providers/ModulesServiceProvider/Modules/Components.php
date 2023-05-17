@@ -30,6 +30,19 @@ class Components extends BasePackage
 		return false;
 	}
 
+	public function getComponentByNameForAppType($name, $appType)
+	{
+		foreach($this->components as $component) {
+			if (strtolower($component['name']) === strtolower($name) &&
+				strtolower($component['app_type']) === strtolower($appType)
+			) {
+				return $component;
+			}
+		}
+
+		return false;
+	}
+
 	public function getComponentsByApiId($apiId)
 	{
 		$components = [];

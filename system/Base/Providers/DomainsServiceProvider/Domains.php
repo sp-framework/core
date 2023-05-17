@@ -146,7 +146,9 @@ class Domains extends BasePackage
 
 	protected function checkAppsData($data, $exclusive = true)
 	{
-		$data['apps'] = Json::decode($data['apps'], true);
+		if (!is_array($data['apps'])) {
+			$data['apps'] = Json::decode($data['apps'], true);
+		}
 
 		if (count($data['apps']) >= 1) {
 			foreach ($data['apps'] as $appId => &$appSettings) {

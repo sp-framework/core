@@ -31,8 +31,8 @@ class AppsComponent extends BaseComponent
                 if (!isset($app['default_component']) ||
                     isset($app['default_component']) && $app['default_component'] == '0'
                 ) {
-                    if ($app['app_type'] === 'dash') {
-                        $dashboard = $this->modules->components->getComponentByName('dashboards');
+                    if ($app['app_type'] === 'core' || $app['app_type'] === 'dash') {
+                        $dashboard = $this->modules->components->getComponentByNameForAppType('dashboards', $app['app_type']);
 
                         if ($dashboard) {
                             $app['default_component'] = $dashboard['id'];
@@ -43,7 +43,7 @@ class AppsComponent extends BaseComponent
                 if (!isset($app['errors_component']) ||
                     isset($app['errors_component']) && $app['errors_component'] == '0'
                 ) {
-                    $errors = $this->modules->components->getComponentByName('errors');
+                    $errors = $this->modules->components->getComponentByNameForAppType('errors', $app['app_type']);
 
                     if ($errors) {
                         $app['errors_component'] = $errors['id'];
@@ -166,8 +166,22 @@ class AppsComponent extends BaseComponent
 
                 if (count($viewsArr) === 1) {
                     array_push($mandatoryViews, Arr::first($viewsArr)['name']);
+
+                    $views[Arr::first($viewsArr)['id']] = Arr::first($viewsArr);
+
+                    if ($views[Arr::first($viewsArr)['id']]['apps']) {
+                        $views[Arr::first($viewsArr)['id']]['apps'] = Json::decode($views[Arr::first($viewsArr)['id']]['apps'], true);
+                    }
+
+                    if ($views[Arr::first($viewsArr)['id']]['settings']) {
+                        $views[Arr::first($viewsArr)['id']]['settings'] = Json::decode($views[Arr::first($viewsArr)['id']]['settings'], true);
+                    }
                 } else {
                     foreach ($viewsArr as $key => &$viewValue) {
+                        if ($viewValue['base_view_module_id'] != '0') {
+                            continue;
+                        }
+
                         if ($viewValue['apps']) {
                             $viewValue['apps'] = Json::decode($viewValue['apps'], true);
                         }

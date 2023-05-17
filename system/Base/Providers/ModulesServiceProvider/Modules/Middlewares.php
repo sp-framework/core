@@ -173,6 +173,10 @@ class Middlewares extends BasePackage
 
 	public function updateMiddlewares(array $data)
 	{
+		if ($data['middlewares'] === '') {
+			return true;
+		}
+
 		$dependencyArray = [];
 
 		$middlewares = Json::decode($data['middlewares'], true);

@@ -1421,8 +1421,7 @@ dataCollectionSection =
                                             return false;
                                         }
 
-                                        $('#{{componentId}}-{{sectionId}}-base_view_module_id')
-                                            .val(dataCollectionSectionForm['vars']['modules'][modules][moduleData['id']]['base_view_module_id']);
+                                        $('#{{componentId}}-{{sectionId}}-base_view_module_id').val(moduleData['id']);
 
                                         $('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked = false;
                                         $('#{{componentId}}-{{sectionId}}-base_view_module').attr('disabled', true);
