@@ -55,6 +55,7 @@
     </fieldset>
 </form>
 <script>
+/* globals PNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -84,7 +85,9 @@ dataCollectionSectionForm['vars']['module_type'] = '{{type}}';
 dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modulesJson}}');
 dataCollectionSectionForm['vars']['moduleDependencies'] = JSON.parse('{{moduleDependencies}}');
 dataCollectionSectionForm['vars']['moduleSettings'] = JSON.parse('{{moduleSettings}}');
-if (!dataCollectionSectionForm['vars']['moduleDependencies']['external']) {
+if (dataCollectionSectionForm['vars']['module_type'] !== 'views' &&
+    !dataCollectionSectionForm['vars']['moduleDependencies']['external']
+) {
     dataCollectionSectionForm['vars']['moduleDependencies']['external'] = { };
 }
 
@@ -120,12 +123,14 @@ dataCollectionSection =
                     id = e.params.data.id;
                     repourl = $(e.params.data.element).data('url');
 
-                    repourl =
-                        repourl + '/' +
-                        'apps-' +
-                        $('#{{componentId}}-{{sectionId}}-app_type').val().toLowerCase() + '-' +
-                        $('#{{componentId}}-{{sectionId}}-module_type').val().toLowerCase() + '-' +
-                        $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
+                    if (repourl !== 'https://.../') {
+                        repourl =
+                            repourl + '/' +
+                            'apps-' +
+                            $('#{{componentId}}-{{sectionId}}-app_type').val().toLowerCase() + '-' +
+                            $('#{{componentId}}-{{sectionId}}-module_type').val().toLowerCase() + '-' +
+                            $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
+                    }
 
                     $('#{{componentId}}-{{sectionId}}-repo').val(repourl);
                 });
@@ -718,6 +723,13 @@ dataCollectionSection =
 
                                 break;
                             case 'head-meta-author' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
                                 type = 'text';
                                 settings = '';
 
@@ -727,6 +739,13 @@ dataCollectionSection =
 
                                 break;
                             case 'head-meta-charset' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
                                 type = 'text';
                                 settings = '';
 
@@ -736,6 +755,13 @@ dataCollectionSection =
 
                                 break;
                             case 'head-meta-keywords' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
                                 type = 'text';
                                 settings = '';
 
@@ -745,6 +771,13 @@ dataCollectionSection =
 
                                 break;
                             case 'head-meta-viewport' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
                                 type = 'text';
                                 settings = '';
 
@@ -754,6 +787,13 @@ dataCollectionSection =
 
                                 break;
                             case 'head-meta-description' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
                                 type = 'text';
                                 settings = '';
 
@@ -763,6 +803,13 @@ dataCollectionSection =
 
                                 break;
                             case 'title' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
                                 type = 'text';
                                 settings = '';
 
@@ -781,6 +828,13 @@ dataCollectionSection =
 
                                 break;
                             case 'tags' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
                                 type = 'text';
                                 settings = '';
 
@@ -808,6 +862,13 @@ dataCollectionSection =
 
                                 break;
                             case 'footer-copyright-name' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
                                 type = 'text';
                                 settings = '';
 
@@ -817,6 +878,13 @@ dataCollectionSection =
 
                                 break;
                             case 'footer-copyright-site' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
                                 type = 'text';
                                 settings = '';
 
@@ -826,6 +894,13 @@ dataCollectionSection =
 
                                 break;
                             case 'footer-copyright-fromYear' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
                                 type = 'text';
                                 settings = '';
 
@@ -835,6 +910,13 @@ dataCollectionSection =
 
                                 break;
                             case 'layouts' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
                                 type = 'array';
                                 settings = '';
 
@@ -844,6 +926,13 @@ dataCollectionSection =
 
                                 break;
                             case 'mandatory' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
                                 type = 'boolean';
                                 settings = '';
 
@@ -1312,7 +1401,29 @@ dataCollectionSection =
                                 });
 
                                 if (!found) {
-                                    dataCollectionSectionForm['vars']['moduleDependencies'][modules].push(moduleData);
+                                    if (modules === 'views') {
+                                        if (dataCollectionSectionForm['vars']['modules'][modules][moduleData['id']]['base_view_module_id'] != '0') {
+                                            PNotify.error({'text': 'Only base view modules can be a view dependency'});
+
+                                            reset();
+
+                                            return false;
+                                        }
+
+                                        $('#{{componentId}}-{{sectionId}}-base_view_module_id')
+                                            .val(dataCollectionSectionForm['vars']['modules'][modules][moduleData['id']]['base_view_module_id']);
+
+                                        $('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked = false;
+                                        $('#{{componentId}}-{{sectionId}}-base_view_module').attr('disabled', true);
+                                    }
+
+                                    var moduleToPush = { };
+                                    moduleToPush['name'] = moduleData['name'];
+                                    moduleToPush['version'] = moduleData['version'];
+                                    moduleToPush['repo'] = moduleData['repo'];
+
+
+                                    dataCollectionSectionForm['vars']['moduleDependencies'][modules].push(moduleToPush);
                                 }
                             }
                         }
@@ -1344,6 +1455,12 @@ dataCollectionSection =
                                 });
 
                                 if (found) {
+                                    if (modules === 'views') {
+                                        $('#{{componentId}}-{{sectionId}}-base_view_module_id').val('');
+
+                                        $('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked = true;
+                                        $('#{{componentId}}-{{sectionId}}-base_view_module').attr('disabled', false);
+                                    }
                                     dataCollectionSectionForm['vars']['moduleDependencies'][modules].splice(foundIndex);
                                 }
                             }
@@ -1358,6 +1475,8 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-dependencies-external'                   : { },
+        '{{componentId}}-{{sectionId}}-base_view_module_id'                     : { },
+        '{{componentId}}-{{sectionId}}-base_view_module'                        : { },
         '{{componentId}}-{{sectionId}}-dependencies-external-version'           : { },
         '{{componentId}}-{{sectionId}}-form'                                    : {
             rules: {

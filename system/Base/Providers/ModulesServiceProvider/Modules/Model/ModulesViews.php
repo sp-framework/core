@@ -18,6 +18,10 @@ class ModulesViews extends BaseModel
 
     public $version;
 
+    public $view_modules_version;
+
+    public $base_view_module_id;
+
     public $repo;
 
     public $settings;

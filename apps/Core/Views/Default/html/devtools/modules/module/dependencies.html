@@ -24,11 +24,62 @@
                             'fieldBazScan'                         : true,
                             'fieldDataSelect2Options'              : modules,
                             'fieldDataSelect2OptionsKey'           : 'id',
-                            'fieldDataSelect2OptionsValue'         : 'name',
+                            'fieldDataSelect2OptionsValue'         : 'display_name|name',
                             'fieldDataSelect2OptionsSelected'      : ''
                         ]
                     )}}
                 </div>
+                {% if type === 'views' %}
+                    <div class="col">
+                        {% set baseViewChecked = false %}
+                        {% set baseViewModuleId = '0' %}
+                        {% if module['base_view_module_id'] is defined %}
+                            {% if module['base_view_module_id'] == '0' %}
+                                {% set baseViewChecked = true %}
+                            {% endif %}
+                            {% set baseViewModuleId = module['base_view_module_id'] %}
+                        {% endif %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'base_view_module_id',
+                                'fieldLabel'                     : 'base view module',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : '',
+                                'fieldRequired'                  : true,
+                                'fieldHidden'                    : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 50,
+                                'fieldValue'                     : baseViewModuleId
+                            ]
+                        )}}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'base_view_module',
+                                'fieldLabel'                     : 'Base View Module?',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'View modules have a base view module, example: View module "Default" will be base for View module "home". View module home will require dependency of View module default.',
+                                'fieldRequired'                  : false,
+                                'fieldType'                      : 'checkbox',
+                                'fieldCheckboxChecked'           : true,
+                                'fieldCheckboxType'              : 'primary',
+                                'fieldBazJstreeSearch'           : false,
+                                'fieldBazScan'                   : true
+                            ]
+                        )}}
+                    </div>
+                {% endif %}
             </div>
             <div id="selected-module-information" hidden>
                 <div class="row">
@@ -129,6 +180,7 @@
             </div>
         </div>
     {% endif %}
+    {% if type !== 'views' %}
         <div class="col">
             <div class="row">
                 <div class="col">
@@ -204,6 +256,7 @@
                 </div>
             </div>
         </div>
+    {% endif %}
 </div>
 <hr>
 <div class="row">

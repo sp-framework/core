@@ -77,6 +77,20 @@ class Views
 						]
 					),
 					new Column(
+						'view_modules_version',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'    => 20,
+						]
+					),
+					new Column(
+						'base_view_module_id',
+						[
+							'type'    => Column::TYPE_SMALLINTEGER,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'repo',
 						[
 							'type'    => Column::TYPE_VARCHAR,

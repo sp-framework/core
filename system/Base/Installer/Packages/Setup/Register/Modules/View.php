@@ -18,6 +18,8 @@ class View
 				'app_type' 				=> $viewFile['app_type'],
 				'category'  			=> $viewFile['category'],
 				'version'				=> $viewFile['version'],
+				'view_modules_version'	=> '0.0.0.0',
+				'base_view_module_id'	=> 0,
 				'repo'		 			=> $viewFile['repo'],
 				'settings'				=>
 					isset($viewFile['settings']) ?

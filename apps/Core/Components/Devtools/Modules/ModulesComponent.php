@@ -74,10 +74,20 @@ class ModulesComponent extends BaseComponent
 			foreach ($moduleJson['childs'] as $childKey => $child) {
 				$modulesJson[$moduleKey][$child['id']] =
 					[
+						'id' 		=> $child['id'],
 						'name' 		=> $child['name'],
 						'version' 	=> $child['version'],
 						'repo' 		=> $child['repo'],
 					];
+
+				if ($moduleKey === 'views') {
+					$modulesJson[$moduleKey][$child['id']] =
+						array_merge($modulesJson[$moduleKey][$child['id']],
+							[
+								'base_view_module_id' => $child['base_view_module_id']
+							]
+						);
+				}
 			}
 		}
 
@@ -122,8 +132,8 @@ class ModulesComponent extends BaseComponent
 
 			$this->view->apis = $apis;
 			$this->view->moduleTypes = $this->modulesPackage->getModuleTypes();
-			$this->view->moduleSettings = $this->modulesPackage->getDefaultSettings($type);
-			$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies();
+			$this->view->moduleSettings = $this->modulesPackage->getDefaultSettings();
+			$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies($type);
 			$this->view->moduleMenu = Json::encode([]);
 
 			if ($this->getData()['id'] != 0) {
