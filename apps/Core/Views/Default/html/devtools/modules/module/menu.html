@@ -235,6 +235,10 @@
             </div>
             <div class="row mb-3">
                 <div class="col">
+                    {% set noMenuChecked = false %}
+                    {% if moduleMenu_id === '' %}
+                        {% set noMenuChecked = true %}
+                    {% endif %}
                     {{adminltetags.useTag('fields',
                         [
                             'component'                      : component,
@@ -248,7 +252,7 @@
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxLabel'             : 'NO MENU?',
-                            'fieldCheckboxChecked'           : false,
+                            'fieldCheckboxChecked'           : noMenuChecked,
                             'fieldCheckboxType'              : 'secondary',
                             'fieldBazJstreeSearch'           : false,
                             'fieldBazPostOnCreate'           : false,
@@ -316,7 +320,7 @@
                             'fieldRequired'                  : true,
                             'fieldHidden'                    : true,
                             'fieldBazScan'                   : true,
-                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : true,
                             'fieldDataInputMinLength'        : 1,
                             'fieldDataInputMaxLength'        : 50,
@@ -330,6 +334,7 @@
                     {% set noMenuDisabled = false %}
                     {% if moduleMenu_id === '' %}
                         {% set noMenuDisabled = true %}
+                        {% set moduleMenu = 'false' %}
                     {% endif %}
                     {{adminltetags.useTag('fields',
                         [
@@ -340,7 +345,7 @@
                             'fieldId'                        : 'menu',
                             'fieldLabel'                     : 'Module Menu',
                             'fieldType'                      : 'textarea',
-                            'fieldDataMaxLength'             : 2048,
+                            'fieldDataMaxLength'             : 4096,
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Menu of the component',
                             'fieldRequired'                  : false,
@@ -348,7 +353,7 @@
                             'fieldBazScan'                   : true,
                             'fieldBazPostOnCreate'           : true,
                             'fieldBazPostOnUpdate'           : true,
-                            'fieldDataInputMaxLength'        : 2048,
+                            'fieldDataInputMaxLength'        : 4096,
                             'fieldTextareaRows'              : 10,
                             'fieldValue'                     : moduleMenu
                         ]

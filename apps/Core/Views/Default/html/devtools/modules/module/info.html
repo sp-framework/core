@@ -28,6 +28,10 @@
     {% if type !== 'core' %}
         {% set moduleApps = module['module_details']['apps'] %}
     {% endif %}
+    {% if clone is defined and clone == true %}
+        {% set moduleId = '' %}
+        {% set moduleName = module['name'] ~ ' (Clone)' %}
+    {% endif %}
 {% else %}
     {% set moduleId = '' %}
     {% set moduleName = '' %}

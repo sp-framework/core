@@ -1,3 +1,13 @@
+{% set componentsURL = links.url('devtools/modules/q/module/true/type/components/id/0') %}
+{% set packagesURL = links.url('devtools/modules/q/module/true/type/packages/id/0') %}
+{% set middlewaresURL = links.url('devtools/modules/q/module/true/type/middlewares/id/0') %}
+{% set viewsURL = links.url('devtools/modules/q/module/true/type/views/id/0') %}
+{% if includecoremodules is defined and includecoremodules === true %}
+    {% set componentsURL = componentsURL ~ '/includecoremodules/true' %}
+    {% set packagesURL = packagesURL ~ '/includecoremodules/true' %}
+    {% set middlewaresURL = middlewaresURL ~ '/includecoremodules/true' %}
+    {% set viewsURL = viewsURL ~ '/includecoremodules/true' %}
+{% endif %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('buttons',
@@ -18,25 +28,25 @@
                             'title'                   : 'Component',
                             'type'                    : 'primary',
                             'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : links.url('devtools/modules/q/module/true/type/components/id/0')
+                            'url'                     : componentsURL
                         },
                         'packages' : {
                             'title'                   : 'Package',
                             'type'                    : 'primary',
                             'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : links.url('devtools/modules/q/module/true/type/packages/id/0')
+                            'url'                     : packagesURL
                         },
                         'middlewares' : {
                             'title'                   : 'Middleware',
                             'type'                    : 'primary',
                             'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : links.url('devtools/modules/q/module/true/type/middlewares/id/0')
+                            'url'                     : middlewaresURL
                         },
                         'views' : {
                             'title'                   : 'View',
                             'type'                    : 'primary',
                             'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : links.url('devtools/modules/q/module/true/type/views/id/0')
+                            'url'                     : viewsURL
                         }
                     }
             ]
@@ -89,7 +99,7 @@
                 'fieldBazPostOnUpdate'                 : true,
                 'fieldDataSelect2Options'              : modules,
                 'fieldDataSelect2OptionsKey'           : 'id',
-                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsValue'         : 'display_name|name',
                 'fieldDataSelect2OptionsSelected'      : ''
             ]
         )}}
@@ -128,6 +138,14 @@
                             'size'                    : 'xs',
                             'type'                    : 'primary',
                             'icon'                    : 'edit',
+                            'position'                : 'left',
+                            'disabled'                : true
+                        ],
+                        'clone-module' : [
+                            'title'                   : 'Clone Module',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'icon'                    : 'copy',
                             'position'                : 'left',
                             'disabled'                : true
                         ],
@@ -175,9 +193,8 @@ dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['curr
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-module'                               : { },
-        '{{componentId}}-{{sectionId}}-include_core_modules'                 : { },
-        '{{componentId}}-{{sectionId}}-modules'                              : {
+        '{{componentId}}-{{sectionId}}-include_core_modules'                : { },
+        '{{componentId}}-{{sectionId}}-modules'                             : {
             'placeholder'   : 'SELECT MODULE TO EDIT',
             'afterInit'     : function() {
                 var id, label;
@@ -186,9 +203,11 @@ dataCollectionSection =
                     label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
 
                     $('#{{componentId}}-{{sectionId}}-edit-module').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-clone-module').attr('disabled', false);
 
                     if (label === 'core') {
                         $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-clone-module').attr('disabled', true);
                     } else if (label !== 'core') {
                         if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === false) {
                             $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', false);
@@ -215,6 +234,15 @@ dataCollectionSection =
                     }
                 });
 
+                $('#{{componentId}}-{{sectionId}}-clone-module').off();
+                $('#{{componentId}}-{{sectionId}}-clone-module').click(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, true, false, true);
+                    } else {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, false, false, true);
+                    }
+                });
+
                 $('#{{componentId}}-{{sectionId}}-generate-new-release').off();
                 $('#{{componentId}}-{{sectionId}}-generate-new-release').click(function() {
                     if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
@@ -225,7 +253,7 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-form'                            : {
+        '{{componentId}}-{{sectionId}}-form'                                : {
             rules: {
             },
             messages: {
@@ -233,7 +261,7 @@ dataCollectionSection =
         }
     });
 
-dataCollectionSectionForm['funcs']['loadAjax'] = function(id = null, label = null, includecoremodules = false, newrelease = false) {
+dataCollectionSectionForm['funcs']['loadAjax'] = function(id = null, label = null, includecoremodules = false, newrelease = false, clone = false) {
     if (id && label) {
         if (dataCollectionSectionForm['vars']['url'].includes('/q/')) {
             dataCollectionSectionForm['vars']['url'] = '{{links.url("module/true/type/' + label + '/id/' + id + '")}}';
@@ -246,14 +274,23 @@ dataCollectionSectionForm['funcs']['loadAjax'] = function(id = null, label = nul
         if (newrelease) {
             dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/newrelease/true';
         }
+        if (clone) {
+            dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/clone/true';
+        }
     } else if (includecoremodules) {
         if (dataCollectionSectionForm['vars']['url'].includes('/q/')) {
-            dataCollectionSectionForm['vars']['url'] = '{{links.url("includecoremodules/true")}}';
+            dataCollectionSectionForm['vars']['url'] = '{{links.url("/includecoremodules/true")}}';
         } else {
-            dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/includecoremodules/true")}}';
+            dataCollectionSectionForm['vars']['url'] = '{{links.url("/devtools/modules/q/includecoremodules/true")}}';
         }
     } else {
         dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];
+    }
+
+    if (dataCollectionSectionForm['vars']['url'].charAt(0) !== 'h' &&
+        dataCollectionSectionForm['vars']['url'].charAt(0) !== '/'
+    ) {
+       dataCollectionSectionForm['vars']['url'] = '/' + dataCollectionSectionForm['vars']['url'];
     }
 
     $('#{{componentId}}-{{sectionId}}-modules-link').attr('href', dataCollectionSectionForm['vars']['url']);

@@ -24,6 +24,10 @@ class ModulesComponent extends BaseComponent
 			$this->view->includecoremodules = true;
 		}
 
+		if (isset($this->getData()['clone'])) {
+			$this->view->clone = true;
+		}
+
 		$appTypesArr = $this->apps->types->types;
 		$appTypes = [];
 

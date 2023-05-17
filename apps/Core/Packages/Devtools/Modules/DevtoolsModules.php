@@ -17,22 +17,46 @@ class DevtoolsModules extends BasePackage
 {
     public function addModule($data)
     {
-        $data = $this->checkTypeAndCategory($data);
-
-        $repoMethod = 'get' . ucfirst(substr($data['type'], 0, -1)) . 'ByRepo';
-        $module = $this->modules->{$data['type']}->{$repoMethod}($data['repo']);
-        //Need to add more checks. Repo can be as simple as "https://.../" for local, in that case there should be more checks.
-        if ($module) {
-            $this->addResponse('Module with same repo already exists!', 1);
+        if ($data['type'] === 'core') {
+            $this->addResponse('Core already exists!', 1);
 
             return false;
         }
-        var_dump($repoMethod, $module, $data);die();
-        if ($data['type'] === 'core') {
-            //
-        } else {
-            //
+
+        $data = $this->checkTypeAndCategory($data);
+
+        if ($data['type'] === 'components') {
+            $moduleMethod = 'get' . ucfirst(substr($data['type'], 0, -1)) . 'ByAppTypeAndRepoAndRoute';
+            $module = $this->modules->{$data['type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['route']);
+        } else if ($data['type'] === 'packages' || $data['type'] === 'middlewares') {
+            $moduleMethod = 'get' . ucfirst(substr($data['type'], 0, -1)) . 'ByAppTypeAndRepoAndClass';
+            $module = $this->modules->{$data['type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['class']);
+        } else if ($data['type'] === 'views') {
+            $moduleMethod = 'get' . ucfirst(substr($data['type'], 0, -1)) . 'ByAppTypeAndRepoAndName';
+            $module = $this->modules->{$data['type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['name']);
         }
+        //Need to add more checks. Repo can be as simple as "https://.../" for local, in that case there should be more checks.
+        if ($module) {
+            $this->addResponse('Module already exists!', 1);
+
+            return false;
+        }
+
+        $data['name'] = ucfirst(trim(str_replace('(Clone)', '', $data['name'])));
+        $data['repo'] = trim(str_replace('(clone)', '', $data['repo']));
+        $data['installed'] = '1';
+        $data['updated_by'] = '0';
+
+        if ($this->modules->{$data['type']}->add($data) &&
+            $this->updateModuleJson($data) &&
+            $this->generateNewFiles($data)
+        ) {
+            $this->addResponse('Module added');
+
+            return;
+        }
+
+        $this->addResponse('Error adding Module', 1);
     }
 
     public function updateModule($data)
@@ -50,12 +74,12 @@ class DevtoolsModules extends BasePackage
 
             $module = array_merge($module, $data);
 
-            if ($this->modules->{$data['type']}->update($module)) {
-                if ($this->updateModuleJson($data)) {
-                    $this->addResponse('Module updated');
+            if ($this->modules->{$data['type']}->update($module) &&
+                $this->updateModuleJson($data)
+            ) {
+                $this->addResponse('Module updated');
 
-                    return;
-                }
+                return;
             }
         }
 
@@ -168,14 +192,14 @@ class DevtoolsModules extends BasePackage
             ];
     }
 
-    public function getDefaultSettings($type)
+    public function getDefaultSettings()
     {
         $defaultSettings = [];
 
         return Json::encode($defaultSettings);
     }
 
-    public function getDefaultDependencies()
+    public function getDefaultDependencies($type)
     {
         $defaultDependencies =
             [
@@ -186,6 +210,10 @@ class DevtoolsModules extends BasePackage
                 'views'             => [],
                 'external'          => []
             ];
+
+        if ($type === 'views') {
+            unset($defaultDependencies['external']);
+        }
 
         return Json::encode($defaultDependencies);
     }
@@ -240,7 +268,6 @@ class DevtoolsModules extends BasePackage
     {
         if ($data['module_type'] === 'components') {
             $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Components/';
-            $this->view->moduleMenu = $data['menu'];
         } else if ($data['module_type'] === 'packages') {
             if ($data['app_type'] === 'core' &&
                 ($data['category'] === 'basepackages' ||
@@ -283,6 +310,67 @@ class DevtoolsModules extends BasePackage
                 $pathArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
 
                 $routePath = implode('/', $pathArr) . '/Install/';
+            } else if ($data['module_type'] === 'views') {
+                $routePath = $data['name'] . '/';
+            }
+
+            return
+                $moduleLocation .
+                $routePath .
+                substr($data['module_type'], 0, -1) . '.json';
+        }
+    }
+
+    protected function generateNewFiles($data)
+    {
+        //
+    }
+
+    protected function getNewFilesLocation($data)
+    {
+        if ($data['module_type'] === 'components') {
+            $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Components/';
+        } else if ($data['module_type'] === 'packages') {
+            if ($data['app_type'] === 'core' &&
+                ($data['category'] === 'basepackages' ||
+                 $data['category'] === 'providers')
+            ) {
+                if ($data['category'] === 'basepackages') {
+                    $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/';
+                } else if ($data['category'] === 'providers') {
+                    $moduleLocation = 'system/Base/Providers/';
+                }
+            } else {
+                $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Packages/';
+            }
+        } else if ($data['module_type'] === 'middlewares') {
+            $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Middlewares/';
+        } else if ($data['module_type'] === 'views') {
+            $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Views/';
+        }
+
+        if ($data['module_type'] === 'packages' &&
+            ($data['category'] === 'basepackages' ||
+             $data['category'] === 'providers')
+        ) {
+            return
+                $moduleLocation .
+                ucfirst($data['name']) . '.php';
+        } else {
+            if ($data['module_type'] === 'components') {
+                $routeArr = explode('/', $data['route']);
+
+                foreach ($routeArr as &$path) {
+                    $path = ucfirst($path);
+                }
+
+                $routePath = implode('/', $routeArr) . '/';
+            } else if ($data['module_type'] === 'middlewares') {
+                $routePath = $data['name'] . '/';
+            } else if ($data['module_type'] === 'packages') {
+                $pathArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
+
+                $routePath = implode('/', $pathArr) . '/';
             } else if ($data['module_type'] === 'views') {
                 $routePath = $data['name'] . '/';
             }

@@ -583,9 +583,9 @@ var BazCore = function() {
                 }
 
                 if (dataCollection.env.devmode && dataCollection.env.devmode == '1') {
-                    timeout = 60000;
-                } else {
                     timeout = 600000;
+                } else {
+                    timeout = 60000;
                 }
 
                 BazHelpers.setTimeoutTimers.add(function() {

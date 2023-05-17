@@ -175,11 +175,18 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-category').select2('data')[0].id !== 'basepackages') ||
                         dataCollectionSectionForm['vars']['module_type'] === 'middlewares'
                     ) {
-                        currentClassArr[0] = 'Apps';
-                        currentClassArr[1] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
-                        currentClassArr[2] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-module_type').val());
-                        currentClassArr[3] = '';
-                        currentClassArr[4] = '';
+                        if ($('#{{componentId}}-{{sectionId}}-category').val() === 'providers') {
+                            currentClassArr[0] = 'System';
+                            currentClassArr[1] = 'Base';
+                            currentClassArr[2] = 'Providers';
+                            currentClassArr[3] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-name').val()) + 'ServiceProvider';
+                        } else {
+                            currentClassArr[0] = 'Apps';
+                            currentClassArr[1] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
+                            currentClassArr[2] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-module_type').val());
+                            currentClassArr[3] = '';
+                            currentClassArr[4] = '';
+                        }
 
                         if ($('#{{componentId}}-{{sectionId}}-name').val() !== '') {
                             if (dataCollectionSectionForm['vars']['module_type'] === 'middlewares') {
@@ -187,22 +194,26 @@ dataCollectionSection =
                                 currentClassArr[3] = capitalizeFirstLetter(name);
                                 currentClassArr[4] = currentClassArr[3];
                             } else {
-                                nameArr = $('#{{componentId}}-{{sectionId}}-name').val().split(/(?=[A-Z])/);
-
-                                if (nameArr.length === 1) {
-                                    currentClassArr[3] = capitalizeFirstLetter(nameArr[0]);
-                                    currentClassArr[4] = currentClassArr[3];
+                                if ($('#{{componentId}}-{{sectionId}}-category').val() === 'providers') {
+                                    currentClassArr[4] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-name').val());
                                 } else {
-                                    if (nameArr[nameArr.length -1] !== '') {
-                                        $(nameArr).each(function(i, name) {
-                                            if (i !== nameArr.length) {
-                                                i = 3 + i;
-                                                if (dataCollectionSectionForm['vars']['module_type'] === 'packages') {
-                                                    currentClassArr[i] = capitalizeFirstLetter(name);
-                                                    currentClassArr[i + 1] = currentClassArr[i - 1] + capitalizeFirstLetter(name)
+                                    nameArr = $('#{{componentId}}-{{sectionId}}-name').val().split(/(?=[A-Z])/);
+
+                                    if (nameArr.length === 1) {
+                                        currentClassArr[3] = capitalizeFirstLetter(nameArr[0]);
+                                        currentClassArr[4] = currentClassArr[3];
+                                    } else {
+                                        if (nameArr[nameArr.length -1] !== '') {
+                                            $(nameArr).each(function(i, name) {
+                                                if (i !== nameArr.length) {
+                                                    i = 3 + i;
+                                                    if (dataCollectionSectionForm['vars']['module_type'] === 'packages') {
+                                                        currentClassArr[i] = capitalizeFirstLetter(name);
+                                                        currentClassArr[i + 1] = currentClassArr[i - 1] + capitalizeFirstLetter(name)
+                                                    }
                                                 }
-                                            }
-                                        });
+                                            });
+                                        }
                                     }
                                 }
                             }

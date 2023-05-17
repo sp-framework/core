@@ -297,6 +297,20 @@ class Views extends BasePackage
         return false;
     }
 
+    public function getViewByAppTypeAndRepoAndName($appType, $repo, $name)
+    {
+        foreach($this->views as $view) {
+            if ($view['app_type'] === $appType &&
+                $view['repo'] === $repo &&
+                strtolower($name) === strtolower($view['name'])
+            ) {
+                return $view;
+            }
+        }
+
+        return false;
+    }
+
     public function getViewsByApiId($apiId)
     {
         $views = [];

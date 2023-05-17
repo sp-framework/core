@@ -391,8 +391,22 @@ class Tree extends Adminltetags
                         if (isset($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsKey']) &&
                             isset($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue'])
                         ) {
+                            if (is_string($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue'])) {
+                                $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue'] = explode('|', $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue']);
+                            }
+
                             $key = $itemValue[$this->fieldParams['fieldDataSelect' . $selectType . 'OptionsKey']];
-                            $value = $itemValue[$this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue']];
+
+                            if (count($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue']) === 1) {
+                                $value = $itemValue[$this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue'][0]];
+                            } else {
+                                foreach ($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue'] as $optionsValueKey) {
+                                    if (isset($itemValue[$optionsValueKey])) {
+                                        $value = $itemValue[$optionsValueKey];
+                                        break;
+                                    }
+                                }
+                            }
                         // }
                         // if ($itemKey === $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsKey']) {
 

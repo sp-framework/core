@@ -60,6 +60,20 @@ class Middlewares extends BasePackage
 		return false;
 	}
 
+	public function getMiddlewareByAppTypeAndRepoAndClass($appType, $repo, $class)
+	{
+		foreach($this->middlewares as $middleware) {
+			if ($middleware['app_type'] === $appType &&
+				$middleware['repo'] === $repo &&
+				trim($class, '\\') === trim($middleware['class'], '\\')
+			) {
+				return $middleware;
+			}
+		}
+
+		return false;
+	}
+
 	public function getMiddlewaresByApiId($apiId)
 	{
 		$middlewares = [];

@@ -1,6 +1,10 @@
 {% if module['id'] is defined %}
     {% set moduleName = module['name'] %}
     {% set moduleId = module['id'] %}
+    {% if clone is defined and clone == true %}
+        {% set moduleId = '' %}
+        {% set moduleName = module['name'] ~ ' (Clone)' %}
+    {% endif %}
 {% else %}
     {% set moduleName = 'New' %}
     {% set moduleId = '' %}
