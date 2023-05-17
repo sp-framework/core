@@ -28,7 +28,7 @@ class Progress extends BasePackage
 
         $this->checkProgressPath();
 
-        if (!$this->notificationsTunnel) {
+        if ($this->container && !$this->notificationsTunnel) {
             $this->checkNotificationTunnel();
         }
 
