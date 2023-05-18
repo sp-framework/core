@@ -13,7 +13,7 @@
         {% if activeLayout === 'topnav' or activeLayout === 'topnavsidebar' %}
             {% if activeLayout === 'topnavsidebar' %}
                 <a href="{{links.url('home')}}" class="navbar-brand contentAjaxLink" style="padding:0">
-                    <img src="{{links.images('/baz/logo/justlogo33x30.png')}}" data-rjs="3" alt="Bazaari Logo" class="brand-image" style="height:30px">
+                    <img src="{{links.images(assets.get('branding').getCodes()[0].getContent())}}" data-rjs="3" alt="Bazaari Logo" class="brand-image" style="height:30px">
                     <span class="brand-text font-weight-light">{{appRoute|upper}}</span>
                 </a>
                 <ul class="navbar-nav">
@@ -23,7 +23,7 @@
                 </ul>
             {% elseif activeLayout === 'topnav' %}
                 <a href="{{links.url('home')}}" class="navbar-brand contentAjaxLink" style="padding:0">
-                    <img src="{{links.images('/baz/logo/justlogo33x30.png')}}" data-rjs="3" alt="Bazaari Logo" class="brand-image" style="height:30px">
+                    <img src="{{links.images(assets.get('branding').getCodes()[0].getContent())}}" data-rjs="3" alt="Bazaari Logo" class="brand-image" style="height:30px">
                     <span class="brand-text font-weight-light">{{appRoute|upper}}</span>
                 </a>
                 {% include modules.views.getPhalconViewPath() ~ 'layouts/common/header/topnav' with ['activeLayout': activeLayout] %}

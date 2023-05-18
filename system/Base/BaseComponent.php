@@ -652,6 +652,7 @@ abstract class BaseComponent extends Controller
 		$this->buildAssetsHeadStyle();
 		$this->buildAssetsHeadJs();
 		$this->buildAssetsBodyJs();
+		$this->buildAssetsBranding();
 		$this->buildAssetsFooter();
 		$this->buildAssetsFooterJs();
 		$this->buildAssetsFooterJsInline();
@@ -743,6 +744,13 @@ abstract class BaseComponent extends Controller
 	{
 		$this->assetsCollections['body'] = $this->assets->collection('body');
 		$this->assetsCollections['body']->addInline(new Inline('bodyScript', $this->viewSettings['body']['jsscript']));
+	}
+
+	protected function buildAssetsBranding()
+	{
+		$this->assetsCollections['branding'] = $this->assets->collection('branding');
+		$this->assetsCollections['branding']->addInline(new Inline('small', $this->viewSettings['branding']['small']));
+		$this->assetsCollections['branding']->addInline(new Inline('large', $this->viewSettings['branding']['large']));
 	}
 
 	protected function buildAssetsFooter()

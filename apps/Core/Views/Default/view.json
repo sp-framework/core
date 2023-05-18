@@ -68,6 +68,10 @@
         "body"          : {
             "jsscript"  : ""
         },
+        "branding"      : {
+            "small"     : "baz/logo/justlogo33x30.png",
+            "large"     : "baz/logo/fulllogo168x30.png"
+        },
         "footer"        : {
             "script"    : {
                 "src"   : [

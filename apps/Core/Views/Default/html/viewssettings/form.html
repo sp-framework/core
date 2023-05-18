@@ -324,6 +324,9 @@ if (dataCollectionSectionForm['vars']['viewsSettingsId'] == '0') {
     dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['fromYear'] = '';
     dataCollectionSectionForm['vars']['viewsSettings']['layouts'] = { };
     dataCollectionSectionForm['vars']['viewsSettings']['mandatory'] = false;
+    dataCollectionSectionForm['vars']['viewsSettings']['branding'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['small'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['large'] = '';
 } else {
     dataCollectionSectionForm['vars']['viewsSettings'] = JSON.parse('{{viewsSettings}}');
 }
@@ -525,6 +528,12 @@ dataCollectionSection =
                                 'id'    : 'mandatory',
                                 'text'  : 'View Mandatory'
                             }
+                        },
+                        {
+                            'branding' : {
+                                'id'    : 'branding',
+                                'text'  : 'View Branding (logo)'
+                            }
                         }
                     ];
 
@@ -695,6 +704,15 @@ dataCollectionSection =
 
                             if (dataCollectionSectionForm['vars']['viewsSettings']['mandatory']) {
                                 settings = dataCollectionSectionForm['vars']['viewsSettings']['mandatory'];
+                            }
+
+                            break;
+                        case 'branding' :
+                            type = 'array';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['branding']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['branding'];
                             }
 
                             break;
@@ -931,6 +949,11 @@ dataCollectionSection =
                             break;
                         case 'mandatory' :
                             dataCollectionSectionForm['vars']['viewsSettings']['mandatory']
+                                = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                            break;
+                        case 'branding' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['branding']
                                 = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                             break;

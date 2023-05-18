@@ -119,6 +119,9 @@ if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['layouts'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] = false;
+        dataCollectionSectionForm['vars']['moduleSettings']['branding'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['small'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['large'] = '';
     }
 } else {
     dataCollectionSectionForm['vars']['moduleSettings'] = JSON.parse('{{moduleSettings}}');
@@ -637,6 +640,12 @@ dataCollectionSection =
                                 'id'    : 'mandatory',
                                 'text'  : 'View Mandatory'
                             }
+                        },
+                        {
+                            'branding' : {
+                                'id'    : 'branding',
+                                'text'  : 'View Branding (logo)'
+                            }
                         }
                     ];
                 } else if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
@@ -990,7 +999,23 @@ dataCollectionSection =
                                 }
 
                                 break;
-                        }
+                            case 'branding' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['branding']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['branding'];
+                                }
+
+                                break;
+                            }
                     } else if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
                         switch (key) {
                             case 'debug' :
@@ -1248,6 +1273,11 @@ dataCollectionSection =
                                 break;
                             case 'mandatory' :
                                 dataCollectionSectionForm['vars']['moduleSettings']['mandatory']
+                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'branding' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['branding']
                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                                 break;
