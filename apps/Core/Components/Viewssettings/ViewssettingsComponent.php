@@ -50,7 +50,7 @@ class ViewssettingsComponent extends BaseComponent
                 if ($views) {
                     foreach ($views as $viewKey => $view) {
                         $apps[$value['id']]['views'][$view['id']]['id'] = $view['id'];
-                        $apps[$value['id']]['views'][$view['id']]['name'] = $view['name'];
+                        $apps[$value['id']]['views'][$view['id']]['name'] = $view['display_name'];
                         $apps[$value['id']]['views'][$view['id']]['settings'] = Json::decode($view['settings'], true);
                     }
                 }
@@ -261,8 +261,8 @@ class ViewssettingsComponent extends BaseComponent
                 return;
             }
 
-            if ($this->postData()['viewsettings_id']) {
-                $viewsSettings = $this->modules->viewsSettings->getViewsSettingsFromViewModule($this->postData()['viewsettings_id']);
+            if (isset($this->postData()['viewsettings_id']) || isset($this->postData()['view_id'])) {
+                $viewsSettings = $this->modules->viewsSettings->getViewsSettingsFromViewModule($this->postData());
 
                 if ($viewsSettings) {
                     $this->addResponse(
