@@ -14,7 +14,7 @@
         {{assets.outputJs('headJs')}}
         {{assets.outputInlineCss()}}
     </head>
-    <body id="body" class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm">
+    <body id="body" class="layout-top-nav sidebar-collapse layout-navbar-fixed text-sm">
         {% if response.getHeaders().get('currentId') !== false %}
             {% set currentId = response.getHeaders().get('currentId') %}
         {% else %}

@@ -132,11 +132,13 @@ class Views extends BasePackage
             }
         }
 
-        if (!$this->phalconViewLayoutFile) {
-            $this->phalconViewLayoutFile = 'default';
-        }
         if (!$this->activeLayout) {
             $this->activeLayout = 'default';
+        }
+        if ($this->activeLayout && !$this->phalconViewLayoutFile) {
+            $this->phalconViewLayoutFile = $this->activeLayout;
+        } else if (!$this->phalconViewLayoutFile) {
+            $this->phalconViewLayoutFile = 'default';
         }
     }
 

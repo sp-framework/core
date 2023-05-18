@@ -14,7 +14,7 @@
         {{assets.outputJs('headJs')}}
         {{assets.outputInlineCss()}}
     </head>
-    <body id="body" class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm">
+    <body id="body" class="layout-top-nav text-sm">
         {% if response.getHeaders().get('currentId') !== false %}
             {% set currentId = response.getHeaders().get('currentId') %}
         {% else %}
@@ -98,7 +98,6 @@ if (localStorage.getItem('bazDevMode') === null) {
         </script>
         <div class="wrapper">
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/header/view') %}
-            {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/sidebar/view') %}
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/content/view') %}
             {% if modules.components.getComponentByNameForAppId('Messenger', apps.getAppInfo()['id']) %}
                 {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/messenger/view') %}

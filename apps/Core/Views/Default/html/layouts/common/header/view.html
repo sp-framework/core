@@ -3,8 +3,8 @@
     {% if activeLayout === 'topnav' %}
         <nav class="main-header navbar navbar-expand-lg navbar-light bg-light" id="main_navbar">
     {% else %}
-        <nav class="main-header navbar navbar-expand navbar-white navbar-light" style="z-index: 9999">
-            <div class="container-fluid">
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <div class="container">
     {% endif %}
 {% elseif activeLayout === 'default' %}
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -12,23 +12,24 @@
 {% endif %}
         {% if activeLayout === 'topnav' or activeLayout === 'topnavsidebar' %}
             {% if activeLayout === 'topnavsidebar' %}
+                <a href="{{links.url('home')}}" class="navbar-brand contentAjaxLink" style="padding:0">
+                    <img src="{{links.images('/baz/logo/justlogo33x30.png')}}" data-rjs="3" alt="Bazaari Logo" class="brand-image" style="height:30px">
+                    <span class="brand-text font-weight-light">{{appRoute|upper}}</span>
+                </a>
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a id="push-menu" data-widget="pushmenu" class="nav-link" role="button" href="#"><i class="fas fa-bars"></i></a>
                     </li>
                 </ul>
-                <a href="{{links.url('home')}}" class="navbar-brand contentAjaxLink" style="padding:0">
-                    <img src="{{links.images('/baz/logo/justlogo33x30.png')}}" data-rjs="3" alt="Bazaari Logo" class="brand-image" style="height:30px">
-                    <span class="brand-text font-weight-light">{{appRoute|upper}}</span>
-                </a>
             {% elseif activeLayout === 'topnav' %}
                 <a href="{{links.url('home')}}" class="navbar-brand contentAjaxLink" style="padding:0">
                     <img src="{{links.images('/baz/logo/justlogo33x30.png')}}" data-rjs="3" alt="Bazaari Logo" class="brand-image" style="height:30px">
                     <span class="brand-text font-weight-light">{{appRoute|upper}}</span>
                 </a>
-                {% include modules.views.getPhalconViewPath() ~ 'layouts/default/header/topnav' with ['activeLayout': activeLayout] %}
+                {% include modules.views.getPhalconViewPath() ~ 'layouts/common/header/topnav' with ['activeLayout': activeLayout] %}
             {% endif %}
-        {% elseif activeLayout === 'default' or activeLayout === 'topnavsidebar' %}
+        {% endif %}
+        {% if activeLayout === 'default' or activeLayout === 'topnavsidebar' %}
             {% if activeLayout === 'default' %}
                 <ul class="navbar-nav">
                     <li class="nav-item">
@@ -138,7 +139,7 @@
         {% endif %}
     </div>
 {% if activeLayout === 'topnav' or activeLayout === 'topnavsidebar' %}
-    {% if activeLayout === 'topnav' %}
+    {% if activeLayout === 'topnav' or activeLayout === 'topnavsidebar' %}
         </nav>
     {% else %}
         </div>
