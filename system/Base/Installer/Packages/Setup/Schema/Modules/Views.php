@@ -81,6 +81,7 @@ class Views
 						[
 							'type'    => Column::TYPE_VARCHAR,
 							'size'    => 20,
+							'notNull' => false,
 						]
 					),
 					new Column(

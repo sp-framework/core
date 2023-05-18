@@ -39,6 +39,7 @@
             )}}
         {% else %}
             {% set viewsSettings = viewssettings %}
+            {% set viewsSettingsId = '0' %}
             <div class="row">
                 <div class="col">
                     {{adminltetags.useTag('fields',
@@ -198,12 +199,23 @@
                         'buttonType'                    : 'button',
                         'buttons'                       :
                             [
+                                'defaults'    : [
+                                    'title'                   : 'Load Defaults',
+                                    'size'                    : 'xs',
+                                    'position'                : 'left',
+                                    'type'                    : 'primary',
+                                    'icon'                    : 'rotate-left',
+                                    'disabled'                : true,
+                                    'hidden'                  : true
+                                ],
                                 'reset'    : [
                                     'title'                   : 'Reset',
                                     'size'                    : 'xs',
                                     'position'                : 'left',
                                     'type'                    : 'warning',
-                                    'icon'                    : 'rotate-left'
+                                    'icon'                    : 'rotate-left',
+                                    'disabled'                : true,
+                                    'hidden'                  : true
                                 ],
                                 'save'    : [
                                     'title'                   : 'Save',
@@ -283,8 +295,38 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['apps'] = JSON.parse('{{apps}}');
-dataCollectionSectionForm['vars']['viewsSettings'] = JSON.parse('{{viewsSettings}}');
 dataCollectionSectionForm['vars']['viewsSettingsId'] = '{{viewsSettingsId}}';
+
+if (dataCollectionSectionForm['vars']['viewsSettingsId'] == '0') {
+    dataCollectionSectionForm['vars']['viewsSettings'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['body'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['body']['jsscript'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['head'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['link'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['meta'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['author'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['charset'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['keywords'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['viewport'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['description'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['title'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['script'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['tags'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['footer'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['footer']['script'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['footer']['jsscript'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['name'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['site'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['fromYear'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['layouts'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['mandatory'] = false;
+} else {
+    dataCollectionSectionForm['vars']['viewsSettings'] = JSON.parse('{{viewsSettings}}');
+}
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
@@ -352,6 +394,11 @@ dataCollectionSection =
                                 $('#{{componentId}}-{{sectionId}}-view_id').val(0).trigger('change');
                                 $('#{{componentId}}-{{sectionId}}-view_id').empty().trigger('change');
                                 $('#{{componentId}}-{{sectionId}}-view_id').attr('disabled', true);
+                            } else {
+                                if (dataCollectionSectionForm['vars']['viewsSettingsId'] == '0') {
+                                    $('#{{componentId}}-{{sectionId}}-defaults').attr('disabled', false);
+                                    $('#{{componentId}}-{{sectionId}}-defaults').attr('hidden', false);
+                                }
                             }
                         }, 'json');
                     }
@@ -365,6 +412,11 @@ dataCollectionSection =
                         .val(JSON.stringify(dataCollectionSectionForm['vars']['viewsSettings'], null, 4));
                 }
                 prettyfyJson();
+
+                if (dataCollectionSectionForm['vars']['viewsSettingsId'] != '0') {
+                    $('#{{componentId}}-{{sectionId}}-reset').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-reset').attr('hidden', false);
+                }
             }
         },
         '{{componentId}}-{{sectionId}}-settings-keys'                           : {
@@ -711,7 +763,65 @@ dataCollectionSection =
                                     $('#{{componentId}}-{{sectionId}}-save').attr('disabled', true);
                                     $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
                                     $('#{{componentId}}-{{sectionId}}-settings-keys').val(0).trigger('change');
+                                    dataCollectionSectionForm['vars']['viewsSettings'] = response.responseData['settings'];
 
+                                    PNotify.success({'text': response.responseMessage});
+
+                                    return;
+                                }
+
+                                PNotify.error({'text': response.responseMessage});
+                            }, 'json');
+                        }
+                    });
+                });
+
+                $('#{{componentId}}-{{sectionId}}-defaults').off();
+                $('#{{componentId}}-{{sectionId}}-defaults').click(function(e) {
+                    e.preventDefault();
+
+                    var swalSound = window['dataCollection'].env.sounds.swalSound;
+
+                    Swal.fire({
+                        title                       : '<span class="text-warning"> Load Defaults?</span>',
+                        text                        : 'This will reset all settings and grab default settings from the view module.',
+                        icon                        : 'question',
+                        background                  : 'rgba(0,0,0,.8)',
+                        backdrop                    : 'rgba(0,0,0,.6)',
+                        buttonsStyling              : false,
+                        confirmButtonText           : 'Reset',
+                        customClass                 : {
+                            'confirmButton'             : 'btn btn-warning text-uppercase',
+                            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                        },
+                        showCancelButton            : true,
+                        keydownListenerCapture      : true,
+                        allowOutsideClick           : true,
+                        allowEscapeKey              : true,
+                        didOpen                     : function() {
+                            swalSound.play();
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                            var postData = { };
+                            postData[$('#security-token').attr('name')] = $('#security-token').val();
+                            postData['view_id'] = $('#{{componentId}}-{{sectionId}}-view_id').val();
+
+                            $.post('{{links.url("viewssettings/getViewsSettingsFromViewModule")}}', postData, function(response) {
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+
+                                if (response.responseCode == 0) {
+                                    $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val('');
+                                    $('#{{componentId}}-{{sectionId}}-settings')
+                                        .val(JSON.stringify(response.responseData['settings'], null, 4));
+                                    $('#settings-' + fieldType).attr('hidden', true);
+                                    $('#{{componentId}}-{{sectionId}}-save').attr('disabled', true);
+                                    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
+                                    $('#{{componentId}}-{{sectionId}}-settings-keys').val(0).trigger('change');
+                                    dataCollectionSectionForm['vars']['viewsSettings'] = response.responseData['settings'];
                                     PNotify.success({'text': response.responseMessage});
 
                                     return;

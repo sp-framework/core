@@ -105,4 +105,45 @@ class Menus extends BasePackage
 
         $this->init(true);
     }
+
+    public function addMenu($appType, array $menu)
+    {
+        if (isset($menu['seq'])) {
+            $sequence = $menu['seq'];
+            unset($menu['seq']);
+        } else {
+            $sequence = 99;
+        }
+
+        $menu = $this->addSequence($menu, $sequence);
+
+        $insertMenu = $this->add([
+                'menu'                  => Json::encode($menu),
+                'apps'                  => Json::encode([]),
+                'app_type'              => $appType,
+                'sequence'              => $sequence
+            ]
+        );
+
+        if ($insertMenu) {
+            return $this->packagesData->last;
+        } else {
+            return null;
+        }
+    }
+
+    protected function addSequence($menu, $sequence)
+    {
+        foreach ($menu as $key => &$value) {
+            if (!isset($value['seq'])) {
+                $value['seq'] = $sequence;
+            }
+
+            if (isset($value['childs'])) {
+                $value['childs'] = $this->addSequence($value['childs'], $sequence);
+            }
+        }
+
+        return $menu;
+    }
 }

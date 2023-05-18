@@ -326,6 +326,19 @@ class Views extends BasePackage
         return $views;
     }
 
+    public function getViewsByBaseViewModuleId($baseViewModuleId)
+    {
+        $views = [];
+
+        foreach($this->views as $view) {
+            if ($view['base_view_module_id'] == $baseViewModuleId) {
+                array_push($views, $view);
+            }
+        }
+
+        return $views;
+    }
+
     public function getViewByName($name)
     {
         foreach($this->views as $view) {
@@ -415,5 +428,38 @@ class Views extends BasePackage
         }
 
         return true;
+    }
+
+    public function getCalculatedAssetsVersion()
+    {
+        $viewsModulesVersion = [0,0,0,1];
+
+        $baseView = $this->modules->views->getViewInfo();
+
+        $baseViewVersion = $baseView['version'];
+        $baseViewVersion = explode('.', $baseViewVersion);
+        foreach ($baseViewVersion as $key => $version) {
+            $viewsModulesVersion[$key] = (int) $version;
+        }
+
+        $views = $this->getViewsByBaseViewModuleId($this->modules->views->getViewInfo()['id']);
+
+        if (count($views) > 0) {
+            foreach ($views as $view) {
+                $viewVersion = explode('.', $view['version']);
+
+                foreach ($viewVersion as $key => $version) {
+                    $viewsModulesVersion[$key] = $viewsModulesVersion[$key] + (int) $version;
+                }
+            }
+
+            $viewsModulesVersion[3] = count($views) + $viewsModulesVersion[3];
+        }
+
+        $baseView['view_modules_version'] = $viewsModulesVersion = implode('.', $viewsModulesVersion);
+
+        $this->update($baseView);
+
+        return $viewsModulesVersion;
     }
 }

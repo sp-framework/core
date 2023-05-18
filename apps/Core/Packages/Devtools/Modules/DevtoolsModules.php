@@ -3,6 +3,7 @@
 namespace Apps\Core\Packages\Devtools\Modules;
 
 use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
@@ -56,15 +57,11 @@ class DevtoolsModules extends BasePackage
         }
 
         if ($this->modules->{$data['type']}->add($data) &&
-            $this->updateModuleJson($data)
-            // $this->generateNewFiles($data)
+            $this->updateModuleJson($data) &&
+            $this->generateNewFiles($data)
         ) {
             $this->addResponse('Module added');
-
-            return;
         }
-
-        $this->addResponse('Error adding Module', 1);
     }
 
     public function updateModule($data)
@@ -137,45 +134,6 @@ class DevtoolsModules extends BasePackage
         }
 
         return $data;
-    }
-
-    public function validateJson($data)
-    {
-        if (!isset($data['json'])) {
-            $this->addResponse('Json data not provided.', 1);
-
-            return;
-        }
-
-        try {
-            $parser = new JsonParser();
-
-            $result = $parser->lint($data['json']);
-
-            $parser->parse($data['json'], JsonParser::DETECT_KEY_CONFLICTS);
-        } catch (ParsingException | \throwable $e) {
-            if ($result === null) {
-                if (defined('JSON_ERROR_UTF8') && JSON_ERROR_UTF8 === json_last_error()) {
-                    $this->addResponse('Json is not UTF-8, could not parse json data.', 1);
-
-                    return;
-                }
-            }
-
-            $this->addResponse($e->getDetails(), 1);
-
-            throw $e;
-        }
-
-        if (isset($data['returnJson']) && $data['returnJson'] === 'array') {
-            $data['json'] = Json::decode($data['json'], true);
-        } else if (isset($data['returnJson']) && $data['returnJson'] === 'formatted') {
-            $data['json'] = $this->basepackages->utils->formatJson($data);
-        }
-
-        $this->addResponse('Success', 0, ['json' => $data['json']]);
-
-        return $data['json'];
     }
 
     public function getModuleTypes()
@@ -324,7 +282,13 @@ class DevtoolsModules extends BasePackage
 
                 $routePath = implode('/', $pathArr) . '/Install/';
             } else if ($data['module_type'] === 'views') {
-                $routePath = $data['name'] . '/';
+                if ($data['base_view_module_id'] == 0) {
+                    $routePath = $data['name'] . '/';
+                } else {
+                    $baseView = $this->modules->views->getViewById($data['base_view_module_id']);
+
+                    return $moduleLocation . $baseView['name'] . '/html/' . strtolower($data['name']) . '/' . substr($data['module_type'], 0, -1) . '.json';
+                }
             }
 
             return
@@ -336,10 +300,14 @@ class DevtoolsModules extends BasePackage
 
     protected function generateNewFiles($data)
     {
-        //
+        $moduleFilesLocation = $this->getNewFilesLocation($data);
+
+        $method = 'generateNew' . ucfirst($data['type']) . 'Files';
+
+        $this->{$method}($moduleFilesLocation, $data);
     }
 
-    protected function getNewFilesLocation($data)
+    protected function getNewFilesLocation($data, $public = false)
     {
         if ($data['module_type'] === 'components') {
             $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Components/';
@@ -360,6 +328,12 @@ class DevtoolsModules extends BasePackage
             $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Middlewares/';
         } else if ($data['module_type'] === 'views') {
             $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Views/';
+
+            if ($public) {
+                $moduleLocation = 'public/' . $data['app_type'] . '/' . strtolower($data['name']) . '/';
+
+                return $moduleLocation;
+            }
         }
 
         if ($data['module_type'] === 'packages' &&
@@ -368,7 +342,7 @@ class DevtoolsModules extends BasePackage
         ) {
             return
                 $moduleLocation .
-                ucfirst($data['name']) . '.php';
+                ucfirst($data['name']);
         } else {
             if ($data['module_type'] === 'components') {
                 $routeArr = explode('/', $data['route']);
@@ -385,13 +359,93 @@ class DevtoolsModules extends BasePackage
 
                 $routePath = implode('/', $pathArr) . '/';
             } else if ($data['module_type'] === 'views') {
-                $routePath = $data['name'] . '/';
+                if ($data['base_view_module_id'] == 0) {
+                    $routePath = $data['name'] . '/';
+                } else {
+                    $baseView = $this->modules->views->getViewById($data['base_view_module_id']);
+
+                    $routePath = $baseView['name'] . '/html/' . strtolower($data['name']) . '/';
+                }
             }
 
-            return
-                $moduleLocation .
-                $routePath .
-                substr($data['module_type'], 0, -1) . '.json';
+            return $moduleLocation . $routePath;
         }
+    }
+
+    protected function generateNewComponentsFiles($moduleFilesLocation, $data)
+    {
+        if ($data['menu'] != 'false' && $data['menu'] != '') {
+            $data['menu'] = Json::decode($data['menu'], true);
+
+            $menu = $this->basepackages->menus->addMenu($data['app_type'], $data['menu']);
+
+            if ($menu) {
+                $module = $this->modules->{$data['type']}->packagesData->last;
+
+                $module['menu_id'] = $menu['id'];
+            }
+
+            $this->modules->{$data['type']}->update($module);
+        }
+
+        $componentName = ucfirst(Arr::last(explode('/', $data['route']))) . 'Component';
+
+        try {
+            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/Component.txt');
+        } catch (FilesystemException | UnableToReadFile $exception) {
+            $this->addResponse('Unable to read module base component file.');
+
+            return false;
+        }
+
+        $data['class'] = explode('\\', $data['class']);
+        unset($data['class'][Arr::lastKey($data['class'])]);
+        $namespaceClass = implode('\\', $data['class']);
+
+        $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass, $file);
+        $file = str_replace('"COMPONENTNAME"', $componentName, $file);
+
+        try {
+            $this->localContent->write($moduleFilesLocation . $componentName . '.php', $file);
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write module component file');
+
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function generateNewViewsFiles($moduleFilesLocation, $data)
+    {
+        if ($data['base_view_module_id'] == 0) {
+            $modulePublicFilesLocation = $this->getNewFilesLocation($data, true);
+            try {
+                $this->localContent->createDirectory($moduleFilesLocation . 'html');
+                $this->localContent->write($moduleFilesLocation . 'html/' . 'view.html', '{{content()}}');
+                // $this->localContent->write($moduleFilesLocation . 'html/layouts/' . 'default.html', '{{content()}}');
+                $this->localContent->createDirectory($moduleFilesLocation . 'html/layouts');
+                $this->localContent->createDirectory($modulePublicFilesLocation . 'css');
+                $this->localContent->createDirectory($modulePublicFilesLocation . 'fonts');
+                $this->localContent->createDirectory($modulePublicFilesLocation . 'images');
+                $this->localContent->createDirectory($modulePublicFilesLocation . 'js');
+                $this->localContent->createDirectory($modulePublicFilesLocation . 'sounds');
+            } catch (FilesystemException | UnableToCreateDirectory $exception) {
+                $this->addResponse('Unable to create view directories in public folder.');
+
+                return false;
+            }
+        } else {
+            try {
+                $this->localContent->write($moduleFilesLocation . 'view.html', $data['name'] . ' Main View');
+                $this->localContent->write($moduleFilesLocation . 'list.html', $data['name'] . ' List View');
+            } catch (FilesystemException | UnableToReadFile | UnableToWriteFile $exception) {
+                $this->addResponse('Unable to read/write module base html files.');
+
+                return false;
+            }
+        }
+
+        return true;
     }
 }

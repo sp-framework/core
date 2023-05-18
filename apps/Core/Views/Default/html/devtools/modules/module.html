@@ -54,6 +54,11 @@
         )}}
     </fieldset>
 </form>
+{% if module['id'] is defined %}
+    {% set moduleId = module['id'] %}
+{% else %}
+    {% set moduleId = '0' %}
+{% endif %}
 <script>
 /* globals PNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
@@ -84,7 +89,40 @@ dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['module_type'] = '{{type}}';
 dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modulesJson}}');
 dataCollectionSectionForm['vars']['moduleDependencies'] = JSON.parse('{{moduleDependencies}}');
-dataCollectionSectionForm['vars']['moduleSettings'] = JSON.parse('{{moduleSettings}}');
+dataCollectionSectionForm['vars']['moduleId'] = '{{moduleId}}';
+
+if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
+    if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
+        dataCollectionSectionForm['vars']['moduleSettings'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['body'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['body']['jsscript'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['head'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['meta'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['keywords'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['viewport'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['description'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['title'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['script'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['tags'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['footer'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['script'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['jsscript'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['site'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['layouts'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] = false;
+    }
+} else {
+    dataCollectionSectionForm['vars']['moduleSettings'] = JSON.parse('{{moduleSettings}}');
+}
 if (dataCollectionSectionForm['vars']['module_type'] !== 'views' &&
     !dataCollectionSectionForm['vars']['moduleDependencies']['external']
 ) {

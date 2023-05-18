@@ -107,7 +107,7 @@ class AppsComponent extends BaseComponent
                         }
                     }
 
-                    if (isset($dashboard)) {
+                    if (isset($dashboard) && $dashboard) {
                         if ($dashboard['id'] == $componentValue['id']) {
                             $componentValue['apps'][$app['id']]['enabled'] = true;
                         }
@@ -127,15 +127,16 @@ class AppsComponent extends BaseComponent
                         }
 
                         if (isset($componentValue['settings']['needAuth']) &&
-                             $componentValue['settings']['needAuth'] === 'disabled'
+                            $componentValue['settings']['needAuth'] === 'disabled'
                         ) {
                             $componentValue['apps'][$app['id']]['needAuth'] = 'disabled';
                         } else if (isset($componentValue['settings']['needAuth']) &&
-                             $componentValue['settings']['needAuth'] === 'mandatory'
+                                   $componentValue['settings']['needAuth'] === 'mandatory'
                         ) {
                             $componentValue['apps'][$app['id']]['needAuth'] = 'mandatory';
                         }
                     }
+
                     $components[$key] = $componentValue;
                 }
 
@@ -495,9 +496,19 @@ class AppsComponent extends BaseComponent
                 return;
             }
 
-            $views = $this->modules->views->getViewsForAppType($this->postData()['app_type']);
+            $viewsArr = $this->modules->views->getViewsForAppType($this->postData()['app_type']);
 
-            if ($views) {
+            if ($viewsArr) {
+                $views = [];
+
+                foreach ($viewsArr as $key => &$viewValue) {
+                    if ($viewValue['base_view_module_id'] != '0') {
+                        continue;
+                    }
+
+                    $views[$key] = $viewValue;
+                }
+
                 $this->addResponse('Ok', 0, ['views' => $views]);
             } else {
                 $this->addResponse(

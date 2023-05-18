@@ -1,0 +1,86 @@
+<?php
+
+"NAMESPACE";
+
+use System\Base\BaseComponent;
+
+class "COMPONENTNAME" extends BaseComponent
+{
+    protected $package;
+
+    public function initialize()
+    {
+        //$this->package = $this->usePackage(?::class);
+    }
+
+    /**
+     * @acl(name=view)
+     */
+    public function viewAction()
+    {
+        return;
+    }
+
+    /**
+     * @acl(name=add)
+     */
+    public function addAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            //$this->package->add{?}($this->postData());
+
+            $this->addResponse(
+                $this->package->packagesData->responseMessage,
+                $this->package->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    /**
+     * @acl(name=update)
+     */
+    public function updateAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            //$this->package->update{?}($this->postData());
+
+            $this->addResponse(
+                $this->package->packagesData->responseMessage,
+                $this->package->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    /**
+     * @acl(name=remove)
+     */
+    public function removeAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            //$this->package->remove{?}($this->postData());
+
+            $this->addResponse(
+                $this->package->packagesData->responseMessage,
+                $this->package->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+}
