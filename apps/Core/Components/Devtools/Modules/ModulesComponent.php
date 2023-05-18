@@ -41,7 +41,7 @@ class ModulesComponent extends BaseComponent
 		$modules = [];
 
 		try {
-			$module = $this->modulesPackage->validateJson(
+			$module = $this->basepackages->utils->validateJson(
 				[
 					'json' => $this->localContent->read('system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json'),
 					'returnJson' => 'array'
@@ -202,7 +202,7 @@ class ModulesComponent extends BaseComponent
 					}
 
 					try {
-						$module = array_merge($module, $this->modulesPackage->validateJson(
+						$module = array_merge($module, $this->basepackages->utils->validateJson(
 							[
 								'json' 			=> $this->localContent->read($jsonFile),
 								'returnJson' 	=> 'array'

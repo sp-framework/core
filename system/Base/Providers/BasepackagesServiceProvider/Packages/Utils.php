@@ -4,6 +4,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use League\Flysystem\StorageAttributes;
 use Phalcon\Helper\Json;
+use Seld\JsonLint\JsonParser;
 use System\Base\BasePackage;
 use ZxcvbnPhp\Zxcvbn;
 
@@ -194,5 +195,47 @@ class Utils extends BasePackage
         array_walk_recursive($data, 'json_decode_recursive');
 
         return $data;
+    }
+
+    public function validateJson($data)
+    {
+        if (!isset($data['json'])) {
+            $this->addResponse('Json data not provided.', 1);
+
+            return;
+        }
+
+        $result = null;
+
+        try {
+            $parser = new JsonParser();
+
+            $result = $parser->lint($data['json']);
+
+            $parser->parse($data['json'], JsonParser::DETECT_KEY_CONFLICTS);
+        } catch (ParsingException | \throwable $e) {
+            if ($result === null) {
+                if (defined('JSON_ERROR_UTF8') && JSON_ERROR_UTF8 === json_last_error()) {
+                    $this->addResponse('Json is not UTF-8, could not parse json data.', 1);
+
+                    return;
+                }
+            }
+
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+            // throw $e;
+        }
+
+        if (isset($data['returnJson']) && $data['returnJson'] === 'array') {
+            $data['json'] = Json::decode($data['json'], true);
+        } else if (isset($data['returnJson']) && $data['returnJson'] === 'formatted') {
+            $data['json'] = $this->basepackages->utils->formatJson($data);
+        }
+
+        $this->addResponse('Success', 0, ['json' => $data['json']]);
+
+        return $data['json'];
     }
 }

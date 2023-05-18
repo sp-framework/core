@@ -31,6 +31,12 @@ class ViewsSettings extends BasePackage
             return false;
         }
 
+        if (!$this->basepackages->utils->validateJson(['json' => $data['settings']])) {
+            $this->addResponse($this->basepackages->utils->packagesData->responseMessage, 1);
+
+            return false;
+        }
+
         if ($this->add($data)) {
             $this->addResponse('Settings added.');
 
@@ -42,6 +48,12 @@ class ViewsSettings extends BasePackage
 
     public function updateViewsSettings($data)
     {
+        if (!$this->basepackages->utils->validateJson(['json' => $data['settings']])) {
+            $this->addResponse($this->basepackages->utils->packagesData->responseMessage, 1);
+
+            return false;
+        }
+
         if (!isset($data['id']) && !isset($data['settings'])) {
             $this->addResponse('Please provide settings ID & Settings', 1);
 
