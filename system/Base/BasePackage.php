@@ -847,6 +847,10 @@ abstract class BasePackage extends Controller
 				return;
 			}
 
+			if (isset($data['updated_on'])) {
+				unset($data['updated_on']);
+			}
+
 			${$this->packageNameModel}->assign($data);
 
 			$update = ${$this->packageNameModel}->update();

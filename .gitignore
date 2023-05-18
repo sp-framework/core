@@ -24,3 +24,5 @@ system/.dbkeys
 composer
 !external/composer
 !external/composer.json
+apps/*
+!apps/Core/
