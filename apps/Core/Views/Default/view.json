@@ -52,17 +52,40 @@
                 "keywords"      : "HTML, CSS, JavaScript"
             },
             "link"      : {
-                "href"      : [
-                    "core/default/css/plugins.css",
-                    "core/default/css/core.css"
-                ]
+                "href"      : {
+                    "assets" : {
+                        "dev" : [
+                            {
+                                "local"     : true,
+                                "asset"     : "core/default/css/core.css"
+                            },
+                            {
+                                "local"     : true,
+                                "asset"     : "core/default/css/plugins.css"
+                            }
+                        ]
+                    }
+                }
             },
             "script"    : {
-                "src"   : [
-                    "core/default/js/header/jsHeaderDependencies.js",
-                    "core/default/js/header/jsHeaderCore.js",
-                    "core/default/js/header/jsHeaderPlugins.js"
-                ]
+                "src"   : {
+                    "assets" : {
+                        "dev" : [
+                            {
+                                "local"     : true,
+                                "asset"     : "core/default/js/header/jsHeaderDependencies.js"
+                            },
+                            {
+                                "local"     : true,
+                                "asset"     : "core/default/js/header/jsHeaderCore.js"
+                            },
+                            {
+                                "local"     : true,
+                                "asset"     : "core/default/js/header/jsHeaderPlugins.js"
+                            }
+                        ]
+                    }
+                }
             }
         },
         "body"          : {
@@ -74,9 +97,16 @@
         },
         "footer"        : {
             "script"    : {
-                "src"   : [
-                    "core/default/js/footer/jsFooterDependencies.js"
-                ]
+                "src"   : {
+                    "assets" : {
+                        "dev" : [
+                            {
+                                "local"     : true,
+                                "asset"     : "core/default/js/footer/jsFooterDependencies.js"
+                            }
+                        ]
+                    }
+                }
             },
             "jsscript"  : "",
             "copyright" : {

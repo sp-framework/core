@@ -99,6 +99,9 @@ if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
         dataCollectionSectionForm['vars']['moduleSettings']['head'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['link'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['meta'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset'] = '';
@@ -108,10 +111,16 @@ if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
         dataCollectionSectionForm['vars']['moduleSettings']['head']['title'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['dev'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['prod'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['tags'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['footer'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['script'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['jsscript'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name'] = '';
@@ -120,8 +129,8 @@ if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
         dataCollectionSectionForm['vars']['moduleSettings']['layouts'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] = false;
         dataCollectionSectionForm['vars']['moduleSettings']['branding'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['small'] = '';
-        dataCollectionSectionForm['vars']['moduleSettings']['large'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['branding']['small'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['branding']['large'] = '';
     }
 } else {
     dataCollectionSectionForm['vars']['moduleSettings'] = JSON.parse('{{moduleSettings}}');
@@ -546,9 +555,15 @@ dataCollectionSection =
                             }
                         },
                         {
-                            'head-link-href' : {
-                                'id'    : 'head-link-href',
-                                'text'  : 'Head CSS Links'
+                            'head-link-href-assets-dev' : {
+                                'id'    : 'head-link-href-assets-dev',
+                                'text'  : 'Head CSS Links (Dev)'
+                            }
+                        },
+                        {
+                            'head-link-href-assets-prod' : {
+                                'id'    : 'head-link-href-assets-prod',
+                                'text'  : 'Head CSS Links (Production)'
                             }
                         },
                         {
@@ -588,9 +603,15 @@ dataCollectionSection =
                             }
                         },
                         {
-                            'script-src' : {
-                                'id'    : 'script-src',
-                                'text'  : 'Head Java Scripts Source'
+                            'script-src-assets-dev' : {
+                                'id'    : 'script-src-assets-dev',
+                                'text'  : 'Head Java Scripts Source (Dev)'
+                            }
+                        },
+                        {
+                            'script-src-assets-prod' : {
+                                'id'    : 'script-src-assets-prod',
+                                'text'  : 'Head Java Scripts Source (Production)'
                             }
                         },
                         {
@@ -600,9 +621,15 @@ dataCollectionSection =
                             }
                         },
                         {
-                            'footer-script-src' : {
-                                'id'    : 'footer-script-src',
-                                'text'  : 'Footer Java Scripts Source'
+                            'footer-script-src-assets-dev' : {
+                                'id'    : 'footer-script-src-assets-dev',
+                                'text'  : 'Footer Java Scripts Source (Dev)'
+                            }
+                        },
+                        {
+                            'footer-script-src-assets-prod' : {
+                                'id'    : 'footer-script-src-assets-prod',
+                                'text'  : 'Footer Java Scripts Source (Production)'
                             }
                         },
                         {
@@ -771,12 +798,21 @@ dataCollectionSection =
                                 }
 
                                 break;
-                            case 'head-link-href' :
+                            case 'head-link-href-assets-dev' :
                                 type = 'array';
                                 settings = '';
 
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href'];
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev'];
+                                }
+
+                                break;
+                            case 'head-link-href-assets-prod' :
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod'];
                                 }
 
                                 break;
@@ -876,12 +912,21 @@ dataCollectionSection =
                                 }
 
                                 break;
-                            case 'script-src' :
+                            case 'script-src-assets-dev' :
                                 type = 'array';
                                 settings = '';
 
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src'];
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['dev']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['dev'];
+                                }
+
+                                break;
+                            case 'script-src-assets-prod' :
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['prod']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['prod'];
                                 }
 
                                 break;
@@ -901,12 +946,21 @@ dataCollectionSection =
                                 }
 
                                 break;
-                            case 'footer-script-src' :
+                            case 'footer-script-src-assets-dev' :
                                 type = 'array';
                                 settings = '';
 
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src'];
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev'];
+                                }
+
+                                break;
+                            case 'footer-script-src-assets-prod' :
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod'];
                                 }
 
                                 break;
@@ -1196,8 +1250,13 @@ dataCollectionSection =
                                     = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
                                 break;
-                            case 'head-link-href' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']
+                            case 'head-link-href-assets-dev' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev']
+                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'head-link-href-assets-prod' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod']
                                      = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                                 break;
@@ -1231,8 +1290,13 @@ dataCollectionSection =
                                     = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
                                 break;
-                            case 'script-src' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']
+                            case 'script-src-assets-dev' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['dev']
+                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'script-src-assets-prod' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['prod']
                                      = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                                 break;
@@ -1241,8 +1305,13 @@ dataCollectionSection =
                                     = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
                                 break;
-                            case 'footer-script-src' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']
+                            case 'footer-script-src-assets-dev' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev']
+                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'footer-script-src-assets-prod' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod']
                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                                 break;
