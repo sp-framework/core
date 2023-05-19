@@ -1,0 +1,18 @@
+<!-- htmlhint tag-pair:false -->
+{{get_doctype()}}
+<html lang="en">
+    <head>
+        {% for meta in assets.get('meta').getCodes() %}
+            {% if meta.getType() === 'charset' %}
+                <meta charset="{{meta.getContent()}}">
+            {% else %}
+                <meta name="{{meta.getType()}}" content="{{meta.getContent()}}">
+            {% endif %}
+        {% endfor %}
+        {{renderTitle()}}
+        {{assets.outputCss('headLinks')}}
+        {{assets.outputJs('headJs')}}
+        {{assets.outputInlineCss()}}
+    </head>
+    <body>{{content()}}</body>
+</html>

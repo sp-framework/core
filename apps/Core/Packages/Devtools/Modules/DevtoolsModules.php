@@ -421,10 +421,18 @@ class DevtoolsModules extends BasePackage
         if ($data['base_view_module_id'] == 0) {
             $modulePublicFilesLocation = $this->getNewFilesLocation($data, true);
             try {
+                if (is_string($data['settings'])) {
+                    $data['settings'] = Json::decode($data['settings'], true);
+                }
+
                 $this->localContent->createDirectory($moduleFilesLocation . 'html');
-                $this->localContent->write($moduleFilesLocation . 'html/' . 'view.html', '{{content()}}');
-                // $this->localContent->write($moduleFilesLocation . 'html/layouts/' . 'default.html', '{{content()}}');
                 $this->localContent->createDirectory($moduleFilesLocation . 'html/layouts');
+
+                $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/layout.txt');
+                foreach ($data['settings']['layouts'] as $layout) {
+                    $this->localContent->write($moduleFilesLocation . 'html/layouts/' . $layout['view'] . '.html', $file);
+                }
+
                 $this->localContent->createDirectory($modulePublicFilesLocation . 'css');
                 $this->localContent->createDirectory($modulePublicFilesLocation . 'fonts');
                 $this->localContent->createDirectory($modulePublicFilesLocation . 'images');
