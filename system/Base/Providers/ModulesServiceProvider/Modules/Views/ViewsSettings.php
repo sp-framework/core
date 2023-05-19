@@ -86,7 +86,7 @@ class ViewsSettings extends BasePackage
         $settings = $this->getById($data['id']);
 
         if ($settings) {
-            if ($this->remove($settings)) {
+            if ($this->remove($data['id'])) {
                 $this->addResponse('Settings removed');
 
                 return;
@@ -167,7 +167,7 @@ class ViewsSettings extends BasePackage
 
     public function getViewsSettingsFromViewModule($data)
     {
-        if (!$this->viewssettings) {
+        if (!$this->viewssettings && !isset($data['view_id'])) {
             return false;
         }
 

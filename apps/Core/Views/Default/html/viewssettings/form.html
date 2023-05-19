@@ -17,29 +17,9 @@
                     <span class="text-uppercase" id="view">{{viewssettings['view_id']}}</span>
                 </div>
             </div>
-            {{adminltetags.useTag('fields',
-                [
-                    'component'                      : component,
-                    'componentName'                  : componentName,
-                    'componentId'                    : componentId,
-                    'sectionId'                      : sectionId,
-                    'fieldId'                        : 'id',
-                    'fieldLabel'                     : 'view settings ID',
-                    'fieldType'                      : 'input',
-                    'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : 'view settings ID',
-                    'fieldRequired'                  : true,
-                    'fieldBazScan'                   : true,
-                    'fieldBazPostOnCreate'           : false,
-                    'fieldBazPostOnUpdate'           : true,
-                    'fieldHidden'                    : true,
-                    'fieldDisabled'                  : true,
-                    'fieldValue'                     : viewssettings['id']
-                ]
-            )}}
         {% else %}
             {% set viewsSettings = viewssettings %}
-            {% set viewsSettingsId = '0' %}
+            {% set viewsSettingsId = '' %}
             <div class="row">
                 <div class="col">
                     {{adminltetags.useTag('fields',
@@ -117,6 +97,30 @@
                 </div>
             </div>
         {% endif %}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'view settings ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'view settings ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : viewsSettingsId
+                    ]
+                )}}
+            </div>
+        </div>
         <hr>
         <div class="row">
             <div class="col">
@@ -254,7 +258,7 @@
                         'fieldHelpTooltipContent'        : 'Settings of the module. JSON Format',
                         'fieldRequired'                  : false,
                         'fieldBazScan'                   : true,
-                        'fieldBazPostOnAdd'              : true,
+                        'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMaxLength'        : 4096,
                         'fieldTextareaRows'              : 15,
@@ -266,7 +270,7 @@
     </fieldset>
 </form>
 {% set apps = json_encode(apps) %}
-{% set viewsSettings = json_encode(viewsSettings) %}
+{% set viewsSettings = json_encode(viewsSettings, 64) %}
 <script>
 /* globals PNotify Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
@@ -304,6 +308,9 @@ if (dataCollectionSectionForm['vars']['viewsSettingsId'] == '0') {
     dataCollectionSectionForm['vars']['viewsSettings']['head'] = { };
     dataCollectionSectionForm['vars']['viewsSettings']['head']['link'] = { };
     dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['dev'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['prod'] = { };
     dataCollectionSectionForm['vars']['viewsSettings']['head']['meta'] = { };
     dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['author'] = '';
     dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['charset'] = '';
@@ -313,10 +320,16 @@ if (dataCollectionSectionForm['vars']['viewsSettingsId'] == '0') {
     dataCollectionSectionForm['vars']['viewsSettings']['head']['title'] = '';
     dataCollectionSectionForm['vars']['viewsSettings']['head']['script'] = { };
     dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['dev'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['prod'] = { };
     dataCollectionSectionForm['vars']['viewsSettings']['tags'] = '';
     dataCollectionSectionForm['vars']['viewsSettings']['footer'] = { };
     dataCollectionSectionForm['vars']['viewsSettings']['footer']['script'] = { };
     dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['dev'] = { };
+    dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['prod'] = { };
     dataCollectionSectionForm['vars']['viewsSettings']['footer']['jsscript'] = '';
     dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright'] = { };
     dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['name'] = '';
@@ -325,8 +338,8 @@ if (dataCollectionSectionForm['vars']['viewsSettingsId'] == '0') {
     dataCollectionSectionForm['vars']['viewsSettings']['layouts'] = { };
     dataCollectionSectionForm['vars']['viewsSettings']['mandatory'] = false;
     dataCollectionSectionForm['vars']['viewsSettings']['branding'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['small'] = '';
-    dataCollectionSectionForm['vars']['viewsSettings']['large'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['branding']['small'] = '';
+    dataCollectionSectionForm['vars']['viewsSettings']['branding']['large'] = '';
 } else {
     dataCollectionSectionForm['vars']['viewsSettings'] = JSON.parse('{{viewsSettings}}');
 }
@@ -361,7 +374,7 @@ dataCollectionSection =
                                         dataCollectionSectionForm['vars']['apps'][e.params.data.id]['views'][view].id, false, false
                                     );
 
-                                $('#{{componentId}}-{{sectionId}}-view_id').append(newOption).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-view_id').empty().append(newOption).trigger('change');
                             }
                         }
                         $('#{{componentId}}-{{sectionId}}-view_id').val(0).trigger('change');
@@ -398,7 +411,7 @@ dataCollectionSection =
                                 $('#{{componentId}}-{{sectionId}}-view_id').empty().trigger('change');
                                 $('#{{componentId}}-{{sectionId}}-view_id').attr('disabled', true);
                             } else {
-                                if (dataCollectionSectionForm['vars']['viewsSettingsId'] == '0') {
+                                if (dataCollectionSectionForm['vars']['viewsSettingsId'] == '') {
                                     $('#{{componentId}}-{{sectionId}}-defaults').attr('disabled', false);
                                     $('#{{componentId}}-{{sectionId}}-defaults').attr('hidden', false);
                                 }
@@ -416,7 +429,7 @@ dataCollectionSection =
                 }
                 prettyfyJson();
 
-                if (dataCollectionSectionForm['vars']['viewsSettingsId'] != '0') {
+                if (dataCollectionSectionForm['vars']['viewsSettingsId'] != '') {
                     $('#{{componentId}}-{{sectionId}}-reset').attr('disabled', false);
                     $('#{{componentId}}-{{sectionId}}-reset').attr('hidden', false);
                 }
@@ -434,9 +447,15 @@ dataCollectionSection =
                             }
                         },
                         {
-                            'head-link-href' : {
-                                'id'    : 'head-link-href',
-                                'text'  : 'Head CSS Links'
+                            'head-link-href-assets-dev' : {
+                                'id'    : 'head-link-href-assets-dev',
+                                'text'  : 'Head CSS Links (Dev)'
+                            }
+                        },
+                        {
+                            'head-link-href-assets-prod' : {
+                                'id'    : 'head-link-href-assets-prod',
+                                'text'  : 'Head CSS Links (Production)'
                             }
                         },
                         {
@@ -476,9 +495,15 @@ dataCollectionSection =
                             }
                         },
                         {
-                            'script-src' : {
-                                'id'    : 'script-src',
-                                'text'  : 'Head Java Scripts Source'
+                            'script-src-assets-dev' : {
+                                'id'    : 'script-src-assets-dev',
+                                'text'  : 'Head Java Scripts Source (Dev)'
+                            }
+                        },
+                        {
+                            'script-src-assets-prod' : {
+                                'id'    : 'script-src-assets-prod',
+                                'text'  : 'Head Java Scripts Source (Production)'
                             }
                         },
                         {
@@ -488,9 +513,15 @@ dataCollectionSection =
                             }
                         },
                         {
-                            'footer-script-src' : {
-                                'id'    : 'footer-script-src',
-                                'text'  : 'Footer Java Scripts Source'
+                            'footer-script-src-assets-dev' : {
+                                'id'    : 'footer-script-src-assets-dev',
+                                'text'  : 'Footer Java Scripts Source (Dev)'
+                            }
+                        },
+                        {
+                            'footer-script-src-assets-prod' : {
+                                'id'    : 'footer-script-src-assets-prod',
+                                'text'  : 'Footer Java Scripts Source (Production)'
                             }
                         },
                         {
@@ -563,12 +594,21 @@ dataCollectionSection =
                             }
 
                             break;
-                        case 'head-link-href' :
+                        case 'head-link-href-assets-dev' :
                             type = 'array';
                             settings = '';
 
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href'];
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['dev']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['dev'];
+                            }
+
+                            break;
+                        case 'head-link-href-assets-prod' :
+                            type = 'array';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['prod']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['prod'];
                             }
 
                             break;
@@ -626,12 +666,21 @@ dataCollectionSection =
                             }
 
                             break;
-                        case 'script-src' :
+                        case 'script-src-assets-dev' :
                             type = 'array';
                             settings = '';
 
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src'];
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['dev']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['dev'];
+                            }
+
+                            break;
+                        case 'script-src-assets-prod' :
+                            type = 'array';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['prod']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['prod'];
                             }
 
                             break;
@@ -644,12 +693,21 @@ dataCollectionSection =
                             }
 
                             break;
-                        case 'footer-script-src' :
+                        case 'footer-script-src-assets-dev' :
                             type = 'array';
                             settings = '';
 
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src'];
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['dev']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['dev'];
+                            }
+
+                            break;
+                        case 'footer-script-src-assets-prod' :
+                            type = 'array';
+                            settings = '';
+
+                            if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['prod']) {
+                                settings = dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['prod'];
                             }
 
                             break;
@@ -872,8 +930,13 @@ dataCollectionSection =
                                 = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
                             break;
-                        case 'head-link-href' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']
+                        case 'head-link-href-assets-dev' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['dev']
+                                 = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                            break;
+                        case 'head-link-href-assets-prod' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['prod']
                                  = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                             break;
@@ -907,8 +970,13 @@ dataCollectionSection =
                                 = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
                             break;
-                        case 'script-src' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']
+                        case 'script-src-assets-dev' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['dev']
+                                 = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                            break;
+                        case 'script-src-assets-prod' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['prod']
                                  = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                             break;
@@ -917,8 +985,13 @@ dataCollectionSection =
                                 = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
                             break;
-                        case 'footer-script-src' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']
+                        case 'footer-script-src-assets-dev' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['dev']
+                                = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                            break;
+                        case 'footer-script-src-assets-prod' :
+                            dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['prod']
                                 = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                             break;
