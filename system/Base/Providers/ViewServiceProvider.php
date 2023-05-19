@@ -16,16 +16,15 @@ class ViewServiceProvider implements ServiceProviderInterface
 {
 	public function register(DiInterface $container) : void
 	{
-
 		$container->setShared(
 			'volt',
-			function(ViewBaseInterface $view) use ($container) {
+			function() use ($container) {
 				$cache = $container->getShared('modules')->views->getCache();
 				$compiledPath = $container->getShared('modules')->views->getVoltCompiledPath();
+				$view = $container->getShared('view');
 				return (new Volt($view))->init($container, $cache, $compiledPath);
 			}
 		);
-
 
 		$container->setShared(
 			'view',
@@ -47,10 +46,11 @@ class ViewServiceProvider implements ServiceProviderInterface
 		$container->setShared(
 			'voltTools',
 			function () use ($container) {
-				return new VoltTools($container);
+				$volt = $container->getShared('volt');
+				$view = $container->getShared('view');
+				return new VoltTools($volt, $view);
 			}
 		);
-
 		$container->setShared(
 			'tag',
 			function () {
