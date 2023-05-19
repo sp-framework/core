@@ -645,7 +645,7 @@ dataCollectionSection =
 
                             break;
                         case 'footer-script-src' :
-                            type = 'textarea';
+                            type = 'array';
                             settings = '';
 
                             if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']) {
@@ -919,7 +919,7 @@ dataCollectionSection =
                             break;
                         case 'footer-script-src' :
                             dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                                = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                             break;
                         case 'footer-jsscript' :
