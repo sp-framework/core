@@ -4,6 +4,8 @@ namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
+use Phalcon\Tag;
+use Phalcon\Assets\Inline;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesViews;
 
@@ -31,6 +33,14 @@ class Views extends BasePackage
 
     protected $tags;
 
+    protected $assetsPath;
+
+    protected $assetsCollections;
+
+    protected $componentName;
+
+    protected $assetsVersion;
+
     public function init(bool $resetCache = false)
     {
         $this->getAll($resetCache);
@@ -44,6 +54,8 @@ class Views extends BasePackage
         $this->setPhalconViewLayoutPath();
 
         $this->setPhalconViewLayoutFile();
+
+        $this->setAssetsPath();
 
         return $this;
     }
@@ -119,6 +131,24 @@ class Views extends BasePackage
         }
     }
 
+    public function setAssetsPath($path = null)
+    {
+        if ($path) {
+            $this->assetsPath = $path;
+
+            return;
+        }
+
+        if (!isset($this->assetsPath)) {
+            if ($this->app && $this->view) {
+                $this->assetsPath =
+                    'public/' . strtolower($this->app['app_type']) . '/' . strtolower($this->view['name']) . '/';
+            } else {
+                $this->assetsPath = 'public/core/default/';
+            }
+        }
+    }
+
     public function setPhalconViewLayoutFile()
     {
         if (!isset($this->phalconViewLayoutFile)) {
@@ -155,6 +185,11 @@ class Views extends BasePackage
     public function getPhalconViewLayoutPath()
     {
         return $this->phalconViewLayoutPath;
+    }
+
+    public function getAssetsPath()
+    {
+        return $this->assetsPath;
     }
 
     public function getPhalconViewLayoutFile()
@@ -251,7 +286,8 @@ class Views extends BasePackage
 
             if ((isset($view['apps'][$appId]['enabled']) &&
                 $view['apps'][$appId]['enabled'] == true) &&
-                strtolower($view['name']) == strtolower($name)
+                strtolower($view['name']) == strtolower($name) &&
+                $view['base_view_module_id'] == '0'
             ) {
                 return $view;
             }
@@ -434,15 +470,13 @@ class Views extends BasePackage
     {
         $viewsModulesVersion = [0,0,0,1];
 
-        $baseView = $this->modules->views->getViewInfo();
-
-        $baseViewVersion = $baseView['version'];
+        $baseViewVersion = $this->view['version'];
         $baseViewVersion = explode('.', $baseViewVersion);
         foreach ($baseViewVersion as $key => $version) {
             $viewsModulesVersion[$key] = (int) $version;
         }
 
-        $views = $this->getViewsByBaseViewModuleId($this->modules->views->getViewInfo()['id']);
+        $views = $this->getViewsByBaseViewModuleId($this->view['id']);
 
         if (count($views) > 0) {
             foreach ($views as $view) {
@@ -461,5 +495,204 @@ class Views extends BasePackage
         $this->update($baseView);
 
         return $viewsModulesVersion;
+    }
+
+    public function buildAssets($componentName = null)
+    {
+        if ($this->assetsCollections) {
+            return;
+        }
+
+        if ($componentName) {
+            $this->componentName = $componentName;
+        }
+
+        if (!$this->assetsVersion) {
+            if ($this->app['app_type'] === 'core') {
+                $this->assetsVersion = $this->core->getVersion();
+            } else {
+                if ($this->view['view_modules_version'] &&
+                    $this->view['view_modules_version'] !== '0.0.0.0'
+                ) {
+                    $this->assetsVersion = $this->view['view_modules_version'];
+                } else {
+                    $this->assetsVersion = $this->getCalculatedAssetsVersion();
+                }
+            }
+        }
+
+        $this->buildAssetsTitle();
+        $this->buildAssetsMeta();
+        $this->buildAssetsHeadCss();
+        $this->buildAssetsHeadStyle();
+        $this->buildAssetsHeadJs();
+        $this->buildAssetsBodyJs();
+        $this->buildAssetsBranding();
+        $this->buildAssetsFooter();
+        $this->buildAssetsFooterJs();
+        $this->buildAssetsFooterJsInline();
+    }
+
+    protected function buildAssetsTitle()
+    {
+        $this->tag::setDocType(Tag::XHTML5);
+
+        if (isset($this->viewSettings['head']['title'])) {
+            Tag::setTitle($this->viewSettings['head']['title'] . ' - ' . ucfirst($this->app['name']));
+        } else {
+            Tag::setTitle(ucfirst($this->app['name']));
+        }
+
+        if (isset($this->componentName)) {
+            Tag::appendTitle(' - ' . $this->componentName);
+        }
+    }
+
+    protected function buildAssetsMeta()
+    {
+        $this->assetsCollections['meta'] = $this->assets->collection('meta');
+
+        if (isset($this->viewSettings['head']['meta']['charset'])) {
+            $charset = $this->viewSettings['head']['meta']['charset'];
+        } else {
+            $charset = 'UTF-8';
+        }
+
+        $this->assetsCollections['meta']->addInline(new Inline('charset', $charset));
+
+        $this->assetsCollections['meta']->addInline(
+            new Inline('description', $this->viewSettings['head']['meta']['description'])
+        );
+        $this->assetsCollections['meta']->addInline(
+            new Inline('keywords', $this->viewSettings['head']['meta']['keywords'])
+        );
+        $this->assetsCollections['meta']->addInline(
+            new Inline('author', $this->viewSettings['head']['meta']['author'])
+        );
+        $this->assetsCollections['meta']->addInline(
+            new Inline('viewport', $this->viewSettings['head']['meta']['viewport'])
+        );
+    }
+
+    protected function buildAssetsHeadCss()
+    {
+        $this->assetsCollections['headLinks'] = $this->assets->collection('headLinks');
+        $links = $this->viewSettings['head']['link']['href'];
+
+        if ($this->config->dev && isset($links['assets']['dev'])) {
+            $links = $links['assets']['dev'];
+        } else if (isset($links['assets']['prod'])) {
+            $links = $links['assets']['prod'];
+        } else if (isset($links['assets']['dev'])) {
+            $links = $links['assets']['dev'];//Fallback to dev if set.
+        }
+
+        if (count($links) > 0) {
+            foreach ($links as $link) {
+                if (!isset($link['local'])) {//Default is local script
+                    $link['local'] = true;
+                }
+
+                if ($this->config->dev) {
+                    $this->assetsCollections['headLinks']->addCss($link['asset']);
+                } else {
+                    $this->assetsCollections['headLinks']->addCss($link['asset'], $link['local'], false, [], $this->assetsVersion);
+                }
+            }
+        }
+    }
+
+    protected function buildAssetsHeadStyle()
+    {
+        $this->assetsCollections['headStyle'] = $this->assets->collection('headStyle');
+        $inlineStyle = $this->viewSettings['head']['style'] ?? null;
+        if ($inlineStyle) {
+            $this->assets->addInlineCss($inlineStyle);
+        }
+    }
+
+    protected function buildAssetsHeadJs()
+    {
+        $this->assetsCollections['headJs'] = $this->assets->collection('headJs');
+        $scripts = $this->viewSettings['head']['script']['src'];
+
+        if ($this->config->dev && isset($scripts['assets']['dev'])) {
+            $scripts = $scripts['assets']['dev'];
+        } else if (isset($scripts['assets']['prod'])) {
+            $scripts = $scripts['assets']['prod'];
+        } else if (isset($scripts['assets']['dev'])) {
+            $scripts = $scripts['assets']['dev'];//Fallback to dev if set.
+        }
+
+        if (count($scripts) > 0) {
+            foreach ($scripts as $script) {
+                if (!isset($script['local'])) {//Default is local script
+                    $script['local'] = true;
+                }
+
+                if ($this->config->dev) {
+                    $this->assetsCollections['headJs']->addJs($script['asset']);
+                } else {
+                    $this->assetsCollections['headJs']->addJs($script['asset'], $script['local'], true, [], $this->assetsVersion);
+                }
+            }
+        }
+    }
+
+    protected function buildAssetsBodyJs()
+    {
+        $this->assetsCollections['body'] = $this->assets->collection('body');
+        $this->assetsCollections['body']->addInline(new Inline('bodyScript', $this->viewSettings['body']['jsscript']));
+    }
+
+    protected function buildAssetsBranding()
+    {
+        $this->assetsCollections['branding'] = $this->assets->collection('branding');
+        $this->assetsCollections['branding']->addInline(new Inline('small', $this->viewSettings['branding']['small']));
+        $this->assetsCollections['branding']->addInline(new Inline('large', $this->viewSettings['branding']['large']));
+    }
+
+    protected function buildAssetsFooter()
+    {
+        $this->assetsCollections['footer'] = $this->assets->collection('footer');
+        $this->assetsCollections['footer']->addInline(new Inline('footerCopyrightfromYear', $this->viewSettings['footer']['copyright']['fromYear']));
+        $this->assetsCollections['footer']->addInline(new Inline('footerCopyrightSite', $this->viewSettings['footer']['copyright']['site']));
+        $this->assetsCollections['footer']->addInline(new Inline('footerCopyrightName', $this->viewSettings['footer']['copyright']['name']));
+    }
+
+    protected function buildAssetsFooterJs()
+    {
+        $this->assetsCollections['footerJs'] = $this->assets->collection('footerJs');
+        $scripts = $this->viewSettings['footer']['script']['src'];
+
+        if ($this->config->dev && isset($scripts['assets']['dev'])) {
+            $scripts = $scripts['assets']['dev'];
+        } else if (isset($scripts['assets']['prod'])) {
+            $scripts = $scripts['assets']['prod'];
+        } else if (isset($scripts['assets']['dev'])) {
+            $scripts = $scripts['assets']['dev'];//Fallback to dev if set.
+        }
+
+        if (count($scripts) > 0) {
+            foreach ($scripts as $script) {
+                if (!isset($script['local'])) {//Default is local script
+                    $script['local'] = true;
+                }
+
+                if ($this->config->dev) {
+                    $this->assetsCollections['footerJs']->addJs($script['asset']);
+                } else {
+                    $this->assetsCollections['footerJs']->addJs($script['asset'], $script['local'], true, [], $this->assetsVersion);
+                }
+            }
+        }
+    }
+
+    protected function buildAssetsFooterJsInline()
+    {
+        $inlineScript = $this->viewSettings['footer']['jsscript'] ?? null;
+        if ($inlineScript && $inlineScript !== '') {
+            $this->assets->addInlineJs($inlineScript);
+        }
     }
 }

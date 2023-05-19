@@ -2,14 +2,11 @@
 
 namespace System\Base;
 
-use Phalcon\Assets\Collection;
-use Phalcon\Assets\Inline;
 use Phalcon\Di\DiInterface;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use Phalcon\Mvc\Controller;
 use Phalcon\Mvc\View;
-use Phalcon\Tag;
 use System\Base\Exceptions\ControllerNotFoundException;
 use System\Base\Exceptions\IdNotFoundException;
 
@@ -29,17 +26,11 @@ abstract class BaseComponent extends Controller
 
 	protected $views;
 
-	protected $viewSettings;
-
 	protected $viewName;
-
-	protected $assetsCollections = [];
 
 	protected $tokenKey = null;
 
 	protected $token = null;
-
-	protected $assetsVersion;
 
 	public $widgets;
 
@@ -56,15 +47,9 @@ abstract class BaseComponent extends Controller
 
 		$this->views = $this->modules->views->getViewInfo();
 
-		$this->viewSettings = $this->modules->views->getViewSettings();
-
 		$this->setComponent();
 
 		if (!$this->isJson() || $this->request->isAjax()) {
-			if (!$this->viewSettings) {
-				$this->viewSettings = json_decode($this->views['settings'], true);
-			}
-
 			$this->checkLayout();
 
 			if (!$this->isJson() && $this->request->isGet()) {
@@ -511,7 +496,7 @@ abstract class BaseComponent extends Controller
 
 				if (Arr::has($this->getQueryArr, 'layout')) {
 					if ($this->getQueryArr['layout'] === '1') {
-						$this->buildAssets();
+						$this->modules->views->buildAssets($this->componentName);
 						return;
 					} else {
 						$this->disableViewLevel();
@@ -534,15 +519,15 @@ abstract class BaseComponent extends Controller
 						$this->disableViewLevel();
 						return;
 					} else {
-						$this->buildAssets();
+						$this->modules->views->buildAssets($this->componentName);
 						return;
 					}
 				} else {
-					$this->buildAssets();
+					$this->modules->views->buildAssets($this->componentName);
 					return;
 				}
 			} else {
-				$this->buildAssets();
+				$this->modules->views->buildAssets($this->componentName);
 				return;
 			}
 		} else if ($this->request->isPost()) {
@@ -551,11 +536,11 @@ abstract class BaseComponent extends Controller
 					$this->disableViewLevel();
 					return;
 				} else {
-					$this->buildAssets();
+					$this->modules->views->buildAssets($this->componentName);
 					return;
 				}
 			} else {
-				$this->buildAssets();
+				$this->modules->views->buildAssets($this->componentName);
 				return;
 			}
 		} else {
@@ -628,160 +613,6 @@ abstract class BaseComponent extends Controller
 	protected function putData()
 	{
 		return $this->request->getPut();
-	}
-
-	protected function buildAssets()
-	{
-		if (!$this->assetsVersion) {
-			if ($this->app['app_type'] === 'core') {
-				$this->assetsVersion = $this->core->getVersion();
-			} else {
-				if ($this->modules->views->getViewInfo()['view_modules_version'] &&
-					$this->modules->views->getViewInfo()['view_modules_version'] !== '0.0.0.0'
-				) {
-					$this->assetsVersion = $this->modules->views->getViewInfo()['view_modules_version'];
-				} else {
-					$this->assetsVersion = $this->modules->views->getCalculatedAssetsVersion();
-				}
-			}
-		}
-
-		$this->buildAssetsTitle();
-		$this->buildAssetsMeta();
-		$this->buildAssetsHeadCss();
-		$this->buildAssetsHeadStyle();
-		$this->buildAssetsHeadJs();
-		$this->buildAssetsBodyJs();
-		$this->buildAssetsBranding();
-		$this->buildAssetsFooter();
-		$this->buildAssetsFooterJs();
-		$this->buildAssetsFooterJsInline();
-	}
-
-	protected function buildAssetsTitle()
-	{
-		$this->tag::setDocType(Tag::XHTML5);
-
-		if (isset($this->viewSettings['head']['title'])) {
-			Tag::setTitle($this->viewSettings['head']['title'] . ' - ' . ucfirst($this->app['name']));
-		} else {
-			Tag::setTitle(ucfirst($this->app['name']));
-		}
-
-		if (isset($this->componentName)) {
-			Tag::appendTitle(' - ' . $this->componentName);
-		}
-	}
-
-	protected function buildAssetsMeta()
-	{
-		$this->assetsCollections['meta'] = $this->assets->collection('meta');
-
-		if (isset($this->viewSettings['head']['meta']['charset'])) {
-			$charset = $this->viewSettings['head']['meta']['charset'];
-		} else {
-			$charset = 'UTF-8';
-		}
-
-		$this->assetsCollections['meta']->addInline(new Inline('charset', $charset));
-
-		$this->assetsCollections['meta']->addInline(
-			new Inline('description', $this->viewSettings['head']['meta']['description'])
-		);
-		$this->assetsCollections['meta']->addInline(
-			new Inline('keywords', $this->viewSettings['head']['meta']['keywords'])
-		);
-		$this->assetsCollections['meta']->addInline(
-			new Inline('author', $this->viewSettings['head']['meta']['author'])
-		);
-		$this->assetsCollections['meta']->addInline(
-			new Inline('viewport', $this->viewSettings['head']['meta']['viewport'])
-		);
-	}
-
-	protected function buildAssetsHeadCss()
-	{
-		$this->assetsCollections['headLinks'] = $this->assets->collection('headLinks');
-		$links = $this->viewSettings['head']['link']['href'];
-		if (count($links) > 0) {
-			foreach ($links as $link) {
-				if (!$this->config->dev) {
-					$this->assetsCollections['headLinks']->addCss($link, null, true, [], $this->assetsVersion);
-				} else {
-					$this->assetsCollections['headLinks']->addCss($link);
-				}
-			}
-		}
-	}
-
-	protected function buildAssetsHeadStyle()
-	{
-		$this->assetsCollections['headStyle'] = $this->assets->collection('headStyle');
-		$inlineStyle = $this->viewSettings['head']['style'] ?? null;
-		if ($inlineStyle) {
-			$this->assets->addInlineCss($inlineStyle);
-		}
-	}
-
-	protected function buildAssetsHeadJs()
-	{
-		$this->assetsCollections['headJs'] = $this->assets->collection('headJs');
-
-		$scripts = $this->viewSettings['head']['script']['src'];
-
-		if (count($scripts) > 0) {
-			foreach ($scripts as $script) {
-				if (!$this->config->dev) {
-					$this->assetsCollections['headJs']->addJs($script, null, true, [], $this->assetsVersion);
-				} else {
-					$this->assetsCollections['headJs']->addJs($script);
-				}
-			}
-		}
-	}
-
-	protected function buildAssetsBodyJs()
-	{
-		$this->assetsCollections['body'] = $this->assets->collection('body');
-		$this->assetsCollections['body']->addInline(new Inline('bodyScript', $this->viewSettings['body']['jsscript']));
-	}
-
-	protected function buildAssetsBranding()
-	{
-		$this->assetsCollections['branding'] = $this->assets->collection('branding');
-		$this->assetsCollections['branding']->addInline(new Inline('small', $this->viewSettings['branding']['small']));
-		$this->assetsCollections['branding']->addInline(new Inline('large', $this->viewSettings['branding']['large']));
-	}
-
-	protected function buildAssetsFooter()
-	{
-		$this->assetsCollections['footer'] = $this->assets->collection('footer');
-		$this->assetsCollections['footer']->addInline(new Inline('footerCopyrightfromYear', $this->viewSettings['footer']['copyright']['fromYear']));
-		$this->assetsCollections['footer']->addInline(new Inline('footerCopyrightSite', $this->viewSettings['footer']['copyright']['site']));
-		$this->assetsCollections['footer']->addInline(new Inline('footerCopyrightName', $this->viewSettings['footer']['copyright']['name']));
-	}
-
-	protected function buildAssetsFooterJs()
-	{
-		$this->assetsCollections['footerJs'] = $this->assets->collection('footerJs');
-		$scripts = $this->viewSettings['footer']['script']['src'];
-		if (count($scripts) > 0) {
-			foreach ($scripts as $script) {
-				if (!$this->config->dev) {
-					$this->assetsCollections['footerJs']->addJs($script, null, true, [], $this->assetsVersion);
-				} else {
-					$this->assetsCollections['footerJs']->addJs($script);
-				}
-			}
-		}
-	}
-
-	protected function buildAssetsFooterJsInline()
-	{
-		$inlineScript = $this->viewSettings['footer']['jsscript'] ?? null;
-		if ($inlineScript && $inlineScript !== '') {
-			$this->assets->addInlineJs($inlineScript);
-		}
 	}
 
 	protected function usePackage($packageClass, $getSettings = false)

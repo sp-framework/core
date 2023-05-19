@@ -93,9 +93,7 @@ if (localStorage.getItem('bazDevMode') === null) {
 }
 </script>
         {% endif %}
-        <script type="text/javascript" charset="utf-8">
-            {{assets.get('body').getCodes()[0].getContent()}}
-        </script>
+        {{assets.get('body').getCodes()[0].getContent()}}
         <div class="wrapper">
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/header/view') %}
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/sidebar/view') %}
