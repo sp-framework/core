@@ -21,15 +21,21 @@ class ViewsSettings extends BasePackage
 
     public function addViewsSettings($data)
     {
-        if (!isset($data['domain_id']) ||
-            !isset($data['app_id']) ||
-            !isset($data['view_id']) ||
-            !isset($data['settings'])
-        ) {
-            $this->addResponse('Please provide all required data', 1);
+        if (!isset($data['view_id'])) {
+            $this->addResponse('Please provide view id', 1);
 
             return false;
         }
+
+        $view = $this->modules->views->getById($data['view_id']);
+
+        if (!$view) {
+            $this->addResponse('Please provide correct view id', 1);
+
+            return false;
+        }
+
+        $data['settings'] = $this->mergeViewsSettings($data, $view);
 
         if (!$this->basepackages->utils->validateJson(['json' => $data['settings']])) {
             $this->addResponse($this->basepackages->utils->packagesData->responseMessage, 1);
@@ -48,14 +54,30 @@ class ViewsSettings extends BasePackage
 
     public function updateViewsSettings($data)
     {
-        if (!$this->basepackages->utils->validateJson(['json' => $data['settings']])) {
-            $this->addResponse($this->basepackages->utils->packagesData->responseMessage, 1);
+        if (!isset($data['id']) && !isset($data['settings'])) {
+            $this->addResponse('Please provide settings ID & Settings', 1);
 
             return false;
         }
 
-        if (!isset($data['id']) && !isset($data['settings'])) {
-            $this->addResponse('Please provide settings ID & Settings', 1);
+        if (!isset($data['view_id'])) {
+            $this->addResponse('Please provide view id', 1);
+
+            return false;
+        }
+
+        $view = $this->modules->views->getById($data['view_id']);
+
+        if (!$view) {
+            $this->addResponse('Please provide correct view id', 1);
+
+            return false;
+        }
+
+        $data['settings'] = $this->mergeViewsSettings($data, $view);
+
+        if (!$this->basepackages->utils->validateJson(['json' => $data['settings']])) {
+            $this->addResponse($this->basepackages->utils->packagesData->responseMessage, 1);
 
             return false;
         }
@@ -73,6 +95,47 @@ class ViewsSettings extends BasePackage
 
             $this->addResponse('Error updating settings', 1);
         }
+    }
+
+    protected function mergeViewsSettings($data, $view)
+    {
+        if (is_string($view['settings'])) {
+            $view['settings'] = Json::decode($view['settings'], true);
+        }
+
+        foreach ($view['settings']['branding'] as $brandingKey => $branding) {
+            if (isset($data[$brandingKey])) {
+                if ($data[$brandingKey] !== $view['settings']['branding'][$brandingKey]['brand']) {
+                    $data[$brandingKey] = str_replace('public/' . $this->apps->getAppInfo()['app_type'] . '/' . strtolower($this->modules->views->getViewInfo()['name']) . '/images/', '', $data[$brandingKey]);
+
+                    $view['settings']['branding'][$brandingKey]['brand'] = $data[$brandingKey];
+                }
+                unset($data[$brandingKey]);
+            }
+        }
+
+        $view['settings']['head']['title'] = $data['head_title'];
+        unset($data['head_title']);
+        $view['settings']['head']['meta']['keywords'] = $data['head_meta_keywords'];
+        unset($data['head_meta_keywords']);
+        $view['settings']['head']['meta']['description'] = $data['head_meta_description'];
+        unset($data['head_meta_description']);
+        $view['settings']['footer']['copyright']['name'] = $data['copyright_name'];
+        unset($data['copyright_name']);
+        $view['settings']['footer']['copyright']['site'] = $data['copyright_site'];
+        unset($data['copyright_site']);
+        $view['settings']['footer']['copyright']['fromYear'] = $data['copyright_fromYear'];
+        unset($data['copyright_fromYear']);
+
+        $data['settings'] = $view['settings'];
+
+        if (isset($data['id'])) {
+            unset($data['id']);
+        }
+
+        $data['settings'] = Json::encode($data['settings']);
+
+        return $data['settings'];
     }
 
     public function removeViewsSettings($data)

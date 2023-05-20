@@ -1,25 +1,348 @@
 <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         {% if viewssettings['id'] is defined %}
-            {% set viewsSettings = viewssettings['settings'] %}
             {% set viewsSettingsId = viewssettings['id'] %}
             <div class="row">
                 <div class="col">
-                    <label>DOMAIN: </label>
-                    <span class="text-uppercase" id="domain">{{viewssettings['domain_id']}}</span>
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'domain_id',
+                            'fieldLabel'                     : 'Select Domain',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select Domain.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldRequired'                  : true,
+                            'fieldDisabled'                  : true,
+                            'fieldDataSelect2Options'        : domains,
+                            'fieldDataSelect2OptionsKey'     : 'id',
+                            'fieldDataSelect2OptionsValue'   : 'name',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': viewssettings['domain_id']
+                        ]
+                    )}}
                 </div>
                 <div class="col">
-                    <label>APP: </label>
-                    <span class="text-uppercase" id="app">{{viewssettings['app_id']}}</span>
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'app_id',
+                            'fieldLabel'                     : 'Select App',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select App.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldRequired'                  : true,
+                            'fieldDisabled'                  : true,
+                            'fieldDataSelect2Options'        : apps,
+                            'fieldDataSelect2OptionsKey'     : 'id',
+                            'fieldDataSelect2OptionsValue'   : 'name',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': viewssettings['app_id']
+                        ]
+                    )}}
                 </div>
                 <div class="col">
-                    <label>VIEW: </label>
-                    <span class="text-uppercase" id="view">{{viewssettings['view_id']}}</span>
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'view_id',
+                            'fieldLabel'                     : 'Select View',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select View.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldRequired'                  : true,
+                            'fieldDisabled'                  : true,
+                            'fieldDataSelect2Options'        : views,
+                            'fieldDataSelect2OptionsKey'     : 'id',
+                            'fieldDataSelect2OptionsValue'   : 'display_name',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': viewssettings['view_id']
+                        ]
+                    )}}
+                </div>
+            </div>
+            <hr>
+            {% if viewssettings['settings']['branding'] is defined and viewssettings['settings']['branding']|length > 0 %}
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'branding',
+                                'fieldLabel'                            : 'Branding',
+                                'fieldLabelLegend'                      : true,
+                                'fieldHidden'                           : false,
+                                'fieldType'                             : 'html',
+                                'fieldBazScan'                          : false,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : false,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldHtmlContent'                      : ''
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    {% for brandKey, brand in viewssettings['settings']['branding'] %}
+                        {% if brand['maxWidth'] is not defined %}
+                            {% set brand['maxWidth'] = 0 %}
+                        {% endif %}
+                        {% if brand['maxHeight'] is not defined %}
+                            {% set brand['maxHeight'] = 0 %}
+                        {% endif %}
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : brandKey,
+                                    'fieldLabel'                     : brandKey ~ ' logo',
+                                    'fieldType'                      : 'files/croppie',
+                                    'fieldValue'                     : brand['brand'],
+                                    'imageType'                      : 'logo',
+                                    'storageType'                    : 'public',
+                                    'uploadDirectory'                : 'public/' ~ viewssettings['app_type'] ~ '/' ~ viewssettings['view_name'] ~ '/images/assets',
+                                    'isPointer'                      : true,
+                                    'upload'                         : true,
+                                    'remove'                         : true,
+                                    'maxWidth'                       : brand['maxWidth'],
+                                    'maxHeight'                      : brand['maxHeight'],
+                                    'logoLink'                       : brand['brand']
+                                ]
+                            )}}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <hr>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'header',
+                            'fieldLabel'                            : 'Header',
+                            'fieldLabelLegend'                      : true,
+                            'fieldHidden'                           : false,
+                            'fieldType'                             : 'html',
+                            'fieldBazScan'                          : false,
+                            'fieldBazPostOnCreate'                  : false,
+                            'fieldBazPostOnUpdate'                  : false,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldHtmlContent'                      : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'head_title',
+                            'fieldLabel'                     : 'Title Tag',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Website Title Tag',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldValue'                     : viewssettings['settings']['head']['title']
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'head_meta_keywords',
+                            'fieldLabel'                     : 'Site Keywords',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 4096,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Enter site keywords.',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 4096,
+                            'fieldTextareaRows'              : 5,
+                            'fieldValue'                     : viewssettings['settings']['head']['meta']['keywords']
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'head_meta_description',
+                            'fieldLabel'                     : 'Site Description',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 4096,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Enter site description.',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 4096,
+                            'fieldTextareaRows'              : 5,
+                            'fieldValue'                     : viewssettings['settings']['head']['meta']['description']
+                        ]
+                    )}}
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'footer',
+                            'fieldLabel'                            : 'Footer',
+                            'fieldLabelLegend'                      : true,
+                            'fieldHidden'                           : false,
+                            'fieldType'                             : 'html',
+                            'fieldBazScan'                          : false,
+                            'fieldBazPostOnCreate'                  : false,
+                            'fieldBazPostOnUpdate'                  : false,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldHtmlContent'                      : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'copyright_name',
+                            'fieldLabel'                     : 'Copyright Name',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Website Copyright Name',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 100,
+                            'fieldValue'                     : viewssettings['settings']['footer']['copyright']['name']
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'copyright_site',
+                            'fieldLabel'                     : 'Copyright Site',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Website Copyright Site',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 512,
+                            'fieldValue'                     : viewssettings['settings']['footer']['copyright']['site']
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'copyright_fromYear',
+                            'fieldLabel'                     : 'Copyright From Year',
+                            'fieldType'                      : 'input',
+                            'fieldInputTypeTextFilter'       : 'positiveInt',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Website Copyright From Year',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 4,
+                            'fieldValue'                     : viewssettings['settings']['footer']['copyright']['fromYear']
+                        ]
+                    )}}
                 </div>
             </div>
         {% else %}
             {% set viewsSettings = viewssettings %}
             {% set viewsSettingsId = '' %}
+            {{adminltetags.useTag('buttons',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'buttonType'                    : 'button',
+                    'buttons'                       :
+                        [
+                            'settings-link'    : [
+                                'title'                   : 'link',
+                                'size'                    : 'xs',
+                                'disabled'                : true,
+                                'hidden'                  : true,
+                                'url'                     : '#'
+                            ]
+                        ]
+                ]
+            )}}
             <div class="row">
                 <div class="col">
                     {{adminltetags.useTag('fields',
@@ -89,7 +412,7 @@
                             'fieldDisabled'                  : true,
                             'fieldDataSelect2Options'        : [],
                             'fieldDataSelect2OptionsKey'     : 'id',
-                            'fieldDataSelect2OptionsValue'   : 'name',
+                            'fieldDataSelect2OptionsValue'   : 'display_name',
                             'fieldDataSelect2OptionsArray'   : true,
                             'fieldDataSelect2OptionsSelected': ''
                         ]
@@ -121,158 +444,11 @@
                 )}}
             </div>
         </div>
-        <hr>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                            : component,
-                        'componentName'                        : componentName,
-                        'componentId'                          : componentId,
-                        'sectionId'                            : sectionId,
-                        'fieldId'                              : 'settings-keys',
-                        'fieldLabel'                           : 'Select Setting',
-                        'fieldType'                            : 'select2',
-                        'fieldHelp'                            : true,
-                        'fieldHelpTooltipContent'              : 'Select setting that you want to modify or add.',
-                        'fieldRequired'                        : true,
-                        'fieldBazScan'                         : true,
-                        'fieldDataSelect2Options'              : [],
-                        'fieldDataSelect2OptionsKey'           : 'id',
-                        'fieldDataSelect2OptionsValue'         : 'name',
-                        'fieldDataSelect2OptionsSelected'      : ''
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row" id="settings-text" hidden>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'settings-text',
-                        'fieldLabel'                     : 'Settings Value',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Enter settings value and save.',
-                        'fieldRequired'                  : true,
-                        'fieldBazScan'                   : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 1024,
-                        'fieldValue'                     : ''
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row" id="settings-textarea" hidden>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'settings-textarea',
-                        'fieldLabel'                     : 'Settings Value',
-                        'fieldType'                      : 'textarea',
-                        'fieldDataMaxLength'             : 4096,
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Enter settings value and save.',
-                        'fieldRequired'                  : false,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnAdd'              : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldDataInputMaxLength'        : 4096,
-                        'fieldTextareaRows'              : 5,
-                        'fieldValue'                     : ''
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('buttons',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'buttonType'                    : 'button',
-                        'buttons'                       :
-                            [
-                                'defaults'    : [
-                                    'title'                   : 'Load Defaults',
-                                    'size'                    : 'xs',
-                                    'position'                : 'left',
-                                    'type'                    : 'primary',
-                                    'icon'                    : 'rotate-left',
-                                    'disabled'                : true,
-                                    'hidden'                  : true
-                                ],
-                                'reset'    : [
-                                    'title'                   : 'Reset',
-                                    'size'                    : 'xs',
-                                    'position'                : 'left',
-                                    'type'                    : 'warning',
-                                    'icon'                    : 'rotate-left',
-                                    'disabled'                : true,
-                                    'hidden'                  : true
-                                ],
-                                'save'    : [
-                                    'title'                   : 'Save',
-                                    'size'                    : 'xs',
-                                    'disabled'                : true,
-                                    'position'                : 'right',
-                                    'type'                    : 'primary',
-                                    'icon'                    : 'floppy-disk'
-                                ],
-                                'cancel'    : [
-                                    'title'                   : 'Cancel',
-                                    'size'                    : 'xs',
-                                    'disabled'                : true,
-                                    'position'                : 'right',
-                                    'type'                    : 'secondary'
-                                ]
-                            ]
-                    ]
-                )}}
-            </div>
-        </div>
-        <hr>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'settings',
-                        'fieldLabel'                     : 'Views Settings',
-                        'fieldType'                      : 'textarea',
-                        'fieldDataMaxLength'             : 4096,
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Settings of the module. JSON Format',
-                        'fieldRequired'                  : false,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMaxLength'        : 4096,
-                        'fieldTextareaRows'              : 15,
-                        'fieldValue'                     : ''
-                    ]
-                )}}
-            </div>
-        </div>
     </fieldset>
 </form>
 {% set apps = json_encode(apps) %}
-{% set viewsSettings = json_encode(viewsSettings, 64) %}
 <script>
-/* globals PNotify Swal */
+/* globals PNotify BazContentLoader Pace BazCore */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -299,50 +475,6 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['apps'] = JSON.parse('{{apps}}');
-dataCollectionSectionForm['vars']['viewsSettingsId'] = '{{viewsSettingsId}}';
-
-if (dataCollectionSectionForm['vars']['viewsSettingsId'] == '0') {
-    dataCollectionSectionForm['vars']['viewsSettings'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['body'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['body']['jsscript'] = '';
-    dataCollectionSectionForm['vars']['viewsSettings']['head'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['link'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['dev'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['prod'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['meta'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['author'] = '';
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['charset'] = '';
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['keywords'] = '';
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['viewport'] = '';
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['description'] = '';
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['title'] = '';
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['script'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['dev'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['prod'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['tags'] = '';
-    dataCollectionSectionForm['vars']['viewsSettings']['footer'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['footer']['script'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['dev'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['prod'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['footer']['jsscript'] = '';
-    dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['name'] = '';
-    dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['site'] = '';
-    dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['fromYear'] = '';
-    dataCollectionSectionForm['vars']['viewsSettings']['layouts'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['mandatory'] = false;
-    dataCollectionSectionForm['vars']['viewsSettings']['branding'] = { };
-    dataCollectionSectionForm['vars']['viewsSettings']['branding']['small'] = '';
-    dataCollectionSectionForm['vars']['viewsSettings']['branding']['large'] = '';
-} else {
-    dataCollectionSectionForm['vars']['viewsSettings'] = JSON.parse('{{viewsSettings}}');
-}
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
@@ -415,650 +547,71 @@ dataCollectionSection =
                                     $('#{{componentId}}-{{sectionId}}-defaults').attr('disabled', false);
                                     $('#{{componentId}}-{{sectionId}}-defaults').attr('hidden', false);
                                 }
+
+                                dataCollectionSectionForm['funcs']['loadAjax'](
+                                    $('#{{componentId}}-{{sectionId}}-domain_id').val(),
+                                    $('#{{componentId}}-{{sectionId}}-app_id').val(),
+                                    $('#{{componentId}}-{{sectionId}}-view_id').val()
+                                );
                             }
                         }, 'json');
                     }
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-settings'                                : {
-            afterInit: function() {
-                function prettyfyJson() {
-                    $('#{{componentId}}-{{sectionId}}-settings')
-                        .val(JSON.stringify(dataCollectionSectionForm['vars']['viewsSettings'], null, 4));
-                }
-                prettyfyJson();
-
-                if (dataCollectionSectionForm['vars']['viewsSettingsId'] != '') {
-                    $('#{{componentId}}-{{sectionId}}-reset').attr('disabled', false);
-                    $('#{{componentId}}-{{sectionId}}-reset').attr('hidden', false);
-                }
-            }
-        },
-        '{{componentId}}-{{sectionId}}-settings-keys'                           : {
-            placeholder: "SELECT SETTING TO MODIFY OR ADD",
-            afterInit: function() {
-                var keys =
-                    [
-                        {
-                            'body-jsscript' : {
-                                'id'    : 'body-jsscript',
-                                'text'  : 'Body Inline Java Script'
-                            }
-                        },
-                        {
-                            'head-link-href-assets-dev' : {
-                                'id'    : 'head-link-href-assets-dev',
-                                'text'  : 'Head CSS Links (Dev)'
-                            }
-                        },
-                        {
-                            'head-link-href-assets-prod' : {
-                                'id'    : 'head-link-href-assets-prod',
-                                'text'  : 'Head CSS Links (Production)'
-                            }
-                        },
-                        {
-                            'head-meta-author' : {
-                                'id'    : 'head-meta-author',
-                                'text'  : 'Head Meta Author'
-                            }
-                        },
-                        {
-                            'head-meta-charset' : {
-                                'id'    : 'head-meta-charset',
-                                'text'  : 'Head Meta Charset'
-                            }
-                        },
-                        {
-                            'head-meta-keywords' : {
-                                'id'    : 'head-meta-keywords',
-                                'text'  : 'Head Meta Keywords'
-                            }
-                        },
-                        {
-                            'head-meta-viewport' : {
-                                'id'    : 'head-meta-viewport',
-                                'text'  : 'Head Meta Viewport'
-                            }
-                        },
-                        {
-                            'head-meta-description' : {
-                                'id'    : 'head-meta-description',
-                                'text'  : 'Head Meta Description'
-                            }
-                        },
-                        {
-                            'title' : {
-                                'id'    : 'title',
-                                'text'  : 'Site Title'
-                            }
-                        },
-                        {
-                            'script-src-assets-dev' : {
-                                'id'    : 'script-src-assets-dev',
-                                'text'  : 'Head Java Scripts Source (Dev)'
-                            }
-                        },
-                        {
-                            'script-src-assets-prod' : {
-                                'id'    : 'script-src-assets-prod',
-                                'text'  : 'Head Java Scripts Source (Production)'
-                            }
-                        },
-                        {
-                            'tags' : {
-                                'id'    : 'tags',
-                                'text'  : 'HTML Tags'
-                            }
-                        },
-                        {
-                            'footer-script-src-assets-dev' : {
-                                'id'    : 'footer-script-src-assets-dev',
-                                'text'  : 'Footer Java Scripts Source (Dev)'
-                            }
-                        },
-                        {
-                            'footer-script-src-assets-prod' : {
-                                'id'    : 'footer-script-src-assets-prod',
-                                'text'  : 'Footer Java Scripts Source (Production)'
-                            }
-                        },
-                        {
-                            'footer-jsscript' : {
-                                'id'    : 'footer-jsscript',
-                                'text'  : 'Footer Inline Java Script'
-                            }
-                        },
-                        {
-                            'footer-copyright-name' : {
-                                'id'    : 'footer-copyright-name',
-                                'text'  : 'Footer Copyright Name'
-                            }
-                        },
-                        {
-                            'footer-copyright-site' : {
-                                'id'    : 'footer-copyright-site',
-                                'text'  : 'Footer Copyright Website'
-                            }
-                        },
-                        {
-                            'footer-copyright-fromYear' : {
-                                'id'    : 'footer-copyright-fromYear',
-                                'text'  : 'Footer Copyright From Year'
-                            }
-                        },
-                        {
-                            'layouts' : {
-                                'id'    : 'layouts',
-                                'text'  : 'Layouts'
-                            }
-                        },
-                        {
-                            'mandatory' : {
-                                'id'    : 'mandatory',
-                                'text'  : 'View Mandatory'
-                            }
-                        },
-                        {
-                            'branding' : {
-                                'id'    : 'branding',
-                                'text'  : 'View Branding (logo)'
-                            }
-                        }
-                    ];
-
-                $(keys).each(function(e, key) {
-                    for (var keyId in key) {
-                        var newOption = new Option(key[keyId].text, key[keyId].id, false, false);
-                        $('#{{componentId}}-{{sectionId}}-settings-keys').append(newOption).trigger('change');
-                    }
-                });
-
-                var key, settings, fieldType, type;
-
-                $('#{{componentId}}-{{sectionId}}-settings-keys').on('select2:select', function(e) {
-                    $('#settings-text').attr('hidden', true);
-                    $('#settings-textarea').attr('hidden', true);
-                    $('#settings-select').attr('hidden', true);
-
-                    key = e.params.data.id;
-
-                    switch (key) {
-                        case 'body-jsscript' :
-                            type = 'textarea';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['body']['jsscript']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['body']['jsscript'];
-                            }
-
-                            break;
-                        case 'head-link-href-assets-dev' :
-                            type = 'array';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['dev']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['dev'];
-                            }
-
-                            break;
-                        case 'head-link-href-assets-prod' :
-                            type = 'array';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['prod']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['prod'];
-                            }
-
-                            break;
-                        case 'head-meta-author' :
-                            type = 'text';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['author']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['author'];
-                            }
-
-                            break;
-                        case 'head-meta-charset' :
-                            type = 'text';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['charset']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['charset'];
-                            }
-
-                            break;
-                        case 'head-meta-keywords' :
-                            type = 'text';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['keywords']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['keywords'];
-                            }
-
-                            break;
-                        case 'head-meta-viewport' :
-                            type = 'text';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['viewport']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['viewport'];
-                            }
-
-                            break;
-                        case 'head-meta-description' :
-                            type = 'text';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['description']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['description'];
-                            }
-
-                            break;
-                        case 'title' :
-                            type = 'text';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['title']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['title'];
-                            }
-
-                            break;
-                        case 'script-src-assets-dev' :
-                            type = 'array';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['dev']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['dev'];
-                            }
-
-                            break;
-                        case 'script-src-assets-prod' :
-                            type = 'array';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['prod']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['prod'];
-                            }
-
-                            break;
-                        case 'tags' :
-                            type = 'text';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['tags']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['tags'];
-                            }
-
-                            break;
-                        case 'footer-script-src-assets-dev' :
-                            type = 'array';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['dev']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['dev'];
-                            }
-
-                            break;
-                        case 'footer-script-src-assets-prod' :
-                            type = 'array';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['prod']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['prod'];
-                            }
-
-                            break;
-                        case 'footer-jsscript' :
-                            type = 'textarea';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['jsscript']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['footer']['jsscript'];
-                            }
-
-                            break;
-                        case 'footer-copyright-name' :
-                            type = 'text';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['name']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['name'];
-                            }
-
-                            break;
-                        case 'footer-copyright-site' :
-                            type = 'text';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['site']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['site'];
-                            }
-
-                            break;
-                        case 'footer-copyright-fromYear' :
-                            type = 'text';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['fromYear']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['fromYear'];
-                            }
-
-                            break;
-                        case 'layouts' :
-                            type = 'array';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['layouts']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['layouts'];
-                            }
-
-                            break;
-                        case 'mandatory' :
-                            type = 'boolean';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['mandatory']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['mandatory'];
-                            }
-
-                            break;
-                        case 'branding' :
-                            type = 'array';
-                            settings = '';
-
-                            if (dataCollectionSectionForm['vars']['viewsSettings']['branding']) {
-                                settings = dataCollectionSectionForm['vars']['viewsSettings']['branding'];
-                            }
-
-                            break;
-                    }
-
-                    if (type === 'text' || type === 'boolean') {
-                        $('#{{componentId}}-{{sectionId}}-settings-text').val(settings);
-
-                        fieldType = 'text';
-                    } else if (type === 'textarea') {
-                        $('#{{componentId}}-{{sectionId}}-settings-textarea').val(settings);
-                        fieldType = 'textarea';
-                    } else if (type === 'array') {
-                        $('#{{componentId}}-{{sectionId}}-settings-textarea').val(JSON.stringify(settings, null, 4));
-
-                        fieldType = 'textarea';
-                    }
-
-                    $('#settings-' + fieldType).attr('hidden', false);
-                    $('#{{componentId}}-{{sectionId}}-save').attr('disabled', false);
-                    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', false);
-                });
-
-                $('#{{componentId}}-{{sectionId}}-reset').off();
-                $('#{{componentId}}-{{sectionId}}-reset').click(function(e) {
-                    e.preventDefault();
-
-                    var swalSound = window['dataCollection'].env.sounds.swalSound;
-
-                    Swal.fire({
-                        title                       : '<span class="text-warning"> Reset Settings?</span>',
-                        text                        : 'This will reset all settings and grab original settings from the view module.',
-                        icon                        : 'question',
-                        background                  : 'rgba(0,0,0,.8)',
-                        backdrop                    : 'rgba(0,0,0,.6)',
-                        buttonsStyling              : false,
-                        confirmButtonText           : 'Reset',
-                        customClass                 : {
-                            'confirmButton'             : 'btn btn-warning text-uppercase',
-                            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-                        },
-                        showCancelButton            : true,
-                        keydownListenerCapture      : true,
-                        allowOutsideClick           : true,
-                        allowEscapeKey              : true,
-                        didOpen                     : function() {
-                            swalSound.play();
-                        }
-                    }).then((result) => {
-                        if (result.value) {
-                            var postData = { };
-                            postData[$('#security-token').attr('name')] = $('#security-token').val();
-                            postData['viewsettings_id'] = dataCollectionSectionForm['vars']['viewsSettingsId'];
-
-                            $.post('{{links.url("viewssettings/getViewsSettingsFromViewModule")}}', postData, function(response) {
-                                if (response.tokenKey && response.token) {
-                                    $('#security-token').attr('name', response.tokenKey);
-                                    $('#security-token').val(response.token);
-                                }
-
-                                if (response.responseCode == 0) {
-                                    $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val('');
-                                    $('#{{componentId}}-{{sectionId}}-settings')
-                                        .val(JSON.stringify(response.responseData['settings'], null, 4));
-                                    $('#settings-' + fieldType).attr('hidden', true);
-                                    $('#{{componentId}}-{{sectionId}}-save').attr('disabled', true);
-                                    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
-                                    $('#{{componentId}}-{{sectionId}}-settings-keys').val(0).trigger('change');
-                                    dataCollectionSectionForm['vars']['viewsSettings'] = response.responseData['settings'];
-
-                                    PNotify.success({'text': response.responseMessage});
-
-                                    return;
-                                }
-
-                                PNotify.error({'text': response.responseMessage});
-                            }, 'json');
-                        }
-                    });
-                });
-
-                $('#{{componentId}}-{{sectionId}}-defaults').off();
-                $('#{{componentId}}-{{sectionId}}-defaults').click(function(e) {
-                    e.preventDefault();
-
-                    var swalSound = window['dataCollection'].env.sounds.swalSound;
-
-                    Swal.fire({
-                        title                       : '<span class="text-warning"> Load Defaults?</span>',
-                        text                        : 'This will reset all settings and grab default settings from the view module.',
-                        icon                        : 'question',
-                        background                  : 'rgba(0,0,0,.8)',
-                        backdrop                    : 'rgba(0,0,0,.6)',
-                        buttonsStyling              : false,
-                        confirmButtonText           : 'Reset',
-                        customClass                 : {
-                            'confirmButton'             : 'btn btn-warning text-uppercase',
-                            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-                        },
-                        showCancelButton            : true,
-                        keydownListenerCapture      : true,
-                        allowOutsideClick           : true,
-                        allowEscapeKey              : true,
-                        didOpen                     : function() {
-                            swalSound.play();
-                        }
-                    }).then((result) => {
-                        if (result.value) {
-                            var postData = { };
-                            postData[$('#security-token').attr('name')] = $('#security-token').val();
-                            postData['view_id'] = $('#{{componentId}}-{{sectionId}}-view_id').val();
-
-                            $.post('{{links.url("viewssettings/getViewsSettingsFromViewModule")}}', postData, function(response) {
-                                if (response.tokenKey && response.token) {
-                                    $('#security-token').attr('name', response.tokenKey);
-                                    $('#security-token').val(response.token);
-                                }
-
-                                if (response.responseCode == 0) {
-                                    $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val('');
-                                    $('#{{componentId}}-{{sectionId}}-settings')
-                                        .val(JSON.stringify(response.responseData['settings'], null, 4));
-                                    $('#settings-' + fieldType).attr('hidden', true);
-                                    $('#{{componentId}}-{{sectionId}}-save').attr('disabled', true);
-                                    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
-                                    $('#{{componentId}}-{{sectionId}}-settings-keys').val(0).trigger('change');
-                                    dataCollectionSectionForm['vars']['viewsSettings'] = response.responseData['settings'];
-                                    PNotify.success({'text': response.responseMessage});
-
-                                    return;
-                                }
-
-                                PNotify.error({'text': response.responseMessage});
-                            }, 'json');
-                        }
-                    });
-                });
-
-                $('#{{componentId}}-{{sectionId}}-cancel').off();
-                $('#{{componentId}}-{{sectionId}}-cancel').click(function(e) {
-                    e.preventDefault();
-
-                    $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val('');
-                    $('#settings-' + fieldType).attr('hidden', true);
-                    $('#{{componentId}}-{{sectionId}}-save').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-settings-keys').val(0).trigger('change');
-                });
-
-                $('#{{componentId}}-{{sectionId}}-save').off();
-                $('#{{componentId}}-{{sectionId}}-save').click(function(e) {
-                    e.preventDefault();
-
-                    switch (key) {
-                        case 'body-jsscript' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['body']['jsscript']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
-
-                            break;
-                        case 'head-link-href-assets-dev' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['dev']
-                                 = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
-
-                            break;
-                        case 'head-link-href-assets-prod' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['head']['link']['href']['assets']['prod']
-                                 = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
-
-                            break;
-                        case 'head-meta-author' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['author']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
-
-                            break;
-                        case 'head-meta-charset' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['charset']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
-
-                            break;
-                        case 'head-meta-keywords' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['keywords']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
-
-                            break;
-                        case 'head-meta-viewport' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['viewport']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
-
-                            break;
-                        case 'head-meta-description' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['head']['meta']['description']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
-
-                            break;
-                        case 'title' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['head']['title']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
-
-                            break;
-                        case 'script-src-assets-dev' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['dev']
-                                 = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
-
-                            break;
-                        case 'script-src-assets-prod' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['head']['script']['src']['assets']['prod']
-                                 = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
-
-                            break;
-                        case 'tags' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['tags']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
-
-                            break;
-                        case 'footer-script-src-assets-dev' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['dev']
-                                = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
-
-                            break;
-                        case 'footer-script-src-assets-prod' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['footer']['script']['src']['assets']['prod']
-                                = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
-
-                            break;
-                        case 'footer-jsscript' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['footer']['jsscript']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
-
-                            break;
-                        case 'footer-copyright-name' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['name']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
-
-                            break;
-                        case 'footer-copyright-site' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['site']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
-
-                            break;
-                        case 'footer-copyright-fromYear' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['footer']['copyright']['fromYear']
-                                = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
-
-                            break;
-                        case 'layouts' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['layouts']
-                                = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
-
-                            break;
-                        case 'mandatory' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['mandatory']
-                                = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
-
-                            break;
-                        case 'branding' :
-                            dataCollectionSectionForm['vars']['viewsSettings']['branding']
-                                = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
-
-                            break;
-                    }
-
-                    $('#{{componentId}}-{{sectionId}}-settings')
-                        .val(JSON.stringify(dataCollectionSectionForm['vars']['viewsSettings'], null, 4));
-
-                    $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val('');
-                    $('#settings-' + fieldType).attr('hidden', true);
-                    $('#{{componentId}}-{{sectionId}}-save').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-settings-keys').val(0).trigger('change');
-                });
-            }
-        },
-        '{{componentId}}-{{sectionId}}-settings-text'                           : { },
-        '{{componentId}}-{{sectionId}}-settings-textarea'                       : { },
+        '{{componentId}}-{{sectionId}}-head_title'                              : { },
+        '{{componentId}}-{{sectionId}}-head_meta_keywords'                      : { },
+        '{{componentId}}-{{sectionId}}-head_meta_description'                   : { },
+        '{{componentId}}-{{sectionId}}-copyright_name'                          : { },
+        '{{componentId}}-{{sectionId}}-copyright_site'                          : { },
+        '{{componentId}}-{{sectionId}}-copyright_fromYear'                      : { },
         '{{componentId}}-{{sectionId}}-id'                                      : { },
         '{{componentId}}-{{sectionId}}-form'                                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-domain_id'                            : 'required',
                 '{{componentId}}-{{sectionId}}-app_id'                               : 'required',
                 '{{componentId}}-{{sectionId}}-view_id'                              : 'required',
-                '{{componentId}}-{{sectionId}}-settings'                             : 'required',
+                '{{componentId}}-{{sectionId}}-head_title'                           : 'required',
+                '{{componentId}}-{{sectionId}}-head_meta_keywords'                   : 'required',
+                '{{componentId}}-{{sectionId}}-head_meta_description'                : 'required',
+                '{{componentId}}-{{sectionId}}-copyright_name'                       : 'required',
+                '{{componentId}}-{{sectionId}}-copyright_site'                       : 'required',
+                '{{componentId}}-{{sectionId}}-copyright_fromYear'                   : 'required',
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-domain_id'                            : 'Please select domain',
                 '{{componentId}}-{{sectionId}}-app_id'                               : 'Please select app',
                 '{{componentId}}-{{sectionId}}-view_id'                              : 'Please select view',
-                '{{componentId}}-{{sectionId}}-settings'                             : 'Please enter settings',
+                '{{componentId}}-{{sectionId}}-head_title'                           : 'Please enter title',
+                '{{componentId}}-{{sectionId}}-head_meta_keywords'                   : 'Please enter keywords',
+                '{{componentId}}-{{sectionId}}-head_meta_description'                : 'Please enter description',
+                '{{componentId}}-{{sectionId}}-copyright_name'                       : 'Please enter copyright name',
+                '{{componentId}}-{{sectionId}}-copyright_site'                       : 'Please enter copyright site',
+                '{{componentId}}-{{sectionId}}-copyright_fromYear'                   : 'Please enter copyright from year',
             }
         }
     });
+
+dataCollectionSectionForm['funcs'] = { };
+dataCollectionSectionForm['funcs']['loadAjax'] = function(domainId, appId, viewId) {
+    dataCollectionSectionForm['vars']['url'] = '{{links.url("viewssettings/q/id/0/domainid/' + domainId + '/appid/' + appId + '/viewid/' + viewId + '")}}';
+
+    $('#{{componentId}}-{{sectionId}}-settings-link').attr('href', dataCollectionSectionForm['vars']['url']);
+
+    BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-settings-link'), {
+        ajaxBefore                      : function () {
+                                            Pace.restart();
+                                            $("#baz-content").empty();
+                                            $("#loader").attr('hidden', false);
+                                        },
+        ajaxFinished                    : function () {
+                                            BazCore.updateBreadcrumb();
+                                            $("#loader").attr('hidden', true);
+                                        },
+        ajaxError                       : function () {
+                                            $("#loader").attr('hidden', true);
+                                            BazCore.updateBreadcrumb();
+                                        }
+    });
+}
 </script>

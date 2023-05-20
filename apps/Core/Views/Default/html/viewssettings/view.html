@@ -1,9 +1,33 @@
 {% if viewssettings['id'] is defined %}
     {% set viewssettingsId = viewssettings['id'] %}
-    {% set title = 'Views Settings (' ~ viewssettings['id'] ~ ')' %}
+    {% if viewssettings['name'] is defined %}
+        {% set title = 'Views Settings (' ~ viewssettings['name'] ~ ')' %}
+    {% else %}
+        {% set title = 'Views Settings (' ~ viewssettings['id'] ~ ')' %}
+    {% endif %}
+    {% if viewssettings['id'] == 0 %}
+        {% set viewssettingsId = '' %}
+    {% endif %}
+    {% set formButtons =
+        [
+            'updateButtonId'                : viewssettingsId,
+            'addActionUrl'                  : 'viewssettings/add',
+            'addSuccessRedirectUrl'         : 'viewssettings',
+            'updateActionUrl'               : 'viewssettings/update',
+            'updateSuccessRedirectUrl'      : 'viewssettings',
+            'cancelActionUrl'               : 'viewssettings',
+            'closeActionUrl'                : 'viewssettings'
+        ]
+    %}
 {% else %}
     {% set viewssettingsId = '' %}
     {% set title = 'New Views Settings' %}
+    {% set formButtons =
+        [
+            'cancelActionUrl'               : 'viewssettings',
+            'closeActionUrl'                : 'viewssettings'
+        ]
+    %}
 {% endif %}
 {{adminltetags.useTag('content',
     [
@@ -20,15 +44,6 @@
         'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
         'cardBodyInclude'               : 'viewssettings/form',
-        'formButtons'                   :
-        [
-            'updateButtonId'                : viewssettingsId,
-            'addActionUrl'                  : 'viewssettings/add',
-            'addSuccessRedirectUrl'         : 'viewssettings',
-            'updateActionUrl'               : 'viewssettings/update',
-            'updateSuccessRedirectUrl'      : 'viewssettings',
-            'cancelActionUrl'               : 'viewssettings',
-            'closeActionUrl'                : 'viewssettings'
-        ]
+        'formButtons'                   : formButtons
     ]
 )}}

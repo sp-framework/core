@@ -29,14 +29,6 @@ class ViewssettingsComponent extends BaseComponent
                 }
             }
 
-            if (isset($viewssettings)) {
-                $viewssettings['settings'] = Json::decode($viewssettings['settings'], true);
-                $viewssettings = $this->replaceColumns([$viewssettings])[0];
-                $this->view->viewssettings = $viewssettings;
-            } else {
-                $this->view->viewssettings = [];
-            }
-
             $this->view->domains = $this->domains->domains;
 
             $appsArr = $this->apps->apps;
@@ -45,18 +37,82 @@ class ViewssettingsComponent extends BaseComponent
             foreach ($appsArr as $key => $value) {
                 $apps[$value['id']]['id'] = $value['id'];
                 $apps[$value['id']]['name'] = $value['name'];
+                $apps[$value['id']]['app_type'] = $value['app_type'];
                 $views = $this->modules->views->getViewsForAppId($value['id']);
 
                 if ($views) {
                     foreach ($views as $viewKey => $view) {
                         $apps[$value['id']]['views'][$view['id']]['id'] = $view['id'];
-                        $apps[$value['id']]['views'][$view['id']]['name'] = $view['display_name'];
-                        $apps[$value['id']]['views'][$view['id']]['settings'] = Json::decode($view['settings'], true);
+                        $apps[$value['id']]['views'][$view['id']]['name'] = $view['name'];
+                        $apps[$value['id']]['views'][$view['id']]['display_name'] = $view['display_name'];
+                        $view['settings'] = Json::decode($view['settings'], true);
+                        if (is_array($view['settings']['branding'])) {
+                            foreach ($view['settings']['branding'] as $brandKey => $brand) {
+
+                                if (is_array($brand) && !isset($brand['brand'])) {
+                                    // we unset it as branding is not correct.
+                                    unset($view['settings']['branding'][$brandKey]);
+                                    continue;
+                                } else if (is_string($brand) && !isset($brand['maxWidth']) && !isset($brand['maxHeight'])) {
+                                    $view['settings']['branding'][$brandKey] = [];
+                                    $view['settings']['branding'][$brandKey]['brand'] = $brand;
+                                    $view['settings']['branding'][$brandKey]['maxWidth'] = 200;
+                                    $view['settings']['branding'][$brandKey]['maxHeight'] = 50;
+                                } else if (is_array($brand) && isset($brand['brand']) && !isset($brand['maxWidth']) && !isset($brand['maxHeight'])) {
+                                    $view['settings']['branding'][$brandKey]['maxWidth'] = 200;
+                                    $view['settings']['branding'][$brandKey]['maxHeight'] = 50;
+                                }
+                            }
+                        }
+                        $apps[$value['id']]['views'][$view['id']]['settings'] = $view['settings'];
                     }
                 }
             }
 
             $this->view->apps = $apps;
+            $views = [];
+
+            if ($this->getData()['id'] == 0 &&
+                isset($this->getData()['domainid']) &&
+                isset($this->getData()['appid']) &&
+                isset($this->getData()['viewid'])
+            ) {
+                if (isset($apps[$this->getData()['appid']]['views'][$this->getData()['viewid']])) {
+                    $this->view->domainId = $this->getData()['domainid'];
+                    $this->view->appId = $this->getData()['appid'];
+                    $this->view->viewId = $this->getData()['viewid'];
+
+                    $viewssettings = $apps[$this->getData()['appid']]['views'][$this->getData()['viewid']];
+                    $views = [$viewssettings];
+                    $viewssettings['id'] = 0;
+                    $viewssettings['domain_id'] = $this->getData()['domainid'];
+                    $viewssettings['app_id'] = $this->getData()['appid'];
+                    $viewssettings['view_id'] = $this->getData()['viewid'];
+                } else {
+                    return $this->throwIdNotFound();
+                }
+            }
+
+            if (isset($viewssettings)) {
+                if (is_string($viewssettings['settings'])) {
+                    $viewssettings['settings'] = Json::decode($viewssettings['settings'], true);
+                }
+
+                $viewssettings['app_type'] = $apps[$viewssettings['app_id']]['app_type'];
+                $viewssettings['view_name'] = strtolower($apps[$viewssettings['app_id']]['views'][$viewssettings['view_id']]['name']);
+                if (isset($this->getData()['view_id'])) {
+                    $viewssettings['view_id'] = $this->getData()['view_id'];
+                }
+
+                if (count($views) === 0) {
+                    $views = [$apps[$viewssettings['app_id']]['views'][$viewssettings['view_id']]];
+                }
+
+                $this->view->views = $views;
+                $this->view->viewssettings = $viewssettings;
+            } else {
+                $this->view->viewssettings = [];
+            }
 
             $this->view->pick('viewssettings/view');
 

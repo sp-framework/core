@@ -260,7 +260,7 @@
             }
 
             _proto._initSectionButtonsAndActions = function _initSectionButtonsAndActions() {
-                if ($('#' + sectionId + '-id').val() === '') {
+                if ($('#' + sectionId + '-id').val() === '' || $('#' + sectionId + '-id').val() === '0') {
                     $('#' + sectionId + ' .card-footer button.addData').attr('hidden', false);
                     if ($('#' + sectionId + ' .card-footer button.addData').length === 1) {
                         $('#' + sectionId + ' .card-footer button.cancelForm').attr('hidden', false);
