@@ -42,14 +42,26 @@
             }
         ],
         "tags"      : "Adminltetags",
+        "branding"  : {
+            "small"     : {
+                "brand"     : "baz/logo/justlogo33x30.png",
+                "maxWidth"  : 35,
+                "maxHeight"  : 30
+            },
+            "large"    : {
+                "brand" : "baz/logo/fulllogo168x30.png",
+                "maxWidth"  : 200,
+                "maxHeight"  : 30
+            }
+        },
         "head"      : {
             "title" : "Bazaari Core",
             "meta"  : {
-                "charset"       : "UTF-8",
-                "viewport"      : "width=device-width, initial-scale=1, shrink-to-fit=no",
-                "description"   : "Bazaari Core Views",
                 "author"        : "guru@bazaari.com.au",
-                "keywords"      : "HTML, CSS, JavaScript"
+                "charset"       : "UTF-8",
+                "keywords"      : "HTML, CSS, JavaScript",
+                "viewport"      : "width=device-width, initial-scale=1, shrink-to-fit=no",
+                "description"   : "Bazaari Core Views"
             },
             "link"      : {
                 "href"      : {
@@ -57,11 +69,11 @@
                         "dev" : [
                             {
                                 "local"     : true,
-                                "asset"     : "core/default/css/core.css"
+                                "asset"     : "core/default/css/plugins.css"
                             },
                             {
                                 "local"     : true,
-                                "asset"     : "core/default/css/plugins.css"
+                                "asset"     : "core/default/css/core.css"
                             }
                         ]
                     }
@@ -88,14 +100,12 @@
                 }
             }
         },
-        "body"          : {
-            "jsscript"  : ""
-        },
-        "branding"      : {
-            "small"     : "baz/logo/justlogo33x30.png",
-            "large"     : "baz/logo/fulllogo168x30.png"
-        },
         "footer"        : {
+            "copyright" : {
+                "fromYear"  : "2014",
+                "site"      : "https://www.bazaari.com.au",
+                "name"      : "Bazaari E Trade Pty. Ltd."
+            },
             "script"    : {
                 "src"   : {
                     "assets" : {
@@ -107,12 +117,6 @@
                         ]
                     }
                 }
-            },
-            "jsscript"  : "",
-            "copyright" : {
-                "fromYear"  : "2014",
-                "site"      : "https://www.bazaari.com.au",
-                "name"      : "Bazaari E Trade Pty. Ltd."
             }
         }
     }

@@ -13,7 +13,6 @@
         {{assets.outputCss('headLinks')}}
         {{assets.outputJs('headJs')}}
         <script src="/core/default/js/footer/plugins/vegas/2.4.4/vegas.min.js"></script>
-        {{assets.outputInlineCss()}}
     </head>
     <body id="body" class="login-page">
         {% set currentId = null %}
@@ -83,9 +82,6 @@ if (!window.dataCollection) {
     dataCollection.env.currentId = "{{currentId}}";
 }
 </script>
-        <script type="text/javascript" charset="utf-8">
-            {{assets.get('body').getCodes()[0].getContent()}}
-        </script>
         <input id="security-token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
         {{content()}}
     </body>

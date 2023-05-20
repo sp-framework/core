@@ -11,8 +11,6 @@
                     <a target="_blank" href="{{assets.get('footer').getCodes()[1].getContent()}}">{{assets.get('footer').getCodes()[2].getContent()}}</a>
                 {% endif %}
             </strong> All rights reserved.
-            {{assets.outputJs('footerJs')}}
-            {{assets.outputInlineJs()}}
         </div>
         <div class="col text-right mr-3">
             <span class="connectivity" data-toggle="tooltip" data-placement="auto" title="Connectivity Status">
@@ -23,6 +21,7 @@
             </span>
         </div>
     </div>
+    {{assets.outputJs('footerJs')}}
 </footer>
 <script>
 /* globals BazCore */

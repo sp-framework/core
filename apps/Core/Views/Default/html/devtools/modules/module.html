@@ -94,43 +94,40 @@ dataCollectionSectionForm['vars']['moduleId'] = '{{moduleId}}';
 if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
     if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
         dataCollectionSectionForm['vars']['moduleSettings'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['body'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['body']['jsscript'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] = false;
+        dataCollectionSectionForm['vars']['moduleSettings']['layouts'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['tags'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['branding'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['branding']['small'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['branding']['large'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['head'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['head']['link'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['title'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['head']['meta'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['keywords'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['viewport'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['description'] = '';
-        dataCollectionSectionForm['vars']['moduleSettings']['head']['title'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['dev'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['prod'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['tags'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['footer'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['script'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['footer']['jsscript'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['site'] = '';
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear'] = '';
-        dataCollectionSectionForm['vars']['moduleSettings']['layouts'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] = false;
-        dataCollectionSectionForm['vars']['moduleSettings']['branding'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['branding']['small'] = '';
-        dataCollectionSectionForm['vars']['moduleSettings']['branding']['large'] = '';
     }
 } else {
     dataCollectionSectionForm['vars']['moduleSettings'] = JSON.parse('{{moduleSettings}}');
@@ -549,21 +546,33 @@ dataCollectionSection =
                     keys =
                     [
                         {
-                            'body-jsscript' : {
-                                'id'    : 'body-jsscript',
-                                'text'  : 'Body Inline Java Script'
+                            'mandatory' : {
+                                'id'    : 'mandatory',
+                                'text'  : 'View Mandatory'
                             }
                         },
                         {
-                            'head-link-href-assets-dev' : {
-                                'id'    : 'head-link-href-assets-dev',
-                                'text'  : 'Head CSS Links (Dev)'
+                            'layouts' : {
+                                'id'    : 'layouts',
+                                'text'  : 'Layouts'
                             }
                         },
                         {
-                            'head-link-href-assets-prod' : {
-                                'id'    : 'head-link-href-assets-prod',
-                                'text'  : 'Head CSS Links (Production)'
+                            'tags' : {
+                                'id'    : 'tags',
+                                'text'  : 'HTML Tags'
+                            }
+                        },
+                        {
+                            'branding' : {
+                                'id'    : 'branding',
+                                'text'  : 'View Branding (logo)'
+                            }
+                        },
+                        {
+                            'head-title' : {
+                                'id'    : 'head-title',
+                                'text'  : 'Site Title'
                             }
                         },
                         {
@@ -597,45 +606,27 @@ dataCollectionSection =
                             }
                         },
                         {
-                            'title' : {
-                                'id'    : 'title',
-                                'text'  : 'Site Title'
+                            'head-link-href-assets-dev' : {
+                                'id'    : 'head-link-href-assets-dev',
+                                'text'  : 'Head CSS Links (Dev)'
                             }
                         },
                         {
-                            'script-src-assets-dev' : {
-                                'id'    : 'script-src-assets-dev',
+                            'head-link-href-assets-prod' : {
+                                'id'    : 'head-link-href-assets-prod',
+                                'text'  : 'Head CSS Links (Production)'
+                            }
+                        },
+                        {
+                            'head-script-src-assets-dev' : {
+                                'id'    : 'head-script-src-assets-dev',
                                 'text'  : 'Head Java Scripts Source (Dev)'
                             }
                         },
                         {
-                            'script-src-assets-prod' : {
-                                'id'    : 'script-src-assets-prod',
+                            'head-script-src-assets-prod' : {
+                                'id'    : 'head-script-src-assets-prod',
                                 'text'  : 'Head Java Scripts Source (Production)'
-                            }
-                        },
-                        {
-                            'tags' : {
-                                'id'    : 'tags',
-                                'text'  : 'HTML Tags'
-                            }
-                        },
-                        {
-                            'footer-script-src-assets-dev' : {
-                                'id'    : 'footer-script-src-assets-dev',
-                                'text'  : 'Footer Java Scripts Source (Dev)'
-                            }
-                        },
-                        {
-                            'footer-script-src-assets-prod' : {
-                                'id'    : 'footer-script-src-assets-prod',
-                                'text'  : 'Footer Java Scripts Source (Production)'
-                            }
-                        },
-                        {
-                            'footer-jsscript' : {
-                                'id'    : 'footer-jsscript',
-                                'text'  : 'Footer Inline Java Script'
                             }
                         },
                         {
@@ -657,21 +648,15 @@ dataCollectionSection =
                             }
                         },
                         {
-                            'layouts' : {
-                                'id'    : 'layouts',
-                                'text'  : 'Layouts'
+                            'footer-script-src-assets-dev' : {
+                                'id'    : 'footer-script-src-assets-dev',
+                                'text'  : 'Footer Java Scripts Source (Dev)'
                             }
                         },
                         {
-                            'mandatory' : {
-                                'id'    : 'mandatory',
-                                'text'  : 'View Mandatory'
-                            }
-                        },
-                        {
-                            'branding' : {
-                                'id'    : 'branding',
-                                'text'  : 'View Branding (logo)'
+                            'footer-script-src-assets-prod' : {
+                                'id'    : 'footer-script-src-assets-prod',
+                                'text'  : 'Footer Java Scripts Source (Production)'
                             }
                         }
                     ];
@@ -789,30 +774,83 @@ dataCollectionSection =
 
                     if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
                         switch (key) {
-                            case 'body-jsscript' :
-                                type = 'textarea';
+                            case 'mandatory' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'boolean';
                                 settings = '';
 
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['body']['jsscript']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['body']['jsscript'];
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['mandatory']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['mandatory'];
                                 }
 
                                 break;
-                            case 'head-link-href-assets-dev' :
+                            case 'layouts' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
                                 type = 'array';
                                 settings = '';
 
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev'];
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['layouts']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['layouts'];
                                 }
 
                                 break;
-                            case 'head-link-href-assets-prod' :
+                            case 'tags' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['tags']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['tags'];
+                                }
+
+                                break;
+                            case 'branding' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
                                 type = 'array';
                                 settings = '';
 
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod'];
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['branding']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['branding'];
+                                }
+
+                                break;
+                            case 'head-title' :
+                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['title']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['title'];
                                 }
 
                                 break;
@@ -896,23 +934,25 @@ dataCollectionSection =
                                 }
 
                                 break;
-                            case 'title' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
-
-                                    $(this).val(0).trigger('change');
-                                    return false;
-                                }
-
-                                type = 'text';
+                            case 'head-link-href-assets-dev' :
+                                type = 'array';
                                 settings = '';
 
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['title']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['title'];
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev'];
                                 }
 
                                 break;
-                            case 'script-src-assets-dev' :
+                            case 'head-link-href-assets-prod' :
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod'];
+                                }
+
+                                break;
+                            case 'head-script-src-assets-dev' :
                                 type = 'array';
                                 settings = '';
 
@@ -921,55 +961,12 @@ dataCollectionSection =
                                 }
 
                                 break;
-                            case 'script-src-assets-prod' :
+                            case 'head-script-src-assets-prod' :
                                 type = 'array';
                                 settings = '';
 
                                 if (dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['prod']) {
                                     settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['prod'];
-                                }
-
-                                break;
-                            case 'tags' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
-
-                                    $(this).val(0).trigger('change');
-                                    return false;
-                                }
-
-                                type = 'text';
-                                settings = '';
-
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['tags']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['tags'];
-                                }
-
-                                break;
-                            case 'footer-script-src-assets-dev' :
-                                type = 'array';
-                                settings = '';
-
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev'];
-                                }
-
-                                break;
-                            case 'footer-script-src-assets-prod' :
-                                type = 'array';
-                                settings = '';
-
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod'];
-                                }
-
-                                break;
-                            case 'footer-jsscript' :
-                                type = 'textarea';
-                                settings = '';
-
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['jsscript']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['jsscript'];
                                 }
 
                                 break;
@@ -1021,51 +1018,21 @@ dataCollectionSection =
                                 }
 
                                 break;
-                            case 'layouts' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
-
-                                    $(this).val(0).trigger('change');
-                                    return false;
-                                }
-
+                            case 'footer-script-src-assets-dev' :
                                 type = 'array';
                                 settings = '';
 
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['layouts']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['layouts'];
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev'];
                                 }
 
                                 break;
-                            case 'mandatory' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
-
-                                    $(this).val(0).trigger('change');
-                                    return false;
-                                }
-
-                                type = 'boolean';
-                                settings = '';
-
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['mandatory']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['mandatory'];
-                                }
-
-                                break;
-                            case 'branding' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
-
-                                    $(this).val(0).trigger('change');
-                                    return false;
-                                }
-
+                            case 'footer-script-src-assets-prod' :
                                 type = 'array';
                                 settings = '';
 
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['branding']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['branding'];
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod'];
                                 }
 
                                 break;
@@ -1245,19 +1212,29 @@ dataCollectionSection =
 
                     if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
                         switch (key) {
-                            case 'body-jsscript' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['body']['jsscript']
+                            case 'mandatory' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['mandatory']
+                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'layouts' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['layouts']
+                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'tags' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['tags']
                                     = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
                                 break;
-                            case 'head-link-href-assets-dev' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev']
-                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+                            case 'branding' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['branding']
+                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                                 break;
-                            case 'head-link-href-assets-prod' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod']
-                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+                            case 'head-title' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['title']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
                                 break;
                             case 'head-meta-author' :
@@ -1285,39 +1262,24 @@ dataCollectionSection =
                                     = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
                                 break;
-                            case 'title' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['head']['title']
-                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+                            case 'head-link-href-assets-dev' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev']
+                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                                 break;
-                            case 'script-src-assets-dev' :
+                            case 'head-link-href-assets-prod' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod']
+                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'head-script-src-assets-dev' :
                                 dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['dev']
                                      = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                                 break;
-                            case 'script-src-assets-prod' :
+                            case 'head-script-src-assets-prod' :
                                 dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['prod']
                                      = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
-
-                                break;
-                            case 'tags' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['tags']
-                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
-
-                                break;
-                            case 'footer-script-src-assets-dev' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev']
-                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
-
-                                break;
-                            case 'footer-script-src-assets-prod' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod']
-                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
-
-                                break;
-                            case 'footer-jsscript' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['jsscript']
-                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
                                 break;
                             case 'footer-copyright-name' :
@@ -1335,18 +1297,13 @@ dataCollectionSection =
                                     = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
                                 break;
-                            case 'layouts' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['layouts']
+                            case 'footer-script-src-assets-dev' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev']
                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                                 break;
-                            case 'mandatory' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['mandatory']
-                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
-
-                                break;
-                            case 'branding' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['branding']
+                            case 'footer-script-src-assets-prod' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod']
                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                                 break;

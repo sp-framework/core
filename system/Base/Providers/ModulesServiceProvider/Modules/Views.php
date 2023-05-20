@@ -524,13 +524,10 @@ class Views extends BasePackage
         $this->buildAssetsTitle();
         $this->buildAssetsMeta();
         $this->buildAssetsHeadCss();
-        $this->buildAssetsHeadStyle();
         $this->buildAssetsHeadJs();
-        $this->buildAssetsBodyJs();
         $this->buildAssetsBranding();
         $this->buildAssetsFooter();
         $this->buildAssetsFooterJs();
-        $this->buildAssetsFooterJsInline();
     }
 
     protected function buildAssetsTitle()
@@ -602,15 +599,6 @@ class Views extends BasePackage
         }
     }
 
-    protected function buildAssetsHeadStyle()
-    {
-        $this->assetsCollections['headStyle'] = $this->assets->collection('headStyle');
-        $inlineStyle = $this->viewSettings['head']['style'] ?? null;
-        if ($inlineStyle) {
-            $this->assets->addInlineCss($inlineStyle);
-        }
-    }
-
     protected function buildAssetsHeadJs()
     {
         $this->assetsCollections['headJs'] = $this->assets->collection('headJs');
@@ -639,17 +627,23 @@ class Views extends BasePackage
         }
     }
 
-    protected function buildAssetsBodyJs()
-    {
-        $this->assetsCollections['body'] = $this->assets->collection('body');
-        $this->assetsCollections['body']->addInline(new Inline('bodyScript', $this->viewSettings['body']['jsscript']));
-    }
-
     protected function buildAssetsBranding()
     {
         $this->assetsCollections['branding'] = $this->assets->collection('branding');
-        $this->assetsCollections['branding']->addInline(new Inline('small', $this->viewSettings['branding']['small']));
-        $this->assetsCollections['branding']->addInline(new Inline('large', $this->viewSettings['branding']['large']));
+        if (is_array($this->viewSettings['branding']) && count($this->viewSettings['branding']) > 0) {
+            foreach ($this->viewSettings['branding'] as $key => $brand) {
+                if (isset($brand['brand'])) {
+                    $this->assetsCollections['branding']->addInline(new Inline($key . '-brand', $brand['brand']));
+
+                    if (!isset($brand['maxWidth']) && !isset($brand['maxHeight'])) {
+                        $brand['maxWidth'] = 200;
+                        $brand['maxHeight'] = 50;
+                    }
+                    $this->assetsCollections['branding']->addInline(new Inline($key . '-brand-maxWidth', $brand['maxWidth']));
+                    $this->assetsCollections['branding']->addInline(new Inline($key . '-brand-maxHeight', $brand['maxHeight']));
+                }
+            }
+        }
     }
 
     protected function buildAssetsFooter()
@@ -685,14 +679,6 @@ class Views extends BasePackage
                     $this->assetsCollections['footerJs']->addJs($script['asset'], $script['local'], true, [], $this->assetsVersion);
                 }
             }
-        }
-    }
-
-    protected function buildAssetsFooterJsInline()
-    {
-        $inlineScript = $this->viewSettings['footer']['jsscript'] ?? null;
-        if ($inlineScript && $inlineScript !== '') {
-            $this->assets->addInlineJs($inlineScript);
         }
     }
 }

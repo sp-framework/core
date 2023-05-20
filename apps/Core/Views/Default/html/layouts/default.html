@@ -12,7 +12,6 @@
         {{renderTitle()}}
         {{assets.outputCss('headLinks')}}
         {{assets.outputJs('headJs')}}
-        {{assets.outputInlineCss()}}
     </head>
     <body id="body" class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm">
         {% if response.getHeaders().get('currentId') !== false %}
@@ -93,7 +92,6 @@ if (localStorage.getItem('bazDevMode') === null) {
 }
 </script>
         {% endif %}
-        {{assets.get('body').getCodes()[0].getContent()}}
         <div class="wrapper">
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/header/view') %}
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/sidebar/view') %}

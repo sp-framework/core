@@ -188,9 +188,9 @@ class Profile extends BasePackage
 
     public function generateAvatar(string $regenerateUsingFile = null, string $gender = 'M')
     {
-        $this->maleAvatarDir = 'public/dash/default/images/avatar/male/';
+        $this->maleAvatarDir = 'public/core/default/images/avatar/male/';
 
-        $this->femaleAvatarDir = 'public/dash/default/images/avatar/female/';
+        $this->femaleAvatarDir = 'public/core/default/images/avatar/female/';
 
         $avatarImageArr = [];
 
@@ -207,7 +207,7 @@ class Profile extends BasePackage
             $counterFileNames = [];
 
             foreach ($this->avatarProperties as $avatarPropertyKey => $avatarPropertyValue) {
-                $dirContents = $this->localContent->listContents($avatarDir.'/'.$avatarPropertyValue, true);
+                $dirContents = $this->localContent->listContents($avatarDir.$avatarPropertyValue, true);
 
                 $files = [];
                 foreach ($dirContents as $content) {
