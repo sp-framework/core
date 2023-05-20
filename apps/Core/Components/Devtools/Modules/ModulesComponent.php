@@ -20,12 +20,20 @@ class ModulesComponent extends BaseComponent
 	 */
 	public function viewAction()
 	{
+		if (isset($this->getData()['bundles'])) {
+			$this->view->bundles = true;
+		}
+
 		if (isset($this->getData()['includecoremodules'])) {
 			$this->view->includecoremodules = true;
 		}
 
 		if (isset($this->getData()['clone'])) {
 			$this->view->clone = true;
+		}
+
+		if (isset($this->getData()['newrelease'])) {
+			$this->view->newrelease = true;
 		}
 
 		$appTypesArr = $this->apps->types->types;
@@ -57,11 +65,16 @@ class ModulesComponent extends BaseComponent
 		$modules['core']['value'] = 'Core';
 		$modules['core']['childs'][1] = $module;
 
-		$modulesTypeArr = ['components', 'packages', 'middlewares', 'views'];
+		$modulesTypeArr = ['components', 'packages', 'middlewares', 'views', 'bundles'];
 
 		foreach ($modulesTypeArr as $modulesType) {
-			$modulesArr = $this->processModulesArr(msort($this->modules->{$modulesType}->{$modulesType}, 'name'));
-			${$modulesType . 'CategoryArr'} = $modulesArr['categoryArr'];
+			if ($modulesType === 'bundles') {
+				$modulesArr['modules'] = $this->modulesPackage->getAll()->bundles;
+			} else {
+				$modulesArr = $this->processModulesArr(msort($this->modules->{$modulesType}->{$modulesType}, 'name'));
+				${$modulesType . 'CategoryArr'} = $modulesArr['categoryArr'];
+			}
+
 			if (count($modulesArr['modules']) > 0) {
 				$modules[$modulesType]['value'] = ucfirst($modulesType);
 				$modules[$modulesType]['childs'] = $modulesArr['modules'];
@@ -75,6 +88,10 @@ class ModulesComponent extends BaseComponent
 		$modulesJson = [];
 
 		foreach ($modules as $moduleKey => $moduleJson) {
+			if ($moduleKey === 'bundles') {
+				continue;
+			}
+
 			foreach ($moduleJson['childs'] as $childKey => $child) {
 				$modulesJson[$moduleKey][$child['id']] =
 					[
@@ -97,6 +114,24 @@ class ModulesComponent extends BaseComponent
 
 		$this->view->modulesJson = Json::encode($modulesJson);
 
+		$apisArr = $this->basepackages->api->init()->getAll()->api;
+		if (count($apisArr) > 0) {
+			$apis[0]['id'] = 0;
+			$apis[0]['name'] = 'Local Modules';
+			$apis[0]['data']['url'] = 'https://.../';
+
+			foreach ($apisArr as $api) {
+				if ($api['category'] === 'repos') {
+					$useApi = $this->basepackages->api->useApi($api['id'], true);
+					$apiConfig = $useApi->getApiConfig();
+
+					$apis[$api['id']]['id'] = $apiConfig['id'];
+					$apis[$api['id']]['name'] = $apiConfig['name'];
+					$apis[$api['id']]['data']['url'] = $apiConfig['repo_url'];
+				}
+			}
+		}
+
 		if (isset($this->getData()['id']) &&
 			isset($this->getData()['module']) &&
 			isset($this->getData()['type'])
@@ -115,24 +150,6 @@ class ModulesComponent extends BaseComponent
 
 			$this->view->type = $type;
 			$this->view->module = null;
-
-			$apisArr = $this->basepackages->api->init()->getAll()->api;
-			if (count($apisArr) > 0) {
-				$apis[0]['id'] = 0;
-				$apis[0]['name'] = 'Local Modules';
-				$apis[0]['data']['url'] = 'https://.../';
-
-				foreach ($apisArr as $api) {
-					if ($api['category'] === 'repos') {
-						$useApi = $this->basepackages->api->useApi($api['id'], true);
-						$apiConfig = $useApi->getApiConfig();
-
-						$apis[$api['id']]['id'] = $apiConfig['id'];
-						$apis[$api['id']]['name'] = $apiConfig['name'];
-						$apis[$api['id']]['data']['url'] = $apiConfig['repo_url'];
-					}
-				}
-			}
 
 			$this->view->apis = $apis;
 			$this->view->moduleTypes = $this->modulesPackage->getModuleTypes();
@@ -224,6 +241,31 @@ class ModulesComponent extends BaseComponent
 
 				$this->view->module = $module;
 			}
+		} else if (isset($this->getData()['id']) &&
+				   isset($this->getData()['bundles'])
+		) {
+			$this->view->type = 'bundles';
+			unset($apis[0]);//Remove local
+			$this->view->apis = $apis;
+			$this->view->bundleModules = $this->modulesPackage->getDefaultDependencies();
+
+			if ($this->getData()['id'] != 0) {
+				$bundle = $this->modulesPackage->getById($this->getData()['id']);
+
+				if (!$bundle) {
+					return $this->throwIdNotFound();
+				}
+
+				$this->view->bundle = $bundle;
+
+				if (isset($modules['bundles'])) {
+					unset($modules['bundles']);
+				}
+
+				$this->view->modules = $modules;
+			}
+
+			$this->view->pick('modules/view');
 		} else {
 			$this->view->pick('modules/list');
 		}
@@ -283,19 +325,19 @@ class ModulesComponent extends BaseComponent
 	// 	}
 	// }
 
-	public function validateJsonAction()
-	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
-			$this->modulesPackage->updateModules($this->postData());
+	// public function validateJsonAction()
+	// {
+	// 	if ($this->request->isPost()) {
+	// 		if (!$this->checkCSRF()) {
+	// 			return;
+	// 		}
+	// 		$this->modulesPackage->updateModules($this->postData());
 
-			$this->addResponse($this->modulesPackage->packagesData->responseMessage, $this->modulesPackage->packagesData->responseCode);
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
-		}
-	}
+	// 		$this->addResponse($this->modulesPackage->packagesData->responseMessage, $this->modulesPackage->packagesData->responseCode);
+	// 	} else {
+	// 		$this->addResponse('Method Not Allowed', 1);
+	// 	}
+	// }
 
 	public function formatJsonAction()
 	{
@@ -307,9 +349,9 @@ class ModulesComponent extends BaseComponent
 			$this->basepackages->utils->formatJson($this->postData());
 
 			$this->addResponse(
-				$this->modulesPackage->packagesData->responseMessage,
-				$this->modulesPackage->packagesData->responseCode,
-				$this->modulesPackage->packagesData->responseData
+				$this->basepackages->utils->packagesData->responseMessage,
+				$this->basepackages->utils->packagesData->responseCode,
+				$this->basepackages->utils->packagesData->responseData
 			);
 		} else {
 			$this->addResponse('Method Not Allowed', 1);
@@ -376,5 +418,83 @@ class ModulesComponent extends BaseComponent
 				'itemIcon' 		=> '{"icon" : "fas fa-fw fa-circle-dot text-sm"}'
 			]
 		);
+	}
+
+	public function syncLabelsAction()
+	{
+		if ($this->request->isPost()) {
+			if (!$this->checkCSRF()) {
+				return;
+			}
+
+			if ($this->modulesPackage->syncLabels($this->postData())) {
+				$this->addResponse(
+					$this->modulesPackage->packagesData->responseMessage,
+					$this->modulesPackage->packagesData->responseCode,
+					$this->modulesPackage->packagesData->responseData
+				);
+
+				return;
+			}
+
+			$this->addResponse(
+				$this->modulesPackage->packagesData->responseMessage,
+				$this->modulesPackage->packagesData->responseCode
+			);
+		} else {
+			$this->addResponse('Method Not Allowed', 1);
+		}
+	}
+
+	public function getLabelIssuesAction()
+	{
+		if ($this->request->isPost()) {
+			if (!$this->checkCSRF()) {
+				return;
+			}
+
+			if ($this->modulesPackage->getLabelIssues($this->postData())) {
+				$this->addResponse(
+					$this->modulesPackage->packagesData->responseMessage,
+					$this->modulesPackage->packagesData->responseCode,
+					$this->modulesPackage->packagesData->responseData
+				);
+
+				return;
+			}
+
+			$this->addResponse(
+				$this->modulesPackage->packagesData->responseMessage,
+				$this->modulesPackage->packagesData->responseCode
+			);
+		} else {
+			$this->addResponse('Method Not Allowed', 1);
+		}
+	}
+
+	public function bumpVersionAction()
+	{
+		if ($this->request->isPost()) {
+			if (!$this->checkCSRF()) {
+				return;
+			}
+
+			if ($this->modulesPackage->bumpVersion($this->postData())) {
+				$this->addResponse(
+					$this->modulesPackage->packagesData->responseMessage,
+					$this->modulesPackage->packagesData->responseCode,
+					$this->modulesPackage->packagesData->responseData
+				);
+
+				return;
+			}
+
+			$this->addResponse(
+				$this->modulesPackage->packagesData->responseMessage,
+				$this->modulesPackage->packagesData->responseCode
+			);
+		} else {
+			$this->addResponse('Method Not Allowed', 1);
+		}
 	}
 }

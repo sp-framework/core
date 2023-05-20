@@ -1,65 +1,375 @@
-{% set tabsData =
-    [
-        'info'   :
+{% if type === 'bundles' %}
+    {% set tabsData =
         [
-            'tabTitle'          : 'Info',
-            'tabInclude'        : 'modules/module/info'
-        ],
-        'description'   :
-        [
-            'tabTitle'          : 'Description',
-            'tabInclude'        : 'modules/module/description'
+            'info'   :
+            [
+                'tabTitle'          : 'Info',
+                'tabInclude'        : 'modules/bundle/info'
+            ],
+            'description'   :
+            [
+                'tabTitle'          : 'Description',
+                'tabInclude'        : 'modules/bundle/description'
+            ],
+            'modules'   :
+                [
+                    'tabTitle'          : 'Modules',
+                    'tabInclude'        : 'modules/bundle/modules'
+                ]
         ]
-    ]
-%}
-{% if module is defined and module['module_type'] === 'components' or type === 'components' %}
+    %}
+    <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+        <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+            {{adminltetags.useTag('tabs',
+                [
+                    'component'                     : component,
+                    'componentName'                 : componentName,
+                    'componentId'                   : componentId,
+                    'sectionId'                     : 'main',
+                    'tabsId'                        : 'tabs',
+                    'tabsStyle'                     : 'card-outline-tabs',
+                    'tabsData'                      : tabsData
+                ]
+            )}}
+        </fieldset>
+    </form>
+    {% if bundle['id'] is defined %}
+        {% set bundleId = bundle['id'] %}
+        {% set bundleModules = bundle['bundle_modules'] %}
+    {% else %}
+        {% set bundleId = '0' %}
+    {% endif %}
+    <script>
+/* globals PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modulesJson}}');
+dataCollectionSectionForm['vars']['bundleModules'] = JSON.parse('{{bundleModules}}');
+dataCollectionSectionForm['vars']['bundleId'] = '{{bundleId}}';
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
+        '{{componentId}}-{{sectionId}}-type'                                    : { },
+        '{{componentId}}-{{sectionId}}-app_type'                                : {
+            'placeholder'   : 'SELECT APP TYPE OR CREATE NEW'
+        },
+        '{{componentId}}-{{sectionId}}-module_type'                             : {
+            'placeholder'   : 'SELECT MODULE TYPE'
+        },
+        '{{componentId}}-{{sectionId}}-name'                                    : { },
+        '{{componentId}}-{{sectionId}}-description'                             : {
+            afterInit: function() {
+                $("#{{componentId}}-{{sectionId}}-description").closest(".trumbowyg-box").css("min-height", "400px");
+                $("#{{componentId}}-{{sectionId}}-description").prev(".trumbowyg-editor").css("min-height", "400px");
+                $("#{{componentId}}-{{sectionId}}-description").css("min-height", "400px");
+            }
+        },
+        '{{componentId}}-{{sectionId}}-api_id'                                  : {
+            'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY',
+            afterInit: function() {
+                var repourl = '';
+                $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function(e) {
+                    var id;
+
+                    id = e.params.data.id;
+                    repourl = $(e.params.data.element).data('url');
+                    extractName(repourl);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-name').off();
+                $('#{{componentId}}-{{sectionId}}-name').on('keyup', function() {
+                    extractName(repourl);
+                });
+
+                function extractName(repourl = '') {
+                    repourl =
+                        repourl + '/' +
+                        'apps-' +
+                        $('#{{componentId}}-{{sectionId}}-app_type').val().toLowerCase() + '-' +
+                        $('#{{componentId}}-{{sectionId}}-module_type').val().toLowerCase() + '-' +
+                        $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
+
+                    $('#{{componentId}}-{{sectionId}}-repo').val(repourl);
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-version'                                 : { },
+        '{{componentId}}-{{sectionId}}-repo'                                    : { },
+        '{{componentId}}-{{sectionId}}-modules'                                 : {
+            'placeholder'   : 'SELECT MODULE',
+            'allowClear'    : true
+        },
+        '{{componentId}}-{{sectionId}}-modules-modulename'                      : { },
+        '{{componentId}}-{{sectionId}}-modules-moduleversion'                   : { },
+        '{{componentId}}-{{sectionId}}-modules-modulerepo'                      : { },
+        '{{componentId}}-{{sectionId}}-bundle_modules'                          : {
+            'afterInit'     : function() {
+                var id, label, moduleData;
+                $('#{{componentId}}-{{sectionId}}-modules-external, ' +
+                  '#{{componentId}}-{{sectionId}}-modules-external-version'
+                ).on('keyup', function() {
+                    if ($(this).val() !== '') {
+                        label = 'external';
+                        $('#{{componentId}}-{{sectionId}}-modules').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-modules-external-add, ' +
+                          '#{{componentId}}-{{sectionId}}-modules-external-remove').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-modules').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-modules-external-add, ' +
+                          '#{{componentId}}-{{sectionId}}-modules-external-remove').attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-modules').on('select2:clear', function(e) {
+                    reset();
+                });
+
+                $('#{{componentId}}-{{sectionId}}-modules').on('select2:select', function(e) {
+                    id = e.params.data.id;
+                    label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
+
+                    moduleData = dataCollectionSectionForm['vars']['modules'][label][id];
+                    $('#{{componentId}}-{{sectionId}}-modules-modulename').val(moduleData['name']);
+                    $('#{{componentId}}-{{sectionId}}-modules-moduleversion').val(moduleData['version']);
+                    $('#{{componentId}}-{{sectionId}}-modules-modulerepo').val(moduleData['repo']);
+
+                    $('#{{componentId}}-{{sectionId}}-modules-add, ' +
+                      '#{{componentId}}-{{sectionId}}-modules-remove').attr('disabled', false);
+
+                    $('#{{componentId}}-{{sectionId}}-modules-external, ' +
+                      '#{{componentId}}-{{sectionId}}-modules-external-version').attr('disabled', true);
+
+                    $('#selected-module-information').attr('hidden', false);
+                });
+
+                function reset() {
+                    $('#{{componentId}}-{{sectionId}}-modules-add, ' +
+                      '#{{componentId}}-{{sectionId}}-modules-external-add, ' +
+                      '#{{componentId}}-{{sectionId}}-modules-external-remove, ' +
+                      '#{{componentId}}-{{sectionId}}-modules-remove').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-modules-external, ' +
+                      '#{{componentId}}-{{sectionId}}-modules-external-version, ' +
+                      '#{{componentId}}-{{sectionId}}-modules').attr('disabled', false);
+
+                    $('#{{componentId}}-{{sectionId}}-modules-modulename').val('');
+                    $('#{{componentId}}-{{sectionId}}-modules-moduleversion').val('');
+                    $('#{{componentId}}-{{sectionId}}-modules-modulerepo').val('');
+                    $('#{{componentId}}-{{sectionId}}-modules-external').val('');
+                    $('#{{componentId}}-{{sectionId}}-modules-external-version').val('');
+                    $('#{{componentId}}-{{sectionId}}-modules').val(0).trigger('change');
+
+                    $('#selected-module-information').attr('hidden', true);
+                }
+
+                function prettyfyJson() {
+                    $('#{{componentId}}-{{sectionId}}-bundle_modules')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['bundleModules'], null, 4));
+                }
+
+                $('#{{componentId}}-{{sectionId}}-modules-add, ' +
+                  '#{{componentId}}-{{sectionId}}-modules-external-add').click(function(e) {
+                    e.preventDefault();
+
+                    var found = false;
+
+                    if (label === 'core') {
+                        dataCollectionSectionForm['vars']['bundleModules'][label] = { };
+                        dataCollectionSectionForm['vars']['bundleModules'][label]['name'] = moduleData['name'];
+                        dataCollectionSectionForm['vars']['bundleModules'][label]['version'] = moduleData['version'];
+                        dataCollectionSectionForm['vars']['bundleModules'][label]['repo'] = moduleData['repo'];
+                    } else if (label === 'external') {
+                        if (dataCollectionSectionForm['vars']['bundleModules']['external'].length === 0) {
+                            dataCollectionSectionForm['vars']['bundleModules']['external'] = { };
+                        }
+
+                        dataCollectionSectionForm['vars']['bundleModules'][label][$('#{{componentId}}-{{sectionId}}-modules-external').val()]
+                            = $('#{{componentId}}-{{sectionId}}-modules-external-version').val();
+
+                        reset();
+                    } else {
+                        for (var modules in dataCollectionSectionForm['vars']['bundleModules']) {
+                            if (label === modules) {
+                                $.each(dataCollectionSectionForm['vars']['bundleModules'][modules], function(index, mod) {
+                                    if (mod['name'] === moduleData['name']) {
+                                        found = true;
+                                    }
+                                });
+
+                                if (!found) {
+                                    var moduleToPush = { };
+                                    moduleToPush['name'] = moduleData['name'];
+                                    moduleToPush['version'] = moduleData['version'];
+                                    moduleToPush['repo'] = moduleData['repo'];
+
+
+                                    dataCollectionSectionForm['vars']['bundleModules'][modules].push(moduleToPush);
+                                }
+                            }
+                        }
+                    }
+
+                    reset();
+                    prettyfyJson();
+                });
+
+                $('#{{componentId}}-{{sectionId}}-modules-remove, ' +
+                  '#{{componentId}}-{{sectionId}}-modules-external-remove').click(function(e) {
+                    e.preventDefault();
+
+                    var found = false;
+                    var foundIndex;
+
+                    if (label === 'core') {
+                        dataCollectionSectionForm['vars']['bundleModules'][label] = { };
+                    } else if (label === 'external') {
+                        delete dataCollectionSectionForm['vars']['bundleModules'][label][$('#{{componentId}}-{{sectionId}}-modules-external').val()];
+                    } else {
+                        for (var modules in dataCollectionSectionForm['vars']['bundleModules']) {
+                            if (label === modules) {
+                                $.each(dataCollectionSectionForm['vars']['bundleModules'][modules], function(index, mod) {
+                                    if (mod['name'] === moduleData['name']) {
+                                        found = true;
+                                        foundIndex = index;
+                                    }
+                                });
+
+                                if (found) {
+                                    dataCollectionSectionForm['vars']['bundleModules'][modules].splice(foundIndex);
+                                }
+                            }
+                        }
+                    }
+
+                    reset();
+                    prettyfyJson();
+                });
+
+                prettyfyJson();
+            }
+        },
+        '{{componentId}}-{{sectionId}}-modules-external'                        : { },
+        '{{componentId}}-{{sectionId}}-modules-external-version'                : { },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-app_type'                        : 'required',
+                '{{componentId}}-{{sectionId}}-module_type'                     : 'required',
+                '{{componentId}}-{{sectionId}}-name'                            : 'required',
+                '{{componentId}}-{{sectionId}}-api_id'                          : 'required',
+                '{{componentId}}-{{sectionId}}-repo'                            : 'required',
+                '{{componentId}}-{{sectionId}}-bundle_modules'                  : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-app_type'                        : 'Please select app type',
+                '{{componentId}}-{{sectionId}}-module_type'                     : 'Please select module type',
+                '{{componentId}}-{{sectionId}}-name'                            : 'Please enter module name',
+                '{{componentId}}-{{sectionId}}-api_id'                          : 'Please select Remote Repo',
+                '{{componentId}}-{{sectionId}}-repo'                            : 'Please enter repo',
+                '{{componentId}}-{{sectionId}}-bundle_modules'                  : 'Please enter bundle modules',
+            },
+            onSubmitResponse: function(response) {
+                return true;
+            }
+        }
+    });
+</script>
+{% else %}
+    {% set tabsData =
+        [
+            'info'   :
+            [
+                'tabTitle'          : 'Info',
+                'tabInclude'        : 'modules/module/info'
+            ],
+            'description'   :
+            [
+                'tabTitle'          : 'Description',
+                'tabInclude'        : 'modules/module/description'
+            ]
+        ]
+    %}
+    {% if module is defined and module['module_type'] === 'components' or type === 'components' %}
+        {% set tabsData = array_merge(tabsData,
+            [
+                'menu'   :
+                [
+                    'tabTitle'          : 'Menu',
+                    'tabInclude'        : 'modules/module/menu'
+                ]
+            ])
+        %}
+    {% endif %}
     {% set tabsData = array_merge(tabsData,
         [
-            'menu'   :
+            'settings'   :
             [
-                'tabTitle'          : 'Menu',
-                'tabInclude'        : 'modules/module/menu'
+                'tabTitle'          : 'Settings',
+                'tabInclude'        : 'modules/module/settings'
             ]
+        ],
+        [
+            'dependencies'   :
+                [
+                    'tabTitle'          : 'Dependencies',
+                    'tabInclude'        : 'modules/module/dependencies'
+                ]
         ])
     %}
-{% endif %}
-{% set tabsData = array_merge(tabsData,
-    [
-        'settings'   :
-        [
-            'tabTitle'          : 'Settings',
-            'tabInclude'        : 'modules/module/settings'
-        ]
-    ],
-    [
-        'dependencies'   :
+    {% if newrelease is defined and newrelease === true %}
+        {% set tabsData = array_merge(tabsData,
             [
-                'tabTitle'          : 'Dependencies',
-                'tabInclude'        : 'modules/module/dependencies'
-            ]
-    ])
-%}
-<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
-    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
-        {{adminltetags.useTag('tabs',
-            [
-                'component'                     : component,
-                'componentName'                 : componentName,
-                'componentId'                   : componentId,
-                'sectionId'                     : 'main',
-                'tabsId'                        : 'tabs',
-                'tabsStyle'                     : 'card-outline-tabs',
-                'tabsData'                      : tabsData
-            ]
-        )}}
-    </fieldset>
-</form>
-{% if module['id'] is defined %}
-    {% set moduleId = module['id'] %}
-{% else %}
-    {% set moduleId = '0' %}
-{% endif %}
-<script>
+                'release'   :
+                [
+                    'tabTitle'          : 'Release',
+                    'tabInclude'        : 'modules/module/release'
+                ]
+            ])
+        %}
+    {% endif %}
+    <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+        <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+            {{adminltetags.useTag('tabs',
+                [
+                    'component'                     : component,
+                    'componentName'                 : componentName,
+                    'componentId'                   : componentId,
+                    'sectionId'                     : 'main',
+                    'tabsId'                        : 'tabs',
+                    'tabsStyle'                     : 'card-outline-tabs',
+                    'tabsData'                      : tabsData
+                ]
+            )}}
+        </fieldset>
+    </form>
+    {% if module['id'] is defined %}
+        {% set moduleId = module['id'] %}
+    {% else %}
+        {% set moduleId = '0' %}
+    {% endif %}
+    <script>
 /* globals PNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
@@ -1582,6 +1892,154 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-base_view_module_id'                     : { },
         '{{componentId}}-{{sectionId}}-base_view_module'                        : { },
         '{{componentId}}-{{sectionId}}-dependencies-external-version'           : { },
+        '{{componentId}}-{{sectionId}}-release-notes'                           : { },
+        '{{componentId}}-{{sectionId}}-release-version'                         : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-release-version-major, ' +
+                  '#{{componentId}}-{{sectionId}}-release-version-minor, ' +
+                  '#{{componentId}}-{{sectionId}}-release-version-patch'
+                ).off();
+
+                $('#{{componentId}}-{{sectionId}}-release-version-major, ' +
+                  '#{{componentId}}-{{sectionId}}-release-version-minor, ' +
+                  '#{{componentId}}-{{sectionId}}-release-version-patch'
+                ).click(function(e) {
+                    e.preventDefault();
+
+                    var id = $(this)[0].id;
+                    var bump;
+
+                    if (id === '{{componentId}}-{{sectionId}}-release-version-major') {
+                        bump = 'major';
+                    } else if (id === '{{componentId}}-{{sectionId}}-release-version-minor') {
+                        bump = 'minor';
+                    } else if (id === '{{componentId}}-{{sectionId}}-release-version-patch') {
+                        bump = 'patch';
+                    }
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    postData['type'] = '{{type}}';
+                    postData['bump'] = bump;
+
+                    $.post('{{links.url("devtools/modules/bumpVersion")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.version) {
+                                $('#{{componentId}}-{{sectionId}}-release-version').val(response.responseData.version);
+                            }
+
+                            PNotify.success({'text': 'Bumped to version ' + response.responseData.version});
+                        } else {
+                            PNotify.error({'text': response.responseMessage});
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-labels'                                  : {
+            placeholder : "SELECT LABELS TO IMPORT RESOLVED ISSUES",
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-sync-labels').off();
+                $('#{{componentId}}-{{sectionId}}-sync-labels').click(function(e) {
+                    e.preventDefault();
+                        $('#{{componentId}}-{{sectionId}}-sync-labels').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-sync-labels').children('i').addClass('fa-spin');
+                        $('#{{componentId}}-{{sectionId}}-labels').empty().trigger('change');
+
+                        var postData = { };
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
+                        postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+
+                        $.post('{{links.url("devtools/modules/syncLabels")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+
+                            if (response.responseCode == 0) {
+                                if (response.responseData && response.responseData.labels) {
+                                    for (var label in response.responseData.labels) {
+                                        var newOption
+                                            = new Option(
+                                                response.responseData.labels[label]['name'],
+                                                response.responseData.labels[label]['id'], false, false
+                                            );
+
+                                        $('#{{componentId}}-{{sectionId}}-labels').append(newOption).trigger('change');
+                                    }
+                                }
+                                PNotify.success({'text': 'Synced ' + response.responseData.labels.length + ' labels.'});
+                            } else {
+                                PNotify.error({'text': response.responseMessage});
+                            }
+                            $('#{{componentId}}-{{sectionId}}-sync-labels').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-sync-labels').children('i').removeClass('fa-spin');
+                        }, 'json');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-import-issues').off();
+                $('#{{componentId}}-{{sectionId}}-import-issues').click(function(e) {
+                    var selectedLabels = $('#{{componentId}}-{{sectionId}}-labels').select2('data');
+                    var labelsArr = [];
+                    if (selectedLabels.length === 0) {
+                        PNotify.error({'text': 'Please select labels to import issues'});
+
+                        return;
+                    }
+
+                    $(selectedLabels).each(function(i, labels) {
+                        for (var label in labels) {
+                            if (labels[label]['text']) {
+                                labelsArr.push(labels[label]['text']);
+                            }
+                        }
+                    });
+
+                    $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-list-check').addClass('fa-spin fa-cog');
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
+                    postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                    postData['labels'] = labelsArr;
+
+                    $.post('{{links.url("devtools/modules/getLabelIssues")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.issues) {
+                                var html = $('#{{componentId}}-{{sectionId}}-release-notes').trumbowyg('html');
+
+                                html += '<p>Resolved Issues (' + labelsArr.join() + '):</p>';
+
+                                $(response.responseData.issues).each(function(i, issues) {
+                                    html += '<p>' + issues['number'] + ' : ' + issues['title'] + '</p>';
+                                })
+
+                                $('#{{componentId}}-{{sectionId}}-release-notes').trumbowyg('html', html);
+                            }
+                            PNotify.success({'text': 'Got ' + response.responseData.issues.length + ' issues.'});
+                        } else {
+                            PNotify.error({'text': response.responseMessage});
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-spin fa-cog').addClass('fa-list-check');
+                    }, 'json');
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-form'                                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-app_type'                        : 'required',
@@ -1615,3 +2073,4 @@ dataCollectionSection =
         }
     });
 </script>
+{% endif %}

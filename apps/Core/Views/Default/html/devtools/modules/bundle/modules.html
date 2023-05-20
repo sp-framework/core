@@ -1,0 +1,227 @@
+{% if bundle['id'] is defined %}
+    {% set bundleModules = bundle['bundle_modules'] %}
+{% endif %}
+<div class="row vdivide">
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'modules',
+                        'fieldLabel'                           : 'Select Module',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Module',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldDataSelect2Options'              : modules,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'display_name|name',
+                        'fieldDataSelect2OptionsSelected'      : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div id="selected-module-information" hidden>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'modules-modulename',
+                            'fieldLabel'                     : 'Module Name',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'component Name Example: Dashboard',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 50,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+                <div class="col-md-4">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'modules-moduleversion',
+                            'fieldLabel'                     : 'bundle version',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'bundle version.',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 1024,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'modules-modulerepo',
+                            'fieldLabel'                     : 'bundle repo',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'bundle repo.',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 1024,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'buttonType'                    : 'button',
+                        'buttons'                       :
+                            [
+                                'modules-remove'    : [
+                                    'title'                   : 'Remove',
+                                    'size'                    : 'xs',
+                                    'disabled'                : true,
+                                    'type'                    : 'danger',
+                                    'icon'                    : 'trash'
+                                ],
+                                'modules-add'    : [
+                                    'title'                   : 'Add',
+                                    'size'                    : 'xs',
+                                    'disabled'                : true,
+                                    'type'                    : 'primary',
+                                    'icon'                    : 'plus',
+                                    'position'                : 'right'
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'modules-external',
+                        'fieldLabel'                     : 'External Package Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'External package Name Example: composer/composer',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : ''
+                    ]
+                )}}
+            </div>
+            <div class="col-md-4">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'modules-external-version',
+                        'fieldLabel'                     : 'Version',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'External package version Example: 2.5',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'buttonType'                    : 'button',
+                        'buttons'                       :
+                            [
+                                'modules-external-remove'    : [
+                                    'title'                   : 'Remove',
+                                    'size'                    : 'xs',
+                                    'disabled'                : true,
+                                    'type'                    : 'danger',
+                                    'icon'                    : 'trash'
+                                ],
+                                'modules-external-add'    : [
+                                    'title'                   : 'Add',
+                                    'size'                    : 'xs',
+                                    'disabled'                : true,
+                                    'type'                    : 'primary',
+                                    'icon'                    : 'plus',
+                                    'position'                : 'right'
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'bundle_modules',
+                'fieldLabel'                     : 'Bundle Modules',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 4096,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Bundle Modules',
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldTextareaRows'              : 15,
+                'fieldValue'                     : bundleModules
+            ]
+        )}}
+    </div>
+</div>

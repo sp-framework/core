@@ -410,8 +410,7 @@ class Input
                             '<div class="dropdown-divider"></div>';
                     } else {
                         $this->content .=
-                            '<a class="dropdown-item text-uppercase" data-id="' . $key . '" ' . $this->fieldParams['fieldId'] . '-' . $key . '" href="#">' . $title . '</a>
-                            </div>';
+                            '<a class="dropdown-item text-uppercase" data-id="' . $key . '" ' . $this->fieldParams['fieldId'] . '-' . $key . '" href="#">' . $title . '</a>';
                     }
                 }
             }

@@ -1,0 +1,114 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'release-version',
+                'fieldLabel'                                : 'Release Version',
+                'fieldType'                                 : 'input',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Select which version to release, Major, Minor Or patch.',
+                'fieldGroupPostAddonDropdown'               : true,
+                'fieldGroupPostAddonDropdownButtonTitle'    : 'BUMP CURRENT VERSION',
+                'fieldGroupPostAddonDropdownButtonListTitle':
+                    [
+                        'major'   : 'Major',
+                        'minor'   : 'Minor',
+                        'patch'   : 'Patch'
+                    ],
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 20,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'labels',
+                'fieldLabel'                     : 'Labels',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select labels and hit import resolved issues. If you are managing issues via gitea/github, the system will grab information (if available) of issues with selected labels from the server.',
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldRequired'                  : false,
+                'fieldDisabled'                  : false,
+                'fieldBazJstreeSearch'           : true,
+                'fieldDataSelect2Multiple'       : true,
+                'fieldDataSelect2Options'        : [],
+                'fieldDataSelect2OptionsKey'     : 'id',
+                'fieldDataSelect2OptionsValue'   : 'name',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row mb-2">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'componentId'           : componentId,
+                'sectionId'             : sectionId,
+                'buttonType'            : 'button',
+                'buttons'               :
+                    [
+                        'import-issues' : [
+                            'label'                   : '',
+                            'title'                   : 'Import Issues',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'position'                : 'right',
+                            'icon'                    : 'list-check'
+                        ],
+                        'sync-labels' : [
+                            'label'                   : '',
+                            'title'                   : 'Sync Labels',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'icon'                    : 'sync-alt',
+                            'position'                : 'right'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'release-notes',
+                'fieldLabel'                     : 'Release Notes',
+                'fieldType'                      : 'trumbowyg',
+                'fieldDataMaxLength'             : 4096,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Release notes for this release.',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>

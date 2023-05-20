@@ -2,6 +2,7 @@
 
 namespace Apps\Core\Packages\Devtools\Modules;
 
+use Apps\Core\Packages\Devtools\Modules\Model\AppsCoreDevtoolsModulesBundles;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToReadFile;
@@ -13,11 +14,36 @@ use Phalcon\Helper\Str;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use System\Base\BasePackage;
+use z4kn4fein\SemVer\Version;
 
 class DevtoolsModules extends BasePackage
 {
+    protected $modelToUse = AppsCoreDevtoolsModulesBundles::class;
+
+    protected $packageName = 'bundles';
+
+    public $bundles;
+
+    protected $api;
+
+    protected $apiConfig;
+
     public function addModule($data)
     {
+        if ($data['type'] === 'bundles') {
+            $data = $this->checkTypeAndCategory($data);
+
+            if ($this->add($data)) {
+                $this->addResponse('Bundle added');
+
+                return;
+            }
+
+            $this->addResponse('Error adding bundle', 1);
+
+            return;
+        }
+
         if ($data['type'] === 'core') {
             $this->addResponse('Core already exists!', 1);
 
@@ -66,6 +92,20 @@ class DevtoolsModules extends BasePackage
 
     public function updateModule($data)
     {
+        if ($data['type'] === 'bundles') {
+            $data = $this->checkTypeAndCategory($data);
+
+            if ($this->update($data)) {
+                $this->addResponse('Bundle updated');
+
+                return;
+            }
+
+            $this->addResponse('Error updating bundle', 1);
+
+            return;
+        }
+
         $data = $this->checkTypeAndCategory($data);
 
         if ($data['type'] === 'core') {
@@ -104,7 +144,7 @@ class DevtoolsModules extends BasePackage
 
     protected function checkTypeAndCategory($data)
     {
-        if (str_contains($data['app_type'], '"data"')) {
+        if (isset($data['app_type']) && str_contains($data['app_type'], '"data"')) {
             $data['app_type'] = Json::decode($data['app_type'], true);
             if (isset($data['app_type']['data'][0])) {
                 $data['app_type'] = $data['app_type']['data'][0];
@@ -124,7 +164,7 @@ class DevtoolsModules extends BasePackage
             }
         }
 
-        if (str_contains($data['category'], '"data"')) {
+        if (isset($data['category']) && str_contains($data['category'], '"data"')) {
             $data['category'] = Json::decode($data['category'], true);
             if (isset($data['category']['data'][0])) {
                 $data['category'] = $data['category']['data'][0];
@@ -170,7 +210,7 @@ class DevtoolsModules extends BasePackage
         return Json::encode($defaultSettings);
     }
 
-    public function getDefaultDependencies($type)
+    public function getDefaultDependencies($type = null)
     {
         $defaultDependencies =
             [
@@ -182,7 +222,7 @@ class DevtoolsModules extends BasePackage
                 'external'          => []
             ];
 
-        if ($type === 'views') {
+        if ($type && $type === 'views') {
             unset($defaultDependencies['external']);
         }
 
@@ -455,5 +495,159 @@ class DevtoolsModules extends BasePackage
         }
 
         return true;
+    }
+
+    public function syncLabels($data)
+    {
+        if (!isset($data['api_id']) || !isset($data['name'])) {
+            $this->addResponse('API information not provided', 1, []);
+
+            return false;
+        }
+
+        if (isset($data['api_id']) && $data['api_id'] == '0') {
+            $this->addResponse('This is local module and not remote module, cannot sync labels.', 1, []);
+
+            return false;
+        }
+
+        if (!$this->initApi($data['api_id'])) {
+            return false;
+        }
+
+        if ($this->apiConfig) {
+            if (strtolower($this->apiConfig['provider']) === 'gitea') {
+                $collection = 'IssueApi';
+                $method = 'issueListLabels';
+                $args = [$this->apiConfig['org_user'], strtolower($data['name'])];
+            } else if (strtolower($this->apiConfig['provider']) === 'github') {
+                //For github
+            }
+
+            $labels = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+
+            if ($labels) {
+                $this->addResponse('Labels Synced', 0, ['labels' => $labels]);
+
+                return true;
+            }
+
+            $this->addResponse('Error syncing labels', 1);
+        }
+    }
+
+    public function getLabelIssues($data)
+    {
+        if (!isset($data['api_id']) || !isset($data['name'])) {
+            $this->addResponse('API information not provided', 1, []);
+
+            return false;
+        }
+
+        if (isset($data['api_id']) && $data['api_id'] == '0') {
+            $this->addResponse('This is local module and not remote module, cannot sync labels.', 1, []);
+
+            return false;
+        }
+
+        if (!$this->initApi($data['api_id'])) {
+            return false;
+        }
+
+        if ($this->apiConfig) {
+            //Get Latest Release (Last One, we need to sync issues since that release)
+            if (strtolower($this->apiConfig['provider']) === 'gitea') {
+                $collection = 'RepositoryApi';
+                $method = 'repoGetLatestRelease';
+                $args = [$this->apiConfig['org_user'], strtolower($data['name'])];
+            } else if (strtolower($this->apiConfig['provider']) === 'github') {
+                //For github
+            }
+
+            $latestRelease = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+
+            if (!$latestRelease) {
+                $since = null;
+            }
+
+            $since = $latestRelease['created_at'];
+
+            if (strtolower($this->apiConfig['provider']) === 'gitea') {
+                $collection = 'IssueApi';
+                $method = 'issueListIssues';
+                $args = [$this->apiConfig['org_user'], strtolower($data['name']), 'closed', implode(',', $data['labels']), null, null, null, $since];
+            } else if (strtolower($this->apiConfig['provider']) === 'github') {
+                //For github
+            }
+
+            $issues = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+
+            if ($issues) {
+                $this->addResponse('Issues Synced', 0, ['issues' => $issues]);
+
+                return true;
+            }
+
+            $this->addResponse('Error syncing issues', 1);
+        }
+    }
+
+    protected function initApi($id)
+    {
+        $this->api = $this->basepackages->api->useApi($id, true);
+
+        $this->apiConfig = $this->api->getApiConfig();
+
+        if ($this->apiConfig['auth_type'] === 'auth' &&
+            ((!$this->apiConfig['username'] || $this->apiConfig['username'] === '') &&
+             (!$this->apiConfig['password'] || $this->apiConfig['password'] === ''))
+        ) {
+            $this->addResponse('Username/Password missing, cannot sync', 1);
+
+            return false;
+        } else if ($this->apiConfig['auth_type'] === 'access_token' &&
+                   (!$this->apiConfig['access_token'] || $this->apiConfig['access_token'] === '')
+        ) {
+            $this->addResponse('Access token missing, cannot sync', 1);
+
+            return false;
+        } else if ($this->apiConfig['auth_type'] === 'autho' &&
+                   (!$this->apiConfig['authorization'] || $this->apiConfig['authorization'] === '')
+        ) {
+            $this->addResponse('Authorization token missing, cannot sync', 1);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public function bumpVersion($data)
+    {
+        if ($data['type'] === 'core') {
+            $version = $this->core->getVersion();
+        } else {
+            $module = $this->modules->{$data['type']}->getById($data['id']);
+
+            $version = $module['version'];
+        }
+
+        if (!isset($version)) {
+            $this->addResponse('Could not retrieve next version', 1);
+
+            return false;
+        }
+
+        $version = Version::parse($version);
+        $bump = 'getNext' . ucfirst($data['bump']) . 'Version';
+        $newVersion = $version->$bump();
+
+        if ($newVersion) {
+            $this->addResponse('New Version', 0, ['version' => $newVersion->__toString()]);
+
+            return true;
+        }
+
+        $this->addResponse('Could not retrieve next version', 1);
     }
 }

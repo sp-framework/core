@@ -9,6 +9,10 @@
     {% set moduleName = 'New' %}
     {% set moduleId = '0' %}
 {% endif %}
+{% if bundle['id'] is defined %}
+    {% set moduleName = bundle['name'] %}
+    {% set moduleId = bundle['id'] %}
+{% endif %}
 {{adminltetags.useTag('content',
     [
         'component'                     : component,

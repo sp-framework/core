@@ -6,6 +6,7 @@ use Apps\Core\Packages\Devtools\Api\Contracts\Install\Schema\DevtoolsApiContract
 use Apps\Core\Packages\Devtools\Api\Contracts\Model\AppsDashDevtoolsApiContracts;
 use Apps\Core\Packages\Devtools\Api\Enums\Install\Schema\DevtoolsApiEnums;
 use Apps\Core\Packages\Devtools\Api\Enums\Model\AppsDashDevtoolsApiEnums;
+use Apps\Core\Packages\Devtools\Modules\Install\Schema\DevtoolsModulesBundles;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
 use League\Flysystem\UnableToDeleteFile;
@@ -346,6 +347,7 @@ class Setup
 		if ($this->postData['dev'] == 'true') {
 			$this->db->createTable('apps_core_devtools_api_contracts', $dbName, (new DevtoolsApiContracts)->columns());
 			$this->db->createTable('apps_core_devtools_api_enums', $dbName, (new DevtoolsApiEnums)->columns());
+			$this->db->createTable('apps_core_devtools_modules_bundles', $dbName, (new DevtoolsModulesBundles)->columns());
 		}
 
 		return true;
