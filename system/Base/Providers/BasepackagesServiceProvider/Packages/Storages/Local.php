@@ -137,9 +137,7 @@ class Local extends BasePackage
 
             $this->addFileInfoToDb();
 
-            $storageData['uuid'] = $this->uuid;
-
-            $storageData['id'] = $this->packagesData->last['id'];
+            $storageData = $this->packagesData->last;
 
             $this->addResponse('File(s) Uploaded', 0, ['storageData' => $storageData]);
 
@@ -194,8 +192,7 @@ class Local extends BasePackage
                 return false;
             }
 
-            $storageData['uuid'] = $this->uuid;
-            $storageData['id'] = $this->packagesData->last['id'];
+            $storageData = $this->packagesData->last;
 
         } else if ($this->request->getUploadedFiles()) {
             foreach ($this->request->getUploadedFiles() as $key => $file) {
@@ -216,9 +213,7 @@ class Local extends BasePackage
                     return false;
                 }
 
-                $storageData['uuid'] = $this->uuid;
-                $storageData['name'] = $this->fileName;
-                $storageData['id'] = $this->packagesData->last['id'];
+                $storageData = $this->packagesData->last;
             }
         }
 
@@ -329,12 +324,12 @@ class Local extends BasePackage
 
     protected function moveImageToLocationAsImageName()
     {
-        $this->file->moveTo(base_path($this->directory . '/' . $this->fileName));
+        $this->file->moveTo(base_path($this->directory . '/' . $this->uuid));
     }
 
     protected function moveFileToLocationAsFileName()
     {
-        $this->file->moveTo(base_path($this->directory . '/' . $this->fileName));
+        $this->file->moveTo(base_path($this->directory . '/' . $this->uuid));
     }
 
     protected function addFileInfoToDb()
