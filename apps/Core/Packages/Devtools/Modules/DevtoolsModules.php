@@ -556,15 +556,7 @@ class DevtoolsModules extends BasePackage
 
         if ($this->apiConfig) {
             //Get Latest Release (Last One, we need to sync issues since that release)
-            if (strtolower($this->apiConfig['provider']) === 'gitea') {
-                $collection = 'RepositoryApi';
-                $method = 'repoGetLatestRelease';
-                $args = [$this->apiConfig['org_user'], strtolower($data['name'])];
-            } else if (strtolower($this->apiConfig['provider']) === 'github') {
-                //For github
-            }
-
-            $latestRelease = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+            $latestRelease = $this->getLatestRelease($data);
 
             if (!$latestRelease) {
                 $since = null;
@@ -590,6 +582,25 @@ class DevtoolsModules extends BasePackage
 
             $this->addResponse('Error syncing issues', 1);
         }
+    }
+
+    protected function getLatestRelease($data)
+    {
+        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+            $collection = 'RepositoryApi';
+            $method = 'repoGetLatestRelease';
+            $args = [$this->apiConfig['org_user'], strtolower($data['name'])];
+        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+            //For github
+        }
+
+        $latestRelease = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+
+        if ($latestRelease) {
+            return $latestRelease;
+        }
+
+        return false;
     }
 
     protected function initApi($id)
@@ -624,30 +635,161 @@ class DevtoolsModules extends BasePackage
 
     public function bumpVersion($data)
     {
+        if (!$this->initApi($data['api_id'])) {
+            return false;
+        }
+
+        $latestRelease = $this->getLatestRelease($data);
+
+        if ($latestRelease) {
+            $latestReleaseVersion = $latestRelease['name'];
+        }
+
         if ($data['type'] === 'core') {
-            $version = $this->core->getVersion();
+            $currentVersion = $this->core->getVersion();
         } else {
             $module = $this->modules->{$data['type']}->getById($data['id']);
 
-            $version = $module['version'];
+            $currentVersion = $module['version'];
         }
 
-        if (!isset($version)) {
-            $this->addResponse('Could not retrieve next version', 1);
+        $compareVersion = Version::compare(Version::parse($currentVersion), Version::parse($latestReleaseVersion));
+
+        if ($compareVersion !== 0) {
+            $currentVersion = $latestReleaseVersion;
+        }
+
+        if ($compareVersion === 1) {
+            $compareVersion = 2;
+        }
+
+        if (!isset($currentVersion)) {
+            $this->addResponse('Could not retrieve current version', 2);
 
             return false;
         }
 
-        $version = Version::parse($version);
+        $version = Version::parse($currentVersion);
         $bump = 'getNext' . ucfirst($data['bump']) . 'Version';
         $newVersion = $version->$bump();
 
         if ($newVersion) {
-            $this->addResponse('New Version', 0, ['version' => $newVersion->__toString()]);
+            $this->addResponse('New Version', $compareVersion, ['currentVersion' => $currentVersion, 'newVersion' => $newVersion->__toString()]);
 
-            return true;
+            return $newVersion->__toString();
         }
 
-        $this->addResponse('Could not retrieve next version', 1);
+        $this->addResponse('Could not retrieve current/next version', 2);
+    }
+
+    public function syncBranches($data)
+    {
+        if (!isset($data['api_id']) || !isset($data['name'])) {
+            $this->addResponse('API information not provided', 1, []);
+
+            return false;
+        }
+
+        if (isset($data['api_id']) && $data['api_id'] == '0') {
+            $this->addResponse('This is local module and not remote module, cannot sync labels.', 1, []);
+
+            return false;
+        }
+
+        if (!$this->initApi($data['api_id'])) {
+            return false;
+        }
+
+        if ($this->apiConfig) {
+            if (strtolower($this->apiConfig['provider']) === 'gitea') {
+                $collection = 'RepositoryApi';
+                $method = 'repoListBranches';
+                $args = [$this->apiConfig['org_user'], strtolower($data['name'])];
+            } else if (strtolower($this->apiConfig['provider']) === 'github') {
+                //For github
+            }
+
+            $branches = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+
+            if ($branches) {
+                $this->addResponse('Labels Synced', 0, ['branches' => $branches]);
+
+                return true;
+            }
+
+            $this->addResponse('Error syncing branches', 1);
+        }
+    }
+
+    public function generateRelease($data)
+    {
+        if (!isset($data['api_id']) || !isset($data['name'])) {
+            $this->addResponse('API information not provided', 1, []);
+
+            return false;
+        }
+
+        if (isset($data['api_id']) && $data['api_id'] == '0') {
+            $this->addResponse('This is local module and not remote module, cannot sync labels.', 1, []);
+
+            return false;
+        }
+
+        if (!$this->initApi($data['api_id'])) {
+            return false;
+        }
+
+        if ($this->apiConfig) {
+            if (strtolower($this->apiConfig['provider']) === 'gitea') {
+                $collection = 'RepositoryApi';
+                $method = 'repoCreateRelease';
+
+                // $draft = false;
+                // if (isset($data['draft'])) {
+                //     if ($data['draft'] == '1') {
+                //         $draft = true;
+                //     }
+                // }
+
+                $prerelease = false;
+                if (isset($data['prerelease']) && $data['prerelease'] == 'true') {
+                    $prerelease = true;
+                }
+
+                $name = $this->bumpVersion($data);
+
+                $args =
+                    [
+                        $this->apiConfig['org_user'],
+                        strtolower($data['name']),
+                        [
+                            'body'              => $data['release_notes'],
+                            'draft'             => false,
+                            'name'              => $name,
+                            'prerelease'        => $prerelease,
+                            'tag_name'          => $name,
+                            'target_commitish'  => $data['branch']
+                        ]
+                    ];
+            } else if (strtolower($this->apiConfig['provider']) === 'github') {
+                //For github
+            }
+
+            try {
+                $newRelease = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+
+                if ($newRelease) {
+                    $this->addResponse('Generated New Release!', 0, ['newRelease' => $newRelease]);
+
+                    return true;
+                }
+            } catch (\throwable $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                return;
+            }
+
+            $this->addResponse('Error generating new release', 1);
+        }
     }
 }

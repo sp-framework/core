@@ -13,30 +13,66 @@
     {% set moduleName = bundle['name'] %}
     {% set moduleId = bundle['id'] %}
 {% endif %}
-{{adminltetags.useTag('content',
-    [
-        'component'                     : component,
-        'componentName'                 : componentName,
-        'componentId'                   : componentId,
-        'parentComponentId'             : parent,
-        'sectionId'                     : type,
-        'contentType'                   : 'sectionWithForm',
-        'cardHeader'                    : true,
-        'cardFooter'                    : true,
-        'cardType'                      : 'primary',
-        'cardIcon'                      : 'th',
-        'cardTitle'                     : 'Modules : ' ~ moduleName ~ ' (' ~ type ~ ')',
-        'cardAdditionalClass'           : 'rounded-0',
-        'cardBodyInclude'               : 'modules/module',
-        'formButtons'                   :
+{% if newrelease is defined and newrelease === true %}
+    {{adminltetags.useTag('content',
         [
-            'updateButtonId'                : moduleId,
-            'addActionUrl'                  : 'devtools/modules/add',
-            'addSuccessRedirectUrl'         : 'devtools/modules',
-            'updateActionUrl'               : 'devtools/modules/update',
-            'updateSuccessRedirectUrl'      : 'devtools/modules',
-            'cancelActionUrl'               : 'devtools/modules',
-            'closeActionUrl'                : 'devtools/modules'
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : type,
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'success',
+            'cardIcon'                      : 'th',
+            'cardTitle'                     : 'NEW RELEASE : ' ~ moduleName ~ ' (' ~ type ~ ')',
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'modules/module',
+            'formButtons'                   :
+            [
+                'cancelActionUrl'           : 'devtools/modules',
+                'closeActionUrl'            : 'devtools/modules'
+            ],
+            'formSecondaryButtons'          :
+            [
+                'buttonType'                : 'button',
+                'buttons'                   : {
+                    'generate' : {
+                        'title'                   : 'Generate',
+                        'type'                    : 'success',
+                        'icon'                    : 'wand-sparkles'
+                    }
+                }
+            ]
         ]
-    ]
-)}}
+    )}}
+{% else %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : type,
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'th',
+            'cardTitle'                     : 'Modules : ' ~ moduleName ~ ' (' ~ type ~ ')',
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'modules/module',
+            'formButtons'                   :
+            [
+                'updateButtonId'                : moduleId,
+                'addActionUrl'                  : 'devtools/modules/add',
+                'addSuccessRedirectUrl'         : 'devtools/modules',
+                'updateActionUrl'               : 'devtools/modules/update',
+                'updateSuccessRedirectUrl'      : 'devtools/modules',
+                'cancelActionUrl'               : 'devtools/modules',
+                'closeActionUrl'                : 'devtools/modules'
+            ]
+        ]
+    )}}
+{% endif %}

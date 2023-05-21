@@ -1,32 +1,126 @@
-<div class="row">
+{% set moduleId = module['id'] %}
+{% set moduleName = module['name'] %}
+{% set moduleModule_type = module['module_type'] %}
+{% set moduleApiId = module['module_details']['api_id'] %}
+{% set moduleVersion = module['version'] %}
+{% set moduleRepo = module['repo'] %}
+<div class="row" hidden>
     <div class="col">
         {{adminltetags.useTag('fields',
             [
-                'component'                                 : component,
-                'componentName'                             : componentName,
-                'componentId'                               : componentId,
-                'sectionId'                                 : sectionId,
-                'fieldId'                                   : 'release-version',
-                'fieldLabel'                                : 'Release Version',
-                'fieldType'                                 : 'input',
-                'fieldHelp'                                 : true,
-                'fieldHelpTooltipContent'                   : 'Select which version to release, Major, Minor Or patch.',
-                'fieldGroupPostAddonDropdown'               : true,
-                'fieldGroupPostAddonDropdownButtonTitle'    : 'BUMP CURRENT VERSION',
-                'fieldGroupPostAddonDropdownButtonListTitle':
-                    [
-                        'major'   : 'Major',
-                        'minor'   : 'Minor',
-                        'patch'   : 'Patch'
-                    ],
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'id',
+                'fieldLabel'                     : 'Module ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module ID',
                 'fieldRequired'                  : true,
                 'fieldBazScan'                   : true,
-                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : moduleId
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'name',
+                'fieldLabel'                     : 'Module Name',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module Name Example: Dashboard. For Packages name has to be in Pascal Case. Each capital letter donated a directory name. Example UsersAccounts is Users/Accounts and class will be \\Users\\Account\\ and so on.',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : moduleName
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'module_type',
+                'fieldLabel'                           : 'Module Type',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Module Type',
+                'fieldRequired'                        : true,
+                'fieldDisabled'                        : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldBazScan'                         : true,
+                'fieldDataSelect2Options'              : moduleTypes,
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsSelected'      : moduleModule_type
+            ]
+        )}}
+    </div>
+</div>
+<div class="row" hidden>
+    <div class="col-md-3">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'api_id',
+                'fieldLabel'                           : 'Local/Remote Repo?',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select repo if the module will be available on a repo. If not, choose local and you can pass zip file to the end user.',
+                'fieldRequired'                        : true,
+                'fieldDisabled'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2Options'              : apis,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsSelected'      : moduleApiId
+            ]
+        )}}
+    </div>
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'version',
+                'fieldLabel'                     : 'Module version',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module version. New modules start with 0.0.0(Major.Minor.Patch). We use semantic version system.',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : true,
+                'fieldBazScan'                   : true,
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
-                'fieldDataInputMaxLength'        : 20,
-                'fieldValue'                     : ''
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : moduleVersion
             ]
         )}}
     </div>
@@ -37,58 +131,221 @@
                 'componentName'                  : componentName,
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
-                'fieldId'                        : 'labels',
-                'fieldLabel'                     : 'Labels',
-                'fieldType'                      : 'select2',
+                'fieldId'                        : 'repo',
+                'fieldLabel'                     : 'Module repo',
+                'fieldType'                      : 'input',
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Select labels and hit import resolved issues. If you are managing issues via gitea/github, the system will grab information (if available) of issues with selected labels from the server.',
+                'fieldHelpTooltipContent'        : 'Module repo.',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : true,
                 'fieldBazScan'                   : true,
-                'fieldBazPostOnCreate'           : false,
-                'fieldBazPostOnUpdate'           : false,
-                'fieldRequired'                  : false,
-                'fieldDisabled'                  : false,
-                'fieldBazJstreeSearch'           : true,
-                'fieldDataSelect2Multiple'       : true,
-                'fieldDataSelect2Options'        : [],
-                'fieldDataSelect2OptionsKey'     : 'id',
-                'fieldDataSelect2OptionsValue'   : 'name',
-                'fieldDataSelect2OptionsArray'   : true,
-                'fieldDataSelect2OptionsSelected': ''
-            ]
-        )}}
-    </div>
-</div>
-<div class="row mb-2">
-    <div class="col">
-        {{adminltetags.useTag('buttons',
-            [
-                'componentId'           : componentId,
-                'sectionId'             : sectionId,
-                'buttonType'            : 'button',
-                'buttons'               :
-                    [
-                        'import-issues' : [
-                            'label'                   : '',
-                            'title'                   : 'Import Issues',
-                            'size'                    : 'xs',
-                            'type'                    : 'primary',
-                            'position'                : 'right',
-                            'icon'                    : 'list-check'
-                        ],
-                        'sync-labels' : [
-                            'label'                   : '',
-                            'title'                   : 'Sync Labels',
-                            'size'                    : 'xs',
-                            'type'                    : 'primary',
-                            'icon'                    : 'sync-alt',
-                            'position'                : 'right'
-                        ]
-                    ]
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 1024,
+                'fieldValue'                     : moduleRepo
             ]
         )}}
     </div>
 </div>
 <div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'release-type',
+                'fieldLabel'                            : 'Release Type',
+                'fieldType'                             : 'select2',
+                'fieldRequired'                         : true,
+                'fieldAdditionalClass'                  : 'mb-2',
+                'fieldBazScan'                          : true,
+                'fieldHelpTooltipContent'               : 'Select release type: Major, Minor Or Patch.',
+                'fieldDataSelect2Options'               : {
+                    'major' : {
+                        'id'    : 'major',
+                        'name'  : 'MAJOR'
+                    },
+                    'minor' : {
+                        'id'    : 'minor',
+                        'name'  : 'MINOR'
+                    },
+                    'patch' : {
+                        'id'    : 'patch',
+                        'name'  : 'PATCH'
+                    }
+                },
+                'fieldDataSelect2OptionsArray'           : true,
+                'fieldDataSelect2OptionsKey'             : 'id',
+                'fieldDataSelect2OptionsValue'           : 'name',
+                'fieldDataSelect2OptionsSelected'        : ''
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'release-version',
+                        'fieldLabel'                            : 'Release Version',
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'html',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldHtmlContent'                      : '<h4 class="mt-1">SELECT RELEASE TYPE</h4>'
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'prerelease',
+                        'fieldLabel'                     : 'Pre-Release?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Check if release is a pre-release (not production ready)?',
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'warning',
+                        'fieldCheckboxChecked'           : false,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'branch',
+                        'fieldLabel'                     : 'Branch',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select branch to generate new release from.',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldRequired'                  : true,
+                        'fieldDisabled'                  : false,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldDataSelect2Options'        : [],
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'componentId'           : componentId,
+                        'sectionId'             : sectionId,
+                        'buttonType'            : 'button',
+                        'buttons'               :
+                            [
+                                'sync-branches' : [
+                                    'label'                   : '',
+                                    'title'                   : 'Sync Branches',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'primary',
+                                    'icon'                    : 'code-branch',
+                                    'position'                : 'left'
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'labels',
+                        'fieldLabel'                     : 'Labels',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select labels and hit import resolved issues. If you are managing issues via gitea/github, the system will grab information (if available) of issues with selected labels from the server.',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldRequired'                  : false,
+                        'fieldDisabled'                  : false,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldDataSelect2Multiple'       : true,
+                        'fieldDataSelect2Options'        : [],
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'componentId'           : componentId,
+                        'sectionId'             : sectionId,
+                        'buttonType'            : 'button',
+                        'buttons'               :
+                            [
+                                'import-issues' : [
+                                    'label'                   : '',
+                                    'title'                   : 'Import Issues',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'primary',
+                                    'position'                : 'right',
+                                    'icon'                    : 'list-check'
+                                ],
+                                'sync-labels' : [
+                                    'label'                   : '',
+                                    'title'                   : 'Sync Labels',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'primary',
+                                    'icon'                    : 'sync-alt',
+                                    'position'                : 'left'
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-2">
     <div class="col">
         {{adminltetags.useTag('fields',
             [

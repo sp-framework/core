@@ -844,11 +844,11 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
         var changelogText;
         if (moduleData.repo_details.latestRelease.prerelease === false) {
             changelogText =
-                'Version: ' + moduleInfo.version +
+                'Version: ' + moduleData.repo_details.latestRelease.name +
                 ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-success">STABLE</span></span>';
         } else {
             changelogText =
-                'Version: ' + moduleInfo.version +
+                'Version: ' + moduleData.repo_details.latestRelease.name +
                 ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-danger">UNSTABLE</span></span>';
         }
         $('#changelogs-version').html(changelogText);

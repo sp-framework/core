@@ -42228,6 +42228,12 @@ a.disabled {
   min-width: 95%;
 }
 
+.custom-select {
+  font-size: 0.75rem !important;
+  height: inherit !important;
+  padding: 0.5rem;
+}
+
 .custom-select, .form-control, .form-control:focus {
   color: #444;
 }

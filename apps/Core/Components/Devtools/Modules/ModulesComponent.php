@@ -497,4 +497,56 @@ class ModulesComponent extends BaseComponent
 			$this->addResponse('Method Not Allowed', 1);
 		}
 	}
+
+	public function syncBranchesAction()
+	{
+		if ($this->request->isPost()) {
+			if (!$this->checkCSRF()) {
+				return;
+			}
+
+			if ($this->modulesPackage->syncBranches($this->postData())) {
+				$this->addResponse(
+					$this->modulesPackage->packagesData->responseMessage,
+					$this->modulesPackage->packagesData->responseCode,
+					$this->modulesPackage->packagesData->responseData
+				);
+
+				return;
+			}
+
+			$this->addResponse(
+				$this->modulesPackage->packagesData->responseMessage,
+				$this->modulesPackage->packagesData->responseCode
+			);
+		} else {
+			$this->addResponse('Method Not Allowed', 1);
+		}
+	}
+
+	public function generateReleaseAction()
+	{
+		if ($this->request->isPost()) {
+			if (!$this->checkCSRF()) {
+				return;
+			}
+
+			if ($this->modulesPackage->generateRelease($this->postData())) {
+				$this->addResponse(
+					$this->modulesPackage->packagesData->responseMessage,
+					$this->modulesPackage->packagesData->responseCode,
+					$this->modulesPackage->packagesData->responseData
+				);
+
+				return;
+			}
+
+			$this->addResponse(
+				$this->modulesPackage->packagesData->responseMessage,
+				$this->modulesPackage->packagesData->responseCode
+			);
+		} else {
+			$this->addResponse('Method Not Allowed', 1);
+		}
+	}
 }
