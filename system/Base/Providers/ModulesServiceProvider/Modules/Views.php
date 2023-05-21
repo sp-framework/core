@@ -590,10 +590,18 @@ class Views extends BasePackage
                     $link['local'] = true;
                 }
 
-                if ($this->config->dev) {
-                    $this->assetsCollections['headLinks']->addCss($link['asset']);
-                } else {
-                    $this->assetsCollections['headLinks']->addCss($link['asset'], $link['local'], false, [], $this->assetsVersion);
+                if (!isset($link['route'])) {
+                    $link['route'] = '/';
+                }
+
+                if ($link['route'] === '/' ||
+                    $link['route'] === $this->router->getMatchedRoute()->getPattern()
+                ) {
+                    if ($this->config->dev) {
+                        $this->assetsCollections['headLinks']->addCss($link['asset']);
+                    } else {
+                        $this->assetsCollections['headLinks']->addCss($link['asset'], $link['local'], false, [], $this->assetsVersion);
+                    }
                 }
             }
         }
@@ -618,10 +626,18 @@ class Views extends BasePackage
                     $script['local'] = true;
                 }
 
-                if ($this->config->dev) {
-                    $this->assetsCollections['headJs']->addJs($script['asset']);
-                } else {
-                    $this->assetsCollections['headJs']->addJs($script['asset'], $script['local'], true, [], $this->assetsVersion);
+                if (!isset($link['route'])) {
+                    $link['route'] = '/';
+                }
+
+                if ($link['route'] === '/' ||
+                    $link['route'] === $this->router->getMatchedRoute()->getPattern()
+                ) {
+                    if ($this->config->dev) {
+                        $this->assetsCollections['headJs']->addJs($script['asset']);
+                    } else {
+                        $this->assetsCollections['headJs']->addJs($script['asset'], $script['local'], true, [], $this->assetsVersion);
+                    }
                 }
             }
         }
@@ -673,10 +689,18 @@ class Views extends BasePackage
                     $script['local'] = true;
                 }
 
-                if ($this->config->dev) {
-                    $this->assetsCollections['footerJs']->addJs($script['asset']);
-                } else {
-                    $this->assetsCollections['footerJs']->addJs($script['asset'], $script['local'], true, [], $this->assetsVersion);
+                if (!isset($link['route'])) {
+                    $link['route'] = '/';
+                }
+
+                if ($link['route'] === '/' ||
+                    $link['route'] === $this->router->getMatchedRoute()->getPattern()
+                ) {
+                    if ($this->config->dev) {
+                        $this->assetsCollections['footerJs']->addJs($script['asset']);
+                    } else {
+                        $this->assetsCollections['footerJs']->addJs($script['asset'], $script['local'], true, [], $this->assetsVersion);
+                    }
                 }
             }
         }
