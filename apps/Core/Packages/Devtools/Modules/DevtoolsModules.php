@@ -122,6 +122,10 @@ class DevtoolsModules extends BasePackage
             if ($this->modules->{$data['type']}->update($module) &&
                 $this->updateModuleJson($data)
             ) {
+                if ($data['type'] === 'components') {
+                    $this->addUpdateComponentMenu($data);
+                }
+
                 $this->addResponse('Module updated');
 
                 return;
@@ -414,19 +418,7 @@ class DevtoolsModules extends BasePackage
 
     protected function generateNewComponentsFiles($moduleFilesLocation, $data)
     {
-        if ($data['menu'] != 'false' && $data['menu'] != '') {
-            $data['menu'] = Json::decode($data['menu'], true);
-
-            $menu = $this->basepackages->menus->addMenu($data['app_type'], $data['menu']);
-
-            if ($menu) {
-                $module = $this->modules->{$data['type']}->packagesData->last;
-
-                $module['menu_id'] = $menu['id'];
-            }
-
-            $this->modules->{$data['type']}->update($module);
-        }
+        $this->addUpdateComponentMenu($data);
 
         $componentName = ucfirst(Arr::last(explode('/', $data['route']))) . 'Component';
 
@@ -495,6 +487,48 @@ class DevtoolsModules extends BasePackage
         }
 
         return true;
+    }
+
+    protected function addUpdateComponentMenu($data)
+    {
+        if ($data['menu_id'] != '' || $data['menu_id'] != '0') {
+            $menu = $this->basepackages->menus->getById($data['menu_id']);
+
+            if ($menu) {
+                if ($data['menu'] == 'false') {
+                    $this->basepackages->menus->remove($data['menu_id']);
+
+                    $module = $this->modules->{$data['type']}->getById($data['id']);
+
+                    $module['menu_id'] = null;
+                    $module['menu'] = null;
+
+                    $this->modules->{$data['type']}->update($module);
+
+                    return;
+                }
+            }
+        }
+
+        if ($data['menu'] != 'false' && $data['menu'] != '') {
+            $data['menu'] = Json::decode($data['menu'], true);
+
+            if ($menu) {
+                $this->basepackages->menus->updateMenu($data['menu_id'], $data['app_type'], $data['menu']);
+
+                return;
+            } else {
+                $menu = $this->basepackages->menus->addMenu($data['app_type'], $data['menu']);
+
+                if ($menu) {
+                    $module = $this->modules->{$data['type']}->packagesData->last;
+
+                    $module['menu_id'] = $menu['id'];
+                }
+
+                $this->modules->{$data['type']}->update($module);
+            }
+        }
     }
 
     public function syncLabels($data)

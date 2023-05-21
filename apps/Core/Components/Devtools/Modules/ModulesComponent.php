@@ -22,6 +22,10 @@ class ModulesComponent extends BaseComponent
 	{
 		if (isset($this->getData()['bundles'])) {
 			$this->view->bundles = true;
+
+			if (isset($this->getData()['bundlesjson'])) {
+				$this->view->bundlesjson = true;
+			}
 		}
 
 		if (isset($this->getData()['includecoremodules'])) {
@@ -246,7 +250,10 @@ class ModulesComponent extends BaseComponent
 		) {
 			$this->view->type = 'bundles';
 			unset($apis[0]);//Remove local
+			unset($apis[1]);//Remove core
 			$this->view->apis = $apis;
+			unset($appTypes['core']);//Remove core
+			$this->view->appTypes = $appTypes;
 			$this->view->bundleModules = $this->modulesPackage->getDefaultDependencies();
 
 			if ($this->getData()['id'] != 0) {

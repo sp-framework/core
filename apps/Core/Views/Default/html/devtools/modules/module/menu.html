@@ -982,9 +982,13 @@ dataCollectionSection =
             // getAppTypeMenus
             $('#{{componentId}}-{{sectionId}}-app_type').off('select2:select');
             $('#{{componentId}}-{{sectionId}}-app_type').on('select2:select', function(e) {
+                getAppTypeMenus(e.params.data.id);
+            });
+
+            function getAppTypeMenus(id) {
                 var postData = { };
                 postData[$('#security-token').attr('name')] = $('#security-token').val();
-                postData['app_type'] = e.params.data.id;
+                postData['app_type'] = id;
 
                 $.post('{{links.url("devtools/modules/getAppTypeMenus")}}', postData, function(response) {
                     if (response.tokenKey && response.token) {
@@ -1019,7 +1023,7 @@ dataCollectionSection =
                         });
                     }
                 }, 'json');
-            });
+            }
 
             $('#{{componentId}}-{{sectionId}}-no_menu').off();
             $('#{{componentId}}-{{sectionId}}-no_menu').click(function() {
@@ -1034,7 +1038,6 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}-add-menu-item').attr('disabled', false);
                 }
             });
-
         },
         'core' : $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-menu_structure']['core'], {
             check_callback : function (operation, node, node_parent, node_position, more) {

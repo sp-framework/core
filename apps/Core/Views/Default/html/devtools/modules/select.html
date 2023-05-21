@@ -277,6 +277,11 @@ dataCollectionSection =
                         dataCollectionSectionForm['funcs']['loadAjax'](id, label, false, true);
                     }
                 });
+
+                $('#{{componentId}}-{{sectionId}}-generate-bundle-json').off();
+                $('#{{componentId}}-{{sectionId}}-generate-bundle-json').click(function() {
+                    dataCollectionSectionForm['funcs']['loadAjax'](id, label, false, false, false, true);
+                });
             }
         },
         '{{componentId}}-{{sectionId}}-form'                                : {
@@ -287,10 +292,13 @@ dataCollectionSection =
         }
     });
 
-dataCollectionSectionForm['funcs']['loadAjax'] = function(id = null, label = null, includecoremodules = false, newrelease = false, clone = false) {
+dataCollectionSectionForm['funcs']['loadAjax'] = function(id = null, label = null, includecoremodules = false, newrelease = false, clone = false, bundlesjson = false) {
     if (id && label) {
         if (label === 'bundles') {
             dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/bundles/true/id/' + id + '")}}';
+            if (bundlesjson) {
+                dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/bundles/true/bundlesjson/true/id/' + id + '")}}';
+            }
         } else {
             if (dataCollectionSectionForm['vars']['url'].includes('/q/')) {
                 dataCollectionSectionForm['vars']['url'] = '{{links.url("module/true/type/' + label + '/id/' + id + '")}}';

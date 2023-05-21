@@ -47,6 +47,40 @@
             ]
         ]
     )}}
+{% elseif bundlesjson is defined and bundlesjson === true %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : type,
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'success',
+            'cardIcon'                      : 'th',
+            'cardTitle'                     : 'NEW BUNDLE JSON : ' ~ moduleName ~ ' (' ~ type ~ ')',
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'modules/module',
+            'formButtons'                   :
+            [
+                'cancelActionUrl'           : 'devtools/modules',
+                'closeActionUrl'            : 'devtools/modules'
+            ],
+            'formSecondaryButtons'          :
+            [
+                'buttonType'                : 'button',
+                'buttons'                   : {
+                    'publish' : {
+                        'title'                   : 'Publish to repo',
+                        'type'                    : 'success',
+                        'icon'                    : 'code'
+                    }
+                }
+            ]
+        ]
+    )}}
 {% else %}
     {{adminltetags.useTag('content',
         [

@@ -72,6 +72,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Jobs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Schedules;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Tasks;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Workers;
+use System\Base\Installer\Packages\Setup\Schema\Modules\Bundles;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Components;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Middlewares;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Packages;
@@ -301,6 +302,7 @@ class Setup
 		$this->db->createTable('modules_packages', $dbName, (new Packages)->columns());
 		$this->db->createTable('modules_middlewares', $dbName, (new Middlewares)->columns());
 		$this->db->createTable('modules_views', $dbName, (new Views)->columns());
+		$this->db->createTable('modules_bundles', $dbName, (new Bundles)->columns());
 		$this->db->createTable('modules_views_settings', $dbName, (new Settings)->columns());
 
 		$this->db->createTable('basepackages_email_services', $dbName, (new EmailServices)->columns());
