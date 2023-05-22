@@ -490,9 +490,9 @@ class Views extends BasePackage
             $viewsModulesVersion[3] = count($views) + $viewsModulesVersion[3];
         }
 
-        $baseView['view_modules_version'] = $viewsModulesVersion = implode('.', $viewsModulesVersion);
+        $this->view['view_modules_version'] = $viewsModulesVersion = implode('.', $viewsModulesVersion);
 
-        $this->update($baseView);
+        $this->update($this->view);
 
         return $viewsModulesVersion;
     }

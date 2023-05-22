@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Modules;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Packages
 {
@@ -201,6 +202,19 @@ class Packages
 							'notNull' => false,
 						]
 					),
+				],
+				'indexes' => [
+					new Index(
+						'column_UNIQUE',
+						[
+							'name',
+							'app_type'
+						],
+						'UNIQUE'
+					)
+				],
+				'options' => [
+					'TABLE_COLLATION' => 'utf8mb4_general_ci'
 				]
 			];
 	}

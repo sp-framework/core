@@ -79,7 +79,7 @@ class ModulesComponent extends BaseComponent
 				${$modulesType . 'CategoryArr'} = $modulesArr['categoryArr'];
 			}
 
-			if (count($modulesArr['modules']) > 0) {
+			if ($modulesArr['modules'] && count($modulesArr['modules']) > 0) {
 				$modules[$modulesType]['value'] = ucfirst($modulesType);
 				$modules[$modulesType]['childs'] = $modulesArr['modules'];
 			} else {
@@ -169,7 +169,13 @@ class ModulesComponent extends BaseComponent
 
 					if ($module['module_details']['module_type'] === 'components') {
 						$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Components/';
-						$this->view->moduleMenu = Json::encode(Json::decode($module['module_details']['menu'], true));
+						if ($module['module_details']['menu']) {
+							$this->view->moduleMenu = Json::encode(Json::decode($module['module_details']['menu'], true));
+							$this->view->menuBaseStructure = $this->basepackages->menus->getMenusForAppType($module['module_details']['app_type']);
+						} else {
+							$this->view->moduleMenu = false;
+							$this->view->menuBaseStructure = [];
+						}
 					} else if ($module['module_details']['module_type'] === 'packages') {
 						if ($module['module_details']['app_type'] === 'core' &&
 							($module['module_details']['category'] === 'basepackages' ||
@@ -264,6 +270,7 @@ class ModulesComponent extends BaseComponent
 				}
 
 				$this->view->bundle = $bundle;
+				$this->view->bundleModules = $bundle['bundle_modules'];
 
 				if (isset($modules['bundles'])) {
 					unset($modules['bundles']);
@@ -539,6 +546,32 @@ class ModulesComponent extends BaseComponent
 			}
 
 			if ($this->modulesPackage->generateRelease($this->postData())) {
+				$this->addResponse(
+					$this->modulesPackage->packagesData->responseMessage,
+					$this->modulesPackage->packagesData->responseCode,
+					$this->modulesPackage->packagesData->responseData
+				);
+
+				return;
+			}
+
+			$this->addResponse(
+				$this->modulesPackage->packagesData->responseMessage,
+				$this->modulesPackage->packagesData->responseCode
+			);
+		} else {
+			$this->addResponse('Method Not Allowed', 1);
+		}
+	}
+
+	public function publishBundleJsonAction()
+	{
+		if ($this->request->isPost()) {
+			if (!$this->checkCSRF()) {
+				return;
+			}
+
+			if ($this->modulesPackage->publishBundleJson($this->postData())) {
 				$this->addResponse(
 					$this->modulesPackage->packagesData->responseMessage,
 					$this->modulesPackage->packagesData->responseCode,

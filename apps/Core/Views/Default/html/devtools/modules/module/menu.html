@@ -236,7 +236,7 @@
             <div class="row mb-3">
                 <div class="col">
                     {% set noMenuChecked = false %}
-                    {% if moduleMenu_id === '' %}
+                    {% if moduleMenu == 'false' %}
                         {% set noMenuChecked = true %}
                     {% endif %}
                     {{adminltetags.useTag('fields',
@@ -320,7 +320,7 @@
                             'fieldRequired'                  : true,
                             'fieldHidden'                    : true,
                             'fieldBazScan'                   : true,
-                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnCreate'           : true,
                             'fieldBazPostOnUpdate'           : true,
                             'fieldDataInputMinLength'        : 1,
                             'fieldDataInputMaxLength'        : 50,
@@ -1038,6 +1038,13 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}-add-menu-item').attr('disabled', false);
                 }
             });
+
+            if ($('#{{componentId}}-{{sectionId}}-no_menu')[0].checked == true) {
+                    $('#{{componentId}}-{{sectionId}}-menu').val('false');
+                    $('#{{componentId}}-{{sectionId}}-menu').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-add-menu-item').attr('disabled', true);
+                    cleanMenuForm();
+            }
         },
         'core' : $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-menu_structure']['core'], {
             check_callback : function (operation, node, node_parent, node_position, more) {

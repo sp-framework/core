@@ -82,11 +82,27 @@ class DevtoolsModules extends BasePackage
             $data['apps'] = Json::encode([]);
         }
 
-        if ($this->modules->{$data['type']}->add($data) &&
-            $this->updateModuleJson($data) &&
-            $this->generateNewFiles($data)
-        ) {
-            $this->addResponse('Module added');
+        try {
+            if ($this->modules->{$data['type']}->add($data) &&
+                $this->updateModuleJson($data) &&
+                $this->generateNewFiles($data)
+            ) {
+                if ($data['createrepo'] == true) {
+                    if (!$this->checkRepo($data)) {
+                        $newRepo = $this->createRepo($data);
+
+                        $this->addResponse('Module added & created new repo.', 0, ['newRepo' => $newRepo]);
+
+                        return;
+                    }
+                }
+
+                $this->addResponse('Module added');
+
+                return;
+            }
+        } catch (\Exception $e) {
+            $this->addResponse($e->getMessage(), 1);
         }
     }
 
@@ -124,6 +140,16 @@ class DevtoolsModules extends BasePackage
             ) {
                 if ($data['type'] === 'components') {
                     $this->addUpdateComponentMenu($data);
+                }
+
+                if ($data['createrepo'] == true) {
+                    if (!$this->checkRepo($data)) {
+                        $newRepo = $this->createRepo($data);
+
+                        $this->addResponse('Module added & created new repo.', 0, ['newRepo' => $newRepo]);
+
+                        return;
+                    }
                 }
 
                 $this->addResponse('Module updated');
@@ -349,6 +375,8 @@ class DevtoolsModules extends BasePackage
         $method = 'generateNew' . ucfirst($data['type']) . 'Files';
 
         $this->{$method}($moduleFilesLocation, $data);
+
+        return true;
     }
 
     protected function getNewFilesLocation($data, $public = false)
@@ -491,21 +519,25 @@ class DevtoolsModules extends BasePackage
 
     protected function addUpdateComponentMenu($data)
     {
-        if ($data['menu_id'] != '' || $data['menu_id'] != '0') {
-            $menu = $this->basepackages->menus->getById($data['menu_id']);
+        if ($data['menu_id'] != '' && $data['menu_id'] != '0') {
+            if (!isset($data['is_clone']) ||
+                (isset($data['is_clone']) && $data['is_clone'] == false)
+            ) {
+                $menu = $this->basepackages->menus->getById($data['menu_id']);
 
-            if ($menu) {
-                if ($data['menu'] == 'false') {
-                    $this->basepackages->menus->remove($data['menu_id']);
+                if ($menu) {
+                    if ($data['menu'] == 'false') {
+                        $this->basepackages->menus->remove($data['menu_id']);
 
-                    $module = $this->modules->{$data['type']}->getById($data['id']);
+                        $module = $this->modules->{$data['type']}->getById($data['id']);
 
-                    $module['menu_id'] = null;
-                    $module['menu'] = null;
+                        $module['menu_id'] = null;
+                        $module['menu'] = null;
 
-                    $this->modules->{$data['type']}->update($module);
+                        $this->modules->{$data['type']}->update($module);
 
-                    return;
+                        return;
+                    }
                 }
             }
         }
@@ -513,7 +545,7 @@ class DevtoolsModules extends BasePackage
         if ($data['menu'] != 'false' && $data['menu'] != '') {
             $data['menu'] = Json::decode($data['menu'], true);
 
-            if ($menu) {
+            if (isset($menu)) {
                 $this->basepackages->menus->updateMenu($data['menu_id'], $data['app_type'], $data['menu']);
 
                 return;
@@ -533,89 +565,67 @@ class DevtoolsModules extends BasePackage
 
     public function syncLabels($data)
     {
-        if (!isset($data['api_id']) || !isset($data['name'])) {
-            $this->addResponse('API information not provided', 1, []);
-
+        if (!$this->initApi($data)) {
             return false;
         }
 
-        if (isset($data['api_id']) && $data['api_id'] == '0') {
-            $this->addResponse('This is local module and not remote module, cannot sync labels.', 1, []);
-
-            return false;
+        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+            $collection = 'IssueApi';
+            $method = 'issueListLabels';
+            $args = [$this->apiConfig['org_user'], strtolower($data['name'])];
+        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+            //For github
         }
 
-        if (!$this->initApi($data['api_id'])) {
-            return false;
-        }
-
-        if ($this->apiConfig) {
-            if (strtolower($this->apiConfig['provider']) === 'gitea') {
-                $collection = 'IssueApi';
-                $method = 'issueListLabels';
-                $args = [$this->apiConfig['org_user'], strtolower($data['name'])];
-            } else if (strtolower($this->apiConfig['provider']) === 'github') {
-                //For github
-            }
-
+        try {
             $labels = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+        } catch (\throwable $e) {
+            $this->addResponse($e->getmessage(), 1);
 
-            if ($labels) {
-                $this->addResponse('Labels Synced', 0, ['labels' => $labels]);
-
-                return true;
-            }
-
-            $this->addResponse('Error syncing labels', 1);
+            return false;
         }
+
+        if ($labels) {
+            $this->addResponse('Labels Synced', 0, ['labels' => $labels]);
+
+            return true;
+        }
+
+        $this->addResponse('Error syncing labels', 1);
     }
 
     public function getLabelIssues($data)
     {
-        if (!isset($data['api_id']) || !isset($data['name'])) {
-            $this->addResponse('API information not provided', 1, []);
-
+        if (!$this->initApi($data)) {
             return false;
         }
 
-        if (isset($data['api_id']) && $data['api_id'] == '0') {
-            $this->addResponse('This is local module and not remote module, cannot sync labels.', 1, []);
+        //Get Latest Release (Last One, we need to sync issues since that release)
+        $latestRelease = $this->getLatestRelease($data);
 
-            return false;
+        if (!$latestRelease) {
+            $since = null;
         }
 
-        if (!$this->initApi($data['api_id'])) {
-            return false;
+        $since = $latestRelease['created_at'];
+
+        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+            $collection = 'IssueApi';
+            $method = 'issueListIssues';
+            $args = [$this->apiConfig['org_user'], strtolower($data['name']), 'closed', implode(',', $data['labels']), null, null, null, $since];
+        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+            //For github
         }
 
-        if ($this->apiConfig) {
-            //Get Latest Release (Last One, we need to sync issues since that release)
-            $latestRelease = $this->getLatestRelease($data);
+        $issues = $this->api->useMethod($collection, $method, $args)->getResponse(true);
 
-            if (!$latestRelease) {
-                $since = null;
-            }
+        if ($issues) {
+            $this->addResponse('Issues Synced', 0, ['issues' => $issues]);
 
-            $since = $latestRelease['created_at'];
-
-            if (strtolower($this->apiConfig['provider']) === 'gitea') {
-                $collection = 'IssueApi';
-                $method = 'issueListIssues';
-                $args = [$this->apiConfig['org_user'], strtolower($data['name']), 'closed', implode(',', $data['labels']), null, null, null, $since];
-            } else if (strtolower($this->apiConfig['provider']) === 'github') {
-                //For github
-            }
-
-            $issues = $this->api->useMethod($collection, $method, $args)->getResponse(true);
-
-            if ($issues) {
-                $this->addResponse('Issues Synced', 0, ['issues' => $issues]);
-
-                return true;
-            }
-
-            $this->addResponse('Error syncing issues', 1);
+            return true;
         }
+
+        $this->addResponse('Error syncing issues', 1);
     }
 
     protected function getLatestRelease($data)
@@ -628,18 +638,34 @@ class DevtoolsModules extends BasePackage
             //For github
         }
 
-        $latestRelease = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+        try {
+            $latestRelease = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+        } catch (\throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+        }
 
-        if ($latestRelease) {
+        if (isset($latestRelease)) {
             return $latestRelease;
         }
 
         return false;
     }
 
-    protected function initApi($id)
+    protected function initApi($data)
     {
-        $this->api = $this->basepackages->api->useApi($id, true);
+        if (!isset($data['api_id']) || !isset($data['name'])) {
+            $this->addResponse('API information not provided', 1, []);
+
+            return false;
+        }
+
+        if (isset($data['api_id']) && $data['api_id'] == '0') {
+            $this->addResponse('This is local module and not remote module, cannot sync labels.', 1, []);
+
+            return false;
+        }
+
+        $this->api = $this->basepackages->api->useApi($data['api_id'], true);
 
         $this->apiConfig = $this->api->getApiConfig();
 
@@ -677,6 +703,8 @@ class DevtoolsModules extends BasePackage
 
         if ($latestRelease) {
             $latestReleaseVersion = $latestRelease['name'];
+        } else {
+            return false;
         }
 
         if ($data['type'] === 'core') {
@@ -718,112 +746,260 @@ class DevtoolsModules extends BasePackage
 
     public function syncBranches($data)
     {
-        if (!isset($data['api_id']) || !isset($data['name'])) {
-            $this->addResponse('API information not provided', 1, []);
-
+        if (!$this->initApi($data)) {
             return false;
         }
 
-        if (isset($data['api_id']) && $data['api_id'] == '0') {
-            $this->addResponse('This is local module and not remote module, cannot sync labels.', 1, []);
-
-            return false;
+        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+            $collection = 'RepositoryApi';
+            $method = 'repoListBranches';
+            $args = [$this->apiConfig['org_user'], strtolower($data['name'])];
+        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+            //For github
         }
 
-        if (!$this->initApi($data['api_id'])) {
-            return false;
-        }
-
-        if ($this->apiConfig) {
-            if (strtolower($this->apiConfig['provider']) === 'gitea') {
-                $collection = 'RepositoryApi';
-                $method = 'repoListBranches';
-                $args = [$this->apiConfig['org_user'], strtolower($data['name'])];
-            } else if (strtolower($this->apiConfig['provider']) === 'github') {
-                //For github
-            }
-
+        try {
             $branches = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+        } catch (\throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
 
-            if ($branches) {
-                $this->addResponse('Labels Synced', 0, ['branches' => $branches]);
-
-                return true;
-            }
-
-            $this->addResponse('Error syncing branches', 1);
+            return false;
         }
+
+        if ($branches) {
+            $this->addResponse('Labels Synced', 0, ['branches' => $branches]);
+
+            return true;
+        }
+
+        $this->addResponse('Error syncing branches', 1);
     }
 
     public function generateRelease($data)
     {
-        if (!isset($data['api_id']) || !isset($data['name'])) {
-            $this->addResponse('API information not provided', 1, []);
-
+        if (!$this->initApi($data)) {
             return false;
         }
 
-        if (isset($data['api_id']) && $data['api_id'] == '0') {
-            $this->addResponse('This is local module and not remote module, cannot sync labels.', 1, []);
+        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+            $collection = 'RepositoryApi';
+            $method = 'repoCreateRelease';
 
-            return false;
-        }
+            // $draft = false;
+            // if (isset($data['draft'])) {
+            //     if ($data['draft'] == '1') {
+            //         $draft = true;
+            //     }
+            // }
 
-        if (!$this->initApi($data['api_id'])) {
-            return false;
-        }
-
-        if ($this->apiConfig) {
-            if (strtolower($this->apiConfig['provider']) === 'gitea') {
-                $collection = 'RepositoryApi';
-                $method = 'repoCreateRelease';
-
-                // $draft = false;
-                // if (isset($data['draft'])) {
-                //     if ($data['draft'] == '1') {
-                //         $draft = true;
-                //     }
-                // }
-
-                $prerelease = false;
-                if (isset($data['prerelease']) && $data['prerelease'] == 'true') {
-                    $prerelease = true;
-                }
-
-                $name = $this->bumpVersion($data);
-
-                $args =
-                    [
-                        $this->apiConfig['org_user'],
-                        strtolower($data['name']),
-                        [
-                            'body'              => $data['release_notes'],
-                            'draft'             => false,
-                            'name'              => $name,
-                            'prerelease'        => $prerelease,
-                            'tag_name'          => $name,
-                            'target_commitish'  => $data['branch']
-                        ]
-                    ];
-            } else if (strtolower($this->apiConfig['provider']) === 'github') {
-                //For github
+            $prerelease = false;
+            if (isset($data['prerelease']) && $data['prerelease'] == 'true') {
+                $prerelease = true;
             }
 
-            try {
-                $newRelease = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+            $name = $this->bumpVersion($data);
 
-                if ($newRelease) {
-                    $this->addResponse('Generated New Release!', 0, ['newRelease' => $newRelease]);
+            $args =
+                [
+                    $this->apiConfig['org_user'],
+                    strtolower($data['name']),
+                    [
+                        'body'              => $data['release_notes'],
+                        'draft'             => false,
+                        'name'              => $name,
+                        'prerelease'        => $prerelease,
+                        'tag_name'          => $name,
+                        'target_commitish'  => $data['branch']
+                    ]
+                ];
+        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+            //For github
+        }
 
-                    return true;
-                }
-            } catch (\throwable $e) {
+        try {
+            $newRelease = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+
+            if ($newRelease) {
+                $this->addResponse('Generated New Release!', 0, ['newRelease' => $newRelease]);
+
+                return true;
+            }
+        } catch (\throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return;
+        }
+
+        $this->addResponse('Error generating new release', 1);
+    }
+
+    public function publishBundleJson($data)
+    {
+        if (!$this->initApi($data)) {
+            return false;
+        }
+
+        $repo = $this->checkRepo($data);
+
+        //Create new repo if doesnt exist.
+        if (!$repo) {
+            $newRepo = $this->createRepo($data);
+        }
+
+        $data['repo'] = Arr::last(explode('/', $data['repo']));
+
+        //Check for bundle.json file
+        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+            $collection = 'RepositoryApi';
+            $method = 'repoGetContents';
+        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+            //For github
+        }
+
+        try {
+            $file = $this->api->useMethod($collection, $method, [$this->apiConfig['org_user'], strtolower($data['repo']), 'bundle.json'])->getResponse(true);
+        } catch (\throwable $e) {
+            if ($e->getCode() !== 404) {
                 $this->addResponse($e->getMessage(), 1);
 
                 return;
             }
-
-            $this->addResponse('Error generating new release', 1);
         }
+
+        $jsonContent = [];
+        $jsonContent["name"] = $data["name"];
+        $jsonContent["description"] = $data["description"];
+        $jsonContent["module_type"] = $data["module_type"];
+        $jsonContent["app_type"] = $data["app_type"];
+        $jsonContent["repo"] = $data["repo"];
+        $jsonContent["bundle_modules"] = Json::decode($data["bundle_modules"], true);
+
+        $jsonContent = Json::encode($jsonContent, JSON_UNESCAPED_SLASHES);
+
+        $jsonContent = str_replace('\\"', '"', $jsonContent);
+        $jsonContent = str_replace('"{', '{', $jsonContent);
+        $jsonContent = str_replace('}"', '}', $jsonContent);
+        $jsonContent = $this->basepackages->utils->formatJson(['json' => $jsonContent]);
+        // $jsonContent = str_replace('\\n    ', '', $jsonContent);
+        // $jsonContent = str_replace('    "', '"', $jsonContent);
+
+        //Create File if not found
+        if (!isset($file)) {
+            $method = 'repoCreateFile';
+            $args =
+                [
+                    $this->apiConfig['org_user'],
+                    strtolower($data['repo']),
+                    'bundle.json',
+                    [
+                        'message' => $data['comment'],
+                        'content' => base64_encode($jsonContent)
+                    ]
+                ];
+        } else {
+            $method = 'repoUpdateFile';
+            $args =
+                [
+                    $this->apiConfig['org_user'],
+                    strtolower($data['repo']),
+                    'bundle.json',
+                    [
+                        'message' => $data['comment'],
+                        'content' => base64_encode($jsonContent),
+                        'sha' => $file['sha']
+                    ]
+                ];
+        }
+
+        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+            $collection = 'RepositoryApi';
+        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+            //For github
+        }
+
+        try {
+            $file = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+        } catch (\throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return;
+        }
+
+        $this->addResponse('Added/Updated bundle.json to repository', 0, []);
+    }
+
+    protected function checkRepo($data)
+    {
+        if (!$this->apiConfig && !$this->initApi($data)) {
+            return false;
+        }
+
+        $data['repo'] = Arr::last(explode('/', $data['repo']));
+
+        //Check Repo if exists
+        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+            $collection = 'RepositoryApi';
+            $method = 'repoGet';
+        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+            //For github
+        }
+
+        try {
+            $repo = $this->api->useMethod($collection, $method, [$this->apiConfig['org_user'], strtolower($data['repo'])])->getResponse(true);
+        } catch (\throwable $e) {
+            if ($e->getCode() === 404 && $data['createrepo'] == false) {
+                $this->addResponse('Repository does not exist. Please check create repo and publish again.' . $e->getMessage(), 1);
+
+                return false;
+            }
+        }
+
+        if (isset($repo)) {
+            return $repo;
+        }
+
+        return false;
+    }
+
+    protected function createRepo($data)
+    {
+        if (!$this->apiConfig && !$this->initApi($data)) {
+            return false;
+        }
+
+        $data['repo'] = Arr::last(explode('/', $data['repo']));
+
+        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+            $collection = 'OrganizationApi';
+            $method = 'createOrgRepo';
+
+            $args =
+                [
+                    $this->apiConfig['org_user'],
+                    [
+                        "auto_init"         => true,
+                        "default_branch"    => "main",
+                        "description"       => $data['repo'],
+                        "name"              => $data['repo'],
+                        "private"           => false,
+                    ]
+                ];
+        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+            //For github
+        }
+
+        try {
+            $newRepo = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+        } catch (\throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        if (isset($newRepo)) {
+            return $newRepo;
+        }
+
+        return false;
     }
 }

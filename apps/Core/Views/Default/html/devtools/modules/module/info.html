@@ -68,6 +68,28 @@
 {% endif %}
 <div class="row">
     <div class="col">
+        {% if clone is defined and clone === true %}
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'is_clone',
+                    'fieldLabel'                     : 'Is Clone',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Is Clone',
+                    'fieldRequired'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldHidden'                    : true,
+                    'fieldDisabled'                  : true,
+                    'fieldValue'                     : 'true'
+                ]
+            )}}
+        {% endif %}
         {{adminltetags.useTag('fields',
             [
                 'component'                      : component,
@@ -335,6 +357,28 @@
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 1024,
                 'fieldValue'                     : moduleRepo
+            ]
+        )}}
+    </div>
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'createrepo',
+                'fieldLabel'                     : 'Create New Repo?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Create new repository if it does not exist on remote?',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : false,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
             ]
         )}}
     </div>

@@ -146,6 +146,10 @@ dataCollectionSection =
                                 );
                             }
                         } else {
+                            $('#{{componentId}}-{{sectionId}}-release-version').html(
+                                '<span class="text-danger">ERROR LOADING RELEASE INFORMATION!</span>'
+                            );
+
                             PNotify.error({'text': response.responseMessage});
                         }
                     }, 'json');
@@ -359,149 +363,59 @@ dataCollectionSection =
             'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY'
         },
         '{{componentId}}-{{sectionId}}-repo'                                    : { },
+        '{{componentId}}-{{sectionId}}-createrepo'                              : { },
+        '{{componentId}}-{{sectionId}}-comment'                                 : { },
         '{{componentId}}-{{sectionId}}-bundle_modules'                          : {
             'afterInit'     : function() {
-                var id, label, moduleData;
-                $('#{{componentId}}-{{sectionId}}-modules-external, ' +
-                  '#{{componentId}}-{{sectionId}}-modules-external-version'
-                ).on('keyup', function() {
-                    if ($(this).val() !== '') {
-                        label = 'external';
-                        $('#{{componentId}}-{{sectionId}}-modules').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-modules-external-add, ' +
-                          '#{{componentId}}-{{sectionId}}-modules-external-remove').attr('disabled', false);
-                    } else {
-                        $('#{{componentId}}-{{sectionId}}-modules').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-modules-external-add, ' +
-                          '#{{componentId}}-{{sectionId}}-modules-external-remove').attr('disabled', true);
-                    }
-                });
-
-                $('#{{componentId}}-{{sectionId}}-modules').on('select2:clear', function(e) {
-                    reset();
-                });
-
-                $('#{{componentId}}-{{sectionId}}-modules').on('select2:select', function(e) {
-                    id = e.params.data.id;
-                    label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
-
-                    moduleData = dataCollectionSectionForm['vars']['modules'][label][id];
-                    $('#{{componentId}}-{{sectionId}}-modules-modulename').val(moduleData['name']);
-                    $('#{{componentId}}-{{sectionId}}-modules-moduleversion').val(moduleData['version']);
-                    $('#{{componentId}}-{{sectionId}}-modules-modulerepo').val(moduleData['repo']);
-
-                    $('#{{componentId}}-{{sectionId}}-modules-add, ' +
-                      '#{{componentId}}-{{sectionId}}-modules-remove').attr('disabled', false);
-
-                    $('#{{componentId}}-{{sectionId}}-modules-external, ' +
-                      '#{{componentId}}-{{sectionId}}-modules-external-version').attr('disabled', true);
-
-                    $('#selected-module-information').attr('hidden', false);
-                });
-
-                function reset() {
-                    $('#{{componentId}}-{{sectionId}}-modules-add, ' +
-                      '#{{componentId}}-{{sectionId}}-modules-external-add, ' +
-                      '#{{componentId}}-{{sectionId}}-modules-external-remove, ' +
-                      '#{{componentId}}-{{sectionId}}-modules-remove').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-modules-external, ' +
-                      '#{{componentId}}-{{sectionId}}-modules-external-version, ' +
-                      '#{{componentId}}-{{sectionId}}-modules').attr('disabled', false);
-
-                    $('#{{componentId}}-{{sectionId}}-modules-modulename').val('');
-                    $('#{{componentId}}-{{sectionId}}-modules-moduleversion').val('');
-                    $('#{{componentId}}-{{sectionId}}-modules-modulerepo').val('');
-                    $('#{{componentId}}-{{sectionId}}-modules-external').val('');
-                    $('#{{componentId}}-{{sectionId}}-modules-external-version').val('');
-                    $('#{{componentId}}-{{sectionId}}-modules').val(0).trigger('change');
-
-                    $('#selected-module-information').attr('hidden', true);
-                }
-
                 function prettyfyJson() {
                     $('#{{componentId}}-{{sectionId}}-bundle_modules')
                         .val(JSON.stringify(dataCollectionSectionForm['vars']['bundleModules'], null, 4));
                 }
 
-                $('#{{componentId}}-{{sectionId}}-modules-add, ' +
-                  '#{{componentId}}-{{sectionId}}-modules-external-add').click(function(e) {
-                    e.preventDefault();
-
-                    var found = false;
-
-                    if (label === 'core') {
-                        dataCollectionSectionForm['vars']['bundleModules'][label] = { };
-                        dataCollectionSectionForm['vars']['bundleModules'][label]['name'] = moduleData['name'];
-                        dataCollectionSectionForm['vars']['bundleModules'][label]['version'] = moduleData['version'];
-                        dataCollectionSectionForm['vars']['bundleModules'][label]['repo'] = moduleData['repo'];
-                    } else if (label === 'external') {
-                        if (dataCollectionSectionForm['vars']['bundleModules']['external'].length === 0) {
-                            dataCollectionSectionForm['vars']['bundleModules']['external'] = { };
-                        }
-
-                        dataCollectionSectionForm['vars']['bundleModules'][label][$('#{{componentId}}-{{sectionId}}-modules-external').val()]
-                            = $('#{{componentId}}-{{sectionId}}-modules-external-version').val();
-
-                        reset();
-                    } else {
-                        for (var modules in dataCollectionSectionForm['vars']['bundleModules']) {
-                            if (label === modules) {
-                                $.each(dataCollectionSectionForm['vars']['bundleModules'][modules], function(index, mod) {
-                                    if (mod['name'] === moduleData['name']) {
-                                        found = true;
-                                    }
-                                });
-
-                                if (!found) {
-                                    var moduleToPush = { };
-                                    moduleToPush['name'] = moduleData['name'];
-                                    moduleToPush['version'] = moduleData['version'];
-                                    moduleToPush['repo'] = moduleData['repo'];
-
-
-                                    dataCollectionSectionForm['vars']['bundleModules'][modules].push(moduleToPush);
-                                }
-                            }
-                        }
-                    }
-
-                    reset();
-                    prettyfyJson();
-                });
-
-                $('#{{componentId}}-{{sectionId}}-modules-remove, ' +
-                  '#{{componentId}}-{{sectionId}}-modules-external-remove').click(function(e) {
-                    e.preventDefault();
-
-                    var found = false;
-                    var foundIndex;
-
-                    if (label === 'core') {
-                        dataCollectionSectionForm['vars']['bundleModules'][label] = { };
-                    } else if (label === 'external') {
-                        delete dataCollectionSectionForm['vars']['bundleModules'][label][$('#{{componentId}}-{{sectionId}}-modules-external').val()];
-                    } else {
-                        for (var modules in dataCollectionSectionForm['vars']['bundleModules']) {
-                            if (label === modules) {
-                                $.each(dataCollectionSectionForm['vars']['bundleModules'][modules], function(index, mod) {
-                                    if (mod['name'] === moduleData['name']) {
-                                        found = true;
-                                        foundIndex = index;
-                                    }
-                                });
-
-                                if (found) {
-                                    dataCollectionSectionForm['vars']['bundleModules'][modules].splice(foundIndex);
-                                }
-                            }
-                        }
-                    }
-
-                    reset();
-                    prettyfyJson();
-                });
-
                 prettyfyJson();
+
+                $('#publish').off();
+                $('#publish').click(function(e) {
+                    e.preventDefault();
+
+                    $('#{{componentId}}-{{sectionId}}').BazContentSectionWithForm({'task':'validateForm'});
+
+                    if ($('#{{componentId}}-{{sectionId}}-alert').length === 0) {
+                        $('#publish').attr('disabled', true);
+                        $('#publish').children('i').removeClass('fa-code').addClass('fa-spin fa-cog');
+
+                        var postData = { };
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                        postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                        postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                        postData['app_type'] = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                        postData['description'] = $('#{{componentId}}-{{sectionId}}-description').val();
+                        postData['type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                        postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
+                        postData['repo'] = $('#{{componentId}}-{{sectionId}}-repo').val();
+                        postData['createrepo'] = $('#{{componentId}}-{{sectionId}}-createrepo')[0].checked;
+                        postData['comment'] = $('#{{componentId}}-{{sectionId}}-comment').val();
+                        postData['bundle_modules'] = $('#{{componentId}}-{{sectionId}}-bundle_modules').val();
+
+                        $.post('{{links.url("devtools/modules/publishBundleJson")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+
+                            if (response.responseCode == 0) {
+                                PNotify.success({'text': response.responseMessage});
+                            } else {
+                                PNotify.error({'text': response.responseMessage});
+
+                                $('#publish').attr('disabled', false);
+                            }
+
+                            $('#publish').children('i').removeClass('fa-spin fa-cog').addClass('fa-code');
+                        }, 'json');
+                    }
+                });
             }
         },
         '{{componentId}}-{{sectionId}}-form'                                    : {
@@ -511,6 +425,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-name'                            : 'required',
                 '{{componentId}}-{{sectionId}}-api_id'                          : 'required',
                 '{{componentId}}-{{sectionId}}-repo'                            : 'required',
+                '{{componentId}}-{{sectionId}}-comment'                         : 'required',
                 '{{componentId}}-{{sectionId}}-bundle_modules'                  : 'required',
             },
             messages: {
@@ -519,6 +434,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-name'                            : 'Please enter module name',
                 '{{componentId}}-{{sectionId}}-api_id'                          : 'Please select Remote Repo',
                 '{{componentId}}-{{sectionId}}-repo'                            : 'Please enter repo',
+                '{{componentId}}-{{sectionId}}-comment'                         : 'Please enter commit comment',
                 '{{componentId}}-{{sectionId}}-bundle_modules'                  : 'Please enter bundle modules',
             },
             onSubmitResponse: function(response) {
@@ -637,7 +553,6 @@ dataCollectionSection =
                 function extractName(repourl = '') {
                     repourl =
                         repourl + '/' +
-                        'apps-' +
                         $('#{{componentId}}-{{sectionId}}-app_type').val().toLowerCase() + '-' +
                         $('#{{componentId}}-{{sectionId}}-module_type').val().toLowerCase() + '-' +
                         $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
@@ -921,8 +836,8 @@ dataCollectionSectionForm['vars']['moduleDependencies'] = JSON.parse('{{moduleDe
 dataCollectionSectionForm['vars']['moduleId'] = '{{moduleId}}';
 
 if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
+    dataCollectionSectionForm['vars']['moduleSettings'] = { };
     if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
-        dataCollectionSectionForm['vars']['moduleSettings'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] = false;
         dataCollectionSectionForm['vars']['moduleSettings']['layouts'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['tags'] = '';
@@ -969,6 +884,7 @@ if (dataCollectionSectionForm['vars']['module_type'] !== 'views' &&
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-is_clone'                                : { },
         '{{componentId}}-{{sectionId}}-id'                                      : { },
         '{{componentId}}-{{sectionId}}-type'                                    : { },
         '{{componentId}}-{{sectionId}}-app_type'                                : {
@@ -993,27 +909,54 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-api_id'                                  : {
             'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY',
             afterInit: function() {
-                $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function(e) {
-                    var id, repourl;
+                var repourl = $('#{{componentId}}-{{sectionId}}-repo').val();
 
-                    id = e.params.data.id;
+                $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function(e) {
+                    var id = e.params.data.id;
                     repourl = $(e.params.data.element).data('url');
 
                     if (repourl !== 'https://.../') {
-                        repourl =
-                            repourl + '/' +
-                            'apps-' +
-                            $('#{{componentId}}-{{sectionId}}-app_type').val().toLowerCase() + '-' +
-                            $('#{{componentId}}-{{sectionId}}-module_type').val().toLowerCase() + '-' +
-                            $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
+                        extractRepoName(repourl);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-createrepo')[0].checked = false;
+                        $('#{{componentId}}-{{sectionId}}-createrepo').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-repo').val(repourl);
                     }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-name').on('keyup', function() {
+                    if (repourl !== 'https://.../') {
+                        extractRepoName(repourl);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-app_type').on('change.select2', function() {
+                    if (repourl !== 'https://.../') {
+                        extractRepoName(repourl);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-category').on('change.select2', function() {
+                    if (repourl !== 'https://.../') {
+                        extractRepoName(repourl);
+                    }
+                });
+
+                function extractRepoName(repourl = '') {
+                    repourl =
+                        repourl + '/' +
+                        $('#{{componentId}}-{{sectionId}}-app_type').val().toLowerCase() + '-' +
+                        $('#{{componentId}}-{{sectionId}}-module_type').val().toLowerCase() + '-' +
+                        $('#{{componentId}}-{{sectionId}}-category').val().toLowerCase() + '-' +
+                        $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
 
                     $('#{{componentId}}-{{sectionId}}-repo').val(repourl);
-                });
+                }
             }
         },
         '{{componentId}}-{{sectionId}}-version'                                 : { },
         '{{componentId}}-{{sectionId}}-repo'                                    : { },
+        '{{componentId}}-{{sectionId}}-createrepo'                              : { },
         '{{componentId}}-{{sectionId}}-class'                                   : {
             afterInit: function() {
                 function capitalizeFirstLetter(string) {
@@ -1041,12 +984,11 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}-class').val(currentClassArr.join('\\'));
                 });
 
-                $('#{{componentId}}-{{sectionId}}-name').off();
                 $('#{{componentId}}-{{sectionId}}-name').on('keyup', function() {
-                    extractName();
+                    extractClass();
                 });
 
-                function extractName() {
+                function extractClass() {
                     if ((dataCollectionSectionForm['vars']['module_type'] === 'packages' &&
                         $('#{{componentId}}-{{sectionId}}-category').select2('data')[0].id !== 'basepackages') ||
                         dataCollectionSectionForm['vars']['module_type'] === 'middlewares'
@@ -1152,7 +1094,7 @@ dataCollectionSection =
                         currentClassArr[5] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-name').val());
                         $('#{{componentId}}-{{sectionId}}-class').val(currentClassArr.join('\\'));
                     } else {
-                        extractName();
+                        extractClass();
                     }
                 });
             }

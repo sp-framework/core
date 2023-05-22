@@ -112,6 +112,7 @@
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'Bundle Name Example: Dashboard Base.',
                 'fieldRequired'                  : true,
+                'fieldDisabled'                  : true,
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
@@ -123,7 +124,7 @@
         )}}
     </div>
 </div>
-<div class="row" hidden>
+<div class="row">
     <div class="col-md-3">
         {{adminltetags.useTag('fields',
             [
@@ -137,6 +138,7 @@
                 'fieldHelp'                            : true,
                 'fieldHelpTooltipContent'              : 'Select repo if the bundle will be available on a repo. Note: Bundles are only available via Repo.',
                 'fieldRequired'                        : true,
+                'fieldDisabled'                        : true,
                 'fieldBazScan'                         : true,
                 'fieldBazPostOnCreate'                 : true,
                 'fieldBazPostOnUpdate'                 : true,
@@ -172,6 +174,53 @@
             ]
         )}}
     </div>
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'createrepo',
+                'fieldLabel'                     : 'Create New Repo?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Create new repository if it does not exist on remote?',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : true,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'comment',
+                'fieldLabel'                     : 'Commit Comment',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Commit Comment',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 512,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
 </div>
 <div class="row">
     <div class="col">
@@ -193,6 +242,31 @@
                 'fieldDataInputMaxLength'        : 4096,
                 'fieldTextareaRows'              : 15,
                 'fieldValue'                     : bundleModules
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'description',
+                'fieldLabel'                     : 'Bundle Description',
+                'fieldType'                      : 'trumbowyg',
+                'fieldDataMaxLength'             : 4096,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Description of the component',
+                'fieldRequired'                  : false,
+                'fieldHidden'                    : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldValue'                     : bundleDescription
             ]
         )}}
     </div>

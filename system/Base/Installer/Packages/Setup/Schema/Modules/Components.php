@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Modules;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Components
 {
@@ -208,6 +209,17 @@ class Components
 							'type'    => Column::TYPE_JSON,
 							'notNull' => false,
 						]
+					)
+				],
+				'indexes' => [
+					new Index(
+						'column_UNIQUE',
+						[
+							'name',
+							'app_type',
+							'route'
+						],
+						'UNIQUE'
 					)
 				],
 				'options' => [
