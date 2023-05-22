@@ -347,8 +347,6 @@ class Setup
 		$this->db->createTable('basepackages_api_apis_repos', $dbName, (new Repos)->columns());
 
 		if ($this->postData['dev'] == 'true') {
-			$this->db->createTable('apps_core_devtools_api_contracts', $dbName, (new DevtoolsApiContracts)->columns());
-			$this->db->createTable('apps_core_devtools_api_enums', $dbName, (new DevtoolsApiEnums)->columns());
 			$this->db->createTable('apps_core_devtools_modules_bundles', $dbName, (new DevtoolsModulesBundles)->columns());
 		}
 
