@@ -303,6 +303,7 @@ class DevtoolsModules extends BasePackage
         $jsonContent = str_replace('\\"', '"', $jsonContent);
         $jsonContent = str_replace('"{', '{', $jsonContent);
         $jsonContent = str_replace('}"', '}', $jsonContent);
+        $jsonContent = str_replace('\\n', '', $jsonContent);
         $jsonContent = $this->basepackages->utils->formatJson(['json' => $jsonContent]);
 
         try {
@@ -593,6 +594,46 @@ class DevtoolsModules extends BasePackage
 
         try {
             $this->localContent->write($moduleFilesLocation . $componentName . '.php', $file);
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write module component file');
+
+            return false;
+        }
+
+        if (isset($data['widgets']) && $data['widgets'] !== '') {
+            $data['widgets'] = Json::decode($data['widgets'], true);
+
+            try {
+                $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/ComponentWidget.txt');
+            } catch (FilesystemException | UnableToReadFile $exception) {
+                $this->addResponse('Unable to read module base component file.');
+
+                return false;
+            }
+
+
+            $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass, $file);
+
+            foreach ($data['widgets'] as $widget) {
+                try {
+                    $methodFile = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/ComponentWidgetMethod.txt');
+                } catch (FilesystemException | UnableToReadFile $exception) {
+                    $this->addResponse('Unable to read module base component file.');
+
+                    return false;
+                }
+
+                $methodFile = str_replace('"WIDGETNAME"', $widget['method'], $methodFile);
+
+$file .= '
+' . $methodFile;
+            }
+
+            $file .= '}';
+        }
+
+        try {
+            $this->localContent->write($moduleFilesLocation . 'Widgets.php', $file);
         } catch (FilesystemException | UnableToWriteFile $exception) {
             $this->addResponse('Unable to write module component file');
 

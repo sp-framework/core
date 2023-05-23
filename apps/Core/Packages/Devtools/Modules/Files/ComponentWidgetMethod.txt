@@ -1,0 +1,4 @@
+    public function "WIDGETNAME"($widget, $dashboardWidget)
+    {
+        return $this->getWidgetContent($widget, $dashboardWidget);
+    }
