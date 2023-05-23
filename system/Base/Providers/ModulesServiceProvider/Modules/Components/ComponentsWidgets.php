@@ -1,10 +1,10 @@
 <?php
 
-namespace Apps\Core\Components\Dashboards;
+namespace System\Base\Providers\ModulesServiceProvider\Modules\Components;
 
 use Phalcon\Helper\Arr;
 
-abstract class WidgetsComponent
+class ComponentsWidgets
 {
     protected $componentObj;
 

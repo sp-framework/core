@@ -2,9 +2,9 @@
 
 namespace Apps\Core\Components\System\Geo\Timezones;
 
-use Apps\Core\Components\Dashboards\WidgetsComponent;
+use System\Base\Providers\ModulesServiceProvider\Modules\Components\ComponentsWidgets;
 
-class Widgets extends WidgetsComponent
+class Widgets extends ComponentsWidgets
 {
     public function worldClock($widget, $dashboardWidget)
     {
