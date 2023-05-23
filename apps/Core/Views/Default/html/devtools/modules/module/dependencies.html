@@ -32,12 +32,14 @@
                 {% if type === 'views' %}
                     <div class="col">
                         {% set baseViewChecked = false %}
+                        {% set baseViewDisabled = true %}
                         {% set baseViewModuleId = '0' %}
-                        {% if module['base_view_module_id'] is defined %}
-                            {% if module['base_view_module_id'] == '0' %}
+                        {% if module['module_details']['base_view_module_id'] is defined %}
+                            {% if module['module_details']['base_view_module_id'] == '0' %}
                                 {% set baseViewChecked = true %}
+                                {% set baseViewDisabled = false %}
                             {% endif %}
-                            {% set baseViewModuleId = module['base_view_module_id'] %}
+                            {% set baseViewModuleId = module['module_details']['base_view_module_id'] %}
                         {% endif %}
                         {{adminltetags.useTag('fields',
                             [
@@ -71,8 +73,9 @@
                                 'fieldHelp'                      : true,
                                 'fieldHelpTooltipContent'        : 'View modules have a base view module, example: View module "Default" will be base for View module "home". View module home will require dependency of View module default.',
                                 'fieldRequired'                  : false,
+                                'fieldDisabled'                  : baseViewDisabled,
                                 'fieldType'                      : 'checkbox',
-                                'fieldCheckboxChecked'           : true,
+                                'fieldCheckboxChecked'           : baseViewChecked,
                                 'fieldCheckboxType'              : 'primary',
                                 'fieldBazJstreeSearch'           : false,
                                 'fieldBazScan'                   : true

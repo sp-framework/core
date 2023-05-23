@@ -2,6 +2,7 @@
 {% set packagesURL = links.url('devtools/modules/q/module/true/type/packages/id/0') %}
 {% set middlewaresURL = links.url('devtools/modules/q/module/true/type/middlewares/id/0') %}
 {% set viewsURL = links.url('devtools/modules/q/module/true/type/views/id/0') %}
+{% set subViewsURL = links.url('devtools/modules/q/module/true/type/views/subview/true/id/0') %}
 {% set bundlesURL = links.url('devtools/modules/q/bundles/true/id/0') %}
 {% if includecoremodules is defined and includecoremodules === true %}
     {% set componentsURL = componentsURL ~ '/includecoremodules/true' %}
@@ -48,6 +49,12 @@
                             'type'                    : 'primary',
                             'additionalClass'         : 'contentAjaxLink',
                             'url'                     : viewsURL
+                        },
+                        'subviews' : {
+                            'title'                   : 'Sub View',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : subViewsURL
                         },
                         'divider' : 'divider',
                         'bundles' : {

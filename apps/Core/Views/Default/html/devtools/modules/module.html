@@ -803,6 +803,10 @@ dataCollectionSection =
         {% else %}
             {% set moduleId = '0' %}
         {% endif %}
+        {% set subView = false %}
+        {% if subview is defined and subview === true %}
+            {% set subView = true %}
+        {% endif %}
         <script>
 /* globals PNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
@@ -838,20 +842,31 @@ dataCollectionSectionForm['vars']['moduleId'] = '{{moduleId}}';
 if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
     dataCollectionSectionForm['vars']['moduleSettings'] = { };
     if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
-        dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] = false;
-        dataCollectionSectionForm['vars']['moduleSettings']['layouts'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['tags'] = '';
-        dataCollectionSectionForm['vars']['moduleSettings']['branding'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['branding']['small'] = '';
-        dataCollectionSectionForm['vars']['moduleSettings']['branding']['large'] = '';
+        dataCollectionSectionForm['vars']['subview'] = '{{subView}}';
+
         dataCollectionSectionForm['vars']['moduleSettings']['head'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['head']['title'] = '';
-        dataCollectionSectionForm['vars']['moduleSettings']['head']['meta'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author'] = '';
-        dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset'] = '';
-        dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['keywords'] = '';
-        dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['viewport'] = '';
-        dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['description'] = '';
+        dataCollectionSectionForm['vars']['moduleSettings']['footer'] = { };
+
+        if (dataCollectionSectionForm['vars']['subview'] == false) {
+            dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] = false;
+            dataCollectionSectionForm['vars']['moduleSettings']['layouts'] = { };
+            dataCollectionSectionForm['vars']['moduleSettings']['tags'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['branding'] = { };
+            dataCollectionSectionForm['vars']['moduleSettings']['branding']['small'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['branding']['large'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['head']['title'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta'] = { };
+            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['keywords'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['viewport'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['description'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright'] = { };
+            dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['site'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear'] = '';
+        }
+
         dataCollectionSectionForm['vars']['moduleSettings']['head']['link'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets'] = { };
@@ -862,16 +877,11 @@ if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['dev'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['prod'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['footer'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['script'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright'] = { };
-        dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name'] = '';
-        dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['site'] = '';
-        dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear'] = '';
     }
 } else {
     dataCollectionSectionForm['vars']['moduleSettings'] = JSON.parse('{{moduleSettings}}');
@@ -1311,71 +1321,11 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-settings-keys'                           : {
             placeholder: "SELECT SETTING TO MODIFY OR ADD",
             afterInit: function() {
-                var keys;
+                var keys, subKeys = [], mainKeys = [];
 
                 if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
-                    keys =
+                    subKeys =
                     [
-                        {
-                            'mandatory' : {
-                                'id'    : 'mandatory',
-                                'text'  : 'View Mandatory'
-                            }
-                        },
-                        {
-                            'layouts' : {
-                                'id'    : 'layouts',
-                                'text'  : 'Layouts'
-                            }
-                        },
-                        {
-                            'tags' : {
-                                'id'    : 'tags',
-                                'text'  : 'HTML Tags'
-                            }
-                        },
-                        {
-                            'branding' : {
-                                'id'    : 'branding',
-                                'text'  : 'View Branding (logo)'
-                            }
-                        },
-                        {
-                            'head-title' : {
-                                'id'    : 'head-title',
-                                'text'  : 'Site Title'
-                            }
-                        },
-                        {
-                            'head-meta-author' : {
-                                'id'    : 'head-meta-author',
-                                'text'  : 'Head Meta Author'
-                            }
-                        },
-                        {
-                            'head-meta-charset' : {
-                                'id'    : 'head-meta-charset',
-                                'text'  : 'Head Meta Charset'
-                            }
-                        },
-                        {
-                            'head-meta-keywords' : {
-                                'id'    : 'head-meta-keywords',
-                                'text'  : 'Head Meta Keywords'
-                            }
-                        },
-                        {
-                            'head-meta-viewport' : {
-                                'id'    : 'head-meta-viewport',
-                                'text'  : 'Head Meta Viewport'
-                            }
-                        },
-                        {
-                            'head-meta-description' : {
-                                'id'    : 'head-meta-description',
-                                'text'  : 'Head Meta Description'
-                            }
-                        },
                         {
                             'head-link-href-assets-dev' : {
                                 'id'    : 'head-link-href-assets-dev',
@@ -1401,24 +1351,6 @@ dataCollectionSection =
                             }
                         },
                         {
-                            'footer-copyright-name' : {
-                                'id'    : 'footer-copyright-name',
-                                'text'  : 'Footer Copyright Name'
-                            }
-                        },
-                        {
-                            'footer-copyright-site' : {
-                                'id'    : 'footer-copyright-site',
-                                'text'  : 'Footer Copyright Website'
-                            }
-                        },
-                        {
-                            'footer-copyright-fromYear' : {
-                                'id'    : 'footer-copyright-fromYear',
-                                'text'  : 'Footer Copyright From Year'
-                            }
-                        },
-                        {
                             'footer-script-src-assets-dev' : {
                                 'id'    : 'footer-script-src-assets-dev',
                                 'text'  : 'Footer Java Scripts Source (Dev)'
@@ -1431,6 +1363,92 @@ dataCollectionSection =
                             }
                         }
                     ];
+
+                    if (dataCollectionSectionForm['vars']['subview'] == false) {
+                        mainKeys =
+                        [
+                            {
+                                'mandatory' : {
+                                    'id'    : 'mandatory',
+                                    'text'  : 'View Mandatory'
+                                }
+                            },
+                            {
+                                'layouts' : {
+                                    'id'    : 'layouts',
+                                    'text'  : 'Layouts'
+                                }
+                            },
+                            {
+                                'tags' : {
+                                    'id'    : 'tags',
+                                    'text'  : 'HTML Tags'
+                                }
+                            },
+                            {
+                                'branding' : {
+                                    'id'    : 'branding',
+                                    'text'  : 'View Branding (logo)'
+                                }
+                            },
+                            {
+                                'head-title' : {
+                                    'id'    : 'head-title',
+                                    'text'  : 'Site Title'
+                                }
+                            },
+                            {
+                                'head-meta-author' : {
+                                    'id'    : 'head-meta-author',
+                                    'text'  : 'Head Meta Author'
+                                }
+                            },
+                            {
+                                'head-meta-charset' : {
+                                    'id'    : 'head-meta-charset',
+                                    'text'  : 'Head Meta Charset'
+                                }
+                            },
+                            {
+                                'head-meta-keywords' : {
+                                    'id'    : 'head-meta-keywords',
+                                    'text'  : 'Head Meta Keywords'
+                                }
+                            },
+                            {
+                                'head-meta-viewport' : {
+                                    'id'    : 'head-meta-viewport',
+                                    'text'  : 'Head Meta Viewport'
+                                }
+                            },
+                            {
+                                'head-meta-description' : {
+                                    'id'    : 'head-meta-description',
+                                    'text'  : 'Head Meta Description'
+                                }
+                            },
+                            {
+                                'footer-copyright-name' : {
+                                    'id'    : 'footer-copyright-name',
+                                    'text'  : 'Footer Copyright Name'
+                                }
+                            },
+                            {
+                                'footer-copyright-site' : {
+                                    'id'    : 'footer-copyright-site',
+                                    'text'  : 'Footer Copyright Website'
+                                }
+                            },
+                            {
+                                'footer-copyright-fromYear' : {
+                                    'id'    : 'footer-copyright-fromYear',
+                                    'text'  : 'Footer Copyright From Year'
+                                }
+                            }
+                        ];
+                    }
+
+                    keys = mainKeys.concat(subKeys);
                 } else if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
                     keys =
                     [
@@ -1546,7 +1564,7 @@ dataCollectionSection =
                     if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
                         switch (key) {
                             case 'mandatory' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
                                     PNotify.error({text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
@@ -1562,7 +1580,7 @@ dataCollectionSection =
 
                                 break;
                             case 'layouts' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
                                     PNotify.error({text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
@@ -1578,7 +1596,7 @@ dataCollectionSection =
 
                                 break;
                             case 'tags' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
                                     PNotify.error({text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
@@ -1594,7 +1612,7 @@ dataCollectionSection =
 
                                 break;
                             case 'branding' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
                                     PNotify.error({text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
@@ -1610,7 +1628,7 @@ dataCollectionSection =
 
                                 break;
                             case 'head-title' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
                                     PNotify.error({text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
@@ -1626,7 +1644,7 @@ dataCollectionSection =
 
                                 break;
                             case 'head-meta-author' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
                                     PNotify.error({text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
@@ -1642,7 +1660,7 @@ dataCollectionSection =
 
                                 break;
                             case 'head-meta-charset' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
                                     PNotify.error({text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
@@ -1658,7 +1676,7 @@ dataCollectionSection =
 
                                 break;
                             case 'head-meta-keywords' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
                                     PNotify.error({text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
@@ -1674,7 +1692,7 @@ dataCollectionSection =
 
                                 break;
                             case 'head-meta-viewport' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
                                     PNotify.error({text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
@@ -1690,7 +1708,7 @@ dataCollectionSection =
 
                                 break;
                             case 'head-meta-description' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
                                     PNotify.error({text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
@@ -1742,7 +1760,7 @@ dataCollectionSection =
 
                                 break;
                             case 'footer-copyright-name' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
                                     PNotify.error({text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
@@ -1758,7 +1776,7 @@ dataCollectionSection =
 
                                 break;
                             case 'footer-copyright-site' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
                                     PNotify.error({text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
@@ -1774,7 +1792,7 @@ dataCollectionSection =
 
                                 break;
                             case 'footer-copyright-fromYear' :
-                                if ($('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked === false) {
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
                                     PNotify.error({text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');

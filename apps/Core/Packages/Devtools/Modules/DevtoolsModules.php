@@ -285,6 +285,15 @@ class DevtoolsModules extends BasePackage
         if ($data['module_type'] === 'components') {
             $jsonContent["menu"] = $data["menu"];
         }
+
+        if ($data['module_type'] === 'views') {
+            if (isset($data['base_view_module_id']) &&
+                $data['base_view_module_id'] != '0'
+            ) {
+                $data = $this->mergeViewSettings($data);
+            }
+        }
+
         $jsonContent["settings"] = $data["settings"];
 
         $jsonContent = Json::encode($jsonContent, JSON_UNESCAPED_SLASHES);
@@ -305,7 +314,98 @@ class DevtoolsModules extends BasePackage
         return true;
     }
 
-    protected function getModuleJsonFileLocation($data)
+    protected function mergeViewSettings($data)
+    {
+        $baseView = $this->modules->views->getViewById($data['base_view_module_id']);
+
+        if ($baseView) {
+            $baseViewJsonLocation = $this->getModuleJsonFileLocation($baseView);
+
+            try {
+                $baseViewJson = Json::decode($this->localContent->read($baseViewJsonLocation), true);
+            } catch (FilesystemException | UnableToReadFile $exception) {
+                $this->addResponse('Unable to read base view json content to file: ' . $baseViewJsonLocation);
+
+                return false;
+            }
+
+            $baseView = $this->basepackages->utils->jsonDecodeData($baseView);
+            $baseViewJson = $this->basepackages->utils->jsonDecodeData($baseViewJson);
+
+            //Overwrite baseview with original json file because only developer changes the json file that is imported into the db via module installer on install or update.
+            $baseView['settings']['head']['link'] = $baseViewJson['settings']['head']['link'];
+            $baseView['settings']['head']['script'] = $baseViewJson['settings']['head']['script'];
+            $baseView['settings']['footer']['script'] = $baseViewJson['settings']['footer']['script'];
+
+            $subViews = $this->modules->views->getViewsByBaseViewModuleId($baseView['id']);
+
+            $assets = ['link', 'head', 'footer'];
+            $envs = ['dev', 'prod'];
+
+            foreach ($subViews as $subView) {
+                $subView = $this->basepackages->utils->jsonDecodeData($subView);
+
+                foreach ($assets as $asset) {
+                    foreach ($envs as $env) {
+                        if ($asset === 'link') {
+                            if (isset($subView['settings']['head']['link']['href']['assets'][$env])) {
+                                $dataAssets = $subView['settings']['head']['link']['href']['assets'][$env];
+                            }
+                            if (isset($baseView['settings']['head']['link']['href']['assets'][$env])) {
+                                $baseViewAssets = &$baseView['settings']['head']['link']['href']['assets'][$env];
+                            }
+                        } else if ($asset === 'head') {
+                            if (isset($subView['settings']['head']['script']['src']['assets'][$env])) {
+                                $dataAssets = $subView['settings']['head']['script']['src']['assets'][$env];
+                            }
+                            if (isset($baseView['settings']['head']['script']['src']['assets'][$env])) {
+                                $baseViewAssets = &$baseView['settings']['head']['script']['src']['assets'][$env];
+                            }
+                        } else if ($asset === 'footer') {
+                            if (isset($subView['settings']['footer']['script']['src']['assets'][$env])) {
+                                $dataAssets = $subView['settings']['footer']['script']['src']['assets'][$env];
+                            }
+                            if (isset($baseView['settings']['footer']['script']['src']['assets'][$env])) {
+                                $baseViewAssets = &$baseView['settings']['footer']['script']['src']['assets'][$env];
+                            }
+                        }
+
+                        $this->mergeViewAssets($data, $dataAssets, $baseViewAssets);
+                    }
+                }
+            }
+
+            $this->modules->views->update($baseView);
+        }
+
+        return $data;
+    }
+
+    protected function mergeViewAssets(&$data, &$dataAssets, &$baseViewAssets)
+    {
+        if (isset($dataAssets) && is_array($dataAssets) && count($dataAssets) > 0) {
+            foreach ($dataAssets as $dataAsset) {
+                $found = false;
+
+                if (isset($dataAsset['asset'])) {
+                    foreach ($baseViewAssets as $baseViewAsset) {
+                        if (isset($baseViewAsset['asset'])) {
+                            if ($dataAsset['asset'] === $baseViewAsset['asset']) {
+                                $found = true;
+                            }
+                        }
+                    }
+                }
+
+                if (!$found) {
+                    $dataAsset['route'] = '/' . $data['route'];
+                    array_push($baseViewAssets, $dataAsset);
+                }
+            }
+        }
+    }
+
+    protected function getModuleJsonFileLocation(&$data)
     {
         if ($data['module_type'] === 'components') {
             $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Components/';
@@ -348,7 +448,7 @@ class DevtoolsModules extends BasePackage
             } else if ($data['module_type'] === 'middlewares') {
                 $routePath = $data['name'] . '/Install/';
             } else if ($data['module_type'] === 'packages') {
-                $pathArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
+                $pathArr = preg_split('/(?=[A-Z])/', ucfirst($data['name']), -1, PREG_SPLIT_NO_EMPTY);
 
                 $routePath = implode('/', $pathArr) . '/Install/';
             } else if ($data['module_type'] === 'views') {
@@ -357,7 +457,19 @@ class DevtoolsModules extends BasePackage
                 } else {
                     $baseView = $this->modules->views->getViewById($data['base_view_module_id']);
 
-                    return $moduleLocation . $baseView['name'] . '/html/' . strtolower($data['name']) . '/' . substr($data['module_type'], 0, -1) . '.json';
+                    $pathArr = preg_split('/(?=[A-Z])/', ucfirst($data['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+                    if (count($pathArr) > 1) {
+                        foreach ($pathArr as &$path) {
+                            $path = strtolower($path);
+                        }
+                    } else {
+                        $pathArr[0] = strtolower($pathArr[0]);
+                    }
+
+                    $data['route'] = implode('/', $pathArr);
+
+                    return $moduleLocation . $baseView['name'] . '/html/' . $data['route'] . '/' . substr($data['module_type'], 0, -1) . '.json';
                 }
             }
 
@@ -436,7 +548,19 @@ class DevtoolsModules extends BasePackage
                 } else {
                     $baseView = $this->modules->views->getViewById($data['base_view_module_id']);
 
-                    $routePath = $baseView['name'] . '/html/' . strtolower($data['name']) . '/';
+                    $pathArr = preg_split('/(?=[A-Z])/', ucfirst($data['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+                    if (count($pathArr) > 1) {
+                        foreach ($pathArr as &$path) {
+                            $path = strtolower($path);
+                        }
+                    } else {
+                        $pathArr[0] = strtolower($pathArr[0]);
+                    }
+
+                    $data['route'] = implode('/', $pathArr);
+
+                    $routePath = $baseView['name'] . '/html/' . $data['route'] . '/';
                 }
             }
 
@@ -880,8 +1004,6 @@ class DevtoolsModules extends BasePackage
         $jsonContent = str_replace('"{', '{', $jsonContent);
         $jsonContent = str_replace('}"', '}', $jsonContent);
         $jsonContent = $this->basepackages->utils->formatJson(['json' => $jsonContent]);
-        // $jsonContent = str_replace('\\n    ', '', $jsonContent);
-        // $jsonContent = str_replace('    "', '"', $jsonContent);
 
         //Create File if not found
         if (!isset($file)) {

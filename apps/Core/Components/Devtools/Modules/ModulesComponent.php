@@ -40,6 +40,10 @@ class ModulesComponent extends BaseComponent
 			$this->view->newrelease = true;
 		}
 
+		if (isset($this->getData()['subview'])) {
+			$this->view->subview = true;
+		}
+
 		$appTypesArr = $this->apps->types->types;
 		$appTypes = [];
 
@@ -219,7 +223,27 @@ class ModulesComponent extends BaseComponent
 
 							$routePath = implode('/', $pathArr) . '/Install/';
 						} else if ($module['module_details']['module_type'] === 'views') {
-							$routePath = $module['module_details']['name'] . '/';
+							if (!$module['module_details']['view_modules_version'] ||
+								($module['module_details']['base_view_module_id'] && $module['module_details']['base_view_module_id'] != '0')
+							) {
+								$baseView = $this->modules->views->getViewById($module['module_details']['base_view_module_id']);
+
+								$pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['module_details']['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+								if (count($pathArr) > 1) {
+									foreach ($pathArr as &$path) {
+										$path = strtolower($path);
+									}
+								} else {
+									$pathArr[0] = strtolower($pathArr[0]);
+								}
+
+								$module['route'] = implode('/', $pathArr);
+
+								$routePath = $baseView['name'] . '/html/' . $module['route'] . '/';
+							} else {
+								$routePath = $module['module_details']['name'] . '/';
+							}
 						}
 
 						$jsonFile =
