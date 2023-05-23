@@ -594,9 +594,7 @@ class Views extends BasePackage
                     $link['route'] = '/';
                 }
 
-                if ($link['route'] === '/' ||
-                    $link['route'] === $this->router->getMatchedRoute()->getPattern()
-                ) {
+                if ($link['route'] === '/' || $link['route'] === $this->extractRoute()) {
                     if ($this->config->dev) {
                         $this->assetsCollections['headLinks']->addCss($link['asset']);
                     } else {
@@ -626,13 +624,11 @@ class Views extends BasePackage
                     $script['local'] = true;
                 }
 
-                if (!isset($link['route'])) {
-                    $link['route'] = '/';
+                if (!isset($script['route'])) {
+                    $script['route'] = '/';
                 }
 
-                if ($link['route'] === '/' ||
-                    $link['route'] === $this->router->getMatchedRoute()->getPattern()
-                ) {
+                if ($script['route'] === '/' || $script['route'] === $this->extractRoute()) {
                     if ($this->config->dev) {
                         $this->assetsCollections['headJs']->addJs($script['asset']);
                     } else {
@@ -689,13 +685,11 @@ class Views extends BasePackage
                     $script['local'] = true;
                 }
 
-                if (!isset($link['route'])) {
-                    $link['route'] = '/';
+                if (!isset($script['route'])) {
+                    $script['route'] = '/';
                 }
 
-                if ($link['route'] === '/' ||
-                    $link['route'] === $this->router->getMatchedRoute()->getPattern()
-                ) {
+                if ($script['route'] === '/' || $script['route'] === $this->extractRoute()) {
                     if ($this->config->dev) {
                         $this->assetsCollections['footerJs']->addJs($script['asset']);
                     } else {
@@ -704,5 +698,21 @@ class Views extends BasePackage
                 }
             }
         }
+    }
+
+    protected function extractRoute()
+    {
+        $route = $this->router->getMatchedRoute()->getPattern();
+        if ($this->domain['exclusive_to_default_app'] == 1 &&
+            $this->domain['default_app_id'] == $this->app['id']
+        ) {
+            return $route;
+        }
+
+        $route = trim($route, '/');
+
+        $route = str_replace(strtolower($this->app['name']), '', $route);
+
+        return $route;
     }
 }
