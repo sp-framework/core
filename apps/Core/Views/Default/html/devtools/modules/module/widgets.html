@@ -1,0 +1,189 @@
+{% if module['id'] is defined and module['widgets'] is defined %}
+    {% set widgets = module['widgets'] %}
+    {% set moduleWidgets = module['widgets'] %}
+{% else %}
+    {% set widgets = moduleWidgets %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'widget-name',
+                'fieldLabel'                     : 'Widget Name',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Widget Name Example: World Clock',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 100,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'widget-method',
+                'fieldLabel'                     : 'Widget Method',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Widget Method Example: worldClock',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'multiple',
+                    'fieldLabel'                     : 'Multple Widget Instance',
+                    'fieldType'                      : 'radio',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Multiple instances of the this widget.',
+                    'fieldRequired'                  : true,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldBazScan'                   : true,
+                    'fieldRadioPlacementType'        : 'horizontal',
+                    'fieldRadioButtons'              :
+                        [
+                            'multiple-no' :
+                                [
+                                    'title'                           : 'NO',
+                                    'dataValue'                       : 'multiple-no'
+                                ],
+                            'multiple-yes' :
+                                [
+                                    'title'                           : 'YES',
+                                    'dataValue'                       : 'multiple-yes'
+                                ]
+                        ],
+                    'fieldRadioChecked'              : 'multiple-no'
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'max-multiple',
+                    'fieldLabel'                            : 'Max Multiple Count',
+                    'fieldType'                             : 'input',
+                    'fieldInputTypeTextFilter'              : 'positiveInt',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Max multiple count',
+                    'fieldRequired'                         : true,
+                    'fieldDisabled'                         : true,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldDataInputMaxLength'               : 2,
+                    'fieldDataInputMinNumber'               : 1,
+                    'fieldDataInputMaxNumber'               : 10,
+                    'fieldValue'                            : ''
+                ]
+            )}}
+        </div>
+    </div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'widget-settings',
+                'fieldLabel'                     : 'Widget Settings',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 4096,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Settings of the widget. JSON Format',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldTextareaRows'              : 5,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                    [
+                        'widget-remove'    : [
+                            'title'                   : 'Remove',
+                            'size'                    : 'xs',
+                            'type'                    : 'danger',
+                            'icon'                    : 'trash'
+                        ],
+                        'widget-add'    : [
+                            'title'                   : 'Add',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'icon'                    : 'plus',
+                            'position'                : 'right'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'widgets',
+                'fieldLabel'                     : 'Widgets',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 10000,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Widgets settings of the module. JSON Format',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 10000,
+                'fieldTextareaRows'              : 15,
+                'fieldValue'                     : widgets
+            ]
+        )}}
+    </div>
+</div>

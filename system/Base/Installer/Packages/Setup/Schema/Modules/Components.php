@@ -108,6 +108,13 @@ class Components
 						]
 					),
 					new Column(
+						'widgets',
+						[
+							'type'    => Column::TYPE_JSON,
+							'notNull' => false,
+						]
+					),
+					new Column(
 						'dependencies',
 						[
 							'type'    => Column::TYPE_JSON,

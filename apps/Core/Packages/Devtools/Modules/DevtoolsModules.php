@@ -295,7 +295,9 @@ class DevtoolsModules extends BasePackage
         }
 
         $jsonContent["settings"] = $data["settings"];
-
+        if ($data['module_type'] === 'components') {
+            $jsonContent["widgets"] = $data["widgets"];
+        }
         $jsonContent = Json::encode($jsonContent, JSON_UNESCAPED_SLASHES);
 
         $jsonContent = str_replace('\\"', '"', $jsonContent);

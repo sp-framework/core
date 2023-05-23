@@ -266,6 +266,11 @@ class ModulesComponent extends BaseComponent
 					}
 				}
 
+				if (isset($module['widgets']) && is_array($module['widgets'])) {
+					$this->view->moduleWidgets = $module['widgets'] = Json::encode($module['widgets']);
+				} else {
+					$this->view->moduleWidgets = $module['widgets'] = Json::encode([]);
+				}
 				if (is_array($module['settings'])) {
 					$this->view->moduleSettings = $module['settings'] = Json::encode($module['settings']);
 				}

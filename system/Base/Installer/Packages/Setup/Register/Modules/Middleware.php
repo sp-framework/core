@@ -31,11 +31,11 @@ class Middleware
 				'settings'				=>
 					isset($middlewareFile['settings']) ?
 					Json::encode($middlewareFile['settings']) :
-					null,
+					Json::encode([]),
 				'dependencies'		 	=>
 					isset($middlewareFile['dependencies']) ?
 					Json::encode($middlewareFile['dependencies']) :
-					null,
+					Json::encode([]),
 				'apps'					=> $apps,
 				'api_id'				=> 1,
 				'installed'				=> 1,

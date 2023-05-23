@@ -23,11 +23,11 @@ class Package
 				'settings'				=>
 					isset($packageFile['settings']) ?
 					Json::encode($packageFile['settings']) :
-					null,
+					Json::encode([]),
 				'dependencies'		 	=>
 					isset($packageFile['dependencies']) ?
 					Json::encode($packageFile['dependencies']) :
-					null,
+					Json::encode([]),
 				'apps'					=>
 					Json::encode(['1'=>['enabled'=>true]]),
 				'api_id'				=> 1,

@@ -33,7 +33,7 @@ class Component
 				'dependencies'		 	=>
 					isset($componentFile['dependencies']) ?
 					Json::encode($componentFile['dependencies']) :
-					null,
+					Json::encode([]),
 				'menu'		 			=>
 					isset($componentFile['menu']) ?
 					Json::encode($componentFile['menu']) :
@@ -50,7 +50,11 @@ class Component
 				'settings'				=>
 					isset($componentFile['settings']) ?
 					Json::encode($componentFile['settings']) :
-					null,
+					Json::encode([]),
+				'widgets'				=>
+					isset($componentFile['widgets']) ?
+					Json::encode($componentFile['widgets']) :
+					Json::encode([]),
 				'updated_by'			=> 0
 			]
 		);

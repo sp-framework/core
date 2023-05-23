@@ -764,6 +764,13 @@ dataCollectionSection =
                         'tabTitle'          : 'Menu',
                         'tabInclude'        : 'modules/module/menu'
                     ]
+                ],
+                [
+                    'widgets'   :
+                    [
+                        'tabTitle'          : 'Widgets',
+                        'tabInclude'        : 'modules/module/widgets'
+                    ]
                 ])
             %}
         {% endif %}
@@ -838,6 +845,10 @@ dataCollectionSectionForm['vars']['module_type'] = '{{type}}';
 dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modulesJson}}');
 dataCollectionSectionForm['vars']['moduleDependencies'] = JSON.parse('{{moduleDependencies}}');
 dataCollectionSectionForm['vars']['moduleId'] = '{{moduleId}}';
+
+if (dataCollectionSectionForm['vars']['module_type'] === 'components') {
+    dataCollectionSectionForm['vars']['moduleWidgets'] = JSON.parse('{{moduleWidgets}}');
+}
 
 if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
     dataCollectionSectionForm['vars']['moduleSettings'] = { };
@@ -1254,7 +1265,6 @@ dataCollectionSection =
                     }
                 });
 
-
                 $('#{{componentId}}-{{sectionId}}-generate-settings').off();
                 $('#{{componentId}}-{{sectionId}}-generate-settings').click(function() {
                     if ($($('#{{componentId}}-{{sectionId}}-module_type').find(':selected')[0]).val() === 'components' ||
@@ -1317,6 +1327,107 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-settings-packages'                       : {
             'placeholder'   : 'SELECT PACKAGE',
             'allowClear'    : true
+        },
+        '{{componentId}}-{{sectionId}}-widget-name'                             : { },
+        '{{componentId}}-{{sectionId}}-widget-method'                           : { },
+        '{{componentId}}-{{sectionId}}-multiple'                                : { },
+        '{{componentId}}-{{sectionId}}-max-multiple'                            : { },
+        '{{componentId}}-{{sectionId}}-widget-settings'                         : { },
+        '{{componentId}}-{{sectionId}}-widgets'                                 : {
+            afterInit: function() {
+                function prettyfyJson() {
+                    $('#{{componentId}}-{{sectionId}}-widgets')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleWidgets'], null, 4));
+                }
+                prettyfyJson();
+
+                function reset() {
+                    $('#{{componentId}}-{{sectionId}}-widget-name').val('');
+                    $('#{{componentId}}-{{sectionId}}-widget-method').val('');
+                    $("#multiple-no").prop('checked', true);
+                    $('#{{componentId}}-{{sectionId}}-max-multiple').val('');
+                    $('#{{componentId}}-{{sectionId}}-max-multiple').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-widget-settings').val('');
+                }
+
+                $('#{{componentId}}-{{sectionId}}-multiple').off();
+                $('#{{componentId}}-{{sectionId}}-multiple').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'multiple-yes') {
+                        $('#{{componentId}}-{{sectionId}}-max-multiple').attr('disabled', false);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'multiple-no') {
+                        $('#{{componentId}}-{{sectionId}}-max-multiple').val('');
+                        $('#{{componentId}}-{{sectionId}}-max-multiple').attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-widget-add, ' +
+                  '#{{componentId}}-{{sectionId}}-widget-remove').click(function(e) {
+                    e.preventDefault();
+
+                    if ($('#{{componentId}}-{{sectionId}}-widget-name').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-widget-name').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-widget-name').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-widget-method').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-widget-method').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-widget-method').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-max-multiple').attr('disabled') !== 'disabled' &&
+                               $('#{{componentId}}-{{sectionId}}-max-multiple').val() === ''
+                    ) {
+                        $('#{{componentId}}-{{sectionId}}-max-multiple').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-max-multiple').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else {
+                        if (dataCollectionSectionForm['vars']['moduleWidgets'].length > 0) {
+                            $(dataCollectionSectionForm['vars']['moduleWidgets']).each(function(index, widget) {
+                                if (widget['method'] === $('#{{componentId}}-{{sectionId}}-widget-method').val()) {
+                                    dataCollectionSectionForm['vars']['moduleWidgets'].splice(index);
+                                }
+                            });
+
+                            if ($(this)[0].id !== '{{componentId}}-{{sectionId}}-widget-remove') {
+                                addWidget();
+                            }
+                        } else {
+                            if ($(this)[0].id !== '{{componentId}}-{{sectionId}}-widget-remove') {
+                                addWidget();
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+
+                    reset();
+                    prettyfyJson();
+                });
+
+                function addWidget() {
+                    var multiple = false;
+                    var settings = { };
+
+                    if ($('#{{componentId}}-{{sectionId}}-multiple').find('input[type=radio]:checked').data('value') == 'multiple-yes') {
+                        multiple = true;
+                    }
+
+                    if ($('#{{componentId}}-{{sectionId}}-widget-settings').val() !== '') {
+                        settings = $('#{{componentId}}-{{sectionId}}-widget-settings').val();
+                    }
+
+                    dataCollectionSectionForm['vars']['moduleWidgets'].push(
+                        {
+                            'name'          : $('#{{componentId}}-{{sectionId}}-widget-name').val(),
+                            'method'        : $('#{{componentId}}-{{sectionId}}-widget-method').val(),
+                            'multiple'      : multiple,
+                            'max_multiple'  : $('#{{componentId}}-{{sectionId}}-max-multiple').val(),
+                            'settings'      : settings
+                        }
+                    );
+                }
+            }
         },
         '{{componentId}}-{{sectionId}}-settings-keys'                           : {
             placeholder: "SELECT SETTING TO MODIFY OR ADD",

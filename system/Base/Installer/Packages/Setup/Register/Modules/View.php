@@ -24,11 +24,11 @@ class View
 				'settings'				=>
 					isset($viewFile['settings']) ?
 					Json::encode($viewFile['settings']) :
-					null,
+					Json::encode([]),
 				'dependencies'			=>
 					isset($viewFile['dependencies']) ?
 					Json::encode($viewFile['dependencies']) :
-					null,
+					Json::encode([]),
 				'apps'					=>
 					Json::encode(['1'=>['enabled'=>true]]),
 				'api_id'				=> 1,
@@ -50,7 +50,7 @@ class View
 				'settings'				=>
 					isset($viewFile['settings']) ?
 					Json::encode($viewFile['settings']) :
-					null
+					Json::encode([])
 			]
 		);
 	}
