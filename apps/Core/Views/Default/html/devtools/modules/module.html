@@ -845,10 +845,7 @@ dataCollectionSectionForm['vars']['module_type'] = '{{type}}';
 dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modulesJson}}');
 dataCollectionSectionForm['vars']['moduleDependencies'] = JSON.parse('{{moduleDependencies}}');
 dataCollectionSectionForm['vars']['moduleId'] = '{{moduleId}}';
-
-if (dataCollectionSectionForm['vars']['module_type'] === 'components') {
-    dataCollectionSectionForm['vars']['moduleWidgets'] = JSON.parse('{{moduleWidgets}}');
-}
+dataCollectionSectionForm['vars']['moduleWidgets'] = JSON.parse('{{moduleWidgets}}');
 
 if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
     dataCollectionSectionForm['vars']['moduleSettings'] = { };
@@ -1015,11 +1012,13 @@ dataCollectionSection =
                         dataCollectionSectionForm['vars']['module_type'] === 'middlewares'
                     ) {
                         if ($('#{{componentId}}-{{sectionId}}-category').val() === 'providers') {
+                            currentClassArr = [];
                             currentClassArr[0] = 'System';
                             currentClassArr[1] = 'Base';
                             currentClassArr[2] = 'Providers';
                             currentClassArr[3] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-name').val()) + 'ServiceProvider';
                         } else {
+                            currentClassArr = [];
                             currentClassArr[0] = 'Apps';
                             currentClassArr[1] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
                             currentClassArr[2] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-module_type').val());
@@ -1056,7 +1055,6 @@ dataCollectionSection =
                                     }
                                 }
                             }
-
                         } else {
                             currentClassArr = [];
                             currentClassArr[0] = 'Apps';
@@ -1107,12 +1105,22 @@ dataCollectionSection =
                     var data = $('#{{componentId}}-{{sectionId}}-category').select2('data')[0];
 
                     if (data.id === 'basepackages') {
+                        currentClassArr = [];
                         currentClassArr[0] = 'System';
                         currentClassArr[1] = 'Base';
                         currentClassArr[2] = 'Providers';
                         currentClassArr[3] = 'BasepackagesServiceProvider';
                         currentClassArr[4] = 'Packages';
-                        currentClassArr[5] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-name').val());
+                        var nameArr = $('#{{componentId}}-{{sectionId}}-name').val().split(/(?=[A-Z])/);
+
+                        if (nameArr.length > 1) {
+                            for (var i = nameArr.length - 1; i >= 0; i--) {
+                                currentClassArr[5 + i] = capitalizeFirstLetter(nameArr[i]);
+                            }
+                        } else {
+                            currentClassArr[5] = capitalizeFirstLetter(nameArr[0]);
+                        }
+
                         $('#{{componentId}}-{{sectionId}}-class').val(currentClassArr.join('\\'));
                     } else {
                         extractClass();

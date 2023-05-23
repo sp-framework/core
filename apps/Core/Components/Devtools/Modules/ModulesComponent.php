@@ -164,6 +164,7 @@ class ModulesComponent extends BaseComponent
 			$this->view->moduleSettings = $this->modulesPackage->getDefaultSettings();
 			$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies($type);
 			$this->view->moduleMenu = Json::encode([]);
+			$this->view->moduleWidgets = Json::encode([]);
 
 			if ($this->getData()['id'] != 0) {
 				if ($type !== 'core') {
