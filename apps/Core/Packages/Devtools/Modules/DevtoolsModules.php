@@ -30,6 +30,12 @@ class DevtoolsModules extends BasePackage
 
     public function addModule($data)
     {
+        if (!checkCtype($data['name'], 'alpha')) {
+            $this->addResponse('Name cannot have special chars or numbers.', 1);
+
+            return false;
+        }
+
         if ($data['type'] === 'bundles') {
             $data = $this->checkTypeAndCategory($data);
 
@@ -82,6 +88,9 @@ class DevtoolsModules extends BasePackage
             $data['apps'] = Json::encode([]);
         }
 
+// $this->updateModuleJson($data);
+$this->generateNewFiles($data);
+die();
         try {
             if ($this->modules->{$data['type']}->add($data) &&
                 $this->updateModuleJson($data) &&
@@ -108,6 +117,12 @@ class DevtoolsModules extends BasePackage
 
     public function updateModule($data)
     {
+        if (!checkCtype($data['name'], 'alpha')) {
+            $this->addResponse('Name cannot have special chars or numbers.', 1);
+
+            return false;
+        }
+
         if ($data['type'] === 'bundles') {
             $data = $this->checkTypeAndCategory($data);
 
@@ -200,6 +215,12 @@ class DevtoolsModules extends BasePackage
                 $data['category'] = $data['category']['data'][0];
             } else if (isset($data['category']['newTags'][0])) {
                 $data['category'] = strtolower($data['category']['newTags'][0]);
+            }
+        }
+
+        if ($data['module_type'] === 'packages') {//Possible error can happen when cloning core modules.
+            if ($data['category'] === 'basepackages' || $data['category'] === 'providers') {
+                $data['app_type'] = 'core';
             }
         }
 
@@ -305,7 +326,7 @@ class DevtoolsModules extends BasePackage
         $jsonContent = str_replace('}"', '}', $jsonContent);
         $jsonContent = str_replace('\\n', '', $jsonContent);
         $jsonContent = $this->basepackages->utils->formatJson(['json' => $jsonContent]);
-
+        dump($jsonFile, $jsonContent);die();
         try {
             $this->localContent->write($jsonFile, $jsonContent);
         } catch (FilesystemException | UnableToWriteFile $exception) {
@@ -527,9 +548,19 @@ class DevtoolsModules extends BasePackage
             ($data['category'] === 'basepackages' ||
              $data['category'] === 'providers')
         ) {
+            if ($data['category'] === 'basepackages') {
+                $pathArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
+
+                unset($pathArr[Arr::lastKey($pathArr)]);
+
+                return
+                    $moduleLocation .
+                    implode('/', $pathArr) . '/';
+            }
+
             return
                 $moduleLocation .
-                ucfirst($data['name']);
+                ucfirst($data['name']) . 'ServiceProvider/';
         } else {
             if ($data['module_type'] === 'components') {
                 $routeArr = explode('/', $data['route']);
@@ -641,6 +672,164 @@ $file .= '
         }
 
         return true;
+    }
+
+    protected function generateNewPackagesFiles($moduleFilesLocation, $data)
+    {
+        //Package File
+        try {
+            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/Package.txt');
+        } catch (FilesystemException | UnableToReadFile $exception) {
+            $this->addResponse('Unable to read module base package file.');
+
+            return false;
+        }
+
+        $data['class'] = explode('\\', $data['class']);
+        unset($data['class'][Arr::lastKey($data['class'])]);
+        $namespaceClass = implode('\\', $data['class']);
+
+        $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass . ';', $file);
+        $file = str_replace('"PACKAGENAME"', $data['name'], $file);
+        $file = str_replace('"PACKAGENAMELC"', strtolower($data['name']), $file);
+
+        if ($data['category'] === 'basepackages') {
+            $fileName = $moduleFilesLocation . Arr::last(preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY)) . '.php';
+        } else {
+            $fileName = $moduleFilesLocation . $data['name'] . '.php';
+        }
+        // try {
+        //     $this->localContent->write($fileName, $file);
+        // } catch (FilesystemException | UnableToWriteFile $exception) {
+        //     $this->addResponse('Unable to write module component file');
+
+        //     return false;
+        // }
+
+        // $this->generateNewPackagesInstallFiles($data);
+        $this->generateNewPackagesModelFiles($data, $moduleFilesLocation);
+    }
+
+    protected function generateNewPackagesInstallFiles($data, $moduleFilesLocation)
+    {
+        //Install Schema File
+        try {
+            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/PackageInstallSchema.txt');
+        } catch (FilesystemException | UnableToReadFile $exception) {
+            $this->addResponse('Unable to read module base package file.');
+
+            return false;
+        }
+
+        if ($data['category'] === 'basepackages' || $data['category'] === 'providers') {
+            $moduleFilesLocation = $this->getModuleJsonFileLocation($data);
+            $moduleFilesLocation = str_replace('Register/Modules/Packages', 'Schema', $moduleFilesLocation);
+            $moduleFilesLocation = rtrim(str_replace('package.json', '', $moduleFilesLocation), '/');
+            $fileName = $moduleFilesLocation . '.php';
+            $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
+            $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+            $moduleSchemaClass = $moduleFilesLocationClass . '\\' . $data['name'];
+        } else {
+            $moduleFilesLocation = $moduleFilesLocation . 'Install/Schema';
+            $fileName = $moduleFilesLocation . '/' . $data['name'] . '.php';
+            $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
+            $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+            $moduleSchemaClass = $moduleFilesLocationClass . '\\' . $data['name'];
+        }
+
+        $file = str_replace('"NAMESPACE"', 'namespace ' . $moduleFilesLocationClass . ';', $file);
+        $file = str_replace('"PACKAGESCHEMANAME"', $data['name'], $file);
+        // try {
+        //     $this->localContent->write($fileName, $file);
+        // } catch (FilesystemException | UnableToWriteFile $exception) {
+        //     $this->addResponse('Unable to write module component file');
+
+        //     return false;
+        // }
+
+        //Package Installer File
+        try {
+            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/PackageInstallPackage.txt');
+        } catch (FilesystemException | UnableToReadFile $exception) {
+            $this->addResponse('Unable to read module base package file.');
+
+            return false;
+        }
+
+        if ($data['category'] !== 'basepackages' && $data['category'] !== 'providers') {
+            $moduleFilesLocation = str_replace('/Schema', '', ucfirst($moduleFilesLocation));
+            $fileName = $moduleFilesLocation . '/' . 'Package.php';
+            $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
+            $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+            $file = str_replace('"NAMESPACE"', 'namespace ' . $moduleFilesLocationClass . ';', $file);
+            $file = str_replace('"PACKAGESCHEMACLASS"', $moduleSchemaClass . ';', $file);
+            $file = str_replace('"PACKAGESCHEMANAME"', $data['name'], $file);
+
+            // try {
+            //     $this->localContent->write($fileName, $file);
+            // } catch (FilesystemException | UnableToWriteFile $exception) {
+            //     $this->addResponse('Unable to write module component file');
+
+            //     return false;
+            // }
+        }
+
+        //
+        return true;
+    }
+
+    protected function generateNewPackagesModelFiles($data, $moduleFilesLocation)
+    {
+        //Install Model File
+        try {
+            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/PackageModel.txt');
+        } catch (FilesystemException | UnableToReadFile $exception) {
+            $this->addResponse('Unable to read module base package file.');
+
+            return false;
+        }
+
+        if ($data['category'] === 'basepackages' || $data['category'] === 'providers') {
+            $nameArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
+
+            if ($data['category'] === 'basepackages') {
+                $moduleFilesLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Model/';
+
+                if (count($nameArr) === 1) {
+                    $moduleFilesLocation = $moduleFilesLocation . $nameArr[0];
+                } else {
+                    unset($nameArr[Arr::lastKey($nameArr)]);
+                    $moduleFilesLocation = $moduleFilesLocation . implode('/', $nameArr);
+                }
+
+                $fileName = $moduleFilesLocation . '/Basepackages' . $data['name'] . '.php';
+                $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
+                $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+                $className = 'Basepackages' . $data['name'];
+            } else if ($data['category'] === 'providers') {
+                $moduleFilesLocation = 'system/Base/Providers/' . $data['name'] . 'ServiceProvider/Model/';
+                $fileName = $moduleFilesLocation . '/ServiceProvider' . $data['name'] . '.php';
+
+                $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
+                $className = 'ServiceProvider' . $data['name'];
+            }
+        } else {
+            $moduleFilesLocation = $moduleFilesLocation . 'Model';
+            $fileName = $moduleFilesLocation . '/' . $data['name'] . '.php';
+            $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
+            $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+        }
+
+        $file = str_replace('"NAMESPACE"', 'namespace ' . rtrim($moduleFilesLocationClass, '\\') . ';', $file);
+        $file = str_replace('"PACKAGEMODELNAME"', $className, $file);
+        // try {
+        //     $this->localContent->write($fileName, $file);
+        // } catch (FilesystemException | UnableToWriteFile $exception) {
+        //     $this->addResponse('Unable to write module component file');
+
+        //     return false;
+        // }
+        var_dump($moduleFilesLocation, $moduleFilesLocationClass, $file);
     }
 
     protected function generateNewViewsFiles($moduleFilesLocation, $data)

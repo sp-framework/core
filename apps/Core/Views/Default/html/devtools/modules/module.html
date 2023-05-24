@@ -1047,7 +1047,8 @@ dataCollectionSection =
                                                     i = 3 + i;
                                                     if (dataCollectionSectionForm['vars']['module_type'] === 'packages') {
                                                         currentClassArr[i] = capitalizeFirstLetter(name);
-                                                        currentClassArr[i + 1] = currentClassArr[i - 1] + capitalizeFirstLetter(name)
+                                                        currentClassArr[i + 1] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-name').val());
+                                                        // currentClassArr[i + 1] = currentClassArr[i - 1] + capitalizeFirstLetter(name);
                                                     }
                                                 }
                                             });

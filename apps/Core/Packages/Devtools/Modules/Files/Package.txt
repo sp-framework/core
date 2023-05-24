@@ -26,12 +26,12 @@ class "PACKAGENAME" extends BasePackage
         $this->addResponse('Error', 1);
     }
 
-    public function add"PACKAGENAMELC"($data)
+    public function add"PACKAGENAME"($data)
     {
         //
     }
 
-    public function update"PACKAGENAMELC"($data)
+    public function update"PACKAGENAME"($data)
     {
         $"PACKAGENAMELC" = $this->getById($id);
 
@@ -45,7 +45,7 @@ class "PACKAGENAME" extends BasePackage
         $this->addResponse('Error', 1);
     }
 
-    public function remove"PACKAGENAMELC"($data)
+    public function remove"PACKAGENAME"($data)
     {
         $"PACKAGENAMELC" = $this->getById($id);
 
