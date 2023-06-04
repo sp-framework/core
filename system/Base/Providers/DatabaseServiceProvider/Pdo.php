@@ -81,7 +81,7 @@ class Pdo
 	protected function runSetup($onlyUpdateDb = false, $message = null)
 	{
 		if (PHP_SAPI === 'cli') {
-			sleep(10);
+			sleep(10);//This is to avoid supervisord from not retrying
 
 			exit();
 		}

@@ -4,44 +4,31 @@ namespace System\Base\Providers;
 
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
+use System\Base\Providers\DatabaseServiceProvider\Ff;
 use System\Base\Providers\DatabaseServiceProvider\ModelsManager;
 use System\Base\Providers\DatabaseServiceProvider\Pdo;
 use System\Base\Providers\DatabaseServiceProvider\PdoCli;
+use System\Base\Providers\DatabaseServiceProvider\Sqlite;
 
 class DatabaseServiceProvider implements ServiceProviderInterface
 {
 	public function register(DiInterface $container) : void
 	{
-		if (PHP_SAPI === 'cli') {
-
-			$container->setShared(
-				'db',
-				function () use ($container) {
-					$dbConfig = $container->getShared('config')->db;
-					$localContent = $container->getShared('localContent');
-					$crypt = $container->getShared('crypt');
-					return (new PdoCli($dbConfig, $localContent, $crypt))->init();
-				}
-			);
-
-			$container->setShared(
-				'modelsManager',
-				function () {
-					return (new ModelsManager())->init();
-				}
-			);
-
-			return;
-		}
+		$config = $container->getShared('config');
 
 		$container->setShared(
 			'db',
-			function () use ($container) {
-				$config = $container->getShared('config');
+			function () use ($container, $config) {
+				$dbConfig = $config->db;
 				$session = $container->getShared('session');
-				$localContent = $container->getShared('localContent');
 				$crypt = $container->getShared('crypt');
-				return (new Pdo($config, $session, $localContent, $crypt))->init();
+				$localContent = $container->getShared('localContent');
+
+				if (PHP_SAPI === 'cli') {
+					return (new PdoCli($dbConfig, $localContent, $crypt))->init();
+				} else {
+					return (new Pdo($config, $session, $localContent, $crypt))->init();
+				}
 			}
 		);
 
@@ -49,6 +36,20 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 			'modelsManager',
 			function () {
 				return (new ModelsManager())->init();
+			}
+		);
+
+		$container->setShared(
+			'ff',
+			function () {
+				return (new Ff())->init();
+			}
+		);
+
+		$container->setShared(
+			'sqlite',
+			function () {
+				return (new Sqlite())->init();
 			}
 		);
 	}
