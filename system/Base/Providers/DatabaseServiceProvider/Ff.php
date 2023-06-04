@@ -2,8 +2,8 @@
 
 namespace System\Base\Providers\DatabaseServiceProvider;
 
-use SleekDB\Query;
-use SleekDB\Store;
+use System\Base\Providers\DatabaseServiceProvider\Ff\Query;
+use System\Base\Providers\DatabaseServiceProvider\Ff\Store;
 
 class Ff
 {
@@ -11,7 +11,7 @@ class Ff
 
     protected $databaseDir;
 
-    protected $config;
+    protected $config = [];
 
     protected $store;
 
@@ -23,21 +23,6 @@ class Ff
     public function init()
     {
         $this->databaseDir = base_path('.ff/');
-
-        $this->config =
-        [
-            "auto_cache" => true,
-            "cache_lifetime" => null,
-            "timeout" => false,
-            "primary_key" => "id",
-            "search" => [
-                "min_length" => 2,
-                "mode" => "or",
-                "score_key" => "scoreKey",
-                "algorithm" => Query::SEARCH_ALGORITHM["hits"]
-            ],
-            "folder_permissions" => 0777
-        ];
 
         $this->checkDatabasePath();
 
