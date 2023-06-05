@@ -6,8 +6,10 @@ use Closure;
 use Exception;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use System\Base\Providers\DatabaseServiceProvider\Ff\Classes\IndexHandler;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Exceptions\IOException;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Exceptions\JsonException;
+use System\Base\Providers\DatabaseServiceProvider\Ff\Store;
 
 class IoHelper
 {
@@ -44,12 +46,26 @@ class IoHelper
         return self::readFileContent($filePath);
     }
 
-    public static function writeContentToFile(string $filePath, string $content)
+    public static function writeContentToFile(string $filePath, string $content, bool $index = false, Store $store = null)
     {
         self::checkWrite($filePath);
 
         if (file_put_contents($filePath, $content, LOCK_EX) === false) {
             throw new IOException("Could not write content to file. Please check permissions at: $filePath");
+        }
+
+        if ($index && $store) {
+            $storeConfiguration = $store->getStoreConfiguration();
+
+            if (count($storeConfiguration) > 0 &&
+                $storeConfiguration['indexing']
+            ) {
+                try {
+                    (new IndexHandler($storeConfiguration))->setIndex($content);
+                } catch (\Exception $e) {
+                    var_dump($e);die();
+                }
+            }
         }
     }
 
@@ -100,10 +116,13 @@ class IoHelper
 
         if (!is_string($content)) {
             $encodedContent = json_encode($content);
+
             if ($encodedContent === false) {
                 $content = (!is_object($content) && !is_array($content) && !is_null($content)) ? $content : gettype($content);
+
                 throw new JsonException("Could not encode content with json_encode. Content: \"$content\".");
             }
+
             $content = $encodedContent;
         }
 

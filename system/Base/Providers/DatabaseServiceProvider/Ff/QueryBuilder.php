@@ -214,7 +214,7 @@ class QueryBuilder
                 'query' => $query
             ];
 
-            if(!empty($options)) {
+            if (!empty($options)) {
                 if (array_key_exists("minLength", $options) &&
                     is_int($options["minLength"]) &&
                     $options["minLength"] > 0

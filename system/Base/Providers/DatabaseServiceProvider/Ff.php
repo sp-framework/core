@@ -29,13 +29,30 @@ class Ff
         return $this;
     }
 
-    public function use($file, $config = null)
+    public function createStore($file, $config = null, $schema = null)
+    {
+        return $this->store($file, $config, $schema);
+    }
+
+    public function updateStore($file, $config = null, $schema = null)
+    {
+        return $this->store($file, $config, $schema);
+    }
+
+    public function useStore($file)
+    {
+        $this->store = new Store($file, $this->databaseDir);
+
+        return $this->store;
+    }
+
+    protected function store($file, $config = null, $schema = null)
     {
         if ($config) {
             $this->config = array_replace_recursive($this->config, $config);
         }
 
-        $this->store = new Store($file, $this->databaseDir, $this->config);
+        $this->store = new Store($file, $this->databaseDir, $this->config, $schema);
 
         return $this->store;
     }

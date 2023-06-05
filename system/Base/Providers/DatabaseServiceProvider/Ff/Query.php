@@ -27,19 +27,28 @@ class Query
 
     protected $documentUpdater;
 
+    protected $store;
+
+    protected $storeConfiguration;
+
     public function __construct(QueryBuilder $queryBuilder)
     {
-        $this->cacheHandler = new CacheHandler($queryBuilder->getStore()->getStorePath(),
+        $this->store = $queryBuilder->getStore();
+
+        $this->storeConfiguration = $this->store->getStoreConfiguration();
+
+        $this->cacheHandler = new CacheHandler($this->store->getStorePath(),
                                                $queryBuilder
                                               );
 
-        $this->documentFinder = new DocumentFinder($queryBuilder->getStore()->getStorePath(),
+        $this->documentFinder = new DocumentFinder($this->store->getStorePath(),
                                                    $queryBuilder->getConditionProperties(),
-                                                   $queryBuilder->getStore()->getPrimaryKey()
+                                                   $this->store->getPrimaryKey(),
+                                                   $this->store
                                                   );
 
-        $this->documentUpdater = new DocumentUpdater($queryBuilder->getStore()->getStorePath(),
-                                                     $queryBuilder->getStore()->getPrimaryKey()
+        $this->documentUpdater = new DocumentUpdater($this->store->getStorePath(),
+                                                     $this->store->getPrimaryKey()
                                                     );
     }
 

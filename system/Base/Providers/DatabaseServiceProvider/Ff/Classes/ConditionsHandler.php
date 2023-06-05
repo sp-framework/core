@@ -215,6 +215,7 @@ class ConditionsHandler
                 $results[] = $value;
             } else if ($value instanceof \Closure) {
                 $result = $value($data);
+
                 if (!is_bool($result)) {
                     $resultType = gettype($result);
                     $errorMsg = "The closure in the where condition needs to return a boolean. Got: $resultType";

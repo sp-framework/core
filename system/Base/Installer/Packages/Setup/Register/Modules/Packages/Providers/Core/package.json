@@ -54,8 +54,7 @@
 			"league/oauth2-github" : "^3.1",
 			"league/oauth2-client" : "^2.7",
 			"z4kn4fein/php-semver" : "^2.0",
-			"opis/json-schema" : "^2.2",
-			"rakibtg/sleekdb" : "^2.15"
+			"opis/json-schema" : "^2.2"
 		}
 	},
 	"settings" : 

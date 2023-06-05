@@ -11,14 +11,26 @@ use System\Base\Providers\DatabaseServiceProvider\Ff\Store;
 class DocumentFinder
 {
     protected $storePath;
+
     protected $queryBuilderProperties;
+
     protected $primaryKey;
 
-    public function __construct(string $storePath, array $queryBuilderProperties, string $primaryKey)
+    protected $store;
+
+    protected $storeConfiguration;
+
+    public function __construct(string $storePath, array $queryBuilderProperties, string $primaryKey, $store)
     {
         $this->storePath = $storePath;
+
         $this->queryBuilderProperties = $queryBuilderProperties;
+
         $this->primaryKey = $primaryKey;
+
+        $this->store = $store;
+
+        $this->storeConfiguration = $this->store->getStoreConfiguration();
     }
 
     public function findDocuments(bool $getOneDocument, bool $reduceAndJoinPossible): array
@@ -46,46 +58,97 @@ class DocumentFinder
 
         unset($queryBuilderProperties);
 
-        if ($handle = opendir($dataPath)) {
-            while (false !== ($entry = readdir($handle))) {
-                if ($entry === "." || $entry === "..") {
-                    continue;
-                }
+        if ($this->storeConfiguration['indexing']) {
+            if (count($conditions) > 0) {
+                foreach ($conditions as $condition) {
+                    if (isset($condition[0]) &&
+                        in_array($condition[0], $this->storeConfiguration['indexes'])
+                    ) {
+                        $keyword = trim($condition[2], '%');//This needs to extend
 
-                $documentPath = $dataPath . $entry;
+                        if (strlen($keyword) < $this->storeConfiguration['min_index_chars']) {
+                            continue;
+                        }
 
-                try {
-                    $data = IoHelper::getFileContent($documentPath);
-                } catch (Exception $exception){
-                    continue;
-                }
+                        $indexChars = strtolower(substr($keyword, 0, $this->storeConfiguration['min_index_chars']));
 
-                $data = @json_decode($data, true);
+                        try {
+                            $indexFile =
+                                IoHelper::getFileContent($this->storeConfiguration['indexesPath'] . $condition[0] . '/' . $indexChars . '.json');
 
-                if (!is_array($data)) {
-                    continue;
-                }
+                            $indexJson = json_decode($indexFile, true);
 
-                $storePassed = true;
+                            if (count($indexJson) > 0) {
+                                foreach ($indexJson as $key => $ids) {
+                                    $key = strtolower($key);
 
-                if (!empty($conditions)) {
-                    $storePassed = ConditionsHandler::handleWhereConditions($conditions, $data);
-                }
-
-                if ($storePassed === true && count($distinctFields) > 0) {
-                    $storePassed = ConditionsHandler::handleDistinct($found, $data, $distinctFields);
-                }
-
-                if ($storePassed === true) {
-                    $found[] = $data;
-
-                    if ($getOneDocument === true) {
-                        break;
+                                    if (strtolower($condition[1]) === 'like') {
+                                        if (str_starts_with($key, strtolower($keyword))) {
+                                            foreach ($ids as $id) {
+                                                $found[] = $this->store->findById($id);
+                                            }
+                                        }
+                                    } else if ($condition[1] === '=' ||
+                                               $condition[1] === '==='
+                                    ) {
+                                        if ($key === strtolower($keyword)) {
+                                            foreach ($ids as $id) {
+                                                $found[] = $this->store->findById($id);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            $found = [];
+                        }
                     }
                 }
             }
+        }
 
-            closedir($handle);
+        if (count($found) === 0) {
+            if ($handle = opendir($dataPath)) {
+                while (false !== ($entry = readdir($handle))) {
+                    if ($entry === "." || $entry === "..") {
+                        continue;
+                    }
+
+                    $documentPath = $dataPath . $entry;
+
+                    try {
+                        $data = IoHelper::getFileContent($documentPath);
+                    } catch (Exception $exception) {
+                        continue;
+                    }
+
+                    $data = @json_decode($data, true);
+
+                    if (!is_array($data)) {
+                        continue;
+                    }
+
+                    $storePassed = true;
+
+                    if (!empty($conditions)) {
+                        $storePassed = ConditionsHandler::handleWhereConditions($conditions, $data);
+                    }
+
+                    if ($storePassed === true && count($distinctFields) > 0) {
+                        $storePassed = ConditionsHandler::handleDistinct($found, $data, $distinctFields);
+                    }
+
+                    if ($storePassed === true) {
+                        $found[] = $data;
+
+                        if ($getOneDocument === true) {
+                            break;
+                        }
+                    }
+                }
+
+                closedir($handle);
+            }
         }
 
         if ($reduceAndJoinPossible === true) {
