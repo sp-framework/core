@@ -63,7 +63,7 @@ class IoHelper
                 try {
                     (new IndexHandler($storeConfiguration))->setIndex($content);
                 } catch (\Exception $e) {
-                    var_dump($e);die();
+                    throw new IOException("Unable to set Index for : " . $filePath);
                 }
             }
         }

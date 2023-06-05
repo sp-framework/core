@@ -16,33 +16,38 @@ use System\Base\Providers\DatabaseServiceProvider\Ff\Exceptions\JsonException;
 
 class Store
 {
-    protected $root = __DIR__;
     protected $storeName = '';
     protected $storePath = '';
     protected $databasePath = '';
-    protected $indexesPath = '';
 
     protected $useCache = true;
     protected $defaultCacheLifetime = null;
+
+    protected $indexesPath = '';
     protected $indexing = false;
     protected $minIndexChars = 3;
     protected $indexes = [];
+
+    protected $uniqueFields = [];
+
     protected $primaryKey = "id";
+
     protected $searchOptions = [
         "minLength" => 2,
         "scoreKey" => "searchScore",
         "mode" => "or",
         "algorithm" => Query::SEARCH_ALGORITHM["hits"]
     ];
+
     protected $folderPermissions = 0777;
 
     protected $storeConfiguration = [];
 
-    protected $schema = null;
+    protected $storeSchema = [];
 
     const dataDirectory = "data/";
 
-    public function __construct(string $storeName, string $databasePath, array $configuration = [], $schema = null)
+    public function __construct(string $storeName, string $databasePath, array $configuration = [], array $schema = [])
     {
         if (empty($storeName)) {
             throw new InvalidArgumentException('store name can not be empty');
@@ -60,13 +65,11 @@ class Store
 
         $this->indexesPath = $this->databasePath . $this->storeName . 'indexes/';
 
-        $this->setConfiguration($configuration);
+        $this->setConfiguration($configuration, $schema);
 
         $this->createDatabasePath();
 
-        $this->createStore($configuration);
-
-        $this->schema = $schema;
+        $this->createStore($configuration, $schema);
     }
 
     public function getSchema()
@@ -74,7 +77,7 @@ class Store
         return $this->schema;
     }
 
-    public function createStore(array $configuration = [])
+    public function createStore(array $configuration = [], array $schema = [])
     {
         IoHelper::createFolder($this->storePath, $this->folderPermissions);
         IoHelper::createFolder($this->storePath . 'cache', $this->folderPermissions);
@@ -89,6 +92,12 @@ class Store
             count($configuration) > 0
         ) {
             IoHelper::writeContentToFile($this->storePath . 'config.json', json_encode($this->storeConfiguration));
+        }
+
+        if (!file_exists($this->storePath . 'schema.json') ||
+            count($schema) > 0
+        ) {
+            IoHelper::writeContentToFile($this->storePath . 'schema.json', json_encode($this->storeSchema));
         }
     }
 
@@ -496,7 +505,7 @@ class Store
         IoHelper::createFolder($this->databasePath, $this->folderPermissions);
     }
 
-    protected function setConfiguration(array $configuration = [])
+    protected function setConfiguration(array $configuration = [], array $schema = [])
     {
         $writeConfig = true;
 
@@ -511,6 +520,19 @@ class Store
             } else {
                 $writeConfig = false;
             }
+        }
+
+        if (count($schema) === 0) {
+            if (file_exists($this->storePath . 'schema.json')) {
+                $schema = IoHelper::getFileContent($this->storePath . 'schema.json');
+                $schema = json_decode($schema, true);
+            }
+
+            if (count($schema) > 0) {
+                $this->storeSchema = json_encode($schema);
+            }
+        } else {
+            $this->storeSchema = json_encode($schema);
         }
 
         if (array_key_exists("indexing", $configuration)) {
@@ -603,6 +625,14 @@ class Store
             }
         }
 
+        if (array_key_exists("uniqueFields", $configuration)) {
+            if (!is_array($configuration["uniqueFields"])) {
+                throw new InvalidConfigurationException("uniqueFields has to be an array");
+            }
+
+            $this->uniqueFields = $configuration["uniqueFields"];
+        }
+
         if (array_key_exists("folder_permissions", $configuration)) {
             if (!is_int($configuration["folder_permissions"])) {
                 throw new InvalidConfigurationException("folder_permissions has to be an integer (e.g. 0777)");
@@ -632,6 +662,7 @@ class Store
             "folder_permissions"    => $this->folderPermissions,
             "indexing"              => $this->indexing,
             "min_index_chars"       => $this->minIndexChars,
+            "uniqueFields"          => $this->uniqueFields,
             "indexes"               => $this->indexes,
             "storePath"             => $this->storePath,
             "databasePath"          => $this->databasePath,
@@ -674,16 +705,46 @@ class Store
 
     protected function validateData(array $data)
     {
-        if ($this->schema === null) {
+        if (count($this->uniqueFields) > 0) {
+            foreach ($this->uniqueFields as $uniqueField) {
+                if (isset($data[$uniqueField])) {
+                    $found = $this->findOneBy([$uniqueField, '=', $data[$uniqueField]]);
+
+                    if ($found) {
+                        throw new IOException("Duplicate entry found for field: $uniqueField. $uniqueField should be unique.");
+                    }
+                }
+            }
+        }
+
+        if ($this->storeSchema === null) {
             return true;
         }
 
         $validator = new Validator();
 
-        $result = $validator->validate($data, $this->schema);
+        $result = $validator->validate((object) $data, $this->storeSchema);
+
+        if ($result->isValid()) {
+            return true;
+        }
 
         if ($result->hasError()) {
-            throw new InvalidDataException($result->error()->__toString());
+            $errors = $result->error()->__toString() . '. ';
+
+            if ($result->error()->subErrors() && count($result->error()->subErrors()) > 0) {
+                foreach ($result->error()->subErrors() as $subError) {
+                    $errors .= $subError->__toString() . '. ';
+
+                    if (count($subError->args()) > 0) {
+                        foreach ($subError->args() as $key => $arg) {
+                            $errors .= $key . ' ' . $arg . ' ';
+                        }
+                    }
+                }
+            }
+
+            throw new InvalidDataException($errors);
         }
     }
 
@@ -753,5 +814,7 @@ class Store
     public function reIndexStore()
     {
         (new IndexHandler($this->storeConfiguration))->reIndex();
+
+        return $this;
     }
 }

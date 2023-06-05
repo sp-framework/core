@@ -41,8 +41,10 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 
 		$container->setShared(
 			'ff',
-			function () {
-				return (new Ff())->init();
+			function () use ($container, $config) {
+				$cacheConfig = $config->cache;
+
+				return (new Ff($cacheConfig))->init();
 			}
 		);
 

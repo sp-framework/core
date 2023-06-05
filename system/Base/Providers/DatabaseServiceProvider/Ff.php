@@ -15,9 +15,11 @@ class Ff
 
     protected $store;
 
-    public function __construct()
+    public function __construct($cacheConfig)
     {
-        //
+        $this->config['auto_cache'] = $cacheConfig->enabled;
+
+        $this->config['cache_lifetime'] = $cacheConfig->timeout;
     }
 
     public function init()
@@ -29,24 +31,7 @@ class Ff
         return $this;
     }
 
-    public function createStore($file, $config = null, $schema = null)
-    {
-        return $this->store($file, $config, $schema);
-    }
-
-    public function updateStore($file, $config = null, $schema = null)
-    {
-        return $this->store($file, $config, $schema);
-    }
-
-    public function useStore($file)
-    {
-        $this->store = new Store($file, $this->databaseDir);
-
-        return $this->store;
-    }
-
-    protected function store($file, $config = null, $schema = null)
+    public function store($file, $config = [], $schema = [])
     {
         if ($config) {
             $this->config = array_replace_recursive($this->config, $config);
