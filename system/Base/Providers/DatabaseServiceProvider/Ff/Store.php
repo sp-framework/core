@@ -751,7 +751,7 @@ class Store
                 count($result->error()->subErrors()) > 0
             ) {
                 foreach ($result->error()->subErrors() as $subError) {
-                    $errors .= $subError->__toString() . '. ';
+                    $errors .= '<br>' . $subError->data()->path()[0] . ': ' . $subError->__toString() . '. ';
 
                     if (count($subError->args()) > 0) {
                         foreach ($subError->args() as $key => $arg) {

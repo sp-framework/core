@@ -16,13 +16,20 @@ class TestComponent extends BaseComponent
         $starttime = microtime(true);
 
         $schema = [
+            '$schema' => 'https://json-schema.org/draft/2020-12/schema',
             '$id' => 'http://example.com/schema.json',
             'type' => 'object',
             'properties' => [
-                'email' => [
+                'username' => [
                     'type' => 'string',
                     'minLength' => 1,
-                    'maxLength' => 22,
+                    'maxLength' => 20
+                ],
+                'email' => [
+                    'type' => 'string',
+                    'format' => 'email',
+                    'minLength' => 1,
+                    'maxLength' => 50
                 ]
             ],
             'required' => ['email']
