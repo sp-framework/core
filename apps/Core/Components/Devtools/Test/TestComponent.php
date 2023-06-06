@@ -15,16 +15,48 @@ class TestComponent extends BaseComponent
 
         $starttime = microtime(true);
 
-        // $this->sqlite->createTable('basepackages_geo_countries', 'main', (new \System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Countries)->columns());
-        // $this->sqlite->addIndex('basepackages_geo_countries', 'main', (new \System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Countries)->indexes()[0]);
-        // $this->sqlite->createTable('basepackages_geo_states', 'main', (new \System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\States)->columns());
-        // $this->sqlite->addIndex('basepackages_geo_states', 'main', (new \System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\States)->indexes()[0]);
-        // $this->sqlite->addIndex('basepackages_geo_states', 'main', (new \System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\States)->indexes()[1]);
-        // $this->sqlite->createTable('basepackages_geo_cities', 'main', (new \System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities)->columns());
-        // $this->sqlite->addIndex('basepackages_geo_cities', 'main', (new \System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities)->indexes()[0]);
-        // $this->sqlite->addIndex('basepackages_geo_cities', 'main', (new \System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities)->indexes()[1]);
-        // $this->sqlite->addIndex('basepackages_geo_cities', 'main', (new \System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities)->indexes()[2]);
-        // $countriesStore = $this->ff->use('countries');
+        $schema = [
+            '$id' => 'http://example.com/schema.json',
+            'type' => 'object',
+            'properties' => [
+                'email' => [
+                    'type' => 'string',
+                    'minLength' => 1,
+                    'maxLength' => 22,
+                ]
+            ],
+            'required' => ['email']
+        ];
+
+        $userStore = $this->ff->store('users', ['search' => ['min_length' => 1], 'indexing' => true, 'minIndexChars' => 2, 'indexes' => ['username'], 'uniqueFields' => ['email']], $schema);
+
+        $userStore->updateOrInsert(
+            [
+                'username'  => 'sharon3',
+                'email'     => 'sharon3@bazaari.com.au',
+                'full_name' => [
+                    'first_name'    => 'Sharon',
+                    'last_name'     => 'Singh'
+                ]
+            ]
+        );
+        // $ab = $userStore->findBy([['full_name.last_name', '=', 'singh'],['username', 'LIKE', '%3%']]);
+        $ab = $userStore
+            ->createQueryBuilder()
+            ->where(['full_name.last_name', 'like', 'singh'])
+            ->where(['username', 'LIKE', '%ru3'])
+            ->getQuery()
+            ->fetch();
+        // $countriesStore = $this->ff->store('geo_countries', ['search' => ['min_length' => 1], 'indexing' => true, 'minIndexChars' => 2, 'indexes' => ['name']]);
+        // $statesStore = $this->ff->store('geo_states',
+        //     ['search' => ['min_length' => 1], 'indexing' => true, 'minIndexChars' => 2, 'indexes' => ['name', 'country_id']]
+        // );
+        // $citiesStore = $this->ff->store('geo_cities',
+        //     ['auto_cache' => false, 'search' => ['min_length' => 1], 'indexing' => true, 'minIndexChars' => 2, 'indexes' => ['name', 'state_id', 'country_id']]
+        // );
+        // $citiesStore->reIndexStore();die();
+        // $ipv4Store = $this->ff->store('geo_cities_ip2locationv4');
+        // $ipv6Store = $this->ff->store('geo_cities_ip2locationv6');
 
         // $countries =
         //     Json::decode(
@@ -35,9 +67,7 @@ class TestComponent extends BaseComponent
         //     );
 
         // foreach ($countries as $key => $country) {
-        //     $this->sqlite->insertAsDict(
-        //         'basepackages_geo_countries',
-        //     // $countriesStore->updateOrInsert(
+        //     $countriesStore->updateOrInsert(
         //         [
         //             'id'                => $country['id'],
         //             'name'              => $country['name'],
@@ -58,34 +88,17 @@ class TestComponent extends BaseComponent
         //             'longitude'         => $country['longitude'],
         //             'installed'         => 0,
         //             'enabled'           => 0,
-        //         ]
+        //         ],
+        //         false
         //     );
         // }
 
-        // die();
-        $modelToUse = new \System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCountries;
-
-        $modelToUse->setConnectionService('sqlite');
-        $geoCountries = $modelToUse::find(['conditions'=>'']);
-        dump($geoCountries);die();
-        dump($allCountries);
         // $allCountries = $countriesStore->findAll();
         // $country = $countriesStore->findOneBy(['iso3', '=', 'USA']);
         // $countryData = Json::decode($this->localContent->read($this->sourceDir . $country['iso2'] . '.json'), true);
 
-        // $statesStore = $this->ff->use('states');
-        // $citiesStore = $this->ff->use('cities', ['search' => ['min_length' => 1]]);
-
         // $cal = $statesStore->findOneBy(['name', '=', 'California']);
-
-        // $stateWithCities = $statesStore
-        //     ->createQueryBuilder()
-        //     ->where(['name', 'like', 'california'])
-        //     ->join(function($state) use ($citiesStore) {
-        //         return $citiesStore->findBy(['state_id', '=', $state['id']]);
-        //     }, 'cities')
-        //     ->getQuery()
-        //     ->fetch();
+        // $ab = $citiesStore->findBy(['name', '=', 'San Jose']);
 
         // foreach ($countryData['states'] as $key => $state) {
         //     $state['country_id'] = $country['id'];
@@ -99,8 +112,27 @@ class TestComponent extends BaseComponent
 
         //     if (isset($cities)) {
         //         foreach ($cities as $key => $city) {
+        //             if (!isset($city['id'])) {
+        //                 continue;
+        //             }
+
         //             $city['state_id'] = $state['id'];
         //             $city['country_id'] = $country['id'];
+
+        //             if (isset($city['ip2locationv4'])) {
+        //                 $ip2locationv4['id'] = $city['id'];
+        //                 $ip2locationv4['city_id'] = $city['id'];
+        //                 $ip2locationv4['ip2locationv4'] = $city['ip2locationv4'];
+        //                 $ipv4Store->updateOrInsert($ip2locationv4, false);
+        //             }
+
+        //             if (isset($city['ip2locationv6'])) {
+        //                 $ip2locationv6['id'] = $city['id'];
+        //                 $ip2locationv6['city_id'] = $city['id'];
+        //                 $ip2locationv6['ip2locationv6'] = $city['ip2locationv6'];
+        //                 $ipv6Store->updateOrInsert($ip2locationv6, false);
+        //             }
+
         //             unset($city['ip2locationv4']);
         //             unset($city['ip2locationv6']);
 
@@ -118,7 +150,36 @@ class TestComponent extends BaseComponent
         // $final will contain something like "00:00:02.452"
         // $final = strftime('%T', mktime(0, 0, $sec)) . str_replace('0.', '.', sprintf('%.3f', $micro));
 
-        dump($micro);
+
+        // $stateWithCities =
+        //     $statesStore
+        //         ->createQueryBuilder()
+        //         ->where(['name', 'like', 'california'])
+        //         ->join(function($state) use ($citiesStore, $ipv4Store, $ipv6Store) {
+        //             $san = $citiesStore
+        //                 ->createQueryBuilder()
+        //                 ->where(['name', '=', 'San Jose'], ['state_id', '=', $state['id']])
+        //                 ->join(function($city) use ($ipv4Store) {
+        //                     $ipv4 = $ipv4Store->findById($city['id']);
+
+        //                     if ($ipv4) {
+        //                         return $ipv4['ip2locationv4'];
+        //                     }
+        //                 }, 'ip2locationv4')
+        //                 ->join(function($city) use ($ipv6Store) {
+        //                     $ipv6 = $ipv6Store->findById($city['id']);
+
+        //                     if ($ipv6) {
+        //                         return $ipv6['ip2locationv6'];
+        //                     }
+        //                 }, 'ip2locationv6');
+
+        //             return $san;
+        //         }, 'cities')
+        //         ->getQuery()
+        //         ->fetch();
+
+        var_dump($micro, $ab);
         // dump($stateWithCities);
         die();
     }

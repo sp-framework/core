@@ -3,6 +3,7 @@
 namespace System\Base\Providers\DatabaseServiceProvider\Ff;
 
 use Exception;
+use Opis\JsonSchema\Helper;
 use Opis\JsonSchema\Validator;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Classes\IndexHandler;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Classes\IoHelper;
@@ -723,7 +724,7 @@ class Store
 
         $validator = new Validator();
 
-        $result = $validator->validate((object) $data, $this->storeSchema);
+        $result = $validator->validate(Helper::toJSON($data), $this->storeSchema);
 
         if ($result->isValid()) {
             return true;
@@ -732,13 +733,29 @@ class Store
         if ($result->hasError()) {
             $errors = $result->error()->__toString() . '. ';
 
-            if ($result->error()->subErrors() && count($result->error()->subErrors()) > 0) {
+            if ($result->error()->args() &&
+                count($result->error()->args()) > 0
+            ) {
+                foreach ($result->error()->args() as $key => $arg) {
+                    $args = $arg;
+
+                    if (is_array($arg)) {
+                        $args = join(',', $arg);
+                    }
+
+                    $errors = str_replace('{' . $key . '}', $args, $errors);
+                }
+            }
+
+            if ($result->error()->subErrors() &&
+                count($result->error()->subErrors()) > 0
+            ) {
                 foreach ($result->error()->subErrors() as $subError) {
                     $errors .= $subError->__toString() . '. ';
 
                     if (count($subError->args()) > 0) {
                         foreach ($subError->args() as $key => $arg) {
-                            $errors .= $key . ' ' . $arg . ' ';
+                            $errors = str_replace('{' . $key . '}', $arg, $errors);
                         }
                     }
                 }
