@@ -4,6 +4,7 @@ namespace System\Base\Providers\ModulesServiceProvider;
 
 use System\Base\Providers\ModulesServiceProvider\Installer;
 use System\Base\Providers\ModulesServiceProvider\Manager;
+use System\Base\Providers\ModulesServiceProvider\Modules\Bundles;
 use System\Base\Providers\ModulesServiceProvider\Modules\Components;
 use System\Base\Providers\ModulesServiceProvider\Modules\Middlewares;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages;
@@ -24,6 +25,8 @@ class Modules
 	protected $viewsSettings;
 
 	protected $repositories;
+
+	protected $bundles;
 
 	protected $manager;
 
@@ -84,6 +87,13 @@ class Modules
 		$this->repositories = (new Repositories())->init();
 
 		return $this->repositories;
+	}
+
+	protected function initBundles()
+	{
+		$this->bundles = (new Bundles())->init();
+
+		return $this->bundles;
 	}
 
 	protected function initManager()

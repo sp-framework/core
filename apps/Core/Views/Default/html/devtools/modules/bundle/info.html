@@ -5,6 +5,7 @@
     {% set bundleApp_type = bundle['app_type'] %}
     {% set bundleModule_type = 'bundles' %}
     {% set bundleApiId = bundle['api_id'] %}
+    {% set bundleVersion = bundle['version'] %}
     {% set bundleRepo = bundle['repo'] %}
 {% else %}
     {% set bundleId = '' %}
@@ -13,6 +14,7 @@
     {% set bundleApp_type = '' %}
     {% set bundleModule_type = 'bundles' %}
     {% set bundleApiId = '' %}
+    {% set bundleVersion = '0.0.0' %}
     {% set bundleRepo = '' %}
 {% endif %}
 {% set moduleTypeDisabled = true %}
@@ -158,6 +160,30 @@
             ]
         )}}
     </div>
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'version',
+                'fieldLabel'                     : 'Bundle version',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Bundle version. New modules start with 0.0.0(Major.Minor.Patch). We use semantic version system.',
+                'fieldRequired'                  : true,
+                'fieldInputToggleEdit'           : true,
+                'fieldDisabled'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : bundleVersion
+            ]
+        )}}
+    </div>
     <div class="col">
         {{adminltetags.useTag('fields',
             [
@@ -179,6 +205,28 @@
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 1024,
                 'fieldValue'                     : bundleRepo
+            ]
+        )}}
+    </div>
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'createrepo',
+                'fieldLabel'                     : 'Create New Repo?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Create new repository if it does not exist on remote?',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : false,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
             ]
         )}}
     </div>

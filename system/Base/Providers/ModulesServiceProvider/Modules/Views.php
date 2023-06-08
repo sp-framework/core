@@ -241,7 +241,11 @@ class Views extends BasePackage
                 );
 
                 if ($viewsSettings) {
-                    $this->viewSettings = Json::decode($viewsSettings['settings'], true);
+                    if (is_string($viewsSettings['settings'])) {
+                        $this->viewSettings = Json::decode($viewsSettings['settings'], true);
+                    } else {
+                        $this->viewSettings = $viewsSettings['settings'];
+                    }
                 }
             } else {
                 $viewsName =  'Default';

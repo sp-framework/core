@@ -28,6 +28,10 @@ class DevtoolsModules extends BasePackage
 
     protected $apiConfig;
 
+    protected $newFiles = [];
+
+    protected $newDirs = [];
+
     public function addModule($data)
     {
         if (!checkCtype($data['name'], 'alpha')) {
@@ -36,10 +40,25 @@ class DevtoolsModules extends BasePackage
             return false;
         }
 
-        if ($data['type'] === 'bundles') {
-            $data = $this->checkTypeAndCategory($data);
+        $data = $this->checkTypeAndCategory($data);
 
-            if ($this->add($data)) {
+        $data['name'] = ucfirst(trim(str_replace('(Clone)', '', $data['name'])));
+        $data['repo'] = trim(str_replace('(clone)', '', $data['repo']));
+        $data['installed'] = '1';
+        $data['updated_by'] = '0';
+
+        if ($data['module_type'] === 'bundles') {
+            if ($this->modules->{$data['module_type']}->add($data)) {
+                if ($data['createrepo'] == true) {
+                    if (!$this->checkRepo($data)) {
+                        $newRepo = $this->createRepo($data);
+
+                        $this->addResponse('Bundle added & created new repo.');
+
+                        return;
+                    }
+                }
+
                 $this->addResponse('Bundle added');
 
                 return;
@@ -50,23 +69,21 @@ class DevtoolsModules extends BasePackage
             return;
         }
 
-        if ($data['type'] === 'core') {
+        if ($data['module_type'] === 'core') {
             $this->addResponse('Core already exists!', 1);
 
             return false;
         }
 
-        $data = $this->checkTypeAndCategory($data);
-
-        if ($data['type'] === 'components') {
-            $moduleMethod = 'get' . ucfirst(substr($data['type'], 0, -1)) . 'ByAppTypeAndRepoAndRoute';
-            $module = $this->modules->{$data['type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['route']);
-        } else if ($data['type'] === 'packages' || $data['type'] === 'middlewares') {
-            $moduleMethod = 'get' . ucfirst(substr($data['type'], 0, -1)) . 'ByAppTypeAndRepoAndClass';
-            $module = $this->modules->{$data['type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['class']);
-        } else if ($data['type'] === 'views') {
-            $moduleMethod = 'get' . ucfirst(substr($data['type'], 0, -1)) . 'ByAppTypeAndRepoAndName';
-            $module = $this->modules->{$data['type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['name']);
+        if ($data['module_type'] === 'components') {
+            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndRepoAndRoute';
+            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['route']);
+        } else if ($data['module_type'] === 'packages' || $data['module_type'] === 'middlewares') {
+            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndRepoAndClass';
+            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['class']);
+        } else if ($data['module_type'] === 'views') {
+            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndRepoAndName';
+            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['name']);
         }
 
         if ($module) {
@@ -75,12 +92,13 @@ class DevtoolsModules extends BasePackage
             return false;
         }
 
-        $data['name'] = ucfirst(trim(str_replace('(Clone)', '', $data['name'])));
-        $data['repo'] = trim(str_replace('(clone)', '', $data['repo']));
-        $data['installed'] = '1';
-        $data['updated_by'] = '0';
+        if ($data['module_type'] !== 'views') {
+            $moduleLocation = $this->getNewFilesLocation($data);
 
-        if ($data['type'] === 'views' && $data['base_view_module_id'] == 0) {
+            $data['class'] = rtrim(str_replace('/', '\\', ucfirst($moduleLocation)), '\\');
+        }
+
+        if ($data['module_type'] === 'views' && $data['base_view_module_id'] == 0) {
             $data['view_modules_version'] = '0.0.0.0';
         }
 
@@ -88,11 +106,8 @@ class DevtoolsModules extends BasePackage
             $data['apps'] = Json::encode([]);
         }
 
-// $this->updateModuleJson($data);
-$this->generateNewFiles($data);
-die();
         try {
-            if ($this->modules->{$data['type']}->add($data) &&
+            if ($this->modules->{$data['module_type']}->add($data) &&
                 $this->updateModuleJson($data) &&
                 $this->generateNewFiles($data)
             ) {
@@ -100,19 +115,36 @@ die();
                     if (!$this->checkRepo($data)) {
                         $newRepo = $this->createRepo($data);
 
-                        $this->addResponse('Module added & created new repo.', 0, ['newRepo' => $newRepo]);
+                        $this->addResponse('Module added & created new repo.',
+                                           0,
+                                           [
+                                            'newFiles'  => $this->newFiles,
+                                            'newDirs'   => $this->newDirs,
+                                            'newRepo'   => $newRepo
+                                           ]
+                                        );
 
                         return;
                     }
                 }
 
-                $this->addResponse('Module added');
-
+                $this->addResponse('Module added',
+                                   0,
+                                   [
+                                    'newFiles'  => $this->newFiles,
+                                    'newDirs'   => $this->newDirs
+                                   ]
+                                );
+                die();
                 return;
             }
         } catch (\Exception $e) {
             $this->addResponse($e->getMessage(), 1);
+
+            return;
         }
+
+        $this->addResponse('Error adding Module', 1);
     }
 
     public function updateModule($data)
@@ -123,10 +155,20 @@ die();
             return false;
         }
 
-        if ($data['type'] === 'bundles') {
-            $data = $this->checkTypeAndCategory($data);
+        $data = $this->checkTypeAndCategory($data);
 
-            if ($this->update($data)) {
+        if ($data['module_type'] === 'bundles') {
+            if ($this->modules->{$data['module_type']}->update($data)) {
+                if ($data['createrepo'] == true) {
+                    if (!$this->checkRepo($data)) {
+                        $newRepo = $this->createRepo($data);
+
+                        $this->addResponse('Bundle updated & created new repo.');
+
+                        return;
+                    }
+                }
+
                 $this->addResponse('Bundle updated');
 
                 return;
@@ -137,40 +179,44 @@ die();
             return;
         }
 
-        $data = $this->checkTypeAndCategory($data);
+        try {
+            if ($data['module_type'] === 'core') {
+                if ($this->updateModuleJson($data)) {
+                    $this->addResponse('Module updated');
 
-        if ($data['type'] === 'core') {
-            if ($this->updateModuleJson($data)) {
-                $this->addResponse('Module updated');
-
-                return;
-            }
-        } else {
-            $module = $this->modules->{$data['type']}->getById($data['id']);
-
-            $module = array_merge($module, $data);
-
-            if ($this->modules->{$data['type']}->update($module) &&
-                $this->updateModuleJson($data)
-            ) {
-                if ($data['type'] === 'components') {
-                    $this->addUpdateComponentMenu($data);
+                    return;
                 }
+            } else {
+                $module = $this->modules->{$data['module_type']}->getById($data['id']);
 
-                if ($data['createrepo'] == true) {
-                    if (!$this->checkRepo($data)) {
-                        $newRepo = $this->createRepo($data);
+                $module = array_merge($module, $data);
 
-                        $this->addResponse('Module added & created new repo.', 0, ['newRepo' => $newRepo]);
-
-                        return;
+                if ($this->modules->{$data['module_type']}->update($module) &&
+                    $this->updateModuleJson($data)
+                ) {
+                    if ($data['module_type'] === 'components') {
+                        $this->addUpdateComponentMenu($data);
                     }
+
+                    if ($data['createrepo'] == true) {
+                        if (!$this->checkRepo($data)) {
+                            $newRepo = $this->createRepo($data);
+
+                            $this->addResponse('Module updated & created new repo.', 0, ['newRepo' => $newRepo]);
+
+                            return;
+                        }
+                    }
+
+                    $this->addResponse('Module updated');
+
+                    return;
                 }
-
-                $this->addResponse('Module updated');
-
-                return;
             }
+        } catch (\Exception $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return;
         }
 
         $this->addResponse('Error updating Module', 1);
@@ -326,7 +372,7 @@ die();
         $jsonContent = str_replace('}"', '}', $jsonContent);
         $jsonContent = str_replace('\\n', '', $jsonContent);
         $jsonContent = $this->basepackages->utils->formatJson(['json' => $jsonContent]);
-        dump($jsonFile, $jsonContent);die();
+
         try {
             $this->localContent->write($jsonFile, $jsonContent);
         } catch (FilesystemException | UnableToWriteFile $exception) {
@@ -508,7 +554,7 @@ die();
     {
         $moduleFilesLocation = $this->getNewFilesLocation($data);
 
-        $method = 'generateNew' . ucfirst($data['type']) . 'Files';
+        $method = 'generateNew' . ucfirst($data['module_type']) . 'Files';
 
         $this->{$method}($moduleFilesLocation, $data);
 
@@ -625,6 +671,7 @@ die();
 
         try {
             $this->localContent->write($moduleFilesLocation . $componentName . '.php', $file);
+            array_push($this->newFiles, $moduleFilesLocation . $componentName . '.php');
         } catch (FilesystemException | UnableToWriteFile $exception) {
             $this->addResponse('Unable to write module component file');
 
@@ -665,6 +712,7 @@ $file .= '
 
         try {
             $this->localContent->write($moduleFilesLocation . 'Widgets.php', $file);
+            array_push($this->newFiles, $moduleFilesLocation . 'Widgets.php');
         } catch (FilesystemException | UnableToWriteFile $exception) {
             $this->addResponse('Unable to write module component file');
 
@@ -698,15 +746,16 @@ $file .= '
         } else {
             $fileName = $moduleFilesLocation . $data['name'] . '.php';
         }
-        // try {
-        //     $this->localContent->write($fileName, $file);
-        // } catch (FilesystemException | UnableToWriteFile $exception) {
-        //     $this->addResponse('Unable to write module component file');
+        try {
+            $this->localContent->write($fileName, $file);
+            array_push($this->newFiles, $fileName);
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write module component file');
 
-        //     return false;
-        // }
+            return false;
+        }
 
-        // $this->generateNewPackagesInstallFiles($data);
+        $this->generateNewPackagesInstallFiles($data, $moduleFilesLocation);
         $this->generateNewPackagesModelFiles($data, $moduleFilesLocation);
     }
 
@@ -739,13 +788,15 @@ $file .= '
 
         $file = str_replace('"NAMESPACE"', 'namespace ' . $moduleFilesLocationClass . ';', $file);
         $file = str_replace('"PACKAGESCHEMANAME"', $data['name'], $file);
-        // try {
-        //     $this->localContent->write($fileName, $file);
-        // } catch (FilesystemException | UnableToWriteFile $exception) {
-        //     $this->addResponse('Unable to write module component file');
 
-        //     return false;
-        // }
+        try {
+            $this->localContent->write($fileName, $file);
+            array_push($this->newFiles, $fileName);
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write module component file');
+
+            return false;
+        }
 
         //Package Installer File
         try {
@@ -765,16 +816,16 @@ $file .= '
             $file = str_replace('"PACKAGESCHEMACLASS"', $moduleSchemaClass . ';', $file);
             $file = str_replace('"PACKAGESCHEMANAME"', $data['name'], $file);
 
-            // try {
-            //     $this->localContent->write($fileName, $file);
-            // } catch (FilesystemException | UnableToWriteFile $exception) {
-            //     $this->addResponse('Unable to write module component file');
+            try {
+                $this->localContent->write($fileName, $file);
+                array_push($this->newFiles, $fileName);
+            } catch (FilesystemException | UnableToWriteFile $exception) {
+                $this->addResponse('Unable to write module component file');
 
-            //     return false;
-            // }
+                return false;
+            }
         }
 
-        //
         return true;
     }
 
@@ -815,21 +866,25 @@ $file .= '
             }
         } else {
             $moduleFilesLocation = $moduleFilesLocation . 'Model';
-            $fileName = $moduleFilesLocation . '/' . $data['name'] . '.php';
+            $fileName = $moduleFilesLocation . '/' . 'Apps' . ucfirst($data['app_type']) . $data['name'] . '.php';
             $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
             $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+            $className = 'Apps' . ucfirst($data['app_type']) . $data['name'];
         }
 
         $file = str_replace('"NAMESPACE"', 'namespace ' . rtrim($moduleFilesLocationClass, '\\') . ';', $file);
         $file = str_replace('"PACKAGEMODELNAME"', $className, $file);
-        // try {
-        //     $this->localContent->write($fileName, $file);
-        // } catch (FilesystemException | UnableToWriteFile $exception) {
-        //     $this->addResponse('Unable to write module component file');
 
-        //     return false;
-        // }
-        var_dump($moduleFilesLocation, $moduleFilesLocationClass, $file);
+        try {
+            $this->localContent->write($fileName, $file);
+            array_push($this->newFiles, $fileName);
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write module component file');
+
+            return false;
+        }
+
+        return true;
     }
 
     protected function generateNewViewsFiles($moduleFilesLocation, $data)
@@ -842,18 +897,26 @@ $file .= '
                 }
 
                 $this->localContent->createDirectory($moduleFilesLocation . 'html');
+                array_push($this->newDirs, $moduleFilesLocation . 'html');
                 $this->localContent->createDirectory($moduleFilesLocation . 'html/layouts');
+                array_push($this->newDirs, $moduleFilesLocation . 'html/layouts');
 
                 $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/layout.txt');
                 foreach ($data['settings']['layouts'] as $layout) {
                     $this->localContent->write($moduleFilesLocation . 'html/layouts/' . $layout['view'] . '.html', $file);
+                    array_push($this->newFiles, $moduleFilesLocation . 'html/layouts/' . $layout['view'] . '.html');
                 }
 
                 $this->localContent->createDirectory($modulePublicFilesLocation . 'css');
+                array_push($this->newDirs, $modulePublicFilesLocation . 'css');
                 $this->localContent->createDirectory($modulePublicFilesLocation . 'fonts');
+                array_push($this->newDirs, $modulePublicFilesLocation . 'fonts');
                 $this->localContent->createDirectory($modulePublicFilesLocation . 'images');
+                array_push($this->newDirs, $modulePublicFilesLocation . 'images');
                 $this->localContent->createDirectory($modulePublicFilesLocation . 'js');
+                array_push($this->newDirs, $modulePublicFilesLocation . 'js');
                 $this->localContent->createDirectory($modulePublicFilesLocation . 'sounds');
+                array_push($this->newDirs, $modulePublicFilesLocation . 'sounds');
             } catch (FilesystemException | UnableToCreateDirectory $exception) {
                 $this->addResponse('Unable to create view directories in public folder.');
 
@@ -862,7 +925,9 @@ $file .= '
         } else {
             try {
                 $this->localContent->write($moduleFilesLocation . 'view.html', $data['name'] . ' Main View');
+                array_push($this->newFiles, $moduleFilesLocation . 'view.html');
                 $this->localContent->write($moduleFilesLocation . 'list.html', $data['name'] . ' List View');
+                array_push($this->newFiles, $moduleFilesLocation . 'list.html');
             } catch (FilesystemException | UnableToReadFile | UnableToWriteFile $exception) {
                 $this->addResponse('Unable to read/write module base html files.');
 
@@ -885,12 +950,12 @@ $file .= '
                     if ($data['menu'] == 'false') {
                         $this->basepackages->menus->remove($data['menu_id']);
 
-                        $module = $this->modules->{$data['type']}->getById($data['id']);
+                        $module = $this->modules->{$data['module_type']}->getById($data['id']);
 
                         $module['menu_id'] = null;
                         $module['menu'] = null;
 
-                        $this->modules->{$data['type']}->update($module);
+                        $this->modules->{$data['module_type']}->update($module);
 
                         return;
                     }
@@ -909,12 +974,12 @@ $file .= '
                 $menu = $this->basepackages->menus->addMenu($data['app_type'], $data['menu']);
 
                 if ($menu) {
-                    $module = $this->modules->{$data['type']}->packagesData->last;
+                    $module = $this->modules->{$data['module_type']}->packagesData->last;
 
                     $module['menu_id'] = $menu['id'];
                 }
 
-                $this->modules->{$data['type']}->update($module);
+                $this->modules->{$data['module_type']}->update($module);
             }
         }
     }
@@ -1063,10 +1128,10 @@ $file .= '
             return false;
         }
 
-        if ($data['type'] === 'core') {
+        if ($data['module_type'] === 'core') {
             $currentVersion = $this->core->getVersion();
         } else {
-            $module = $this->modules->{$data['type']}->getById($data['id']);
+            $module = $this->modules->{$data['module_type']}->getById($data['id']);
 
             $currentVersion = $module['version'];
         }

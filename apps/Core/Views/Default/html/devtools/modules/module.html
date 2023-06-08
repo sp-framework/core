@@ -563,6 +563,7 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-version'                                 : { },
         '{{componentId}}-{{sectionId}}-repo'                                    : { },
+        '{{componentId}}-{{sectionId}}-createrepo'                              : { },
         '{{componentId}}-{{sectionId}}-modules'                                 : {
             'placeholder'   : 'SELECT MODULE',
             'allowClear'    : true
@@ -912,7 +913,7 @@ dataCollectionSection =
             'placeholder'   : 'SELECT MODULE TYPE'
         },
         '{{componentId}}-{{sectionId}}-category'                                : {
-            'placeholder'   : 'SELECT CATEGORY'
+            'placeholder'   : 'SELECT CATEGORY OR CREATE NEW'
         },
         '{{componentId}}-{{sectionId}}-name'                                    : { },
         '{{componentId}}-{{sectionId}}-display_name'                            : { },
@@ -1573,6 +1574,12 @@ dataCollectionSection =
                     keys =
                     [
                         {
+                            'databasetype' : {
+                                'id'        : 'databasetype',
+                                'text'      : 'Database Type'
+                            }
+                        },
+                        {
                             'debug' : {
                                 'id'        : 'debug',
                                 'text'      : 'Debug Enabled?'
@@ -1948,6 +1955,15 @@ dataCollectionSection =
                             }
                     } else if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
                         switch (key) {
+                            case 'databasetype' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['databasetype']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['databasetype'];
+                                }
+
+                                break;
                             case 'debug' :
                                 type = 'boolean';
                                 settings = '';
@@ -2219,6 +2235,11 @@ dataCollectionSection =
                         }
                     } else if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
                         switch (key) {
+                            case 'databasetype' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['databasetype']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
                             case 'debug' :
                                 dataCollectionSectionForm['vars']['moduleSettings']['debug']
                                     = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
@@ -2415,7 +2436,7 @@ dataCollectionSection =
                                 });
 
                                 if (!found) {
-                                    if (modules === 'views') {
+                                    if (modules === 'views' && dataCollectionSectionForm['vars']['module_type'] === 'views') {
                                         if (dataCollectionSectionForm['vars']['modules'][modules][moduleData['id']]['base_view_module_id'] != '0') {
                                             PNotify.error({'text': 'Only base view modules can be a view dependency'});
 

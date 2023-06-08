@@ -77,7 +77,7 @@ class ModulesComponent extends BaseComponent
 
 		foreach ($modulesTypeArr as $modulesType) {
 			if ($modulesType === 'bundles') {
-				$modulesArr['modules'] = $this->modulesPackage->getAll()->bundles;
+				$modulesArr['modules'] = msort($this->modules->{$modulesType}->{$modulesType}, 'name');
 			} else {
 				$modulesArr = $this->processModulesArr(msort($this->modules->{$modulesType}->{$modulesType}, 'name'));
 				${$modulesType . 'CategoryArr'} = $modulesArr['categoryArr'];
@@ -293,7 +293,7 @@ class ModulesComponent extends BaseComponent
 			$this->view->bundleModules = $this->modulesPackage->getDefaultDependencies();
 
 			if ($this->getData()['id'] != 0) {
-				$bundle = $this->modulesPackage->getById($this->getData()['id']);
+				$bundle = $this->modules->bundles->getById($this->getData()['id']);
 
 				if (!$bundle) {
 					return $this->throwIdNotFound();
@@ -301,13 +301,13 @@ class ModulesComponent extends BaseComponent
 
 				$this->view->bundle = $bundle;
 				$this->view->bundleModules = $bundle['bundle_modules'];
-
-				if (isset($modules['bundles'])) {
-					unset($modules['bundles']);
-				}
-
-				$this->view->modules = $modules;
 			}
+
+			if (isset($modules['bundles'])) {
+				unset($modules['bundles']);
+			}
+
+			$this->view->modules = $modules;
 
 			$this->view->pick('modules/view');
 		} else {
@@ -326,7 +326,8 @@ class ModulesComponent extends BaseComponent
 
 			$this->addResponse(
 				$this->modulesPackage->packagesData->responseMessage,
-				$this->modulesPackage->packagesData->responseCode
+				$this->modulesPackage->packagesData->responseCode,
+				$this->modulesPackage->packagesData->responseData
 			);
 		} else {
 			$this->addResponse('Method Not Allowed', 1);

@@ -12,8 +12,6 @@ class ModulesComponents extends BaseModel
 
     public $route;
 
-    public $alias;
-
     public $description;
 
     public $app_type;
