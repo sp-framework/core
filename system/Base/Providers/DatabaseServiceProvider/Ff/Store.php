@@ -5,6 +5,7 @@ namespace System\Base\Providers\DatabaseServiceProvider\Ff;
 use Exception;
 use Opis\JsonSchema\Helper;
 use Opis\JsonSchema\Validator;
+use Phalcon\Helper\Arr;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Utils;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Classes\IndexHandler;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Classes\IoHelper;
@@ -47,6 +48,8 @@ class Store
     protected $storeConfiguration = [];
 
     protected $storeSchema = [];
+
+    public $data;
 
     const dataDirectory = "data/";
 
@@ -93,6 +96,11 @@ class Store
     public function getSchema()
     {
         return $this->schema;
+    }
+
+    public function toArray()
+    {
+        return $this->data;
     }
 
     public function createStore(array $configuration = [], array $schema = [])
@@ -170,7 +178,9 @@ class Store
             $qb->skip($offset);
         }
 
-        return $qb->getQuery()->fetch();
+        $this->data = $qb->getQuery()->fetch();
+
+        return $this->data;
     }
 
     public function findById($id)
@@ -183,7 +193,9 @@ class Store
             return null;
         }
 
-        return @json_decode($content, true);
+        $this->data = @json_decode($content, true);
+
+        return $this->data;
     }
 
     public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null): array
@@ -202,10 +214,12 @@ class Store
             $qb->skip($offset);
         }
 
-        return $qb->getQuery()->fetch();
+        $this->data = $qb->getQuery()->fetch();
+
+        return $this->data;
     }
 
-    public function findOneBy(array $criteria)
+    public function findOneBy(array $criteria, $getRelations = false)
     {
         $qb = $this->createQueryBuilder();
 
@@ -213,7 +227,13 @@ class Store
 
         $result = $qb->getQuery()->first();
 
-        return (!empty($result)) ? $result : null;
+        if ($getRelations) {
+            $result = $this->getRelations($result);
+        }
+
+        $this->data = (!empty($result)) ? $result : null;
+
+        return $this->data;
     }
 
     public function insert(array $data): array
@@ -226,7 +246,9 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-        return $data;
+        $this->data = $data;
+
+        return $this->data;
     }
 
     public function updateOrInsert(array $data, bool $autoGenerateIdOnInsert = true): array
@@ -260,7 +282,9 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-        return $data;
+        $this->data = $data;
+
+        return $this->data;
     }
 
     public function insertMany(array $data): array
@@ -276,7 +300,9 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-        return $results;
+        $this->data = $results;
+
+        return $this->data;
     }
 
     public function updateOrInsertMany(array $data, bool $autoGenerateIdOnInsert = true): array
@@ -317,7 +343,9 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-        return $data;
+        $this->data = $data;
+
+        return $this->data;
     }
 
     public function update(array $data): bool
@@ -362,7 +390,9 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-        return true;
+        $this->data = $data;
+
+        return $this->data;
     }
 
     public function updateById($id, array $data)
@@ -400,7 +430,9 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-        return json_decode($content, true);
+        $this->data = $data;
+
+        return $this->data;
     }
 
     public function deleteBy(array $criteria, int $returnOption = Query::DELETE_RETURN_BOOL)
@@ -453,7 +485,9 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-        return json_decode($content, true);
+        $this->data = json_decode($content, true);
+
+        return $this->data;
     }
 
     public function search(array $fields, string $query, array $orderBy = null, int $limit = null, int $offset = null): array
@@ -474,7 +508,111 @@ class Store
             $qb->skip($offset);
         }
 
-        return $qb->getQuery()->fetch();
+        $this->data = $qb->getQuery()->fetch();
+
+        return $this->data;
+    }
+
+    public function getRelations($data)
+    {
+        if (count($data) === 0) {
+            return $data;
+        }
+
+        if (is_string($this->storeSchema)) {
+            $schema = json_decode($this->storeSchema, true);
+        }
+
+        if (isset($schema['properties']) && count($schema['properties']) > 0) {
+            foreach ($schema['properties'] as $propertyKey => $property) {
+                if (!is_array($property['type'])) {
+                    continue;
+                }
+
+                if (in_array('array', $property['type']) && isset($property['description'])) {
+                    $description = explode('|', $property['description']);
+
+                    if (count($description) > 0) {
+                        if ($description[1] === 'hasOne' || $description[1] === 'hasMany') {
+                            if (isset($description[4])) {
+                                $fields = explode(':', $description[4]);
+
+                                if (count($fields) > 0 && count($fields) % 2 == 0) {
+                                    $fieldsArr = Arr::chunk($fields, 2);
+                                    $criteria = [];
+
+                                    foreach ($fieldsArr as $fieldArr) {
+                                        array_push($criteria, [$fieldArr[1], '=', $data[$fieldArr[0]]]);
+                                    }
+
+                                    try {
+                                        $store = new Store($description[2], $this->databasePath);
+
+                                        $storeData = $store->findBy($criteria);
+
+                                        if ($description[1] === 'hasOne') {
+                                            $data[$description[0]] = $storeData[0];
+                                        } else if ($description[1] === 'hasMany') {
+                                            $data[$description[0]] = $storeData;
+                                        }
+                                    } catch (\Exception $e) {
+                                        continue;
+                                    }
+                                }
+                            }
+                        } else if ($description[1] === 'hasOneThrough' || $description[1] === 'hasManyThrough') {
+                            if (isset($description[2]) && isset($description[3])) {
+                                $description[2] = explode('+', $description[2]);
+                                $description[3] = explode('+', $description[3]);
+                            }
+
+                            if (isset($description[2][2]) && isset($description[3][2])) {
+                                $intermediateFields = explode(':', $description[2][2]);
+                                $fields = explode(':', $description[3][2]);
+                            }
+
+                            if ((count($intermediateFields) > 0 && count($intermediateFields) % 2 == 0) &&
+                                (count($fields) > 0 && count($fields) % 2 == 0)
+                            ) {
+                                $fieldsArr = Arr::chunk($intermediateFields, 2);
+                                $criteria = [];
+
+                                foreach ($fieldsArr as $fieldArr) {
+                                    array_push($criteria, [$fieldArr[1], '=', $data[$fieldArr[0]]]);
+                                }
+
+                                try {
+                                    $store = new Store($description[2][0], $this->databasePath);
+
+                                    $storeData = $store->findOneBy($criteria);
+
+                                    $fieldsArr = Arr::chunk($fields, 2);
+                                    $criteria = [];
+
+                                    foreach ($fieldsArr as $fieldArr) {
+                                        array_push($criteria, [$fieldArr[1], '=', $storeData[$fieldArr[0]]]);
+                                    }
+
+                                    $store = new Store($description[3][0], $this->databasePath);
+
+                                    $storeData = $store->findBy($criteria);
+
+                                    if ($description[1] === 'hasOneThrough') {
+                                        $data[$description[0]] = $storeData[0];
+                                    } else if ($description[1] === 'hasManyThrough') {
+                                        $data[$description[0]] = $storeData;
+                                    }
+                                } catch (\Exception $e) {
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $data;
     }
 
     public function getPrimaryKey(): string

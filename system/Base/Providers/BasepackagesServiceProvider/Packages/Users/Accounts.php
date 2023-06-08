@@ -22,92 +22,60 @@ class Accounts extends BasePackage
 
     public $accounts;
 
-    public function getAccountById(
-        int $id,
-        $getsecurity = false,
-        $getcanlogin = false,
-        $getsessions = false,
-        $getidentifiers = false,
-        $getagents = false,
-        $gettunnels = false,
-        $getprofiles = false
-    ) {
+    public function getAccountById(int $id)
+    {
+        $this->setFFRelations(true);
+
         $this->getFirst('id', $id);
 
         if ($this->model) {
             $account = $this->model->toArray();
 
-            if ($getsecurity) {
-                if ($this->model->getsecurity()) {
-                    $relationData = $this->model->getsecurity()->toArray();
-
-                    unset($relationData['id']);
-
-                    $account = array_merge($account, $relationData);
-                }
+            $account['security'] = [];
+            if ($this->model->getsecurity()) {
+                $account['security'] = $this->model->getsecurity()->toArray();
             }
 
-            if ($getcanlogin) {
-                if ($this->model->getcanlogin()) {
-                    $relationData = $this->model->getcanlogin()->toArray();
-
-                    unset($relationData['id']);
-
-                    $account = array_merge($account, $relationData);
-                }
+            $account['canlogin'] = [];
+            if ($this->model->getcanlogin()) {
+                $account['canlogin'] = $this->model->getcanlogin()->toArray();
             }
 
-            if ($getsessions) {
-                if ($this->model->getsessions()) {
-                    $relationData = $this->model->getsessions()->toArray();
-
-                    unset($relationData['id']);
-
-                    $account = array_merge($account, $relationData);
-                }
+            $account['sessions'] = [];
+            if ($this->model->getsessions()) {
+                $account['sessions'] = $this->model->getsessions()->toArray();
             }
 
-            if ($getidentifiers) {
-                if ($this->model->getidentifiers()) {
-                    $relationData = $this->model->getidentifiers()->toArray();
-
-                    unset($relationData['id']);
-
-                    $account = array_merge($account, $relationData);
-                }
+            $account['identifiers'] = [];
+            if ($this->model->getidentifiers()) {
+                $account['identifiers'] = $this->model->getidentifiers()->toArray();
             }
 
-            if ($getagents) {
-                if ($this->model->getagents()) {
-                    $relationData = $this->model->getagents()->toArray();
-
-                    unset($relationData['id']);
-
-                    $account = array_merge($account, $relationData);
-                }
+            $account['agents'] = [];
+            if ($this->model->getagents()) {
+                $account['agents'] = $this->model->getagents()->toArray();
             }
 
-            if ($gettunnels) {
-                if ($this->model->gettunnels()) {
-                    $relationData = $this->model->gettunnels()->toArray();
-
-                    unset($relationData['id']);
-
-                    $account = array_merge($account, $relationData);
-                }
+            $account['tunnels'] = [];
+            if ($this->model->gettunnels()) {
+                $account['tunnels'] = $this->model->gettunnels()->toArray();
             }
 
-            if ($getprofiles) {
-                if ($this->model->getProfiles()) {
-                    $relationData = $this->model->getProfiles()->toArray();
+            $account['profile'] = [];
+            if ($this->model->getProfile()) {
+                $account['profile'] = $this->model->getProfile()->toArray();
+            }
 
-                    unset($relationData['id']);
-
-                    $account = array_merge($account, $relationData);
-                }
+            $account['role'] = [];
+            if ($this->model->getRole()) {
+                $account['role'] = $this->model->getRole()->toArray();
             }
 
             return $account;
+        } else {
+            if ($this->ffData) {
+                return $this->ffData;
+            }
         }
 
         return null;
@@ -135,11 +103,10 @@ class Accounts extends BasePackage
 
         $data['domain'] = explode('@', $data['email'])[1];
 
-        if ($this->checkAccountBy($data['email'])) {
+        $account = $this->checkAccountBy($data['email']);
+
+        if ($account) {
             if (isset($data['package_name']) && $data['package_name'] !== 'profiles') {
-
-                $account = $this->checkAccountBy($data['email']);
-
                 $account = array_merge($account, $data);
 
                 $account['account_id'] = $account['id'];
@@ -251,7 +218,7 @@ class Accounts extends BasePackage
 
         $accountObj = $this->getFirst('id', $data['id']);
 
-        $account = $this->getAccountById($data['id'], true);
+        $account = $this->getAccountById($data['id']);
 
         if (!isset($data['override_role']) ||
             $data['override_role'] == 0
@@ -564,6 +531,8 @@ class Accounts extends BasePackage
     public function checkAccount(string $username, $getSecurity = false)
     {
         if ($this->app) {
+            $account = $this->checkAccountBy($username, $getSecurity);
+
             if ($this->app['acceptable_usernames'] && $this->app['acceptable_usernames'] !== '') {
                 if (is_string($this->app['acceptable_usernames'])) {
                     $this->app['acceptable_usernames'] = Json::decode($this->app['acceptable_usernames'], true);
@@ -599,45 +568,31 @@ class Accounts extends BasePackage
 
                 return false;
             } else {
-                return $this->checkAccountBy($username, $getSecurity);
+                return $account;
             }
         } else {
-            return $this->checkAccountBy($username, $getSecurity);
+            return $account;
         }
     }
 
     public function checkAccountBy(string $username, $getSecurity = false, $by = 'email')
     {
+        if ($getSecurity) {
+            $this->setFFRelations(true);
+        }
+
         $this->getFirst($by, $username, true);
 
         if ($this->model) {
             $account = $this->model->toArray();
 
             if ($getsecurity && $this->model->getsecurity()) {
-                $security = $this->model->getsecurity()->toArray();
-
-                unset($security['id']);
-                unset($security['account_id']);
-
-                $account = array_merge($account, $security);
+                $account['security'] = $this->model->getsecurity()->toArray();
             }
         }
 
         if ($this->ffData) {
             $account = $this->ffData;
-
-            if ($getSecurity) {
-                $this->ffStoreToUse = 'basepackages_users_accounts_security';
-
-                $this->getFirst('account_id', $account['id'], true);
-
-                $security = $this->ffData;
-
-                unset($security['id']);
-                unset($security['account_id']);
-
-                $account = array_merge($account, $security);
-            }
         }
 
         if (isset($account)) {
@@ -695,7 +650,7 @@ class Accounts extends BasePackage
 
     public function hasSession($id, $session)
     {
-        $this->getById($id);
+        $this->getAccountById($id);
 
         $hasSession =
             $this->model->sessions->filter(
@@ -951,12 +906,10 @@ class Accounts extends BasePackage
             $accountObj = $this->modelToUse::findFirstById($uid);
 
             if ($accountObj) {
-                $account = $this->getAccountById($uid, true);
+                $account = $this->getAccountById($uid);
 
-                $canLoginArr = $accountObj->canlogin->toArray();
-
-                if ($canLoginArr > 0) {
-                    foreach ($canLoginArr as $key => $value) {
+                if ($account['canlogin'] > 0) {
+                    foreach ($account['canlogin'] as $key => $value) {
                         $account['can_login'][$value['app_id']] = $value['allowed'];
                     }
                 } else {

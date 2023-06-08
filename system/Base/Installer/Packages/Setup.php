@@ -89,7 +89,55 @@ use System\Base\Installer\Packages\Setup\Schema\Providers\Domains;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Logs;
 use System\Base\Installer\Packages\Setup\Write\Configs;
 use System\Base\Installer\Packages\Setup\Write\Pdo;
+use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderApps;
+use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsIpFilter;
+use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsTypes;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Api\BasepackagesApi;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Api\BasepackagesApiCalls;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesActivityLogs;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesDashboards;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesFilters;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesImportExport;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMenus;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotes;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotifications;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesStorages;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesTemplates;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesWidgets;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Dashboards\BasepackagesDashboardsWidgets;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Email\BasepackagesEmailQueue;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Email\BasepackagesEmailServices;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCities;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCitiesIp2locationv4;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCitiesIp2locationv6;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCountries;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoStates;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoTimezones;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Messenger\BasepackagesMessenger;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Storages\BasepackagesStoragesLocal;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSecurity;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersProfiles;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersRoles;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersJobs;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersSchedules;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersTasks;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersWorkers;
+use System\Base\Providers\CoreServiceProvider\Model\ServiceProviderCore;
 use System\Base\Providers\DatabaseServiceProvider\Ff;
+use System\Base\Providers\DomainsServiceProvider\Model\ServiceProviderDomains;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesBundles;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesComponents;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesMiddlewares;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesPackages;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesViews;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesViewsSettings;
 
 class Setup
 {
@@ -163,6 +211,7 @@ class Setup
 				$this->dbConfig['db']['username'] = $this->postData['create-username'];
 				$this->dbConfig['db']['password'] = $this->postData['create-password'];
 				$this->dbConfig['db']['dbname'] = 'mysql';
+		$this->PROPERTY = $PROPERTY;
 			}
 
 			$this->db = new Mysql($this->dbConfig['db']);
@@ -305,77 +354,229 @@ class Setup
 	protected function buildSchema()
 	{
 		$databases = [
-			'service_provider_core' 					=> new Core,
-			'service_provider_apps' 					=> new Apps,
-			'service_provider_apps_types' 				=> new Types,
-			'service_provider_apps_ip_filter' 			=> new IpFilter,
-			'service_provider_domains' 					=> new Domains,
-			'service_provider_logs' 					=> new Logs,
-			'service_provider_cache' 					=> new Cache,
-			'modules_bundles' 							=> new Bundles,
-			'modules_components' 						=> new Components,
-			'modules_packages' 							=> new Packages,
-			'modules_middlewares' 						=> new Middlewares,
-			'modules_views' 							=> new Views,
-			'modules_views_settings' 					=> new Settings,
-			'basepackages_email_services' 				=> new EmailServices,
-			'basepackages_email_queue' 					=> new EmailQueue,
-			'basepackages_users_accounts' 				=> new Accounts,
-			'basepackages_users_accounts_security' 		=> new Security,
-			'basepackages_users_accounts_canlogin' 		=> new CanLogin,
-			'basepackages_users_accounts_sessions' 		=> new Sessions,
-			'basepackages_users_accounts_identifiers' 	=> new Identifiers,
-			'basepackages_users_accounts_agents' 		=> new Agents,
-			'basepackages_users_accounts_tunnels' 		=> new Tunnels,
-			'basepackages_users_profiles' 				=> new Profiles,
-			'basepackages_users_roles' 					=> new Roles,
-			'basepackages_menus' 						=> new Menus,
-			'basepackages_filters' 						=> new Filters,
-			'basepackages_geo_countries' 				=> new Countries,
-			'basepackages_geo_states' 					=> new States,
-			'basepackages_geo_cities' 					=> new Cities,
-			'basepackages_geo_cities_ip2locationv4' 	=> new CitiesIp2LocationV4,
-			'basepackages_geo_cities_ip2locationv6' 	=> new CitiesIp2LocationV6,
-			'basepackages_geo_cities' 					=> new Cities,
-			'basepackages_geo_timezones' 				=> new Timezones,
-			'basepackages_address_book' 				=> new AddressBook,
-			'basepackages_storages' 					=> new Storages,
-			'basepackages_storages_local' 				=> new StoragesLocal,
-			'basepackages_activity_logs' 				=> new ActivityLogs,
-			'basepackages_notes' 						=> new Notes,
-			'basepackages_notifications' 				=> new Notifications,
-			'basepackages_workers_workers' 				=> new Workers,
-			'basepackages_workers_schedules' 			=> new Schedules,
-			'basepackages_workers_tasks' 				=> new Tasks,
-			'basepackages_workers_jobs' 				=> new Jobs,
-			'basepackages_import_export' 				=> new ImportExport,
-			'basepackages_templates' 					=> new Templates,
-			'basepackages_dashboards' 					=> new Dashboards,
-			'basepackages_dashboards_widgets' 			=> new DashboardsWidgets,
-			'basepackages_widgets' 						=> new Widgets,
-			'basepackages_messenger' 					=> new Messenger,
-			'basepackages_api' 							=> new Api,
-			'basepackages_api_calls' 					=> new ApiCalls,
-			'basepackages_api_apis_repos' 				=> new Repos
+			'service_provider_core' 					=> [
+					'schema'	=> new Core,
+					'model'		=> new ServiceProviderCore,
+				],
+			'service_provider_apps' 					=> [
+					'schema'	=> new Apps,
+					'model'		=> new ServiceProviderApps,
+				],
+			'service_provider_apps_types' 				=> [
+					'schema'	=> new Types,
+					'model'		=> new ServiceProviderAppsTypes,
+				],
+			'service_provider_apps_ip_filter' 			=> [
+					'schema'	=> new IpFilter,
+					'model'		=> new ServiceProviderAppsIpFilter,
+				],
+			'service_provider_domains' 					=> [
+					'schema'	=> new Domains,
+					'model'		=> new ServiceProviderDomains,
+				],
+			'modules_bundles' 							=> [
+					'schema'	=> new Bundles,
+					'model'		=> new ModulesBundles,
+				],
+			'modules_components' 						=> [
+					'schema'	=> new Components,
+					'model'		=> new ModulesComponents,
+				],
+			'modules_packages' 							=> [
+					'schema'	=> new Packages,
+					'model'		=> new ModulesPackages,
+				],
+			'modules_middlewares' 						=> [
+					'schema'	=> new Middlewares,
+					'model'		=> new ModulesMiddlewares,
+				],
+			'modules_views' 							=> [
+					'schema'	=> new Views,
+					'model'		=> new ModulesViews,
+				],
+			'modules_views_settings' 					=> [
+					'schema'	=> new Settings,
+					'model'		=> new ModulesViewsSettings,
+				],
+			'basepackages_email_services' 				=> [
+					'schema'	=> new EmailServices,
+					'model'		=> new BasepackagesEmailServices,
+				],
+			'basepackages_email_queue' 					=> [
+					'schema'	=> new EmailQueue,
+					'model'		=> new BasepackagesEmailQueue,
+				],
+			'basepackages_users_accounts' 				=> [
+					'schema'	=> new Accounts,
+					'model'		=> new BasepackagesUsersAccounts,
+				],
+			'basepackages_users_accounts_security' 		=> [
+					'schema'	=> new Security,
+					'model'		=> new BasepackagesUsersAccountsSecurity,
+				],
+			'basepackages_users_accounts_canlogin' 		=> [
+					'schema'	=> new CanLogin,
+					'model'		=> new BasepackagesUsersAccountsCanlogin,
+				],
+			'basepackages_users_accounts_sessions' 		=> [
+					'schema'	=> new Sessions,
+					'model'		=> new BasepackagesUsersAccountsSessions,
+				],
+			'basepackages_users_accounts_identifiers' 	=> [
+					'schema'	=> new Identifiers,
+					'model'		=> new BasepackagesUsersAccountsIdentifiers,
+				],
+			'basepackages_users_accounts_agents' 		=> [
+					'schema'	=> new Agents,
+					'model'		=> new BasepackagesUsersAccountsAgents,
+				],
+			'basepackages_users_accounts_tunnels' 		=> [
+					'schema'	=> new Tunnels,
+					'model'		=> new BasepackagesUsersAccountsTunnels,
+				],
+			'basepackages_users_profiles' 				=> [
+					'schema'	=> new Profiles,
+					'model'		=> new BasepackagesUsersProfiles,
+				],
+			'basepackages_users_roles' 					=> [
+					'schema'	=> new Roles,
+					'model'		=> new BasepackagesUsersRoles,
+				],
+			'basepackages_menus' 						=> [
+					'schema'	=> new Menus,
+					'model'		=> new BasepackagesMenus,
+				],
+			'basepackages_filters' 						=> [
+					'schema'	=> new Filters,
+					'model'		=> new BasepackagesFilters,
+				],
+			'basepackages_geo_countries' 				=> [
+					'schema'	=> new Countries,
+					'model'		=> new BasepackagesGeoCountries,
+				],
+			'basepackages_geo_states' 					=> [
+					'schema'	=> new States,
+					'model'		=> new BasepackagesGeoStates,
+				],
+			'basepackages_geo_cities' 					=> [
+					'schema'	=> new Cities,
+					'model'		=> new BasepackagesGeoCities,
+				],
+			'basepackages_geo_cities_ip2locationv4' 	=> [
+					'schema'	=> new CitiesIp2LocationV4,
+					'model'		=> new BasepackagesGeoCitiesIp2locationv4,
+				],
+			'basepackages_geo_cities_ip2locationv6' 	=> [
+					'schema'	=> new CitiesIp2LocationV6,
+					'model'		=> new BasepackagesGeoCitiesIp2locationv6,
+				],
+			'basepackages_geo_cities' 					=> [
+					'schema'	=> new Cities,
+					'model'		=> new BasepackagesGeoCities,
+				],
+			'basepackages_geo_timezones' 				=> [
+					'schema'	=> new Timezones,
+					'model'		=> new BasepackagesGeoTimezones,
+				],
+			'basepackages_address_book' 				=> [
+					'schema'	=> new AddressBook,
+					'model'		=> new BasepackagesAddressBook,
+				],
+			'basepackages_storages' 					=> [
+					'schema'	=> new Storages,
+					'model'		=> new BasepackagesStorages,
+				],
+			'basepackages_storages_local' 				=> [
+					'schema'	=> new StoragesLocal,
+					'model'		=> new BasepackagesStoragesLocal,
+				],
+			'basepackages_activity_logs' 				=> [
+					'schema'	=> new ActivityLogs,
+					'model'		=> new BasepackagesActivityLogs,
+				],
+			'basepackages_notes' 						=> [
+					'schema'	=> new Notes,
+					'model'		=> new BasepackagesNotes,
+				],
+			'basepackages_notifications' 				=> [
+					'schema'	=> new Notifications,
+					'model'		=> new BasepackagesNotifications,
+				],
+			'basepackages_workers_workers' 				=> [
+					'schema'	=> new Workers,
+					'model'		=> new BasepackagesWorkersWorkers,
+				],
+			'basepackages_workers_schedules' 			=> [
+					'schema'	=> new Schedules,
+					'model'		=> new BasepackagesWorkersSchedules,
+				],
+			'basepackages_workers_tasks' 				=> [
+					'schema'	=> new Tasks,
+					'model'		=> new BasepackagesWorkersTasks,
+				],
+			'basepackages_workers_jobs' 				=> [
+					'schema'	=> new Jobs,
+					'model'		=> new BasepackagesWorkersJobs,
+				],
+			'basepackages_import_export' 				=> [
+					'schema'	=> new ImportExport,
+					'model'		=> new BasepackagesImportExport,
+				],
+			'basepackages_templates' 					=> [
+					'schema'	=> new Templates,
+					'model'		=> new BasepackagesTemplates,
+				],
+			'basepackages_dashboards' 					=> [
+					'schema'	=> new Dashboards,
+					'model'		=> new BasepackagesDashboards,
+				],
+			'basepackages_dashboards_widgets' 			=> [
+					'schema'	=> new DashboardsWidgets,
+					'model'		=> new BasepackagesDashboardsWidgets,
+				],
+			'basepackages_widgets' 						=> [
+					'schema'	=> new Widgets,
+					'model'		=> new BasepackagesWidgets,
+				],
+			'basepackages_messenger' 					=> [
+					'schema'	=> new Messenger,
+					'model'		=> new BasepackagesMessenger,
+			],
+			'basepackages_api' 							=> [
+					'schema'	=> new Api,
+					'model'		=> new BasepackagesApi,
+			],
+			'basepackages_api_calls' 					=> [
+					'schema'	=> new ApiCalls,
+					'model'		=> new BasepackagesApiCalls,
+			],
+			'basepackages_api_apis_repos' 				=> [
+					'schema'	=> new Repos,
+					'model'		=> null
+			]
 		];
 
 		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'ff') {
 			foreach ($databases as $tableName => $tableClass) {
-				if (method_exists($tableClass, 'columns')) {
-					$this->db->createTable($tableName, $this->dbConfig['db']['dbname'], $tableClass->columns());
+				if (method_exists($tableClass['schema'], 'columns')) {
+					$this->db->createTable($tableName, $this->dbConfig['db']['dbname'], $tableClass['schema']->columns());
 				}
-				if (method_exists($tableClass, 'indexes')) {
-					$this->addIndex($tableName, $tableClass->indexes());
+				if (method_exists($tableClass['schema'], 'indexes')) {
+					$this->addIndex($tableName, $tableClass['schema']->indexes());
 				}
 			}
 		}
 
 		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'mysql') {
 			foreach ($databases as $tableName => $tableClass) {
-				$this->ff->store($tableName)->deleteStore();
+				if ($tableClass['model'] && $tableClass['model']->getSource()) {
+					$tableName = $tableClass['model']->getSource();
+				}
 
-				$schema = $this->ff->generateSchema($tableName, $tableClass);
-				$config = $this->ff->generateConfig($tableName, $tableClass);
+				$config = $this->ff->generateConfig($tableName, $tableClass['schema'], $tableClass['model']);
+				$schema = $this->ff->generateSchema($tableName, $tableClass['schema'], $tableClass['model']);
+
+				$this->ff->store($tableName, $config, $schema)->deleteStore();
 
 				$this->ff->store($tableName, $config, $schema);
 			}

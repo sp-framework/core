@@ -48,6 +48,8 @@ abstract class BasePackage extends Controller
 
 	protected $ffData;
 
+	protected $ffRelations = false;
+
 	public function onConstruct()
 	{
 		$this->packagesData = new PackagesData;
@@ -71,11 +73,16 @@ abstract class BasePackage extends Controller
 
 	protected function setFfStoreToUse()
 	{
-		$modelToUseArr = explode('\\', $this->modelToUse);
+		$model = $this->useModel();
 
-		$modelToUseArr = preg_split('/(?=[A-Z])/', Arr::last($modelToUseArr), -1, PREG_SPLIT_NO_EMPTY);
+		$this->ffStoreToUse = $model->getSource();
 
-		$this->ffStoreToUse = strtolower(join('_', $modelToUseArr));
+		$this->ffRelations = false;
+	}
+
+	public function setFFRelations(bool $set)
+	{
+		$this->ffRelations = $set;
 	}
 
 	public function init()
@@ -224,12 +231,16 @@ abstract class BasePackage extends Controller
 		} else {
 			$this->ffStore = $this->ff->store($this->ffStoreToUse);
 
-			$this->ffData = $this->ffStore->findOneBy([$by, '=', $value]);
+			$this->ffData = $this->ffStore->findOneBy([$by, '=', $value], $this->ffRelations);
 
 			$this->setFfStoreToUse();
 
 			if (is_array($this->ffData) && count($this->ffData) > 0) {
-				return $this->ffData;
+				if ($returnArray) {
+					return $this->ffData;
+				}
+
+				return $this->ffStore;
 			}
 
 			return false;

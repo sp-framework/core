@@ -54,17 +54,17 @@ class Acl extends BaseMiddleware
         if ($this->auth->account()) {
             $this->account = $this->auth->account();
 
-            $this->accountPermissions = Json::decode($this->account['permissions'], true);
+            $this->accountPermissions = Json::decode($this->account['security']['permissions'], true);
 
             //System Admin bypasses the ACL if they don't have any permissions defined.
             if ($this->account['id'] === '1' &&
-                $this->account['role_id'] === '1' &&
+                $this->account['security']['role_id'] === '1' &&
                 count($this->accountPermissions) === 0
             ) {
                 return;
             }
 
-            if ($this->account['override_role'] === '1') {
+            if ($this->account['security']['override_role'] === '1') {
                 $this->accountEmail = str_replace('.', '', str_replace('@', '', $this->account['email']));
 
                 if ($this->localContent->fileExists($aclFileDir . $this->accountEmail . $this->account['id'])) {
@@ -101,7 +101,7 @@ class Acl extends BaseMiddleware
 
                 return;
             } else {
-                $this->role = $roles[$this->account['role_id']];
+                $this->role = $roles[$this->account['security']['role_id']];
             }
         } else {
             $this->role = $roles[$this->app['guest_role_id']];

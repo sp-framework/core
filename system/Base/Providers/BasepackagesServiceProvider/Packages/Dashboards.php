@@ -22,6 +22,8 @@ class Dashboards extends BasePackage
 
     public function getDashboardById(int $id, $getwidgets = true, $getContent = false)
     {
+        $this->setFFRelations(true);
+
         $this->getFirst('id', $id);
 
         if ($this->model) {
@@ -38,6 +40,10 @@ class Dashboards extends BasePackage
             }
 
             return $dashboard;
+        } else {
+            if ($this->ffData) {
+                return $this->ffData;
+            }
         }
 
         return false;

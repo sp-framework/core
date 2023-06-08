@@ -10,6 +10,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accou
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersProfiles;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersRoles;
 
 class BasepackagesUsersAccounts extends BaseModel
 {
@@ -58,45 +59,51 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        $this->modelRelations['identifiers']['relationObj'] = $this->hasOneThrough(
+        $this->modelRelations['identifier']['relationObj'] = $this->hasOne(
             'id',
-            BasepackagesUsersAccountsSessions::class,
-            'account_id',
-            'session_id',
             BasepackagesUsersAccountsIdentifiers::class,
-            'session_id',
+            'account_id',
             [
-                'alias'         => 'identifiers'
+                'alias'         => 'identifier'
             ]
         );
 
-        $this->modelRelations['agents']['relationObj'] = $this->hasOneThrough(
+        $this->modelRelations['agents']['relationObj'] = $this->hasMany(
             'id',
-            BasepackagesUsersAccountsSessions::class,
-            'account_id',
-            'session_id',
             BasepackagesUsersAccountsAgents::class,
-            'session_id',
+            'account_id',
             [
                 'alias'         => 'agents'
             ]
         );
 
-        $this->modelRelations['tunnels']['relationObj'] = $this->hasOne(
+        $this->modelRelations['tunnel']['relationObj'] = $this->hasOne(
             'id',
             BasepackagesUsersAccountsTunnels::class,
             'account_id',
             [
-                'alias'         => 'tunnels'
+                'alias'         => 'tunnel'
             ]
         );
 
-        $this->modelRelations['profiles']['relationObj'] = $this->hasOne(
+        $this->modelRelations['profile']['relationObj'] = $this->hasOne(
             'id',
             BasepackagesUsersProfiles::class,
             'account_id',
             [
-                'alias'         => 'profiles'
+                'alias'         => 'profile'
+            ]
+        );
+
+        $this->modelRelations['role']['relationObj'] = $this->hasOneThrough(
+            'id',
+            BasepackagesUsersAccountsSecurity::class,
+            'account_id',
+            'role_id',
+            BasepackagesUsersRoles::class,
+            'id',
+            [
+                'alias'         => 'role'
             ]
         );
 

@@ -176,18 +176,28 @@ class Auth
 
     protected function clearAccountRecaller()
     {
-        $identifierModel = new BasepackagesUsersAccountsIdentifiers;
+        if ($this->config->databasetype === 'db') {
+            $identifierModel = new BasepackagesUsersAccountsIdentifiers;
 
-        $identifier = $identifierModel::findFirst(
-            [
-            'session_id = :sessionId:',
-            'bind'      => ['sessionId' => $this->session->getId()]
-            ]
-        );
+            $identifier = $identifierModel::findFirst(
+                [
+                'session_id = :sessionId:',
+                'bind'      => ['sessionId' => $this->session->getId()]
+                ]
+            );
 
-        if ($identifier) {
-            if (!$identifier->delete()) {
-                $this->logger->log->debug($identifier->getMessages());
+            if ($identifier) {
+                if (!$identifier->delete()) {
+                    $this->logger->log->debug($identifier->getMessages());
+                }
+            }
+        } else {
+            $identifierStore = $this->ff->store('basepackages_users_accounts_identifiers');
+
+            $identifierStore->findOneBy(['session_id', '=', $this->session->getId()]);
+
+            if ($identifierStore->toArray()) {
+                $identifierStore->deleteById($identifierStore->toArray()['id']);
             }
         }
 
@@ -223,18 +233,28 @@ class Auth
 
     protected function clearAccountSessionId()
     {
-        $sessionModel = new BasepackagesUsersAccountsSessions;
+        if ($this->config->databasetype === 'db') {
+            $sessionModel = new BasepackagesUsersAccountsSessions;
 
-        $session = $sessionModel::findFirst(
-            [
-            'session_id = :sessionId:',
-            'bind'      => ['sessionId' => $this->session->getId()]
-            ]
-        );
+            $session = $sessionModel::findFirst(
+                [
+                'session_id = :sessionId:',
+                'bind'      => ['sessionId' => $this->session->getId()]
+                ]
+            );
 
-        if ($session) {
-            if (!$session->delete()) {
-                $this->logger->log->debug($session->getMessages());
+            if ($session) {
+                if (!$session->delete()) {
+                    $this->logger->log->debug($session->getMessages());
+                }
+            }
+        } else {
+            $sessionStore = $this->ff->store('basepackages_users_accounts_sessions');
+
+            $sessionStore->findOneBy(['session_id', '=', $this->session->getId()]);
+
+            if ($sessionStore->toArray()) {
+                $sessionStore->deleteById($sessionStore->toArray()['id']);
             }
         }
 
@@ -261,19 +281,12 @@ class Auth
 
         $this->apps->ipFilter->removeFromMonitoring();
 
-        if ($this->config->databasetype === 'db') {
-            $security = $this->getAccountSecurityObject();
-
-            $two_fa_status = $security->two_fa_status;
-        } else {
-            $security = $this->getAccountSecurityObject();
-            // $securityStore = $this->ff->store('basepackages_users_accounts_security');
-
-            // $security = $securityStore->findOneBy()
-        }
+        $security = $this->getAccountSecurityObject();
 
         if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
-            if (!$two_fa_status || ($two_fa_status && $two_fa_status == '0')) {
+            if (!$security->two_fa_status ||
+                ($security->two_fa_status && $security->two_fa_status == '0')
+            ) {
                 $this->packagesData->responseCode = 3;
 
                 $this->packagesData->responseMessage = '2FA Code Required!';
@@ -306,7 +319,7 @@ class Auth
 
         $this->packagesData->responseMessage = 'Authenticated. Redirecting...';
 
-        if ($this->account['force_pwreset'] && $this->account['force_pwreset'] === '1') {
+        if ($this->account['security']['force_pwreset'] && $this->account['security']['force_pwreset'] === '1') {
 
             $this->packagesData->redirectUrl = $this->links->url('auth/q/pwreset/true');
 
@@ -319,8 +332,8 @@ class Auth
             $this->packagesData->redirectUrl = $this->links->url('home');
         }
 
-        if ($this->secTools->passwordNeedsRehash($this->account['password'])) {
-            $this->account['password'] = $this->secTools->hashPassword($data['pass'], $this->config->security->passwordWorkFactor);
+        if ($this->secTools->passwordNeedsRehash($this->account['security']['password'])) {
+            $this->account['security']['password'] = $this->secTools->hashPassword($data['pass'], $this->config->security->passwordWorkFactor);
         }
 
         $this->setSessionAndRecaller($data);
@@ -354,7 +367,7 @@ class Auth
                         $this->app['can_login_role_ids'] = Json::decode($this->app['can_login_role_ids'], true);
                     }
 
-                    if (in_array($this->account['role_id'], $this->app['can_login_role_ids'])) {
+                    if (in_array($this->account['security']['role_id'], $this->app['can_login_role_ids'])) {
                         if ($this->config->databasetype === 'db') {
                             $canloginModel = new BasepackagesUsersAccountsCanlogin;
 
@@ -404,7 +417,7 @@ class Auth
                 return false;
             }
 
-            if (!$this->secTools->checkPassword($data['pass'], $this->account['password'])) {//Password Fail
+            if (!$this->secTools->checkPassword($data['pass'], $this->account['security']['password'])) {//Password Fail
                 $this->packagesData->responseCode = 1;
 
                 if ($viaProfile) {
@@ -435,23 +448,36 @@ class Auth
     protected function setSessionAndRecaller(array $data)
     {
         if ($this->setUserSession()) {
-            $sessionModel = new BasepackagesUsersAccountsSessions;
-
             $newSession['account_id'] = $this->account['id'];
             $newSession['app'] = $this->getKey();
             $newSession['session_id'] = $this->session->getId();
 
-            $sessionModel->assign($newSession);
+            if ($this->config->databasetype === 'db') {
+                $sessionModel = new BasepackagesUsersAccountsSessions;
 
-            try {
-                $sessionModel->create();
-            } catch (\Exception $e) {
+                $sessionModel->assign($newSession);
 
-                $this->logger->log->debug('Duplicate session Id Found. This happens when session was deleted from server and browser used an old session ID.');
+                try {
+                    $sessionModel->create();
+                } catch (\Exception $e) {
+                    $this->logger->log->debug('Duplicate session Id Found. This happens when session was deleted from server and browser used an old session ID.');
 
-                $this->logout();
+                    $this->logout();
 
-                throw $e;
+                    throw $e;
+                }
+            } else {
+                $sessionStore = $this->ff->store('basepackages_users_accounts_sessions');
+
+                try {
+                    $sessionStore->updateOrInsert($newSession);
+                } catch (\Exception $e) {
+                    $this->logger->log->debug('Duplicate session Id Found. This happens when session was deleted from server and browser used an old session ID.');
+
+                    $this->logout();
+
+                    throw $e;
+                }
             }
         }
 
@@ -500,14 +526,14 @@ class Auth
             throw new \Exception('Cannot set account from cookie');
         }
 
-        $this->account = $this->accounts->getAccountById($hasIdentifier['account_id'], true);
+        $this->account = $this->accounts->getAccountById($hasIdentifier['account_id']);
 
         if ($this->account) {
             $this->updateSessionIdForSessionAndIdentifier($hasIdentifier);
 
-            $this->setAccountProfile();
+            // $this->setAccountProfile();
 
-            $this->setAccountRole();
+            // $this->setAccountRole();
 
             return true;
         }
@@ -601,17 +627,23 @@ class Auth
         $this->cookies->send();
 
         //Add to db
-        $identifierModel = new BasepackagesUsersAccountsIdentifiers;
-
         $newIdentifier['account_id'] = $this->account['id'];
         $newIdentifier['app'] = $this->getKey();
         $newIdentifier['session_id'] = $this->session->getId();
         $newIdentifier['identifier'] = $identifier;
         $newIdentifier['token'] = $this->secTools->hashPassword($token, $this->config->security->cookiesWorkFactor);
 
-        $identifierModel->assign($newIdentifier);
+        if ($this->config->databasetype === 'db') {
+            $identifierModel = new BasepackagesUsersAccountsIdentifiers;
 
-        $identifierModel->create();
+            $identifierModel->assign($newIdentifier);
+
+            $identifierModel->create();
+        } else {
+            $identifierStore = $this->ff->store('basepackages_users_accounts_identifiers');
+
+            $identifierStore->updateOrInsert($newIdentifier);
+        }
     }
 
     protected function generateRecaller()
@@ -659,7 +691,7 @@ class Auth
     public function setUserFromSession()
     {
         if ($this->session->get($this->getKey())) {
-            $this->account = $this->accounts->getAccountById($this->session->get($this->getKey()), true);
+            $this->account = $this->accounts->getAccountById($this->session->get($this->getKey()));
 
             if (!$this->account) {
                 $this->logger->log->debug($this->account['email'] . ' not found in session for app: ' . $this->app['name']);
@@ -667,30 +699,22 @@ class Auth
                 throw new \Exception('User not found in session');
             }
 
-            if (!$this->accounts->hasSession($this->account['id'], $this->session->getId())) {
-                $this->logger->log->debug($this->account['email'] . ' session id ' . $this->session->getId() . ' not present in DB.');
-
-                $this->sessionTools->clearSession($this->session->getId());
-
-                throw new \Exception('User session deleted in DB by administrator via force logout.');
+            if ($this->account['sessions'] && is_array($this->account['session']) && count($this->account['sessions']) > 0) {
+                foreach ($this->account['sessions'] as $session) {
+                    if (isset($session['session_id']) && $session['session_id'] === $this->session->getId()) {
+                        return true;
+                    }
+                }
             }
 
-            $this->setAccountProfile();
+            $this->logger->log->debug($this->account['email'] . ' session id ' . $this->session->getId() . ' not present in DB.');
 
-            $this->setAccountRole();
+            $this->sessionTools->clearSession($this->session->getId());
+
+            throw new \Exception('User session deleted in DB by administrator via force logout.');
         } else {
             return false;
         }
-    }
-
-    protected function setAccountProfile()
-    {
-        $this->account['profile'] = $this->profile->profile($this->account['id']);
-    }
-
-    protected function setAccountRole()
-    {
-        $this->account['role'] = $this->roles->getById($this->account['role_id']);
     }
 
     protected function setUserSession()
@@ -796,7 +820,7 @@ class Auth
             }
         }
 
-        $this->account['password'] = $this->secTools->hashPassword($data['newpass'], $this->config->security->passwordWorkFactor);
+        $this->account['security']['password'] = $this->secTools->hashPassword($data['newpass'], $this->config->security->passwordWorkFactor);
 
         $this->account['force_pwreset'] = null;
 
@@ -1030,8 +1054,22 @@ class Auth
     protected function getAccountSecurityObject()
     {
         $accountsObj = $this->accounts->getFirst('id', $this->account()['id']);
-        var_dump($accountsObj);die();
-        return $accountsObj->getSecurity();
+
+        if ($this->config->databasetype === 'db') {
+            return $accountsObj->getSecurity();
+        } else {
+            $account = $accountsObj->toArray();
+
+            if ($account) {
+                $securityStore = $accountsObj->changeStore('basepackages_users_accounts_security');
+
+                $securityStore->findOneBy(['account_id', '=', $this->account()['id']]);
+
+                if ($securityStore->toArray()) {
+                    return (object) $securityStore->toArray();
+                }
+            }
+        }
     }
 
     public function checkAgent()

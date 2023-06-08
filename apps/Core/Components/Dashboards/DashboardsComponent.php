@@ -30,7 +30,9 @@ class DashboardsComponent extends BaseComponent
             } else {
                 $app = $this->apps->getAppInfo();
 
-                $app['settings'] = Json::decode($app['settings'], true);
+                if (is_string($app['settings'])) {
+                    $app['settings'] = Json::decode($app['settings'], true);
+                }
 
                 if (isset($app['settings']['defaultDashboard'])) {
                     $dashboardId = $app['settings']['defaultDashboard'];

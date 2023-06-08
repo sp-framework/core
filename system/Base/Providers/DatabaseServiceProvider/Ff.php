@@ -52,7 +52,7 @@ class Ff
         return $this->store;
     }
 
-    public function generateSchema($tableName, $tableClass)
+    public function generateSchema($tableName, $tableClass, $tableModel)
     {
         $schema = [];
 
@@ -137,10 +137,112 @@ class Ff
             }
         }
 
+        if ($tableModel) {
+            $relations = $tableModel->getModelRelations();
+
+            if ($relations && is_array($relations) && count($relations) > 0) {
+                foreach ($relations as $relationKey => $relation) {
+                    $intermediate = false;
+
+                    if (isset($relation['relationObj'])) {
+                        if ($relation['relationObj']->getReferencedModel() &&
+                            is_string($relation['relationObj']->getReferencedModel())
+                        ) {
+                            if (isset($relation['relationObj']->getOptions()['alias'])) {
+                                $references[$relationKey]['alias'] = $relation['relationObj']->getOptions()['alias'];
+                            }
+
+
+                            switch ($relation['relationObj']->getType()) {
+                                case '1':
+                                    $references[$relationKey]['type'] = 'hasOne';
+                                    break;
+                                case '2':
+                                    $references[$relationKey]['type'] = 'hasMany';
+                                    break;
+                                case '3':
+                                    $intermediate = true;
+                                    $references[$relationKey]['type'] = 'hasOneThrough';
+                                    break;
+                                case '4':
+                                    $intermediate = true;
+                                    $references[$relationKey]['type'] = 'hasManyThrough';
+                                    break;
+                            }
+
+                            if (!$intermediate) {
+                                $model = $relation['relationObj']->getReferencedModel();
+                                $references[$relationKey]['table'] = (new $model)->getSource();
+                                $references[$relationKey]['model'] = $model;
+                                $fields = $relation['relationObj']->getFields();
+                                $referencedFields = $relation['relationObj']->getReferencedFields();
+
+                                if (is_array($fields) && is_array($referencedFields)) {
+                                    $references[$relationKey]['fields'] = array_merge_recursive($fields, $referencedFields);
+                                } else if (is_string($fields) && is_string($referencedFields)) {
+                                    $references[$relationKey]['fields'] = [$fields, $referencedFields];
+                                }
+                            } else {
+                                $model = $relation['relationObj']->getIntermediateModel();
+                                $references[$relationKey][0]['table'] = (new $model)->getSource();
+                                $references[$relationKey][0]['model'] = $model;
+                                $fields = $relation['relationObj']->getFields();
+                                $intermediateFields = $relation['relationObj']->getIntermediateFields();
+                                if (is_array($fields) && is_array($intermediateFields)) {
+                                    $references[$relationKey][0]['fields'] = array_merge_recursive($fields, $intermediateFields);
+                                } else if (is_string($fields) && is_string($intermediateFields)) {
+                                    $references[$relationKey][0]['fields'] = [$fields, $intermediateFields];
+                                }
+
+                                $model = $relation['relationObj']->getReferencedModel();
+                                $references[$relationKey][1]['table'] = (new $model)->getSource();
+                                $references[$relationKey][1]['model'] = $model;
+                                $fields = $relation['relationObj']->getIntermediateReferencedFields();
+                                $referencedFields = $relation['relationObj']->getReferencedFields();
+                                if (is_array($fields) && is_array($referencedFields)) {
+                                    $references[$relationKey][1]['fields'] = array_merge_recursive($fields, $referencedFields);
+                                } else if (is_string($fields) && is_string($referencedFields)) {
+                                    $references[$relationKey][1]['fields'] = [$fields, $referencedFields];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (isset($references) && is_array($references)) {
+                foreach ($references as $key => $reference) {
+                    if (isset($reference['alias'])) {
+                        $schema['properties'][$reference['alias']] = [];
+                        $schema['properties'][$reference['alias']]['type'] = ['null','array'];
+
+                        if (isset($reference[0]) && isset($reference[1])) {
+                            if (isset($reference[0]['fields']) && count($reference[0]['fields']) > 0) {
+                                $reference[0]['fields'] = join(':', $reference[0]['fields']);
+                            }
+                            if (isset($reference[1]['fields']) && count($reference[1]['fields']) > 0) {
+                                $reference[1]['fields'] = join(':', $reference[1]['fields']);
+                            }
+
+                            $reference[0] = join('+', $reference[0]);
+                            $reference[1] = join('+', $reference[1]);
+                            $schema['properties'][$reference['alias']]['description'] = join('|', $reference);
+                        } else {
+                            if (isset($reference['fields']) && count($reference['fields']) > 0) {
+                                $reference['fields'] = join(':', $reference['fields']);
+                            }
+
+                            $schema['properties'][$reference['alias']]['description'] = join('|', $reference);
+                        }
+                    }
+                }
+            }
+        }
+
         return $schema;
     }
 
-    public function generateConfig($tableName, $tableClass)
+    public function generateConfig($tableName, $tableClass, $tableModel)
     {
         $config = [];
 

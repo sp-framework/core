@@ -384,10 +384,10 @@ class AppsComponent extends BaseComponent
                 if ($filter['added_by'] == '0') {
                     $filter['added_by'] = "System";
                 } else {
-                    $user = $this->basepackages->accounts->getAccountById($filter['added_by'],false,false,false,false,false,false,true);
+                    $user = $this->basepackages->accounts->getAccountById($filter['added_by']);
 
-                    if ($user && isset($user['full_name'])) {
-                        $filter['added_by'] = $user['full_name'];
+                    if ($user && isset($user['profile']['full_name'])) {
+                        $filter['added_by'] = $user['profile']['full_name'];
                     } else {
                         $filter['added_by'] = "System";
                     }

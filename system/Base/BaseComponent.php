@@ -290,8 +290,8 @@ abstract class BaseComponent extends Controller
 	protected function checkPermissions()
 	{
 		if ($this->auth->account()) {
-			if ($this->auth->account()['permissions'] !== '') {
-				$permissions = Json::decode($this->auth->account()['permissions'], true);
+			if ($this->auth->account()['security']['permissions'] !== '') {
+				$permissions = Json::decode($this->auth->account()['security']['permissions'], true);
 			}
 
 			if (is_array($permissions) && count($permissions) === 0) {

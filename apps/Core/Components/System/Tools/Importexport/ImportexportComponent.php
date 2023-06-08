@@ -159,10 +159,10 @@ class ImportexportComponent extends BaseComponent
             }
 
             if ($data['account_id'] != '0') {
-                $account = $this->basepackages->accounts->getAccountById($data['account_id'], false, false, false, false, false, false, true);
+                $account = $this->basepackages->accounts->getAccountById($data['account_id']);
 
                 if ($account) {
-                    $data['account_id'] = $account['full_name'] . ' (' . $data['account_id'] . ')';
+                    $data['account_id'] = $account['profile']['full_name'] . ' (' . $data['account_id'] . ')';
                 }
             } else {
                 $data['account_id'] = 'System (' . $data['account_id'] . ')';
