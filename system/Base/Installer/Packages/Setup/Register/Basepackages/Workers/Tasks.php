@@ -6,15 +6,20 @@ use Phalcon\Helper\Json;
 
 class Tasks
 {
-    public function register($db)
+    public function register($db, $ff)
     {
         $taskArr = $this->systemSchedules();
 
         foreach ($taskArr as $key => $task) {
-            $db->insertAsDict(
-                'basepackages_workers_tasks',
-                $task
-            );
+            if ($db) {
+                $db->insertAsDict('basepackages_workers_tasks', $task);
+            }
+
+            if ($ff) {
+                $taskStore = $ff->store('basepackages_workers_tasks');
+
+                $taskStore->updateOrInsert($task);
+            }
         }
     }
 

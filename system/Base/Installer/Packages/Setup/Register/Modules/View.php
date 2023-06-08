@@ -6,10 +6,9 @@ use Phalcon\Helper\Json;
 
 class View
 {
-	public function register($db, $viewFile)
+	public function register($db, $ff, $viewFile)
 	{
-		$views = $db->insertAsDict(
-			'modules_views',
+		$view =
 			[
 				'name' 					=> $viewFile['name'],
 				'display_name' 			=> $viewFile['display_name'],
@@ -38,11 +37,9 @@ class View
 					Json::encode($viewFile['files']) :
 					Json::encode([]),
 				'updated_by'			=> 0
-			]
-		);
+			];
 
-		$viewsSettings = $db->insertAsDict(
-			'modules_views_settings',
+		$viewSettings =
 			[
 				'view_id'				=> 1,
 				'domain_id' 			=> 1,
@@ -51,7 +48,20 @@ class View
 					isset($viewFile['settings']) ?
 					Json::encode($viewFile['settings']) :
 					Json::encode([])
-			]
-		);
+			];
+
+		if ($db) {
+			$db->insertAsDict('modules_views', $view);
+
+			$db->insertAsDict('modules_views_settings', $viewSettings);
+		}
+
+		if ($ff) {
+			$viewsStore = $ff->store('modules_views');
+			$viewsSettingsStore = $ff->store('modules_views_settings');
+
+			$viewsStore->updateOrInsert($view);
+			$viewsSettingsStore->updateOrInsert($viewSettings);
+		}
 	}
 }

@@ -8,9 +8,13 @@ class Storages
 {
     protected $db;
 
-    public function register($db, $packageFile)
+    protected $ff;
+
+    public function register($db, $ff, $packageFile)
     {
         $this->db = $db;
+
+        $this->ff = $ff;
 
         $allowedImageMimeTypes = [];
         $allowedImageSizes = [];
@@ -56,7 +60,7 @@ class Storages
             $maxBytes = $maxPostsize;
         }
 
-        $this->db->insertAsDict('basepackages_storages',
+        $storage =
             [
                 'name'                          => $name,
                 'type'                          => $type,
@@ -72,7 +76,16 @@ class Storages
                 'allowed_file_mime_types'       => Json::encode($allowedFileMimeTypes),
                 'data_path'                     => 'data',
                 'max_data_file_size'            => $maxBytes
-            ]
-        );
+            ];
+
+        if ($this->db) {
+            $this->db->insertAsDict('basepackages_storages', $storage);
+        }
+
+        if ($this->ff) {
+            $storageStore = $this->ff->store('basepackages_storages');
+
+            $storageStore->updateOrInsert($storage);
+        }
     }
 }

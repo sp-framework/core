@@ -33,9 +33,7 @@ class Config
 
         $configsObj = new PhalconConfig($configs);
 
-        if (isset($configs['debug']) &&
-            isset($configs['db']) &&
-            isset($configs['setup']) && $configs['setup'] === false &&
+        if (isset($configs['setup']) && $configs['setup'] === false &&
             !isset($this->request->getPost()['session'])
         ) {
             return $configsObj;

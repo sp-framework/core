@@ -565,7 +565,9 @@ class Accounts extends BasePackage
     {
         if ($this->app) {
             if ($this->app['acceptable_usernames'] && $this->app['acceptable_usernames'] !== '') {
-                $this->app['acceptable_usernames'] = Json::decode($this->app['acceptable_usernames'], true);
+                if (is_string($this->app['acceptable_usernames'])) {
+                    $this->app['acceptable_usernames'] = Json::decode($this->app['acceptable_usernames'], true);
+                }
 
                 foreach ($this->app['acceptable_usernames'] as $acceptableUsername) {
                     if ($acceptableUsername === 'email') {
@@ -611,8 +613,25 @@ class Accounts extends BasePackage
         if ($this->model) {
             $account = $this->model->toArray();
 
-            if ($this->model->getsecurity()) {
+            if ($getsecurity && $this->model->getsecurity()) {
                 $security = $this->model->getsecurity()->toArray();
+
+                unset($security['id']);
+                unset($security['account_id']);
+
+                $account = array_merge($account, $security);
+            }
+        }
+
+        if ($this->ffData) {
+            $account = $this->ffData;
+
+            if ($getSecurity) {
+                $this->ffStoreToUse = 'basepackages_users_accounts_security';
+
+                $this->getFirst('account_id', $account['id'], true);
+
+                $security = $this->ffData;
 
                 unset($security['id']);
                 unset($security['account_id']);
@@ -628,22 +647,36 @@ class Accounts extends BasePackage
         }
     }
 
-    public function canLogin($id, $appID)
+    public function canLogin($id, $appId)
     {
         $this->getById($id);
 
-        $canLogin =
-            $this->model->canlogin->filter(
-                function($allowed) use ($id, $appID) {
-                    $allowed = $allowed->toArray();
+        if ($this->model) {
+            $canLogin =
+                $this->model->canlogin->filter(
+                    function($allowed) use ($id, $appId) {
+                        $allowed = $allowed->toArray();
 
-                    if ($allowed['account_id'] == $id &&
-                        $allowed['app_id'] === $appID
-                    ) {
-                        return $allowed;
+                        if ($allowed['account_id'] == $id &&
+                            $allowed['app_id'] === $appId
+                        ) {
+                            return $allowed;
+                        }
                     }
-                }
-            );
+                );
+        }
+
+        if ($this->ffData) {
+            $this->ffStoreToUse = 'basepackages_users_accounts_canlogin';
+
+            $this->getByParams([['account_id', '=', $id],['app_id', '=', $appId]]);
+
+            $canLogin = $this->ffData;
+        }
+
+        if (!$canLogin) {
+            return false;
+        }
 
         if (count($canLogin) === 1 &&
             ($canLogin[0]['allowed'] == '1' || $canLogin[0]['allowed'] == '2')

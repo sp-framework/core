@@ -37,7 +37,7 @@ class CanLogin
                     new Column(
                         'allowed',
                         [
-                            'type'          => Column::TYPE_BOOLEAN,
+                            'type'          => Column::TYPE_TINYINTEGER,
                             'notNull'       => true,
                         ]
                     )

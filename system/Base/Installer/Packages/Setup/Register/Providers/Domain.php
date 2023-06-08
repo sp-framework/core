@@ -11,7 +11,7 @@ class Domain
 {
 	protected $request;
 
-	public function register($db, $request)
+	public function register($db, $ff, $request)
 	{
 		$this->request = $request;
 
@@ -30,16 +30,16 @@ class Domain
 		];
 
 		$record = $this->validateDomain($this->request->getHttpHost());
+
 		if (count($record) > 0) {
+			$isInternal = isset($record['internal']) ? $record['internal'] : '1';
 			$record = Json::encode($record);
-			$isInternal = isset($record['internal']) ? $record['internal'] : 1;
 		} else {
+			$isInternal = '1';
 			$record = [];
-			$isInternal = 1;
 		}
 
-		$db->insertAsDict(
-			'service_provider_domains',
+		$domain =
 			[
 				'name'   							=> $this->request->getHttpHost(),
 				'description' 						=> '',
@@ -49,8 +49,17 @@ class Domain
 				"dns_record"						=> $record,
 				"is_internal"						=> $isInternal,
 				'settings'			 				=> Json::encode([])
-			]
-		);
+			];
+
+		if ($db) {
+			$db->insertAsDict('service_provider_domains', $domain);
+		}
+
+		if ($ff) {
+			$domainStore = $ff->store('service_provider_domains');
+
+			$domainStore->updateOrInsert($domain);
+		}
 	}
 
 	protected function validateDomain($domain)

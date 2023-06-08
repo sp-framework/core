@@ -26,7 +26,7 @@ class Domains
 						[
 							'type'    => Column::TYPE_VARCHAR,
 							'size'    => 100,
-							'notNull' => true,
+							'notNull' => true
 						]
 					),
 					new Column(

@@ -60,6 +60,7 @@
 	"settings" : 
 	{
 		"dev" : false,
+		"databasetype" : "hybrid",
 		"debug" : false,
 		"auto_off_debug" : 0,
 		"dbs" : [],

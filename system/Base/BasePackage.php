@@ -42,6 +42,12 @@ abstract class BasePackage extends Controller
 
 	private $filterConditions = null;
 
+	protected $ffStore;
+
+	protected $ffStoreToUse;
+
+	protected $ffData;
+
 	public function onConstruct()
 	{
 		$this->packagesData = new PackagesData;
@@ -50,6 +56,8 @@ abstract class BasePackage extends Controller
 
 		if (isset($this->modelToUse)) {
 			$this->cacheClass = $this->modelToUse;
+
+			$this->setFfStoreToUse();
 		} else {
 			$this->cacheClass = $this;
 		}
@@ -59,6 +67,15 @@ abstract class BasePackage extends Controller
 		}
 
 		$this->setNames();
+	}
+
+	protected function setFfStoreToUse()
+	{
+		$modelToUseArr = explode('\\', $this->modelToUse);
+
+		$modelToUseArr = preg_split('/(?=[A-Z])/', Arr::last($modelToUseArr), -1, PREG_SPLIT_NO_EMPTY);
+
+		$this->ffStoreToUse = strtolower(join('_', $modelToUseArr));
 	}
 
 	public function init()
@@ -129,23 +146,37 @@ abstract class BasePackage extends Controller
 		$this->buildGetQueryParamsArr();
 
 		if ($id) {
-			if ($this->config->cache->enabled && !$resetCache && $enableCache && $this->cacheName) {
-				$parameters = $this->paramsWithCache($this->getIdParams($id), $this->cacheName);
+			if ($this->config->databasetype === 'db') {
+				if ($this->config->cache->enabled && !$resetCache && $enableCache && $this->cacheName) {
+					$parameters = $this->paramsWithCache($this->getIdParams($id), $this->cacheName);
+				} else {
+					$parameters = $this->getIdParams($id);
+				}
+
+				if (isset($this->getData()['resetcache']) && $this->getData()['resetcache'] == 'true') {
+					$this->resetCache($id);
+				}
+
+				$this->getFirst(null, null, $resetCache, $enableCache, null, $parameters);
+
+				if ($this->model) {
+					return $this->getDbData($parameters, $enableCache);
+				}
+
+				return false;
 			} else {
-				$parameters = $this->getIdParams($id);
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+				$this->ffData = $this->ffStore->findById($id);
+
+				$this->setFfStoreToUse();
+
+				if (is_array($this->ffData) && count($this->ffData) > 0) {
+					return $this->ffData;
+				}
+
+				return false;
 			}
-
-			if (isset($this->getData()['resetcache']) && $this->getData()['resetcache'] == 'true') {
-				$this->resetCache($id);
-			}
-
-			$this->getFirst(null, null, $resetCache, $enableCache, null, $parameters);
-
-			if ($this->model) {
-				return $this->getDbData($parameters, $enableCache);
-			}
-
-			return false;
 		}
 
 		throw new \Exception('getById needs id parameter to be set.');
@@ -153,48 +184,70 @@ abstract class BasePackage extends Controller
 
 	public function getFirst($by = null, $value = null, bool $resetCache = false, bool $enableCache = true, $model = null, $params = [], $returnArray = false)
 	{
-		$this->useModel($model);
+		if ($this->config->databasetype === 'db') {
+			$this->useModel($model);
 
-		if ($by && $value && !$params) {
-			$params = $this->getParams($by, $value);
-		}
-
-		if ($this->config->cache->enabled && !$resetCache && $enableCache && $this->cacheName) {
-			$parameters = $this->paramsWithCache($params);
-		} else {
-			$parameters = $params;
-		}
-
-		if ($resetCache) {
-			$this->resetCache();
-		}
-
-		try {
-			$this->model = $this->modelToUse::findFirst($parameters);
-
-			$this->cacheTools->updateIndex(
-				$this->cacheName,
-				$parameters,
-				null,
-				true,
-				$this->model
-			);
-
-			if (!$returnArray) {
-				return $this->model;
-			} else {
-				return $this->model->toArray();
+			if ($by && $value && !$params) {
+				$params = $this->getParams($by, $value);
 			}
 
-		} catch (\Exception $e) {
-			throw $e;
+			if ($this->config->cache->enabled && !$resetCache && $enableCache && $this->cacheName) {
+				$parameters = $this->paramsWithCache($params);
+			} else {
+				$parameters = $params;
+			}
+
+			if ($resetCache) {
+				$this->resetCache();
+			}
+
+			try {
+				$this->model = $this->modelToUse::findFirst($parameters);
+
+				$this->cacheTools->updateIndex(
+					$this->cacheName,
+					$parameters,
+					null,
+					true,
+					$this->model
+				);
+
+				if (!$returnArray) {
+					return $this->model;
+				} else {
+					return $this->model->toArray();
+				}
+
+			} catch (\Exception $e) {
+				throw $e;
+			}
+		} else {
+			$this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+			$this->ffData = $this->ffStore->findOneBy([$by, '=', $value]);
+
+			$this->setFfStoreToUse();
+
+			if (is_array($this->ffData) && count($this->ffData) > 0) {
+				return $this->ffData;
+			}
+
+			return false;
 		}
 	}
 
 	public function getAll(bool $resetCache = false, bool $enableCache = true, $model = null)
 	{
-		if (!$this->{$this->packageName} || $resetCache) {
-			$this->{$this->packageName} = $this->getByParams(['conditions'=>''], $resetCache, $enableCache, $model);
+		if ($this->config->databasetype === 'db') {
+			if (!$this->{$this->packageName} || $resetCache) {
+				$this->{$this->packageName} = $this->getByParams(['conditions'=>''], $resetCache, $enableCache, $model);
+			}
+		} else {
+			$this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+			$this->{$this->packageName} = $this->ffStore->findAll();
+
+			$this->setFfStoreToUse();
 		}
 
 		return $this;
@@ -202,59 +255,73 @@ abstract class BasePackage extends Controller
 
 	public function getByParams(array $params, bool $resetCache = false, bool $enableCache = true, $model = null)
 	{
-		if (isset($params['conditions'])) {
-			if ($this->config->cache->enabled && !$resetCache && $enableCache && $this->cacheName) {
-				$parameters = $this->paramsWithCache($params);
-			} else {
-				$parameters = $params;
-			}
+		if ($this->config->databasetype === 'db') {
+			if (isset($params['conditions'])) {
+				if ($this->config->cache->enabled && !$resetCache && $enableCache && $this->cacheName) {
+					$parameters = $this->paramsWithCache($params);
+				} else {
+					$parameters = $params;
+				}
 
-			$relationColumns = [];
+				$relationColumns = [];
 
-			if (isset($parameters['columns']) && count($parameters['columns']) > 0) {
-				$modelMetaData = $this->getModelsMetaData();
-				$modelRelations = $this->getModelsRelations()['modelRelations'];
+				if (isset($parameters['columns']) && count($parameters['columns']) > 0) {
+					$modelMetaData = $this->getModelsMetaData();
+					$modelRelations = $this->getModelsRelations()['modelRelations'];
 
-				foreach ($parameters['columns'] as $columnKey => $column) {
-					if (!in_array($column, $modelMetaData['columns'])) {
-						if ($modelRelations) {
-							foreach ($modelRelations as $modelRelationKey => $modelRelation) {
-								if (in_array($column, $modelRelation['columns'])) {
-									if (!isset($relationColumns[$modelRelationKey])) {
-										$relationColumns[$modelRelationKey] = $modelRelation;
-										$relationColumns[$modelRelationKey]['requestedColumns'] = [];
+					foreach ($parameters['columns'] as $columnKey => $column) {
+						if (!in_array($column, $modelMetaData['columns'])) {
+							if ($modelRelations) {
+								foreach ($modelRelations as $modelRelationKey => $modelRelation) {
+									if (in_array($column, $modelRelation['columns'])) {
+										if (!isset($relationColumns[$modelRelationKey])) {
+											$relationColumns[$modelRelationKey] = $modelRelation;
+											$relationColumns[$modelRelationKey]['requestedColumns'] = [];
+										}
+										array_push($relationColumns[$modelRelationKey]['requestedColumns'], $column);
+										unset($parameters['columns'][$columnKey]);
 									}
-									array_push($relationColumns[$modelRelationKey]['requestedColumns'], $column);
-									unset($parameters['columns'][$columnKey]);
 								}
 							}
 						}
 					}
 				}
+
+				if ($resetCache) {
+					$this->resetCache();
+				}
+
+				$this->useModel($model);
+
+				$this->model = $this->modelToUse::find($parameters);
+
+				$data = $this->getDbData($parameters, $enableCache, 'params');
+
+				if ($data && count($relationColumns) > 0) {
+					$data = $this->getRelationColumnsData($relationColumns, $data);
+				}
+
+				if ($data) {
+					return $data;
+				} else {
+					return false;
+				}
 			}
 
-			if ($resetCache) {
-				$this->resetCache();
+			throw new \Exception('getByParams needs parameter condition to be set.');
+		} else {
+			$this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+			$this->ffData = $this->ffStore->findBy($params);
+
+			$this->setFfStoreToUse();
+
+			if (is_array($this->ffData) && count($this->ffData) > 0) {
+				return $this->ffData;
 			}
 
-			$this->useModel($model);
-
-			$this->model = $this->modelToUse::find($parameters);
-
-			$data = $this->getDbData($parameters, $enableCache, 'params');
-
-			if ($data && count($relationColumns) > 0) {
-				$data = $this->getRelationColumnsData($relationColumns, $data);
-			}
-
-			if ($data) {
-				return $data;
-			} else {
-				return false;
-			}
+			return false;
 		}
-
-		throw new \Exception('getByParams needs parameter condition to be set.');
 	}
 
 	protected function getRelationColumnsData($relationColumns, $data)

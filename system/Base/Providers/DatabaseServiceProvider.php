@@ -15,43 +15,47 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 	public function register(DiInterface $container) : void
 	{
 		$config = $container->getShared('config');
+		$request = $container->getShared('request');
 
-		$container->setShared(
-			'db',
-			function () use ($container, $config) {
-				$dbConfig = $config->db;
-				$session = $container->getShared('session');
-				$crypt = $container->getShared('crypt');
-				$localContent = $container->getShared('localContent');
+		if ($config->databasetype === 'db') {
+			$container->setShared(
+				'db',
+				function () use ($container, $config) {
+					$dbConfig = $config->db;
+					$session = $container->getShared('session');
+					$crypt = $container->getShared('crypt');
+					$localContent = $container->getShared('localContent');
 
-				if (PHP_SAPI === 'cli') {
-					return (new PdoCli($dbConfig, $localContent, $crypt))->init();
-				} else {
-					return (new Pdo($config, $session, $localContent, $crypt))->init();
+					if (PHP_SAPI === 'cli') {
+						return (new PdoCli($dbConfig, $localContent, $crypt))->init();
+					} else {
+						return (new Pdo($config, $session, $localContent, $crypt))->init();
+					}
 				}
-			}
-		);
+			);
 
-		$container->setShared(
-			'modelsManager',
-			function () {
-				return (new ModelsManager())->init();
-			}
-		);
+			$container->setShared(
+				'modelsManager',
+				function () {
+					return (new ModelsManager())->init();
+				}
+			);
+
+			$container->setShared(
+				'sqlite',
+				function () {
+					return (new Sqlite())->init();
+				}
+			);
+		}
+
 
 		$container->setShared(
 			'ff',
-			function () use ($container, $config) {
+			function () use ($config, $request) {
 				$cacheConfig = $config->cache;
 
-				return (new Ff($cacheConfig))->init();
-			}
-		);
-
-		$container->setShared(
-			'sqlite',
-			function () {
-				return (new Sqlite())->init();
+				return (new Ff($cacheConfig, $request))->init();
 			}
 		);
 	}

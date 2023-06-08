@@ -6,15 +6,20 @@ use Phalcon\Helper\Json;
 
 class Schedules
 {
-    public function register($db)
+    public function register($db, $ff)
     {
         $schedulesArr = $this->systemSchedules();
 
         foreach ($schedulesArr as $key => $schedule) {
-            $db->insertAsDict(
-                'basepackages_workers_schedules',
-                $schedule
-            );
+            if ($db) {
+                $db->insertAsDict('basepackages_workers_schedules', $schedule);
+            }
+
+            if ($ff) {
+                $scheduleStore = $ff->store('basepackages_workers_schedules');
+
+                $scheduleStore->updateOrInsert($schedule);
+            }
         }
     }
 

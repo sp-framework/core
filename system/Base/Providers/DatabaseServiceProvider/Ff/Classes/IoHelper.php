@@ -69,6 +69,15 @@ class IoHelper
         }
     }
 
+    public static function checkFolder(string $folderPath): bool
+    {
+        if (file_exists($folderPath) === true) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static function deleteFolder(string $folderPath): bool
     {
         self::checkWrite($folderPath);

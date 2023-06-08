@@ -6,10 +6,9 @@ use Phalcon\Helper\Json;
 
 class Package
 {
-	public function register($db, $packageFile)
+	public function register($db, $ff, $packageFile)
 	{
-		return $db->insertAsDict(
-			'modules_packages',
+		$package =
 			[
 				'name' 					=> $packageFile['name'],
 				'display_name'			=> $packageFile['display_name'],
@@ -37,7 +36,16 @@ class Package
 					Json::encode($packageFile['files']) :
 					Json::encode([]),
 				'updated_by'			=> 0
-			]
-		);
+			];
+
+		if ($db) {
+			$db->insertAsDict('modules_packages', $package);
+		}
+
+		if ($ff) {
+			$packageStore = $ff->store('modules_packages');
+
+			$packageStore->updateOrInsert($package);
+		}
 	}
 }

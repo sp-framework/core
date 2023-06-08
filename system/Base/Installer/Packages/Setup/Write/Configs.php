@@ -51,6 +51,7 @@ class Configs
 return
 	[
 		"setup" 			=> true,
+		"databasetype" 		=> "hybrid",
 		"cache"				=>
 		[
 			"enabled"						=> false, //Global Cache value //true - Production false - Development
@@ -133,18 +134,21 @@ return
 		$setup = 'false';
 
 		$this->coreJson['settings']['setup'] = $setup == 'true'? true : false;
+		$this->coreJson['settings']['databasetype'] = $this->postData['databasetype'];
 		$this->coreJson['settings']['debug'] = $debug == 'true'? true : false;
 		$this->coreJson['settings']['cache']['enabled'] = $cache == 'true'? true : false;
 		$this->coreJson['settings']['dev'] = $dev == 'true'? true : false;
-		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['active'] = true;
-		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['host'] = $this->postData['host'];
-		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['dbname'] = $this->postData['dbname'];
-		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['username'] = $this->postData['username'];
-		$this->postData['password'] = $this->container['crypt']->encryptBase64($this->postData['password'], $this->createDbKey());
-		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['password'] = $this->postData['password'];
-		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['port'] = $this->postData['port'];
-		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['charset'] = $this->postData['charset'];
-		$this->coreJson['settings']['dbs'][$this->postData['dbname']]['collation'] = $this->postData['collation'];
+		if ($this->coreJson['settings']['databasetype'] !== 'ff') {
+			$this->coreJson['settings']['dbs'][$this->postData['dbname']]['active'] = true;
+			$this->coreJson['settings']['dbs'][$this->postData['dbname']]['host'] = $this->postData['host'];
+			$this->coreJson['settings']['dbs'][$this->postData['dbname']]['dbname'] = $this->postData['dbname'];
+			$this->coreJson['settings']['dbs'][$this->postData['dbname']]['username'] = $this->postData['username'];
+			$this->postData['password'] = $this->container['crypt']->encryptBase64($this->postData['password'], $this->createDbKey());
+			$this->coreJson['settings']['dbs'][$this->postData['dbname']]['password'] = $this->postData['password'];
+			$this->coreJson['settings']['dbs'][$this->postData['dbname']]['port'] = $this->postData['port'];
+			$this->coreJson['settings']['dbs'][$this->postData['dbname']]['charset'] = $this->postData['charset'];
+			$this->coreJson['settings']['dbs'][$this->postData['dbname']]['collation'] = $this->postData['collation'];
+		}
 		$this->coreJson['settings']['logs']['level'] = $logLevel;
 		$this->coreJson['settings']['security']['passwordWorkFactor'] = $pwf;
 		$this->coreJson['settings']['security']['cookiesWorkFactor'] = $cwf;
@@ -155,9 +159,12 @@ return
 return
 	[
 		"setup" 			=> ' . $setup .',
+		"databasetype" 		=> "' . $this->coreJson['settings']['databasetype'] . '",
 		"dev"    			=> ' . $dev . ', //true - Development false - Production
 		"debug"				=> ' . $debug . ',
-		"auto_off_debug"	=> ' . $this->coreJson['settings']['auto_off_debug'] . ',
+		"auto_off_debug"	=> ' . $this->coreJson['settings']['auto_off_debug'] . ',';
+if ($this->coreJson['settings']['databasetype'] !== 'ff') {
+		$this->baseFileContent .= '
 		"db" 				=>
 		[
 			"host" 							=> "' . $this->postData['host'] . '",
@@ -167,7 +174,9 @@ return
 			"collation" 	    			=> "' . $this->postData['collation'] . '",
 			"username" 						=> "' . $this->postData['username'] . '",
 			"password" 						=> "' . $this->postData['password'] . '",
-		],
+		],';
+}
+		$this->baseFileContent .= '
 		"cache"				=>
 		[
 			"enabled"						=> ' . $cache . ', //Global Cache value //true - Production false - Development

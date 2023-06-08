@@ -30,6 +30,7 @@ class AccessServiceProvider implements ServiceProviderInterface
                 $email = $container->getShared('basepackages')->email;
                 $emailQueue = $container->getShared('basepackages')->emailqueue;
                 $domains = $container->getShared('domains');
+                $ff = $container->getShared('ff');
 
                 return (
                     new Auth(
@@ -48,7 +49,8 @@ class AccessServiceProvider implements ServiceProviderInterface
                         $roles,
                         $email,
                         $emailQueue,
-                        $domains
+                        $domains,
+                        $ff
                     ))->init();
             }
         );

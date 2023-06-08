@@ -15,43 +15,53 @@ class TestComponent extends BaseComponent
 
         $starttime = microtime(true);
 
-        $schema = [
-            '$schema' => 'https://json-schema.org/draft/2020-12/schema',
-            '$id' => 'http://example.com/schema.json',
-            'type' => 'object',
-            'properties' => [
-                'username' => [
-                    'type' => 'string',
-                    'minLength' => 1,
-                    'maxLength' => 20
-                ],
-                'email' => [
-                    'type' => 'string',
-                    'format' => 'email',
-                    'minLength' => 1,
-                    'maxLength' => 50
-                ]
-            ],
-            'required' => ['email']
-        ];
+        // $schema = [
+        //     '$schema' => 'https://json-schema.org/draft/2020-12/schema',
+        //     '$id' => 'http://example.com/schema.json',
+        //     'type' => 'object',
+        //     'properties' => [
+        //         'username' => [
+        //             'type' => 'string',
+        //             'minLength' => 1,
+        //             'maxLength' => 20
+        //         ],
+        //         'email' => [
+        //             'type' => 'string',
+        //             'format' => 'email',
+        //             'minLength' => 1,
+        //             'maxLength' => 50
+        //         ]
+        //     ],
+        //     'required' => ['email']
+        // ];
 
-        $userStore = $this->ff->store('users', ['search' => ['min_length' => 1], 'indexing' => true, 'minIndexChars' => 2, 'indexes' => ['username'], 'uniqueFields' => ['email']], $schema);
+        // $userStore = $this->ff->store('users', ['search' => ['min_length' => 1], 'indexing' => true, 'minIndexChars' => 2, 'indexes' => ['username'], 'uniqueFields' => ['email']], $schema);
 
-        $userStore->updateOrInsert(
+        $apiStore = $this->ff->store('basepackages_api_calls');
+        $apiStore->updateOrInsert(
             [
-                'username'  => 'sharon3',
-                'email'     => 'sharon3@bazaari.com.au',
-                'full_name' => [
-                    'first_name'    => 'Sharon',
-                    'last_name'     => 'Singh'
-                ]
+                'api_id'                => 1,
+                'call_method'           => 'test',
+                'call_response_code'    => '200',
+                'call_exec_time'        => 500.776,
+                'call_stats'            => 'success'
             ]
         );
+        var_dump($apiStore);die();
+        // $userStore->updateOrInsert(
+        //     [
+        //         'username'  => 'sharon3',
+        //         'email'     => 'sharon3@bazaari.com.au',
+        //         'full_name' => [
+        //             'first_name'    => 'Sharon',
+        //             'last_name'     => 'Singh'
+        //         ]
+        //     ]
+        // );
         // $ab = $userStore->findBy([['full_name.last_name', '=', 'singh'],['username', 'LIKE', '%3%']]);
         $ab = $userStore
             ->createQueryBuilder()
             ->where(['full_name.last_name', 'like', 'singh'])
-            ->where(['username', 'LIKE', '%ru3'])
             ->getQuery()
             ->fetch();
         // $countriesStore = $this->ff->store('geo_countries', ['search' => ['min_length' => 1], 'indexing' => true, 'minIndexChars' => 2, 'indexes' => ['name']]);

@@ -5,6 +5,7 @@ namespace System\Base\Providers\DatabaseServiceProvider\Ff;
 use Exception;
 use Opis\JsonSchema\Helper;
 use Opis\JsonSchema\Validator;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Utils;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Classes\IndexHandler;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Classes\IoHelper;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Classes\NestedHelper;
@@ -13,6 +14,7 @@ use System\Base\Providers\DatabaseServiceProvider\Ff\Exceptions\IdNotAllowedExce
 use System\Base\Providers\DatabaseServiceProvider\Ff\Exceptions\InvalidArgumentException;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Exceptions\InvalidConfigurationException;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Exceptions\InvalidDataException;
+use System\Base\Providers\DatabaseServiceProvider\Ff\Exceptions\InvalidStoreException;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Exceptions\JsonException;
 
 class Store
@@ -64,13 +66,28 @@ class Store
 
         $this->storePath = $this->databasePath . $this->storeName;
 
+        if (count($configuration) === 0 && count($schema) === 0) {
+            $this->checkStore($storeName);
+        }
+
         $this->indexesPath = $this->databasePath . $this->storeName . 'indexes/';
 
-        $this->setConfiguration($configuration, $schema);
+        $this->setConfigurationAndSchema($configuration, $schema);
 
         $this->createDatabasePath();
 
-        $this->createStore($configuration, $schema);
+        if (count($schema) > 0) {
+            $this->createStore($configuration, $schema);
+        }
+    }
+
+    protected function checkStore($storeName)
+    {
+        if (!IoHelper::checkFolder($this->storePath)) {
+            throw new InvalidStoreException('Store ' . $storeName . ' does not exist. Please provide configuration and schema to create new store');
+        }
+
+        return true;
     }
 
     public function getSchema()
@@ -98,7 +115,11 @@ class Store
         if (!file_exists($this->storePath . 'schema.json') ||
             count($schema) > 0
         ) {
-            IoHelper::writeContentToFile($this->storePath . 'schema.json', json_encode($this->storeSchema));
+            if (is_array($this->storeSchema)) {
+                $this->storeSchema = json_encode($this->storeSchema);
+            }
+
+            IoHelper::writeContentToFile($this->storePath . 'schema.json', $this->storeSchema);
         }
     }
 
@@ -214,7 +235,7 @@ class Store
             throw new InvalidArgumentException("No document to update or insert.");
         }
 
-        $this->validateData($data);
+        $data = $this->validateData($data);
 
         if (!array_key_exists($this->primaryKey, $data)) {
             $data[$this->primaryKey] = $this->increaseCounterAndGetNextId();
@@ -266,7 +287,7 @@ class Store
 
         // Check if all documents have the primary key before updating or inserting any
         foreach ($data as $key => $document) {
-            $this->validateData($document);
+            $document = $this->validateData($document);
 
             if (!is_array($document))  {
                 throw new InvalidArgumentException('Documents have to be an arrays.');
@@ -313,7 +334,7 @@ class Store
 
         // Check if all documents exist and have the primary key before updating any
         foreach ($data as $key => $document) {
-            $this->validateData($document);
+            $document = $this->validateData($document);
 
             if (!is_array($document))  {
                 throw new InvalidArgumentException('Documents have to be an arrays.');
@@ -358,7 +379,7 @@ class Store
             throw new InvalidArgumentException("You can not update the primary key \"$this->primaryKey\" of documents.");
         }
 
-        $this->validateData($data);
+        $data = $this->validateData($data);
 
         $content = IoHelper::updateFileContent(
             $filePath,
@@ -506,20 +527,12 @@ class Store
         IoHelper::createFolder($this->databasePath, $this->folderPermissions);
     }
 
-    protected function setConfiguration(array $configuration = [], array $schema = [])
+    protected function setConfigurationAndSchema(array $configuration = [], array $schema = [])
     {
-        $writeConfig = true;
-
         if (count($configuration) === 0) {
             if (file_exists($this->storePath . 'config.json')) {
                 $configuration = IoHelper::getFileContent($this->storePath . 'config.json');
                 $configuration = json_decode($configuration, true);
-            }
-
-            if (count($configuration) === 0) {
-                $writeConfig = true;
-            } else {
-                $writeConfig = false;
             }
         }
 
@@ -642,9 +655,7 @@ class Store
             $this->folderPermissions = $configuration["folder_permissions"];
         }
 
-        if ($writeConfig) {
-            $this->storeConfiguration();
-        }
+        $this->storeConfiguration();
     }
 
     protected function storeConfiguration()
@@ -684,7 +695,7 @@ class Store
             );
         }
 
-        $this->validateData($storeData);
+        $storeData = $this->validateData($storeData);
 
         $id = $this->increaseCounterAndGetNextId();
 
@@ -706,14 +717,20 @@ class Store
 
     protected function validateData(array $data)
     {
-        if (count($this->uniqueFields) > 0) {
+        if (!isset($data['id']) && count($this->uniqueFields) > 0) {
+            $criteria = [];
+
             foreach ($this->uniqueFields as $uniqueField) {
                 if (isset($data[$uniqueField])) {
-                    $found = $this->findOneBy([$uniqueField, '=', $data[$uniqueField]]);
+                    array_push($criteria, [$uniqueField, '=', $data[$uniqueField]]);
+                }
+            }
 
-                    if ($found) {
-                        throw new IOException("Duplicate entry found for field: $uniqueField. $uniqueField should be unique.");
-                    }
+            if (count($criteria) > 0) {
+                $found = $this->findOneBy($criteria);
+
+                if ($found) {
+                    throw new IOException("Duplicate entry found for field: $uniqueField. $uniqueField should be unique. Store: " . $this->storeName);
                 }
             }
         }
@@ -722,16 +739,30 @@ class Store
             return true;
         }
 
+        $data = $this->normalizeData($data);
+
         $validator = new Validator();
+
+        $formats = $validator->parser()->getFormatResolver();
+
+        $this->registerNewValidatorFormats($formats);
 
         $result = $validator->validate(Helper::toJSON($data), $this->storeSchema);
 
         if ($result->isValid()) {
-            return true;
+            $data = $this->normalizeData($data, true);
+
+            if (isset($data['id']) && $data['id'] == 0) {
+                unset($data['id']);
+            }
+
+            return $data;
         }
 
         if ($result->hasError()) {
-            $errors = $result->error()->__toString() . '. ';
+            $errors = 'Schema: ' . $result->error()->schema()->info()->data()->{'$id'} . '<br>';
+
+            $errors .= $result->error()->__toString() . '. ';
 
             if ($result->error()->args() &&
                 count($result->error()->args()) > 0
@@ -755,7 +786,15 @@ class Store
 
                     if (count($subError->args()) > 0) {
                         foreach ($subError->args() as $key => $arg) {
-                            $errors = str_replace('{' . $key . '}', $arg, $errors);
+                            if ($key === 'expected') {
+                                if (is_array($arg)) {
+                                    $arg = join(' | ', $arg);
+                                }
+
+                                $errors = str_replace('{' . $key . '}', $arg, $errors);
+                            } else {
+                                $errors = str_replace('{' . $key . '}', $arg, $errors);
+                            }
                         }
                     }
                 }
@@ -763,6 +802,110 @@ class Store
 
             throw new InvalidDataException($errors);
         }
+    }
+
+    protected function normalizeData(array $data, $jsonToArray = false): array
+    {
+        if (is_string($this->storeSchema)) {
+            $schema = json_decode($this->storeSchema, true);
+        }
+
+        if (isset($schema['properties']) && count($schema['properties']) > 0) {
+            if (!isset($data['id'])) {
+                $data['id'] = 0;
+            }
+
+            foreach ($schema['properties'] as $propertyKey => $property) {
+                if ($jsonToArray) {
+                    if (array_key_exists('format', $property)) {
+                        if ($property['format'] === 'json') {
+                            if (is_string($data[$propertyKey])) {
+                                $utils = new Utils();
+
+                                if (!$utils->validateJson(['json' => $data[$propertyKey]])) {
+                                    throw new \Exception($utils->packagesData->responseMessage);
+                                }
+
+                                $data[$propertyKey] = json_decode($data[$propertyKey], true);
+                            }
+                        }
+                    }
+                } else {
+                    if (array_key_exists('format', $property)) {
+                        if ($property['format'] === 'json') {
+                            if (isset($data[$propertyKey]) && is_array($data[$propertyKey])) {
+                                $data[$propertyKey] = json_encode($data[$propertyKey]);
+                            }
+                        }
+                    }
+
+                    if (isset($property['format']) && $property['format'] === 'date-time') {
+                        if (in_array($propertyKey, $schema['required'])) {
+                            if (!isset($data[$propertyKey])) {
+                                $data[$propertyKey] = date('c');
+                            }
+                        }
+                    }
+
+                    if (array_key_exists('default', $property)) {
+                        if (!isset($data[$propertyKey])) {
+                            $data[$propertyKey] = $property['default'];
+                        }
+                    }
+
+                    if (is_string($property['type'])) {
+                        $property['type'] = [$property['type']];
+                    }
+
+                    foreach ($property['type'] as $type) {
+                        if ($type === 'null') {
+                            continue;
+                        }
+
+                        if ($type === 'boolean' || $type === 'integer') {
+                            if (is_string($data[$propertyKey])) {
+                                $data[$propertyKey] = (int) $data[$propertyKey];
+                            }
+
+                            if (is_int($data[$propertyKey]) && $type === 'boolean') {
+                                $data[$propertyKey] = $data[$propertyKey] === 0 ? false : true;
+                            }
+                        }
+
+                        if ($type === 'number') {
+                            if (is_string($data[$propertyKey]) && $type === 'number') {
+                                $data[$propertyKey] = (float) $data[$propertyKey];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    protected function registerNewValidatorFormats($formats)
+    {
+        $jsonFormat = function($value): bool {
+            if (is_array($value)) {
+                return true;
+            }
+
+            if (is_string($value)) {
+                $utils = new Utils();
+
+                if (!$utils->validateJson(['json' => $value])) {
+                    return false;
+                }
+
+                return true;
+            }
+
+            return false;
+        };
+
+        $formats->registerCallable('string', 'json', $jsonFormat);
     }
 
     protected function increaseCounterAndGetNextId(): int

@@ -6,45 +6,56 @@ use Phalcon\Helper\Json;
 
 class Role
 {
-    public function registerCoreRole($db)
+    public function registerCoreRole($db, $ff)
     {
-        $insertAdminRole = $db->insertAsDict(
-            'basepackages_users_roles',
+        $role =
             [
                 'name'              => 'System Administrators',
                 'description'       => 'System Administrators Role',
                 'type'              => 0,
                 'permissions'       => Json::encode([])
-            ]
-        );
+            ];
 
-        if ($insertAdminRole) {
-            return $db->lastInsertId();
-        } else {
-            return null;
+        if ($db) {
+            $db->insertAsDict('basepackages_users_roles', $role);
+        }
+
+        if ($ff) {
+            $roleStore = $ff->store('basepackages_users_roles');
+
+            $roleStore->updateOrInsert($role);
         }
     }
 
-    public function registerRegisteredUserAndGuestRoles($db)
+    public function registerRegisteredUserAndGuestRoles($db, $ff)
     {
-        $db->insertAsDict(
-            'basepackages_users_roles',
+        $registered =
             [
                 'name'              => 'Registered Users',
                 'description'       => 'Registered Users Role',
                 'type'              => 0,
                 'permissions'       => Json::encode([])
-            ]
-        );
+            ];
 
-        $db->insertAsDict(
-            'basepackages_users_roles',
+        $guest =
             [
                 'name'              => 'Guests',
                 'description'       => 'Guests Role',
                 'type'              => 0,
                 'permissions'       => Json::encode([])
-            ]
-        );        
+            ];
+
+
+        if ($db) {
+            $db->insertAsDict('basepackages_users_roles', $registered);
+            $db->insertAsDict('basepackages_users_roles', $guest);
+        }
+
+        if ($ff) {
+            $roleStore = $ff->store('basepackages_users_roles');
+
+            $roleStore->updateOrInsert($registered);
+            $roleStore->updateOrInsert($guest);
+        }
     }
 }

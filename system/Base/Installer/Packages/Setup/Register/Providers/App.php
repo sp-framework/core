@@ -7,10 +7,9 @@ use Phalcon\Helper\Json;
 
 class App
 {
-	public function register($db)
+	public function register($db, $ff)
 	{
-		$insertApp = $db->insertAsDict(
-			'service_provider_apps',
+		$coreApp =
 			[
 				'name' 						=> 'Core',
 				'route' 					=> 'core',
@@ -22,43 +21,64 @@ class App
 				'acceptable_usernames'		=> Json::encode(["email", "username"]),
 				'ip_filter_default_action'	=> 0,
 				'settings'					=> Json::encode(["defaultDashboard" => 1])
-			]
-		);
+			];
 
-		if ($insertApp) {
-			return $db->lastInsertId();
-		} else {
-			return null;
+		if ($db) {
+			$db->insertAsDict('service_provider_apps', $coreApp);
+		}
+
+		if ($ff) {
+			$appStore = $ff->store('service_provider_apps');
+
+			$appStore->updateOrInsert($coreApp);
 		}
 	}
 
-	public function update($db)
+	public function update($db, $ff)
 	{
-		$dashboardsComponent =
-			$db->fetchAll(
-				"SELECT * FROM modules_components WHERE route LIKE :route",
-				Enum::FETCH_ASSOC,
-				[
-					"route" => "dashboards",
-				]
-			);
+		if ($db) {
+			$dashboardsComponent =
+				$db->fetchAll(
+					"SELECT * FROM modules_components WHERE route LIKE :route",
+					Enum::FETCH_ASSOC,
+					[
+						"route" => "dashboards",
+					]
+				);
 
-		$errorsComponent =
-			$db->fetchAll(
-				"SELECT * FROM modules_components WHERE route LIKE :route",
-				Enum::FETCH_ASSOC,
-				[
-					"route" => "errors",
-				]
-			);
+			$errorsComponent =
+				$db->fetchAll(
+					"SELECT * FROM modules_components WHERE route LIKE :route",
+					Enum::FETCH_ASSOC,
+					[
+						"route" => "errors",
+					]
+				);
 
-		$db->updateAsDict(
-			'service_provider_apps',
-			[
-				'default_component' 	=> $dashboardsComponent[0]['id'],
-				'errors_component' 		=> $errorsComponent[0]['id']
-			],
-			"id = 1"
-		);
+			$db->updateAsDict(
+				'service_provider_apps',
+				[
+					'default_component' 	=> $dashboardsComponent[0]['id'],
+					'errors_component' 		=> $errorsComponent[0]['id']
+				],
+				"id = 1"
+			);
+		}
+
+		if ($ff) {
+			$modulesStore = $ff->store('modules_components');
+
+			$dashboardsComponent = $modulesStore->findOneBy(['route', '=', 'dashboards']);
+			$errorsComponent = $modulesStore->findOneBy(['route', '=', 'errors']);
+
+			$appStore = $ff->store('service_provider_apps');
+
+			$app = $appStore->findById('1');
+
+			$app['default_component'] = $dashboardsComponent['id'];
+			$app['errors_component'] = $errorsComponent['id'];
+
+			$appStore->updateOrInsert($app);
+		}
 	}
 }

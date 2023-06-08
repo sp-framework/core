@@ -59,7 +59,7 @@ class IndexHandler
                 }
 
                 try {
-                    $indexFile = IoHelper::getFileContent($this->indexesPath . $index . '/' . $indexChars . '.json');
+                    $indexFile = $this->getIndex($index, $indexChars);
 
                     $indexJson = json_decode($indexFile, true);
                 } catch (\Exception $e) {
@@ -79,21 +79,23 @@ class IndexHandler
         }
     }
 
-    public function getIndex()
+    public function getIndex($index, $indexChars)
     {
-        //
+        return IoHelper::getFileContent($this->indexesPath . $index . '/' . $indexChars . '.json');
     }
 
-    public function removeIndex()
+    public function removeIndex($index, $indexChars)
     {
-        //
+        return IoHelper::deleteFile($this->indexesPath . $index . '/' . $indexChars . '.json');
     }
 
-    public function reIndex()
+    public function reIndex($dataPath = null)
     {
         IoHelper::deleteFolder($this->indexesPath);
 
-        $dataPath = $this->storeConfiguration['storePath'] . 'data/';
+        if (!$dataPath) {
+            $dataPath = $this->storeConfiguration['storePath'] . 'data/';
+        }
 
         if ($handle = opendir($dataPath)) {
             while (false !== ($entry = readdir($handle))) {

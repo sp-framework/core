@@ -6,9 +6,9 @@ use Phalcon\Helper\Json;
 
 class Component
 {
-	public function register($db, $componentFile, $menuId)
+	public function register($db, $ff, $componentFile, $menuId)
 	{
-		$componentApp = ['1'=>['enabled'=>true]];
+		$componentApp = ['1' => ['enabled'=>true]];
 
 		if (isset($componentFile['settings']['needAuth']) &&
 			$componentFile['settings']['needAuth'] !== true
@@ -18,8 +18,7 @@ class Component
 			$componentApp['1']['needAuth'] = true;
 		}
 
-		$insertComponent = $db->insertAsDict(
-			'modules_components',
+		$component =
 			[
 				'name' 					=> $componentFile['name'],
 				'route'					=> $componentFile['route'],
@@ -56,13 +55,34 @@ class Component
 					Json::encode($componentFile['widgets']) :
 					Json::encode([]),
 				'updated_by'			=> 0
-			]
-		);
+			];
 
-		if ($insertComponent) {
-			return $db->lastInsertId();
-		} else {
-			return null;
+		if ($db) {
+			$db->insertAsDict('modules_components', $component);
+
+			$dbComponentId = (int) $db->lastInsertId();
 		}
+
+		if ($ff) {
+			$componentStore = $ff->store('modules_components');
+
+			$componentStore->updateOrInsert($component);
+
+			$ffComponentId = (int) $componentStore->getLastInsertedId();
+		}
+
+		if (isset($dbComponentId) && isset($ffComponentId)) {
+			if ($dbComponentId == $ffComponentId) {
+				return $dbComponentId;
+			}
+
+			throw new \Exception('Component ids dont match for db and ff');
+		} else if (isset($dbComponentId) && !isset($ffComponentId)) {
+			return $dbComponentId;
+		} else if (!isset($dbComponentId) && isset($ffComponentId)) {
+			return $ffComponentId;
+		}
+
+		return null;
 	}
 }

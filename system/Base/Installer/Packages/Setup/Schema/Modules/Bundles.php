@@ -61,6 +61,14 @@ class Bundles
                         ]
                     ),
                     new Column(
+                        'version',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 15,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
                         'repo',
                         [
                             'type'    => Column::TYPE_VARCHAR,
@@ -76,6 +84,22 @@ class Bundles
                         ]
                     ),
                     new Column(
+                        'update_available',
+                        [
+                            'type'    => Column::TYPE_TINYINTEGER,
+                            'size'    => 1,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
+                        'update_version',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 15,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
                         'updated_by',
                         [
                             'type'    => Column::TYPE_INTEGER,
@@ -88,6 +112,20 @@ class Bundles
                             'type'    => Column::TYPE_TIMESTAMP,
                             'notNull' => true,
                             'default' => 'CURRENT_TIMESTAMP',
+                        ]
+                    ),
+                    new Column(
+                        'auto_update',
+                        [
+                            'type'    => Column::TYPE_BOOLEAN,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
+                        'repo_details',
+                        [
+                            'type'    => Column::TYPE_JSON,
+                            'notNull' => false,
                         ]
                     )
                 ],

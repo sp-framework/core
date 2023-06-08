@@ -4,10 +4,9 @@ namespace System\Base\Installer\Packages\Setup\Register\Providers;
 
 class Core
 {
-	public function register($baseConfig, $db)
+	public function register($baseConfig, $db, $ff)
 	{
-		$db->insertAsDict(
-			'service_provider_core',
+		$core =
 			[
 				'name' 					=> $baseConfig['name'],
 				'display_name'			=> $baseConfig['display_name'],
@@ -18,7 +17,16 @@ class Core
 					isset($baseConfig['settings']) ?
 					json_encode($baseConfig['settings']) :
 					null
-			]
-		);
+			];
+
+		if ($db) {
+			$db->insertAsDict('service_provider_core', $core);
+		}
+
+		if ($ff) {
+			$coreStore = $ff->store('service_provider_core');
+
+			$coreStore->updateOrInsert($core);
+		}
 	}
 }

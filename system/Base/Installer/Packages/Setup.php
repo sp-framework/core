@@ -47,6 +47,8 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailQueue;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailServices;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Filters;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV4;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV6;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Countries;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\States;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Timezones;
@@ -87,6 +89,7 @@ use System\Base\Installer\Packages\Setup\Schema\Providers\Domains;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Logs;
 use System\Base\Installer\Packages\Setup\Write\Configs;
 use System\Base\Installer\Packages\Setup\Write\Pdo;
+use System\Base\Providers\DatabaseServiceProvider\Ff;
 
 class Setup
 {
@@ -99,6 +102,8 @@ class Setup
 	protected $session;
 
 	protected $db;
+
+	protected $ff;
 
 	protected $dbConfig;
 
@@ -126,7 +131,7 @@ class Setup
 
 		$this->cookies = $this->container->getShared('cookies');
 
-		if ($this->request->isPost() && !$precheckFail) {
+		if ($this->request->isPost() && !$precheckFail && isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'ff') {
 			$this->dbConfig =
 					[
 						'db' =>
@@ -153,6 +158,7 @@ class Setup
 									3306,
 							]
 					];
+
 			if (isset($this->postData['create-username']) && isset($this->postData['create-password'])) {
 				$this->dbConfig['db']['username'] = $this->postData['create-username'];
 				$this->dbConfig['db']['password'] = $this->postData['create-password'];
@@ -162,6 +168,10 @@ class Setup
 			$this->db = new Mysql($this->dbConfig['db']);
 		}
 
+		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'mysql') {
+			$this->ff = (new Ff((object) ['enabled' => false, 'timeout' => 0], $this->request))->init();
+		}
+
 		$this->basepackages = $this->container->getShared('basepackages');
 
 		$this->progress = $this->basepackages->progress;
@@ -169,6 +179,8 @@ class Setup
 		if (!$precheckFail) {
 			$this->localContent = $this->container['localContent'];
 		}
+
+		$this->remoteWebContent = $this->container['remoteWebContent'];
 	}
 
 	public function __call($method, $arguments)
@@ -270,6 +282,10 @@ class Setup
 
 	protected function checkDbEmpty()
 	{
+		if (!$this->db) {
+			return true;
+		}
+
 		$allTables = $this->db->listTables($this->postData['dbname']);
 
 		if (count($allTables) > 0) {
@@ -288,66 +304,81 @@ class Setup
 
 	protected function buildSchema()
 	{
-		$dbName = $this->dbConfig['db']['dbname'];
+		$databases = [
+			'service_provider_core' 					=> new Core,
+			'service_provider_apps' 					=> new Apps,
+			'service_provider_apps_types' 				=> new Types,
+			'service_provider_apps_ip_filter' 			=> new IpFilter,
+			'service_provider_domains' 					=> new Domains,
+			'service_provider_logs' 					=> new Logs,
+			'service_provider_cache' 					=> new Cache,
+			'modules_bundles' 							=> new Bundles,
+			'modules_components' 						=> new Components,
+			'modules_packages' 							=> new Packages,
+			'modules_middlewares' 						=> new Middlewares,
+			'modules_views' 							=> new Views,
+			'modules_views_settings' 					=> new Settings,
+			'basepackages_email_services' 				=> new EmailServices,
+			'basepackages_email_queue' 					=> new EmailQueue,
+			'basepackages_users_accounts' 				=> new Accounts,
+			'basepackages_users_accounts_security' 		=> new Security,
+			'basepackages_users_accounts_canlogin' 		=> new CanLogin,
+			'basepackages_users_accounts_sessions' 		=> new Sessions,
+			'basepackages_users_accounts_identifiers' 	=> new Identifiers,
+			'basepackages_users_accounts_agents' 		=> new Agents,
+			'basepackages_users_accounts_tunnels' 		=> new Tunnels,
+			'basepackages_users_profiles' 				=> new Profiles,
+			'basepackages_users_roles' 					=> new Roles,
+			'basepackages_menus' 						=> new Menus,
+			'basepackages_filters' 						=> new Filters,
+			'basepackages_geo_countries' 				=> new Countries,
+			'basepackages_geo_states' 					=> new States,
+			'basepackages_geo_cities' 					=> new Cities,
+			'basepackages_geo_cities_ip2locationv4' 	=> new CitiesIp2LocationV4,
+			'basepackages_geo_cities_ip2locationv6' 	=> new CitiesIp2LocationV6,
+			'basepackages_geo_cities' 					=> new Cities,
+			'basepackages_geo_timezones' 				=> new Timezones,
+			'basepackages_address_book' 				=> new AddressBook,
+			'basepackages_storages' 					=> new Storages,
+			'basepackages_storages_local' 				=> new StoragesLocal,
+			'basepackages_activity_logs' 				=> new ActivityLogs,
+			'basepackages_notes' 						=> new Notes,
+			'basepackages_notifications' 				=> new Notifications,
+			'basepackages_workers_workers' 				=> new Workers,
+			'basepackages_workers_schedules' 			=> new Schedules,
+			'basepackages_workers_tasks' 				=> new Tasks,
+			'basepackages_workers_jobs' 				=> new Jobs,
+			'basepackages_import_export' 				=> new ImportExport,
+			'basepackages_templates' 					=> new Templates,
+			'basepackages_dashboards' 					=> new Dashboards,
+			'basepackages_dashboards_widgets' 			=> new DashboardsWidgets,
+			'basepackages_widgets' 						=> new Widgets,
+			'basepackages_messenger' 					=> new Messenger,
+			'basepackages_api' 							=> new Api,
+			'basepackages_api_calls' 					=> new ApiCalls,
+			'basepackages_api_apis_repos' 				=> new Repos
+		];
 
-		$this->db->createTable('service_provider_core', $dbName, (new Core)->columns());
-		$this->db->createTable('service_provider_apps', $dbName, (new Apps)->columns());
-		$this->db->createTable('service_provider_apps_types', $dbName, (new Types)->columns());
-		$this->db->createTable('service_provider_apps_ip_filter', $dbName, (new IpFilter)->columns());
-		$this->db->createTable('service_provider_domains', $dbName, (new Domains)->columns());
-		$this->db->createTable('service_provider_logs', $dbName, (new Logs)->columns());
-		$this->db->createTable('service_provider_cache', $dbName, (new Cache)->columns());
+		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'ff') {
+			foreach ($databases as $tableName => $tableClass) {
+				if (method_exists($tableClass, 'columns')) {
+					$this->db->createTable($tableName, $this->dbConfig['db']['dbname'], $tableClass->columns());
+				}
+				if (method_exists($tableClass, 'indexes')) {
+					$this->addIndex($tableName, $tableClass->indexes());
+				}
+			}
+		}
 
-		$this->db->createTable('modules_components', $dbName, (new Components)->columns());
-		$this->db->createTable('modules_packages', $dbName, (new Packages)->columns());
-		$this->db->createTable('modules_middlewares', $dbName, (new Middlewares)->columns());
-		$this->db->createTable('modules_views', $dbName, (new Views)->columns());
-		$this->db->createTable('modules_bundles', $dbName, (new Bundles)->columns());
-		$this->db->createTable('modules_views_settings', $dbName, (new Settings)->columns());
+		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'mysql') {
+			foreach ($databases as $tableName => $tableClass) {
+				$this->ff->store($tableName)->deleteStore();
 
-		$this->db->createTable('basepackages_email_services', $dbName, (new EmailServices)->columns());
-		$this->db->createTable('basepackages_email_queue', $dbName, (new EmailQueue)->columns());
-		$this->db->createTable('basepackages_users_accounts', $dbName, (new Accounts)->columns());
-		$this->db->createTable('basepackages_users_accounts_security', $dbName, (new Security)->columns());
-		$this->db->createTable('basepackages_users_accounts_canlogin', $dbName, (new CanLogin)->columns());
-		$this->db->createTable('basepackages_users_accounts_sessions', $dbName, (new Sessions)->columns());
-		$this->db->createTable('basepackages_users_accounts_identifiers', $dbName, (new Identifiers)->columns());
-		$this->db->createTable('basepackages_users_accounts_agents', $dbName, (new Agents)->columns());
-		$this->db->createTable('basepackages_users_accounts_tunnels', $dbName, (new Tunnels)->columns());
-		$this->db->createTable('basepackages_users_profiles', $dbName, (new Profiles)->columns());
-		$this->db->createTable('basepackages_users_roles', $dbName, (new Roles)->columns());
-		$this->db->createTable('basepackages_menus', $dbName, (new Menus)->columns());
-		$this->db->createTable('basepackages_filters', $dbName, (new Filters)->columns());
-		$this->db->createTable('basepackages_geo_countries', $dbName, (new Countries)->columns());
-		$this->addIndex('basepackages_geo_countries', (new Countries)->indexes());
-		$this->db->createTable('basepackages_geo_states', $dbName, (new States)->columns());
-		$this->addIndex('basepackages_geo_states', (new States)->indexes());
-		$this->db->createTable('basepackages_geo_cities', $dbName, (new Cities)->columns());
-		$this->addIndex('basepackages_geo_cities', (new Cities)->indexes());
-		$this->db->createTable('basepackages_geo_timezones', $dbName, (new Timezones)->columns());
-		// $this->db->createTable('basepackages_geo_ipaddresses', $dbName, (new IpAddresses)->columns());
-		$this->db->createTable('basepackages_address_book', $dbName, (new AddressBook)->columns());
-		$this->db->createTable('basepackages_storages', $dbName, (new Storages)->columns());
-		$this->db->createTable('basepackages_storages_local', $dbName, (new StoragesLocal)->columns());
-		$this->db->createTable('basepackages_activity_logs', $dbName, (new ActivityLogs)->columns());
-		$this->db->createTable('basepackages_notes', $dbName, (new Notes)->columns());
-		$this->db->createTable('basepackages_notifications', $dbName, (new Notifications)->columns());
-		$this->db->createTable('basepackages_workers_workers', $dbName, (new Workers)->columns());
-		$this->db->createTable('basepackages_workers_schedules', $dbName, (new Schedules)->columns());
-		$this->db->createTable('basepackages_workers_tasks', $dbName, (new Tasks)->columns());
-		$this->db->createTable('basepackages_workers_jobs', $dbName, (new Jobs)->columns());
-		$this->db->createTable('basepackages_import_export', $dbName, (new ImportExport)->columns());
-		$this->db->createTable('basepackages_templates', $dbName, (new Templates)->columns());
-		$this->db->createTable('basepackages_dashboards', $dbName, (new Dashboards)->columns());
-		$this->db->createTable('basepackages_dashboards_widgets', $dbName, (new DashboardsWidgets)->columns());
-		$this->db->createTable('basepackages_widgets', $dbName, (new Widgets)->columns());
-		$this->db->createTable('basepackages_messenger', $dbName, (new Messenger)->columns());
-		$this->db->createTable('basepackages_api', $dbName, (new Api)->columns());
-		$this->db->createTable('basepackages_api_calls', $dbName, (new ApiCalls)->columns());
-		$this->db->createTable('basepackages_api_apis_repos', $dbName, (new Repos)->columns());
+				$schema = $this->ff->generateSchema($tableName, $tableClass);
+				$config = $this->ff->generateConfig($tableName, $tableClass);
 
-		if ($this->postData['dev'] == 'true') {
-			$this->db->createTable('apps_core_devtools_modules_bundles', $dbName, (new DevtoolsModulesBundles)->columns());
+				$this->ff->store($tableName, $config, $schema);
+			}
 		}
 
 		return true;
@@ -355,33 +386,33 @@ class Setup
 
 	protected function registerRepos()
 	{
-		(new RegisterRepos())->register($this->db);
+		(new RegisterRepos())->register($this->db, $this->ff);
 
 		return true;
 	}
 
 	protected function registerDomain()
 	{
-		(new RegisterDomain())->register($this->db, $this->request);
+		(new RegisterDomain())->register($this->db, $this->ff, $this->request);
 
 		return true;
 	}
 
 	protected function registerCore(array $baseConfig)
 	{
-		(new RegisterCore())->register($baseConfig, $this->db);
+		(new RegisterCore())->register($baseConfig, $this->db, $this->ff);
 
 		return true;
 	}
 
 	protected function registerCoreAppType()
 	{
-		return (new RegisterCoreAppType())->register($this->db);
+		return (new RegisterCoreAppType())->register($this->db, $this->ff);
 	}
 
 	protected function registerCoreApp()
 	{
-		return (new RegisterCoreApp())->register($this->db);
+		return (new RegisterCoreApp())->register($this->db, $this->ff);
 	}
 
 	protected function registerModule($type)
@@ -522,42 +553,42 @@ class Setup
 
 	protected function registerCoreComponent(array $componentFile, $menuId)
 	{
-		return (new RegisterComponent())->register($this->db, $componentFile, $menuId);
+		return (new RegisterComponent())->register($this->db, $this->ff, $componentFile, $menuId);
 	}
 
 	protected function registerCoreDashboard(array $componentFile)
 	{
-		return (new RegisterCoreDashboard())->register($this->db, $componentFile);
+		return (new RegisterCoreDashboard())->register($this->db, $this->ff, $componentFile);
 	}
 
 	protected function registerCoreWidgets(array $componentFile, $registeredComponentId, $path)
 	{
-		return (new RegisterCoreWidgets())->register($this->db, $componentFile, $registeredComponentId, $path, $this->localContent);
+		return (new RegisterCoreWidgets())->register($this->db, $this->ff, $componentFile, $registeredComponentId, $path, $this->localContent);
 	}
 
 	protected function updateCoreAppComponents()
 	{
-		return (new RegisterCoreApp())->update($this->db);
+		return (new RegisterCoreApp())->update($this->db, $this->ff);
 	}
 
 	protected function registerCoreMenu($appType, array $menu)
 	{
-		return (new RegisterMenu())->register($this->db, $appType, $menu);
+		return (new RegisterMenu())->register($this->db, $this->ff, $appType, $menu);
 	}
 
 	protected function registerCorePackage(array $packageFile)
 	{
-		return (new RegisterPackage())->register($this->db, $packageFile);
+		return (new RegisterPackage())->register($this->db, $this->ff, $packageFile);
 	}
 
 	protected function registerCoreMiddleware(array $middlewareFile)
 	{
-		return (new RegisterMiddleware())->register($this->db, $middlewareFile);
+		return (new RegisterMiddleware())->register($this->db, $this->ff, $middlewareFile);
 	}
 
 	protected function registerCoreView(array $viewFile)
 	{
-		return (new RegisterView())->register($this->db, $viewFile);
+		return (new RegisterView())->register($this->db, $this->ff, $viewFile);
 	}
 
 	public function validateData()
@@ -581,63 +612,73 @@ class Setup
 
 	protected function registerCoreRole()
 	{
-		return (new RegisterRole())->registerCoreRole($this->db);
+		return (new RegisterRole())->registerCoreRole($this->db, $this->ff);
 	}
 
 	protected function registerRegisteredUserAndGuestRoles()
 	{
-		return (new RegisterRole())->registerRegisteredUserAndGuestRoles($this->db);
+		return (new RegisterRole())->registerRegisteredUserAndGuestRoles($this->db, $this->ff);
 	}
 
-	protected function registerCoreAccount($adminRoleId, $workFactor = 12)
+	protected function registerCoreAccount($workFactor = 12)
 	{
 		$password = $this->container['security']->hash($this->postData['pass'], $workFactor);
 
-		return (new RegisterRootCoreAccount())->register($this->db, $this->postData['email'], $password, $adminRoleId);
+		return (new RegisterRootCoreAccount())->register($this->db, $this->ff, $this->postData['email'], $password);
 	}
 
-	protected function registerCoreProfile($adminAccountId)
+	protected function registerCoreProfile()
 	{
-		return (new RegisterRootCoreProfile())->register($this->db, $adminAccountId);
+		return (new RegisterRootCoreProfile())->register($this->db, $this->ff);
 	}
 
 	protected function registerExcludeAutoGeneratedFilters()
 	{
-		return (new RegisterFilter())->register($this->db);
+		return (new RegisterFilter())->register($this->db, $this->ff);
 	}
 
 	protected function registerCountries()
 	{
-		return (new RegisterCountries())->register($this->db, $this->localContent);
+		return (new RegisterCountries())->register($this->db, $this->ff, $this->localContent, $this->postData['country']);
+	}
+
+	protected function downloadCountriesStateAndCities()
+	{
+		return (new RegisterCountries())->downloadSelectedCountryStatesAndCities($this->ff, $this->localContent, $this->remoteWebContent, $this->postData['country']);
+	}
+
+	protected function registerCountriesStateAndCities()
+	{
+		return (new RegisterCountries())->registerSelectedCountryStatesAndCities($this->ff, $this->localContent, $this->remoteWebContent, $this->postData['country'], $this->postData['ip2location']);
 	}
 
 	protected function registerTimezones()
 	{
-		return (new RegisterTimezones())->register($this->db, $this->localContent);
+		return (new RegisterTimezones())->register($this->db, $this->ff, $this->localContent);
 	}
 
 	protected function registerStorages(array $packageFile)
 	{
-		return (new RegisterStorages())->register($this->db, $packageFile);
+		return (new RegisterStorages())->register($this->db, $this->ff, $packageFile);
 	}
 
 	protected function registerWorkers()
 	{
-		(new RegisterWorkers())->register($this->db);
+		(new RegisterWorkers())->register($this->db, $this->ff);
 
 		return true;
 	}
 
 	protected function registerSchedules()
 	{
-		(new RegisterSchedules())->register($this->db);
+		(new RegisterSchedules())->register($this->db, $this->ff);
 
 		return true;
 	}
 
 	protected function registerTasks()
 	{
-		(new RegisterTasks())->register($this->db);
+		(new RegisterTasks())->register($this->db, $this->ff);
 
 		return true;
 	}

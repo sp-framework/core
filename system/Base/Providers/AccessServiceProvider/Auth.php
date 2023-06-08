@@ -60,6 +60,8 @@ class Auth
 
     protected $domains;
 
+    protected $ff;
+
     public $packagesData;
 
     public $agent;
@@ -84,7 +86,8 @@ class Auth
         $roles,
         $email,
         $emailQueue,
-        $domains
+        $domains,
+        $ff
     ) {
         $this->request = $request;
 
@@ -119,6 +122,8 @@ class Auth
         $this->emailQueue = $emailQueue;
 
         $this->domains = $domains;
+
+        $this->ff = $ff;
 
         $this->packagesData = new PackagesData;
     }
@@ -256,12 +261,19 @@ class Auth
 
         $this->apps->ipFilter->removeFromMonitoring();
 
-        $security = $this->getAccountSecurityObject();
+        if ($this->config->databasetype === 'db') {
+            $security = $this->getAccountSecurityObject();
+
+            $two_fa_status = $security->two_fa_status;
+        } else {
+            $security = $this->getAccountSecurityObject();
+            // $securityStore = $this->ff->store('basepackages_users_accounts_security');
+
+            // $security = $securityStore->findOneBy()
+        }
 
         if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
-            if (!$security->two_fa_status ||
-                ($security->two_fa_status && $security->two_fa_status == '0')
-            ) {
+            if (!$two_fa_status || ($two_fa_status && $two_fa_status == '0')) {
                 $this->packagesData->responseCode = 3;
 
                 $this->packagesData->responseMessage = '2FA Code Required!';
@@ -338,19 +350,32 @@ class Auth
 
             if ($canLogin === false) {
                 if ($this->app['can_login_role_ids']) {
-                    $this->app['can_login_role_ids'] = Json::decode($this->app['can_login_role_ids'], true);
+                    if (is_string($this->app['can_login_role_ids'])) {
+                        $this->app['can_login_role_ids'] = Json::decode($this->app['can_login_role_ids'], true);
+                    }
 
                     if (in_array($this->account['role_id'], $this->app['can_login_role_ids'])) {
+                        if ($this->config->databasetype === 'db') {
+                            $canloginModel = new BasepackagesUsersAccountsCanlogin;
 
-                        $canloginModel = new BasepackagesUsersAccountsCanlogin;
+                            $newLogin['account_id'] = $this->account['id'];
+                            $newLogin['app_id'] = $this->app['id'];
+                            $newLogin['allowed'] = '2';
 
-                        $newLogin['account_id'] = $this->account['id'];
-                        $newLogin['app_id'] = $this->app['id'];
-                        $newLogin['allowed'] = '2';
+                            $canloginModel->assign($newLogin);
 
-                        $canloginModel->assign($newLogin);
+                            $canloginModel->create();
+                        } else {
+                            $canloginStore = $this->ff->store('basepackages_users_accounts_canlogin');
 
-                        $canloginModel->create();
+                            $canloginStore->updateOrInsert(
+                                [
+                                    'account_id'    => $this->account['id'],
+                                    'app_id'        => $this->app['id'],
+                                    'allowed'       => 2
+                                ]
+                            );
+                        }
                     } else {
                         $this->packagesData->responseCode = 1;
 
@@ -1005,7 +1030,7 @@ class Auth
     protected function getAccountSecurityObject()
     {
         $accountsObj = $this->accounts->getFirst('id', $this->account()['id']);
-
+        var_dump($accountsObj);die();
         return $accountsObj->getSecurity();
     }
 

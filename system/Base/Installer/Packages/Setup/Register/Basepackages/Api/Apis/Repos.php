@@ -4,10 +4,9 @@ namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Api\Apis;
 
 class Repos
 {
-    public function register($db)
+    public function register($db, $ff)
     {
-        $newApi = $db->insertAsDict(
-            'basepackages_api_apis_repos',
+        $coreRepo =
             [
                 'api_url'               => 'https://dev.bazaari.com.au/',
                 'org_user'              => 'sp-core',
@@ -15,28 +14,21 @@ class Repos
                 'branch'                => 'main',
                 'auth_type'             => 'autho',
                 'authorization'         => '5b7987057a61adfe7be9994b5a5e8d569d385138'//bcust Token
-            ]
-        );
+            ];
 
-        if ($newApi) {
-            $db->insertAsDict(
-                'basepackages_api',
-                [
-                    'name'              => 'Bazaari Core (SP)',
-                    'description'       => 'Bazaari Core Repository',
-                    'api_category_id'   => $db->lastInsertId(),
-                    'category'          => 'repos',
-                    'provider'          => 'Gitea',
-                    'in_use'            => 1,
-                    'used_by'           => 'modules',
-                    'setup'             => 4,
-                    'location'          => 'system'
-                ]
-            );
-        }
+        $coreApi =
+            [
+                'name'              => 'Bazaari Core (SP)',
+                'description'       => 'Bazaari Core Repository',
+                'category'          => 'repos',
+                'provider'          => 'Gitea',
+                'in_use'            => 1,
+                'used_by'           => 'modules',
+                'setup'             => 4,
+                'location'          => 'system'
+            ];
 
-        $newApi = $db->insertAsDict(
-            'basepackages_api_apis_repos',
+        $modulesRepo =
             [
                 'api_url'               => 'https://dev.bazaari.com.au/',
                 'org_user'              => 'sp-modules',
@@ -44,24 +36,57 @@ class Repos
                 'branch'                => 'main',
                 'auth_type'             => 'autho',
                 'authorization'         => '5b7987057a61adfe7be9994b5a5e8d569d385138'//bcust Token
-            ]
-        );
+            ];
 
-        if ($newApi) {
-            $db->insertAsDict(
-                'basepackages_api',
-                [
-                    'api_category_id'       => $db->lastInsertId(),
-                    'name'                  => 'Bazaari Modules (SP)',
-                    'description'           => 'Bazaari Modules Repository',
-                    'category'              => 'repos',
-                    'provider'              => 'Gitea',
-                    'in_use'                => 1,
-                    'used_by'               => 'modules',
-                    'setup'                 => 4,
-                    'location'              => 'system'
-                ]
-            );
+        $modulesApi =
+            [
+                'name'                  => 'Bazaari Modules (SP)',
+                'description'           => 'Bazaari Modules Repository',
+                'category'              => 'repos',
+                'provider'              => 'Gitea',
+                'in_use'                => 1,
+                'used_by'               => 'modules',
+                'setup'                 => 4,
+                'location'              => 'system'
+            ];
+
+        if ($db) {
+            $newRepo = $db->insertAsDict('basepackages_api_apis_repos', $coreRepo);
+
+            if ($newRepo) {
+                $coreApi['api_category_id'] = $db->lastInsertId();
+
+                $db->insertAsDict('basepackages_api', $coreApi);
+            }
+
+            $newRepo = $db->insertAsDict('basepackages_api_apis_repos', $modulesRepo);
+
+            if ($newRepo) {
+                $modulesApi['api_category_id'] = $db->lastInsertId();
+
+                $db->insertAsDict('basepackages_api', $modulesApi);
+            }
+        }
+
+        if ($ff) {
+            $apisReposStore = $ff->store('basepackages_api_apis_repos');
+            $apiStore = $ff->store('basepackages_api');
+
+            $newRepo = $apisReposStore->updateOrInsert($coreRepo);
+
+            if ($newRepo) {
+                $coreApi['api_category_id'] = $apisReposStore->getLastInsertedId();
+
+                $apiStore->updateOrInsert($coreApi);
+            }
+
+            $newRepo = $apisReposStore->updateOrInsert($modulesRepo);
+
+            if ($newRepo) {
+                $modulesApi['api_category_id'] = $apisReposStore->getLastInsertedId();
+
+                $apiStore->updateOrInsert($modulesApi);
+            }
         }
     }
 }

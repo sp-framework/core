@@ -6,7 +6,7 @@ use Phalcon\Helper\Json;
 
 class Middleware
 {
-	public function register($db, $middlewareFile)
+	public function register($db, $ff, $middlewareFile)
 	{
 		if ($middlewareFile['name'] === 'Auth') {
 			$apps = Json::encode(['1' => ['enabled' => true, 'sequence' => 1]]);
@@ -16,8 +16,7 @@ class Middleware
 			$apps = Json::encode(['1' => ['enabled' => false, 'sequence' => 0]]);
 		}
 
-		return $db->insertAsDict(
-			'modules_middlewares',
+		$middleware =
 			[
 				'name' 					=> $middlewareFile['name'],
 				'display_name' 			=> $middlewareFile['display_name'],
@@ -44,7 +43,16 @@ class Middleware
 					Json::encode($middlewareFile['files']) :
 					Json::encode([]),
 				'updated_by'			=> 0
-			]
-		);
+			];
+
+		if ($db) {
+			$db->insertAsDict('modules_middlewares', $middleware);
+		}
+
+		if ($ff) {
+			$middlewareStore = $ff->store('modules_middlewares');
+
+			$middlewareStore->updateOrInsert($middleware);
+		}
 	}
 }

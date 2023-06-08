@@ -6,15 +6,20 @@ use Phalcon\Helper\Json;
 
 class Workers
 {
-    public function register($db)
+    public function register($db, $ff)
     {
         $workersArr = $this->workers();
 
         foreach ($workersArr as $key => $worker) {
-            $db->insertAsDict(
-                'basepackages_workers_workers',
-                $worker
-            );
+            if ($db) {
+                $db->insertAsDict('basepackages_workers_workers', $worker);
+            }
+
+            if ($ff) {
+                $workerStore = $ff->store('basepackages_workers_workers');
+
+                $workerStore->updateOrInsert($worker);
+            }
         }
     }
 

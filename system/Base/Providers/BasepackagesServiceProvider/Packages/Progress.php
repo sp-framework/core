@@ -213,25 +213,27 @@ class Progress extends BasePackage
         if ($this->notificationsTunnel !== null) {
             $progressFile = $this->readProgressFile();
 
-            $this->wss->send(
-                [
-                    'type'              => 'progress',
-                    'to'                => $this->notificationsTunnel,
-                    'response'          => [
-                        'responseCode'      => 0,
-                        'responseMessage'   => 'Ok',
-                        'responseData'      =>
-                            [
-                                'total'             => $progressFile['total'],
-                                'completed'         => $progressFile['completed'],
-                                'preCheckComplete'  => $progressFile['preCheckComplete'],
-                                'percentComplete'   => number_format(($progressFile['completed'] * 100) / $progressFile['total']),
-                                'runners'           => $progressFile['runners'] ?? false,
-                                'callResult'        => $callResult
-                            ]
+            if ($progressFile) {
+                $this->wss->send(
+                    [
+                        'type'              => 'progress',
+                        'to'                => $this->notificationsTunnel,
+                        'response'          => [
+                            'responseCode'      => 0,
+                            'responseMessage'   => 'Ok',
+                            'responseData'      =>
+                                [
+                                    'total'             => $progressFile['total'],
+                                    'completed'         => $progressFile['completed'],
+                                    'preCheckComplete'  => $progressFile['preCheckComplete'],
+                                    'percentComplete'   => number_format(($progressFile['completed'] * 100) / $progressFile['total']),
+                                    'runners'           => $progressFile['runners'] ?? false,
+                                    'callResult'        => $callResult
+                                ]
+                        ]
                     ]
-                ]
-            );
+                );
+            }
         }
     }
 
@@ -239,9 +241,11 @@ class Progress extends BasePackage
     {
         $progressFile = $this->readProgressFile();
 
-        $progressFile['preCheckComplete'] = $complete;
+        if ($progressFile) {
+            $progressFile['preCheckComplete'] = $complete;
 
-        $this->writeProgressFile($progressFile['processes'], false, false, false, null, $progressFile);
+            $this->writeProgressFile($progressFile['processes'], false, false, false, null, $progressFile);
+        }
     }
 
     public function resetProgress($reRegisterMethods = true)

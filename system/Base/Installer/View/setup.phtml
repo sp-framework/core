@@ -54,135 +54,149 @@
                                                 <div class="row">
                                                     <div class="col">
                                                         <div class="form-group">
-                                                            <label class="text-uppercase text-xs" for="host">Host *</label>
-                                                            <div class="input-group input-group-sm">
-                                                                <input type="text" name="host" id="host" class="form-control rounded-0" value="localhost">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col">
-                                                        <div class="form-group">
-                                                            <label class="text-uppercase text-xs" for="port">Port *</label>
-                                                            <div class="input-group input-group-sm">
-                                                                <input type="text" name="port" id="port" class="form-control rounded-0" value="3306">
-                                                            </div>
+                                                            <label class="text-uppercase text-xs" for="host">Select Database Type *</label>
+                                                            <select class="custom-select rounded-0 input-xs" style="padding: 0.375rem 1.75rem 0.375rem 0.75rem;" id="databasetype">
+                                                                <option value="hybrid" selected="">Flat File + MySQL (Recommended)</option>
+                                                                <option value="ff">Flat File Only</option>
+                                                                <option value="db">MySQL Only</option>
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <div class="form-group">
-                                                            <label class="text-uppercase text-xs" for="dbname">Database Name *</label>
-                                                            <div class="input-group input-group-sm">
-                                                                <input type="text" name="dbname" id="dbname" class="form-control rounded-0" value="sp">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col">
-                                                        <div class="form-group">
-                                                            <label class="text-uppercase text-xs" for="charset">Database Charset *</label>
-                                                            <div class="input-group input-group-sm">
-                                                                <input type="text" name="charset" id="charset" class="form-control rounded-0" value="utf8mb4">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col">
-                                                        <div class="form-group">
-                                                            <label class="text-uppercase text-xs" for="collation">Database Collation *</label>
-                                                            <div class="input-group input-group-sm">
-                                                                <input type="text" name="collation" id="collation" class="form-control rounded-0" value="utf8mb4_general_ci">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <div class="form-group">
-                                                            <label class="text-uppercase text-xs" for="username">Database Username *</label>
-                                                            <div class="input-group input-group-sm">
-                                                                <input type="text" name="username" id="username" class="form-control rounded-0" value="sp">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col">
-                                                        <div class="form-group mb-0">
-                                                            <label class="text-uppercase text-xs" for="password">Database Password *</label>
-                                                            <div class="input-group input-group-sm">
-                                                                <div class="input-group-prepend">
-                                                                    <button class="btn btn-sm btn-primary rounded-0" id="generate_db_password_button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="">
-                                                                        <i class="fas fa-fw fa-cog fa-spin" hidden=""></i> <i class="fas fa-fw fa-wand-magic-sparkles"></i>
-                                                                    </button>
-                                                                </div>
-                                                                <input type="password" name="password" id="password" class="form-control rounded-0">
-                                                                <div class="input-group-append">
-                                                                    <button id="password-visibility" class="btn btn-primary rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" data-original-title="">
-                                                                        <i class="fas fa-fw fa-eye-slash"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <div id="db_password_strength_meter"></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <?php if (!$onlyUpdateDb) { ?>
+                                                <div id="mysql">
                                                     <div class="row">
                                                         <div class="col">
                                                             <div class="form-group">
-                                                                <div class="checkbox icheck-danger">
-                                                                    <input type="checkbox" name="drop" id="drop">
-                                                                    <label class="text-uppercase text-xs" for="drop">
-                                                                        Drop tables if exists
-                                                                    </label>
+                                                                <label class="text-uppercase text-xs" for="host">Host *</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <input type="text" name="host" id="host" class="form-control rounded-0" value="localhost">
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="col">
                                                             <div class="form-group">
-                                                                <div class="checkbox icheck-success">
-                                                                    <input type="checkbox" name="create" id="create">
-                                                                    <label class="text-uppercase text-xs" for="create">
-                                                                        Create new database
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col">
-                                                            <div class="form-group">
-                                                                <div class="checkbox icheck-success">
-                                                                    <input type="checkbox" name="create-grant" id="create-grant">
-                                                                    <label class="text-uppercase text-xs" for="create-grant">
-                                                                        Create new user/grant permissions
-                                                                    </label>
+                                                                <label class="text-uppercase text-xs" for="port">Port *</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <input type="text" name="port" id="port" class="form-control rounded-0" value="3306">
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="row" id="create-user">
+                                                    <div class="row">
                                                         <div class="col">
                                                             <div class="form-group">
-                                                                <label class="text-uppercase text-xs" for="create-username">Database Username (With create permission) *</label>
+                                                                <label class="text-uppercase text-xs" for="dbname">Database Name *</label>
                                                                 <div class="input-group input-group-sm">
-                                                                    <input type="text" name="create-username" id="create-username" class="form-control rounded-0" disabled>
+                                                                    <input type="text" name="dbname" id="dbname" class="form-control rounded-0" value="sp">
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="col">
                                                             <div class="form-group">
-                                                                <label class="text-uppercase text-xs" for="create-password">Database Password (With create permission) *</label>
+                                                                <label class="text-uppercase text-xs" for="charset">Database Charset *</label>
                                                                 <div class="input-group input-group-sm">
-                                                                    <input type="password" name="create-password" id="create-password" class="form-control rounded-0" disabled>
+                                                                    <input type="text" name="charset" id="charset" class="form-control rounded-0" value="utf8mb4">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <label class="text-uppercase text-xs" for="collation">Database Collation *</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <input type="text" name="collation" id="collation" class="form-control rounded-0" value="utf8mb4_general_ci">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <label class="text-uppercase text-xs" for="username">Database Username *</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <input type="text" name="username" id="username" class="form-control rounded-0" value="sp">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="form-group mb-0">
+                                                                <label class="text-uppercase text-xs" for="password">Database Password *</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <div class="input-group-prepend">
+                                                                        <button class="btn btn-sm btn-primary rounded-0" id="generate_db_password_button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="">
+                                                                            <i class="fas fa-fw fa-cog fa-spin" hidden=""></i> <i class="fas fa-fw fa-wand-magic-sparkles"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                    <input type="password" name="password" id="password" class="form-control rounded-0">
                                                                     <div class="input-group-append">
-                                                                        <button id="create-password-visibility" class="btn btn-primary rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" data-original-title="">
+                                                                        <button id="password-visibility" class="btn btn-primary rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" data-original-title="">
                                                                             <i class="fas fa-fw fa-eye-slash"></i>
                                                                         </button>
                                                                     </div>
                                                                 </div>
                                                             </div>
+                                                            <div class="form-group">
+                                                                <div id="db_password_strength_meter"></div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                <?php } ?>
+                                                    <?php if (!$onlyUpdateDb) { ?>
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <div class="form-group">
+                                                                    <div class="checkbox icheck-danger">
+                                                                        <input type="checkbox" name="drop" id="drop">
+                                                                        <label class="text-uppercase text-xs" for="drop">
+                                                                            Drop tables if exists
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col">
+                                                                <div class="form-group">
+                                                                    <div class="checkbox icheck-success">
+                                                                        <input type="checkbox" name="create" id="create">
+                                                                        <label class="text-uppercase text-xs" for="create">
+                                                                            Create new database
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col">
+                                                                <div class="form-group">
+                                                                    <div class="checkbox icheck-success">
+                                                                        <input type="checkbox" name="create-grant" id="create-grant">
+                                                                        <label class="text-uppercase text-xs" for="create-grant">
+                                                                            Create new user/grant permissions
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row" id="create-user">
+                                                            <div class="col">
+                                                                <div class="form-group">
+                                                                    <label class="text-uppercase text-xs" for="create-username">Database Username (With create permission) *</label>
+                                                                    <div class="input-group input-group-sm">
+                                                                        <input type="text" name="create-username" id="create-username" class="form-control rounded-0" disabled>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col">
+                                                                <div class="form-group">
+                                                                    <label class="text-uppercase text-xs" for="create-password">Database Password (With create permission) *</label>
+                                                                    <div class="input-group input-group-sm">
+                                                                        <input type="password" name="create-password" id="create-password" class="form-control rounded-0" disabled>
+                                                                        <div class="input-group-append">
+                                                                            <button id="create-password-visibility" class="btn btn-primary rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="auto" title="" data-original-title="">
+                                                                                <i class="fas fa-fw fa-eye-slash"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    <?php } ?>
+                                                </div>
                                             </div>
                                             <?php if (!$onlyUpdateDb) { ?>
                                                 <div class="col-6 p-3">
@@ -218,7 +232,36 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <legend class="text-uppercase">Security</legend>
+                                                    <legend class="text-uppercase">Geo Location</legend>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <select class="custom-select rounded-0" style="padding: 0.375rem 1.75rem 0.375rem 0.75rem;" id="country">
+                                                                    <?php foreach ($countries as $key => $value) {
+                                                                        $selected = '';
+
+                                                                        if ($value['iso3'] === 'AUS') {
+                                                                            $selected = 'selected=""';
+                                                                        }
+
+                                                                        echo '<option value="' . $value['iso3'] . '"' . $selected . '>' . $value['name'] . '</option>';
+                                                                    } ?>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <div class="checkbox icheck-danger">
+                                                                    <input type="checkbox" name="ip2location" id="ip2location">
+                                                                    <label class="text-uppercase text-xs" for="ip2location">
+                                                                        Install ip2location database?
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <small class="text-danger">Note: Depending on ip database, ip2location database can take several minutes to install.</small>
+                                                    <legend class="text-uppercase mt-3">Security</legend>
                                                     <div class="row">
                                                         <div class="col">
                                                             <div class="form-group">
@@ -349,6 +392,14 @@
             <?php } ?>
             BazTunnels.initPusherTunnel({'tunnelsToInit' : ['progress']});
 
+            $('#databasetype').change(function() {
+                if ($('#databasetype').find(':selected').val() === 'ff') {
+                    $('#mysql').attr('hidden', true);
+                } else {
+                    $('#mysql').attr('hidden', false);
+                }
+            });
+
             $('#create, #create-grant').click(function() {
                 if ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) {
                     $('#create-username, #create-password').attr('disabled', false);
@@ -360,51 +411,57 @@
             $('#submit, #update').click(function(e) {
                 e.preventDefault();
 
-                if ($('#host').val() === '') {
+                var onlyFf = false;
+
+                if ($('#databasetype').find(':selected').val() === 'ff') {
+                    onlyFf = true;
+                }
+
+                if ($('#host').val() === '' && !onlyFf) {
                     $('#host').addClass('is-invalid');
                     $('#host').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                } else if ($('#port').val() === '') {
+                } else if ($('#port').val() === '' && !onlyFf) {
                     $('#port').addClass('is-invalid');
                     $('#port').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                } else if ($('#dbname').val() === '') {
+                } else if ($('#dbname').val() === '' && !onlyFf) {
                     $('#dbname').addClass('is-invalid');
                     $('#dbname').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                } else if ($('#charset').val() === '') {
+                } else if ($('#charset').val() === '' && !onlyFf) {
                     $('#charset').addClass('is-invalid');
                     $('#charset').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                } else if ($('#collation').val() === '') {
+                } else if ($('#collation').val() === '' && !onlyFf) {
                     $('#collation').addClass('is-invalid');
                     $('#collation').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                } else if ($('#username').val() === '') {
+                } else if ($('#username').val() === '' && !onlyFf) {
                     $('#username').addClass('is-invalid');
                     $('#username').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
-                } else if ($('#password').val() === '') {
+                } else if ($('#password').val() === '' && !onlyFf) {
                     $('#password').addClass('is-invalid');
                     $('#password').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
                 } else if (($('#create').length > 0 && $('#create-grant').length > 0) &&
                            ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
-                           $('#create-username').val() === '') {
+                           $('#create-username').val() === '' && !onlyFf) {
                     $('#create-username').addClass('is-invalid');
                     $('#create-username').focus(function() {
                         $(this).removeClass('is-invalid');
                     });
                 } else if (($('#create').length > 0 && $('#create-grant').length > 0) &&
                            ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
-                           $('#create-password').val() === '') {
+                           $('#create-password').val() === '' && !onlyFf) {
                     $('#create-password').addClass('is-invalid');
                     $('#create-password').focus(function() {
                         $(this).removeClass('is-invalid');
@@ -438,36 +495,40 @@
                     }).addClass('bg-info');
 
                     var data = { };
-                    data = $.extend(data,
-                        {
-                            "host"                  : $('#host').val(),
-                            "port"                  : $('#port').val(),
-                            "dbname"                : $('#dbname').val(),
-                            "charset"               : $('#charset').val(),
-                            "collation"             : $('#collation').val(),
-                            "username"              : $('#username').val(),
-                            "password"              : $('#password').val()
-                        });
-                    if ($('#create').length > 0 && $('#create')[0].checked === true) {
+                    if ($('#databasetype').find(':selected').val() !== 'ff') {
                         data = $.extend(data,
-                        {
-                            "create-username"       : $('#create-username').val(),
-                            "create-password"       : $('#create-password').val(),
-                            "create-db"             : $('#create')[0].checked,
-                            "create-user"           : $('#create-grant')[0].checked
-                        });
+                            {
+                                "host"                  : $('#host').val(),
+                                "port"                  : $('#port').val(),
+                                "dbname"                : $('#dbname').val(),
+                                "charset"               : $('#charset').val(),
+                                "collation"             : $('#collation').val(),
+                                "username"              : $('#username').val(),
+                                "password"              : $('#password').val(),
+                                "drop"                  : $('#drop')[0].checked,
+                            });
+                        if ($('#create').length > 0 && $('#create')[0].checked === true) {
+                            data = $.extend(data,
+                            {
+                                "create-username"       : $('#create-username').val(),
+                                "create-password"       : $('#create-password').val(),
+                                "create-db"             : $('#create')[0].checked,
+                                "create-user"           : $('#create-grant')[0].checked
+                            });
+                        }
                     }
                 <?php if (!$onlyUpdateDb && !$precheckFail) { ?>
                     data = $.extend(data,
                         {
-                            "drop"                  : $('#drop')[0].checked,
                             "email"                 : $('#email').val(),
                             "pass"                  : $('#pass').val(),
                             "pwf"                   : $('#pwf').val(),
                             "cwf"                   : $('#cwf').val(),
                             "auto-encrypt-level"    : $('#auto-encrypt-level')[0].checked,
                             "dev"                   : $('#dev')[0].checked,
-                            "country"               : $('#country').val()
+                            "databasetype"          : $('#databasetype').val(),
+                            "country"               : $('#country').val(),
+                            "ip2location"           : $('#ip2location')[0].checked
                         });
                 <?php } ?>
                     $('.installer-progress-bar').css('width', '0%');

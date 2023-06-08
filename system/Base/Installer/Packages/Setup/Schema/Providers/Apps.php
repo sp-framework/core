@@ -113,7 +113,7 @@ class Apps
 				new Column(
 					'acceptable_usernames',
 					[
-						'type'    => Column::TYPE_VARCHAR,
+						'type'    => Column::TYPE_JSON,
 						'size'    => 4096,
 						'notNull' => false,
 					]
@@ -135,7 +135,7 @@ class Apps
 				new Column(
 					'menu_structure',
 					[
-						'type'    => Column::TYPE_TEXT,
+						'type'    => Column::TYPE_JSON,
 						'notNull' => false,
 					]
 				),
