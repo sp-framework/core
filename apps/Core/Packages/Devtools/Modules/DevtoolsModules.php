@@ -330,7 +330,7 @@ class DevtoolsModules extends BasePackage
     {
         $jsonFile = $this->getModuleJsonFileLocation($data);
 
-        $data = $this->basepackages->utils->jsonDecodeData($data);
+        $data = $this->jsonData($data, true);
 
         $jsonContent = [];
         $jsonContent["name"] = $data["name"];
@@ -399,8 +399,8 @@ class DevtoolsModules extends BasePackage
                 return false;
             }
 
-            $baseView = $this->basepackages->utils->jsonDecodeData($baseView);
-            $baseViewJson = $this->basepackages->utils->jsonDecodeData($baseViewJson);
+            $baseView = $this->jsonData($baseView, true);
+            $baseViewJson = $this->jsonData($baseViewJson, true);
 
             //Overwrite baseview with original json file because only developer changes the json file that is imported into the db via module installer on install or update.
             $baseView['settings']['head']['link'] = $baseViewJson['settings']['head']['link'];
@@ -413,7 +413,7 @@ class DevtoolsModules extends BasePackage
             $envs = ['dev', 'prod'];
 
             foreach ($subViews as $subView) {
-                $subView = $this->basepackages->utils->jsonDecodeData($subView);
+                $subView = $this->jsonData($subView, true);
 
                 foreach ($assets as $asset) {
                     foreach ($envs as $env) {

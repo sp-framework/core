@@ -962,11 +962,15 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	protected function jsonData(array $data)
+	protected function jsonData(array $data, $decode = false)
 	{
-		foreach ($data as $dataKey => $dataValue) {
-			if (is_array($dataValue)) {
-				$data[$dataKey] = Json::encode($dataValue);
+		if ($decode) {
+			array_walk_recursive($data, 'json_decode_recursive');
+		} else {
+			foreach ($data as $dataKey => $dataValue) {
+				if (is_array($dataValue)) {
+					$data[$dataKey] = Json::encode($dataValue);
+				}
 			}
 		}
 

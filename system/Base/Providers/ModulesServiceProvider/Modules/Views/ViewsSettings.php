@@ -245,7 +245,7 @@ class ViewsSettings extends BasePackage
         }
 
         if ($viewModule) {
-            $viewModule = $this->basepackages->utils->jsonDecodeData($viewModule);
+            $viewModule = $this->jsonData($viewModule, true);
 
             $this->addResponse('Loaded settings from modules view.', 0, ['settings' => $viewModule['settings']]);
 

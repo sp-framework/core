@@ -192,9 +192,7 @@ class Utils extends BasePackage
 
     public function jsonDecodeData(array $data)
     {
-        array_walk_recursive($data, 'json_decode_recursive');
-
-        return $data;
+        return $this->jsonData($data, true);
     }
 
     public function validateJson($data)
