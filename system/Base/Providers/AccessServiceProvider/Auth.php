@@ -580,27 +580,40 @@ class Auth
                 $this->setUserIdCooikie();
             }
 
-            $identifierModel = new BasepackagesUsersAccountsIdentifiers;
+            if ($this->config->databasetype === 'db') {
+                $identifierModel = new BasepackagesUsersAccountsIdentifiers;
 
-            $identifier = $identifierModel::findFirst(
-                [
-                'session_id = :sessionId:',
-                'bind'      => ['sessionId' => $this->session->getId()]
-                ]
-            );
+                $identifier = $identifierModel::findFirst(
+                    [
+                        'session_id = :sessionId:',
+                        'bind'      => ['sessionId' => $this->session->getId()]
+                    ]
+                );
 
-            if ($identifier) {
-                if (!$identifier->delete()) {
-                    $this->logger->log->debug($identifier->getMessages());
+                if ($identifier) {
+                    if (!$identifier->delete()) {
+                        $this->logger->log->debug($identifier->getMessages());
 
-                    return false;
+                        return false;
+                    }
+
+                    $this->setRecaller();
+
+                    return true;
                 }
+            } else {
+                $identifierStore = $this->ff->store('basepackages_users_accounts_identifiers');
 
-                $this->setRecaller();
+                $identifier = $identifierStore->findOneBy(['session_id', '=', $this->session->getId()]);
 
-                return true;
+                if ($identifier) {
+                    $identifierStore->deleteById($identifier['id']);
+
+                    $this->setRecaller();
+
+                    return true;
+                }
             }
-
 
             return false;
         }
@@ -626,7 +639,6 @@ class Auth
 
         $this->cookies->send();
 
-        //Add to db
         $newIdentifier['account_id'] = $this->account['id'];
         $newIdentifier['app'] = $this->getKey();
         $newIdentifier['session_id'] = $this->session->getId();
@@ -699,7 +711,7 @@ class Auth
                 throw new \Exception('User not found in session');
             }
 
-            if ($this->account['sessions'] && is_array($this->account['session']) && count($this->account['sessions']) > 0) {
+            if ($this->account['sessions'] && is_array($this->account['sessions']) && count($this->account['sessions']) > 0) {
                 foreach ($this->account['sessions'] as $session) {
                     if (isset($session['session_id']) && $session['session_id'] === $this->session->getId()) {
                         return true;

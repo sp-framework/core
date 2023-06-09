@@ -59,10 +59,13 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        $this->modelRelations['identifier']['relationObj'] = $this->hasOne(
+        $this->modelRelations['identifier']['relationObj'] = $this->hasOneThrough(
             'id',
-            BasepackagesUsersAccountsIdentifiers::class,
+            BasepackagesUsersAccountsSessions::class,
             'account_id',
+            ['account_id', 'session_id'],
+            BasepackagesUsersAccountsIdentifiers::class,
+            ['account_id', 'session_id'],
             [
                 'alias'         => 'identifier'
             ]

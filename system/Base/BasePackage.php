@@ -50,6 +50,8 @@ abstract class BasePackage extends Controller
 
 	protected $ffRelations = false;
 
+	protected $ffRelationsConditions = false;
+
 	public function onConstruct()
 	{
 		$this->packagesData = new PackagesData;
@@ -78,11 +80,18 @@ abstract class BasePackage extends Controller
 		$this->ffStoreToUse = $model->getSource();
 
 		$this->ffRelations = false;
+
+		$this->ffRelationsConditions = false;
 	}
 
 	public function setFFRelations(bool $set)
 	{
 		$this->ffRelations = $set;
+	}
+
+	public function setFFRelationsConditions(array $conditions)
+	{
+		$this->ffRelationsConditions = $conditions;
 	}
 
 	public function init()
@@ -231,7 +240,7 @@ abstract class BasePackage extends Controller
 		} else {
 			$this->ffStore = $this->ff->store($this->ffStoreToUse);
 
-			$this->ffData = $this->ffStore->findOneBy([$by, '=', $value], $this->ffRelations);
+			$this->ffData = $this->ffStore->findOneBy([$by, '=', $value], $this->ffRelations, $this->ffRelationsConditions);
 
 			$this->setFfStoreToUse();
 

@@ -201,7 +201,7 @@ class IpFilter extends BasePackage
 
         $app = $this->apps->getFirst('id', $this->app['id']);
 
-        $filter = $app->getBlacklist();
+        $filter = $app->getMonitorlist();
 
         if ($filter && $filter->count() > 0) {
             if ($filter->filter_type == '2') {

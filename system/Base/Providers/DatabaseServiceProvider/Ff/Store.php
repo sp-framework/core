@@ -219,7 +219,7 @@ class Store
         return $this->data;
     }
 
-    public function findOneBy(array $criteria, $getRelations = false)
+    public function findOneBy(array $criteria, $getRelations = false, $relationsConditions = false)
     {
         $qb = $this->createQueryBuilder();
 
@@ -228,7 +228,7 @@ class Store
         $result = $qb->getQuery()->first();
 
         if ($getRelations) {
-            $result = $this->getRelations($result);
+            $result = $this->getRelations($result, $relationsConditions);
         }
 
         $this->data = (!empty($result)) ? $result : null;
@@ -513,7 +513,7 @@ class Store
         return $this->data;
     }
 
-    public function getRelations($data)
+    public function getRelations($data, $conditions)
     {
         if (count($data) === 0) {
             return $data;
@@ -534,21 +534,16 @@ class Store
 
                     if (count($description) > 0) {
                         if ($description[1] === 'hasOne' || $description[1] === 'hasMany') {
+                            if (in_array('hasParams', $description) && !$conditions) {
+                                throw new InvalidArgumentException('Model has params(conditions) set. Please set ffRelationsConditions');
+                            }
+
                             if (isset($description[4])) {
-                                $fields = explode(':', $description[4]);
-
-                                if (count($fields) > 0 && count($fields) % 2 == 0) {
-                                    $fieldsArr = Arr::chunk($fields, 2);
-                                    $criteria = [];
-
-                                    foreach ($fieldsArr as $fieldArr) {
-                                        array_push($criteria, [$fieldArr[1], '=', $data[$fieldArr[0]]]);
-                                    }
-
+                                if ($conditions) {
                                     try {
                                         $store = new Store($description[2], $this->databasePath);
 
-                                        $storeData = $store->findBy($criteria);
+                                        $storeData = $store->findBy($conditions);
 
                                         if ($description[1] === 'hasOne') {
                                             $data[$description[0]] = $storeData[0];
@@ -557,6 +552,31 @@ class Store
                                         }
                                     } catch (\Exception $e) {
                                         continue;
+                                    }
+                                } else {
+                                    $fields = explode(':', $description[4]);
+
+                                    if (count($fields) > 0 && count($fields) % 2 == 0) {
+                                        $fieldsArr = Arr::chunk($fields, 2);
+                                        $criteria = [];
+
+                                        foreach ($fieldsArr as $fieldArr) {
+                                            array_push($criteria, [$fieldArr[1], '=', $data[$fieldArr[0]]]);
+                                        }
+
+                                        try {
+                                            $store = new Store($description[2], $this->databasePath);
+
+                                            $storeData = $store->findBy($criteria);
+
+                                            if ($description[1] === 'hasOne') {
+                                                $data[$description[0]] = $storeData[0];
+                                            } else if ($description[1] === 'hasMany') {
+                                                $data[$description[0]] = $storeData;
+                                            }
+                                        } catch (\Exception $e) {
+                                            continue;
+                                        }
                                     }
                                 }
                             }
@@ -577,8 +597,14 @@ class Store
                                 $fieldsArr = Arr::chunk($intermediateFields, 2);
                                 $criteria = [];
 
-                                foreach ($fieldsArr as $fieldArr) {
-                                    array_push($criteria, [$fieldArr[1], '=', $data[$fieldArr[0]]]);
+                                if (count($fieldsArr) === 1) {
+                                    foreach ($fieldsArr as $fieldArr) {
+                                        array_push($criteria, [$fieldArr[1], '=', $data[$fieldArr[0]]]);
+                                    }
+                                } else {
+                                    foreach ($fieldsArr as $fieldArrKey => $fieldArr) {
+                                        array_push($criteria, [$fieldArr[$fieldArrKey], '=', $data[$fieldArr[$fieldArrKey]]]);
+                                    }
                                 }
 
                                 try {
@@ -589,8 +615,14 @@ class Store
                                     $fieldsArr = Arr::chunk($fields, 2);
                                     $criteria = [];
 
-                                    foreach ($fieldsArr as $fieldArr) {
-                                        array_push($criteria, [$fieldArr[1], '=', $storeData[$fieldArr[0]]]);
+                                    if (count($fieldsArr) === 1) {
+                                        foreach ($fieldsArr as $fieldArr) {
+                                            array_push($criteria, [$fieldArr[1], '=', $storeData[$fieldArr[0]]]);
+                                        }
+                                    } else {
+                                        foreach ($fieldsArr as $fieldArrKey => $fieldArr) {
+                                            array_push($criteria, [$fieldArr[$fieldArrKey], '=', $storeData[$fieldArr[$fieldArrKey]]]);
+                                        }
                                     }
 
                                     $store = new Store($description[3][0], $this->databasePath);

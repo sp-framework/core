@@ -50,24 +50,6 @@ class ServiceProviderApps extends BaseModel
             ]
         );
 
-        $this->modelRelations['blacklist']['relationObj'] = $this->hasOne(
-            'id',
-            ServiceProviderAppsIpFilter::class,
-            'app_id',
-            [
-                'alias'         => 'blacklist',
-                'params'        => function() use ($clientAddress) {
-                    return
-                    [
-                        'conditions'        => 'ip_address = :ipaddress:',
-                        'bind'              => [
-                            'ipaddress'     => $clientAddress
-                        ]
-                    ];
-                }
-            ]
-        );
-
         $this->modelRelations['monitorlist']['relationObj'] = $this->hasOne(
             'id',
             ServiceProviderAppsIpFilter::class,

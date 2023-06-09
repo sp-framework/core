@@ -152,7 +152,6 @@ class Ff
                                 $references[$relationKey]['alias'] = $relation['relationObj']->getOptions()['alias'];
                             }
 
-
                             switch ($relation['relationObj']->getType()) {
                                 case '1':
                                     $references[$relationKey]['type'] = 'hasOne';
@@ -204,6 +203,10 @@ class Ff
                                 } else if (is_string($fields) && is_string($referencedFields)) {
                                     $references[$relationKey][1]['fields'] = [$fields, $referencedFields];
                                 }
+                            }
+
+                            if (isset($relation['relationObj']->getOptions()['params'])) {
+                                $references[$relationKey]['params'] = 'hasParams';
                             }
                         }
                     }
