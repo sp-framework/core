@@ -233,7 +233,8 @@ class Notifications extends BasePackage
 
     protected function getNotificationsCount()
     {
-        return $this->getByParams(
+        if ($this->config->databasetype === 'db') {
+            $conditions =
                 [
                     'conditions'    =>
                         'app_id = :appId: AND account_id = :aId: AND read = :read: AND archive = :archive:',
@@ -244,8 +245,20 @@ class Notifications extends BasePackage
                             'read'          => 0,
                             'archive'       => 0
                         ]
-                ], false, false
-            );
+                ];
+        } else {
+            $conditions =
+                [
+                    'conditions'    => [
+                        ['app_id', '=', $this->apps->getAppInfo()['id']],
+                        ['account_id', '=', $this->auth->account()['id']],
+                        ['read', '=', 0],
+                        ['archive', '=', 0]
+                    ]
+                ];
+        }
+
+        return $this->getByParams($conditions, false, false);
     }
 
     public function changeNotificationState(array $data)

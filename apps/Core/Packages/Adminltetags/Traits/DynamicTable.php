@@ -40,18 +40,12 @@ trait DynamicTable {
         if ($this->request->isGet()) {
             $table = [];
 
-            if (isset($package->getModelsColumnMap($this->removeEscapeFromName($columnsForTable))['columns'])) {
-                $table['columns'] =
-                    $this->sortColumns(
-                        $columnsForTable,
-                        $package->getModelsColumnMap($this->removeEscapeFromName($columnsForTable))['columns']
-                    );
+            $modelsColumnMap = $package->getModelsColumnMap($this->removeEscapeFromName($columnsForTable));
+
+            if (isset($modelsColumnMap['columns'])) {
+                $table['columns'] = $this->sortColumns($columnsForTable, $modelsColumnMap['columns']);
             } else {
-                $table['columns'] =
-                    $this->sortColumns(
-                        $columnsForTable,
-                        $package->getModelsColumnMap($this->removeEscapeFromName($columnsForTable))
-                    );
+                $table['columns'] = $this->sortColumns($columnsForTable, $modelsColumnMap);
             }
 
             if ($dtReplaceColumnsTitle && count($dtReplaceColumnsTitle) > 0) {
@@ -79,19 +73,14 @@ trait DynamicTable {
                     $filtersArr = $this->basepackages->filters->getFiltersForComponent($componentId);
                 }
 
-                if (isset($package->getModelsColumnMap($this->removeEscapeFromName($columnsForFilter))['columns'])) {
-                    $table['filterColumns'] =
-                        $this->sortColumns(
-                            $columnsForFilter,
-                            $package->getModelsColumnMap($this->removeEscapeFromName($columnsForFilter))['columns']
-                        );
+                $modelsColumnMap = $package->getModelsColumnMap($this->removeEscapeFromName($columnsForFilter));
+
+                if (isset($modelsColumnMap['columns'])) {
+                    $table['filterColumns'] = $this->sortColumns($columnsForFilter, $modelsColumnMap['columns']);
                 } else {
-                    $table['filterColumns'] =
-                        $this->sortColumns(
-                            $columnsForFilter,
-                            $package->getModelsColumnMap($this->removeEscapeFromName($columnsForFilter))
-                        );
+                    $table['filterColumns'] = $this->sortColumns($columnsForFilter, $modelsColumnMap);
                 }
+
                 foreach ($filtersArr as $key => $filter) {
                     $table['filters'][$filter['id']] = $filter;
                     $table['filters'][$filter['id']]['data']['name'] = $filter['name'];
@@ -143,7 +132,6 @@ trait DynamicTable {
             }
 
             $this->view->table = $table;
-
         } else if ($this->request->isPost()) {
             $conditions =
                 [
@@ -227,7 +215,6 @@ trait DynamicTable {
                     $row["__control"] = $actions;
                 }
             }
-
             $adminltetags = new Adminltetags();
 
             $this->view->rows =

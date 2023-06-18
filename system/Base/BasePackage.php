@@ -328,11 +328,58 @@ abstract class BasePackage extends Controller
 				}
 			}
 
-			throw new \Exception('getByParams needs parameter condition to be set.');
+			throw new \Exception('getByParams needs parameter conditions to be set.');
 		} else {
 			$this->ffStore = $this->ff->store($this->ffStoreToUse);
 
-			$this->ffData = $this->ffStore->findBy($params);
+			$relationColumns = [];
+
+			if (isset($params['columns']) && count($params['columns']) > 0) {
+				$modelMetaData = $this->getModelsMetaData();
+				$storeRelations = $this->getModelsRelations()['storeRelations'];
+
+				foreach ($params['columns'] as $columnKey => $column) {
+					if (!in_array($column, $modelMetaData['columns'])) {
+						if ($storeRelations) {
+							foreach ($storeRelations as $modelRelationKey => $modelRelation) {
+								if (in_array($column, $modelRelation['columns'])) {
+									if (!isset($relationColumns[$modelRelationKey])) {
+										$relationColumns[$modelRelationKey] = $modelRelation;
+										$relationColumns[$modelRelationKey]['requestedColumns'] = [];
+									}
+									array_push($relationColumns[$modelRelationKey]['requestedColumns'], $column);
+									unset($params['columns'][$columnKey]);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			$limit = null;
+			$offset = null;
+
+			if (isset($params['limit'])) {
+				$limit = $params['limit'];
+			}
+			if (isset($params['offset'])) {
+				$offset = $params['offset'];
+			}
+			if (isset($params['conditions']) && is_array($params['conditions']) && count($params['conditions']) > 0) {
+				$this->ffData = $this->ffStore->findBy($params['conditions'], null, $limit, $offset);
+			} else if (isset($params['conditions']) &&
+					   ((is_array($params['conditions']) && count($params['conditions']) === 0) ||
+						 $params['conditions'] === ''
+					   )
+			) {
+				$this->ffData = $this->ffStore->findAll(null, $limit, $offset);
+			} else {
+				throw new \Exception('getByParams needs parameter conditions (array) to be set.');
+			}
+
+			if ($this->ffData && count($relationColumns) > 0) {
+				$this->ffData = $this->getRelationColumnsData($relationColumns, $this->ffData);
+			}
 
 			$this->setFfStoreToUse();
 
@@ -351,17 +398,33 @@ abstract class BasePackage extends Controller
 		}
 
 		foreach ($data as $dataKey => $row) {
-			$model = $this->getFirst('id', $row['id']);
+			if ($this->config->databasetype === 'db') {
+				$model = $this->getFirst('id', $row['id']);
+			}
 
-			foreach ($relationColumns as $relationColumnKey => $relationColumn) {
+			if (isset($model)) {
 				$alias = $relationColumn['relationObj']->getOption('alias');
 
 				if ($model->{$alias}) {
 					$relationRowData = $model->{$alias}->toArray();
+				}
+			} else {
+				$relationRowData = $this->ffStore->findById($row['id'], true);
+			}
 
-					foreach ($relationRowData as $relationRowKey => $relationRow) {
-						if (in_array($relationRowKey, $relationColumn['requestedColumns'])) {
-							$data[$dataKey][$relationRowKey] = $relationRow;
+			foreach ($relationColumns as $relationColumnKey => $relationColumn) {
+				if (isset($relationRowData) && is_array($relationRowData) && count($relationRowData) > 0) {
+					foreach ($relationRowData as $relationRowKeys => $relationRows) {
+						if (is_array($relationRows)) {
+							foreach ($relationRows as $relationRowKey => $relationRow) {
+								if (!is_array($relationRow) && in_array($relationRowKey, $relationColumn['requestedColumns'])) {
+									$data[$dataKey][$relationRowKey] = $relationRow;
+								}
+							}
+						} else {
+							if (in_array($relationRowKeys, $relationColumn['requestedColumns'])) {
+								$data[$dataKey][$relationRowKeys] = $relationRows;
+							}
 						}
 					}
 				}
@@ -441,7 +504,6 @@ abstract class BasePackage extends Controller
 						0,
 				]
 			);
-
 		if (!$arrayData &&
 			isset($pageParams['conditions']) && $pageParams['conditions'] !== ''
 		) {
@@ -464,7 +526,6 @@ abstract class BasePackage extends Controller
 			$data = $this->getByParams($params, $resetCache, $enableCache);
 		}
 
-		// var_dump($data);die();
 		if ($data) {
 			$pageParams['data'] = $data;
 		} else {
@@ -479,11 +540,19 @@ abstract class BasePackage extends Controller
 			if (is_array($arrayData)) {
 				$paginationCounters['total_items'] = count($arrayData);
 			} else {
-				$paginationCounters['total_items'] = $this->modelToUse::count();
+				if ($this->config->databasetype === 'db') {
+					$paginationCounters['total_items'] = $this->modelToUse::count();
+				} else {
+					$paginationCounters['total_items'] = $this->ffStore->count();
+				}
 			}
 
 			if ($this->filterConditions) {
-				$paginationCounters['filtered_items'] = $this->modelToUse::count($this->filterConditions);
+				if ($this->config->databasetype === 'db') {
+					$paginationCounters['filtered_items'] = $this->modelToUse::count($this->filterConditions);
+				} else {
+					$paginationCounters['filtered_items'] = $this->ffStore->count($this->filterConditions);
+				}
 			} else {
 				$paginationCounters['filtered_items'] = $paginationCounters['total_items'];
 			}
@@ -882,18 +951,30 @@ abstract class BasePackage extends Controller
 		if ($data) {
 			$data = $this->jsonData($data);
 
-			${$this->packageNameModel} = $this->useModel();
+			if ($this->config->databasetype === 'db') {
+				${$this->packageNameModel} = $this->useModel();
 
-			${$this->packageNameModel}->assign($data);
+				${$this->packageNameModel}->assign($data);
 
-			$create = ${$this->packageNameModel}->create();
+				$create = ${$this->packageNameModel}->create();
+			} else {
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+				$create = $this->ffData = $this->ffStore->updateOrInsert($data);
+
+				$this->setFfStoreToUse();
+			}
 
 			if ($create) {
 				$this->packagesData->responseCode = 0;
 
 				$this->packagesData->responseMessage = "Added " . ucfirst($this->packageNameS) . "!";
 
-				$this->packagesData->last = ${$this->packageNameModel}->toArray();
+				if ($this->config->databasetype === 'db') {
+					$this->packagesData->last = ${$this->packageNameModel}->toArray();
+				} else {
+					$this->packagesData->last = $create;
+				}
 
 				if ($resetCache) {
 					$this->resetCache();
@@ -971,9 +1052,13 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	protected function jsonData(array $data, $decode = false)
+	protected function jsonData($data, $decode = false)
 	{
 		if ($decode) {
+			if (is_string($data)) {
+				$data = Json::decode($data, true);
+			}
+
 			array_walk_recursive($data, 'json_decode_recursive');
 		} else {
 			foreach ($data as $dataKey => $dataValue) {
@@ -1235,7 +1320,7 @@ abstract class BasePackage extends Controller
 
 	protected function getModelsMetaData()
 	{
-		if ($this->modelToUse) {
+		if ($this->config->databasetype === 'db' && $this->modelToUse) {
 			$model = $this->useModel();
 
 			$md = [];
@@ -1272,6 +1357,12 @@ abstract class BasePackage extends Controller
 			}
 
 			return $md;
+		} else {
+			if (!$this->ffStore) {
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+			}
+
+			return $this->ffStore->getSchemaMetaData();
 		}
 
 		return [];
@@ -1279,7 +1370,7 @@ abstract class BasePackage extends Controller
 
 	protected function getModelsRelations()
 	{
-		if ($this->modelToUse) {
+		if ($this->config->databasetype === 'db' && $this->modelToUse) {
 			$model = $this->useModel();
 
 			$relations = [];
@@ -1412,9 +1503,9 @@ abstract class BasePackage extends Controller
 			}
 
 			return $relations;
+		} else {
+			return $this->ffStore->getSchemaMetaData(true);
 		}
-
-		return [];
 	}
 
 	public function getModelsColumnMap(array $filter = [])
@@ -1423,19 +1514,27 @@ abstract class BasePackage extends Controller
 
 		$md = $this->getModelsMetaData();
 
-		$md['model'] = [];
-		$md['model']['id'] = $this->modelToUse;
+		$filteredColumns = [];
+
+		if ($this->config->databasetype === 'db') {
+			$md['model'] = [];
+			$md['model']['id'] = $this->modelToUse;
+		} else {
+			$md['ff'] = [];
+			$md['ff']['id'] = $this->ffStoreToUse;
+		}
 
 		if (count($md) > 0) {
-			$filteredColumns = [];
-
 			$rmdArr = $this->getModelsRelations();
 
 			if ($rmdArr &&
 				count($rmdArr['dataTypes']) > 0 &&
 				count($rmdArr['number']) > 0 &&
 				count($rmdArr['columns']) > 0 &&
-				count($rmdArr['modelRelations']) > 0
+				(
+					(isset($rmdArr['modelRelations']) && count($rmdArr['modelRelations']) > 0) ||
+					(isset($rmdArr['storeRelations']) && count($rmdArr['storeRelations']) > 0)
+				)
 			) {
 				foreach ($rmdArr as $rmdKey => $rmd) {
 					if ($rmdKey === 'dataTypes') {
@@ -1451,7 +1550,11 @@ abstract class BasePackage extends Controller
 					if ($rmdKey === 'columns') {
 						if (count($rmd) > 0) {
 							foreach ($md['columns'] as $mdc) {
-								$md['model'][$mdc] = $this->modelToUse;
+								if ($this->config->databasetype === 'db') {
+									$md['model'][$mdc] = $this->modelToUse;
+								} else {
+									$md['ff'][$mdc] = $this->ffStoreToUse;
+								}
 							}
 
 							$md['columns'] = array_merge($md['columns'], $rmd);
@@ -1483,6 +1586,17 @@ abstract class BasePackage extends Controller
 							}
 						}
 					}
+					if ($rmdKey === 'storeRelations') {
+						if (count($rmd) > 0) {
+							foreach ($rmd as $rmdModel) {
+								foreach ($rmdModel['columns'] as $rmdModelColumn) {
+									if ($rmdModelColumn !== 'id') {
+										$md['ff'][$rmdModelColumn] = $rmdModel['relationStore'];
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 
@@ -1506,10 +1620,6 @@ abstract class BasePackage extends Controller
 					}
 
 					$metadata[$filteredColumn]['data']['dataType'] = $md['dataTypes'][$filteredColumn];
-
-					// if (isset($md['model'][$filteredColumn])) {
-					// 	$metadata[$filteredColumn]['data']['model'] = $md['model'][$filteredColumn];
-					// }
 				}
 
 				return $metadata;

@@ -211,7 +211,6 @@ class Setup
 				$this->dbConfig['db']['username'] = $this->postData['create-username'];
 				$this->dbConfig['db']['password'] = $this->postData['create-password'];
 				$this->dbConfig['db']['dbname'] = 'mysql';
-		$this->PROPERTY = $PROPERTY;
 			}
 
 			$this->db = new Mysql($this->dbConfig['db']);
@@ -573,7 +572,7 @@ class Setup
 					$tableName = $tableClass['model']->getSource();
 				}
 
-				$config = $this->ff->generateConfig($tableName, $tableClass['schema'], $tableClass['model']);
+				$config = $this->ff->generateConfig($tableName, $tableClass['schema'], $tableClass['model'], $this->db);
 				$schema = $this->ff->generateSchema($tableName, $tableClass['schema'], $tableClass['model']);
 
 				$this->ff->store($tableName, $config, $schema)->deleteStore();

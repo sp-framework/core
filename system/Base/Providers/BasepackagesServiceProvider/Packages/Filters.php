@@ -46,16 +46,20 @@ class Filters extends BasePackage
 
     protected function checkShowAllFilters(int $componentId)
     {
-        return
-            $this->getByParams(
-                [
-                    'conditions'    => 'component_id = :cid: AND auto_generated = :ag:',
-                    'bind'          => [
-                        'cid'       => $componentId,
-                        'ag'        => 1
-                    ]
-                ], true
-            );
+        if ($this->config->databasetype === 'db') {
+            return
+                $this->getByParams(
+                    [
+                        'conditions'    => 'component_id = :cid: AND auto_generated = :ag:',
+                        'bind'          => [
+                            'cid'       => $componentId,
+                            'ag'        => 1
+                        ]
+                    ], true
+                );
+        } else {
+            return $this->getByParams(['conditions' => [['component_id', '=', $componentId], ['auto_generated', '=', 1]]]);
+        }
     }
 
     protected function getFilters(int $componentId, array $account = null)
@@ -69,17 +73,34 @@ class Filters extends BasePackage
         }
 
         if ($account && isset($account['id'])) {
-            $filtersArr =
-                $this->getByParams(
-                    [
-                        'conditions'    => 'component_id = :cid: AND (account_id = :aid: OR account_id = :aid0:)',
-                        'bind'          => [
-                            'cid'       => $componentId,
-                            'aid'       => $account['id'],
-                            'aid0'      => 0
+            if ($this->config->databasetype === 'db') {
+                $filtersArr =
+                    $this->getByParams(
+                        [
+                            'conditions'    => 'component_id = :cid: AND (account_id = :aid: OR account_id = :aid0:)',
+                            'bind'          => [
+                                'cid'       => $componentId,
+                                'aid'       => $account['id'],
+                                'aid0'      => 0
+                            ]
+                        ], true
+                    );
+            } else {
+                $filtersArr =
+                    $this->getByParams(
+                        [
+                            'conditions'    =>
+                                [
+                                    ['component_id', '=', $componentId],
+                                ],
+                                [
+                                    ['account_id', '=', $account['id']],
+                                    'OR',
+                                    ['account_id', '=', 0],
+                                ]
                         ]
-                    ], true
-                );
+                    );
+            }
 
             $myFilters = [];
 
@@ -153,15 +174,27 @@ class Filters extends BasePackage
                 }
             }
 
-            $sharedFiltersArr =
-                $this->getByParams(
-                    [
-                        'conditions'    => 'component_id = :cid: AND shared_ids IS NOT NULL',
-                        'bind'          => [
-                            'cid'       => $componentId
+            if ($this->config->databasetype === 'db') {
+                $sharedFiltersArr =
+                    $this->getByParams(
+                        [
+                            'conditions'    => 'component_id = :cid: AND shared_ids IS NOT NULL',
+                            'bind'          => [
+                                'cid'       => $componentId
+                            ]
                         ]
-                    ]
-                );
+                    );
+            } else {
+                $sharedFiltersArr =
+                    $this->getByParams(
+                        [
+                            'conditions'    => [
+                                ['component_id', '=', $componentId],
+                                ['shared_ids', '!=', null]
+                            ]
+                        ]
+                    );
+            }
 
             if ($sharedFiltersArr) {//Shared By Others
                 foreach ($sharedFiltersArr as $filterKey => $filter) {
@@ -233,22 +266,31 @@ class Filters extends BasePackage
                 if (isset($sharedFilters)) {
                     return array_merge($filters, $sharedFilters);
                 }
-
-                return $filters;
             }
 
             return $filters;
         }
 
-        $filtersArr =
-            $this->getByParams(
-                [
-                    'conditions'    => 'component_id = :cid:',
-                    'bind'          => [
-                        'cid'       => $componentId
+        if ($this->config->databasetype === 'db') {
+            $filtersArr =
+                $this->getByParams(
+                    [
+                        'conditions'    => 'component_id = :cid:',
+                        'bind'          => [
+                            'cid'       => $componentId
+                        ]
                     ]
-                ]
-            );
+                );
+        } else {
+            $filtersArr =
+                $this->getByParams(
+                    [
+                        'conditions'    => [
+                            ['component_id', '=', $componentId]
+                        ]
+                    ]
+                );
+        }
 
         $sortedFilters = [];
 
@@ -289,7 +331,6 @@ class Filters extends BasePackage
             $this->addFilterForEmailQueue($component);
         }
 
-
         $this->addFilter(
             [
                 'name'              => 'Show All ' . $component['name'],
@@ -317,15 +358,21 @@ class Filters extends BasePackage
             ];
 
         foreach ($conditions as $conditionKey => $condition) {
-            $filterCondition =
-                [
-                    'conditions'    => 'conditions = :conditions:',
-                    'bind'          =>
-                        [
-                            'conditions'   => $condition
-                        ]
-                ];
+            if ($this->config->databasetype === 'db') {
+                $filterCondition =
+                    [
+                        'conditions'    => 'conditions = :conditions:',
+                        'bind'          =>
+                            [
+                                'conditions'   => $condition
+                            ]
+                    ];
+            } else {
+                $filterCondition = ['conditions' => ['conditions', '=', $condition]];
+            }
+
             $filter = $this->getByParams($filterCondition);
+
             if (!$filter) {
                 if ($conditionKey === 'all_unread') {
                     $name = 'Show All Unread ' . $component['name'];
@@ -364,15 +411,21 @@ class Filters extends BasePackage
             ];
 
         foreach ($conditions as $conditionKey => $condition) {
-            $filterCondition =
-                [
-                    'conditions'    => 'conditions = :conditions:',
-                    'bind'          =>
-                        [
-                            'conditions'   => $condition
-                        ]
-                ];
+            if ($this->config->databasetype === 'db') {
+                $filterCondition =
+                    [
+                        'conditions'    => 'conditions = :conditions:',
+                        'bind'          =>
+                            [
+                                'conditions'   => $condition
+                            ]
+                    ];
+            } else {
+                $filterCondition = ['conditions' => ['conditions', '=', $condition]];
+            }
+
             $filter = $this->getByParams($filterCondition);
+
             if (!$filter) {
                 if ($conditionKey === 'all_in_queue') {
                     $name = 'Show All In Queue Emails';
@@ -417,15 +470,21 @@ class Filters extends BasePackage
             ];
 
         foreach ($conditions as $conditionKey => $condition) {
-            $filterCondition =
-                [
-                    'conditions'    => 'conditions = :conditions:',
-                    'bind'          =>
-                        [
-                            'conditions'   => $condition
-                        ]
-                ];
+            if ($this->config->databasetype === 'db') {
+                $filterCondition =
+                    [
+                        'conditions'    => 'conditions = :conditions:',
+                        'bind'          =>
+                            [
+                                'conditions'   => $condition
+                            ]
+                    ];
+            } else {
+                $filterCondition = ['conditions' => ['conditions', '=', $condition]];
+            }
+
             $filter = $this->getByParams($filterCondition);
+
             if (!$filter) {
                 if ($conditionKey === 'all_scheduled_and_running') {
                     $name = 'Show All Scheduled and Running Jobs';
@@ -656,26 +715,34 @@ class Filters extends BasePackage
         $account = $this->auth->account();
 
         if ($account) {
-            $params =
-                [
-                    'conditions'    => 'component_id = :cid: AND is_default = :isd: AND account_id = :aid:',
-                    'bind'          =>
-                        [
-                            'cid'   => $componentId,
-                            'isd'   => '1',
-                            'aid'   => $account['id']
-                        ]
-                ];
+            if ($this->config->databasetype === 'db') {
+                $params =
+                    [
+                        'conditions'    => 'component_id = :cid: AND is_default = :isd: AND account_id = :aid:',
+                        'bind'          =>
+                            [
+                                'cid'   => $componentId,
+                                'isd'   => '1',
+                                'aid'   => $account['id']
+                            ]
+                    ];
+            } else {
+                $params = ['conditions' => [['component_id', '=', $componentId], ['is_default', '=', 1], ['account_id', '=', $account['id']]]];
+            }
         } else {
-            $params =
-                [
-                    'conditions'    => 'component_id = :cid: AND is_default = :isd:',
-                    'bind'          =>
-                        [
-                            'cid'   => $componentId,
-                            'isd'   => '1'
-                        ]
-                ];
+            if ($this->config->databasetype === 'db') {
+                $params =
+                    [
+                        'conditions'    => 'component_id = :cid: AND is_default = :isd:',
+                        'bind'          =>
+                            [
+                                'cid'   => $componentId,
+                                'isd'   => '1'
+                            ]
+                    ];
+            } else {
+                $params = ['conditions' => [['component_id', '=', $componentId], ['is_default', '=', 1]]];
+            }
         }
 
         $this->defaultFilter = $this->getByParams($params, true);

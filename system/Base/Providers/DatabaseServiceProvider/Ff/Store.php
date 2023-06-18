@@ -93,9 +93,98 @@ class Store
         return true;
     }
 
-    public function getSchema()
+    public function getSchemaMetaData($relations = false)
     {
-        return $this->schema;
+        $schemaArr = $this->getStoreSchema();
+
+        if ($relations) {
+            $rmd = [];
+            $rmd['dataTypes'] = [];
+            $rmd['number'] = [];
+            $rmd['columns'] = [];
+            $rmd['columnSize'] = [];
+            $rmd['columnUnique'] = [];
+            $rmd['storeRelations'] = [];
+
+            if (isset($schemaArr['properties'])) {
+                foreach ($schemaArr['properties'] as $column => $property) {
+                    if (isset($property['type'][1]) && $property['type'][1] === 'array') {
+                        if (isset($property['description'])) {
+                            $description = explode('|', $property['description']);
+
+                            if (count($description) > 0 && isset($description[2])) {
+                                try {
+                                    $relationsStore = new Store($description[2], $this->databasePath);
+
+                                    $rmd = array_replace_recursive($rmd, $relationsStore->getSchemaMetaData());
+
+                                    $rmd['storeRelations'][$column] = [];
+                                    $rmd['storeRelations'][$column] = $relationsStore->getSchemaMetaData();
+                                    $rmd['storeRelations'][$column]['relationStore'] = $description[2];
+                                } catch (\Exception $e) {
+                                    //
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return $rmd;
+        } else {
+            $md = [];
+            $md['dataTypes'] = [];
+            $md['number'] = [];
+            $md['columns'] = [];
+            $md['columnSize'] = [];
+
+            if (isset($schemaArr['properties'])) {
+                foreach ($schemaArr['properties'] as $column => $property) {
+                    if (isset($property['type'][1]) && $property['type'][1] === 'array') {
+                        continue;
+                    }
+
+                    if (!is_array($property['type'])) {
+                        $md['dataTypes'][$column] = $property['type'];
+                    } else {
+                        if (!in_array('null', $property['type'])) {
+                            array_push($md['required'], $column);
+                        }
+
+                        foreach ($property['type'] as $type) {
+                            if ($type !== 'null') {
+                                $md['dataTypes'][$column] = $type;
+                            }
+                        }
+                    }
+
+                    if ($md['dataTypes'][$column] === 'integer' || $md['dataTypes'][$column] === 'number') {
+                        $md['number'][$column] = true;
+                    }
+
+                    $md['columns'][$column] = $column;
+
+                    if (isset($property['maxLength'])) {
+                        $md['columnSize'][$column] = $property['maxLength'];
+                    } else {
+                        $md['columnSize'][$column] = 0;
+                    }
+                }
+            }
+
+            $md['columnUnique'] = $this->uniqueFields;
+
+            return $md;
+        }
+    }
+
+    public function getStoreSchema()
+    {
+        if (is_string($this->storeSchema)) {
+            return json_decode($this->storeSchema, true);
+        }
+
+        return $this->storeSchema;
     }
 
     public function toArray()
@@ -183,7 +272,7 @@ class Store
         return $this->data;
     }
 
-    public function findById($id)
+    public function findById($id, $getRelations = false, $relationsConditions = false)
     {
         $id = $this->checkAndStripId($id);
 
@@ -193,9 +282,15 @@ class Store
             return null;
         }
 
-        $this->data = @json_decode($content, true);
+        $data = @json_decode($content, true);
 
-        return $this->data;
+        if ($getRelations) {
+            $data = $this->getRelations($data, $relationsConditions);
+        }
+
+        $this->data = $data;
+
+        return $data;
     }
 
     public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null): array

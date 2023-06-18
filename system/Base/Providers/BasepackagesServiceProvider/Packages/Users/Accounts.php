@@ -498,15 +498,22 @@ class Accounts extends BasePackage
             $domains[$key] = $domain['name'];
         }
 
-        $searchAccounts =
-            $this->getByParams(
+        if ($this->config->databasetype === 'db') {
+            $conditions =
                 [
                     'conditions'    => 'email LIKE :aEmail:',
                     'bind'          => [
                         'aEmail'     => '%' . $emailQueryString . '%'
                     ]
-                ]
-            );
+                ];
+        } else {
+            $conditions =
+                [
+                    'conditions' => ['email', 'LIKE', '%' . $emailQueryString . '%']
+                ];
+        }
+
+        $searchAccounts = $this->getByParams($conditions);
 
         if ($searchAccounts && count($searchAccounts) > 0) {
             $accounts = [];
@@ -624,7 +631,7 @@ class Accounts extends BasePackage
         if ($this->ffData) {
             $this->ffStoreToUse = 'basepackages_users_accounts_canlogin';
 
-            $this->getByParams([['account_id', '=', $id],['app_id', '=', $appId]]);
+            $this->getByParams(['conditions' => [['account_id', '=', $id],['app_id', '=', $appId]]]);
 
             $canLogin = $this->ffData;
         }

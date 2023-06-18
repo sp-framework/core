@@ -87,15 +87,19 @@ class EmailQueue extends BasePackage
 
         $hadErrors = false;
 
-        $conditions =
-            [
-                'conditions'    => 'status = :status: AND priority = :priority:',
-                'bind'          =>
+        if ($this->config->databasetype === 'db') {
+                $conditions =
                     [
-                        'status'    => self::STATUS_IN_QUEUE,
-                        'priority'  => $this->priorityToProcess
-                    ]
-            ];
+                        'conditions'    => 'status = :status: AND priority = :priority:',
+                        'bind'          =>
+                            [
+                                'status'    => self::STATUS_IN_QUEUE,
+                                'priority'  => $this->priorityToProcess
+                            ]
+                    ];
+            } else {
+                $conditions = ['conditions' => [['status', '=', self::STATUS_IN_QUEUE], ['priority', '=', $this->priorityToProcess]]];
+            }
 
         $queue = $this->getByParams($conditions, true, false);
 
