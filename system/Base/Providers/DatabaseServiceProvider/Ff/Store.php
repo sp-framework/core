@@ -69,7 +69,7 @@ class Store
 
         $this->storePath = $this->databasePath . $this->storeName;
 
-        if (count($configuration) === 0 && count($schema) === 0) {
+        if (count($schema) === 0) {
             $this->checkStore($storeName);
         }
 

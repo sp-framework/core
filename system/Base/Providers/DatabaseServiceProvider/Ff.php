@@ -41,9 +41,9 @@ class Ff
     {
         $this->config = [];
 
-        if (count($config) > 0) {
-            $this->config = array_merge($this->config, $this->cacheConfig);
+        $this->config = array_merge($this->config, $this->cacheConfig);
 
+        if (count($config) > 0) {
             $this->config = array_replace_recursive($this->config, $config);
         }
 
