@@ -173,7 +173,7 @@ var BazTunnels = function() {
 
                     BazHelpers.setTimeoutTimers.add(function() {
                         initPusherTunnel(options);
-                    }, 10000, null, 'initPusherTunnel');
+                    }, 60000, null, 'initPusherTunnel');
                 },
                 {
                     'skipSubprotocolCheck': true

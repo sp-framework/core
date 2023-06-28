@@ -389,185 +389,58 @@
                 BazProgress.buildProgressBar($('#installer-progress'), true);
             <?php } else { ?>
                 BazProgress.buildProgressBar($('#installer-progress'));
+
+                $('#databasetype').change(function() {
+                    if ($('#databasetype').find(':selected').val() === 'ff') {
+                        $('#mysql').attr('hidden', true);
+                    } else {
+                        $('#mysql').attr('hidden', false);
+                    }
+                });
+
+                $('#create, #create-grant').click(function() {
+                    if ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) {
+                        $('#create-username, #create-password').attr('disabled', false);
+                    } else if ($('#create')[0].checked === false && $('#create-grant')[0].checked === false) {
+                        $('#create-username, #create-password').attr('disabled', true);
+                    }
+                });
             <?php } ?>
+
             BazTunnels.initPusherTunnel({'tunnelsToInit' : ['progress']});
-
-            $('#databasetype').change(function() {
-                if ($('#databasetype').find(':selected').val() === 'ff') {
-                    $('#mysql').attr('hidden', true);
-                } else {
-                    $('#mysql').attr('hidden', false);
-                }
-            });
-
-            $('#create, #create-grant').click(function() {
-                if ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) {
-                    $('#create-username, #create-password').attr('disabled', false);
-                } else if ($('#create')[0].checked === false && $('#create-grant')[0].checked === false) {
-                    $('#create-username, #create-password').attr('disabled', true);
-                }
-            });
 
             $('#submit, #update').click(function(e) {
                 e.preventDefault();
 
-                var onlyFf = false;
+                $(this).attr('disabled', true);
+                $('#submit-spinner, #update-spinner').attr('hidden', false);
+                $('#alert').attr('hidden', true);
 
-                if ($('#databasetype').find(':selected').val() === 'ff') {
-                    onlyFf = true;
-                }
-
-                if ($('#host').val() === '' && !onlyFf) {
-                    $('#host').addClass('is-invalid');
-                    $('#host').focus(function() {
-                        $(this).removeClass('is-invalid');
-                    });
-                } else if ($('#port').val() === '' && !onlyFf) {
-                    $('#port').addClass('is-invalid');
-                    $('#port').focus(function() {
-                        $(this).removeClass('is-invalid');
-                    });
-                } else if ($('#dbname').val() === '' && !onlyFf) {
-                    $('#dbname').addClass('is-invalid');
-                    $('#dbname').focus(function() {
-                        $(this).removeClass('is-invalid');
-                    });
-                } else if ($('#charset').val() === '' && !onlyFf) {
-                    $('#charset').addClass('is-invalid');
-                    $('#charset').focus(function() {
-                        $(this).removeClass('is-invalid');
-                    });
-                } else if ($('#collation').val() === '' && !onlyFf) {
-                    $('#collation').addClass('is-invalid');
-                    $('#collation').focus(function() {
-                        $(this).removeClass('is-invalid');
-                    });
-                } else if ($('#username').val() === '' && !onlyFf) {
-                    $('#username').addClass('is-invalid');
-                    $('#username').focus(function() {
-                        $(this).removeClass('is-invalid');
-                    });
-                } else if ($('#password').val() === '' && !onlyFf) {
-                    $('#password').addClass('is-invalid');
-                    $('#password').focus(function() {
-                        $(this).removeClass('is-invalid');
-                    });
-                } else if (($('#create').length > 0 && $('#create-grant').length > 0) &&
-                           ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
-                           $('#create-username').val() === '' && !onlyFf) {
-                    $('#create-username').addClass('is-invalid');
-                    $('#create-username').focus(function() {
-                        $(this).removeClass('is-invalid');
-                    });
-                } else if (($('#create').length > 0 && $('#create-grant').length > 0) &&
-                           ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
-                           $('#create-password').val() === '' && !onlyFf) {
-                    $('#create-password').addClass('is-invalid');
-                    $('#create-password').focus(function() {
-                        $(this).removeClass('is-invalid');
-                    });
-                } else if ($('#email').val() === '') {
-                    $('#email').addClass('is-invalid');
-                    $('#email').focus(function() {
-                        $(this).removeClass('is-invalid');
-                    });
-                } else if ($('#pass').val() === '') {
-                    $('#pass').addClass('is-invalid');
-                    $('#pass').focus(function() {
-                        $(this).removeClass('is-invalid');
-                    });
-                } else if ($('#pwf').val() === '') {
-                    $('#pwf').addClass('is-invalid');
-                    $('#pwf').focus(function() {
-                        $(this).removeClass('is-invalid');
-                    });
-                } else if ($('#cwf').val() === '') {
-                    $('#cwf').addClass('is-invalid');
-                    $('#cwf').focus(function() {
-                        $(this).removeClass('is-invalid');
-                    });
-                } else {
-                    $(this).attr('disabled', true);
-                    $('#submit-spinner, #update-spinner').attr('hidden', false);
-                    $('#alert').attr('hidden', true);
-                    $('.installer-progress-bar').removeClass(function (index, className) {
-                        return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
-                    }).addClass('bg-info');
-
-                    var data = { };
-                    if ($('#databasetype').find(':selected').val() !== 'ff') {
-                        data = $.extend(data,
-                            {
-                                "host"                  : $('#host').val(),
-                                "port"                  : $('#port').val(),
-                                "dbname"                : $('#dbname').val(),
-                                "charset"               : $('#charset').val(),
-                                "collation"             : $('#collation').val(),
-                                "username"              : $('#username').val(),
-                                "password"              : $('#password').val(),
-                                "drop"                  : $('#drop')[0].checked,
-                            });
-                        if ($('#create').length > 0 && $('#create')[0].checked === true) {
-                            data = $.extend(data,
-                            {
-                                "create-username"       : $('#create-username').val(),
-                                "create-password"       : $('#create-password').val(),
-                                "create-db"             : $('#create')[0].checked,
-                                "create-user"           : $('#create-grant')[0].checked
-                            });
-                        }
-                    }
-                <?php if (!$onlyUpdateDb && !$precheckFail) { ?>
-                    data = $.extend(data,
-                        {
-                            "email"                 : $('#email').val(),
-                            "pass"                  : $('#pass').val(),
-                            "pwf"                   : $('#pwf').val(),
-                            "cwf"                   : $('#cwf').val(),
-                            "auto-encrypt-level"    : $('#auto-encrypt-level')[0].checked,
-                            "dev"                   : $('#dev')[0].checked,
-                            "databasetype"          : $('#databasetype').val(),
-                            "country"               : $('#country').val(),
-                            "ip2location"           : $('#ip2location')[0].checked
-                        });
-                <?php } ?>
-                    $('.installer-progress-bar').css('width', '0%');
-                    $('.installer-progress-bar').attr('aria-valuenow', 0);
-                    $('.progress-bar').addClass('progress-bar-animated');
+                <?php if ($precheckFail) { ?>
                     $('#external-data').val('Downloading & installing external packages...');
+
                     $.ajax({
                         type    : 'POST',
                         url     : '/',
-                        data    : data,
+                        data    : {},
                         dataType: 'json',
                         success: function (data) {
                             if (data && data.responseCode === 0) {
-                                var alert = 'alert-success';
-
                                 $('#alert').attr('hidden', false);
                                 $('#alert').html('');
-                                if ($('#access').is('.btn-warning')) {
-                                    alert = 'alert-warning';
-                                }
                                 $('#alert').removeClass(function (index, className) {
                                     return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
-                                }).addClass(alert).html(data.responseMessage);
+                                }).addClass('alert-success').html(data.responseMessage);
                                 $('#access').attr('disabled', false);
-                                <?php if ($onlyUpdateDb) { ?>
-                                    $('#access-div').attr('hidden', false);
-                                    $('#access').addClass('btn-success');
-                                    $('#access').children('i').addClass('fa-check');
-                                <?php } ?>
-                                $('#update-div').attr('hidden', true);
-                                $('#submit-spinner, #update-spinner').attr('hidden', true);
+                                $('#submit-spinner').attr('hidden', true);
                             } else if (data.responseCode === 1 || data.responseCode === 2 || data.responseCode === 3) {
                                 $('#alert').attr('hidden', false);
                                 $('#alert').html('');
                                 $('#alert').removeClass(function (index, className) {
                                     return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
                                 }).addClass('alert-danger').html(data.responseMessage);
-                                $('#submit, #update').attr('disabled', false);
-                                $('#submit-spinner, #update-spinner').attr('hidden', true);
+                                $('#submit').attr('disabled', false);
+                                $('#submit-spinner').attr('hidden', true);
 
                                 if (data.responseCode === 3) {
                                     BazProgress.getProgress({
@@ -588,14 +461,204 @@
                                     return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
                                 }).addClass('alert-danger').html(data.responseJSON.responseMessage);
                             }
-                            $('#submit, #update').attr('disabled', false);
-                            $('#submit-spinner, #update-spinner').attr('hidden', true);
+                            $('#submit').attr('disabled', false);
+                            $('#submit-spinner').attr('hidden', true);
                             $('#external-div').attr('hidden', true);
                             $('#external-data').val('Downloading & installing external packages...');
                         }
                     });
-                <?php if (!$onlyUpdateDb) { ?>
+
+                    var timeout = 0;
+
                     if (BazProgress.isOnline() === false) {
+                        timeout = 1000;
+                    }
+
+                    setTimeout(function() {
+                        BazProgress.getProgress({
+                            'url' : '/',
+                            'postData' : {
+                                'session' : $('#session-token').val(),
+                                'composer': true
+                            }
+                        });
+                    }, timeout);
+                <?php } else { ?>
+                    var onlyFf = false;
+
+                    if ($('#databasetype').find(':selected').val() === 'ff') {
+                        onlyFf = true;
+                    }
+
+                    if ($('#host').val() === '' && !onlyFf) {
+                        $('#host').addClass('is-invalid');
+                        $('#host').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#port').val() === '' && !onlyFf) {
+                        $('#port').addClass('is-invalid');
+                        $('#port').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#dbname').val() === '' && !onlyFf) {
+                        $('#dbname').addClass('is-invalid');
+                        $('#dbname').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#charset').val() === '' && !onlyFf) {
+                        $('#charset').addClass('is-invalid');
+                        $('#charset').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#collation').val() === '' && !onlyFf) {
+                        $('#collation').addClass('is-invalid');
+                        $('#collation').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#username').val() === '' && !onlyFf) {
+                        $('#username').addClass('is-invalid');
+                        $('#username').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#password').val() === '' && !onlyFf) {
+                        $('#password').addClass('is-invalid');
+                        $('#password').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if (($('#create').length > 0 && $('#create-grant').length > 0) &&
+                               ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
+                               $('#create-username').val() === '' && !onlyFf) {
+                        $('#create-username').addClass('is-invalid');
+                        $('#create-username').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if (($('#create').length > 0 && $('#create-grant').length > 0) &&
+                               ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) &&
+                               $('#create-password').val() === '' && !onlyFf) {
+                        $('#create-password').addClass('is-invalid');
+                        $('#create-password').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#email').val() === '') {
+                        $('#email').addClass('is-invalid');
+                        $('#email').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#pass').val() === '') {
+                        $('#pass').addClass('is-invalid');
+                        $('#pass').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#pwf').val() === '') {
+                        $('#pwf').addClass('is-invalid');
+                        $('#pwf').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#cwf').val() === '') {
+                        $('#cwf').addClass('is-invalid');
+                        $('#cwf').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else {
+                        $('.installer-progress-bar').removeClass(function (index, className) {
+                            return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
+                        }).addClass('bg-info');
+
+                        var data = { };
+                        if ($('#databasetype').find(':selected').val() !== 'ff') {
+                            data = $.extend(data,
+                                {
+                                    "host"                  : $('#host').val(),
+                                    "port"                  : $('#port').val(),
+                                    "dbname"                : $('#dbname').val(),
+                                    "charset"               : $('#charset').val(),
+                                    "collation"             : $('#collation').val(),
+                                    "username"              : $('#username').val(),
+                                    "password"              : $('#password').val(),
+                                    "drop"                  : $('#drop')[0].checked,
+                                });
+                            if ($('#create').length > 0 && $('#create')[0].checked === true) {
+                                data = $.extend(data,
+                                {
+                                    "create-username"       : $('#create-username').val(),
+                                    "create-password"       : $('#create-password').val(),
+                                    "create-db"             : $('#create')[0].checked,
+                                    "create-user"           : $('#create-grant')[0].checked
+                                });
+                            }
+                        }
+                    <?php if (!$onlyUpdateDb) { ?>
+                        data = $.extend(data,
+                            {
+                                "email"                 : $('#email').val(),
+                                "pass"                  : $('#pass').val(),
+                                "pwf"                   : $('#pwf').val(),
+                                "cwf"                   : $('#cwf').val(),
+                                "auto-encrypt-level"    : $('#auto-encrypt-level')[0].checked,
+                                "dev"                   : $('#dev')[0].checked,
+                                "databasetype"          : $('#databasetype').val(),
+                                "country"               : $('#country').val(),
+                                "ip2location"           : $('#ip2location')[0].checked
+                            });
+                    <?php } ?>
+                        $('.installer-progress-bar').css('width', '0%');
+                        $('.installer-progress-bar').attr('aria-valuenow', 0);
+                        $('.progress-bar').addClass('progress-bar-animated');
+
+                        $.ajax({
+                            type    : 'POST',
+                            url     : '/',
+                            data    : data,
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data && data.responseCode === 0) {
+                                    var alert = 'alert-success';
+
+                                    $('#alert').attr('hidden', false);
+                                    $('#alert').html('');
+                                    if ($('#access').is('.btn-warning')) {
+                                        alert = 'alert-warning';
+                                    }
+                                    $('#alert').removeClass(function (index, className) {
+                                        return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
+                                    }).addClass(alert).html(data.responseMessage);
+                                    $('#access').attr('disabled', false);
+                                    <?php if ($onlyUpdateDb) { ?>
+                                        $('#access-div').attr('hidden', false);
+                                        $('#access').addClass('btn-success');
+                                        $('#access').children('i').addClass('fa-check');
+                                    <?php } ?>
+                                    $('#update-div').attr('hidden', true);
+                                    $('#submit-spinner, #update-spinner').attr('hidden', true);
+                                } else if (data.responseCode === 1 || data.responseCode === 2 || data.responseCode === 3) {
+                                    $('#alert').attr('hidden', false);
+                                    $('#alert').html('');
+                                    $('#alert').removeClass(function (index, className) {
+                                        return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
+                                    }).addClass('alert-danger').html(data.responseMessage);
+                                    $('#submit, #update').attr('disabled', false);
+                                    $('#submit-spinner, #update-spinner').attr('hidden', true);
+                                }
+                            },
+                            error: function (data) {
+                                if (data.responseJSON && data.responseJSON.responseCode === 1) {
+                                    $('#alert').attr('hidden', false);
+                                    $('#alert').html('');
+                                    $('#alert').removeClass(function (index, className) {
+                                        return (className.match (/(^|\s)alert-\S+/g) || []).join(' ');
+                                    }).addClass('alert-danger').html(data.responseJSON.responseMessage);
+                                }
+                                $('#submit, #update').attr('disabled', false);
+                                $('#submit-spinner, #update-spinner').attr('hidden', true);
+                            }
+                        });
+                    <?php if (!$onlyUpdateDb) { ?>
+                        var timeout = 0;
+
+                        if (BazProgress.isOnline() === false) {
+                            timeout = 1000;
+                        }
+
                         setTimeout(function() {
                             BazProgress.getProgress({
                                 'url' : '/',
@@ -603,21 +666,18 @@
                                     'session' : $('#session-token').val()
                                 }
                             });
-                        }, 1000);
-                    } else {
-                        BazProgress.getProgress({
-                            'url' : '/',
-                            'postData' : {
-                                'session' : $('#session-token').val()
-                            }
-                        });
+                        }, timeout);
+                    <?php } ?>
                     }
                 <?php } ?>
-                }
             });
 
             BazProgress.setCallable({
                 beforeProcess : function(response) {
+                    if (!response.responseData) {
+                        return;
+                    }
+
                     if (response.responseCode !== 0) {
                         return;
                     }
@@ -645,6 +705,10 @@
                     return true;
                 },
                 afterProcess : function(response) {
+                    if (!response.responseData) {
+                        return;
+                    }
+
                     if (response.responseCode !== 0) {
                         if (response.responseData.composer_error && response.responseData.composer_error == true) {
                             $('#external-data').val(response.responseData.composer);
@@ -713,78 +777,80 @@
                 }
             });
 
-            $('#auto-encrypt-level').click(function() {
-                if ($(this)[0].checked === true) {
-                    $('#pwf, #cwf').attr('disabled', true);
-                    $('#dev')[0].checked = false;
-                } else if ($(this)[0].checked === false) {
-                    $('#pwf, #cwf').attr('disabled', false);
-                }
-            });
-
-            $('#dev').click(function() {
-                if ($(this)[0].checked === true) {
-                    $('#auto-encrypt-level')[0].checked = false;
-                    $('#pwf').val('2');
-                    $('#cwf').val('2');
-                }
-            });
-
-            $('#db_password_strength_meter').strengthMeter({
-                "url"       : '/',
-                "postData"  : {
-                    "session"           : $('#session-token').val(),
-                    "checkPwStrength"   : true
-                }
-            });
-
-            $('#user_password_strength_meter').strengthMeter({
-                "url"       : '/',
-                "session"   : $('#session-token').val(),
-                "postData"  : {
-                    "session"           : $('#session-token').val(),
-                    "checkPwStrength"   : true
-                }
-            });
-
-            $('#password-visibility, #create-password-visibility, #pass-visibility').click(function(e) {
-                e.preventDefault();
-
-                if ($(this).parent().siblings('input').attr('type') === 'password') {
-                    $(this).parent().siblings('input').attr('type', 'text');
-                    $(this).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
-                } else if ($(this).parent().siblings('input').attr('type') === 'text') {
-                    $(this).parent().siblings('input').attr('type', 'password');
-                    $(this).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
-                }
-            });
-
-            $('#generate_db_password_button, #generate_user_password_button').click(function(e) {
-                e.preventDefault();
-
-                var that = this;
-                var generatePwData = { };
-                generatePwData['session'] = $('#session-token').val();
-                generatePwData['generatePw'] = true;
-
-                $.post('/', generatePwData, function(response) {
-                    if (response.responseCode == 0) {
-                        if (response.responseData) {
-                            if ($(that)[0].id === 'generate_db_password_button') {
-                                $('#password').val(response.responseData).trigger('change');
-                                $('#password').attr('type', 'text');
-                                $('#password-visibility').children('i').removeClass('fa-eye-slash').addClass('fa-eye');
-                            } else if ($(that)[0].id === 'generate_user_password_button') {
-                                $('#pass').val(response.responseData).trigger('change');
-                                $('#pass').attr('type', 'text');
-                                $('#pass-visibility').children('i').removeClass('fa-eye-slash').addClass('fa-eye');
-                            }
-                        }
-                    } else {
-                        PNotify.error(response.responseMessage);
+            <?php if (!$precheckFail) { ?>
+                $('#auto-encrypt-level').click(function() {
+                    if ($(this)[0].checked === true) {
+                        $('#pwf, #cwf').attr('disabled', true);
+                        $('#dev')[0].checked = false;
+                    } else if ($(this)[0].checked === false) {
+                        $('#pwf, #cwf').attr('disabled', false);
                     }
-                }, 'json');
-            });
+                });
+
+                $('#dev').click(function() {
+                    if ($(this)[0].checked === true) {
+                        $('#auto-encrypt-level')[0].checked = false;
+                        $('#pwf').val('2');
+                        $('#cwf').val('2');
+                    }
+                });
+
+                $('#db_password_strength_meter').strengthMeter({
+                    "url"       : '/',
+                    "postData"  : {
+                        "session"           : $('#session-token').val(),
+                        "checkPwStrength"   : true
+                    }
+                });
+
+                $('#user_password_strength_meter').strengthMeter({
+                    "url"       : '/',
+                    "session"   : $('#session-token').val(),
+                    "postData"  : {
+                        "session"           : $('#session-token').val(),
+                        "checkPwStrength"   : true
+                    }
+                });
+
+                $('#password-visibility, #create-password-visibility, #pass-visibility').click(function(e) {
+                    e.preventDefault();
+
+                    if ($(this).parent().siblings('input').attr('type') === 'password') {
+                        $(this).parent().siblings('input').attr('type', 'text');
+                        $(this).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+                    } else if ($(this).parent().siblings('input').attr('type') === 'text') {
+                        $(this).parent().siblings('input').attr('type', 'password');
+                        $(this).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+                    }
+                });
+
+                $('#generate_db_password_button, #generate_user_password_button').click(function(e) {
+                    e.preventDefault();
+
+                    var that = this;
+                    var generatePwData = { };
+                    generatePwData['session'] = $('#session-token').val();
+                    generatePwData['generatePw'] = true;
+
+                    $.post('/', generatePwData, function(response) {
+                        if (response.responseCode == 0) {
+                            if (response.responseData) {
+                                if ($(that)[0].id === 'generate_db_password_button') {
+                                    $('#password').val(response.responseData).trigger('change');
+                                    $('#password').attr('type', 'text');
+                                    $('#password-visibility').children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+                                } else if ($(that)[0].id === 'generate_user_password_button') {
+                                    $('#pass').val(response.responseData).trigger('change');
+                                    $('#pass').attr('type', 'text');
+                                    $('#pass-visibility').children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+                                }
+                            }
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+                    }, 'json');
+                });
+            <?php } ?>
         </script>
     </body>
 </html>

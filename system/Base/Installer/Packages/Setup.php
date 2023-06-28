@@ -226,9 +226,8 @@ class Setup
 
 		if (!$precheckFail) {
 			$this->localContent = $this->container['localContent'];
+			$this->remoteWebContent = $this->container['remoteWebContent'];
 		}
-
-		$this->remoteWebContent = $this->container['remoteWebContent'];
 	}
 
 	public function __call($method, $arguments)

@@ -10120,7 +10120,7 @@ var BazTunnels = function() {
 
                     BazHelpers.setTimeoutTimers.add(function() {
                         initPusherTunnel(options);
-                    }, 10000, null, 'initPusherTunnel');
+                    }, 60000, null, 'initPusherTunnel');
                 },
                 {
                     'skipSubprotocolCheck': true
@@ -11725,8 +11725,6 @@ var BazProgress = function() {
                 '</div>' +
             '</div>'
         );
-
-
     }
 
     function getProgress(options) {
@@ -11760,6 +11758,10 @@ var BazProgress = function() {
     }
 
     function processResponse(response) {
+        if (response && response.length === 0) {
+            return;
+        }
+
         if (callableFunc && callableFunc['beforeProcess']) {
             if (callableFunc['beforeProcess'](response) === false) {
                 resetProgressCounter();

@@ -246,8 +246,6 @@ var BazContentLoader = function() {
                     // Reset counter after page load complete to accommodate new links (if any)
                     init(options);
 
-                    $('body').trigger('bazContentLoaderAjaxComplete');
-
                     if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
                         $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
                         $('#security-token').val(xhr.getResponseHeader('token'));
@@ -278,6 +276,8 @@ var BazContentLoader = function() {
                     window['dataCollection']['env']['wizard'] = false;
                 }
                 BazCore.initResizeElement();
+
+                $('body').trigger('bazContentLoaderAjaxComplete');
             });
         }, options.ajaxLoadDelay);
     }
@@ -348,8 +348,6 @@ var BazContentLoader = function() {
                     }
                     // Reset counter after page load complete to accommodate new links (if any)
                     init(options);
-                    // Trigger Modal Complete
-                    $('body').trigger('bazContentLoaderModalComplete');
 
                     if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
                         $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
@@ -360,6 +358,8 @@ var BazContentLoader = function() {
                 $('[data-toggle="tooltip"]').tooltip();
                 $('[data-toggle="popover"]').popover('enable');
                 BazCore.initResizeElement();
+                // Trigger Modal Complete
+                $('body').trigger('bazContentLoaderModalComplete');
             });
         }, options.modalLoadDelay);
     }

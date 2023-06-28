@@ -156,7 +156,9 @@ Class Setup
 			$this->localContent = $this->container->getShared('localContent');
 		} catch (\throwable $e) {
 			if (str_contains($e->getMessage(), 'Class')) {
-				$this->populateComposerJsonFile();
+				if ($this->request->isGet()) {
+					$this->populateComposerJsonFile();
+				}
 
 				$this->renderView(true);
 
@@ -165,7 +167,6 @@ Class Setup
 
 			throw $e;
 		}
-
 	}
 
 	public function run($onlyUpdateDb = false, $message = null)
@@ -469,6 +470,13 @@ Class Setup
 					$this->view->responseCode = 1;
 					$this->view->responseMessage = 'Error retrieving new pass.';
 				}
+			} else {
+				$progress = $this->progress->getProgress($this->postData['session'], true);
+
+				if ($progress) {
+					$this->view->responseCode = 0;
+					$this->view->responseData = $progress;
+				}
 			}
 
 			$this->response->setContentType('application/json', 'UTF-8');
@@ -741,11 +749,13 @@ Class Setup
 
 		$this->cookies->useEncryption(true);
 
-		$this->view->countries =
-			Json::decode(
-				$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/AllCountries.json'),
-				true
-			);
+		if (!$precheckFail) {
+			$this->view->countries =
+				Json::decode(
+					$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/AllCountries.json'),
+					true
+				);
+		}
 
 		echo $this->container->getShared('view')->render(
 			'setup',
