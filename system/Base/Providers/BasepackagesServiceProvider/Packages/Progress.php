@@ -273,10 +273,14 @@ class Progress extends BasePackage
         return true;
     }
 
-    protected function readProgressFile()
+    protected function readProgressFile($session = null)
     {
         if (!$this->progressFileName) {
-            $this->progressFileName = $this->session->getId();
+            if ($session) {
+                $this->progressFileName = $session;
+            } else {
+                $this->progressFileName = $this->session->getId();
+            }
         }
 
         if ($this->opCache) {
