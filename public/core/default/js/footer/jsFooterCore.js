@@ -11670,7 +11670,7 @@ var BazProgress = function() {
     var initialized = false;
     var progressCounter = 0;
     var online = false;
-    var element, manualShow;
+    var element, manualShow, hasChild;
     var callableFunc = null;
     var dataCollection = window.dataCollection;
     var url
@@ -11710,9 +11710,10 @@ var BazProgress = function() {
         console.log('Progress service offline');
     }
 
-    function buildProgressBar(el, mS = false) {
+    function buildProgressBar(el, mS = false, hC = false) {
         element = el;
         manualShow = mS;
+        hasChild = hC;
 
         $(element).html(
             '<div class="progress active progress-xs">' +
@@ -11725,6 +11726,20 @@ var BazProgress = function() {
                 '</div>' +
             '</div>'
         );
+
+        if (hasChild) {
+            $(element).append(
+                '<div class="progress progress-child active progress-xxs" hidden>' +
+                    '<div class="progress-bar progress-xxs bg-info progress-bar-animated progress-bar-striped ' + $(element)[0].id + '-child-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width: 0%"></div>' +
+                '</div>' +
+                '<div class="row child-progress-span text-center text-sm text-primary m-1">' +
+                    '<div class="col">' +
+                        '<span class="sr-only ' + $(element)[0].id + '-child-progress-span"></span>' +
+                        '<span class="' + $(element)[0].id + '-child-progress-span"></span>' +
+                    '</div>' +
+                '</div>'
+            );
+        }
     }
 
     function getProgress(options) {
@@ -11796,11 +11811,24 @@ var BazProgress = function() {
                             } else {
                                 $(element).attr('hidden', false);
                             }
-                            $('.' + $(element)[0].id + '-progress-span')
-                                .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
 
-                            $('.' + $(element)[0].id + '-bar').css('width', responseData['percentComplete'] + '%');
-                            $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', responseData['percentComplete']);
+                            if (responseData['runners']['child']) {
+                                $('#' + $(element)[0].id + ' .progress-child').attr('hidden', false);
+                                $('.child-progress-span').attr('hidden', false);
+                                $('.' + $(element)[0].id + '-child-progress-span')
+                                    .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
+
+                                $('.' + $(element)[0].id + '-child-bar').css('width', responseData['percentComplete'] + '%');
+                                $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', responseData['percentComplete']);
+                            } else {
+                                $('#' + $(element)[0].id + ' .progress-child').attr('hidden', true);
+                                $('.child-progress-span').attr('hidden', true);
+                                $('.' + $(element)[0].id + '-progress-span')
+                                    .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
+
+                                $('.' + $(element)[0].id + '-bar').css('width', responseData['percentComplete'] + '%');
+                                $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', responseData['percentComplete']);
+                            }
                         }
                         if (online === false) {
                             timerId = BazHelpers.getTimerId('progressCounter');
@@ -11817,13 +11845,24 @@ var BazProgress = function() {
                         if (online === false) {
                             BazHelpers.setTimeoutTimers.stopAll();
                         }
-                        $('.' + $(element)[0].id + '-bar').removeClass('progress-bar-animated');
-                        $('.' + $(element)[0].id + '-bar').css('width', '100%');
-                        $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', 100);
-                        $('.' + $(element)[0].id + '-progress-span').html('Done (100%)');
-                        $('.' + $(element)[0].id + '-bar').removeClass(function (index, className) {
-                            return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
-                        }).addClass('bg-success');
+
+                        if (responseData['runners']['child']) {
+                            $('.' + $(element)[0].id + '-child-bar').removeClass('progress-bar-animated');
+                            $('.' + $(element)[0].id + '-child-bar').css('width', '100%');
+                            $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', 100);
+                            $('.' + $(element)[0].id + '-child-progress-span').html('Done (100%)');
+                            $('.' + $(element)[0].id + '-child-bar').removeClass(function (index, className) {
+                                return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
+                            }).addClass('bg-success');
+                        } else {
+                            $('.' + $(element)[0].id + '-bar').removeClass('progress-bar-animated');
+                            $('.' + $(element)[0].id + '-bar').css('width', '100%');
+                            $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', 100);
+                            $('.' + $(element)[0].id + '-progress-span').html('Done (100%)');
+                            $('.' + $(element)[0].id + '-bar').removeClass(function (index, className) {
+                                return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
+                            }).addClass('bg-success');
+                        }
 
                         if (callableFunc && callableFunc['onComplete']) {
                             callableFunc['onComplete'](response);
@@ -11901,8 +11940,8 @@ var BazProgress = function() {
                 getProgress(options);
             }
         }
-        BazProgress.buildProgressBar = function(el, mS = false) {
-            buildProgressBar(el, mS);
+        BazProgress.buildProgressBar = function(el, mS = false, child = false) {
+            buildProgressBar(el, mS, child);
         }
         BazProgress.setCallable = function(callable) {
             setCallable(callable);

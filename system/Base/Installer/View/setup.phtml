@@ -388,7 +388,7 @@
             <?php if ($precheckFail) { ?>
                 BazProgress.buildProgressBar($('#installer-progress'), true);
             <?php } else { ?>
-                BazProgress.buildProgressBar($('#installer-progress'));
+                BazProgress.buildProgressBar($('#installer-progress'), false, true);
 
                 $('#databasetype').change(function() {
                     if ($('#databasetype').find(':selected').val() === 'ff') {

@@ -167,6 +167,7 @@ class Progress extends BasePackage
                                 }
 
                                 $runners['child'] = true;
+                                $runners['remainingChilds'] = count($progressFile['processes'][$progressFileKey]['childs']);
                                 $runners['running'] = current($progressFileMethod['childs']);
                                 $runners['next'] = next($progressFileMethod['childs']);
 
@@ -350,6 +351,8 @@ class Progress extends BasePackage
                         foreach ($progressFile['allProcesses'] as &$allProcess) {
                             if ($allProcess['method'] === $method) {
                                 if ($child && isset($allProcess['childs'])) {
+                                    $totalChilds = count($allProcess['childs']);
+
                                     foreach ($allProcess['childs'] as $childKey => &$childValue) {
                                         if ($childValue['method'] === $child) {
                                             if ($callResult !== null) {
@@ -380,8 +383,13 @@ class Progress extends BasePackage
 
                     $file['allProcesses'] = $progressFile['allProcesses'];
                 }
-                $file['total'] = $progressFile['total'];
-                $file['completed'] = $progressFile['total'] - count($methods);
+                if ($child) {
+                    $file['total'] = $totalChilds;
+                    $file['completed'] = $totalChilds - $runners['remainingChilds'];
+                } else {
+                    $file['total'] = count($progressFile['allProcesses']);
+                    $file['completed'] = count($progressFile['allProcesses']) - count($methods);
+                }
                 $file['preCheckComplete'] = true;
                 if ($runners) {
                     $file['runners'] = $runners;
