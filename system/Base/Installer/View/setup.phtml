@@ -412,11 +412,11 @@
             $('#submit, #update').click(function(e) {
                 e.preventDefault();
 
-                $(this).attr('disabled', true);
-                $('#submit-spinner, #update-spinner').attr('hidden', false);
-                $('#alert').attr('hidden', true);
 
                 <?php if ($precheckFail) { ?>
+                    $(this).attr('disabled', true);
+                    $('#submit-spinner, #update-spinner').attr('hidden', false);
+                    $('#alert').attr('hidden', true);
                     $('#external-data').val('Downloading & installing external packages...');
 
                     $.ajax({
@@ -560,6 +560,10 @@
                             $(this).removeClass('is-invalid');
                         });
                     } else {
+                        $(this).attr('disabled', true);
+                        $('#submit-spinner, #update-spinner').attr('hidden', false);
+                        $('#alert').attr('hidden', true);
+
                         $('.installer-progress-bar').removeClass(function (index, className) {
                             return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
                         }).addClass('bg-info');

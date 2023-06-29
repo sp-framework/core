@@ -146,7 +146,7 @@ class Progress extends BasePackage
         }
     }
 
-    public function updateProgress($method, $callResult = null, $deleteFile = true)
+    public function updateProgress($method, $callResult = null, $deleteFile = true, $child = null)
     {
         if (!$this->progressFileName) {
             $this->progressFileName = $this->session->getId();
@@ -159,12 +159,32 @@ class Progress extends BasePackage
 
             foreach ($progressFile['processes'] as $progressFileKey => $progressFileMethod) {
                 if ($progressFileMethod['method'] === $method) {
-                    if ($callResult !== null) {
-                        unset($progressFile['processes'][$progressFileKey]);
-                    }
+                    if ($child && isset($progressFileMethod['childs'])) {
+                        foreach ($progressFileMethod['childs'] as $childKey => $childValue) {
+                            if ($childValue['method'] === $child) {
+                                if ($callResult !== null) {
+                                    unset($progressFile['processes'][$progressFileKey]['childs'][$childKey]);
+                                }
 
-                    $runners['running'] = current($progressFile['processes']);
-                    $runners['next'] = next($progressFile['processes']);
+                                $runners['child'] = true;
+                                $runners['running'] = current($progressFileMethod['childs']);
+                                $runners['next'] = next($progressFileMethod['childs']);
+
+                                break;
+                            }
+                        }
+
+                        if (count($progressFileMethod['childs']) === 0) {
+                            unset($progressFile['processes'][$progressFileKey]);
+                        }
+                    } else {
+                        if ($callResult !== null) {
+                            unset($progressFile['processes'][$progressFileKey]);
+                        }
+
+                        $runners['running'] = current($progressFile['processes']);
+                        $runners['next'] = next($progressFile['processes']);
+                    }
 
                     break;
                 }
@@ -180,7 +200,7 @@ class Progress extends BasePackage
                 $callResult = true;
             }
 
-            $this->writeProgressFile($progressFile['processes'], false, false, true, $runners, null, $method, $callResult);
+            $this->writeProgressFile($progressFile['processes'], false, false, true, $runners, null, $method, $callResult, $child);
 
             if ($callResult === true) {
                 $this->sendNotification($callResult);
@@ -302,7 +322,8 @@ class Progress extends BasePackage
         $runners = null,
         $progressFile = null,
         $method = null,
-        $callResult = null
+        $callResult = null,
+        $child = null
     ) {
         if ($progressFile) {
             $file = $progressFile;
@@ -323,18 +344,35 @@ class Progress extends BasePackage
 
             if ($update) {
                 $progressFile = $this->readProgressFile();
+
                 if (isset($progressFile['allProcesses'])) {
                     if ($method) {
                         foreach ($progressFile['allProcesses'] as &$allProcess) {
                             if ($allProcess['method'] === $method) {
-                                if ($callResult !== null) {
-                                    $allProcess['callResult'] = $callResult;
-                                }
+                                if ($child && isset($allProcess['childs'])) {
+                                    foreach ($allProcess['childs'] as $childKey => &$childValue) {
+                                        if ($childValue['method'] === $child) {
+                                            if ($callResult !== null) {
+                                                $childValue['callResult'] = $callResult;
+                                            }
 
-                                if (!isset($allProcess['callExecTime'])) {
-                                    $allProcess['callExecTime'] = gettimeofday(true);
+                                            if (!isset($childValue['callExecTime'])) {
+                                                $childValue['callExecTime'] = gettimeofday(true);
+                                            } else {
+                                                $childValue['callExecTime'] = gettimeofday(true) - $childValue['callExecTime'];
+                                            }
+                                        }
+                                    }
                                 } else {
-                                    $allProcess['callExecTime'] = gettimeofday(true) - $allProcess['callExecTime'];
+                                    if ($callResult !== null) {
+                                        $allProcess['callResult'] = $callResult;
+                                    }
+
+                                    if (!isset($allProcess['callExecTime'])) {
+                                        $allProcess['callExecTime'] = gettimeofday(true);
+                                    } else {
+                                        $allProcess['callExecTime'] = gettimeofday(true) - $allProcess['callExecTime'];
+                                    }
                                 }
                             }
                         }

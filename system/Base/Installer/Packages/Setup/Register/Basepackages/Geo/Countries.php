@@ -89,7 +89,6 @@ class Countries
 
             return true;
         } catch (\Exception $e) {
-            var_dump($e);
             return false;
         }
     }
@@ -152,8 +151,9 @@ class Countries
                     }
                 }
             }
+
+            return true;
         } catch (\Exception $e) {
-            var_dump($e);
             return false;
         }
     }

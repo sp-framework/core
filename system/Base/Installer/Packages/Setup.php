@@ -836,6 +836,43 @@ class Setup
 		return (new RegisterFilter())->register($this->db, $this->ff);
 	}
 
+	protected function processGeoData()
+	{
+		$this->progress->updateProgress('processGeoData', null, false, 'registerCountries');
+		$call = $this->registerCountries();
+		if ($call !== false) {
+			$call = true;
+		}
+		$this->progress->updateProgress('processGeoData', $call, false, 'registerCountries');
+
+		// if ($this->postData['dev'] == false) {
+			$this->progress->updateProgress('processGeoData', null, false, 'downloadCountriesStateAndCities');
+			$call = $this->downloadCountriesStateAndCities();
+			if ($call !== false) {
+				$call = true;
+			}
+			$this->progress->updateProgress('processGeoData', $call, false, 'downloadCountriesStateAndCities');
+
+			if ($call) {
+				$this->progress->updateProgress('processGeoData', null, false, 'registerCountriesStateAndCities');
+				$call = $this->registerCountriesStateAndCities();
+				if ($call !== false) {
+					$call = true;
+				}
+				$this->progress->updateProgress('processGeoData', $call, false, 'registerCountriesStateAndCities');
+			}
+		// }
+
+		$this->progress->updateProgress('processGeoData', null, false, 'registerTimezones');
+		$call = $this->registerTimezones();
+		if ($call !== false) {
+			$call = true;
+		}
+		$this->progress->updateProgress('processGeoData', $call, false, 'registerTimezones');
+
+		return true;
+	}
+
 	protected function registerCountries()
 	{
 		return (new RegisterCountries())->register($this->db, $this->ff, $this->localContent, $this->postData['country']);

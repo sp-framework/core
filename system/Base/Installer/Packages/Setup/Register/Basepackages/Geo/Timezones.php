@@ -38,5 +38,7 @@ class Timezones
                 $zoneStore->updateOrInsert($zone);
             }
         }
+
+        return true;
     }
 }
