@@ -1018,16 +1018,16 @@ class Setup
 
 	protected function executeComposer()
 	{
-		putenv('COMPOSER_HOME=' . base_path('external/'));
-
-		$stream = fopen(base_path('external/composer.install'), 'w');
-		$input = new \Symfony\Component\Console\Input\StringInput('install -d ' . base_path('external/'));
-		$output = new \Symfony\Component\Console\Output\StreamOutput($stream);
-
-		$application = new \Composer\Console\Application();
-		$application->setAutoExit(false); // prevent `$application->run` method from exiting the script
-
 		try {
+			putenv('COMPOSER_HOME=' . base_path('external/'));
+
+			$stream = fopen(base_path('external/composer.install'), 'w');
+			$input = new \Symfony\Component\Console\Input\StringInput('install -d ' . base_path('external/'));
+			$output = new \Symfony\Component\Console\Output\StreamOutput($stream);
+
+			$application = new \Composer\Console\Application();
+			$application->setAutoExit(false); // prevent `$application->run` method from exiting the script
+
 			$app = $application->run($input, $output);
 		} catch (\throwable $e) {
 			throw $e;

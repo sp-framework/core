@@ -210,6 +210,8 @@ var BazProgress = function() {
                             $('.' + $(element)[0].id + '-bar').removeClass(function (index, className) {
                                 return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
                             }).addClass('bg-success');
+                            $('#' + $(element)[0].id + ' .progress-child').attr('hidden', true);
+                            $('.child-progress-span').attr('hidden', true);
                         }
 
                         if (callableFunc && callableFunc['onComplete']) {
