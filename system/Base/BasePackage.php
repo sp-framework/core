@@ -365,6 +365,7 @@ abstract class BasePackage extends Controller
 			if (isset($params['offset'])) {
 				$offset = $params['offset'];
 			}
+
 			if (isset($params['conditions']) && is_array($params['conditions']) && count($params['conditions']) > 0) {
 				$this->ffData = $this->ffStore->findBy($params['conditions'], null, $limit, $offset);
 			} else if (isset($params['conditions']) &&
@@ -942,24 +943,9 @@ abstract class BasePackage extends Controller
 				$queries[$model]['ff'] = $this->ffStoreToUse;
 			}
 
-			// $bind = [];
-
 			if ($queries[$model]['ff'] !== $this->ffStoreToUse) {
 				$multiModel = true;
 			}
-
-			//!check this
-			// if (str_starts_with(strtolower($conditionArr[1]), 'not')) {
-			// 	$conditionArr[1] = '[' . $conditionArr[1] . ']';
-			// }
-
-			// if (Arr::firstKey($postConditions) !== $conditionKey) {
-			// 	if ($conditionArr[0] === '') {
-			// 		$queries[$model]['andor'] = 'AND';//Default for AND/OR
-			// 	} else {
-			// 		$queries[$model]['andor'] = strtoupper($conditionArr[0]);
-			// 	}
-			// }
 
 			$conditionArr[1] = str_replace(' ', '_', strtolower($conditionArr[1]));
 
@@ -1029,19 +1015,29 @@ abstract class BasePackage extends Controller
 			} else {
 				$valueArr = explode(',', $conditionArr[3]);
 
-				if (count($valueArr) > 1) {//!check this for Multiple data OR condition, Like id = 1 OR id = 2
+				if (count($valueArr) > 1) {
 					foreach ($valueArr as $valueKey => $valueValue) {
-						$condition .=
-							$conditionArr[1] . ' ' . $sign .
-							' :baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
-
-						$bind[
-							'baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
-						] = $valueValue;
-
-						if (Arr::lastKey($valueArr) !== $valueKey) {
-							$condition .= ' OR ';
+						if ($modelColumnMap['dataTypes'][$conditionArr[1]] === 'integer') {
+							$valueValue = (int) $valueValue;
+						} else if ($modelColumnMap['dataTypes'][$conditionArr[1]] === 'number') {
+							$valueValue = (float) $valueValue;
+						} else if ($modelColumnMap['dataTypes'][$conditionArr[1]] === 'boolean') {
+							if ($valueValue == '1') {
+								$valueValue = true;
+							} else {
+								$valueValue = false;
+							}
 						}
+
+						array_push($ffConditions, [$conditionArr[1], $sign, $valueValue]);
+
+						if (Arr::lastKey($valueArr) != $valueKey) {
+							array_push($ffConditions, 'OR');
+						}
+					}
+
+					if (count($ffConditions) > 1) {
+						$ffConditions = [$ffConditions];
 					}
 				} else {
 					if ($modelColumnMap['dataTypes'][$conditionArr[1]] === 'integer') {
@@ -1072,6 +1068,7 @@ abstract class BasePackage extends Controller
 						array_push($ffConditions, [$conditionArr[1], $sign, $conditionArr[3]]);
 					}
 				}
+					// var_dump($ffConditions);die();
 			}
 			// dump($conditionArr);die();
 
@@ -1100,7 +1097,7 @@ abstract class BasePackage extends Controller
 				}
 
 				$params['conditions'] = $ffConditions;
-// and|name|like|aus&or|name|like|pak|&
+				// and|name|like|aus&or|name|like|pak|&
 				// dump($params);die();
 				$data = $this->getByParams($params, true, false);
 			}
@@ -1281,7 +1278,6 @@ abstract class BasePackage extends Controller
 		$this->getFirst('id', $id);
 
 		if ($this->model && $this->model->id == $id) {
-
 			$relationsDeleted = true;
 
 			if ($removeRelated) {
@@ -1354,7 +1350,6 @@ abstract class BasePackage extends Controller
 		}
 
 		if ($source) {
-
 			unset($source['id']);
 
 			if (isset($source[$addCloneTxtToColumn])) {
@@ -1380,7 +1375,6 @@ abstract class BasePackage extends Controller
 
 				return true;
 			}
-
 		} else if ($this->model->count() > 1) {
 			$this->packagesData->responseCode = 1;
 			$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';

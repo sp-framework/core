@@ -42,33 +42,48 @@ class Profile extends BasePackage
 
     public function getProfile(int $accountId)
     {
-        $profileObj = $this->getFirst('account_id', $accountId);
+        if ($this->config->databasetype === 'db') {
+            $profileObj = $this->getFirst('account_id', $accountId);
 
-        if ($profileObj) {
-            $profile = $profileObj->toArray();
+            if ($profileObj) {
+                $profile = $profileObj->toArray();
 
-            if ($profile['settings'] &&
-                !is_array($profile['settings']) &&
-                $profile['settings'] !== ''
-            ) {
-                $profile['settings'] = Json::decode($profile['settings'], true);
-            } else {
-                $profile['settings'] = [];
+                if ($profile['settings'] &&
+                    !is_array($profile['settings']) &&
+                    $profile['settings'] !== ''
+                ) {
+                    $profile['settings'] = Json::decode($profile['settings'], true);
+                } else {
+                    $profile['settings'] = [];
+                }
+
+                $addressObj = $profileObj->getAddress();
+
+                $profile['address'] = [];
+
+                if ($addressObj) {
+                    $profile['address'] = $addressObj->toArray();
+                }
+
+                if (isset($this->auth)) {
+                    $profile['role'] = $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
+                }
+
+                return $profile;
             }
+        } else {
+            $this->setFFRelations(true);
+            $this->setFFRelationsConditions(['package_name', '=', 'profile']);
 
-            $addressObj = $profileObj->getAddress();
+            $profile = $this->getFirst('account_id', $accountId, false, true, null, [], true);
 
-            $profile['address'] = [];
+            if ($profile) {
+                if (isset($this->auth)) {
+                    $profile['role'] = $this->basepackages->roles->getById($this->auth->account()['role']['id'])['name'];
+                }
 
-            if ($addressObj) {
-                $profile['address'] = $addressObj->toArray();
+                return $profile;
             }
-
-            if (isset($this->auth)) {
-                $profile['role'] = $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
-            }
-
-            return $profile;
         }
     }
 

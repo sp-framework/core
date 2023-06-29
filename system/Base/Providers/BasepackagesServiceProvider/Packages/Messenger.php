@@ -29,11 +29,34 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
 
     protected $tunnelsObj;
 
+    protected $ffStore;
+
+    protected $ffStoreToUse;
+
+    protected $ffData;
+
+    protected $ffRelations = false;
+
+    protected $ffRelationsConditions = false;
+
     public function init()
     {
         $this->tunnelsObj = new BasepackagesUsersAccountsTunnels;
 
+        $this->setFfStoreToUse();
+
         return $this;
+    }
+
+    protected function setFfStoreToUse()
+    {
+        $model = new $this->modelToUse;
+
+        $this->ffStoreToUse = $model->getSource();
+
+        $this->ffRelations = false;
+
+        $this->ffRelationsConditions = false;
     }
 
     public function onConstruct()
@@ -257,42 +280,63 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
 
     public function getUnreadMessagesCount()
     {
-        $conditions =
-            [
-                'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND read = 0'
-            ];
+        $total = 0;
 
-        $total = $this->modelToUse::count($conditions);
+        if ($this->config->databasetype === 'db') {
+            $conditions =
+                [
+                    'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND read = 0'
+                ];
+
+            $total = $this->modelToUse::count($conditions);
+        } else {
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+            $this->ffData = $this->ffStore->findBy([['to_account_id', '=', $this->auth->account()['id']],['read', '=', 0]]);
+
+            if ($this->ffData) {
+                $total = count($this->ffData);
+            }
+        }
 
         $profile = $this->basepackages->profile->getProfile($this->auth->account()['id']);
 
-        if (isset($profile['settings']['messenger']['members'])) {
+        if ($profile['settings'] && isset($profile['settings']['messenger']['members'])) {
             $membersArr = $profile['settings']['messenger']['members'];
 
             $members = [];
 
             foreach ($membersArr['users'] as $key => $memberId) {
                 $members[$key]['id'] = $memberId;
-                $conditions =
-                    [
-                        'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND from_account_id = ' . $memberId . ' AND read = 0'
-                    ];
 
-                $members[$key]['count'] = $this->modelToUse::count($conditions);
+                if ($this->config->databasetype === 'db') {
+                    $conditions =
+                        [
+                            'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND from_account_id = ' . $memberId . ' AND read = 0'
+                        ];
+
+                    $members[$key]['count'] = $this->modelToUse::count($conditions);
+                } else {
+                    $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+                    $this->ffData = $this->ffStore->findBy([['to_account_id', '=', $this->auth->account()['id']],['from_account_id', '=', (int) $memberId],['read', '=', 0]]);
+
+                    if ($this->ffData) {
+                        $members[$key]['count'] = count($this->ffData);
+                    }
+                }
             }
         } else {
             $members = [];
         }
 
-        if ($total >= 0 && count($members) > 0) {
-            $data['total'] = $total;
+        $data['total'] = $total;
 
-            $data['unread_count'] = $members;
+        $data['unread_count'] = $members;
 
-            $this->addResponse('Retrieved messages count.', 0, $data);
+        $this->addResponse('Retrieved messages count.', 0, $data);
 
-            return true;
-        }
+        return true;
     }
 
     public function markAllMessagesRead(array $data)

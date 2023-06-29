@@ -640,10 +640,14 @@ class Store
 
                                         $storeData = $store->findBy($conditions);
 
-                                        if ($description[1] === 'hasOne') {
-                                            $data[$description[0]] = $storeData[0];
-                                        } else if ($description[1] === 'hasMany') {
-                                            $data[$description[0]] = $storeData;
+                                        if ($storeData && count($storeData) > 0) {
+                                            if ($description[1] === 'hasOne') {
+                                                $data[$description[0]] = $storeData[0];
+                                            } else if ($description[1] === 'hasMany') {
+                                                $data[$description[0]] = $storeData;
+                                            }
+                                        } else {
+                                            $data[$description[0]] = null;
                                         }
                                     } catch (\Exception $e) {
                                         continue;
@@ -664,10 +668,14 @@ class Store
 
                                             $storeData = $store->findBy($criteria);
 
-                                            if ($description[1] === 'hasOne') {
-                                                $data[$description[0]] = $storeData[0];
-                                            } else if ($description[1] === 'hasMany') {
-                                                $data[$description[0]] = $storeData;
+                                            if ($storeData && count($storeData) > 0) {
+                                                if ($description[1] === 'hasOne') {
+                                                    $data[$description[0]] = $storeData[0];
+                                                } else if ($description[1] === 'hasMany') {
+                                                    $data[$description[0]] = $storeData;
+                                                }
+                                            } else {
+                                                $data[$description[0]] = null;
                                             }
                                         } catch (\Exception $e) {
                                             continue;
@@ -676,6 +684,10 @@ class Store
                                 }
                             }
                         } else if ($description[1] === 'hasOneThrough' || $description[1] === 'hasManyThrough') {
+                            if (in_array('hasParams', $description) && !$conditions) {
+                                throw new InvalidArgumentException('Model has params(conditions) set. Please set ffRelationsConditions');
+                            }
+
                             if (isset($description[2]) && isset($description[3])) {
                                 $description[2] = explode('+', $description[2]);
                                 $description[3] = explode('+', $description[3]);
@@ -710,24 +722,34 @@ class Store
                                     $fieldsArr = Arr::chunk($fields, 2);
                                     $criteria = [];
 
-                                    if (count($fieldsArr) === 1) {
-                                        foreach ($fieldsArr as $fieldArr) {
-                                            array_push($criteria, [$fieldArr[1], '=', $storeData[$fieldArr[0]]]);
-                                        }
-                                    } else {
-                                        foreach ($fieldsArr as $fieldArrKey => $fieldArr) {
-                                            array_push($criteria, [$fieldArr[$fieldArrKey], '=', $storeData[$fieldArr[$fieldArrKey]]]);
+                                    if ($storeData && count($storeData) > 0) {
+                                        if (count($fieldsArr) === 1) {
+                                            foreach ($fieldsArr as $fieldArr) {
+                                                array_push($criteria, [$fieldArr[1], '=', $storeData[$fieldArr[0]]]);
+                                            }
+                                        } else {
+                                            foreach ($fieldsArr as $fieldArrKey => $fieldArr) {
+                                                array_push($criteria, [$fieldArr[$fieldArrKey], '=', $storeData[$fieldArr[$fieldArrKey]]]);
+                                            }
                                         }
                                     }
 
-                                    $store = new Store($description[3][0], $this->databasePath);
+                                    if (count($criteria) > 0) {
+                                        $store = new Store($description[3][0], $this->databasePath);
 
-                                    $storeData = $store->findBy($criteria);
+                                        $storeData = $store->findBy($criteria);
 
-                                    if ($description[1] === 'hasOneThrough') {
-                                        $data[$description[0]] = $storeData[0];
-                                    } else if ($description[1] === 'hasManyThrough') {
-                                        $data[$description[0]] = $storeData;
+                                        if ($storeData && count($storeData) > 0) {
+                                            if ($description[1] === 'hasOneThrough') {
+                                                $data[$description[0]] = $storeData[0];
+                                            } else if ($description[1] === 'hasManyThrough') {
+                                                $data[$description[0]] = $storeData;
+                                            }
+                                        } else {
+                                            $data[$description[0]] = null;
+                                        }
+                                    } else {
+                                        $data[$description[0]] = null;
                                     }
                                 } catch (\Exception $e) {
                                     continue;
