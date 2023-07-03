@@ -18,7 +18,7 @@ var BazProgress = function() {
     var initialized = false;
     var progressCounter = 0;
     var online = false;
-    var element, manualShow, hasChild;
+    var element, manualShowHide, hasChild;
     var callableFunc = null;
     var dataCollection = window.dataCollection;
     var url
@@ -58,9 +58,9 @@ var BazProgress = function() {
         console.log('Progress service offline');
     }
 
-    function buildProgressBar(el, mS = false, hC = false) {
+    function buildProgressBar(el, mSH = false, hC = false) {
         element = el;
-        manualShow = mS;
+        manualShowHide = mSH;
         hasChild = hC;
 
         $(element).html(
@@ -154,7 +154,7 @@ var BazProgress = function() {
                 if (responseData['total'] !== 'undefined' && responseData['completed'] !== 'undefined') {
                     if (responseData['total'] !== responseData['completed']) {
                         if (responseData['runners'] && responseData['runners']['running'] !== false) {
-                            if (manualShow) {
+                            if (manualShowHide) {
                                 $(element).attr('hidden', true);
                             } else {
                                 $(element).attr('hidden', false);
@@ -212,6 +212,12 @@ var BazProgress = function() {
                             }).addClass('bg-success');
                             $('#' + $(element)[0].id + ' .progress-child').attr('hidden', true);
                             $('.child-progress-span').attr('hidden', true);
+                        }
+
+                        if (manualShowHide) {
+                            $(element).attr('hidden', false);
+                        } else {
+                            $(element).attr('hidden', true);
                         }
 
                         if (callableFunc && callableFunc['onComplete']) {
@@ -290,8 +296,8 @@ var BazProgress = function() {
                 getProgress(options);
             }
         }
-        BazProgress.buildProgressBar = function(el, mS = false, child = false) {
-            buildProgressBar(el, mS, child);
+        BazProgress.buildProgressBar = function(el, mSH = false, child = false) {
+            buildProgressBar(el, mSH, child);
         }
         BazProgress.setCallable = function(callable) {
             setCallable(callable);

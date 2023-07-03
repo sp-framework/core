@@ -28,7 +28,7 @@ class Progress extends BasePackage
 
         $this->checkProgressPath();
 
-        if ($this->container && !$this->notificationsTunnel) {
+        if (!$this->notificationsTunnel) {
             $this->checkNotificationTunnel();
         }
 
@@ -120,7 +120,7 @@ class Progress extends BasePackage
                 'total'             => $progressFile['total'],
                 'completed'         => $progressFile['completed'],
                 'preCheckComplete'  => $progressFile['preCheckComplete'],
-                'percentComplete'   => number_format(($progressFile['completed'] * 100) / $progressFile['total']),
+                'percentComplete'   => $this->getPercentComplete($progressFile),
                 'runners'           => $progressFile['runners']
             ];
 
@@ -146,7 +146,7 @@ class Progress extends BasePackage
         }
     }
 
-    public function updateProgress($method, $callResult = null, $deleteFile = true, $child = null)
+    public function updateProgress($method, $callResult = null, $deleteFile = true, $child = null, array $remoteWebCounters = null)
     {
         if (!$this->progressFileName) {
             $this->progressFileName = $this->session->getId();
@@ -183,7 +183,13 @@ class Progress extends BasePackage
                             unset($progressFile['processes'][$progressFileKey]);
                         }
 
-                        $runners['running'] = current($progressFile['processes']);
+                        $currentProcess = current($progressFile['processes']);
+
+                        if (isset($currentProcess['remoteWeb']) && $currentProcess['remoteWeb'] === true && $remoteWebCounters) {
+                            $currentProcess = array_merge($currentProcess, ['remoteWebCounters' => $remoteWebCounters]);
+                        }
+
+                        $runners['running'] = $currentProcess;
                         $runners['next'] = next($progressFile['processes']);
                     }
 
@@ -201,7 +207,7 @@ class Progress extends BasePackage
                 $callResult = true;
             }
 
-            $this->writeProgressFile($progressFile['processes'], false, false, true, $runners, null, $method, $callResult, $child);
+            $this->writeProgressFile($progressFile['processes'], false, false, true, $runners, null, $method, $callResult, $child, $remoteWebCounters);
 
             if ($callResult === true) {
                 $this->sendNotification($callResult);
@@ -218,8 +224,8 @@ class Progress extends BasePackage
         if (!$this->notificationsTunnel && isset($this->apps)) {
             $account = $this->basepackages->accounts->getAccountById($this->auth->account()['id']);
 
-            if ($account && isset($account['notifications_tunnel'])) {
-                $this->notificationsTunnel = $account['notifications_tunnel'];
+            if ($account && isset($account['tunnels']['notifications_tunnel'])) {
+                $this->notificationsTunnel = $account['tunnels']['notifications_tunnel'];
             }
         } else {
             $this->notificationsTunnel = 0;
@@ -244,7 +250,7 @@ class Progress extends BasePackage
                                     'total'             => $progressFile['total'],
                                     'completed'         => $progressFile['completed'],
                                     'preCheckComplete'  => $progressFile['preCheckComplete'],
-                                    'percentComplete'   => number_format(($progressFile['completed'] * 100) / $progressFile['total']),
+                                    'percentComplete'   => $this->getPercentComplete($progressFile),
                                     'runners'           => $progressFile['runners'] ?? false,
                                     'callResult'        => $callResult
                                 ]
@@ -253,6 +259,31 @@ class Progress extends BasePackage
                 );
             }
         }
+    }
+
+    protected function getPercentComplete($progressFile)
+    {
+        $percentComplete = (float) number_format(($progressFile['completed'] * 100) / $progressFile['total']);
+
+        if (isset($progressFile['runners']['running']['remoteWebCounters'])) {
+            $methodPercent = (float) number_format(100 / $progressFile['total']);
+
+            $webProgress = 0;
+
+            if (isset($progressFile['runners']['running']['remoteWebCounters']['downloadTotal']) && $progressFile['runners']['running']['remoteWebCounters']['downloadTotal'] > 0) {
+                $webProgress = (float) number_format(($progressFile['runners']['running']['remoteWebCounters']['downloadedBytes'] * 100) / $progressFile['runners']['running']['remoteWebCounters']['downloadTotal']);
+            } else if (isset($progressFile['runners']['running']['remoteWebCounters']['uploadTotal']) && $progressFile['runners']['running']['remoteWebCounters']['uploadTotal'] > 0) {
+                $webProgress = (float) number_format(($progressFile['runners']['running']['remoteWebCounters']['uploadedBytes'] * 100) / $progressFile['runners']['running']['remoteWebCounters']['uploadTotal']);
+            }
+
+            if ($webProgress > 0) {
+                $totalProgress = (float) number_format($webProgress * 100 / $methodPercent);
+
+                $percentComplete = $percentComplete + $totalProgress;
+            }
+        }//Need to do if runner is a child
+
+        return $percentComplete;
     }
 
     public function preCheckComplete($complete = true)
@@ -324,7 +355,8 @@ class Progress extends BasePackage
         $progressFile = null,
         $method = null,
         $callResult = null,
-        $child = null
+        $child = null,
+        array $remoteWebCounters = null
     ) {
         if ($progressFile) {
             $file = $progressFile;
@@ -376,6 +408,10 @@ class Progress extends BasePackage
                                     } else {
                                         $allProcess['callExecTime'] = gettimeofday(true) - $allProcess['callExecTime'];
                                     }
+
+                                    if (isset($allProcess['remoteWeb']) && $allProcess['remoteWeb'] === true && $remoteWebCounters) {
+                                        $allProcess = array_merge($allProcess, $remoteWebCounters);
+                                    }
                                 }
                             }
                         }
@@ -383,6 +419,7 @@ class Progress extends BasePackage
 
                     $file['allProcesses'] = $progressFile['allProcesses'];
                 }
+
                 if ($child) {
                     $file['total'] = $totalChilds;
                     $file['completed'] = $totalChilds - $runners['remainingChilds'];
@@ -390,7 +427,9 @@ class Progress extends BasePackage
                     $file['total'] = count($progressFile['allProcesses']);
                     $file['completed'] = count($progressFile['allProcesses']) - count($methods);
                 }
+
                 $file['preCheckComplete'] = true;
+
                 if ($runners) {
                     $file['runners'] = $runners;
                 }
