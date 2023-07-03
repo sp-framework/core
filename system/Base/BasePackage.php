@@ -1162,7 +1162,7 @@ abstract class BasePackage extends Controller
 			} else {
 				$this->ffStore = $this->ff->store($this->ffStoreToUse);
 
-				$create = $this->ffData = $this->ffStore->updateOrInsert($data);
+				$create = $this->ffData = $this->ffStore->insert($data);
 
 				$this->setFfStoreToUse();
 			}
@@ -1207,33 +1207,45 @@ abstract class BasePackage extends Controller
 		if ($data) {
 			$data = $this->jsonData($data);
 
-			${$this->packageNameModel} = $this->getFirst('id', $data['id'], false, false);
-
-			if (!${$this->packageNameModel}) {
-				$this->packagesData->responseCode = 1;
-
-				$this->packagesData->responseMessage = 'ID: ' . $data['id'] . " not found for package {$this->packageName}";
-
-				return;
-			}
-
 			if (isset($data['updated_on'])) {
 				unset($data['updated_on']);
 			}
 
-			${$this->packageNameModel}->assign($data);
+			if ($this->config->databasetype === 'db') {
+				${$this->packageNameModel} = $this->getFirst('id', $data['id'], false, false);
 
-			$update = ${$this->packageNameModel}->update();
+				if (!${$this->packageNameModel}) {
+					$this->packagesData->responseCode = 1;
+
+					$this->packagesData->responseMessage = 'ID: ' . $data['id'] . " not found for package {$this->packageName}";
+
+					return;
+				}
+
+				${$this->packageNameModel}->assign($data);
+
+				$update = ${$this->packageNameModel}->update();
+			} else {
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+				$update = $this->ffData = $this->ffStore->update($data);
+
+				$this->setFfStoreToUse();
+			}
 
 			if ($update) {
 				$this->packagesData->responseCode = 0;
 
 				$this->packagesData->responseMessage = ucfirst($this->packageNameS) . " Updated!";
 
-				$this->packagesData->last = ${$this->packageNameModel}->toArray();
+				if ($this->config->databasetype === 'db') {
+					$this->packagesData->last = ${$this->packageNameModel}->toArray();
 
-				if ($resetCache && count(${$this->packageNameModel}->getUpdatedFields()) !== 0) {//Make sure we only update when we change any fields
-					$this->resetCache($this->packagesData->last['id']);
+					if ($resetCache && count(${$this->packageNameModel}->getUpdatedFields()) !== 0) {//Make sure we only update when we change any fields
+						$this->resetCache($this->packagesData->last['id']);
+					}
+				} else {
+					$this->packagesData->last = $update;
 				}
 
 				return true;

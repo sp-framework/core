@@ -212,23 +212,35 @@ class Pusher extends WebsocketBase implements WampServerInterface
         }
 
         if (isset($cookies['id'])) {
-            $this->db->connect();
+            if ($this->config->databasetype === 'db') {
+                $this->db->connect();
 
-            $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($cookies['id']);
+                $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($cookies['id']);
 
-            if ($this->accountsObj && $this->accountsObj->count() > 0) {
-                $this->account = $this->accountsObj->toArray();
+                if ($this->accountsObj && $this->accountsObj->count() > 0) {
+                    $this->account = $this->accountsObj->toArray();
+                }
+
+                if (!$this->account) {
+                    return false;
+                }
+
+                $this->account['profile'] = $this->basepackages->profile->getProfile($this->account['id']);
+            } else {
+                $this->basepackages->accounts->setFFRelations(true);
+
+                $this->accountsObj = $this->basepackages->accounts->getFirst('id', (int) $cookies['id']);
+
+                $this->account = $this->accountsObj->data;
+
+                if (!$this->account) {
+                    return false;
+                }
             }
-
-            if (!$this->account) {
-                return false;
-            }
-
-            $this->account['profile'] = $this->basepackages->profile->getProfile($this->account['id']);
 
             if ($this->checkSession($cookies)) {
-
                 $agentCheckMiddleware = $this->modules->middlewares->getMiddlewareByNameForAppId('AgentCheck', $app['id']);
+
                 if ($agentCheckMiddleware) {
                     $agent = $conn->httpRequest->getHeader('User-Agent')[0];
 
@@ -250,18 +262,36 @@ class Pusher extends WebsocketBase implements WampServerInterface
                         }
                     }
                 }
-                if (!$this->accountsObj->tunnels) {
-                    $newTunnel =
-                        [
-                            'account_id'            => $this->account['id'],
-                            'notifications_tunnel'  => $conn->resourceId
-                        ];
 
-                    $this->tunnelsObj->assign($newTunnel);
+                $newTunnel =
+                    [
+                        'account_id'            => $this->account['id'],
+                        'notifications_tunnel'  => $conn->resourceId
+                    ];
 
-                    $this->tunnelsObj->create();
+                if ($this->config->databasetype === 'db') {
+                    if (!$this->accountsObj->tunnels) {
+
+                        $this->tunnelsObj->assign($newTunnel);
+
+                        $this->tunnelsObj->create();
+                    } else {
+                        $this->accountsObj->tunnels->assign(['notifications_tunnel'  => $conn->resourceId])->update();
+                    }
                 } else {
-                    $this->accountsObj->tunnels->assign(['notifications_tunnel'  => $conn->resourceId])->update();
+                    $tunnelsStore = $this->ff->store($this->tunnelsObj->getSource());
+
+                    if (!$this->account['tunnels'] ||
+                        ($this->account['tunnels'] && count($this->account['tunnels']) === 0)
+                    ) {
+                        $tunnelsStore->insert($newTunnel);
+                    } else {
+                        $tunnels = $tunnelsStore->findOneBy(['account_id', '=', $this->account['id']]);
+
+                        $tunnels['notifications_tunnel'] = $conn->resourceId;
+
+                        $tunnelsStore->update($tunnels);
+                    }
                 }
 
                 return true;
@@ -275,10 +305,20 @@ class Pusher extends WebsocketBase implements WampServerInterface
 
     protected function checkSession($cookies)
     {
-        if ($this->accountsObj && $this->accountsObj->sessions) {
-            foreach ($this->accountsObj->sessions as $key => $session) {
-                if ($session->session_id === $cookies['Bazaari']) {
-                    return true;
+        if ($this->config->databasetype === 'db') {
+            if ($this->accountsObj && $this->accountsObj->sessions) {
+                foreach ($this->accountsObj->sessions as $key => $session) {
+                    if ($session->session_id === $cookies['Bazaari']) {
+                        return true;
+                    }
+                }
+            }
+        } else {
+            if ($this->account && count($this->account['sessions']) > 0) {
+                foreach ($this->account['sessions'] as $key => $session) {
+                    if ($session['session_id'] === $cookies['Bazaari']) {
+                        return true;
+                    }
                 }
             }
         }
@@ -292,7 +332,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
         $account = $this->basepackages->accounts->checkAccountByNotificationsTunnelId($resourceId);
 
         if ($account) {
-            $this->accountsObj->tunnels->assign(['notifications_tunnel'  => null])->update();
+            $this->accountsObj->tunnel->assign(['notifications_tunnel'  => null])->update();
             // $account['notifications_tunnel_id'] = null;
 
             // $this->basepackages->accounts->update($account);

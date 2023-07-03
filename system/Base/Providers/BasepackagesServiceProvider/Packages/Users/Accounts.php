@@ -593,7 +593,7 @@ class Accounts extends BasePackage
         if ($this->model) {
             $account = $this->model->toArray();
 
-            if ($getsecurity && $this->model->getsecurity()) {
+            if ($getSecurity && $this->model->getsecurity()) {
                 $account['security'] = $this->model->getsecurity()->toArray();
             }
         }

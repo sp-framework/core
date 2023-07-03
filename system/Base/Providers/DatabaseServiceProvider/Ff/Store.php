@@ -200,7 +200,7 @@ class Store
         IoHelper::createFolder($this->storePath . self::dataDirectory, $this->folderPermissions);
 
         if (!file_exists($this->storePath . '_cnt.sdb')) {
-            IoHelper::writeContentToFile($this->storePath . '_cnt.sdb', '0');
+            IoHelper::writeContentToFile($this->storePath . '_cnt.sdb', '{"totalEntries":0,"lastId":0}');
         }
 
         if (!file_exists($this->storePath . 'config.json') ||
@@ -361,6 +361,9 @@ class Store
 
             if ($autoGenerateIdOnInsert && $this->findById($data[$this->primaryKey]) === null) {
                 $data[$this->primaryKey] = $this->increaseCounterAndGetNextId();
+            } else {
+                var_dump('meme');
+                var_Dump($data);
             }
         }
 
@@ -443,7 +446,7 @@ class Store
         return $this->data;
     }
 
-    public function update(array $data): bool
+    public function update(array $data): array
     {
         if (empty($data))  {
             throw new InvalidArgumentException("No documents to update.");
@@ -1203,32 +1206,53 @@ class Store
 
         $dataPath = $this->getDataPath();
 
-        return (int) IoHelper::updateFileContent(
+        $counters = IoHelper::getFileContent($this->storePath . '_cnt.sdb');
+        $counters = json_decode($counters, true);
+
+        $newId = ((int) $counters['lastId']) + 1;
+        while (file_exists($dataPath . "$newId.json") === true) {
+            $newId++;
+        }
+
+        $counters['lastId'] = $newId;
+        $counters['totalEntries'] = $counters['totalEntries'] + 1;
+
+        $updateCounters = IoHelper::updateFileContent(
             $this->storePath . '_cnt.sdb',
-            function ($counter) use ($dataPath) {
-                $newCounter = ((int) $counter) + 1;
-
-                while (file_exists($dataPath . "$newCounter.json") === true) {
-                    $newCounter++;
-                }
-
-                return (string) $newCounter;
+            function () use ($counters) {
+                return json_encode($counters);
             }
         );
+
+        if (!$updateCounters) {
+            throw new IOException("File " . $this->storePath . '_cnt.sdb' . ". Could not update Id.");
+        }
+
+        return $newId;
     }
 
     protected function decreaseCounter()
     {
-        $dataPath = $this->getDataPath();
+        $counters = IoHelper::getFileContent($this->storePath . '_cnt.sdb');
+        $counters = json_decode($counters, true);
 
-        return (int) IoHelper::updateFileContent(
+        $previousId = ((int) $counters['lastId']) - 1;
+
+        $counters['lastId'] = $previousId;
+        $counters['totalEntries'] = $counters['totalEntries'] - 1;
+
+        $updateCounters = IoHelper::updateFileContent(
             $this->storePath . '_cnt.sdb',
-            function ($counter) use ($dataPath) {
-                $newCounter = ((int) $counter) - 1;
-
-                return (string) $newCounter;
+            function () use ($counters) {
+                return json_encode($counters);
             }
         );
+
+        if (!$updateCounters) {
+            throw new IOException("File " . $this->storePath . '_cnt.sdb' . ". Could not update Id.");
+        }
+
+        return $previousId;
     }
 
     protected function checkAndStripId($id): int

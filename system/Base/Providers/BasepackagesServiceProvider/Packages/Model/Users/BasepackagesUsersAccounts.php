@@ -80,12 +80,12 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        $this->modelRelations['tunnel']['relationObj'] = $this->hasOne(
+        $this->modelRelations['tunnels']['relationObj'] = $this->hasOne(
             'id',
             BasepackagesUsersAccountsTunnels::class,
             'account_id',
             [
-                'alias'         => 'tunnel'
+                'alias'         => 'tunnels'
             ]
         );
 

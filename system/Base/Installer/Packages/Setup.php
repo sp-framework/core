@@ -216,7 +216,7 @@ class Setup
 			$this->db = new Mysql($this->dbConfig['db']);
 		}
 
-		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'mysql') {
+		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'db') {
 			$this->ff = (new Ff((object) ['enabled' => false, 'timeout' => 0], $this->request))->init();
 		}
 
@@ -565,7 +565,7 @@ class Setup
 			}
 		}
 
-		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'mysql') {
+		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'db') {
 			foreach ($databases as $tableName => $tableClass) {
 				if ($tableClass['model'] && $tableClass['model']->getSource()) {
 					$tableName = $tableClass['model']->getSource();
@@ -845,7 +845,7 @@ class Setup
 		}
 		$this->progress->updateProgress('processGeoData', $call, false, 'registerCountries');
 
-		// if ($this->postData['dev'] == false) {
+		if ($this->postData['dev'] == false) {
 			$this->progress->updateProgress('processGeoData', null, false, 'downloadCountriesStateAndCities');
 			$call = $this->downloadCountriesStateAndCities();
 			if ($call !== false) {
@@ -861,7 +861,7 @@ class Setup
 				}
 				$this->progress->updateProgress('processGeoData', $call, false, 'registerCountriesStateAndCities');
 			}
-		// }
+		}
 
 		$this->progress->updateProgress('processGeoData', null, false, 'registerTimezones');
 		$call = $this->registerTimezones();
