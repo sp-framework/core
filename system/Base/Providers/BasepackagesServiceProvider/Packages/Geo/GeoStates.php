@@ -23,7 +23,9 @@ class GeoStates extends BasePackage
         if ($this->add($data)) {
 
             if (!isset($data['id'])) {
-                $this->updateSeq();
+                if ($this->config->databasetype === 'db') {
+                    $this->updateSeq();
+                }
             }
 
             $this->addResponse('Added ' . $data['name'] . ' state');

@@ -120,6 +120,7 @@ class Countries
                 }
 
                 $statesStore->updateOrInsert($state, false);
+                die();
 
                 if (isset($cities)) {
                     foreach ($cities as $key => $city) {
