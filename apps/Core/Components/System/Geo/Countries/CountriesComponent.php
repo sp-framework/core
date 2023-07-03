@@ -22,18 +22,6 @@ class CountriesComponent extends BaseComponent
      */
     public function viewAction()
     {
-        if (isset($this->getData()['extractdata']) &&
-            $this->getData()['extractdata'] == true
-        ) {
-            $this->extractData();
-
-            echo 'Code: ' . $this->view->responseCode . '<br>';
-
-            echo 'Message: ' . $this->view->responseMessage;
-
-            return false;
-        }
-
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
                 $country = $this->basepackages->geoCountries->getById($this->getData()['id']);
@@ -204,32 +192,6 @@ class CountriesComponent extends BaseComponent
             } else {
                 $this->addResponse('Search Query Missing', 1);
             }
-        }
-    }
-
-    //To update, get the latest json file from and place it in the /system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/ folder.
-    //Rename the file as src.json and make a call to /admin/system/geo/countries/q/extractdata/true/srcFile/src to extract data.
-    //https://github.com/dr5hn/countries-states-cities-database
-    //https://github.com/dr5hn/countries-states-cities-database/raw/master/countries%2Bstates%2Bcities.json
-    protected function extractData()
-    {
-        if (isset($this->getData()['srcFile'])) {
-            $account = $this->auth->account();
-            $account['id'] = 1;
-            if ($account && $account['id'] == 1) {
-                $geoExtractDataPackage = new GeoExtractData;
-
-                $geoExtractDataPackage->extractData($this->getData()['srcFile']);
-
-                $this->addResponse(
-                    $geoExtractDataPackage->packagesData->responseMessage,
-                    $geoExtractDataPackage->packagesData->responseCode
-                );
-            } else {
-                $this->addResponse('Only super admin allowed to extract geo data', 1);
-            }
-        } else {
-            throw new \Exception('Source file missing in url. Example URL: admin/system/geo/countries/q/extractdata/true/srcFile/src');
         }
     }
 }

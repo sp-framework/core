@@ -22,18 +22,6 @@ class TimezonesComponent extends BaseComponent
      */
     public function viewAction()
     {
-        if (isset($this->getData()['extractdata']) &&
-            $this->getData()['extractdata'] == true
-        ) {
-            $this->extractData();
-
-            echo 'Code: ' . $this->view->responseCode . '<br>';
-
-            echo 'Message: ' . $this->view->responseMessage;
-
-            return false;
-        }
-
         $countriesArr = $this->basepackages->geoCountries->getAll()->geoCountries;
 
         if (isset($this->getData()['id'])) {
@@ -162,26 +150,6 @@ class TimezonesComponent extends BaseComponent
             } else {
                 $this->addResponse('Search Query Missing', 1);
             }
-        }
-    }
-
-    //To update get table from wikipedia link - https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-    //Timezone data is placed in /system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/ folder.
-    protected function extractData()
-    {
-        $account = $this->auth->account();
-        $account['id'] = 1;
-        if ($account && $account['id'] == 1) {
-            $geoExtractDataPackage = new GeoExtractData;
-
-            $geoExtractDataPackage->extractTZData();
-
-            $this->addResponse(
-                $geoExtractDataPackage->packagesData->responseMessage,
-                $geoExtractDataPackage->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Only super admin allowed to extract geo data', 1);
         }
     }
 }
