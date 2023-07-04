@@ -12,7 +12,7 @@
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'Download & Extract from github repository',
                 'fieldRequired'                  : false,
-                'fieldDisabled'                  : true,
+                'fieldDisabled'                  : false,
                 'fieldType'                      : 'checkbox',
                 'fieldCheckboxType'              : 'primary',
                 'fieldCheckboxChecked'           : true,
@@ -151,7 +151,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-token'                                    : { },
         '{{componentId}}-{{sectionId}}-ip'                                       : {
             afterInit : function() {
-                BazProgress.buildProgressBar($('#download-progress'), false, true);
+                BazProgress.buildProgressBar($('#download-progress'), false, false, true);
 
                 $('#{{componentId}}-{{sectionId}}-download-extract').click(function(e) {
                     e.preventDefault();
@@ -181,7 +181,7 @@ dataCollectionSection =
                             PNotify.success({
                                 'title' : response.responseMessage
                             });
-                            $('#{{componentId}}-{{sectionId}}-download-extract').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-download-extract').removeClass('disabled');
                             $('#{{componentId}}-{{sectionId}}-download-extract').siblings().removeClass('d-none');
 
                         } else {

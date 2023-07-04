@@ -6,6 +6,7 @@ use League\Csv\Reader;
 use League\Csv\Statement;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToWriteFile;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
@@ -68,7 +69,7 @@ class DevtoolsGeoExtractData extends BasePackage
             if ($this->localContent->fileExists($this->sourceDir . 'countries+states+cities.json')) {
                 $this->sourceFile = Json::decode($this->localContent->read($this->sourceDir . 'countries+states+cities.json'), true);
             }
-        } catch (FilesystemException | UnableToReadFile | \throwable $e) {
+        } catch (FilesystemException | UnableToReadFile | throwable $e) {
             $this->addResponse($e->getMessage(), 1);
 
             return false;
@@ -121,11 +122,11 @@ class DevtoolsGeoExtractData extends BasePackage
             $allCountries = Json::decode($this->localContent->read($this->sourceDir . 'AllCountries.json'), true);
 
             foreach ($allCountries as $country) {
-                $this->compressZip($country);
+                $this->compressZip($country['iso2']);
             }
 
             return true;
-        } catch (FilesystemException | UnableToReadFile | \throwable $exception) {
+        } catch (FilesystemException | UnableToReadFile | throwable $exception) {
             throw $exception;
         }
     }
@@ -178,7 +179,7 @@ class DevtoolsGeoExtractData extends BasePackage
 
         if ($table[0] && $table[0]->children) {
             foreach ($table[0]->children as $tr) {
-                if (trim($tr->children[4]->plaintext) === 'Canonical') {
+                if (isset($tr->children[4]) && trim($tr->children[4]->plaintext) === 'Canonical') {
                     $zoneName = trim($tr->children[2]->plaintext);
                     $zoneKey = strtolower(str_replace('/', '', $zoneName));
 
@@ -207,7 +208,11 @@ class DevtoolsGeoExtractData extends BasePackage
             }
         }
 
-        $this->localContent->write($this->sourceDir . 'TimeZones.json', JSON::encode($wikiTz));
+        try {
+            $this->localContent->write($this->sourceDir . 'TimeZones.json', JSON::encode($wikiTz));
+        } catch (FilesystemException | UnableToWriteFile | throwable $e) {
+            throw $e;
+        }
 
         return true;
     }
@@ -224,7 +229,7 @@ class DevtoolsGeoExtractData extends BasePackage
 
     protected function unzipGeoIpv4Data()
     {
-        return $this->extractZip('IP2LOCATION-LITE-DB11.CSV.ZIP');
+        return $this->extractZip('apps/Core/Packages/Devtools/GeoExtractData/Data/IP2LOCATION-LITE-DB11.CSV.ZIP');
     }
 
     protected function processGeoIpv4Data()
@@ -246,7 +251,7 @@ class DevtoolsGeoExtractData extends BasePackage
 
     protected function unzipGeoIpv6Data()
     {
-        return $this->extractZip('IP2LOCATION-LITE-DB11.IPV6.CSV.ZIP');
+        return $this->extractZip('apps/Core/Packages/Devtools/GeoExtractData/Data/IP2LOCATION-LITE-DB11.IPV6.CSV.ZIP');
     }
 
     protected function processGeoIpv6Data()
@@ -360,7 +365,7 @@ class DevtoolsGeoExtractData extends BasePackage
 
     protected function downloadData($url, $sink)
     {
-        $this->remoteWebContent->request(
+        $download = $this->remoteWebContent->request(
             'GET',
             $url,
             [
@@ -402,6 +407,14 @@ class DevtoolsGeoExtractData extends BasePackage
             ]
         );
 
-        return true;
+        $this->trackCounter = 0;
+
+        if ($download->getStatusCode() === 200) {
+            return true;
+        }
+
+        $this->addResponse('Download resulted in : ' . $download->getStatusCode(), 1);
+
+        return false;
     }
 }

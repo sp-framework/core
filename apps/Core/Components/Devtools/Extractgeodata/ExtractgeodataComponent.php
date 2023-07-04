@@ -34,10 +34,16 @@ class ExtractgeodataComponent extends BaseComponent
                 $this->basepackages->progress->deleteProgressFile();
             }
 
-            $this->registerProgressMethods();
+            if (!$this->registerProgressMethods()) {
+                $this->addResponse('No Methods Selected', 1);
 
-            $this->geoExtractDataPackage->downloadGeoData();
-            $this->geoExtractDataPackage->processGeoData();
+                return;
+            }
+
+            if (isset($this->postData()['geo']) && $this->postData()['geo'] == 'true') {
+                $this->geoExtractDataPackage->downloadGeoData();
+                $this->geoExtractDataPackage->processGeoData();
+            }
 
             if (isset($this->postData()['timezone']) && $this->postData()['timezone'] == 'true') {
                 $this->geoExtractDataPackage->downloadTimezoneData();
@@ -67,18 +73,23 @@ class ExtractgeodataComponent extends BaseComponent
 
     protected function registerProgressMethods()
     {
-        $methods =
-            [
+        $methods = [];
+
+        if (isset($this->postData()['geo']) && $this->postData()['geo'] == 'true') {
+            $methods = array_merge($methods,
                 [
-                    'method'    => 'downloadGeoData',
-                    'text'      => 'Download Geo Location Data...',
-                    'remoteWeb' => true
-                ],
-                [
-                    'method'    => 'processGeoData',
-                    'text'      => 'Process Geo Location Data...'
+                    [
+                        'method'    => 'downloadGeoData',
+                        'text'      => 'Download Geo Location Data...',
+                        'remoteWeb' => true
+                    ],
+                    [
+                        'method'    => 'processGeoData',
+                        'text'      => 'Process Geo Location Data...'
+                    ]
                 ]
-            ];
+            );
+        }
 
         if (isset($this->postData()['timezone']) && $this->postData()['timezone'] == 'true') {
             $methods = array_merge($methods,
@@ -133,6 +144,10 @@ class ExtractgeodataComponent extends BaseComponent
             );
         }
 
+        if (count($methods) === 0) {
+            return false;
+        }
+
         $methods = array_merge($methods,
             [
                 [
@@ -143,5 +158,7 @@ class ExtractgeodataComponent extends BaseComponent
         );
 
         $this->basepackages->progress->registerMethods($methods);
+
+        return true;
     }
 }
