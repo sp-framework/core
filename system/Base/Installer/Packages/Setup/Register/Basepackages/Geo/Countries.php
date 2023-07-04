@@ -6,6 +6,10 @@ use Phalcon\Helper\Json;
 
 class Countries
 {
+    public $trackCounter;
+
+    public $progress;
+
     protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/';
 
     public function register($db, $ff, $localContent)
@@ -52,10 +56,14 @@ class Countries
                 $countryStore->updateOrInsert($countryToInsert);
             }
         }
+
+        return true;
     }
 
-    public function downloadSelectedCountryStatesAndCities($ff, $localContent, $remoteWebContent, $country)
+    public function downloadSelectedCountryStatesAndCities($ff, $localContent, $remoteWebContent, $country, $progress)
     {
+        $this->progress = $progress;
+
         $countryStore = $ff->store('basepackages_geo_countries');
 
         $country = $countryStore->findOneBy(['iso3', '=', $country]);
@@ -68,17 +76,52 @@ class Countries
             }
 
             $downloadCountry =
-                $remoteWebContent
-                    ->request(
-                        'GET',
-                        'https://dev.bazaari.com.au/sp-public/geodata/raw/branch/master/' . $country['iso2'] . '.zip',
-                        ['verify' => false, 'connect_timeout' => 5]
-                    )->getBody()->getContents();
+                $remoteWebContent->request(
+                    'GET',
+                    'https://dev.bazaari.com.au/sp-public/geodata/raw/branch/master/' . $country['iso2'] . '.zip',
+                    [
+                        'progress' => function(
+                            $downloadTotal,
+                            $downloadedBytes,
+                            $uploadTotal,
+                            $uploadedBytes
+                        ) {
+                            $counters =
+                                    [
+                                        'downloadTotal'     => $downloadTotal,
+                                        'downloadedBytes'   => $downloadedBytes,
+                                        'uploadTotal'       => $uploadTotal,
+                                        'uploadedBytes'     => $uploadedBytes
+                                    ];
 
-            $localContent->write($this->sourceDir . $country['iso2'] . '.zip', $downloadCountry);
+                            if ($downloadedBytes === 0) {
+                                return;
+                            }
+
+                            //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
+                            //So this way, we only update progress when there is actually an update.
+                            if ($downloadedBytes === $this->trackCounter) {
+                                return;
+                            }
+
+                            $this->trackCounter = $downloadedBytes;
+
+                            if ($downloadedBytes === $downloadTotal) {
+                                $this->progress->updateProgress('downloadCountriesStateAndCities', true, false, null, $counters);
+                            } else {
+                                $this->progress->updateProgress('downloadCountriesStateAndCities', null, false, null, $counters);
+                            }
+                        },
+                        'verify'            => false,
+                        'connect_timeout'   => 5,
+                        'sink'              => base_path($this->sourceDir . $country['iso2'] . '.zip')
+                    ]
+                );
+
+            $this->trackCounter = 0;
 
             if ($zip->open(base_path($this->sourceDir . $country['iso2'] . '.zip'))) {
-                if (!$zip->extractTo('/')) {
+                if (!$zip->extractTo(base_path($this->sourceDir))) {
                     return false;
                 }
             } else {
@@ -95,6 +138,19 @@ class Countries
 
     public function registerSelectedCountryStatesAndCities($ff, $localContent, $remoteWebContent, $country, $ip2location)
     {
+        // /etc/apache2.conf - Change the timeout to 3600 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
+        // Timeout 3600
+
+        //Increase Exectimeout to 20 mins as this process takes time to extract and merge data.
+        if ((int) ini_get('max_execution_time') < 3600) {
+            set_time_limit(3600);
+        }
+
+        //Increase memory_limit to 2G as the process takes a bit of memory to process the array.
+        if ((int) ini_get('memory_limit') < 2048) {
+            ini_set('memory_limit', '2048M');
+        }
+
         $countriesStore = $ff->store('basepackages_geo_countries');
         $country = $countriesStore->findOneBy(['iso3', '=', $country]);
         $statesStore = $ff->store('basepackages_geo_states');
@@ -120,7 +176,6 @@ class Countries
                 }
 
                 $statesStore->updateOrInsert($state, false);
-                die();
 
                 if (isset($cities)) {
                     foreach ($cities as $key => $city) {

@@ -579,7 +579,8 @@ Class Setup
 						],
 						[
 							'method'	=> 'downloadCountriesStateAndCities',
-							'text'		=> 'Downloading geo location: selected country\'s states and cities...'
+							'text'		=> 'Downloading geo location: selected country\'s states and cities...',
+							'remoteWeb' => true
 						],
 						[
 							'method'	=> 'registerCountriesStateAndCities',

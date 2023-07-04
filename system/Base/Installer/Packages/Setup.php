@@ -845,12 +845,13 @@ class Setup
 		}
 		$this->progress->updateProgress('processGeoData', $call, false, 'registerCountries');
 
-		if ($this->postData['dev'] == false) {
+		// if ($this->postData['dev'] == false) {
 			$this->progress->updateProgress('processGeoData', null, false, 'downloadCountriesStateAndCities');
 			$call = $this->downloadCountriesStateAndCities();
 			if ($call !== false) {
 				$call = true;
 			}
+
 			$this->progress->updateProgress('processGeoData', $call, false, 'downloadCountriesStateAndCities');
 
 			if ($call) {
@@ -861,7 +862,7 @@ class Setup
 				}
 				$this->progress->updateProgress('processGeoData', $call, false, 'registerCountriesStateAndCities');
 			}
-		}
+		// }
 
 		$this->progress->updateProgress('processGeoData', null, false, 'registerTimezones');
 		$call = $this->registerTimezones();
@@ -880,7 +881,7 @@ class Setup
 
 	protected function downloadCountriesStateAndCities()
 	{
-		return (new RegisterCountries())->downloadSelectedCountryStatesAndCities($this->ff, $this->localContent, $this->remoteWebContent, $this->postData['country']);
+		return (new RegisterCountries())->downloadSelectedCountryStatesAndCities($this->ff, $this->localContent, $this->remoteWebContent, $this->postData['country'], $this->progress);
 	}
 
 	protected function registerCountriesStateAndCities()
