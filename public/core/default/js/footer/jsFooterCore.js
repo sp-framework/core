@@ -11670,12 +11670,18 @@ var BazProgress = function() {
     var initialized = false;
     var progressCounter = 0;
     var online = false;
-    var element, manualShowHide, hasChild;
+    var element, manualShowHide, hasChild, hasRemoteWeb;
     var callableFunc = null;
     var dataCollection = window.dataCollection;
     var url
     var postData = { };
     var progressOptions;
+    var downloadTotal = 0;
+    var downloadedBytes = 0;
+    var uploadTotal = 0;
+    var uploadedBytes = 0;
+    var isUpload = false;
+    var isDownload = false;
     // Error
     // function error(errorMsg) {
     //     throw new Error(errorMsg);
@@ -11710,10 +11716,11 @@ var BazProgress = function() {
         console.log('Progress service offline');
     }
 
-    function buildProgressBar(el, mSH = false, hC = false) {
+    function buildProgressBar(el, mSH = false, hC = false, hRW = false) {
         element = el;
         manualShowHide = mSH;
         hasChild = hC;
+        hasRemoteWeb = hRW;
 
         $(element).html(
             '<div class="progress active progress-xs">' +
@@ -11736,6 +11743,20 @@ var BazProgress = function() {
                     '<div class="col">' +
                         '<span class="sr-only ' + $(element)[0].id + '-child-progress-span"></span>' +
                         '<span class="' + $(element)[0].id + '-child-progress-span"></span>' +
+                    '</div>' +
+                '</div>'
+            );
+        }
+
+        if (hasRemoteWeb) {
+            $(element).append(
+                '<div class="progress progress-remote active progress-xxs" hidden>' +
+                    '<div class="progress-bar progress-xxs bg-primary progress-bar-animated progress-bar-striped ' + $(element)[0].id + '-remote-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width: 0%"></div>' +
+                '</div>' +
+                '<div class="row remote-progress-span text-center text-sm text-primary m-1">' +
+                    '<div class="col">' +
+                        '<span class="sr-only ' + $(element)[0].id + '-remote-progress-span"></span>' +
+                        '<span class="' + $(element)[0].id + '-remote-progress-span"></span>' +
                     '</div>' +
                 '</div>'
             );
@@ -11815,21 +11836,53 @@ var BazProgress = function() {
                             if (responseData['runners']['child']) {
                                 $('#' + $(element)[0].id + ' .progress-child').attr('hidden', false);
                                 $('.child-progress-span').attr('hidden', false);
-                                $('.' + $(element)[0].id + '-child-progress-span')
-                                    .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
 
-                                $('.' + $(element)[0].id + '-child-bar').css('width', responseData['percentComplete'] + '%');
-                                $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', responseData['percentComplete']);
+                                if (responseData['runners']['running']['remoteWeb']) {
+                                    $('#' + $(element)[0].id + ' .progress-remote').attr('hidden', false);
+                                    $('.remote-progress-span').attr('hidden', false);
+
+                                    $('.' + $(element)[0].id + '-remote-progress-span')
+                                        .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
+
+                                    $('.' + $(element)[0].id + '-remote-bar').css('width', responseData['percentComplete'] + '%');
+                                    $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', responseData['percentComplete']);
+                                } else {
+                                    $('#' + $(element)[0].id + ' .progress-remote').attr('hidden', true);
+                                    $('.remote-progress-span').attr('hidden', true);
+
+                                    $('.' + $(element)[0].id + '-child-progress-span')
+                                        .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
+
+                                    $('.' + $(element)[0].id + '-child-bar').css('width', responseData['percentComplete'] + '%');
+                                    $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', responseData['percentComplete']);
+                                }
                             } else {
                                 $('#' + $(element)[0].id + ' .progress-child').attr('hidden', true);
                                 $('.child-progress-span').attr('hidden', true);
-                                $('.' + $(element)[0].id + '-progress-span')
-                                    .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
 
-                                $('.' + $(element)[0].id + '-bar').css('width', responseData['percentComplete'] + '%');
-                                $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', responseData['percentComplete']);
+                                if (responseData['runners']['running']['remoteWeb']) {
+                                    $('#' + $(element)[0].id + ' .progress-remote').attr('hidden', false);
+                                    $('.remote-progress-span').attr('hidden', false);
+
+                                    var text = getText(responseData);
+
+                                    $('.' + $(element)[0].id + '-remote-progress-span').html(text);
+
+                                    $('.' + $(element)[0].id + '-remote-bar').css('width', responseData['percentComplete'] + '%');
+                                    $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', responseData['percentComplete']);
+                                } else {
+                                    $('#' + $(element)[0].id + ' .progress-remote').attr('hidden', true);
+                                    $('.remote-progress-span').attr('hidden', true);
+
+                                    $('.' + $(element)[0].id + '-progress-span')
+                                        .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
+
+                                    $('.' + $(element)[0].id + '-bar').css('width', responseData['percentComplete'] + '%');
+                                    $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', responseData['percentComplete']);
+                                }
                             }
                         }
+
                         if (online === false) {
                             timerId = BazHelpers.getTimerId('progressCounter');
                             if (timerId) {
@@ -11875,6 +11928,17 @@ var BazProgress = function() {
                         if (callableFunc && callableFunc['onComplete']) {
                             callableFunc['onComplete'](response);
                         }
+
+                        downloadTotal = 0;
+                        downloadedBytes = 0;
+                        uploadTotal = 0;
+                        uploadedBytes = 0;
+                        isUpload = false;
+                        isDownload = false;
+                        $('.' + $(element)[0].id + '-child-bar').css('width', '0%');
+                        $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', 0);
+                        $('.' + $(element)[0].id + '-remote-bar').css('width', '0%');
+                        $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', 0);
                     } else {
                         resetProgressCounter();
                     }
@@ -11896,6 +11960,36 @@ var BazProgress = function() {
         }
     }
 
+    function getText(responseData) {
+        var text = responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)';
+
+        if (responseData['runners']['running']['remoteWebCounters']) {
+            if (responseData['runners']['running']['remoteWebCounters']['downloadTotal'] &&
+                responseData['runners']['running']['remoteWebCounters']['downloadTotal'] > 0
+            ) {
+                isDownload = true;
+                downloadTotal = responseData['runners']['running']['remoteWebCounters']['downloadTotal'];
+                downloadedBytes = responseData['runners']['running']['remoteWebCounters']['downloadedBytes'];
+            } else if (responseData['runners']['running']['remoteWebCounters']['uploadTotal'] &&
+                responseData['runners']['running']['remoteWebCounters']['uploadTotal'] > 0
+            ) {
+                isUpload = true;
+                uploadTotal = responseData['runners']['running']['remoteWebCounters']['uploadTotal'];
+                uploadedBytes = responseData['runners']['running']['remoteWebCounters']['uploadedBytes'];
+            }
+        }
+
+        if (isDownload || isUpload) {
+            if (isDownload) {
+                text = responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '% | ' + downloadedBytes + '/' + downloadTotal + ' bytes)';
+            } else if (isUpload) {
+                text = responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '% | ' + uploadedBytes + '/' + uploadTotal + ' bytes)';
+            }
+        }
+
+        return text;
+    }
+
     function resetProgressCounter() {
         if (progressCounter !== 60) {
             progressCounter ++;
@@ -11911,6 +12005,12 @@ var BazProgress = function() {
         $('#' + $(element)[0].id).attr('hidden', true);
         $('.' + $(element)[0].id + '-bar').css('width', '0%');
         $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', 0);
+        downloadTotal = 0;
+        downloadedBytes = 0;
+        uploadTotal = 0;
+        uploadedBytes = 0;
+        isUpload = false;
+        isDownload = false;
     }
 
     function onMessage(data) {
@@ -11948,8 +12048,8 @@ var BazProgress = function() {
                 getProgress(options);
             }
         }
-        BazProgress.buildProgressBar = function(el, mSH = false, child = false) {
-            buildProgressBar(el, mSH, child);
+        BazProgress.buildProgressBar = function(el, mSH = false, child = false, remoteWeb = false) {
+            buildProgressBar(el, mSH, child, remoteWeb);
         }
         BazProgress.setCallable = function(callable) {
             setCallable(callable);

@@ -111,17 +111,13 @@ class Progress extends BasePackage
     {
         $progressFile = $this->readProgressFile($session);
 
-        if (!$progressFile || ($progressFile && !isset($progressFile['runners']))) {
-            return false;
-        }
-
         $progress =
             [
                 'total'             => $progressFile['total'],
                 'completed'         => $progressFile['completed'],
                 'preCheckComplete'  => $progressFile['preCheckComplete'],
                 'percentComplete'   => $this->getPercentComplete($progressFile),
-                'runners'           => $progressFile['runners']
+                'runners'           => $progressFile['runners'] ?? false
             ];
 
         if ($returnArray) {
@@ -168,7 +164,13 @@ class Progress extends BasePackage
 
                                 $runners['child'] = true;
                                 $runners['remainingChilds'] = count($progressFile['processes'][$progressFileKey]['childs']);
-                                $runners['running'] = current($progressFileMethod['childs']);
+                                $currentProcess = current($progressFileMethod['childs']);
+
+                                if (isset($currentProcess['remoteWeb']) && $currentProcess['remoteWeb'] === true && $remoteWebCounters) {
+                                    $currentProcess = array_merge($currentProcess, ['remoteWebCounters' => $remoteWebCounters]);
+                                }
+
+                                $runners['running'] = $currentProcess;
                                 $runners['next'] = next($progressFileMethod['childs']);
 
                                 break;
@@ -277,11 +279,9 @@ class Progress extends BasePackage
             }
 
             if ($webProgress > 0) {
-                $totalProgress = (float) number_format($webProgress * 100 / $methodPercent);
-
-                $percentComplete = $percentComplete + $totalProgress;
+                $percentComplete = $webProgress;
             }
-        }//Need to do if runner is a child
+        }
 
         return $percentComplete;
     }
