@@ -192,13 +192,28 @@ class IoHelper
         }
     }
 
-    public static function countFolderContent(string $folder): int
+    public static function countFolderContent(string $folder, $recount = false): array
     {
         self::checkRead($folder);
 
         $fi = new \FilesystemIterator($folder, \FilesystemIterator::SKIP_DOTS);
 
-        return iterator_count($fi);
+        $count = [];
+        $count['totalEntries'] = iterator_count($fi);
+
+        if ($recount && $count['totalEntries'] > 0) {
+            $files = iterator_to_array($fi);
+
+            $ids = [];
+
+            foreach ($files as $key => $file) {
+                array_push($ids, (int) str_replace('.json', '', $file->getFileName()));
+            }
+
+            $count['lastId'] = max($ids);
+        }
+
+        return $count;
     }
 
     protected static function readFileContent($filePath)

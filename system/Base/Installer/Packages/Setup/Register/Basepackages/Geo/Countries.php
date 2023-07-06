@@ -208,6 +208,12 @@ class Countries
                 }
             }
 
+            $localContent->delete($this->sourceDir . $country['iso2'] . '.json');
+            $localContent->delete($this->sourceDir . $country['iso2'] . '.zip');
+            $countriesStore->count(true);
+            $statesStore->count(true);
+            $citiesStore->count(true);
+
             return true;
         } catch (\Exception $e) {
             return false;

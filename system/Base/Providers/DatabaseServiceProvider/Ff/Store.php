@@ -346,6 +346,24 @@ class Store
         return $this->data;
     }
 
+    public function insertMany(array $data): array
+    {
+        if (empty($data)) {
+            throw new InvalidArgumentException('No data found to insert in the store');
+        }
+
+        $results = [];
+        foreach ($data as $document) {
+            $results[] = $this->writeNewDocumentToStore($document);
+        }
+
+        $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
+
+        $this->data = $results;
+
+        return $this->data;
+    }
+
     public function updateOrInsert(array $data, bool $autoGenerateIdOnInsert = true): array
     {
         if (empty($data)) {
@@ -361,9 +379,6 @@ class Store
 
             if ($autoGenerateIdOnInsert && $this->findById($data[$this->primaryKey]) === null) {
                 $data[$this->primaryKey] = $this->increaseCounterAndGetNextId();
-            } else {
-                var_dump('meme');
-                var_Dump($data);
             }
         }
 
@@ -381,24 +396,6 @@ class Store
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
         $this->data = $data;
-
-        return $this->data;
-    }
-
-    public function insertMany(array $data): array
-    {
-        if (empty($data)) {
-            throw new InvalidArgumentException('No data found to insert in the store');
-        }
-
-        $results = [];
-        foreach ($data as $document) {
-            $results[] = $this->writeNewDocumentToStore($document);
-        }
-
-        $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
-
-        $this->data = $results;
 
         return $this->data;
     }
@@ -772,7 +769,7 @@ class Store
         return $this->primaryKey;
     }
 
-    public function count(): int
+    public function count($recount = false): int
     {
         if ($this->useCache === true) {
             $cacheTokenArray = ["count" => true];
@@ -786,8 +783,14 @@ class Store
             }
         }
 
+        $counters = IoHelper::countFolderContent($this->getDataPath(), $recount);
+
+        if ($recount) {
+            $this->updateCounters($counters);
+        }
+
         $value = [
-            "count" => IoHelper::countFolderContent($this->getDataPath())
+            "count" => $counters['totalEntries']
         ];
 
         if (isset($cache))  {
@@ -795,6 +798,22 @@ class Store
         }
 
         return $value["count"];
+    }
+
+    public function getLastId(): int
+    {
+        if (!file_exists($this->storePath . '_cnt.sdb')) {
+            throw new IOException("File " . $this->storePath . '_cnt.sdb' . " does not exist.");
+        }
+
+        $counters = IoHelper::getFileContent($this->storePath . '_cnt.sdb');
+        $counters = json_decode($counters, true);
+
+        if (!isset($counters['lastId'])) {
+            return 0;
+        }
+
+        return (int) $counters['lastId'];
     }
 
     public function getSearchOptions(): array
@@ -1217,16 +1236,7 @@ class Store
         $counters['lastId'] = $newId;
         $counters['totalEntries'] = $counters['totalEntries'] + 1;
 
-        $updateCounters = IoHelper::updateFileContent(
-            $this->storePath . '_cnt.sdb',
-            function () use ($counters) {
-                return json_encode($counters);
-            }
-        );
-
-        if (!$updateCounters) {
-            throw new IOException("File " . $this->storePath . '_cnt.sdb' . ". Could not update Id.");
-        }
+        $this->updateCounters($counters);
 
         return $newId;
     }
@@ -1241,6 +1251,13 @@ class Store
         $counters['lastId'] = $previousId;
         $counters['totalEntries'] = $counters['totalEntries'] - 1;
 
+        $this->updateCounters($counters);
+
+        return $previousId;
+    }
+
+    protected function updateCounters($counters)
+    {
         $updateCounters = IoHelper::updateFileContent(
             $this->storePath . '_cnt.sdb',
             function () use ($counters) {
@@ -1252,7 +1269,7 @@ class Store
             throw new IOException("File " . $this->storePath . '_cnt.sdb' . ". Could not update Id.");
         }
 
-        return $previousId;
+        return true;
     }
 
     protected function checkAndStripId($id): int
