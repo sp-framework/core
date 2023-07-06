@@ -11,6 +11,7 @@ class TestComponent extends BaseComponent
 
     public function viewAction()
     {
+        die();
         set_time_limit(600);
 
         $starttime = microtime(true);

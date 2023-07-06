@@ -243,7 +243,18 @@ class Store
 
     public function getLastInsertedId(): int
     {
-        return (int) IoHelper::getFileContent($this->storePath . '_cnt.sdb');
+        if (!file_exists($this->storePath . '_cnt.sdb')) {
+            throw new IOException("File " . $this->storePath . '_cnt.sdb' . " does not exist.");
+        }
+
+        $counters = IoHelper::getFileContent($this->storePath . '_cnt.sdb');
+        $counters = json_decode($counters, true);
+
+        if (!isset($counters['lastId'])) {
+            return 0;
+        }
+
+        return (int) $counters['lastId'];
     }
 
     public function getStorePath(): string
@@ -798,22 +809,6 @@ class Store
         }
 
         return $value["count"];
-    }
-
-    public function getLastId(): int
-    {
-        if (!file_exists($this->storePath . '_cnt.sdb')) {
-            throw new IOException("File " . $this->storePath . '_cnt.sdb' . " does not exist.");
-        }
-
-        $counters = IoHelper::getFileContent($this->storePath . '_cnt.sdb');
-        $counters = json_decode($counters, true);
-
-        if (!isset($counters['lastId'])) {
-            return 0;
-        }
-
-        return (int) $counters['lastId'];
     }
 
     public function getSearchOptions(): array
