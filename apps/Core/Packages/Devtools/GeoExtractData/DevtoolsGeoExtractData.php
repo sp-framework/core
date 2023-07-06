@@ -63,6 +63,19 @@ class DevtoolsGeoExtractData extends BasePackage
 
     protected function processGeoData()
     {
+        // /etc/apache2.conf - Change the timeout to 1800 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
+        // Timeout 1800
+
+        //Increase Exectimeout to 20 mins as this process takes time to extract and merge data.
+        if ((int) ini_get('max_execution_time') < 1800) {
+            set_time_limit(1800);
+        }
+
+        //Increase memory_limit to 2G as the process takes a bit of memory to process the array.
+        if ((int) ini_get('memory_limit') < 2048) {
+            ini_set('memory_limit', '2048M');
+        }
+
         $countries = [];
 
         try {
@@ -152,7 +165,7 @@ class DevtoolsGeoExtractData extends BasePackage
 
         $zip->open(base_path($this->sourceDir . $sourceFile . '.zip'), $zip::CREATE);
 
-        $zip->addFile(base_path($this->sourceDir . $sourceFile . '.json'));
+        $zip->addFile(base_path($this->sourceDir . $sourceFile . '.json'), $sourceFile . '.json');
 
         $zip->close();
     }
@@ -236,7 +249,7 @@ class DevtoolsGeoExtractData extends BasePackage
     {
         $this->sourceFile = Reader::createFromPath(base_path($this->sourceDir . 'IP2LOCATION-LITE-DB11.CSV'));
 
-        return $this->processCSV('ipv4');
+        return $this->processCSV('ip2locationv4');
     }
 
     protected function downloadGeoIpv6Data()
@@ -258,17 +271,17 @@ class DevtoolsGeoExtractData extends BasePackage
     {
         $this->sourceFile = Reader::createFromPath(base_path($this->sourceDir . 'IP2LOCATION-LITE-DB11.IPV6.CSV'));
 
-        return $this->processCSV('ipv6');
+        return $this->processCSV('ip2locationv6');
     }
 
-    protected function processCSV($sourceFile)
+    protected function processCSV($ipType)
     {
-        // /etc/apache2.conf - Change the timeout to 3600 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
-        // Timeout 3600
+        // /etc/apache2.conf - Change the timeout to 1800 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
+        // Timeout 1800
 
         //Increase Exectimeout to 20 mins as this process takes time to extract and merge data.
-        if ((int) ini_get('max_execution_time') < 3600) {
-            set_time_limit(3600);
+        if ((int) ini_get('max_execution_time') < 1800) {
+            set_time_limit(1800);
         }
 
         //Increase memory_limit to 2G as the process takes a bit of memory to process the array.
@@ -293,9 +306,9 @@ class DevtoolsGeoExtractData extends BasePackage
             $countries[$record[2]]['states'][$stateName]['name'] = $record[4];
 
             if (isset($countries[$record[2]]['states'][$stateName]['cities'][$cityName]) &&
-                isset($countries[$record[2]]['states'][$stateName]['cities'][$cityName][$sourceFile])
+                isset($countries[$record[2]]['states'][$stateName]['cities'][$cityName][$ipType])
             ) {
-                $ipRanges = array_merge($countries[$record[2]]['states'][$stateName]['cities'][$cityName][$sourceFile], [$record[0], $record[1]]);
+                $ipRanges = array_merge($countries[$record[2]]['states'][$stateName]['cities'][$cityName][$ipType], [$record[0], $record[1]]);
             } else {
                 $ipRanges = [$record[0], $record[1]];
             }
@@ -308,12 +321,12 @@ class DevtoolsGeoExtractData extends BasePackage
                     "postcode"          => $record[8],
                     "gmtOffset"         => $this->getGMTOffset($record[9]),
                     "gmtOffsetName"     => 'UTC' . $record[9],
-                    $sourceFile         => $ipRanges
+                    $ipType             => $ipRanges
                 ];
         }
 
         foreach ($countries as $countryKey => $country) {
-            $this->localContent->write($this->sourceDir . 'ip2location/' . $countryKey . '.json', JSON::encode($country));
+            $this->localContent->write($this->sourceDir . 'ip2location/' . $ipType . '/' . $countryKey . '.json', JSON::encode($country));
 
             array_push($countryKeys, $countryKey);
         }
@@ -325,24 +338,46 @@ class DevtoolsGeoExtractData extends BasePackage
 
     protected function mergeGeoIpData()
     {
+        // /etc/apache2.conf - Change the timeout to 1800 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
+        // Timeout 1800
+
+        //Increase Exectimeout to 20 mins as this process takes time to extract and merge data.
+        if ((int) ini_get('max_execution_time') < 1800) {
+            set_time_limit(1800);
+        }
+
+        //Increase memory_limit to 2G as the process takes a bit of memory to process the array.
+        if ((int) ini_get('memory_limit') < 2048) {
+            ini_set('memory_limit', '2048M');
+        }
+
         try {
             $allCountries = Json::decode($this->localContent->read($this->sourceDir . 'ip2location/AllCountries.json'), true);
 
             foreach ($allCountries as $country) {
+                $countryData = [];
+
                 if ($this->localContent->fileExists($this->sourceDir . $country . '.json')) {
-                    $countryKey = $country;
-
                     $countryData = Json::decode($this->localContent->read($this->sourceDir . $country . '.json'), true);
-                    $iplocationData = Json::decode($this->localContent->read($this->sourceDir . 'ip2location/' . $country . '.json'), true);
 
-                    $country = array_replace_recursive($countryData, $iplocationData);
+                    $iplocationv4Data = [];
+                    if ($this->localContent->fileExists($this->sourceDir . 'ip2location/ip2locationv4/' . $country . '.json')) {
+                        $iplocationv4Data = Json::decode($this->localContent->read($this->sourceDir . 'ip2location/ip2locationv4/' . $country . '.json'), true);
+                    }
 
-                    $this->localContent->write($this->sourceDir . $countryKey . '.json', JSON::encode($country));
+                    $iplocationv6Data = [];
+                    if ($this->localContent->fileExists($this->sourceDir . 'ip2location/ip2locationv6/' . $country . '.json')) {
+                        $iplocationv6Data = Json::decode($this->localContent->read($this->sourceDir . 'ip2location/ip2locationv6/' . $country . '.json'), true);
+                    }
+
+                    $countryGeoData = array_replace_recursive($countryData, $iplocationv4Data, $iplocationv6Data);
+
+                    $this->localContent->write($this->sourceDir . $country . '.json', JSON::encode($countryGeoData));
                 }
             }
 
             return true;
-        } catch (FilesystemException | UnableToReadFile $exception) {
+        } catch (FilesystemException | UnableToReadFile | UnableToWriteFile | throwable $exception) {
             throw $exception;
         }
     }

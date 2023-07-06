@@ -121,7 +121,7 @@ class ExtractgeodataComponent extends BaseComponent
                     ],
                     [
                         'method'    => 'processGeoIpv4Data',
-                        'text'      => 'Process Geo Location IPv4 Data...',
+                        'text'      => 'Process Geo Location IPv4 Data. This will take a while...',
                     ],
                     [
                         'method'    => 'downloadGeoIpv6Data',
@@ -134,11 +134,11 @@ class ExtractgeodataComponent extends BaseComponent
                     ],
                     [
                         'method'    => 'processGeoIpv6Data',
-                        'text'      => 'Process Geo Location IPv6 Data...',
+                        'text'      => 'Process Geo Location IPv6 Data. This will take a while...',
                     ],
                     [
                         'method'    => 'mergeGeoIpData',
-                        'text'      => 'Merge Geo Location IP Data...',
+                        'text'      => 'Merge Geo Location IP Data. This will  take a while...',
                     ]
                 ]
             );
