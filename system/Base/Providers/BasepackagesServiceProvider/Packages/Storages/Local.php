@@ -431,24 +431,34 @@ class Local extends BasePackage
     public function getFileInfo($uuid, $orgFileName = null, $like = false)
     {
         if ($orgFileName) {
-            return $this->getByParams(
-                [
-                    'conditions'    => $like === true ? 'org_file_name LIKE :org_file_name:' : 'org_file_name = :org_file_name:',
-                    'bind'          =>
-                        [
-                            'org_file_name'    => $like === true ? '%' . $orgFileName . '%' : $orgFileName
-                        ]
-                ]);
+            if ($this->config->databasetype === 'db') {
+                $conditions =
+                    [
+                        'conditions'    => $like === true ? 'org_file_name LIKE :org_file_name:' : 'org_file_name = :org_file_name:',
+                        'bind'          =>
+                            [
+                                'org_file_name'    => $like === true ? '%' . $orgFileName . '%' : $orgFileName
+                            ]
+                    ];
+            } else {
+                $conditions = ['conditions' => $like === true ? ['org_file_name', 'LIKE', '%' . $orgFileName . '%'] : ['org_file_name', '=', $orgFileName]];
+            }
+        } else {
+            if ($this->config->databasetype === 'db') {
+                $conditions =
+                    [
+                        'conditions'    => 'uuid = :uuid:',
+                        'bind'          =>
+                            [
+                                'uuid'    => $uuid
+                            ]
+                    ];
+            } else {
+                $conditions = ['conditions' => ['uuid', '=', $uuid]];
+            }
         }
 
-        return $this->getByParams(
-            [
-                'conditions'    => 'uuid = :uuid:',
-                'bind'          =>
-                    [
-                        'uuid'    => $uuid
-                    ]
-            ]);
+        return $this->getByParams($conditions);
     }
 
     protected function getSizedImage($file, $width)

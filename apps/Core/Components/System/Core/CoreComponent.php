@@ -46,19 +46,32 @@ class CoreComponent extends BaseComponent
         $this->view->logLevels = $this->logger->getLogLevels();
         $storage = $this->useStorage('private');
 
+        if ($this->config->databasetype === 'db') {
+            $params =
+                [
+                    'conditions'    => 'uuid_location = :uuidLocation: AND storages_id = :storagesId: AND orphan = :orphan:',
+                    'bind'          =>
+                        [
+                            'uuidLocation'    => '.dbbackups/',
+                            'storagesId'      => $storage['id'],
+                            'orphan'          => 0
+                        ]
+                ];
+        } else {
+            $params =
+                [
+                    'conditions'    =>
+                        [
+                            ['uuid_location', '=', '.dbbackups/'],
+                            ['storages_id', '=', $storage['id']]
+                        ]
+                ];
+        }
+
         $storageFiles =
             $this->basepackages->storages->getFiles(
                 ['storagetype'  => $storage['permission'],
-                 'params'       =>
-                    [
-                        'conditions'    => 'uuid_location = :uuidLocation: AND storages_id = :storagesId: AND orphan = :orphan:',
-                        'bind'          =>
-                            [
-                                'uuidLocation'    => '.dbbackups/',
-                                'storagesId'      => $storage['id'],
-                                'orphan'          => 0
-                            ]
-                    ]
+                 'params'       => $params
                 ]
             );
 

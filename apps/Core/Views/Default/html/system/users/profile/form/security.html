@@ -132,7 +132,7 @@
         )}}
     </div>
 </div>
-{% if account['two_fa_status'] == '1' %}
+{% if account['security']['two_fa_status'] == '1' %}
     {% set disableHidden = false %}
     {% set enableHidden = true %}
 {% else %}

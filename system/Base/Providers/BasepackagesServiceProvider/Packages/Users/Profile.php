@@ -85,6 +85,8 @@ class Profile extends BasePackage
                 return $profile;
             }
         }
+
+        return false;
     }
 
     /**
@@ -175,13 +177,16 @@ class Profile extends BasePackage
             $address['address_id'] = $profile['address']['id'];
 
             $this->basepackages->addressbook->mergeAndUpdate($address);
-
         } else {
             $address = $profile;
 
             $address['package_name'] = $this->packageName;
 
             $address['package_row_id'] = $profile['id'];
+
+            if (isset($address['id'])) {
+                unset($address['id']);
+            }
 
             $this->basepackages->addressbook->addAddress($address);
         }
@@ -296,11 +301,19 @@ class Profile extends BasePackage
 
     public function generateViewData()
     {
-        $accountObj = $this->basepackages->accounts->getFirst('id', $this->auth->account()['id']);
+        $this->packagesData->profile = $this->getProfile($this->auth->account()['id']);
 
-        $canLoginArr = $accountObj->canlogin->toArray();
+        if ($this->config->databasetype === 'db') {
+            $accountObj = $this->basepackages->accounts->getFirst('id', $this->auth->account()['id']);
 
-        $account = $accountObj->toArray();
+            $canLoginArr = $accountObj->canlogin->toArray();
+
+            $account = $accountObj->toArray();
+        } else {
+            $account = $this->basepackages->accounts->getAccountById($this->auth->account()['id']);
+
+            $canLoginArr = $account['canlogin'];
+        }
 
         if ($canLoginArr > 0) {
             foreach ($canLoginArr as $key => $value) {
@@ -435,24 +448,40 @@ class Profile extends BasePackage
         $this->packagesData->sessions = [];
 
         $agentsModel = new BasepackagesUsersAccountsAgents;
+        $identifiersModel = new BasepackagesUsersAccountsIdentifiers;
 
-        $agentsObj = $agentsModel->findByaccount_id($this->auth->account()['id']);
+        if ($this->config->databasetype === 'db') {
+            $agentsObj = $agentsModel->findByaccount_id($this->auth->account()['id']);
 
-        if ($agentsObj) {
-            $agents = $agentsObj->toArray();
+            if ($agentsObj) {
+                $agents = $agentsObj->toArray();
+
+                if (count($agents) > 0) {
+                    foreach ($agents as &$agent) {
+                        if ($identifiersModel::findBysession_id($agent['session_id'])) {
+                            $agent['remember'] = true;
+                        }
+                    }
+                }
+
+            }
+        } else {
+            $agentsStore = $this->ff->store($agentsModel->getSource());
+
+            $agents = $agentsStore->findAll();
 
             if (count($agents) > 0) {
-                $identifiersModel = new BasepackagesUsersAccountsIdentifiers;
+                $identifiersStore = $this->ff->store($identifiersModel->getSource());
 
                 foreach ($agents as &$agent) {
-                    if ($identifiersModel::findBysession_id($agent['session_id'])) {
+                    if ($identifiersStore->findOneBy(['session_id', '=', $agent['session_id']])) {
                         $agent['remember'] = true;
                     }
                 }
             }
-
-            $this->packagesData->sessions = $agents;
         }
+
+        $this->packagesData->sessions = $agents;
 
         return true;
     }

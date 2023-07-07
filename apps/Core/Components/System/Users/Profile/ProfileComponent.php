@@ -38,6 +38,8 @@ class ProfileComponent extends BaseComponent
                         $app['id']
                     ), 'sequence');
 
+            $this->view->profile = $this->profile->packagesData->profile;
+
             $this->view->packages = $this->profile->packagesData->packages;
 
             $this->view->subscriptions = $this->profile->packagesData->subscriptions;

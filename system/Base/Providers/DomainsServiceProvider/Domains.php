@@ -262,9 +262,13 @@ class Domains extends BasePackage
 				return false;
 			}
 
-			$domain['apps'] = Json::decode($domain['apps'], true);
+			if (is_string($domain['apps'])) {
+				$domain['apps'] = Json::decode($domain['apps'], true);
+			}
 			if ($domain['settings']) {
-				$domain['settings'] = Json::decode($domain['settings'], true);
+				if (is_string($domain['settings'])) {
+					$domain['settings'] = Json::decode($domain['settings'], true);
+				}
 			} else {
 				$domain['settings'] = [];
 			}

@@ -649,7 +649,9 @@ abstract class BaseComponent extends Controller
 			$packageInfo = $this->modules->packages->getPackageByName($packageClass);
 			$thisPackage['id'] = $packageInfo['id'];
 			$thisPackage['name'] = $packageInfo['name'];
-			$thisPackage['settings'] = Json::decode($packageInfo['settings'], true);
+			if (is_string($packageInfo['settings'])) {
+				$thisPackage['settings'] = Json::decode($packageInfo['settings'], true);
+			}
 
 			if (!isset($usedModules['packages'])) {
 				$usedModules['packages'] = [];
