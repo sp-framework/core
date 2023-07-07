@@ -133,7 +133,7 @@ class Ff
             }
 
             if ($column->getComment()) {
-                $schema['properties'][$column->getName()]['description'] = $column->getComment();
+                $schema['properties'][$column->getName()]['relation'] = $column->getComment();
             }
         }
 
@@ -229,13 +229,13 @@ class Ff
 
                             $reference[0] = join('+', $reference[0]);
                             $reference[1] = join('+', $reference[1]);
-                            $schema['properties'][$reference['alias']]['description'] = join('|', $reference);
+                            $schema['properties'][$reference['alias']]['relation'] = join('|', $reference);
                         } else {
                             if (isset($reference['fields']) && count($reference['fields']) > 0) {
                                 $reference['fields'] = join(':', $reference['fields']);
                             }
 
-                            $schema['properties'][$reference['alias']]['description'] = join('|', $reference);
+                            $schema['properties'][$reference['alias']]['relation'] = join('|', $reference);
                         }
                     }
                 }

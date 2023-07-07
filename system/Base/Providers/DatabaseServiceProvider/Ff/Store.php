@@ -109,18 +109,18 @@ class Store
             if (isset($schemaArr['properties'])) {
                 foreach ($schemaArr['properties'] as $column => $property) {
                     if (isset($property['type'][1]) && $property['type'][1] === 'array') {
-                        if (isset($property['description'])) {
-                            $description = explode('|', $property['description']);
+                        if (isset($property['relation'])) {
+                            $relation = explode('|', $property['relation']);
 
-                            if (count($description) > 0 && isset($description[2])) {
+                            if (count($relation) > 0 && isset($relation[2])) {
                                 try {
-                                    $relationsStore = new Store($description[2], $this->databasePath);
+                                    $relationsStore = new Store($relation[2], $this->databasePath);
 
                                     $rmd = array_replace_recursive($rmd, $relationsStore->getSchemaMetaData());
 
                                     $rmd['storeRelations'][$column] = [];
                                     $rmd['storeRelations'][$column] = $relationsStore->getSchemaMetaData();
-                                    $rmd['storeRelations'][$column]['relationStore'] = $description[2];
+                                    $rmd['storeRelations'][$column]['relationStore'] = $relation[2];
                                 } catch (\Exception $e) {
                                     //
                                 }
@@ -635,36 +635,36 @@ class Store
                     continue;
                 }
 
-                if (in_array('array', $property['type']) && isset($property['description'])) {
-                    $description = explode('|', $property['description']);
+                if (in_array('array', $property['type']) && isset($property['relation'])) {
+                    $relation = explode('|', $property['relation']);
 
-                    if (count($description) > 0) {
-                        if ($description[1] === 'hasOne' || $description[1] === 'hasMany') {
-                            if (in_array('hasParams', $description) && !$conditions) {
+                    if (count($relation) > 0) {
+                        if ($relation[1] === 'hasOne' || $relation[1] === 'hasMany') {
+                            if (in_array('hasParams', $relation) && !$conditions) {
                                 throw new InvalidArgumentException('Model has params(conditions) set. Please set ffRelationsConditions');
                             }
 
-                            if (isset($description[4])) {
+                            if (isset($relation[4])) {
                                 if ($conditions) {
                                     try {
-                                        $store = new Store($description[2], $this->databasePath);
+                                        $store = new Store($relation[2], $this->databasePath);
 
                                         $storeData = $store->findBy($conditions);
 
                                         if ($storeData && count($storeData) > 0) {
-                                            if ($description[1] === 'hasOne') {
-                                                $data[$description[0]] = $storeData[0];
-                                            } else if ($description[1] === 'hasMany') {
-                                                $data[$description[0]] = $storeData;
+                                            if ($relation[1] === 'hasOne') {
+                                                $data[$relation[0]] = $storeData[0];
+                                            } else if ($relation[1] === 'hasMany') {
+                                                $data[$relation[0]] = $storeData;
                                             }
                                         } else {
-                                            $data[$description[0]] = null;
+                                            $data[$relation[0]] = null;
                                         }
                                     } catch (\Exception $e) {
                                         continue;
                                     }
                                 } else {
-                                    $fields = explode(':', $description[4]);
+                                    $fields = explode(':', $relation[4]);
 
                                     if (count($fields) > 0 && count($fields) % 2 == 0) {
                                         $fieldsArr = Arr::chunk($fields, 2);
@@ -675,18 +675,18 @@ class Store
                                         }
 
                                         try {
-                                            $store = new Store($description[2], $this->databasePath);
+                                            $store = new Store($relation[2], $this->databasePath);
 
                                             $storeData = $store->findBy($criteria);
 
                                             if ($storeData && count($storeData) > 0) {
-                                                if ($description[1] === 'hasOne') {
-                                                    $data[$description[0]] = $storeData[0];
-                                                } else if ($description[1] === 'hasMany') {
-                                                    $data[$description[0]] = $storeData;
+                                                if ($relation[1] === 'hasOne') {
+                                                    $data[$relation[0]] = $storeData[0];
+                                                } else if ($relation[1] === 'hasMany') {
+                                                    $data[$relation[0]] = $storeData;
                                                 }
                                             } else {
-                                                $data[$description[0]] = null;
+                                                $data[$relation[0]] = null;
                                             }
                                         } catch (\Exception $e) {
                                             continue;
@@ -694,19 +694,19 @@ class Store
                                     }
                                 }
                             }
-                        } else if ($description[1] === 'hasOneThrough' || $description[1] === 'hasManyThrough') {
-                            if (in_array('hasParams', $description) && !$conditions) {
+                        } else if ($relation[1] === 'hasOneThrough' || $relation[1] === 'hasManyThrough') {
+                            if (in_array('hasParams', $relation) && !$conditions) {
                                 throw new InvalidArgumentException('Model has params(conditions) set. Please set ffRelationsConditions');
                             }
 
-                            if (isset($description[2]) && isset($description[3])) {
-                                $description[2] = explode('+', $description[2]);
-                                $description[3] = explode('+', $description[3]);
+                            if (isset($relation[2]) && isset($relation[3])) {
+                                $relation[2] = explode('+', $relation[2]);
+                                $relation[3] = explode('+', $relation[3]);
                             }
 
-                            if (isset($description[2][2]) && isset($description[3][2])) {
-                                $intermediateFields = explode(':', $description[2][2]);
-                                $fields = explode(':', $description[3][2]);
+                            if (isset($relation[2][2]) && isset($relation[3][2])) {
+                                $intermediateFields = explode(':', $relation[2][2]);
+                                $fields = explode(':', $relation[3][2]);
                             }
 
                             if ((count($intermediateFields) > 0 && count($intermediateFields) % 2 == 0) &&
@@ -726,7 +726,7 @@ class Store
                                 }
 
                                 try {
-                                    $store = new Store($description[2][0], $this->databasePath);
+                                    $store = new Store($relation[2][0], $this->databasePath);
 
                                     $storeData = $store->findOneBy($criteria);
 
@@ -746,21 +746,21 @@ class Store
                                     }
 
                                     if (count($criteria) > 0) {
-                                        $store = new Store($description[3][0], $this->databasePath);
+                                        $store = new Store($relation[3][0], $this->databasePath);
 
                                         $storeData = $store->findBy($criteria);
 
                                         if ($storeData && count($storeData) > 0) {
-                                            if ($description[1] === 'hasOneThrough') {
-                                                $data[$description[0]] = $storeData[0];
-                                            } else if ($description[1] === 'hasManyThrough') {
-                                                $data[$description[0]] = $storeData;
+                                            if ($relation[1] === 'hasOneThrough') {
+                                                $data[$relation[0]] = $storeData[0];
+                                            } else if ($relation[1] === 'hasManyThrough') {
+                                                $data[$relation[0]] = $storeData;
                                             }
                                         } else {
-                                            $data[$description[0]] = null;
+                                            $data[$relation[0]] = null;
                                         }
                                     } else {
-                                        $data[$description[0]] = null;
+                                        $data[$relation[0]] = null;
                                     }
                                 } catch (\Exception $e) {
                                     continue;
@@ -1113,13 +1113,26 @@ class Store
         if (is_string($this->storeSchema)) {
             $schema = json_decode($this->storeSchema, true);
         }
-
         if (isset($schema['properties']) && count($schema['properties']) > 0) {
             if (!isset($data['id'])) {
                 $data['id'] = 0;
             }
 
+            foreach ($data as $dataKey => $dataValue) {
+                if (!isset($schema['properties'][$dataKey])) {
+                    unset($data[$dataKey]);
+                }
+            }
+
             foreach ($schema['properties'] as $propertyKey => $property) {
+                if (!isset($data[$propertyKey])) {
+                    $data[$propertyKey] = null;
+                }
+
+                if (isset($property['relation'])) {
+                    unset($data[$propertyKey]);
+                }
+
                 if ($jsonToArray) {
                     if (array_key_exists('format', $property)) {
                         if ($property['format'] === 'json') {
