@@ -460,41 +460,33 @@ class Store
             throw new InvalidArgumentException("No documents to update.");
         }
 
-        // we can use this check to determine if multiple documents are given
-        // because documents have to have at least the primary key.
-        if (array_keys($data) !== range(0, (count($data) - 1))) {
-            $data = [$data];
+        $data = $this->validateData($data);
+
+        if (!is_array($data))  {
+            throw new InvalidArgumentException('Documents have to be an arrays.');
         }
 
-        // Check if all documents exist and have the primary key before updating any
-        foreach ($data as $key => $document) {
-            $document = $this->validateData($document);
-
-            if (!is_array($document))  {
-                throw new InvalidArgumentException('Documents have to be an arrays.');
-            }
-
-            if (!array_key_exists($this->primaryKey, $document))  {
-                throw new InvalidArgumentException("Documents have to have the primary key \"$this->primaryKey\".");
-            }
-
-            $document[$this->primaryKey] = $this->checkAndStripId($document[$this->primaryKey]);
-
-            $documentJSON = @json_encode($document);
-
-            if ($documentJSON === false) {
-                throw new JsonException('Unable to encode the data array,
-                                        please provide a valid PHP associative array');
-            }
-
-            if (!file_exists($this->getDataPath() . $document[$this->primaryKey] . '.json')) {
-                return false;
-            }
-
-            IoHelper::writeContentToFile($this->getDataPath() . $document[$this->primaryKey] . '.json', $documentJSON, true, $this);
+        if (!array_key_exists($this->primaryKey, $data))  {
+            throw new InvalidArgumentException("Documents have to have the primary key \"$this->primaryKey\".");
         }
+
+        $data[$this->primaryKey] = $this->checkAndStripId($data[$this->primaryKey]);
+
+        $dataJSON = @json_encode($data);
+
+        if ($dataJSON === false) {
+            throw new JsonException('Unable to encode the data array,
+                                    please provide a valid PHP associative array');
+        }
+
+        if (!file_exists($this->getDataPath() . $data[$this->primaryKey] . '.json')) {
+            return false;
+        }
+
+        IoHelper::writeContentToFile($this->getDataPath() . $data[$this->primaryKey] . '.json', $dataJSON, true, $this);
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
+
 
         $this->data = $data;
 
