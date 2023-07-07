@@ -24,7 +24,7 @@ class BasepackagesApiApisReposGitea extends BaseModel
 
     public $token;
 
-    public function initialize()
+    public function onConstruct()
     {
         $this->setSource('basepackages_api_apis_repos');
     }

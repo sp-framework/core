@@ -345,7 +345,9 @@ class Apps extends BasePackage
 		$app = $this->getById($id);
 
 		if (isset($app['acceptable_usernames']) && $app['acceptable_usernames'] !== '') {
-			$app['acceptable_usernames'] = Json::decode($app['acceptable_usernames'], true);
+			if (is_string($app['acceptable_usernames'])) {
+				$app['acceptable_usernames'] = Json::decode($app['acceptable_usernames'], true);
+			}
 		}
 
 		foreach ($app['acceptable_usernames'] as $acceptableUsername) {

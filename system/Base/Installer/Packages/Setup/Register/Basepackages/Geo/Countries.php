@@ -214,6 +214,10 @@ class Countries
             $statesStore->count(true);
             $citiesStore->count(true);
 
+            $country['installed'] = 1;
+            $country['enabled'] = 1;
+            $countriesStore->update($country);
+
             return true;
         } catch (\Exception $e) {
             return false;

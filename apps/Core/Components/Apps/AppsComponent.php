@@ -51,7 +51,9 @@ class AppsComponent extends BaseComponent
                 }
 
                 if (isset($app['can_login_role_ids'])) {
-                    $app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
+                    if (is_string($app['can_login_role_ids'])) {
+                        $app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
+                    }
 
                     if (isset($app['can_login_role_ids']['data'])) {
                         $app['can_login_role_ids'] = $app['can_login_role_ids']['data'];
@@ -65,7 +67,9 @@ class AppsComponent extends BaseComponent
                 }
 
                 if (isset($app['acceptable_usernames']) && $app['acceptable_usernames'] !== '') {
-                    $app['acceptable_usernames'] = Json::decode($app['acceptable_usernames'], true);
+                    if (is_string($app['acceptable_usernames'])) {
+                        $app['acceptable_usernames'] = Json::decode($app['acceptable_usernames'], true);
+                    }
                 }
 
                 $components = [];
@@ -80,7 +84,9 @@ class AppsComponent extends BaseComponent
                 $this->view->menuBaseStructure = $baseMenuStructure;
 
                 if ($app['menu_structure']) {
-                    $app['menu_structure'] = Json::decode($app['menu_structure'], true);
+                    if (is_string($app['menu_structure'])) {
+                        $app['menu_structure'] = Json::decode($app['menu_structure'], true);
+                    }
 
                     if (count($app['menu_structure']) > 0) {
                         $this->view->menuBaseStructure =
@@ -91,7 +97,9 @@ class AppsComponent extends BaseComponent
                 }
 
                 if ($app['settings']) {
-                    $app['settings'] = Json::decode($app['settings'], true);
+                    if (is_string($app['settings'])) {
+                        $app['settings'] = Json::decode($app['settings'], true);
+                    }
                 }
 
                 $this->view->modulesMenus = $this->basepackages->menus->getMenusForApp($app['id']);
@@ -114,7 +122,9 @@ class AppsComponent extends BaseComponent
                     }
 
                     if ($componentValue['settings']) {
-                        $componentValue['settings'] = Json::decode($componentValue['settings'], true);
+                        if (is_string($componentValue['settings'])) {
+                            $componentValue['settings'] = Json::decode($componentValue['settings'], true);
+                        }
 
                         if (isset($componentValue['settings']['mandatory']) &&
                              $componentValue['settings']['mandatory'] === true
@@ -148,7 +158,9 @@ class AppsComponent extends BaseComponent
 
                 foreach ($middlewaresArr as $key => &$middlewareValue) {
                     if ($middlewareValue['settings']) {
-                        $middlewareValue['settings'] = Json::decode($middlewareValue['settings'], true);
+                        if (is_string($middlewareValue['settings'])) {
+                            $middlewareValue['settings'] = Json::decode($middlewareValue['settings'], true);
+                        }
 
                         if (isset($middlewareValue['settings']['mandatory']) &&
                              $middlewareValue['settings']['mandatory'] === true
@@ -171,11 +183,15 @@ class AppsComponent extends BaseComponent
                     $views[Arr::first($viewsArr)['id']] = Arr::first($viewsArr);
 
                     if ($views[Arr::first($viewsArr)['id']]['apps']) {
-                        $views[Arr::first($viewsArr)['id']]['apps'] = Json::decode($views[Arr::first($viewsArr)['id']]['apps'], true);
+                        if (is_string($views[Arr::first($viewsArr)['id']]['apps'])) {
+                            $views[Arr::first($viewsArr)['id']]['apps'] = Json::decode($views[Arr::first($viewsArr)['id']]['apps'], true);
+                        }
                     }
 
                     if ($views[Arr::first($viewsArr)['id']]['settings']) {
-                        $views[Arr::first($viewsArr)['id']]['settings'] = Json::decode($views[Arr::first($viewsArr)['id']]['settings'], true);
+                        if (is_string($views[Arr::first($viewsArr)['id']]['settings'])) {
+                            $views[Arr::first($viewsArr)['id']]['settings'] = Json::decode($views[Arr::first($viewsArr)['id']]['settings'], true);
+                        }
                     }
                 } else {
                     foreach ($viewsArr as $key => &$viewValue) {
@@ -184,11 +200,15 @@ class AppsComponent extends BaseComponent
                         }
 
                         if ($viewValue['apps']) {
-                            $viewValue['apps'] = Json::decode($viewValue['apps'], true);
+                            if (is_string($viewValue['apps'])) {
+                                $viewValue['apps'] = Json::decode($viewValue['apps'], true);
+                            }
                         }
 
                         if ($viewValue['settings']) {
-                            $viewValue['settings'] = Json::decode($viewValue['settings'], true);
+                            if (is_string($viewValue['settings'])) {
+                                $viewValue['settings'] = Json::decode($viewValue['settings'], true);
+                            }
 
                             if (isset($viewValue['settings']['mandatory']) && $viewValue['settings']['mandatory'] == true) {
                                 array_push($mandatoryViews, $viewValue['name']);

@@ -69,7 +69,7 @@ class Radio
         }
 
         foreach ($this->params['fieldRadioButtons'] as $radioButtonKey => $radioButton) {
-            if ($radioButton['dataValue'] === $this->params['fieldRadioChecked']) {
+            if ($radioButton['dataValue'] == $this->params['fieldRadioChecked']) {
                 $radioChecked = 'checked';
             } else {
                 $radioChecked = '';

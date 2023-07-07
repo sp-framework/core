@@ -30,19 +30,29 @@ class BackuprestoreComponent extends BaseComponent
 
         $storage = $this->useStorage('private');
 
+        if ($this->config->databasetype === 'db') {
+            $params =
+                [
+                    'conditions'    => 'uuid_location = :uuidLocation: AND storages_id = :storagesId: AND orphan = :orphan:',
+                    'bind'          =>
+                        [
+                            'uuidLocation'    => '.backups/',
+                            'storagesId'      => $storage['id'],
+                            'orphan'          => 0
+                        ]
+                ];
+        } else {
+            $params =
+                [
+                    'conditions'    => [['uuid_location', '=', '.backups/'], ['storages_id', '=', $storage['id']], ['orphan', '=', 0]]
+                ];
+        }
+
         $storageFiles =
             $this->basepackages->storages->getFiles(
-                ['storagetype'  => $storage['permission'],
-                 'params'       =>
-                    [
-                        'conditions'    => 'uuid_location = :uuidLocation: AND storages_id = :storagesId: AND orphan = :orphan:',
-                        'bind'          =>
-                            [
-                                'uuidLocation'    => '.backups/',
-                                'storagesId'      => $storage['id'],
-                                'orphan'          => 0
-                            ]
-                    ]
+                [
+                    'storagetype'  => $storage['permission'],
+                    'params'       => $params
                 ]
             );
 

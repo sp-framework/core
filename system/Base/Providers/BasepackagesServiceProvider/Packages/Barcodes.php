@@ -19,8 +19,11 @@ class Barcodes extends BasePackage
         $this->barcodesPackage = $this->modules->packages->getPackageByName('Barcodes');
 
         if ($this->barcodesPackage) {
-
-            $this->barcodesSettings = Json::decode($this->barcodesPackage['settings'], true);
+            if (is_string($this->barcodesPackage['settings'])) {
+                $this->barcodesSettings = Json::decode($this->barcodesPackage['settings'], true);
+            } else {
+                $this->barcodesSettings = $this->barcodesPackage['settings'];
+            }
 
             return $this;
         }

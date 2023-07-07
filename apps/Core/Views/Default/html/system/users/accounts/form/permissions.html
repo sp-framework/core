@@ -1,5 +1,5 @@
 {% if account['id'] is defined %}
-    {% set accountRole = account['role_id'] %}
+    {% set accountRole = account['role']['id'] %}
     {% if auth.account()['id'] === account['id'] %}
         {% set emailCheck = true %}
     {% else %}
@@ -10,13 +10,13 @@
     {% set accountRole = 0 %}
 {% endif %}
 
-{% if account['override_role'] is defined and account['override_role'] == '1' %}
+{% if account['security']['override_role'] is defined and account['security']['override_role'] == '1' %}
     {% set override = true %}
 {% else %}
     {% set override = false %}
 {% endif %}
 
-{% set accountPermissions = account['permissions'] %}
+{% set accountPermissions = account['security']['permissions'] %}
 {% set permissionshidden = '' %}
 {% set vdivide = 'vdivide' %}
 {% if aclMiddlewareEnabled == false %}

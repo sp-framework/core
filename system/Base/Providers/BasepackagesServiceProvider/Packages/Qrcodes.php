@@ -25,8 +25,11 @@ class Qrcodes extends BasePackage
         $this->qrcodesPackage = $this->modules->packages->getPackageByName('Qrcodes');
 
         if ($this->qrcodesPackage) {
-
-            $this->qrcodesSettings = Json::decode($this->qrcodesPackage['settings'], true);
+            if (is_string($this->qrcodesPackage['settings'])) {
+                $this->qrcodesSettings = Json::decode($this->qrcodesPackage['settings'], true);
+            } else {
+                $this->qrcodesSettings = $this->qrcodesPackage['settings'];
+            }
 
             return $this;
         }

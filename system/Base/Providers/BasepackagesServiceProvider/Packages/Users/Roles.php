@@ -69,9 +69,25 @@ class Roles extends BasePackage
         }
 
         if (isset($data['id'])) {
-            $roleObj = $this->getFirst('id', $data['id']);
+            $hasAccounts = false;
 
-            if ($roleObj->getAccounts() && $roleObj->getAccounts()->count() > 0) {
+            if ($this->config->databasetype === 'db') {
+                $roleObj = $this->getFirst('id', $data['id']);
+
+                if ($roleObj->getAccounts() && $roleObj->getAccounts()->count() > 0) {
+                    $hasAccounts = true;
+                }
+            } else {
+                $this->setFFRelations(true);
+
+                $role = $this->getById($data['id']);
+
+                if (isset($role['accounts']) && is_array($role['accounts']) && count($role['accounts']) > 0) {
+                    $hasAccounts = true;
+                }
+            }
+
+            if ($hasAccounts) {
                 $this->addResponse('Role has accounts assigned to it. Cannot removes role.', 1);
 
                 return false;
@@ -226,15 +242,19 @@ class Roles extends BasePackage
 
     public function searchRole(string $roleQueryString)
     {
-        $searchRoles =
-            $this->getByParams(
+        if ($this->config->databasetype === 'db') {
+            $conditions =
                 [
                     'conditions'    => 'name LIKE :aName:',
                     'bind'          => [
                         'aName'     => '%' . $roleQueryString . '%'
                     ]
-                ]
-            );
+                ];
+        } else {
+            $conditions = ['name', 'LIKE', '%' . $roleQueryString . '%'];
+        }
+
+        $searchRoles = $this->getByParams($conditions);
 
         if (count($searchRoles) > 0) {
             $roles = [];

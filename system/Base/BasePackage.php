@@ -183,7 +183,7 @@ abstract class BasePackage extends Controller
 			} else {
 				$this->ffStore = $this->ff->store($this->ffStoreToUse);
 
-				$this->ffData = $this->ffStore->findById($id);
+				$this->ffData = $this->ffStore->findById($id, $this->ffRelations, $this->ffRelationsConditions);
 
 				$this->setFfStoreToUse();
 
@@ -922,6 +922,7 @@ abstract class BasePackage extends Controller
 
 			return $this->getByParams($params, $resetCache, $enableCache);
 		}
+
 		$postConditions = explode('&', rtrim($conditions, '&'));
 
 		$queries = [];
@@ -1041,14 +1042,20 @@ abstract class BasePackage extends Controller
 					}
 				} else {
 					if ($modelColumnMap['dataTypes'][$conditionArr[1]] === 'integer') {
-						$conditionArr[3] = (int) $conditionArr[3];
+						if (strtolower($conditionArr[2]) !== 'like') {
+							$conditionArr[3] = (int) $conditionArr[3];
+						}
 					} else if ($modelColumnMap['dataTypes'][$conditionArr[1]] === 'number') {
-						$conditionArr[3] = (float) $conditionArr[3];
+						if (strtolower($conditionArr[2]) !== 'like') {
+							$conditionArr[3] = (float) $conditionArr[3];
+						}
 					} else if ($modelColumnMap['dataTypes'][$conditionArr[1]] === 'boolean') {
-						if ($conditionArr[3] == '1') {
-							$conditionArr[3] = true;
-						} else {
-							$conditionArr[3] = false;
+						if (strtolower($conditionArr[2]) !== 'like') {
+							if ($conditionArr[3] == '1') {
+								$conditionArr[3] = true;
+							} else {
+								$conditionArr[3] = false;
+							}
 						}
 					}
 

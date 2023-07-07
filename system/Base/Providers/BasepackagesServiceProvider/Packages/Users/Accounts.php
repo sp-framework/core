@@ -216,9 +216,17 @@ class Accounts extends BasePackage
             return;
         }
 
-        $accountObj = $this->getFirst('id', $data['id']);
+        if ($this->config->databasetype === 'db') {
+            $accountObj = $this->getFirst('id', $data['id']);
+        }
 
         $account = $this->getAccountById($data['id']);
+
+        if (!$account) {
+            $this->addResponse('Account for does not exists!', 1);
+
+            return;
+        }
 
         if (!isset($data['override_role']) ||
             $data['override_role'] == 0
@@ -435,26 +443,46 @@ class Accounts extends BasePackage
 
     public function addUpdateSecurity($id, $data)
     {
-        $securityModel = new BasepackagesUsersAccountsSecurity;
+        if ($this->config->databasetype === 'db') {
+            $securityModel = new BasepackagesUsersAccountsSecurity;
 
-        $account = $securityModel::findFirst(['account_id = ' . $id]);
+            $account = $securityModel::findFirst(['account_id = ' . $id]);
+        } else {
+            $securityStore = $this->ff->store('basepackages_users_accounts_security');
+
+            $account = $securityStore->findOneBy(['account_id', '=', $id]);
+        }
 
         $data['account_id'] = $id;
 
         unset($data['id']);
 
         if ($account) {
-            $account->assign($data);
+            if ($this->config->databasetype === 'db') {
+                $account->assign($data);
 
-            $account->update();
+                $account->update();
 
-            return true;
+                return true;
+            } else {
+                $data['id'] = $account['id'];
+
+                $securityStore->update($data);
+
+                return true;
+            }
         } else {
-            $securityModel->assign($data);
+            if ($this->config->databasetype === 'db') {
+                $securityModel->assign($data);
 
-            $securityModel->create();
+                $securityModel->create();
 
-            return true;
+                return true;
+            } else {
+                $securityStore->insert($data);
+
+                return true;
+            }
         }
 
         return false;
@@ -466,23 +494,43 @@ class Accounts extends BasePackage
             $canLogin = Json::decode($canLogin, true);
 
             if (count($canLogin) > 0) {
-                foreach ($canLogin as $appId => $allowed) {
+                if ($this->config->databasetype === 'db') {
                     $canloginModel = new BasepackagesUsersAccountsCanlogin;
-                    $permission = $canloginModel::findFirst(['account_id = ' . $id . ' AND app_id = "' . $appId . '"']);
+                } else {
+                    $canloginStore = $this->ff->store('basepackages_users_accounts_canlogin');
+                }
+
+                foreach ($canLogin as $appId => $allowed) {
+                    if ($this->config->databasetype === 'db') {
+                        $permission = $canloginModel::findFirst(['account_id = ' . $id . ' AND app_id = "' . $appId . '"']);
+                    } else {
+                        $permission = $canloginStore->findOneBy([['account_id', '=', $id], ['app_id', '=', $appId]]);
+                    }
 
                     if ($permission) {
-                        $updatePermission['allowed'] = $allowed;
-                        $permission->assign($updatePermission);
+                        if ($this->config->databasetype === 'db') {
+                            $updatePermission['allowed'] = $allowed;
 
-                        $permission->update();
+                            $permission->assign($updatePermission);
+
+                            $permission->update();
+                        } else {
+                            $permission['allowed'] = $allowed;
+
+                            $canloginStore->update($permission);
+                        }
                     } else {
                         $newPermission['account_id'] = $id;
                         $newPermission['app_id'] = $appId;
                         $newPermission['allowed'] = $allowed;
 
-                        $canloginModel->assign($newPermission);
+                        if ($this->config->databasetype === 'db') {
+                            $canloginModel->assign($newPermission);
 
-                        $canloginModel->create();
+                            $canloginModel->create();
+                        } else {
+                            $canloginStore->insert($newPermission);
+                        }
                     }
                 }
             }
@@ -657,20 +705,30 @@ class Accounts extends BasePackage
 
     public function hasSession($id, $session)
     {
-        $this->getAccountById($id);
+        $this->getById($id);
 
-        $hasSession =
-            $this->model->sessions->filter(
-                function($sessionObj) use ($id, $session) {
-                    $sessionObj = $sessionObj->toArray();
+        if ($this->model) {
+            $hasSession =
+                $this->model->sessions->filter(
+                    function($sessionObj) use ($id, $session) {
+                        $sessionObj = $sessionObj->toArray();
 
-                    if ($sessionObj['account_id'] == $id &&
-                        $sessionObj['session_id'] === $session
-                    ) {
-                        return $sessionObj;
+                        if ($sessionObj['account_id'] == $id &&
+                            $sessionObj['session_id'] === $session
+                        ) {
+                            return $sessionObj;
+                        }
                     }
-                }
-            );
+                );
+        }
+
+        if ($this->ffData) {
+            $this->ffStoreToUse = 'basepackages_users_accounts_sessions';
+
+            $this->getByParams(['conditions' => [['account_id', '=', $id],['session_id', '=', $session]]]);
+
+            $hasSession = $this->ffData;
+        }
 
         if (count($hasSession) === 1) {
             return true;
@@ -681,19 +739,25 @@ class Accounts extends BasePackage
 
     public function hasIdentifier($app, $identifier)
     {
-        $identifierModel = new BasepackagesUsersAccountsIdentifiers;
+        if ($this->config->databasetype === 'db') {
+            $identifierModel = new BasepackagesUsersAccountsIdentifiers;
 
-        $identifier =
-            $identifierModel->find(
-                    [
-                        'conditions'    => 'identifier = :identifier: AND app = :app:',
-                        'bind'          =>
-                            [
-                                'identifier'  => $identifier,
-                                'app'         => $app
-                            ]
-                    ],
-                )->toArray();
+            $identifier =
+                $identifierModel->find(
+                        [
+                            'conditions'    => 'identifier = :identifier: AND app = :app:',
+                            'bind'          =>
+                                [
+                                    'identifier'  => $identifier,
+                                    'app'         => $app
+                                ]
+                        ],
+                    )->toArray();
+        } else {
+            $identifiersStore = $this->ff->store('basepackages_users_accounts_identifiers');
+
+            $identifier = $identifiersStore->findBy([['identifier', '=', $identifier], ['app', '=', $app]]);
+        }
 
         if (count($identifier) === 1) {
             return $identifier[0];
@@ -910,11 +974,9 @@ class Accounts extends BasePackage
         }
 
         if ($uid) {
-            $accountObj = $this->modelToUse::findFirstById($uid);
+            $account = $this->getAccountById($uid);
 
-            if ($accountObj) {
-                $account = $this->getAccountById($uid);
-
+            if ($account) {
                 if ($account['canlogin'] > 0) {
                     foreach ($account['canlogin'] as $key => $value) {
                         $account['can_login'][$value['app_id']] = $value['allowed'];
@@ -923,11 +985,14 @@ class Accounts extends BasePackage
                     $account['can_login'] = [];
                 }
 
-                if ($account['permissions'] && $account['permissions'] !== '') {
-                    $permissionsArr = Json::decode($account['permissions'], true);
+                if ($account['security']['permissions'] && $account['security']['permissions'] !== '') {
+                    if (is_string($account['security']['permissions'])) {
+                        $permissionsArr = Json::decode($account['security']['permissions'], true);
+                    }
                 } else {
                     $permissionsArr = [];
                 }
+
                 $permissions = [];
 
                 foreach ($appsArr as $appKey => $app) {
@@ -958,7 +1023,6 @@ class Accounts extends BasePackage
                 $account['profile'] = $this->basepackages->profile->getProfile($account['id']);
 
                 $this->packagesData->account = $account;
-
             } else {
 
                 $this->packagesData->responseCode = 1;
@@ -993,7 +1057,7 @@ class Accounts extends BasePackage
             }
 
             $this->packagesData->acls = Json::encode($acls);
-            $account['permissions'] = Json::encode($permissions);
+            $account['security']['permissions'] = Json::encode($permissions);
             $this->packagesData->account = $account;
         }
 

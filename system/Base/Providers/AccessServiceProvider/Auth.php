@@ -832,7 +832,7 @@ class Auth
             }
         }
 
-        $this->account['security']['password'] = $this->secTools->hashPassword($data['newpass'], $this->config->security->passwordWorkFactor);
+        $this->account['password'] = $this->secTools->hashPassword($data['newpass'], $this->config->security->passwordWorkFactor);
 
         $this->account['force_pwreset'] = null;
 

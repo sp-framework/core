@@ -446,7 +446,9 @@ class Views extends BasePackage
 
             $view['apps'] = Json::encode($view['apps']);
 
-            $view['settings'] = Json::decode($view['settings'], true);
+            if (is_string($view['settings'])) {
+                $view['settings'] = Json::decode($view['settings'], true);
+            }
 
             if (isset($view['settings']['tags'])) {
                 $package = $this->modules->packages->getPackageByName($view['settings']['tags']);

@@ -45,7 +45,9 @@ class ViewssettingsComponent extends BaseComponent
                         $apps[$value['id']]['views'][$view['id']]['id'] = $view['id'];
                         $apps[$value['id']]['views'][$view['id']]['name'] = $view['name'];
                         $apps[$value['id']]['views'][$view['id']]['display_name'] = $view['display_name'];
-                        $view['settings'] = Json::decode($view['settings'], true);
+                        if (is_string($view['settings'])) {
+                            $view['settings'] = Json::decode($view['settings'], true);
+                        }
                         if (is_array($view['settings']['branding'])) {
                             foreach ($view['settings']['branding'] as $brandKey => $brand) {
 

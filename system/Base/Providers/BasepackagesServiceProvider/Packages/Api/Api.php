@@ -174,8 +174,11 @@ class Api extends BasePackage
         } else {
             $this->modelToUse = $modelToUse = BasepackagesApi::class;
 
+
             $this->packageName = 'api';
         }
+
+        $this->setFFStoreToUse();
     }
 
     /**
@@ -311,30 +314,46 @@ class Api extends BasePackage
                     $this->switchApiModel(['provider' => 'xero']);
                 }
 
-                $api = $this->getByParams(
-                    [
-                        'conditions'    => 'identifier = :identifier:',
-                        'bind'          =>
-                            [
-                                'identifier'    => $data['state']
-                            ]
-                    ], false, false
-                );
+                if ($this->config->databasetype === 'db') {
+                    $conditions =
+                        [
+                            'conditions'    => 'identifier = :identifier:',
+                            'bind'          =>
+                                [
+                                    'identifier'    => $data['state']
+                                ]
+                        ];
+                } else {
+                    $conditions =
+                        [
+                            'conditions'    => ['identifier', '=', $data['state']]
+                        ];
+                }
+
+                $api = $this->getByParams($conditions, false, false);
 
                 if ($api && count($api) === 1) {
                     $apiId = $api[0]['id'];
 
                     $this->switchApiModel();
 
-                    $apiApi = $this->getByParams(
-                        [
-                            'conditions'    => 'id = :id:',
-                            'bind'          =>
-                                [
-                                    'id'    => $apiId
-                                ]
-                        ], false, false
-                    );
+                    if ($this->config->databasetype === 'db') {
+                        $apiApi = $this->getByParams(
+                            [
+                                'conditions'    => 'id = :id:',
+                                'bind'          =>
+                                    [
+                                        'id'    => $apiId
+                                    ]
+                            ], false, false
+                        );
+                    } else {
+                        $apiApi = $this->getByParams(
+                            [
+                                'conditions'    => ['id', '=', $apiId]
+                            ], false, false
+                        );
+                    }
 
                     if (count($apiApi) === 1) {
                         $this->apiConfig = $this->getApiById($apiApi[0]['id']);

@@ -33,18 +33,30 @@ class IpFilter extends BasePackage
 
     public function getFilters(array $data)
     {
+        $filters = [];
+
         if (!isset($data['app_id'])) {
             return Json::encode([]);//blank array
         }
 
-        $app = $this->apps->getFirst('id', $data['app_id']);
+        if ($this->config->databasetype === 'db') {
+            $app = $this->apps->getFirst('id', (int) $data['app_id']);
 
-        $filtersObj = $app->getIpFilters();
+            $filtersObj = $app->getIpFilters();
 
-        if ($filtersObj && $filtersObj->count() > 0) {
-            $filters = $filtersObj->toArray();
+            if ($filtersObj && $filtersObj->count() > 0) {
+                $filters = $filtersObj->toArray();
+            }
         } else {
-            $filters = [];
+            $this->apps->setFFRelations(true);
+
+            $this->apps->setFFRelationsConditions(['ip_address', '=', $this->getDi()->getRequest()->getClientAddress()]);
+
+            $app = $this->apps->getFirst('id', (int) $data['app_id']);
+
+            if ($app->data['ipFilters'] && count($app->data['ipFilters']) > 0) {
+                $filters = $app->data['ipFilters'];
+            }
         }
 
         return $filters;

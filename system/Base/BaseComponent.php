@@ -421,8 +421,12 @@ abstract class BaseComponent extends Controller
 				$this->view->menus =
 					$this->basepackages->menus->buildMenusForApp($this->app['id']);
 			} else {
-				$this->view->menus =
-					Json::decode($this->app['menu_structure'], true);
+				if (is_string($this->app['menu_structure'])) {
+					$this->view->menus =
+						Json::decode($this->app['menu_structure'], true);
+				} else {
+					$this->view->menus = $this->app['menu_structure'];
+				}
 			}
 		}
 	}

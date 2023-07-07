@@ -381,17 +381,25 @@ class Store
             throw new InvalidArgumentException("No document to update or insert.");
         }
 
-        $data = $this->validateData($data);
-
         if (!array_key_exists($this->primaryKey, $data)) {
             $data[$this->primaryKey] = $this->increaseCounterAndGetNextId();
         } else {
             $data[$this->primaryKey] = $this->checkAndStripId($data[$this->primaryKey]);
 
-            if ($autoGenerateIdOnInsert && $this->findById($data[$this->primaryKey]) === null) {
+            $current = $this->findById((int) $data[$this->primaryKey]);
+
+            if ($autoGenerateIdOnInsert && $current === null) {
                 $data[$this->primaryKey] = $this->increaseCounterAndGetNextId();
+            } else {
+                foreach ($current as $currentKey => $currentValue) {
+                    if (!isset($data[$currentKey])) {
+                        $data[$currentKey] = $currentValue;
+                    }
+                }
             }
         }
+
+        $data = $this->validateData($data);
 
         $dataJSON = @json_encode($data);
 
@@ -419,6 +427,7 @@ class Store
 
         // Check if all documents have the primary key before updating or inserting any
         foreach ($data as $key => $document) {
+
             $document = $this->validateData($document);
 
             if (!is_array($document))  {
@@ -430,8 +439,16 @@ class Store
             } else {
                 $document[$this->primaryKey] = $this->checkAndStripId($document[$this->primaryKey]);
 
-                if ($autoGenerateIdOnInsert && $this->findById($document[$this->primaryKey]) === null) {
+                $current = $this->findById((int) $document[$this->primaryKey]);
+
+                if ($autoGenerateIdOnInsert && $current === null) {
                     $document[$this->primaryKey] = $this->increaseCounterAndGetNextId();
+                } else {
+                    foreach ($current as $currentKey => $currentValue) {
+                        if (!isset($document[$currentKey])) {
+                            $document[$currentKey] = $currentValue;
+                        }
+                    }
                 }
             }
 
@@ -460,15 +477,24 @@ class Store
             throw new InvalidArgumentException("No documents to update.");
         }
 
+        if (!array_key_exists($this->primaryKey, $data))  {
+            throw new InvalidArgumentException("Documents have to have the primary key \"$this->primaryKey\".");
+        }
+
+        $current = $this->findById((int) $data[$this->primaryKey]);
+
+        foreach ($current as $currentKey => $currentValue) {
+            if (!isset($data[$currentKey])) {
+                $data[$currentKey] = $currentValue;
+            }
+        }
+
         $data = $this->validateData($data);
 
         if (!is_array($data))  {
             throw new InvalidArgumentException('Documents have to be an arrays.');
         }
 
-        if (!array_key_exists($this->primaryKey, $data))  {
-            throw new InvalidArgumentException("Documents have to have the primary key \"$this->primaryKey\".");
-        }
 
         $data[$this->primaryKey] = $this->checkAndStripId($data[$this->primaryKey]);
 
@@ -505,6 +531,14 @@ class Store
 
         if (array_key_exists($this->primaryKey, $data))  {
             throw new InvalidArgumentException("You can not update the primary key \"$this->primaryKey\" of documents.");
+        }
+
+        $current = $this->findById((int) $id);
+
+        foreach ($current as $currentKey => $currentValue) {
+            if (!isset($data[$currentKey])) {
+                $data[$currentKey] = $currentValue;
+            }
         }
 
         $data = $this->validateData($data);
@@ -633,7 +667,7 @@ class Store
                     if (count($relation) > 0) {
                         if ($relation[1] === 'hasOne' || $relation[1] === 'hasMany') {
                             if (in_array('hasParams', $relation) && !$conditions) {
-                                throw new InvalidArgumentException('Model has params(conditions) set. Please set ffRelationsConditions');
+                                throw new InvalidArgumentException('Model has params(conditions) set. Please set ffRelationsConditions. Please refer to model file.');
                             }
 
                             if (isset($relation[4])) {
