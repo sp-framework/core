@@ -318,28 +318,46 @@ class Accounts extends BasePackage
                 return;
             }
 
-            $accountObj = $this->getFirst('id', $data['id']);
+            $accountObj = $this->getFirst('id', (int) $data['id']);
 
-            if ($accountObj) {
+            if ($accountObj && $this->config->databasetype === 'db') {
                 $account = $accountObj->toArray();
 
-                $relationData = $accountObj->getSecurity()->toArray();
+                if ($accountObj->id != $data['id']) {
+                    $this->addResponse('Account with id not found', 1);
 
-                unset($relationData['id']);
-
-                $account = array_merge($account, $relationData);
+                    return false;
+                }
 
                 if ($this->remove($data['id'])) {
-                    $this->removeRelatedData($accountObj);
-
                     $this->addToNotification('remove', 'Removed account for ID: ' . $account['email']);
 
                     $this->addResponse('Removed account for ID: ' . $account['email']);
+
+                    return true;
+                } else {
+                    $this->addResponse('Error removing account.', 1);
+                }
+            } else if ($this->ffStore && $this->ffData) {
+                $account = $this->ffData;
+
+                if ($this->ffData['id'] != $data['id']) {
+                    $this->addResponse('Account with id not found', 1);
+
+                    return false;
+                }
+
+                if ($this->remove($data['id'])) {
+                    $this->addToNotification('remove', 'Removed account for ID: ' . $account['email']);
+
+                    $this->addResponse('Removed account for ID: ' . $account['email']);
+
+                    return true;
                 } else {
                     $this->addResponse('Error removing account.', 1);
                 }
             } else {
-                $this->addResponse('Error removing account.', 1);
+                $this->addResponse('Account with id not found', 1);
             }
         } else {
             $this->addResponse('Cannot remove default account.', 1);
@@ -405,7 +423,6 @@ class Accounts extends BasePackage
     ) {
         if ($security) {
             if ($accountObj->getsecurity()) {
-                var_dump($accountObj->getsecurity()->toArray());die();
                 $accountObj->getsecurity()->delete();
             }
         }
@@ -439,6 +456,8 @@ class Accounts extends BasePackage
                 $accountObj->gettunnels()->delete();
             }
         }
+
+        return true;
     }
 
     public function addUpdateSecurity($id, $data)
@@ -504,7 +523,7 @@ class Accounts extends BasePackage
                     if ($this->config->databasetype === 'db') {
                         $permission = $canloginModel::findFirst(['account_id = ' . $id . ' AND app_id = "' . $appId . '"']);
                     } else {
-                        $permission = $canloginStore->findOneBy([['account_id', '=', $id], ['app_id', '=', $appId]]);
+                        $permission = $canloginStore->findOneBy([['account_id', '=', (int) $id], ['app_id', '=', $appId]]);
                     }
 
                     if ($permission) {

@@ -1353,6 +1353,14 @@ abstract class BasePackage extends Controller
 			} else {
 				$this->addResponse("Could not delete " . ucfirst($this->packageNameS), 1);
 			}
+		} else if ($this->ffStore && $this->ffData && $this->ffData['id'] == $id) {
+			if ($this->ffStore->deleteById((int) $id, $removeRelated)) {
+				$this->addResponse(ucfirst($this->packageNameS) . " Deleted!");
+
+				return true;
+			} else {
+				$this->addResponse("Could not delete " . ucfirst($this->packageNameS), 1);
+			}
 		} else {
 			$this->addResponse("No Record Found with that ID!", 1);
 		}

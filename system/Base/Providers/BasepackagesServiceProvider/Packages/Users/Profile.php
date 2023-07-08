@@ -73,7 +73,7 @@ class Profile extends BasePackage
             }
         } else {
             $this->setFFRelations(true);
-            $this->setFFRelationsConditions(['package_name', '=', 'profile']);
+            $this->setFFRelationsConditions(['address' => ['package_name', '=', 'profile']]);
 
             $profile = $this->getFirst('account_id', $accountId, false, true, null, [], true);
 

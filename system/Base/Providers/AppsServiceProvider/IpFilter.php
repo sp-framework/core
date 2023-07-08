@@ -50,7 +50,7 @@ class IpFilter extends BasePackage
         } else {
             $this->apps->setFFRelations(true);
 
-            $this->apps->setFFRelationsConditions(['ip_address', '=', $this->getDi()->getRequest()->getClientAddress()]);
+            $this->apps->setFFRelationsConditions(['monitorlist' => ['ip_address', '=', $this->getDi()->getRequest()->getClientAddress()]]);
 
             $app = $this->apps->getFirst('id', (int) $data['app_id']);
 
