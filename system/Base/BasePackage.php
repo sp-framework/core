@@ -87,6 +87,8 @@ abstract class BasePackage extends Controller
 	public function setFFRelations(bool $set)
 	{
 		$this->ffRelations = $set;
+
+		return $set;
 	}
 
 	public function setFFRelationsConditions(array $conditions)

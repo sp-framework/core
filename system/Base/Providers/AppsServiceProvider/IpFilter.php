@@ -211,52 +211,95 @@ class IpFilter extends BasePackage
             return true;
         }
 
+        $this->apps->setFFRelations(true);
+        $this->apps->setFFRelationsConditions(['monitorlist' => ['ip_address', '=', $this->getDi()->getRequest()->getClientAddress()]]);
+
         $app = $this->apps->getFirst('id', $this->app['id']);
 
-        $filter = $app->getMonitorlist();
+        $filterStore = $this->ff->store($this->useModel()->getSource());
 
-        if ($filter && $filter->count() > 0) {
-            if ($filter->filter_type == '2') {
-                $this->bumpFilterHitCounter($filter);
+        $filter = [];
+
+        if ($this->config->databasetype === 'db') {
+            $filterObj = $app->getMonitorlist();
+
+            if ($filterObj) {
+                $filter = $filterObj->toArray();
+            }
+        } else {
+            $app = $app->toArray();
+
+            $filter = $app['monitorlist'];
+        }
+
+        if ($filter && count($filter) > 0) {
+            if ($filter['filter_type'] == '2') {
+                if ($this->config->databasetype === 'db') {
+                    $this->bumpFilterHitCounter($filterObj);
+                } else {
+                    $filterStore->findById($filter['id']);
+
+                    $this->bumpFilterHitCounter($filterStore);
+                }
 
                 return false;
-            } else if ($filter->filter_type == '1') {
+            } else if ($filter['filter_type'] == '1') {
                 return true;
             }
         }
 
-        $filtersObj = $app->getIpFilters(
-            [
-                'address_type = :address_type:',
-                'bind' => [
-                    'address_type' => '2',
+        $filters = [];
+
+        if ($this->config->databasetype === 'db') {
+            $filtersObj = $app->getIpFilters(
+                [
+                    'address_type = :address_type:',
+                    'bind' => [
+                        'address_type' => '2',
+                    ]
                 ]
-            ]
-        );
+            );
 
-        if ($filtersObj && $filtersObj->count() > 0) {
-            $filters = $filtersObj->toArray();
+            if ($filtersObj) {
+                $filters = $filtersObj->toArray();
+            }
+        } else {
+            $filters = $filterStore->findBy(['address_type', '=', (int) 2]);
+        }
 
+        if ($filters && count($filters) > 0) {
             foreach ($filters as $key => $filter) {
                 if (\Symfony\Component\HttpFoundation\IpUtils::checkIp($this->clientAddress, $filter['ip_address'])) {
-                    $filterObj = $this->findFirst(
-                        [
-                            'ip_address = :ip_address:',
-                            'bind' => [
-                                'ip_address' => $filter['ip_address'],
+                    if ($this->config->databasetype === 'db') {
+                        $filterObj = $this->findFirst(
+                            [
+                                'ip_address = :ip_address:',
+                                'bind' => [
+                                    'ip_address' => $filter['ip_address'],
+                                ]
                             ]
-                        ]
-                    );
+                        );
 
-                    $this->bumpFilterHitCounter($filterObj);
+                        $this->bumpFilterHitCounter($filterObj);
+                    } else {
+                        if ($filterStore->findOneBy(['ip_address', '=', $filter['ip_address']])) {
+                            $this->bumpFilterHitCounter($filterStore);
+                        }
+                    }
 
                     return false;
                 }
             }
         }
 
-        if ($app->ip_filter_default_action == '1') {
-            return false;
+        if ($this->config->databasetype === 'db') {
+            if ($app->ip_filter_default_action == '1') {
+                return false;
+            }
+        } else {
+            if ($app['ip_filter_default_action'] === true) {
+                return false;
+            }
         }
 
         return true;
@@ -268,7 +311,7 @@ class IpFilter extends BasePackage
             [
                 "message"           => "Incorrect ip address.",
                 "version"           => Ip::VERSION_4 | Ip::VERSION_6,
-                "allowReserved"     => false,
+                "allowReserved"     => true,
                 "allowPrivate"      => true,
                 "allowEmpty"        => false
             ]
@@ -289,33 +332,41 @@ class IpFilter extends BasePackage
         }
     }
 
-    public function bumpFilterHitCounter($filter = null, $updateHitCount = true, $updateIncorrectAttempts = false, $appRoute = null)
+    public function bumpFilterHitCounter($filterObj = null, $updateHitCount = true, $updateIncorrectAttempts = false, $appRoute = null)
     {
         if (!$this->ipFilterMiddlewareEnabled($appRoute)) {
             return;
         }
 
         if ($updateHitCount) {
-            if ($filter->hit_count !== null) {
-                $hitCount = (int) $filter->hit_count;
+            $filter = $filterObj->toArray();
+
+            if ($filter['hit_count'] !== null) {
+                $hitCount = (int) $filter['hit_count'];
 
                 $hitCount = $hitCount + 1;
             } else {
                 $hitCount = 1;
             }
 
-            $filter->assign(['hit_count' => $hitCount]);
+            $filter['hit_count'] = $hitCount;
 
-            $filter->update();
+            $this->update($filter);
 
             return true;
         }
 
         if ($updateIncorrectAttempts) {
-            if (!$filter) {
+            if (!$filterObj) {
+                $filter = [];
+
                 $filterObj = $this->getFirst('ip_address', $this->clientAddress);
 
-                if (!$filterObj) {
+                if ($filterObj) {
+                    $filter = $filterObj->toArray();
+                }
+
+                if (count($filter) === 0) {
                     $newFilter =
                         [
                             'app_id'                => $this->app['id'],
@@ -328,8 +379,8 @@ class IpFilter extends BasePackage
 
                     $this->addFilter($newFilter);
                 } else {
-                    if ($filterObj->incorrect_attempts !== null) {
-                        $incorrectAttempt = (int) $filterObj->incorrect_attempts;
+                    if ($filter['incorrect_attempts'] !== null) {
+                        $incorrectAttempt = (int) $filter['incorrect_attempts'];
 
                         $incorrectAttempt = $incorrectAttempt + 1;
                     } else {
@@ -337,17 +388,12 @@ class IpFilter extends BasePackage
                     }
 
                     if ($incorrectAttempt >= (int) $this->app['incorrect_login_attempt_block_ip']) {
-                        $filterObj->assign(
-                            [
-                                'filter_type'           => 2,
-                                'incorrect_attempts'    => $incorrectAttempt
-                            ]
-                        );
-                    } else {
-                        $filterObj->assign(['incorrect_attempts' => $incorrectAttempt]);
+                        $filter['filter_type'] = 2;
                     }
 
-                    $filterObj->update();
+                    $filter['incorrect_attempts'] = $incorrectAttempt;
+
+                    $this->update($filter);
                 }
             }
 
@@ -361,12 +407,26 @@ class IpFilter extends BasePackage
             return;
         }
 
+        $this->apps->setFFRelations(true);
+
         $app = $this->apps->getFirst('id', $this->app['id']);
 
-        $filter = $app->getMonitorlist();
+        $filterStore = $this->ff->store($this->useModel()->getSource());
 
-        if ($filter && $filter->count() > 0) {
-            $filter->delete();
+        if ($this->config->databasetype === 'db') {
+            $filter = $app->getMonitorlist();
+
+            if ($filter && $filter->count() > 0) {
+                $filter->delete();
+            }
+        } else {
+            $app = $app->toArray();
+
+            $filter = $app['monitorlist'];
+
+            if ($filter && count($filter) > 0) {
+                $filterStore->deleteById($filter['id'], true, ['ip_address', '=', $this->getDi()->getRequest()->getClientAddress()]);
+            }
         }
     }
 

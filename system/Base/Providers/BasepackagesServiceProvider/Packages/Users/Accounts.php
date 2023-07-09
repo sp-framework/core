@@ -462,12 +462,12 @@ class Accounts extends BasePackage
 
     public function addUpdateSecurity($id, $data)
     {
-        if ($this->config->databasetype === 'db') {
-            $securityModel = new BasepackagesUsersAccountsSecurity;
+        $securityModel = new BasepackagesUsersAccountsSecurity;
 
+        if ($this->config->databasetype === 'db') {
             $account = $securityModel::findFirst(['account_id = ' . $id]);
         } else {
-            $securityStore = $this->ff->store('basepackages_users_accounts_security');
+            $securityStore = $this->ff->store($securityModel->getSource());
 
             $account = $securityStore->findOneBy(['account_id', '=', $id]);
         }
@@ -513,10 +513,11 @@ class Accounts extends BasePackage
             $canLogin = Json::decode($canLogin, true);
 
             if (count($canLogin) > 0) {
+                $canloginModel = new BasepackagesUsersAccountsCanlogin;
+
                 if ($this->config->databasetype === 'db') {
-                    $canloginModel = new BasepackagesUsersAccountsCanlogin;
                 } else {
-                    $canloginStore = $this->ff->store('basepackages_users_accounts_canlogin');
+                    $canloginStore = $this->ff->store($canloginModel->getSource());
                 }
 
                 foreach ($canLogin as $appId => $allowed) {
@@ -758,9 +759,9 @@ class Accounts extends BasePackage
 
     public function hasIdentifier($app, $identifier)
     {
-        if ($this->config->databasetype === 'db') {
-            $identifierModel = new BasepackagesUsersAccountsIdentifiers;
+        $identifierModel = new BasepackagesUsersAccountsIdentifiers;
 
+        if ($this->config->databasetype === 'db') {
             $identifier =
                 $identifierModel->find(
                         [
@@ -773,7 +774,7 @@ class Accounts extends BasePackage
                         ],
                     )->toArray();
         } else {
-            $identifiersStore = $this->ff->store('basepackages_users_accounts_identifiers');
+            $identifiersStore = $this->ff->store($identifierModel->getSource());
 
             $identifier = $identifiersStore->findBy([['identifier', '=', $identifier], ['app', '=', $app]]);
         }
@@ -789,7 +790,13 @@ class Accounts extends BasePackage
     {
         $tunnelsModel = new BasepackagesUsersAccountsTunnels;
 
-        $account = $tunnelsModel::find('[notifications_tunnel] = ' . $tunnelId)->toArray();
+        if ($this->config->databasetype === 'db') {
+            $account = $tunnelsModel::find('[notifications_tunnel] = ' . $tunnelId)->toArray();
+        } else {
+            $tunnelsStore = $this->ff->store($tunnelsModel->getSource());
+
+            $account = $tunnelsStore->findBy(['notifications_tunnel', '=', $tunnelId]);
+        }
 
         if (count($account) === 1) {
             return $account[0];
@@ -844,35 +851,63 @@ class Accounts extends BasePackage
     public function removeAccountAgents(array $data)
     {
         $agentModel = new BasepackagesUsersAccountsAgents;
+        $agentStore = $this->ff->store($agentModel->getSource());
         $sessionModel = new BasepackagesUsersAccountsSessions;
+        $sessionStore = $this->ff->store($sessionModel->getSource());
 
         if (isset($data['id'])) {
-            $agentObj = $agentModel::findFirstById($data['id']);
+            if ($this->config->databasetype === 'db') {
+                $agentObj = $agentModel::findFirstById($data['id']);
 
-            if ($agentObj) {
-                if ($agentObj->session_id === $this->session->getId()) {
-                    $this->addResponse('Cannot remove this session.', 1);
+                if ($agentObj) {
+                    if ($agentObj->session_id === $this->session->getId()) {
+                        $this->addResponse('Cannot remove this session.', 1);
+
+                        return;
+                    }
+
+                    $sessionObj = $sessionModel::findFirstBysession_id($agentObj->session_id);
+
+                    if ($sessionObj) {
+                        if ($sessionObj->identifiers) {
+                            $sessionObj->identifiers->delete();
+                        }
+
+                        $sessionObj->delete();
+                    }
+
+                    if ($agentObj->delete()) {
+                        $this->addResponse('Removed!');
+                    } else {
+                        $this->addResponse('Error removing', 1);
+                    }
 
                     return;
                 }
+            } else {
+                $agent = $agentStore->findById($data['id']);
 
-                $sessionObj = $sessionModel::findFirstBysession_id($agentObj->session_id);
+                if ($agent) {
+                    if ($agent['session_id'] === $this->session->getId()) {
+                        $this->addResponse('Cannot remove this session.', 1);
 
-                if ($sessionObj) {
-                    if ($sessionObj->identifiers) {
-                        $sessionObj->identifiers->delete();
+                        return;
                     }
 
-                    $sessionObj->delete();
-                }
+                    $session = $sessionStore->findOneBy(['session_id', '=', $agent['session_id']]);
 
-                if ($agentObj->delete()) {
-                    $this->addResponse('Removed!');
-                } else {
-                    $this->addResponse('Error removing', 1);
-                }
+                    if ($session) {
+                        $sessionStore->deleteById($session['id']);
+                    }
 
-                return;
+                    if ($agentStore->deleteById($agent['id'])) {
+                        $this->addResponse('Removed!');
+                    } else {
+                        $this->addResponse('Error removing', 1);
+                    }
+
+                    return;
+                }
             }
         } else if (isset($data['verified'])) {
             if (!$this->auth->account()) {
@@ -881,71 +916,120 @@ class Accounts extends BasePackage
                 return;
             }
 
-            $agentObj = $agentModel::find(
-                [
-                    'conditions'    => 'account_id = :aid: AND verified = :v:',
-                    'bind'          => [
-                        'aid'       => $this->auth->account()['id'],
-                        'v'         => $data['verified']
+            if ($this->config->databasetype === 'db') {
+                $agentObj = $agentModel::find(
+                    [
+                        'conditions'    => 'account_id = :aid: AND verified = :v:',
+                        'bind'          => [
+                            'aid'       => $this->auth->account()['id'],
+                            'v'         => $data['verified']
+                        ]
                     ]
-                ]
-            );
+                );
 
-            if ($agentObj) {
-                $removed = true;
-                foreach ($agentObj as $agent) {
-                    if ($agent->session_id !== $this->session->getId() ||
-                        ($agent->session_id === $this->session->getId() &&
-                         $agent->verified == '0')
-                    ) {
-                        $sessionObj = $sessionModel::findFirstBysession_id($agent->session_id);
+                if ($agentObj) {
+                    $removed = true;
+
+                    foreach ($agentObj as $agent) {
+                        if ($agent->session_id !== $this->session->getId() ||
+                            ($agent->session_id === $this->session->getId() &&
+                             $agent->verified == '0')
+                        ) {
+                            $sessionObj = $sessionModel::findFirstBysession_id($agent->session_id);
+
+                            if ($sessionObj) {
+
+                                if ($sessionObj->identifiers) {
+                                    $sessionObj->identifiers->delete();
+                                }
+
+                                $sessionObj->delete();
+                            }
+
+                            if (!$agent->delete()) {
+                                $removed = false;
+                            }
+                        }
+                    }
+
+                    if ($data['verified'] == '1') {
+                        $sessionObj = $sessionModel::find(
+                            [
+                                'conditions'    => 'account_id = :aid:',
+                                'bind'          => [
+                                    'aid'       => $this->auth->account()['id'],
+                                ]
+                            ]
+                        );
 
                         if ($sessionObj) {
-
-                            if ($sessionObj->identifiers) {
-                                $sessionObj->identifiers->delete();
-                            }
-
-                            $sessionObj->delete();
-                        }
-
-                        if (!$agent->delete()) {
-                            $removed = false;
-                        }
-                    }
-                }
-
-                if ($data['verified'] == '1') {
-                    $sessionObj = $sessionModel::find(
-                        [
-                            'conditions'    => 'account_id = :aid:',
-                            'bind'          => [
-                                'aid'       => $this->auth->account()['id'],
-                            ]
-                        ]
-                    );
-
-                    if ($sessionObj) {
-                        foreach ($sessionObj as $session) {
-                            if ($session->session_id !== $this->session->getId()) {
-                                if ($session->identifiers) {
-                                    $session->identifiers->delete();
-                                }
-                                if (!$session->delete()) {
-                                    $removed = false;
+                            foreach ($sessionObj as $session) {
+                                if ($session->session_id !== $this->session->getId()) {
+                                    if ($session->identifiers) {
+                                        $session->identifiers->delete();
+                                    }
+                                    if (!$session->delete()) {
+                                        $removed = false;
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                if ($removed) {
-                    $this->addResponse('Removed!');
-                } else {
-                    $this->addResponse('Error removing session', 1);
-                }
+                    if ($removed) {
+                        $this->addResponse('Removed!');
+                    } else {
+                        $this->addResponse('Error removing session', 1);
+                    }
 
-                return;
+                    return;
+                }
+            } else {
+                $agents = $agentStore->findBy([['account_id', '=', $this->auth->account()['id']], ['verified', '=', $data['verified']]]);
+
+                if ($agents) {
+                    $removed = true;
+
+                    foreach ($agents as $key => $agent) {
+                        if ($agent['session_id'] !== $this->session->getId() ||
+                            ($agent['session_id'] === $this->session->getId() &&
+                             $agent['verified'] == '0')
+                        ) {
+                            $session = $sessionStore->findOneBy(['session_id', '=', $agent['session_id']]);
+
+                            if ($session) {
+                                $sessionStore->deleteById($session['id']);
+                            }
+
+                            if (!$agentStore->deleteById($agent['id'])) {
+                                $removed = false;
+                            }
+                        }
+                    }
+
+                    if ($data['verified'] == '1') {
+                        $sessions = $sessionStore->findBy(['account_id', '=', $this->auth->account()['id']]);
+
+                        if ($sessions) {
+                            foreach ($sessions as $session) {
+                                if ($session['session_id'] !== $this->session->getId()) {
+
+                                    if (!$sessionStore->deleteById($session['id'])) {
+                                        $removed = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if ($removed) {
+                        $this->addResponse('Removed!');
+                    } else {
+                        $this->addResponse('Error removing session', 1);
+                    }
+
+                    return;
+                }
             }
         }
 
@@ -983,7 +1067,9 @@ class Accounts extends BasePackage
         $this->packagesData->components = $components;
 
         $rolesArr = $this->basepackages->roles->init()->getAll()->roles;
+
         $roles = [];
+
         foreach ($rolesArr as $roleKey => $roleValue) {
             $roles[$roleValue['id']] =
                 [

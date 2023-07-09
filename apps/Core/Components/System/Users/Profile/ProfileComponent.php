@@ -208,9 +208,10 @@ class ProfileComponent extends BaseComponent
 
             $this->basepackages->accounts->removeAccountAgents($this->postData());
 
-            $this->view->responseMessage = $this->basepackages->accounts->packagesData->responseMessage;
-
-            $this->view->responseCode = $this->basepackages->accounts->packagesData->responseCode;
+            $this->addResponse(
+                $this->basepackages->accounts->packagesData->responseMessage,
+                $this->basepackages->accounts->packagesData->responseCode
+            );
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }

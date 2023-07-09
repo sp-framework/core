@@ -233,9 +233,10 @@ class Auth
 
     protected function clearAccountSessionId()
     {
-        if ($this->config->databasetype === 'db') {
-            $sessionModel = new BasepackagesUsersAccountsSessions;
+        $sessionModel = new BasepackagesUsersAccountsSessions;
+        $sessionStore = $this->ff->store($sessionModel->getSource());
 
+        if ($this->config->databasetype === 'db') {
             $session = $sessionModel::findFirst(
                 [
                 'session_id = :sessionId:',
@@ -249,8 +250,6 @@ class Auth
                 }
             }
         } else {
-            $sessionStore = $this->ff->store('basepackages_users_accounts_sessions');
-
             $sessionStore->findOneBy(['session_id', '=', $this->session->getId()]);
 
             if ($sessionStore->toArray()) {
@@ -514,7 +513,6 @@ class Auth
         $hasIdentifier = $this->accounts->hasIdentifier($this->app['route'], $identifier);
 
         if (!$this->secTools->checkPassword($token, $hasIdentifier['token'])) {
-
             $this->clearAccountRecaller($this->cookieKey);
 
             $this->cookies->delete($this->cookieKey);
@@ -546,27 +544,46 @@ class Auth
     {
         $this->oldSessionId = $identifier['session_id'];
 
+        $identifierModel = new BasepackagesUsersAccountsIdentifiers;
+        $identifierStore = $this->ff->store($identifierModel->getSource());
+        $sessionModel = new BasepackagesUsersAccountsSessions;
+        $sessionStore = $this->ff->store($sessionModel->getSource());
+
         if ($this->oldSessionId !== $this->session->getId()) {
-            $identifierModel = new BasepackagesUsersAccountsIdentifiers;
-
             $identifier['session_id'] = $this->session->getId();
-            $identifierModel->assign($identifier);
-            $identifierModel->update();
 
-            $sessionModel = new BasepackagesUsersAccountsSessions;
+            if ($this->config->databasetype === 'db') {
+                $identifierModel->assign($identifier);
+                $identifierModel->update();
+            } else {
+                $identifierStore->update($identifier);
+            }
 
-            $session = $sessionModel::findFirst(
-                [
-                'session_id = :sessionId:',
-                'bind'      => ['sessionId' => $this->oldSessionId]
-                ]
-            );
+            if ($this->config->databasetype === 'db') {
+                $session = $sessionModel::findFirst(
+                    [
+                        'session_id = :sessionId:',
+                        'bind'      => ['sessionId' => $this->oldSessionId]
+                    ]
+                );
+
+                if ($session) {
+                    $session = $session->toArray();
+                }
+            } else {
+                $session = $sessionStore->findOneBy(['session_id', '=', $this->oldSessionId]);
+            }
 
             if ($session) {
-                $session = $session->toArray();
                 $session['session_id'] = $this->session->getId();
-                $sessionModel->assign($session);
-                $sessionModel->update();
+
+                if ($this->config->databasetype === 'db') {
+                    $sessionModel->assign($session);
+
+                    $sessionModel->update();
+                } else {
+                    $sessionStore->update($session);
+                }
             }
         }
 
@@ -1090,77 +1107,101 @@ class Auth
         $clientAddress = $this->request->getClientAddress();
         $userAgent = $this->request->getUserAgent();
         $sessionId = $this->session->getId();
+        $agent = [];
+
+        $this->accounts->setFFRelations(true);
+        $agentStore = $this->ff->store('basepackages_users_accounts_agents');
 
         $accountsObj = $this->accounts->getFirst('id', $this->account()['id']);
 
-        if ($accountsObj->agents) {
-            $agentObj =
-                $accountsObj->agents::findFirst(
-                    [
-                        'conditions'    => 'session_id = :sid: AND account_id = :aid:',
-                        'bind'          => [
-                            'sid'       => $sessionId,
-                            'aid'       => $this->account()['id']
+        if ($this->config->databasetype === 'db') {
+            if ($accountsObj->agents) {
+                $agentObj =
+                    $accountsObj->agents::findFirst(
+                        [
+                            'conditions'    => 'session_id = :sid: AND account_id = :aid:',
+                            'bind'          => [
+                                'sid'       => $sessionId,
+                                'aid'       => $this->account()['id']
+                            ]
                         ]
-                    ]
-                );
+                    );
 
-            if ($agentObj) {
-                $agent = $agentObj->toArray();
-
-                if ($agent['client_address'] === $clientAddress &&
-                    $agent['user_agent'] === $userAgent &&
-                    $agent['session_id'] === $sessionId &&
-                    $agent['account_id'] === $this->account()['id'] &&
-                    $agent['verified'] == '1'
-                ) {
-                    return true;
-                } else if ($agent['client_address'] === $clientAddress &&
-                    $agent['user_agent'] === $userAgent &&
-                    $agent['session_id'] === $sessionId &&
-                    $agent['account_id'] === $this->account()['id'] &&
-                    $agent['verified'] == '0'
-                ) {
-                    if (!$this->email->setup()) {
-                        return true;
-                    }
-
-                    return false;
-                } else if ($agent['client_address'] === $clientAddress &&
-                    $agent['user_agent'] !== $userAgent &&
-                    $agent['session_id'] === $sessionId &&
-                    $agent['account_id'] === $this->account()['id'] &&
-                    $agent['verified'] == '1'
-                ) {
-                    // Browser could have updated causing causing agent information change
-                    // We will remove the agent entry and ask for reauth, just in case.
-                    $agentObj->delete();
-
-                    $this->account['force_logout'] = '1';
-
-                    $this->accounts->update($this->account);
-
-                    $this->logout();
-
-                    return false;
-                } else if ($agent['session_id'] === $sessionId &&
-                           $agent['verified'] == '1'
-                ) {
-                    $this->logger->log->emergency('Same session being used by another browser! Probably session hijack!');
-
-                    $this->account['force_logout'] = '1';
-
-                    $this->accounts->update($this->account);
-
-                    $this->logout();
-
-                    return false;
+                if ($agentObj) {
+                    $agent = $agentObj->toArray();
+                } else {
+                    $update = $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
                 }
             } else {
                 $update = $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
             }
         } else {
-            $update = $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
+            $account = $accountsObj->toArray();
+
+            if ($account['agents'] && count($account['agents']) > 0) {
+                $agent = $agentStore->findOneBy([['session_id', '=', $sessionId], ['account_id', '=', $this->account()['id']]]);
+
+                if (!$agent) {
+                    $update = $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
+                }
+            } else {
+                $update = $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
+            }
+        }
+
+        if ($agent && count($agent) > 0) {
+            if ($agent['client_address'] === $clientAddress &&
+                $agent['user_agent'] === $userAgent &&
+                $agent['session_id'] === $sessionId &&
+                $agent['account_id'] === $this->account()['id'] &&
+                $agent['verified'] == '1'
+            ) {
+                return true;
+            } else if ($agent['client_address'] === $clientAddress &&
+                $agent['user_agent'] === $userAgent &&
+                $agent['session_id'] === $sessionId &&
+                $agent['account_id'] === $this->account()['id'] &&
+                $agent['verified'] == '0'
+            ) {
+                if (!$this->email->setup()) {
+                    return true;
+                }
+
+                return false;
+            } else if ($agent['client_address'] === $clientAddress &&
+                $agent['user_agent'] !== $userAgent &&
+                $agent['session_id'] === $sessionId &&
+                $agent['account_id'] === $this->account()['id'] &&
+                $agent['verified'] == '1'
+            ) {
+                // Browser could have updated causing causing agent information change
+                // We will remove the agent entry and ask for reauth, just in case.
+                if ($this->config->databasetype === 'db') {
+                    $agentObj->delete();
+                } else {
+                    $agentStore->deleteById($agent['id'], false);
+                }
+
+                $this->account['force_logout'] = '1';
+
+                $this->accounts->update($this->account);
+
+                $this->logout();
+
+                return false;
+            } else if ($agent['session_id'] === $sessionId &&
+                       $agent['verified'] == '1'
+            ) {
+                $this->logger->log->emergency('Same session being used by another browser! Probably session hijack!');
+
+                $this->account['force_logout'] = '1';
+
+                $this->accounts->update($this->account);
+
+                $this->logout();
+
+                return false;
+            }
         }
 
         //If Email is not configured, we cannot send new passcodes.
@@ -1181,21 +1222,34 @@ class Auth
         }
 
         $agentsObj = new BasepackagesUsersAccountsAgents;
+        $agentsStore = $this->ff->store($agentsObj->getSource());
+
+        $oldAgent = [];
 
         if ($this->oldSessionId) {
-            $oldAgentObj = $agentsObj->findFirstBysession_id($this->oldSessionId);
+            if ($this->config->databasetype === 'db') {
+                $oldAgentObj = $agentsObj->findFirstBysession_id($this->oldSessionId);
 
-            if ($oldAgentObj) {
-                $oldAgent = $oldAgentObj->toArray();
+                if ($oldAgentObj) {
+                    $oldAgent = $oldAgentObj->toArray();
+                }
+            } else {
+                $oldAgent = $agentsStore->findOneBy(['session_id', '=', $this->oldSessionId]);
+            }
 
+            if ($oldAgent && count($oldAgent) > 0) {
                 $oldAgent['session_id'] = $sessionId;
                 $oldAgent['account_id'] = $this->account()['id'];
                 $oldAgent['verified'] = $verified;
 
-                $oldAgentObj->assign($oldAgent);
-
                 try {
-                    $oldAgentObj->update();
+                    if ($this->config->databasetype === 'db') {
+                        $oldAgentObj->assign($oldAgent);
+
+                        $oldAgentObj->update();
+                    } else {
+                        $agentsStore->update($oldAgent);
+                    }
 
                     $this->oldSessionId = null;
 
@@ -1220,11 +1274,14 @@ class Auth
                     'verified'          => $verified
                 ];
 
-
-            $agentsObj->assign($newAgent);
-
             try {
-                $agentsObj->create();
+                if ($this->config->databasetype === 'db') {
+                    $agentsObj->assign($newAgent);
+
+                    $agentsObj->create();
+                } else {
+                    $agentsStore->insert($newAgent);
+                }
 
                 return false;
             } catch (\Exception $e) {

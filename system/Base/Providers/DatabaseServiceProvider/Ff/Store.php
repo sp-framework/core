@@ -576,11 +576,11 @@ class Store
         return $query->delete($returnOption);
     }
 
-    public function deleteById($id, $deleteRelated = true, $conditions = []): bool
+    public function deleteById($id, $deleteRelated = true, $relationsConditions = false): bool
     {
         $id = $this->checkAndStripId($id);
 
-        if ($deleteRelated && !$this->deleteRelated($id, $conditions)) {
+        if ($deleteRelated && !$this->deleteRelated($id, $relationsConditions)) {
             return false;
         } else {
             $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
@@ -589,7 +589,7 @@ class Store
         }
     }
 
-    protected function deleteRelated($id, $conditions)
+    protected function deleteRelated($id, $relationsConditions = false)
     {
         $data = $this->findById((int) $id);
 
@@ -612,18 +612,18 @@ class Store
 
                     if (count($relation) > 0) {
                         if ($relation[1] === 'hasOne' || $relation[1] === 'hasMany') {
-                            if ((in_array('hasParams', $relation) && count($conditions) === 0) ||
-                                (in_array('hasParams', $relation) && count($conditions) > 0 && !isset($conditions[$relation[0]]))
+                            if ((in_array('hasParams', $relation) && $relationsConditions && count($relationsConditions) === 0) ||
+                                (in_array('hasParams', $relation) && $relationsConditions && count($relationsConditions) > 0 && !isset($relationsConditions[$relation[0]]))
                             ) {
                                 throw new InvalidArgumentException('Model has params(conditions) set for ' . $relation[0] . '. Please set ffRelationsConditions. Please refer to model file.');
                             }
 
                             if (isset($relation[4])) {
-                                if (isset($conditions[$relation[0]])) {
+                                if (isset($relationsConditions[$relation[0]])) {
                                     try {
                                         $store = new Store($relation[2], $this->databasePath);
 
-                                        $storeDataArr = $store->findBy($conditions[$relation[0]]);
+                                        $storeDataArr = $store->findBy($relationsConditions[$relation[0]]);
 
                                         if ($storeDataArr && is_array($storeDataArr) && count($storeDataArr) > 0) {
                                             foreach ($storeDataArr as $storeData) {
@@ -796,7 +796,7 @@ class Store
         return $this->data;
     }
 
-    public function getRelations($data, $conditions = [])
+    public function getRelations($data, $relationsConditions = false)
     {
         if (count($data) === 0) {
             return $data;
@@ -817,18 +817,19 @@ class Store
 
                     if (count($relation) > 0) {
                         if ($relation[1] === 'hasOne' || $relation[1] === 'hasMany') {
-                            if ((in_array('hasParams', $relation) && count($conditions) === 0) ||
-                                (in_array('hasParams', $relation) && count($conditions) > 0 && !isset($conditions[$relation[0]]))
+
+                            if ((in_array('hasParams', $relation) && $relationsConditions && count($relationsConditions) === 0) ||
+                                (in_array('hasParams', $relation) && $relationsConditions && count($relationsConditions) > 0 && !isset($relationsConditions[$relation[0]]))
                             ) {
                                 throw new InvalidArgumentException('Model has params(conditions) set for ' . $relation[0] . '. Please set ffRelationsConditions. Please refer to model file.');
                             }
 
                             if (isset($relation[4])) {
-                                if (isset($conditions[$relation[0]])) {
+                                if (isset($relationsConditions[$relation[0]])) {
                                     try {
                                         $store = new Store($relation[2], $this->databasePath);
 
-                                        $storeData = $store->findBy($conditions[$relation[0]]);
+                                        $storeData = $store->findBy($relationsConditions[$relation[0]]);
 
                                         if ($storeData && count($storeData) > 0) {
                                             if ($relation[1] === 'hasOne') {
