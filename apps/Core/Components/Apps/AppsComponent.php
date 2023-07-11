@@ -433,8 +433,8 @@ class AppsComponent extends BaseComponent
             $this->apps->ipFilter->addFilter($this->postData());
 
             $this->addResponse(
-                $this->apps->packagesData->responseMessage,
-                $this->apps->packagesData->responseCode
+                $this->apps->ipFilter->packagesData->responseMessage,
+                $this->apps->ipFilter->packagesData->responseCode
             );
         } else {
             $this->addResponse('Method Not Allowed', 1);
@@ -452,8 +452,8 @@ class AppsComponent extends BaseComponent
             $this->apps->ipFilter->removeFilter($this->postData());
 
             $this->addResponse(
-                $this->apps->packagesData->responseMessage,
-                $this->apps->packagesData->responseCode
+                $this->apps->ipFilter->packagesData->responseMessage,
+                $this->apps->ipFilter->packagesData->responseCode
             );
         } else {
             $this->addResponse('Method Not Allowed', 1);
@@ -470,8 +470,8 @@ class AppsComponent extends BaseComponent
             $this->apps->ipFilter->blockMonitorFilter($this->postData());
 
             $this->addResponse(
-                $this->apps->packagesData->responseMessage,
-                $this->apps->packagesData->responseCode
+                $this->apps->ipFilter->packagesData->responseMessage,
+                $this->apps->ipFilter->packagesData->responseCode
             );
         } else {
             $this->addResponse('Method Not Allowed', 1);
@@ -488,8 +488,8 @@ class AppsComponent extends BaseComponent
             $this->apps->ipFilter->resetAppFilters($this->postData());
 
             $this->addResponse(
-                $this->apps->packagesData->responseMessage,
-                $this->apps->packagesData->responseCode
+                $this->apps->ipFilter->packagesData->responseMessage,
+                $this->apps->ipFilter->packagesData->responseCode
             );
         } else {
             $this->addResponse('Method Not Allowed', 1);

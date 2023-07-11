@@ -113,6 +113,8 @@ class IpFilter extends BasePackage
 
         try {
             $this->add($data);
+
+            $this->addResponse('Filter Added.');
         } catch (\Exception $e) {
             if (strpos($e->getMessage(), 'UNIQUE') !== false) {
                 $this->addResponse('Duplicate Entry!', 3);
@@ -140,7 +142,7 @@ class IpFilter extends BasePackage
         $filter = $this->getById($data['id']);
 
         if ($this->remove($filter['id'])) {
-            $this->addResponse('Filter removed.', 0);
+            $this->addResponse('Filter removed.');
         } else {
             $this->addResponse('Error removing filter.', 1);
         }
@@ -198,7 +200,9 @@ class IpFilter extends BasePackage
 
     public function getClientAddress($clientAddress = null)
     {
-        $this->setClientAddress($clientAddress);
+        if (!$this->clientAddress) {
+            $this->setClientAddress($clientAddress);
+        }
 
         return $this->clientAddress;
     }
@@ -281,23 +285,29 @@ class IpFilter extends BasePackage
                         );
 
                         $this->bumpFilterHitCounter($filterObj);
+
+                        if ($filterObj->filter_type == '2') {
+                            return false;
+                        }
                     } else {
                         if ($filterStore->findOneBy(['ip_address', '=', $filter['ip_address']])) {
                             $this->bumpFilterHitCounter($filterStore);
+
+                            if ($filterStore->data['filter_type'] == '2') {
+                                return false;
+                            }
                         }
                     }
-
-                    return false;
                 }
             }
         }
 
         if ($this->config->databasetype === 'db') {
-            if ($app->ip_filter_default_action == '1') {
+            if ($app->ip_filter_default_action == '0') {
                 return false;
             }
         } else {
-            if ($app['ip_filter_default_action'] === true) {
+            if ($app['ip_filter_default_action'] === false) {
                 return false;
             }
         }
@@ -420,12 +430,10 @@ class IpFilter extends BasePackage
                 $filter->delete();
             }
         } else {
-            $app = $app->toArray();
-
-            $filter = $app['monitorlist'];
+            $filter = $filterStore->findOneBy(['ip_address', '=', $this->getDi()->getRequest()->getClientAddress()]);
 
             if ($filter && count($filter) > 0) {
-                $filterStore->deleteById($filter['id'], true, ['ip_address', '=', $this->getDi()->getRequest()->getClientAddress()]);
+                $filterStore->deleteById($filter['id']);
             }
         }
     }

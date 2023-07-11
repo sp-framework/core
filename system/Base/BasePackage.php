@@ -242,6 +242,10 @@ abstract class BasePackage extends Controller
 		} else {
 			$this->ffStore = $this->ff->store($this->ffStoreToUse);
 
+			if ($by === 'id') {
+				$value = (int) $value;
+			}
+
 			$this->ffData = $this->ffStore->findOneBy([$by, '=', $value], $this->ffRelations, $this->ffRelationsConditions);
 
 			$this->setFfStoreToUse();

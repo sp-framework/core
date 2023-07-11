@@ -127,14 +127,13 @@ class FiltersComponent extends BaseComponent
                     $this->view->filters = $this->filters->packagesData->filters;
                 }
             }
-            $this->view->responseCode = $this->filters->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->filters->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->filters->packagesData->responseMessage,
+                $this->filters->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -151,10 +150,6 @@ class FiltersComponent extends BaseComponent
 
             $this->filters->updateFilter($this->postData());
 
-            $this->view->responseCode = $this->filters->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->filters->packagesData->responseMessage;
-
             if ($this->app['id'] == 1) {
                 $this->view->filters = $this->filters->packagesData->filters;
             } else {
@@ -163,10 +158,12 @@ class FiltersComponent extends BaseComponent
                 }
             }
 
+            $this->addResponse(
+                $this->filters->packagesData->responseMessage,
+                $this->filters->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -180,16 +177,14 @@ class FiltersComponent extends BaseComponent
 
             $this->filters->cloneFilter($this->postData());
 
-            $this->view->responseCode = $this->filters->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->filters->packagesData->responseMessage;
-
             $this->view->filters = $this->filters->packagesData->filters;
 
+            $this->addResponse(
+                $this->filters->packagesData->responseMessage,
+                $this->filters->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -206,9 +201,10 @@ class FiltersComponent extends BaseComponent
 
             $removeFilter = $this->filters->removeFilter($this->postData());
 
-            $this->view->responseCode = $this->filters->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->filters->packagesData->responseMessage;
+            $this->addResponse(
+                $this->filters->packagesData->responseMessage,
+                $this->filters->packagesData->responseCode
+            );
 
             if ($removeFilter) {
                 if ($this->app['id'] === 1) {
@@ -220,9 +216,7 @@ class FiltersComponent extends BaseComponent
                 }
             }
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -234,130 +228,12 @@ class FiltersComponent extends BaseComponent
                 $this->view->defaultFilter = $this->filters->packagesData->defaultFilter;
             }
 
-            $this->view->responseCode = $this->filters->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->filters->packagesData->responseMessage;
+            $this->addResponse(
+                $this->filters->packagesData->responseMessage,
+                $this->filters->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
-    }
-
-    public function searchRoleAction()
-    {
-        if ($this->request->isPost()) {
-            if ($this->postData()['search']) {
-                $searchQuery = $this->postData()['search'];
-
-                if (strlen($searchQuery) < 3) {
-                    return;
-                }
-
-                $searchRoles = $this->roles->searchRole($searchQuery);
-
-                if ($searchRoles) {
-                    $this->view->responseCode = $this->roles->packagesData->responseCode;
-
-                    $this->view->roles = $this->roles->packagesData->roles;
-                }
-            } else {
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'search query missing';
-            }
-        }
-    }
-
-    public function searchAccountAction()
-    {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
-
-            if ($this->postData()['search']) {
-                $searchQuery = $this->postData()['search'];
-
-                if (strlen($searchQuery) < 3) {
-                    return;
-                }
-
-                $searchAccounts = $this->accounts->searchAccountInternal($searchQuery);
-
-                if ($searchAccounts) {
-                    $currentAccount = $this->auth->account();
-
-                    if ($currentAccount) {
-                        $accounts = $this->accounts->packagesData->accounts;
-
-                        foreach ($accounts as $accountKey => $account) {
-                            if ($account['id'] == $currentAccount['id']) {
-                                unset($accounts[$accountKey]);
-                            }
-                        }
-
-                        $accounts = array_values($accounts);
-
-                        $this->view->responseCode = $this->accounts->packagesData->responseCode;
-
-                        $this->view->accounts = $accounts;
-                    } else {
-                        $this->view->responseCode = $this->accounts->packagesData->responseCode;
-
-                        $this->view->accounts = $this->accounts->packagesData->accounts;
-                    }
-                }
-            } else {
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'search query missing';
-            }
-        }
-    }
-
-    public function searchEmployeeAction()
-    {
-        if ($this->request->isPost()) {
-            if ($this->postData()['search']) {
-                $searchQuery = $this->postData()['search'];
-
-                if (strlen($searchQuery) < 3) {
-                    return;
-                }
-
-                $employees = $this->usePackage(Employees::class);
-
-                $searchEmployees = $employees->searchByFullName($searchQuery);
-
-                if ($searchEmployees) {
-                    $currentAccount = $this->auth->account();
-
-                    if ($currentAccount) {
-                        $employeesArr = $employees->packagesData->employees;
-
-                        foreach ($employeesArr as $employeeKey => $employee) {
-                            if ($employee['id'] == $currentAccount['id']) {
-                                unset($employeesArr[$employeeKey]);
-                            }
-                        }
-
-                        $employeesArr = array_values($employeesArr);
-
-                        $this->view->responseCode = $employees->packagesData->responseCode;
-
-                        $this->view->employees = $employeesArr;
-                    } else {
-                        $this->view->responseCode = $employees->packagesData->responseCode;
-
-                        $this->view->employees = $employees->packagesData->employees;
-                    }
-                }
-            } else {
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'search query missing';
-            }
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 }
