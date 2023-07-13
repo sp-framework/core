@@ -484,7 +484,7 @@ class Store
         $current = $this->findById((int) $data[$this->primaryKey]);
 
         foreach ($current as $currentKey => $currentValue) {
-            if (!isset($data[$currentKey])) {
+            if (!array_key_exists($currentKey, $data)) {
                 $data[$currentKey] = $currentValue;
             }
         }
