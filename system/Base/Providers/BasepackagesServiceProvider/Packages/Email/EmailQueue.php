@@ -69,7 +69,7 @@ class EmailQueue extends BasePackage
         return $this->queueLock;
     }
 
-    public function processQueue($processPriority = 0)
+    public function processQueue($processPriority = 0, $id = null)
     {
         if ($this->queueLock === true && $processPriority === $this->priorityToProcess) {
             $this->addResponse('Another process is clearing the queue, please wait...', 1);
@@ -77,8 +77,8 @@ class EmailQueue extends BasePackage
             return;
         }
 
-        if ($processPriority !== 0) {
-            $this->priorityToProcess = $processPriority;
+        if ($processPriority != 0) {
+            $this->priorityToProcess = (int) $processPriority;
         } else {
             $this->priorityToProcess = self::PRIORITY_LOW;
         }
@@ -88,6 +88,16 @@ class EmailQueue extends BasePackage
         $hadErrors = false;
 
         if ($this->config->databasetype === 'db') {
+            if ($id) {
+                $conditions =
+                    [
+                        'conditions'    => 'id = :id:',
+                        'bind'          =>
+                            [
+                                'id'    => $id,
+                            ]
+                    ];
+            } else {
                 $conditions =
                     [
                         'conditions'    => 'status = :status: AND priority = :priority:',
@@ -97,9 +107,14 @@ class EmailQueue extends BasePackage
                                 'priority'  => $this->priorityToProcess
                             ]
                     ];
+            }
+        } else {
+            if ($id) {
+                $conditions = ['conditions' => ['id', '=', (int) $id]];
             } else {
                 $conditions = ['conditions' => [['status', '=', self::STATUS_IN_QUEUE], ['priority', '=', $this->priorityToProcess]]];
             }
+        }
 
         $queue = $this->getByParams($conditions, true, false);
 

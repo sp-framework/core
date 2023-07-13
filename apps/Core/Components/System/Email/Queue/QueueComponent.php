@@ -124,7 +124,11 @@ class QueueComponent extends BaseComponent
     protected function formatSentOn($rowId, $data)
     {
         if (!$data['sent_on']) {
-            $data['sent_on'] = '-';
+            $data['sent_on'] =
+                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-send-' . $rowId . '" href="' . $this->links->url('system/email/queue/processqueue') . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 text-white btn btn-info btn-xs rowSendNow text-uppercase">
+                    <i class="mr-1 fas fa-fw fa-xs fa-paper-plane"></i>
+                    <span class="text-xs"> Send Now</span>
+                </a>';
         }
 
         return $data;
@@ -155,7 +159,7 @@ class QueueComponent extends BaseComponent
     {
         if ($data['status'] === '<span class="badge badge-danger text-uppercase">Error</span>') {
             $data['status'] .=
-                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-markread-' . $rowId . '" href="' . $this->links->url('system/email/queue/requeue') . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 pl-2 pr-2 text-white btn btn-primary btn-xs rowRequeue text-uppercase">
+                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-requeue-' . $rowId . '" href="' . $this->links->url('system/email/queue/requeue') . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 pl-2 pr-2 text-white btn btn-primary btn-xs rowRequeue text-uppercase">
                     <i class="mr-1 fas fa-fw fa-xs fa-sync-alt"></i>
                     <span class="text-xs"> Requeue</span>
                 </a>';
@@ -194,14 +198,12 @@ class QueueComponent extends BaseComponent
 
             $this->emailqueue->removeEmailService($this->postData());
 
-            $this->view->responseCode = $this->emailqueue->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->emailqueue->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->emailqueue->packagesData->responseMessage,
+                $this->emailqueue->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -212,7 +214,18 @@ class QueueComponent extends BaseComponent
                 return;
             }
 
-            $this->emailqueue->processQueue();
+            $priority = 0;
+            $id = null;
+
+            if (isset($this->postData()['priority'])) {
+                $priority = $this->postData()['priority'];
+            }
+
+            if (isset($this->postData()['id'])) {
+                $id = $this->postData()['id'];
+            }
+
+            $this->emailqueue->processQueue($priority, $id);
 
             $this->addResponse(
                 $this->emailqueue->packagesData->responseMessage,

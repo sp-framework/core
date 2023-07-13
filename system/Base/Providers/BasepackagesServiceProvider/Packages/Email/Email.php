@@ -100,7 +100,7 @@ class Email extends BasePackage
             $this->email->Port          = $this->emailSettings['port'];
         }
 
-        if ($this->emailSettings['auth'] === '1' &&
+        if ($this->emailSettings['auth'] == '1' &&
             ($this->emailSettings['username'] === '' || $this->emailSettings['password'] === '')
         ) {
             throw new EmailException(
@@ -113,12 +113,12 @@ class Email extends BasePackage
         }
 
         $this->email->SMTPSecure =
-            isset($this->emailSettings['encryption']) && $this->emailSettings['encryption'] === '1' ?
+            isset($this->emailSettings['encryption']) && $this->emailSettings['encryption'] == '1' ?
             PHPMailer::ENCRYPTION_SMTPS :
             '';
 
         $this->email->isHTML(
-            isset($this->emailSettings['allow_html_body']) && $this->emailSettings['allow_html_body'] === '1' ?
+            isset($this->emailSettings['allow_html_body']) && $this->emailSettings['allow_html_body'] == '1' ?
             $this->emailSettings['allow_html_body'] :
             ''
         );
