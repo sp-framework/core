@@ -31,6 +31,7 @@ class Store
     protected $indexing = false;
     protected $minIndexChars = 3;
     protected $indexes = [];
+    protected $model = null;
 
     protected $uniqueFields = [];
 
@@ -51,10 +52,14 @@ class Store
 
     public $data;
 
+    protected $ff;
+
     const dataDirectory = "data/";
 
-    public function __construct(string $storeName, string $databasePath, array $configuration = [], array $schema = [])
+    public function __construct(string $storeName, string $databasePath, $ff, array $configuration = [], array $schema = [])
     {
+        $this->ff = $ff;
+
         if (empty($storeName)) {
             throw new InvalidArgumentException('store name can not be empty');
         }
@@ -114,7 +119,7 @@ class Store
 
                             if (count($relation) > 0 && isset($relation[2])) {
                                 try {
-                                    $relationsStore = new Store($relation[2], $this->databasePath);
+                                    $relationsStore = new Store($relation[2], $this->databasePath, $this->ff);
 
                                     $rmd = array_replace_recursive($rmd, $relationsStore->getSchemaMetaData());
 
@@ -262,6 +267,11 @@ class Store
         return $this->storePath;
     }
 
+    public function getStoreName(): string
+    {
+        return $this->storeName;
+    }
+
     public function findAll(array $orderBy = null, int $limit = null, int $offset = null): array
     {
         $qb = $this->createQueryBuilder();
@@ -354,6 +364,10 @@ class Store
 
         $this->data = $data;
 
+        if ($this->ff->mode === 'hybrid') {
+            $this->ff->addToSync($this->model, $data[$this->primaryKey]);
+        }
+
         return $this->data;
     }
 
@@ -365,7 +379,13 @@ class Store
 
         $results = [];
         foreach ($data as $document) {
-            $results[] = $this->writeNewDocumentToStore($document);
+            $result = $this->writeNewDocumentToStore($document);
+
+            if ($this->ff->mode === 'hybrid') {
+                $this->ff->addToSync($this->model, $result[$this->primaryKey]);
+            }
+
+            $results[] = $result;
         }
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
@@ -381,8 +401,12 @@ class Store
             throw new InvalidArgumentException("No document to update or insert.");
         }
 
+        $insert = false;
+
         if (!array_key_exists($this->primaryKey, $data)) {
             $data[$this->primaryKey] = $this->increaseCounterAndGetNextId();
+
+            $insert = true;
         } else {
             $data[$this->primaryKey] = $this->checkAndStripId($data[$this->primaryKey]);
 
@@ -390,6 +414,8 @@ class Store
 
             if ($autoGenerateIdOnInsert && $current === null) {
                 $data[$this->primaryKey] = $this->increaseCounterAndGetNextId();
+
+                $insert = true;
             } else {
                 foreach ($current as $currentKey => $currentValue) {
                     if (!isset($data[$currentKey])) {
@@ -414,6 +440,14 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
+        if ($this->ff->mode === 'hybrid') {
+            if ($insert) {
+                $this->ff->addToSync($this->model, $data[$this->primaryKey]);
+            } else {
+                $this->ff->addToSync($this->model, $data[$this->primaryKey], 'update');
+            }
+        }
+
         $this->data = $data;
 
         return $this->data;
@@ -427,6 +461,7 @@ class Store
 
         // Check if all documents have the primary key before updating or inserting any
         foreach ($data as $key => $document) {
+            $insert = false;
 
             $document = $this->validateData($document);
 
@@ -436,6 +471,8 @@ class Store
 
             if (!array_key_exists($this->primaryKey, $document))  {
                 $document[$this->primaryKey] = $this->increaseCounterAndGetNextId();
+
+                $insert = true;
             } else {
                 $document[$this->primaryKey] = $this->checkAndStripId($document[$this->primaryKey]);
 
@@ -443,6 +480,8 @@ class Store
 
                 if ($autoGenerateIdOnInsert && $current === null) {
                     $document[$this->primaryKey] = $this->increaseCounterAndGetNextId();
+
+                    $insert = true;
                 } else {
                     foreach ($current as $currentKey => $currentValue) {
                         if (!isset($document[$currentKey])) {
@@ -462,6 +501,14 @@ class Store
             }
 
             IoHelper::writeContentToFile($this->getDataPath() . $document[$this->primaryKey] . '.json', $documentJSON, true, $this);
+
+            if ($this->ff->mode === 'hybrid') {
+                if ($insert) {
+                    $this->ff->addToSync($this->model, $document[$this->primaryKey]);
+                } else {
+                    $this->ff->addToSync($this->model, $document[$this->primaryKey], 'update');
+                }
+            }
         }
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
@@ -495,7 +542,6 @@ class Store
             throw new InvalidArgumentException('Documents have to be an arrays.');
         }
 
-
         $data[$this->primaryKey] = $this->checkAndStripId($data[$this->primaryKey]);
 
         $dataJSON = @json_encode($data);
@@ -513,6 +559,9 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
+        if ($this->ff->mode === 'hybrid') {
+            $this->ff->addToSync($this->model, $data[$this->primaryKey], 'update');
+        }
 
         $this->data = $data;
 
@@ -562,6 +611,10 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
+        if ($this->ff->mode === 'hybrid') {
+            $this->ff->addToSync($this->model, $data[$this->primaryKey], 'update');
+        }
+
         $this->data = $data;
 
         return $this->data;
@@ -584,6 +637,10 @@ class Store
             return false;
         } else {
             $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
+
+            if ($this->ff->mode === 'hybrid') {
+                $this->ff->addToSync($this->model, (int) $id, 'remove');
+            }
 
             return (!file_exists($this->getDataPath() . "$id.json") || true === @unlink($this->getDataPath() . "$id.json"));
         }
@@ -621,13 +678,15 @@ class Store
                             if (isset($relation[4])) {
                                 if (isset($relationsConditions[$relation[0]])) {
                                     try {
-                                        $store = new Store($relation[2], $this->databasePath);
+                                        $store = new Store($relation[2], $this->databasePath, $this->ff);
 
                                         $storeDataArr = $store->findBy($relationsConditions[$relation[0]]);
 
                                         if ($storeDataArr && is_array($storeDataArr) && count($storeDataArr) > 0) {
                                             foreach ($storeDataArr as $storeData) {
                                                 if (isset($storeData['id'])) {
+                                                    $store->model = $relation[3];
+
                                                     $store->deleteById((int) $storeData['id'], false);
                                                 }
                                             }
@@ -647,12 +706,14 @@ class Store
                                         }
 
                                         try {
-                                            $store = new Store($relation[2], $this->databasePath);
+                                            $store = new Store($relation[2], $this->databasePath, $this->ff);
 
                                             $storeDataArr = $store->findBy($criteria);
                                             if ($storeDataArr && is_array($storeDataArr) && count($storeDataArr) > 0) {
                                                 foreach ($storeDataArr as $storeData) {
                                                     if (isset($storeData['id'])) {
+                                                        $store->model = $relation[3];
+
                                                         $store->deleteById((int) $storeData['id'], false);
                                                     }
                                                 }
@@ -691,7 +752,7 @@ class Store
                                 }
 
                                 try {
-                                    $store = new Store($relation[2][0], $this->databasePath);
+                                    $store = new Store($relation[2][0], $this->databasePath, $this->ff);
 
                                     $storeData = $store->findOneBy($criteria);
 
@@ -711,13 +772,15 @@ class Store
                                     }
 
                                     if (count($criteria) > 0) {
-                                        $store = new Store($relation[3][0], $this->databasePath);
+                                        $store = new Store($relation[3][0], $this->databasePath, $this->ff);
 
                                         $storeDataArr = $store->findBy($criteria);
 
                                         if ($storeDataArr && is_array($storeDataArr) && count($storeDataArr) > 0) {
                                             foreach ($storeDataArr as $storeData) {
                                                 if (isset($storeData['id'])) {
+                                                    $store->model = $relation[3][1];
+
                                                     $store->deleteById((int) $storeData['id'], false);
                                                 }
                                             }
@@ -827,7 +890,7 @@ class Store
                             if (isset($relation[4])) {
                                 if (isset($relationsConditions[$relation[0]])) {
                                     try {
-                                        $store = new Store($relation[2], $this->databasePath);
+                                        $store = new Store($relation[2], $this->databasePath, $this->ff);
 
                                         $storeData = $store->findBy($relationsConditions[$relation[0]]);
 
@@ -855,7 +918,7 @@ class Store
                                         }
 
                                         try {
-                                            $store = new Store($relation[2], $this->databasePath);
+                                            $store = new Store($relation[2], $this->databasePath, $this->ff);
 
                                             $storeData = $store->findBy($criteria);
 
@@ -902,7 +965,7 @@ class Store
                                 }
 
                                 try {
-                                    $store = new Store($relation[2][0], $this->databasePath);
+                                    $store = new Store($relation[2][0], $this->databasePath, $this->ff);
 
                                     $storeData = $store->findOneBy($criteria);
 
@@ -922,7 +985,7 @@ class Store
                                     }
 
                                     if (count($criteria) > 0) {
-                                        $store = new Store($relation[3][0], $this->databasePath);
+                                        $store = new Store($relation[3][0], $this->databasePath, $this->ff);
 
                                         $storeData = $store->findBy($criteria);
 
@@ -1009,7 +1072,7 @@ class Store
 
     protected function setConfigurationAndSchema(array $configuration = [], array $schema = [])
     {
-        if (count($configuration) === 0) {
+        if (count($configuration) === 0 || !array_key_exists('primary_key', $configuration)) {
             if (file_exists($this->storePath . 'config.json')) {
                 $configuration = IoHelper::getFileContent($this->storePath . 'config.json');
                 $configuration = json_decode($configuration, true);
@@ -1135,6 +1198,10 @@ class Store
             $this->folderPermissions = $configuration["folder_permissions"];
         }
 
+        if (array_key_exists("model", $configuration)) {
+            $this->model = $configuration["model"];
+        }
+
         $this->storeConfiguration();
     }
 
@@ -1158,7 +1225,8 @@ class Store
             "indexes"               => $this->indexes,
             "storePath"             => $this->storePath,
             "databasePath"          => $this->databasePath,
-            "indexesPath"           => $this->indexesPath
+            "indexesPath"           => $this->indexesPath,
+            "model"                 => $this->model
         ];
     }
 
@@ -1289,6 +1357,7 @@ class Store
         if (is_string($this->storeSchema)) {
             $schema = json_decode($this->storeSchema, true);
         }
+
         if (isset($schema['properties']) && count($schema['properties']) > 0) {
             if (!isset($data['id'])) {
                 $data['id'] = 0;

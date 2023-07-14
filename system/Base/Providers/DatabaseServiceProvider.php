@@ -23,8 +23,8 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 				function () use ($container, $config) {
 					$dbConfig = $config->db;
 					$session = $container->getShared('session');
-					$crypt = $container->getShared('crypt');
 					$localContent = $container->getShared('localContent');
+					$crypt = $container->getShared('crypt');
 
 					if (PHP_SAPI === 'cli') {
 						return (new PdoCli($dbConfig, $localContent, $crypt))->init();
@@ -47,16 +47,31 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 					return (new Sqlite())->init();
 				}
 			);
-		}
+		} else {
+			if ($config->databasetype === 'hybrid') {
+				$container->setShared(
+					'ff',
+					function () use ($container, $config, $request) {
+						$session = $container->getShared('session');
+						$localContent = $container->getShared('localContent');
+						$crypt = $container->getShared('crypt');
+						$db = (new Pdo($config, $session, $localContent, $crypt))->init();
 
+						$container->setShared('db', $db);
 
-		$container->setShared(
-			'ff',
-			function () use ($config, $request) {
-				$cacheConfig = $config->cache;
+						$basepackages = $container->getShared('basepackages');
 
-				return (new Ff($cacheConfig, $request))->init();
+						return (new Ff($config, $request, $db, $basepackages))->init();
+					}
+				);
+			} else {
+				$container->setShared(
+					'ff',
+					function () use ($config, $request) {
+						return (new Ff($config, $request))->init();
+					}
+				);
 			}
-		);
+		}
 	}
 }

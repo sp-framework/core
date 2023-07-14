@@ -11,6 +11,8 @@ class TestComponent extends BaseComponent
 
     public function viewAction()
     {
+        dump($this->ff->getSyncFile());
+        dump($this->ff->sync());
         die();
         set_time_limit(600);
 

@@ -216,11 +216,17 @@ class Setup
 			$this->db = new Mysql($this->dbConfig['db']);
 		}
 
-		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'db') {
-			$this->ff = (new Ff((object) ['enabled' => false, 'timeout' => 0], $this->request))->init();
-		}
-
 		$this->basepackages = $this->container->getShared('basepackages');
+
+		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'db') {
+			$reset = false;
+
+			if ($this->postData['databasetype'] === 'hybrid') {
+				$reset = true;
+			}
+
+			$this->ff = (new Ff((object) ['enabled' => false, 'timeout' => 0], $this->request))->init($reset);
+		}
 
 		$this->progress = $this->basepackages->progress;
 
@@ -574,9 +580,9 @@ class Setup
 				$config = $this->ff->generateConfig($tableName, $tableClass['schema'], $tableClass['model'], $this->db);
 				$schema = $this->ff->generateSchema($tableName, $tableClass['schema'], $tableClass['model']);
 
-				$this->ff->store($tableName, $config, $schema)->deleteStore();
+				$this->ff->store($tableName, $config, $schema, $this->ff)->deleteStore();
 
-				$this->ff->store($tableName, $config, $schema);
+				$this->ff->store($tableName, $config, $schema, $this->ff);
 			}
 		}
 

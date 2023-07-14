@@ -155,8 +155,12 @@ class Tasks extends BasePackage
             } else {
                 $this->addResponse($task['name'] . ' scheduled with worker for next run.');
             }
+
+            return true;
         } else {
             $this->addResponse('Error scheduling task with worker.', 1);
+
+            return false;
         }
     }
 
@@ -223,6 +227,21 @@ class Tasks extends BasePackage
                 if (recursive_array_search($parameterValue, $task['parameters'], $parameterKey)) {
                     return $task;
                 }
+            }
+        }
+
+        return false;
+    }
+
+    public function findByFunction($function)
+    {
+        if (!$this->tasks) {
+            $this->init();
+        }
+
+        foreach ($this->tasks as $taskKey => $task) {
+            if ($task['function'] === $function) {
+                return $task;
             }
         }
 

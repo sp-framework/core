@@ -102,6 +102,21 @@ class Tasks
             ];
         array_push($taskArr, $taskEntry);
 
+        //DB Sync (Hybrid Mode)
+        $taskEntry =
+            [
+                'name'              => 'DB Sync (Hybric Mode)',
+                'description'       => 'Update database with changed made to the FF Store.',
+                'function'          => 'processdbsync',
+                'parameters'        => '',
+                'schedule_id'       => 0,
+                'is_on_demand'      => 1,
+                'priority'          => 10,
+                'enabled'           => 0,
+                'type'              => 0
+            ];
+        array_push($taskArr, $taskEntry);
+
         return $taskArr;
     }
 }

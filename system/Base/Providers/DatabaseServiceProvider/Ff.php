@@ -2,12 +2,18 @@
 
 namespace System\Base\Providers\DatabaseServiceProvider;
 
+use Carbon\Carbon;
+use System\Base\Providers\DatabaseServiceProvider\Ff\Classes\IoHelper;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Query;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Store;
 
 class Ff
 {
     protected $ff;
+
+    protected $db;
+
+    protected $basepackages;
 
     protected $databaseDir;
 
@@ -19,22 +25,52 @@ class Ff
 
     protected $store;
 
-    public function __construct($cacheConfig, $request)
-    {
-        $this->cacheConfig['auto_cache'] = $cacheConfig->enabled;
+    protected $syncFile;
 
-        $this->cacheConfig['cache_lifetime'] = $cacheConfig->timeout;
+    public $mode;
+
+    public function __construct($config, $request, $db = null, $basepackages = null)
+    {
+        $this->cacheConfig['auto_cache'] = $config->cache->enabled;
+
+        $this->cacheConfig['cache_lifetime'] = $config->cache->timeout;
+
+        $this->mode = $config->databaseType;
 
         $this->request = $request;
+
+        if ($db && $basepackages) {
+            $this->db = $db;
+
+            $this->basepackages = $basepackages;
+
+            $this->init();
+
+            $this->loadSyncFile();
+        }
     }
 
-    public function init()
+    public function init($resetSync = false)
     {
         $this->databaseDir = base_path('.ff/');
 
         $this->checkDatabasePath();
 
+        if ($resetSync) {
+            $this->resetSync();
+        }
+
         return $this;
+    }
+
+    protected function resetSync()
+    {
+        IoHelper::writeContentToFile($this->databaseDir . '_sync.sdb', '{}');
+    }
+
+    public function getDatabaseDir()
+    {
+        return $this->databaseDir;
     }
 
     public function store($file, $config = [], $schema = [])
@@ -47,7 +83,7 @@ class Ff
             $this->config = array_replace_recursive($this->config, $config);
         }
 
-        $this->store = new Store($file, $this->databaseDir, $this->config, $schema);
+        $this->store = new Store($file, $this->databaseDir, $this, $this->config, $schema);
 
         return $this->store;
     }
@@ -249,6 +285,10 @@ class Ff
     {
         $config = [];
 
+        if ($tableModel) {
+            $config['model'] = get_class($tableModel);
+        }
+
         if (!method_exists($tableClass, 'columns')) {
             return $config;
         }
@@ -299,6 +339,7 @@ class Ff
             return $config;
         }
 
+
         return $config;
     }
 
@@ -311,5 +352,208 @@ class Ff
         }
 
         return true;
+    }
+
+    public function addToSync($model, $id, $task = 'add', $schedule = true)
+    {
+        if (is_string($model)) {
+            $model = new $model;
+        }
+
+        $ffStore = $this->store($model->getSource());
+        $ffStoreName = str_replace('/', '', $ffStore->getStoreName());
+        $checkEntry = $ffStore->findById($id);
+
+        if ($checkEntry) {
+            if (isset($this->syncFile[$task][$ffStoreName])) {
+                if (!isset($this->syncFile[$task][$ffStoreName]['model'])) {
+                    $this->syncFile[$task][$ffStoreName]['model'] = get_class($model);
+                }
+
+                if (!isset($this->syncFile[$task][$ffStoreName]['ids'])) {
+                    $this->syncFile[$task][$ffStoreName]['ids'] = $id;
+                } else if (isset($this->syncFile[$task][$ffStoreName]['ids']) &&
+                           is_array($this->syncFile[$task][$ffStoreName]['ids'])
+                ) {
+                    if (!in_array($id, $this->syncFile[$task][$ffStoreName]['ids'])) {
+                        array_push($this->syncFile[$task][$ffStoreName]['ids'], $id);
+                    }
+                }
+            } else {
+                $this->syncFile[$task][$ffStoreName] = [];
+                $this->syncFile[$task][$ffStoreName]['model'] = get_class($model);
+                $this->syncFile[$task][$ffStoreName]['ids'] = [$id];
+            }
+
+            IoHelper::writeContentToFile($this->databaseDir . '_sync.sdb', json_encode($this->syncFile));
+
+            if ($schedule) {
+                return $this->addToSchedule();
+            } else {
+                return $this->sync();
+            }
+        }
+
+        throw new \Exception('Add to Sync failed as data with the ID provided does not exits.');
+    }
+
+    protected function addToSchedule()
+    {
+        $task = $this->basepackages->workers->tasks->findByFunction('processdbsync');
+
+        if ($task) {//We have to update it manually from here as updating via task will cause a loop
+            $time = Carbon::now();
+
+            $task['force_next_run'] = 1;
+            $task['status'] = 1;
+            $task['next_run'] = $time->addMinute()->startOfMinute()->format('Y-m-d H:i:s');
+
+            $this->mode = 'ff';
+            $taskStore = $this->store('basepackages_workers_tasks');
+
+            $taskStore->update($task);
+            $this->mode = 'hybrid';
+
+            return true;
+        }
+
+        throw new \Exception('Task to run sync does not exits. Please re-add task.');
+    }
+
+    public function getSyncFile(): array
+    {
+        return $this->loadSyncFile();
+    }
+
+    public function sync(): array
+    {
+        $this->loadSyncFile();
+
+        if (!$this->syncFile) {
+            array_push($this->syncFile['errors'], 'Error processing sync file.');
+        }
+
+        try {
+            foreach ($this->syncFile as $task => &$tasks) {
+                if (count($tasks) === 0 || $task === 'errors') {
+                    continue;
+                }
+
+                foreach ($tasks as $store => &$toSync) {
+                    if (!isset($toSync['model'])) {
+                        array_push($this->syncFile['errors'], 'Model missing in the sync file.');
+                    }
+
+                    if (isset($toSync['ids']) && count($toSync['ids']) === 0) {
+                        array_push($this->syncFile['errors'], 'Ids missing in the sync file for store: ' . $store);
+                    }
+
+                    $ffStore = $this->store($store);
+                    $storeSchema = $ffStore->getStoreSchema();
+
+                    foreach ($toSync['ids'] as $idKey => &$id) {
+                        $model = new $toSync['model'];
+
+                        $data = $ffStore->findById($id);
+
+                        $data = $this->normalizeData($data, $storeSchema);
+
+                        $model->assign($data);
+
+                        if ($task === 'add') {
+                            $taskPerformed = $model->create();
+
+                            if (!$taskPerformed && strpos($model->getMessages()[0]->getMessage(), 'already exists')) {
+                                $taskPerformed = $model->update();
+                            }
+                        } else if ($task === 'update') {
+                            $taskPerformed = $model->update();
+                        } else if ($task === 'remove') {
+                            $taskPerformed = $model->delete();
+                        }
+
+                        if ($taskPerformed) {
+                            unset($toSync['ids'][$idKey]);
+
+                            if (count($toSync['ids']) === 0) {
+                                unset($tasks[$store]);
+                            }
+
+                            IoHelper::writeContentToFile($this->databaseDir . '_sync.sdb', json_encode($this->syncFile));
+                        } else {
+                            $transactionErrors = [];
+
+                            foreach ($model->getMessages() as $err) {
+                                array_push($transactionErrors, $err->getMessage());
+                            }
+
+                            array_push($this->syncFile['errors'], "Could not " . $task . " data in db for store " . get_class($model) . ", for ID " . $id . ". Reasons: <br>" .
+                                join(',', $transactionErrors)
+                            );
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            array_push($this->syncFile['errors'], $e->getMessage());
+        }
+
+        return $this->syncFile;
+    }
+
+    protected function loadSyncFile()
+    {
+        if (!file_exists($this->databaseDir . '_sync.sdb')) {
+            IoHelper::writeContentToFile($this->databaseDir . '_sync.sdb', '{}');
+        }
+
+        $this->syncFile = json_decode(IoHelper::getFileContent($this->databaseDir . '_sync.sdb'), true);
+
+        if (!array_key_exists('add', $this->syncFile)) {
+            $this->syncFile['add'] = [];
+        }
+        if (!array_key_exists('update', $this->syncFile)) {
+            $this->syncFile['update'] = [];
+        }
+        if (!array_key_exists('remove', $this->syncFile)) {
+            $this->syncFile['remove'] = [];
+        }
+
+        $this->syncFile['errors'] = [];
+
+        return $this->syncFile;
+    }
+
+    protected function normalizeData(array $data, $schema): array
+    {
+        if (is_string($schema)) {
+            $schema = json_decode($schema, true);
+        }
+
+        if (isset($schema['properties']) && count($schema['properties']) > 0) {
+            foreach ($schema['properties'] as $propertyKey => $property) {
+                if (array_key_exists('format', $property)) {
+                    if ($property['format'] === 'json') {
+                        if (isset($data[$propertyKey]) && is_array($data[$propertyKey])) {
+                            $data[$propertyKey] = json_encode($data[$propertyKey]);
+                        }
+                    }
+                }
+
+                if (array_key_exists('type', $property) && is_array($property['type'])) {
+                    foreach ($property['type'] as $type) {
+                        if ($type === 'boolean') {
+                            $data[$propertyKey] = $data[$propertyKey] === true ? '1' : '0';
+                        }
+                    }
+                } else if (array_key_exists('type', $property) && is_string($property['type'])) {
+                    if ($property['type'] === 'boolean') {
+                        $data[$propertyKey] = $data[$propertyKey] === true ? '1' : '0';
+                    }
+                }
+            }
+        }
+
+        return $data;
     }
 }
