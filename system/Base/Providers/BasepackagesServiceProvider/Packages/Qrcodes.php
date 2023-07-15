@@ -126,7 +126,7 @@ class Qrcodes extends BasePackage
 
                 $logoPath = base_path('public' . $path);
             } else {
-                $logoPath = base_path('public/dash/default/images/baz/logo/justlogo110x110.png');
+                $logoPath = base_path('public/core/default/images/baz/logo/justlogo110x110.png');
             }
 
             $logo = Logo::create($logoPath);
@@ -139,7 +139,7 @@ class Qrcodes extends BasePackage
             $label = Label::create($this->qrcodesSettings['labelText']);
             $alignment = '\Endroid\QrCode\Label\Alignment\LabelAlignment' . ucfirst(strtolower($this->qrcodesSettings['defaultLabelAlignment']));
             $label->setAlignment(new $alignment());
-            $label->setFont(new Font(base_path('system/ThirdParty/vendor/endroid/qr-code/assets/noto_sans.otf'), $this->qrcodesSettings['labelFontSize']));
+            $label->setFont(new Font(base_path('external/vendor/endroid/qr-code/assets/noto_sans.otf'), $this->qrcodesSettings['labelFontSize']));
             $label->setTextColor(
                 new Color(
                     $this->qrcodesSettings['labelColor']['r'],
