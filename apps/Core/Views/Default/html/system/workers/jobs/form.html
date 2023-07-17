@@ -137,7 +137,8 @@ dataCollectionSection =
                     if (found) {
                         //eslint-disable-next-line
                         var data = found[0].replaceAll('\"', '"');
-
+                        //eslint-disable-next-line
+                        data = data.replaceAll('\\', '\\\\\\\\');
                         var obj = JSON.parse(data);
 
                         if (obj) {

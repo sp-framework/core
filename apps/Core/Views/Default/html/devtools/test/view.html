@@ -1,1 +1,12 @@
 Test
+<script>
+/* globals */
+
+var test = '{{test}}';
+test = test.replaceAll('\\\\', '\\\\\\\\');
+
+var result = JSON.parse(test);
+
+//eslint-disable-next-line
+console.log(result);
+</script>

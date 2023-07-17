@@ -149,20 +149,39 @@ class Schedules extends BasePackage
 
     public function getSchedulesSchedule($id)
     {
-        $filter =
-            $this->model->filter(
-                function($function) use ($id) {
-                    $function = $function->toArray();
+        if ($this->config->databasetype === 'db') {
+            $filter =
+                $this->model->filter(
+                    function($function) use ($id) {
+                        $function = $function->toArray();
 
-                    if ($function['id'] == $id) {
-                        $function['schedule'] = Json::decode($function['schedule'], true);
+                        if ($function['id'] == $id) {
+                            $function['schedule'] = Json::decode($function['schedule'], true);
 
-                        return $function['schedule'];
+                            return $function['schedule'];
+                        }
                     }
-                }
-            );
+                );
 
-        return $filter[0];
+            return $filter[0];
+        } else {
+            if (!$this->{$this->packageName}) {
+                $this->init();
+            }
+
+            foreach ($this->schedules as $key => $function) {
+                if ($function['id'] == $id) {
+
+                    if (is_string($function['schedule'])) {
+                        $function['schedule'] = Json::decode($function['schedule'], true);
+                    }
+
+                    return $function['schedule'];
+                }
+            }
+        }
+
+        return false;
     }
 
     public function getWeekdays()

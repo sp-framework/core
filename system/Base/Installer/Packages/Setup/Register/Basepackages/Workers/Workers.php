@@ -27,22 +27,12 @@ class Workers
     {
         $workersArr = [];
 
-        for ($x = 1; $x <= 2; $x++) {
+        for ($x = 1; $x <= 100; $x++) {
             array_push($workersArr,
                 [
                     'name'          => 'Worker ' . $x,
                     'status'        => 0,
                     'enabled'       => 1
-                ]
-            );
-        }
-
-        for ($x = 3; $x <= 100; $x++) {
-            array_push($workersArr,
-                [
-                    'name'          => 'Worker ' . $x,
-                    'status'        => 0,
-                    'enabled'       => 0
                 ]
             );
         }

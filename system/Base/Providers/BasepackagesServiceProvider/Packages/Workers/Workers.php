@@ -32,19 +32,37 @@ class Workers extends BasePackage
 
     public function getIdleWorkers()
     {
-        $filter =
-            $this->model->filter(
-                function($function) {
-                    $function = $function->toArray();
+        if ($this->config->databasetype === 'db') {
+            $filter =
+                $this->model->filter(
+                    function($function) {
+                        $function = $function->toArray();
 
-                    if ($function['status'] == 0 &&
-                        $function['enabled'] == 1
-                    ) {
-                        return $function;
+                        if ($function['status'] == 0 &&
+                            $function['enabled'] == 1
+                        ) {
+                            return $function;
+                        }
                     }
-                }
-            );
+                );
 
-        return $filter;
+            return $filter;
+        } else {
+            if (!$this->{$this->packageName}) {
+                $this->init();
+            }
+
+            $workers = [];
+
+            foreach ($this->workers as $key => $function) {
+                if ($function['status'] == 0 &&
+                    $function['enabled'] == 1
+                ) {
+                    array_push($workers, $function);
+                }
+            }
+
+            return $workers;
+        }
     }
 }

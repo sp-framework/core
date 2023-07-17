@@ -2,10 +2,10 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
-use Apps\Core\Packages\System\Api\Model\SystemApiCalls;
 use Carbon\Carbon;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Api\BasepackagesApiCalls;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersJobs;
 
 class Jobs extends BasePackage
@@ -29,7 +29,7 @@ class Jobs extends BasePackage
             return false;
         }
 
-        $apiModel = SystemApiCalls::class;
+        $apiModel = BasepackagesApiCalls::class;
 
         if ($job['run_on'] && $job['run_on'] !== '' && $job['run_on'] != '0' && $job['run_on'] !== '-') {
             $start = $job['run_on'];
@@ -37,26 +37,29 @@ class Jobs extends BasePackage
             $timeRan->addSeconds((float) round($job['execution_time']));
             $end = $timeRan->format('Y-m-d H:i:s');
 
-            $callsObj = $apiModel::find(
-                [
-                    'conditions'        => 'called_at BETWEEN :start: AND :end:',
-                    'bind'              =>
-                        [
-                            'start'     => $start,
-                            'end'       => $end
-                        ]
-                ]
-            );
-
-            if ($callsObj) {
+            if ($this->config->databasetype === 'db') {
+                $callsObj = $apiModel::find(
+                    [
+                        'conditions'        => 'called_at BETWEEN :start: AND :end:',
+                        'bind'              =>
+                            [
+                                'start'     => $start,
+                                'end'       => $end
+                            ]
+                    ]
+                );
                 $callsArr = $callsObj->toArray();
+            } else {
+                $apiStore = $this->ff->store((new $apiModel)->getSource());
 
+                $callsArr = $apiStore->findBy(['called_at', 'BETWEEN', [$start, $end]]);
+            }
+
+            if ($callsArr && count($callsArr) > 0) {
                 $calls = [];
 
-                if (count($callsArr) > 0) {
-                    foreach ($callsArr as $key => $call) {
-                        $calls[$call['id']] = $call;
-                    }
+                foreach ($callsArr as $key => $call) {
+                    $calls[$call['id']] = $call;
                 }
 
                 $job['calls'] = $calls;

@@ -27,6 +27,8 @@ class Ff
 
     protected $syncFile;
 
+    protected $syncEnabled = true;
+
     public $mode;
 
     public function __construct($config, $request, $db = null, $basepackages = null)
@@ -50,7 +52,7 @@ class Ff
         }
     }
 
-    public function init($resetSync = false)
+    public function init($resetSync = false, $syncEnabled = true)
     {
         $this->databaseDir = base_path('.ff/');
 
@@ -59,6 +61,8 @@ class Ff
         if ($resetSync) {
             $this->resetSync();
         }
+
+        $this->syncEnabled = $syncEnabled;
 
         return $this;
     }
@@ -356,6 +360,14 @@ class Ff
 
     public function addToSync($model, $id, $task = 'add', $schedule = true)
     {
+        if (!$this->syncEnabled) {
+            return false;
+        }
+
+        if (!$model) {
+            return false;
+        }
+
         if (is_string($model)) {
             $model = new $model;
         }

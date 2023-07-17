@@ -11,8 +11,9 @@ class TestComponent extends BaseComponent
 
     public function viewAction()
     {
-        dump($this->ff->getSyncFile());
-        dump($this->ff->sync());
+        $file = $this->ff->getSyncFile();
+        $this->view->test = json_encode($file);
+        return;
         die();
         set_time_limit(600);
 
