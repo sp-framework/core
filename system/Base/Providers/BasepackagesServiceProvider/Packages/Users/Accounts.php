@@ -216,9 +216,7 @@ class Accounts extends BasePackage
             return;
         }
 
-        if ($this->config->databasetype === 'db') {
-            $accountObj = $this->getFirst('id', $data['id']);
-        }
+        $accountObj = $this->getFirst('id', $data['id']);
 
         $account = $this->getAccountById($data['id']);
 
@@ -296,7 +294,7 @@ class Accounts extends BasePackage
             if ((isset($data['force_logout']) && $data['force_logout'] === '1') ||
                  (isset($data['status']) && $data['status'] === '0')
             ) {
-                $this->removeRelatedData($accountObj, false, false);
+                $this->removeRelatedData($accountObj, $account, false, false);
             }
         } else {
             $this->addResponse('Error updating account.', 1);
@@ -414,6 +412,7 @@ class Accounts extends BasePackage
 
     public function removeRelatedData(
         $accountObj,
+        $account = null,
         $security = true,
         $canlogin = true,
         $sessions = true,

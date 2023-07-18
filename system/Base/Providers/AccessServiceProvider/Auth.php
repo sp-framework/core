@@ -318,7 +318,7 @@ class Auth
 
         $this->packagesData->responseMessage = 'Authenticated. Redirecting...';
 
-        if ($this->account['security']['force_pwreset'] && $this->account['security']['force_pwreset'] === '1') {
+        if ($this->account['security']['force_pwreset'] && $this->account['security']['force_pwreset'] == '1') {
 
             $this->packagesData->redirectUrl = $this->links->url('auth/q/pwreset/true');
 
@@ -849,11 +849,11 @@ class Auth
             }
         }
 
-        $this->account['password'] = $this->secTools->hashPassword($data['newpass'], $this->config->security->passwordWorkFactor);
+        $this->account['security']['password'] = $this->secTools->hashPassword($data['newpass'], $this->config->security->passwordWorkFactor);
 
-        $this->account['force_pwreset'] = null;
+        $this->account['security']['force_pwreset'] = null;
 
-        if ($this->accounts->addUpdateSecurity($this->account['id'], $this->account)) {
+        if ($this->accounts->addUpdateSecurity($this->account['id'], $this->account['security'])) {
             $this->logger->log->info('Password reset successful for account ' . $this->account['email'] . ' via pwreset.');
 
             $this->packagesData->responseCode = 0;
@@ -1073,9 +1073,13 @@ class Auth
 
         $security = $this->getAccountSecurityObject();
 
-        $security->two_fa_secret = $twoFaSecret;
+        if ($this->config->databasetype === 'db') {
+            $security->two_fa_secret = $twoFaSecret;
 
-        $security->update();
+            $security->update();
+        } else {
+            //
+        }
 
         return $twoFaSecret;
     }
@@ -1298,45 +1302,54 @@ class Auth
             $this->setUserFromSession();
         }
 
+        $this->accounts->setFFRelations(true);
+        $agentStore = $this->ff->store('basepackages_users_accounts_agents');
+
         $accountsObj = $this->accounts->getFirst('id', $this->account()['id']);
 
-        if ($accountsObj->agents) {
-            $agentObj =
-                $accountsObj->agents::findFirst(
-                    [
-                        'conditions'    => 'session_id = :sid: AND account_id = :aid:',
-                        'bind'          => [
-                            'sid'       => $this->session->getId(),
-                            'aid'       => $this->account()['id']
+        if ($this->config->databasetype === 'db') {
+            if ($accountsObj->agents) {
+                $agentObj =
+                    $accountsObj->agents::findFirst(
+                        [
+                            'conditions'    => 'session_id = :sid: AND account_id = :aid:',
+                            'bind'          => [
+                                'sid'       => $this->session->getId(),
+                                'aid'       => $this->account()['id']
+                            ]
                         ]
-                    ]
-                );
-
-            $code = $this->secTools->random->base62(12);
-
-            $agentObj->assign(
-                [
-                    'verification_code' => $this->secTools->hashPassword($code, $this->config->security->passwordWorkFactor)
-                ]
-            )->update();
-
-            if ($this->emailVerificationCode($code)) {
-                $this->logger->log
-                    ->info('New verification code requested for account ' .
-                           $this->account['email'] .
-                           ' via authentication agent. New code was emailed to the account.'
                     );
 
-                $this->packagesData->responseMessage = 'Email Sent!';
-
-                $this->packagesData->responseCode = 0;
-
-                return;
+                $agent = $agentObj->toArray();
             }
+        } else {
+            $account = $accountsObj->toArray();
 
-            $this->packagesData->responseMessage = 'Error Sending Email! Please contact administrator.';
+            if ($account['agents'] && count($account['agents']) > 0) {
+                $agent = $agentStore->findOneBy([['session_id', '=', $this->session->getId()], ['account_id', '=', $this->account()['id']]]);
+            }
+        }
 
-            $this->packagesData->responseCode = 1;
+        $code = $this->secTools->random->base62(12);
+
+        $agent['verification_code'] = $this->secTools->hashPassword($code, $this->config->security->passwordWorkFactor);
+
+        if ($this->config->databasetype === 'db') {
+            $agentObj->assign($agent)->update();
+        } else {
+            $agentStore->update($agent);
+        }
+
+        if ($this->emailVerificationCode($code)) {
+            $this->logger->log
+                ->info('New verification code requested for account ' .
+                       $this->account['email'] .
+                       ' via authentication agent. New code was emailed to the account.'
+                );
+
+            $this->packagesData->responseMessage = 'Email Sent!';
+
+            $this->packagesData->responseCode = 0;
 
             return;
         }
@@ -1372,62 +1385,81 @@ class Auth
         $userAgent = $this->request->getUserAgent();
         $sessionId = $this->session->getId();
 
+        $this->accounts->setFFRelations(true);
+        $agentStore = $this->ff->store('basepackages_users_accounts_agents');
+
         $accountsObj = $this->accounts->getFirst('id', $this->account()['id']);
 
-        if ($accountsObj->agents) {
-            $agentObj =
-                $accountsObj->agents::findFirst(
-                    [
-                        'conditions'    => 'session_id = :sid: AND account_id = :aid:',
-                        'bind'          => [
-                            'sid'       => $sessionId,
-                            'aid'       => $this->account()['id']
+        if ($this->config->databasetype === 'db') {
+            if ($accountsObj->agents) {
+                $agentObj =
+                    $accountsObj->agents::findFirst(
+                        [
+                            'conditions'    => 'session_id = :sid: AND account_id = :aid:',
+                            'bind'          => [
+                                'sid'       => $sessionId,
+                                'aid'       => $this->account()['id']
+                            ]
                         ]
-                    ]
-                );
-            $agent = $agentObj->toArray();
-
-            if ($this->secTools->checkPassword($data['code'], $agent['verification_code'])) {
-                if ($agent['client_address'] === $clientAddress &&
-                    $agent['user_agent'] === $userAgent &&
-                    $agent['session_id'] === $sessionId &&
-                    $agent['account_id'] === $this->account()['id'] &&
-                    $agent['verified'] == '0'
-                ) {
-                    $agentObj->assign(['verified' => '1', 'verification_code' => null])->update();
-
-                    $this->packagesData->responseCode = 0;
-
-                    $this->packagesData->responseMessage = 'Authenticated. Redirecting...';
-
-                    if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
-                        $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
-                    } else {
-                        $this->packagesData->redirectUrl = $this->links->url('home');
-                    }
-                } else if ($agent['client_address'] === $clientAddress &&
-                    $agent['user_agent'] === $userAgent &&
-                    $agent['account_id'] === $this->account()['id'] &&
-                    $agent['session_id'] === $sessionId &&
-                    $agent['verified'] == '1'
-                ) {
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'Session Incorrect... Loggin out.';
-
-                    $this->logout();
-                }
+                    );
             } else {
+                $this->packagesData->responseMessage = 'Please contact administrator.';
+
                 $this->packagesData->responseCode = 1;
 
-                $this->packagesData->responseMessage = 'Incorrect verification code. Try again.';
+                return;
             }
+            $agent = $agentObj->toArray();
 
-            return;
+        } else {
+            $account = $accountsObj->toArray();
+
+            if ($account['agents'] && count($account['agents']) > 0) {
+                $agent = $agentStore->findOneBy([['session_id', '=', $sessionId], ['account_id', '=', $this->account()['id']]]);
+            }
         }
 
-        $this->packagesData->responseMessage = 'Please contact administrator.';
+        if ($this->secTools->checkPassword($data['code'], $agent['verification_code'])) {
+            if ($agent['client_address'] === $clientAddress &&
+                $agent['user_agent'] === $userAgent &&
+                $agent['session_id'] === $sessionId &&
+                $agent['account_id'] === $this->account()['id'] &&
+                $agent['verified'] == '0'
+            ) {
+                if ($this->config->databasetype === 'db') {
+                    $agentObj->assign(['verified' => '1', 'verification_code' => null])->update();
+                } else {
+                    $agent['verified'] = 1;
+                    $agent['verification_code'] = null;
 
-        $this->packagesData->responseCode = 1;
+                    $agentStore->update($agent);
+                }
+
+                $this->packagesData->responseCode = 0;
+
+                $this->packagesData->responseMessage = 'Authenticated. Redirecting...';
+
+                if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
+                    $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
+                } else {
+                    $this->packagesData->redirectUrl = $this->links->url('home');
+                }
+            } else if ($agent['client_address'] === $clientAddress &&
+                $agent['user_agent'] === $userAgent &&
+                $agent['account_id'] === $this->account()['id'] &&
+                $agent['session_id'] === $sessionId &&
+                $agent['verified'] == '1'
+            ) {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Session Incorrect... Loggin out.';
+
+                $this->logout();
+            }
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Incorrect verification code. Try again.';
+        }
     }
 }

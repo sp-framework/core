@@ -225,7 +225,14 @@ class Setup
 				$reset = true;
 			}
 
-			$this->ff = (new Ff((object) ['enabled' => false, 'timeout' => 0], $this->request))->init($reset);
+			$this->ff = (new Ff(
+				(object) [
+					'cache' => (object) [
+						'enabled' => false,
+						'timeout' => 0
+					],
+					'databaseType' => $this->postData['databasetype']
+				], $this->request))->init($reset, false);
 		}
 
 		$this->progress = $this->basepackages->progress;

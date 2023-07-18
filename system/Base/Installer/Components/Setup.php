@@ -225,7 +225,7 @@ Class Setup
 					}
 				}
 			} else if (isset($this->postData['dev']) && $this->postData['dev'] == 'true') {
-				// $this->progress->unregisterMethods(['downloadCountriesStateAndCities', 'registerCountriesStateAndCities']);
+				$this->progress->unregisterMethods(['downloadCountriesStateAndCities', 'registerCountriesStateAndCities']);
 			}
 
 			if (!$onlyUpdateDb) {
