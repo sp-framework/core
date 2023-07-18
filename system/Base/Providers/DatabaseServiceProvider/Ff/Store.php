@@ -844,6 +844,18 @@ class Store
         return $this->data;
     }
 
+    public function truncate($confirm = false)
+    {
+        if ($confirm) {
+            $this->deleteStore();
+            $this->createStore();
+
+            return true;
+        }
+
+        return false;
+    }
+
     public function search(array $fields, string $query, array $orderBy = null, int $limit = null, int $offset = null): array
     {
         $qb = $this->createQueryBuilder();

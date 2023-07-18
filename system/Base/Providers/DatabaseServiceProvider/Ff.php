@@ -67,7 +67,12 @@ class Ff
         return $this;
     }
 
-    protected function resetSync()
+    public function setSync(bool $set)
+    {
+        $this->syncEnabled = $set;
+    }
+
+    public function resetSync()
     {
         IoHelper::writeContentToFile($this->databaseDir . '_sync.sdb', '{}');
     }
@@ -468,6 +473,14 @@ class Ff
 
                         $data = $ffStore->findById($id);
 
+                        if (!$data) {
+                            array_push($this->syncFile['warnings'], 'Data for ID: ' . $id .' missing for store: ' . $store . '. Removing ID from sync.');
+
+                            unset($toSync['ids'][$idKey]);
+
+                            continue;
+                        }
+
                         $data = $this->normalizeData($data, $storeSchema);
 
                         $model->assign($data);
@@ -480,6 +493,10 @@ class Ff
                             }
                         } else if ($task === 'update') {
                             $taskPerformed = $model->update();
+
+                            if (!$taskPerformed && strpos($model->getMessages()[0]->getMessage(), 'does not exist')) {
+                                $taskPerformed = $model->create();
+                            }
                         } else if ($task === 'remove') {
                             $taskPerformed = $model->delete();
                         }
@@ -496,7 +513,13 @@ class Ff
                             $transactionErrors = [];
 
                             foreach ($model->getMessages() as $err) {
-                                array_push($transactionErrors, $err->getMessage());
+                                if (strpos($err->getMessage(), 'already exists')) {
+                                    array_push($this->syncFile['warnings'], 'Trying to ' . $task . ' db entry for ID ' . $id . ' but it already exists. Updating instead.');
+                                } else if (strpos($err->getMessage(), 'does not exist')) {
+                                    array_push($this->syncFile['warnings'], 'Trying to ' . $task . ' db entry for ID ' . $id . ' but it does not exists. Adding instead.');
+                                } else {
+                                    array_push($transactionErrors, $err->getMessage());
+                                }
                             }
 
                             array_push($this->syncFile['errors'], "Could not " . $task . " data in db for store " . get_class($model) . ", for ID " . $id . ". Reasons: <br>" .
@@ -532,6 +555,8 @@ class Ff
         }
 
         $this->syncFile['errors'] = [];
+
+        $this->syncFile['warnings'] = [];
 
         return $this->syncFile;
     }

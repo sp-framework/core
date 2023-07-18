@@ -140,6 +140,11 @@ class Tasks extends BasePackage
         $time = Carbon::now();
 
         if (isset($data['cancel']) && $data['cancel'] == 'true') {
+            if ($this->config->databasetype === 'hybrid' &&
+                $task['function'] === 'processdbsync'
+            ) {
+                $this->ff->setSync(false);
+            }
             $task['force_next_run'] = null;
             $task['status'] = '1';
             $task['next_run'] = '-';
