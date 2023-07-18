@@ -362,9 +362,24 @@ abstract class BasePackage extends Controller
 				}
 			}
 
+			$order = null;
 			$limit = null;
 			$offset = null;
 
+			if (isset($params['order'])) {
+				$orderParamsArr = explode(' ', $params['order']);
+				$orderParamsArr = Arr::chunk($orderParamsArr, 2);
+
+				$orderParams = [];
+
+				foreach ($orderParamsArr as $orderParam) {
+					if (isset($orderParam[1])) {
+						$orderParams[$orderParam[0]] = $orderParam[1];
+					}
+				}
+
+				$order = $orderParams;
+			}
 			if (isset($params['limit'])) {
 				$limit = $params['limit'];
 			}
@@ -373,13 +388,13 @@ abstract class BasePackage extends Controller
 			}
 
 			if (isset($params['conditions']) && is_array($params['conditions']) && count($params['conditions']) > 0) {
-				$this->ffData = $this->ffStore->findBy($params['conditions'], null, $limit, $offset);
+				$this->ffData = $this->ffStore->findBy($params['conditions'], $order, $limit, $offset);
 			} else if (isset($params['conditions']) &&
 					   ((is_array($params['conditions']) && count($params['conditions']) === 0) ||
 						 $params['conditions'] === ''
 					   )
 			) {
-				$this->ffData = $this->ffStore->findAll(null, $limit, $offset);
+				$this->ffData = $this->ffStore->findAll($order, $limit, $offset);
 			} else {
 				throw new \Exception('getByParams needs parameter conditions (array) to be set.');
 			}

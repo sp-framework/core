@@ -274,21 +274,25 @@ class Store
 
     public function findAll(array $orderBy = null, int $limit = null, int $offset = null): array
     {
-        $qb = $this->createQueryBuilder();
+        try {
+            $qb = $this->createQueryBuilder();
 
-        if (!is_null($orderBy)) {
-            $qb->orderBy($orderBy);
+            if (!is_null($orderBy)) {
+                $qb->orderBy($orderBy);
+            }
+
+            if (!is_null($limit)) {
+                $qb->limit($limit);
+            }
+
+            if (!is_null($offset)) {
+                $qb->skip($offset);
+            }
+
+            $this->data = $qb->getQuery()->fetch();
+        } catch (\Exception $e) {
+            throw $e;
         }
-
-        if (!is_null($limit)) {
-            $qb->limit($limit);
-        }
-
-        if (!is_null($offset)) {
-            $qb->skip($offset);
-        }
-
-        $this->data = $qb->getQuery()->fetch();
 
         return $this->data;
     }
@@ -316,21 +320,25 @@ class Store
 
     public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null): array
     {
-        $qb = $this->createQueryBuilder();
+        try {
+            $qb = $this->createQueryBuilder();
 
-        $qb->where($criteria);
+            $qb->where($criteria);
 
-        if ($orderBy !== null)  {
-            $qb->orderBy($orderBy);
-        }
-        if ($limit !== null)  {
-            $qb->limit($limit);
-        }
-        if ($offset !== null)  {
-            $qb->skip($offset);
-        }
+            if ($orderBy !== null)  {
+                $qb->orderBy($orderBy);
+            }
+            if ($limit !== null)  {
+                $qb->limit($limit);
+            }
+            if ($offset !== null)  {
+                $qb->skip($offset);
+            }
 
-        $this->data = $qb->getQuery()->fetch();
+            $this->data = $qb->getQuery()->fetch();
+        } catch (\Exception $e) {
+            throw $e;
+        }
 
         return $this->data;
     }

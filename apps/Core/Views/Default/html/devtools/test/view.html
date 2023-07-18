@@ -3,7 +3,7 @@ Test
 /* globals */
 
 var test = '{{test}}';
-test = test.replaceAll('\\\\', '\\\\\\\\');
+test = test.replaceAll('\\', '\\\\\\\\');
 
 var result = JSON.parse(test);
 
