@@ -36,6 +36,8 @@ class ProcessDbSync extends Functions
                 $thisFunction->packagesData->responseMessage = 'Error Syncing.';
 
                 $thisFunction->packagesData->responseData = $result;
+
+                //Notify the Admins here
             }
 
             $this->addJobResult($thisFunction->packagesData, $args);

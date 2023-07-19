@@ -380,7 +380,7 @@ class Auth
                         } else {
                             $canloginStore = $this->ff->store('basepackages_users_accounts_canlogin');
 
-                            $canloginStore->updateOrInsert(
+                            $canloginStore->insert(
                                 [
                                     'account_id'    => $this->account['id'],
                                     'app_id'        => $this->app['id'],
@@ -469,7 +469,7 @@ class Auth
                 $sessionStore = $this->ff->store('basepackages_users_accounts_sessions');
 
                 try {
-                    $sessionStore->updateOrInsert($newSession);
+                    $sessionStore->insert($newSession);
                 } catch (\Exception $e) {
                     $this->logger->log->debug('Duplicate session Id Found. This happens when session was deleted from server and browser used an old session ID.');
 
@@ -671,7 +671,7 @@ class Auth
         } else {
             $identifierStore = $this->ff->store('basepackages_users_accounts_identifiers');
 
-            $identifierStore->updateOrInsert($newIdentifier);
+            $identifierStore->insert($newIdentifier);
         }
     }
 

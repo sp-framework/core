@@ -457,6 +457,10 @@ class Ff
                 }
 
                 foreach ($tasks as $store => &$toSync) {
+                    if (!is_array($toSync) || (is_array($toSync) && count($toSync) === 0)) {
+                        continue;
+                    }
+
                     if (!isset($toSync['model'])) {
                         array_push($this->syncFile['errors'], 'Model missing in the sync file.');
                     }
@@ -471,19 +475,21 @@ class Ff
                     foreach ($toSync['ids'] as $idKey => &$id) {
                         $model = new $toSync['model'];
 
-                        $data = $ffStore->findById($id);
+                        if ($task !== 'remove') {
+                            $data = $ffStore->findById($id);
 
-                        if (!$data) {
-                            array_push($this->syncFile['warnings'], 'Data for ID: ' . $id .' missing for store: ' . $store . '. Removing ID from sync.');
+                            if (!$data) {
+                                array_push($this->syncFile['warnings'], 'Data for ID: ' . $id .' missing for store: ' . $store . '. Removing ID from sync.');
 
-                            unset($toSync['ids'][$idKey]);
+                                unset($toSync['ids'][$idKey]);
 
-                            continue;
+                                continue;
+                            }
+
+                            $data = $this->normalizeData($data, $storeSchema);
+
+                            $model->assign($data);
                         }
-
-                        $data = $this->normalizeData($data, $storeSchema);
-
-                        $model->assign($data);
 
                         if ($task === 'add') {
                             $taskPerformed = $model->create();
@@ -518,7 +524,7 @@ class Ff
                                 } else if (strpos($err->getMessage(), 'does not exist')) {
                                     array_push($this->syncFile['warnings'], 'Trying to ' . $task . ' db entry for ID ' . $id . ' but it does not exists. Adding instead.');
                                 } else {
-                                    array_push($transactionErrors, $err->getMessage());
+                                    array_push($transactionErrors, str_replace("'", '', $err->getMessage()));
                                 }
                             }
 
@@ -530,7 +536,11 @@ class Ff
                 }
             }
         } catch (\Exception $e) {
-            array_push($this->syncFile['errors'], $e->getMessage());
+            if (strpos($e->getMessage(), 'Integrity')) {
+                array_push($this->syncFile['errors'], str_replace("'", '', $e->getMessage()) . '. Database Sync will happen until admin resync the whole table. Resync can be performed via settings/core/database section.');
+            } else {
+                array_push($this->syncFile['errors'], str_replace("'", '', $e->getMessage()));
+            }
         }
 
         return $this->syncFile;
