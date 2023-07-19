@@ -31,13 +31,15 @@ class Ff
 
     public $mode;
 
-    public function __construct($config, $request, $db = null, $basepackages = null)
+    public function __construct($baseConfig, $request, $db = null, $basepackages = null)
     {
-        $this->cacheConfig['auto_cache'] = $config->cache->enabled;
+        $this->baseConfig = $baseConfig;
 
-        $this->cacheConfig['cache_lifetime'] = $config->cache->timeout;
+        $this->cacheConfig['auto_cache'] = $this->baseConfig->cache->enabled;
 
-        $this->mode = $config->databaseType;
+        $this->cacheConfig['cache_lifetime'] = $this->baseConfig->cache->timeout;
+
+        $this->mode = $this->baseConfig->databaseType;
 
         $this->request = $request;
 
@@ -50,11 +52,16 @@ class Ff
 
             $this->loadSyncFile();
         }
+
     }
 
     public function init($resetSync = false, $syncEnabled = true)
     {
-        $this->databaseDir = base_path('.ff/');
+        if (isset($this->baseConfig->ff) && $this->baseConfig->ff->databaseDir) {
+            $this->databaseDir = base_path($this->baseConfig->ff->databaseDir);
+        } else {
+            $this->databaseDir = base_path('.ff/');
+        }
 
         $this->checkDatabasePath();
 

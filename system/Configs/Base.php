@@ -2,19 +2,12 @@
 
 return
 	[
-		"setup" 			=> false,
-		"dev"    			=> true, //true - Development false - Production
-		"debug"				=> true,
-		"auto_off_debug"	=> 0,
-		"db" 				=>
+		"setup" 			=> true,
+		"databasetype" 		=> "hybrid",
+		"db"				=> [],
+		"ff" 				=>
 		[
-			"host" 							=> "localhost",
-			"port" 							=> "3306",
-			"dbname" 						=> "sp",
-			"charset" 	 	    			=> "utf8mb4",
-			"collation" 	    			=> "utf8mb4_general_ci",
-			"username" 						=> "sp",
-			"password" 						=> "6FaMIr97MkKrKivEtTIEA2TtlA==",
+			"databaseDir" 					=> ".ff/"
 		],
 		"cache"				=>
 		[
@@ -22,18 +15,13 @@ return
 			"timeout"						=> 60, //Global Cache timeout in seconds
 			"service"						=> "streamCache"
 		],
-		"security"			=>
-		[
-			"passwordWorkFactor"			=> 2,
-			"cookiesWorkFactor" 			=> 2,
-		],
 		"logs"				=>
 		[
-			"enabled"						=> "true",
-			"exceptions"					=> "false",
+			"enabled"						=> true,
+			"exceptions"					=> true,
 			"level"							=> "DEBUG",
 			"service"						=> "streamLogs",
-			"emergencyLogsEmail"			=> "true",
+			"emergencyLogsEmail"			=> false,
 			"emergencyLogsEmailAddresses"	=> "",
 		],
 		"websocket"			=>

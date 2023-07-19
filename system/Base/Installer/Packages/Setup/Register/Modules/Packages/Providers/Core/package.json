@@ -60,10 +60,14 @@
 	"settings" : 
 	{
 		"dev" : false,
-		"databasetype" : "hybrid",
 		"debug" : false,
 		"auto_off_debug" : 0,
+		"databasetype" : "hybrid",
 		"dbs" : [],
+		"ff" :
+		{
+			"databaseDir" : ".ff/"
+		},
 		"cache" : 
 		{
 			"enabled" : false,

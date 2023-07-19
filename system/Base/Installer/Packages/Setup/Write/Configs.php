@@ -52,6 +52,11 @@ return
 	[
 		"setup" 			=> true,
 		"databasetype" 		=> "hybrid",
+		"db"				=> [],
+		"ff" 				=>
+		[
+			"databaseDir" 					=> ".ff/"
+		],
 		"cache"				=>
 		[
 			"enabled"						=> false, //Global Cache value //true - Production false - Development
@@ -134,10 +139,10 @@ return
 		$setup = 'false';
 
 		$this->coreJson['settings']['setup'] = $setup == 'true'? true : false;
-		$this->coreJson['settings']['databasetype'] = $this->postData['databasetype'];
 		$this->coreJson['settings']['debug'] = $debug == 'true'? true : false;
 		$this->coreJson['settings']['cache']['enabled'] = $cache == 'true'? true : false;
 		$this->coreJson['settings']['dev'] = $dev == 'true'? true : false;
+		$this->coreJson['settings']['databasetype'] = $this->postData['databasetype'];
 		if ($this->coreJson['settings']['databasetype'] !== 'ff') {
 			$this->coreJson['settings']['dbs'][$this->postData['dbname']]['active'] = true;
 			$this->coreJson['settings']['dbs'][$this->postData['dbname']]['host'] = $this->postData['host'];
@@ -159,10 +164,10 @@ return
 return
 	[
 		"setup" 			=> ' . $setup .',
-		"databasetype" 		=> "' . $this->coreJson['settings']['databasetype'] . '",
 		"dev"    			=> ' . $dev . ', //true - Development false - Production
 		"debug"				=> ' . $debug . ',
-		"auto_off_debug"	=> ' . $this->coreJson['settings']['auto_off_debug'] . ',';
+		"auto_off_debug"	=> ' . $this->coreJson['settings']['auto_off_debug'] . ',
+		"databasetype" 		=> "' . $this->coreJson['settings']['databasetype'] . '",';
 if ($this->coreJson['settings']['databasetype'] !== 'ff') {
 		$this->baseFileContent .= '
 		"db" 				=>
@@ -173,7 +178,17 @@ if ($this->coreJson['settings']['databasetype'] !== 'ff') {
 			"charset" 	 	    			=> "' . $this->postData['charset'] . '",
 			"collation" 	    			=> "' . $this->postData['collation'] . '",
 			"username" 						=> "' . $this->postData['username'] . '",
-			"password" 						=> "' . $this->postData['password'] . '",
+			"password" 						=> "' . $this->postData['password'] . '"
+		],
+		"ff" 				=>
+		[
+			"databaseDir" 					=> "' . $this->coreJson['settings']['ff']['databaseDir'] . '"
+		],';
+} else {
+		$this->baseFileContent .= '
+		"ff" 				=>
+		[
+			"databaseDir" 					=> "' . $this->coreJson['settings']['ff']['databaseDir'] . '"
 		],';
 }
 		$this->baseFileContent .= '
