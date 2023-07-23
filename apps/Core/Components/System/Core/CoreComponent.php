@@ -41,6 +41,11 @@ class CoreComponent extends BaseComponent
             $core['settings']['logs']['emergencyLogsEmailAddresses'] = trim(implode(', ', $core['settings']['logs']['emergencyLogsEmailAddresses']));
         }
 
+        //Unset security keys
+        unset($core['settings']['sigKey']);
+        unset($core['settings']['sigText']);
+        unset($core['settings']['cookiesSig']);
+
         $this->view->core = $core;
         $this->view->availableCaches = $availableCaches;
         $this->view->logLevels = $this->logger->getLogLevels();
