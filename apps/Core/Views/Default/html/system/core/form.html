@@ -73,7 +73,7 @@
 </div>
 {% set dbs = json_encode(core['settings']['dbs'], 16) %}
 <script>
-/* globals PNotify Swal */
+/* globals PNotify Swal BazProgress */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -98,8 +98,12 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
 
-dataCollectionSectionForm['vars'] = { };
-dataCollectionSectionForm['funcs'] = { };
+if (!dataCollectionSectionForm['vars']) {
+    dataCollectionSectionForm['vars'] = { };
+}
+if (!dataCollectionSectionForm['funcs']) {
+    dataCollectionSectionForm['funcs'] = { };
+}
 dataCollectionSectionForm['vars']['dbs'] = JSON.parse('{{dbs}}');
 
 dataCollectionSection =
@@ -140,10 +144,12 @@ dataCollectionSection =
                     if ($(this).find('input[type=radio]:checked').data('value') == 'cacheon') {
                         $('#{{componentId}}-{{sectionId}}-cache_timeout').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-cache_service').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-clear-cache').attr('disabled', false);
                     } else {
                         $('#{{componentId}}-{{sectionId}}-cache_timeout').val('');
                         $('#{{componentId}}-{{sectionId}}-cache_timeout').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-cache_service').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-clear-cache').attr('disabled', true);
                     }
                 });
             }
@@ -186,6 +192,89 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-websocket_protocol'                      : { },
         '{{componentId}}-{{sectionId}}-websocket_host'                          : { },
         '{{componentId}}-{{sectionId}}-websocket_port'                          : { },
+        '{{componentId}}-{{sectionId}}-ff-databasedir'                          : {
+            placeholder : 'SELECT ACTIVE FLAT FILE LOCATION',
+        },
+        '{{componentId}}-{{sectionId}}-databasetype'                            : {
+            placeholder : 'SELECT DATABASE TYPE',
+            afterInit : function() {
+                BazProgress.buildProgressBar($('#maintenance-progress'));
+
+                if ($('#{{componentId}}-{{sectionId}}-cache').find('input[type=radio]:checked').data('value') == 'cacheoff') {
+                    $('#{{componentId}}-{{sectionId}}-clear-cache').attr('disabled', true);
+                }
+
+                dataCollectionSectionForm['vars']['checkedStores'] = [];
+
+                //Check Uncheck all
+                $('#{{componentId}}-{{sectionId}}-check_uncheck_all').click(function() {
+                    var stores;
+                    if ($(this)[0].checked === true) {
+                        for (stores in dataCollectionSectionForm['vars']['ffStores']) {
+                            $('#' + stores)[0].checked = true;
+                            dataCollectionSectionForm['vars']['checkedStores'].push(dataCollectionSectionForm['vars']['ffStores'][stores]);
+                        }
+                    } else {
+                        for (stores in dataCollectionSectionForm['vars']['ffStores']) {
+                            $('#' + stores)[0].checked = false;
+                        }
+                        dataCollectionSectionForm['vars']['checkedStores'] = [];
+                    }
+                });
+
+                for (var store in dataCollectionSectionForm['vars']['ffStores']) {
+                    $('#' + store).click(function() {
+                        if ($(this)[0].checked === true) {
+                            dataCollectionSectionForm['vars']['checkedStores'].push(dataCollectionSectionForm['vars']['ffStores'][$(this)[0].id]);
+                        } else {
+                            var index = dataCollectionSectionForm['vars']['checkedStores'].indexOf(dataCollectionSectionForm['vars']['ffStores'][$(this)[0].id]);
+
+                            if (index > -1) {
+                                dataCollectionSectionForm['vars']['checkedStores'].splice(index, 1);
+                            }
+                        }
+                    });
+                }
+
+                $('#{{componentId}}-{{sectionId}}-clear-cache, #{{componentId}}-{{sectionId}}-re-index, #{{componentId}}-{{sectionId}}-re-sync').click(function(e) {
+                    e.preventDefault();
+
+                    if (dataCollectionSectionForm['vars']['checkedStores'].length === 0) {
+                        PNotify.error('Please select a store!');
+
+                        return;
+                    }
+
+                    var task;
+
+                    if ($(this).hasClass('clear-cache')) {
+                        task = 'clear-cache';
+                    } else if ($(this).hasClass('re-index')) {
+                        task = 're-index';
+                    } else if ($(this).hasClass('re-sync')) {
+                        task = 're-sync';
+                    }
+
+                    var postData = { };
+                    postData['task'] = task;
+                    postData['selectedStores'] = dataCollectionSectionForm['vars']['checkedStores'];
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post('{{links.url("system/core/maintaindb")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            PNotify.success({text : response.responseMessage});
+                        } else {
+                            PNotify.error({text : response.responseMessage});
+                        }
+                    }, 'json');
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-dbs'                                     : { },
         '{{componentId}}-{{sectionId}}-alldbs'                                  : {
             placeholder : "SELECT DATABASE",

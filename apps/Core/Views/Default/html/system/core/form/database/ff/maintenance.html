@@ -1,0 +1,131 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'check_uncheck_all',
+                'fieldLabel'                     : false,
+                'fieldHelp'                      : false,
+                'fieldHelpTooltipContent'        : '',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxLabel'             : 'CHECK/UNCHECK ALL',
+                'fieldCheckboxType'              : 'primary',
+                'fieldBazJstreeSearch'           : false,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : false
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    {% if ffStores is defined and ffStores|length > 0 %}
+        {% for ffStore in ffStores %}
+            <div class="col-md-4">
+                {% set ffStoresArr[componentId ~ '-' ~ sectionId ~ '-ffStore-' ~ ffStore['id']] = ffStore['id'] %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'ffStore-' ~ ffStore['id'],
+                        'fieldLabel'                     : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxLabel'             : ffStore['name'],
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazScan'                   : false,
+                        'fieldDataAttributes'            :
+                        [
+                            'ffStore'    : ffStore['id'],
+                            'type'       : 'ffStore'
+                        ]
+                    ]
+                )}}
+            </div>
+        {% endfor %}
+        {% set ffStoresArr = json_encode(ffStoresArr, 16) %}
+    {% else %}
+        <label>No Stores available.</label>
+        {% set ffStoresArr = json_encode([]) %}
+    {% endif %}
+</div>
+<hr class="mt-0">
+<div id="maintenance-progress" class="mb-3" hidden></div>
+<div class="row">
+    <div class="col text-center">
+        {{adminltetags.useTag('buttons',
+            {
+                'component'             : component,
+                'componentName'         : componentName,
+                'componentId'           : componentId,
+                'sectionId'             : 'main',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'clear-cache' : {
+                            'title'                   : 'Clear Cache',
+                            'size'                    : 'sm',
+                            'buttonAdditionalClass'   : 'mt-1 clear-cache',
+                            'icon'                    : 'fa-cog fa-spin',
+                            'iconHidden'              : true
+                        },
+                        're-index' : {
+                            'title'                   : 'Re-Index',
+                            'size'                    : 'sm',
+                            'buttonAdditionalClass'   : 'mt-1 re-index',
+                            'icon'                    : 'fa-cog fa-spin',
+                            'iconHidden'              : true
+                        },
+                        're-sync' : {
+                            'title'                   : 'Re-Sync',
+                            'size'                    : 'sm',
+                            'buttonAdditionalClass'   : 'mt-1 re-sync',
+                            'icon'                    : 'fa-cog fa-spin',
+                            'iconHidden'              : true
+                        }
+                    }
+            }
+        )}}
+    </div>
+</div>
+<script>
+/* globals PNotify Swal BazProgress */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+if (!dataCollectionSectionForm['vars']) {
+    dataCollectionSectionForm['vars'] = { };
+}
+if (!dataCollectionSectionForm['funcs']) {
+    dataCollectionSectionForm['funcs'] = { };
+}
+
+dataCollectionSectionForm['vars']['ffStores'] = JSON.parse('{{ffStoresArr}}');
+</script>

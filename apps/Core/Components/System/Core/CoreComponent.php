@@ -90,6 +90,22 @@ class CoreComponent extends BaseComponent
         }
 
         $this->view->dbStorageFiles = $storageFiles;
+
+        if ($this->config->databasetype !== 'db') {
+            $ffStoresArr = $this->ff->getAllStores();
+
+            $ffStores = [];
+
+            foreach ($ffStoresArr as $ffStore) {
+                $ffStores[$ffStore] =
+                    [
+                        'id'    => $ffStore,
+                        'name'  => str_replace('_', ' ', $ffStore)
+                    ];
+            }
+
+            $this->view->ffStores = $ffStores;
+        }
     }
 
     /**
@@ -215,6 +231,29 @@ class CoreComponent extends BaseComponent
                     $this->core->packagesData->responseMessage,
                     $this->core->packagesData->responseCode,
                     $this->core->packagesData->responseData,
+                );
+            } else {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode
+                );
+            }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function maintainDbAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->core->maintainDb($this->postData())) {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode
                 );
             } else {
                 $this->addResponse(

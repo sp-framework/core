@@ -182,13 +182,13 @@ if ($this->coreJson['settings']['databasetype'] !== 'ff') {
 		],
 		"ff" 				=>
 		[
-			"databaseDir" 					=> "' . $this->coreJson['settings']['ff']['databaseDir'] . '"
+			"databaseDir" 					=> "' . $this->coreJson['settings']['ff']['ff']['databaseDir'] . '"
 		],';
 } else {
 		$this->baseFileContent .= '
 		"ff" 				=>
 		[
-			"databaseDir" 					=> "' . $this->coreJson['settings']['ff']['databaseDir'] . '"
+			"databaseDir" 					=> "' . $this->coreJson['settings']['ff']['ff']['databaseDir'] . '"
 		],';
 }
 		$this->baseFileContent .= '

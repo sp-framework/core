@@ -551,6 +551,10 @@ class Core extends BasePackage
 			$this->core['settings']['auto_off_debug'] = $data['auto_off_debug'];
 		}
 
+		if (isset($data['databasetype'])) {
+			$this->core['settings']['databasetype'] = $data['databasetype'];
+		}
+
 		if (isset($data['cache'])) {
 			$this->core['settings']['cache']['enabled'] = $data['cache'];
 		}
@@ -672,6 +676,87 @@ class Core extends BasePackage
 		$this->core['settings']['cookiesSig'] = $keys['cookiesSig'];
 	}
 
+	public function maintainDb($data)
+	{
+		if (!isset($data['task'])) {
+			$this->addResponse('Task not set', 1);
+
+			return false;
+		}
+
+		if ($this->config->databasetype !== 'db') {
+			if (!isset($data['selectedStores'])) {
+				$this->addResponse('No Stores Selected', 1);
+
+				return false;
+			}
+		}
+
+		if ($data['task'] === 'clear-cache') {
+			if ($this->config->databasetype !== 'db') {
+				if (is_array($data['selectedStores']) && count($data['selectedStores']) > 0) {
+					foreach ($data['selectedStores'] as $store) {
+						$storeToMaintain = $this->ff->store($store);
+
+						$storeToMaintain->createQueryBuilder()->getQuery()->getCache()->deleteAll();
+					}
+
+					$this->addResponse('Cache Cleared');
+
+					return true;
+				}
+			}
+		} else if ($data['task'] === 're-index') {
+			if ($this->config->databasetype !== 'db') {
+				if (is_array($data['selectedStores']) && count($data['selectedStores']) > 0) {
+					foreach ($data['selectedStores'] as $store) {
+						$storeToMaintain = $this->ff->store($store);
+
+						try {
+							$storeToMaintain->reIndexStore();
+						} catch (\Exception $e) {
+							$this->addResponse($e->getMessage(), 1);
+
+							return false;
+						}
+					}
+
+					$this->addResponse('Stores Re-indexed');
+
+					return true;
+				}
+			} else {
+				$this->addResponse('Database type is RDBMS, cannot perform Flatfile tasks', 1);
+
+				return false;
+			}
+		} else if ($data['task'] === 're-sync') {
+			if ($this->config->databasetype !== 'db') {
+				if (is_array($data['selectedStores']) && count($data['selectedStores']) > 0) {
+					foreach ($data['selectedStores'] as $store) {
+						try {
+							$this->ff->store($store);
+
+							$this->ff->reSync();
+						} catch (\Exception $e) {
+							$this->addResponse($e->getMessage(), 1);
+
+							return false;
+						}
+					}
+
+					$this->addResponse('Stores Re-synced');
+
+					return true;
+				}
+			} else {
+				$this->addResponse('Database type is RDBMS, cannot perform Flatfile tasks', 1);
+
+				return false;
+			}
+		}
+	}
+
 	public function reset()
 	{
 		if ($this->core['settings']['dev'] == 'true') {
@@ -714,6 +799,7 @@ return
 		"dev"    			=> ' . $this->core['settings']['dev'] . ', //true - Development false - Production
 		"debug"				=> ' . $this->core['settings']['debug'] . ',
 		"auto_off_debug"	=> ' . $this->core['settings']['auto_off_debug'] . ',
+		"databasetype"	    => "' . $this->core['settings']['databasetype'] . '",
 		"db" 				=>
 		[
 			"host" 							=> "' . $dbConfig['host'] . '",

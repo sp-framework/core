@@ -424,7 +424,7 @@ class Store
                 $data[$this->primaryKey] = $this->increaseCounterAndGetNextId();
 
                 $insert = true;
-            } else {
+            } else if ($current) {
                 foreach ($current as $currentKey => $currentValue) {
                     if (!isset($data[$currentKey])) {
                         $data[$currentKey] = $currentValue;
@@ -1094,8 +1094,22 @@ class Store
     {
         if (count($configuration) === 0 || !array_key_exists('primary_key', $configuration)) {
             if (file_exists($this->storePath . 'config.json')) {
+                if (isset($configuration['auto_cache'])) {
+                    $autoCache = $configuration['auto_cache'];
+                }
+                if (isset($configuration['cache_lifetime'])) {
+                    $cacheLifetime = $configuration['cache_lifetime'];
+                }
+
                 $configuration = IoHelper::getFileContent($this->storePath . 'config.json');
                 $configuration = json_decode($configuration, true);
+
+                if (isset($autoCache)) {
+                    $configuration['auto_cache'] = $autoCache;
+                }
+                if (isset($cacheLifetime)) {
+                    $configuration['cache_lifetime'] = $cacheLifetime;
+                }
             }
         }
 

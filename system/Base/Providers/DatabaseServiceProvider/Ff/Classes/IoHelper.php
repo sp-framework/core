@@ -216,6 +216,15 @@ class IoHelper
         return $count;
     }
 
+    public static function getFolderList(string $folderToList): array
+    {
+        self::checkRead($folderToList);
+
+        $folders = glob($folderToList . '*' , GLOB_ONLYDIR);
+
+        return $folders;
+    }
+
     protected static function readFileContent($filePath)
     {
         $content = false;

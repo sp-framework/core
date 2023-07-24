@@ -1,0 +1,63 @@
+<div class="row">
+    <div class="col">
+        {% set activeFf = 0 %}
+        {% for ffkey, ff in core['settings']['ff'] %}
+            {% if ff['active'] is defined and ff['active'] === true %}
+                {% set activeFf = ff['databaseDir'] %}
+            {% endif %}
+        {% endfor %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'ff-databasedir',
+                'fieldLabel'                     : 'Select Active Flat File Location',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select flat file location that you want to make active.',
+                'fieldBazScan'                   : true,
+                'fieldRequired'                  : true,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataSelect2Options'        : core['settings']['ff'],
+                'fieldDataSelect2OptionsKey'     : 'databaseDir',
+                'fieldDataSelect2OptionsValue'   : 'databaseDir',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': activeFf
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('tabs',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : 'main',
+                'tabsId'                        : 'ff',
+                'tabsStyle'                     : 'card-outline-tabs',
+                'tabsData'                      :
+                    [
+                        'maintenance'   :
+                        [
+                            'tabTitle'          : 'Maintenance',
+                            'tabInclude'        : 'core/form/database/ff/maintenance'
+                        ],
+                        'backup'   :
+                        [
+                            'tabTitle'          : 'Backup',
+                            'tabInclude'        : 'core/form/database/ff/backup'
+                        ],
+                        'restore'   :
+                        [
+                            'tabTitle'          : 'Restore',
+                            'tabInclude'        : 'core/form/database/ff/restore'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>

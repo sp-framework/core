@@ -52,7 +52,6 @@ class Ff
 
             $this->loadSyncFile();
         }
-
     }
 
     public function init($resetSync = false, $syncEnabled = true)
@@ -87,6 +86,17 @@ class Ff
     public function getDatabaseDir()
     {
         return $this->databaseDir;
+    }
+
+    public function getAllStores()
+    {
+        $stores = IoHelper::getFolderList($this->getDatabaseDir());
+
+        foreach ($stores as &$store) {
+            $store = str_replace($this->getDatabaseDir(), '', $store);
+        }
+
+        return $stores;
     }
 
     public function store($file, $config = [], $schema = [])
@@ -551,6 +561,54 @@ class Ff
         }
 
         return $this->syncFile;
+    }
+
+    public function reSync()
+    {
+        var_dump($this->baseConfig);die();
+        if ($this->mode === 'db') {
+            throw new \Exception('Database type set to RDBMS.');
+        }
+
+        if (!$this->store) {
+            throw new \Exception('Please init store.');
+        }
+
+        $storeDataArr = $this->store->findAll();
+
+        if (!$storeDataArr) {
+            return true;
+        }
+
+        if ($this->mode === 'hybrid') {
+            $config = $this->store->getStoreConfiguration();
+
+            if ($config && isset($config['model']) && $config['model']) {
+                $model = (new $config['model'])->init();
+
+                if (!$model->tableExists($model->getSource())) {
+                    throw new \Exception('table does not exist in database.');
+                }
+
+                //Truncate
+                $sql = 'TRUNCATE TABLE `' . $model->getSource() . '`;';
+                $model->executeSql($sql);
+
+                foreach ($storeDataArr as $storeData) {
+                    $model = new $config['model'];
+
+                    $model->assign($storeData);
+
+                    $model->create();
+                }
+
+                return true;
+            }
+        } else {
+            throw new \Exception('Database type set to flat file, cannot sync.');
+        }
+
+        return false;
     }
 
     protected function loadSyncFile()

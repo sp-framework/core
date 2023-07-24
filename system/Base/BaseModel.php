@@ -39,6 +39,10 @@ abstract class BaseModel extends Model
 
 		$this->modules = $this->getDi()->getShared('modules');
 
+		if (!isset($this->db)) {
+			$this->db = $this->getDi()->getShared('db');
+		}
+
 		return $this;
 	}
 
@@ -54,5 +58,19 @@ abstract class BaseModel extends Model
 	public function getModelRelations()
 	{
 		return $this->modelRelations;
+	}
+
+	public function tableExists(string $table)
+	{
+		return $this->db->tableExists($table);
+	}
+
+	public function executeSQL(string $sql, $data = [])
+	{
+		try {
+			return $this->db->query($sql, $data);
+		} catch (\PDOException $e) {
+			throw new \Exception($e->getMessage());
+		}
 	}
 }

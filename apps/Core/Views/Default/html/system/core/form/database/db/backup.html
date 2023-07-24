@@ -1,0 +1,428 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'dbs',
+                'fieldLabel'                            : 'DBS',
+                'fieldHidden'                           : true,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : false,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldHtmlContent'                      : ''
+            ]
+        )}}
+        {% set activeDb = 0 %}
+        {% set activeDbData = [] %}
+        {% for dbkey, db in core['settings']['dbs'] %}
+            {% if db['active'] is defined and db['active'] === true %}
+                {% set activeDb = dbkey %}
+                {% set activeDbData = db %}
+            {% endif %}
+        {% endfor %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'alldbs',
+                'fieldLabel'                     : 'Select Database',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select database that you want to make active.',
+                'fieldBazScan'                   : true,
+                'fieldRequired'                  : true,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataSelect2Options'        : core['settings']['dbs'],
+                'fieldDataSelect2OptionsKey'     : 'dbname',
+                'fieldDataSelect2OptionsValue'   : 'dbname',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': activeDb
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'is_active',
+                'fieldLabel'                     : 'Is Active',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Is selected database active?',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : true,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'db_host',
+                'fieldLabel'                     : 'Database Host',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Hostname of database server',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : activeDbData['host']
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'db_port',
+                'fieldLabel'                     : 'Host Port',
+                'fieldType'                      : 'input',
+                'fieldInputTypeTextFilter'       : 'positiveInt',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Port of Host',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataInputMinNumber'        : 1,
+                'fieldDataInputMaxNumber'        : 65535,
+                'fieldDataInputMaxLength'        : 5,
+                'fieldValue'                     : activeDbData['port']
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'db_name',
+                'fieldLabel'                     : 'Database Name',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Name of the database',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : activeDbData['dbname']
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'db_charset',
+                'fieldLabel'                     : 'Database Charset',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Charset of database',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : activeDbData['charset']
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'db_collation',
+                'fieldLabel'                     : 'Database Collation',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Collation of database',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : activeDbData['collation']
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'db_username',
+                'fieldLabel'                     : 'Database Username',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Username of the database',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : activeDbData['username']
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'db_password',
+                'fieldLabel'                            : 'Database User Password',
+                'fieldType'                             : 'input',
+                'fieldInputType'                        : 'password',
+                'fieldInputPasswordToggleVisibility'    : true,
+                'fieldInputPasswordGenerate'            : true,
+                'fieldInputPasswordStrengthMeter'       : true,
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Password of database. Leave empty to keep the password same.',
+                'fieldRequired'                         : false,
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldDataInputMinLength'               : 1,
+                'fieldDataInputMaxLength'               : 50,
+                'fieldAdditionalClass'                  : 'mb-0',
+                'fieldValue'                            : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'password_protect',
+                'fieldLabel'                            : 'Password Protect',
+                'fieldType'                             : 'input',
+                'fieldInputType'                        : 'password',
+                'fieldInputPasswordToggleVisibility'    : true,
+                'fieldInputPasswordGenerate'            : true,
+                'fieldInputPasswordStrengthMeter'       : true,
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'We will password protect the zip file if password is provided. Password protection is a must in case of Security and DB keys. During restore, you need to enter this password, else restore will fail. Please keep this password safe.',
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldAdditionalClass'                  : 'mb-0'
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col text-center">
+        {% set backupDisabled = false %}
+        {% set updateDisabled = false %}
+        {% set deleteDisabled = true %}
+        {% if activeDb == '0' %}
+            {% set backupDisabled = true %}
+            {% set updateDisabled = true %}
+            {% set deleteDisabled = false %}
+        {% endif %}
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                     : 'button',
+                'buttons'                        :
+                    [
+                        'delete-db'    : [
+                            'title'                   : 'Remove ' ~ activeDb ~ ' db',
+                            'size'                    : 'xs',
+                            'disabled'                : deleteDisabled,
+                            'type'                    : 'danger',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'buttonAdditionalClass'   : 'delete-db-span text-uppercase mt-1'
+                        ],
+                        'update-db'    : [
+                            'title'                   : 'Update ' ~ activeDb ~ ' db',
+                            'size'                    : 'xs',
+                            'disabled'                : deleteDisabled,
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'buttonAdditionalClass'   : 'update-db-span text-uppercase mt-1'
+                        ],
+                        'backup-db'    : [
+                            'title'                   : 'Backup ' ~ activeDb ~ ' db',
+                            'size'                    : 'xs',
+                            'disabled'                : backupDisabled,
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'buttonAdditionalClass'   : 'generate-backup-span text-uppercase mt-1'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<div id="remove-fields" hidden>
+    <hr>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'db_remove_root_username',
+                    'fieldLabel'                     : 'Root Username',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Username with database create permission.',
+                    'fieldRequired'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldDataInputMinLength'        : 1,
+                    'fieldDataInputMaxLength'        : 50,
+                    'fieldValue'                     : ''
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'db_remove_root_password',
+                    'fieldLabel'                            : 'Root Password',
+                    'fieldType'                             : 'input',
+                    'fieldInputType'                        : 'password',
+                    'fieldHelp'                             : true,
+                    'fieldInputPasswordToggleVisibility'    : true,
+                    'fieldHelpTooltipContent'               : 'Password with database create permission.',
+                    'fieldRequired'                         : true,
+                    'fieldBazScan'                          : true,
+                    'fieldBazPostOnCreate'                  : false,
+                    'fieldBazPostOnUpdate'                  : false,
+                    'fieldDataInputMinLength'               : 1,
+                    'fieldDataInputMaxLength'               : 50,
+                    'fieldValue'                            : ''
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'db_remove_db_user',
+                    'fieldLabel'                     : 'Remove Db User',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Remove Database user? Note: user might be in use with other databases.',
+                    'fieldRequired'                  : false,
+                    'fieldType'                      : 'checkbox',
+                    'fieldCheckboxType'              : 'warning',
+                    'fieldCheckboxChecked'           : false,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldBazScan'                   : true
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('buttons',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'buttonType'                     : 'button',
+                    'buttons'                        :
+                        [
+                            'start-remove'    : [
+                                'title'                   : 'remove',
+                                'size'                    : 'xs',
+                                'additionalClass'         : 'mt-1',
+                                'position'                : 'right',
+                                'type'                    : 'danger',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true
+                            ],
+                            'cancel-remove'    : [
+                                'title'                   : 'Cancel',
+                                'size'                    : 'xs',
+                                'type'                    : 'secondary',
+                                'additionalClass'         : 'mt-1',
+                                'position'                : 'right'
+                            ]
+                        ]
+                ]
+            )}}
+        </div>
+    </div>
+</div>

@@ -1,5 +1,110 @@
 <div class="row">
     <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'databasetype',
+                'fieldLabel'                     : 'Database Type',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select database type and click switch.',
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldRequired'                  : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataSelect2Options'        :
+                    [
+                        'ff'    :
+                            [
+                                'id'    : 'ff',
+                                'name'  : 'FLAT FILE'
+                            ],
+                        'hybrid'    :
+                            [
+                                'id'    : 'hybrid',
+                                'name'  : 'FLAT FILE + MySQL (RECOMMENDED)'
+                            ],
+                        'db'    :
+                            [
+                                'id'    : 'db',
+                                'name'  : 'MySQL'
+                            ]
+                    ]
+                ,
+                'fieldDataSelect2OptionsKey'     : 'id',
+                'fieldDataSelect2OptionsValue'   : 'name',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': core['settings']['databasetype']
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            {
+                'component'             : component,
+                'componentName'         : componentName,
+                'componentId'           : componentId,
+                'sectionId'             : 'main',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'switch-db' : {
+                            'title'                   : 'Switch Database Type',
+                            'size'                    : 'sm',
+                            'icon'                    : 'fa-cog fa-spin',
+                            'disabled'                : true,
+                            'iconHidden'              : true
+                        }
+                    }
+            }
+        )}}
+    </div>
+</div>
+<small class="text-danger">Note: Switch database type only during maintenance. Switching database will truncate the destination table and initiate a sync from source to destination. This  will take a while...</small>
+<hr>
+{% if core['settings']['databasetype'] === 'hybrid' %}
+    {% set dbType =
+        [
+            'ff'   :
+            [
+                'tabTitle'          : 'Flat File',
+                'tabInclude'        : 'core/form/database/ff'
+            ],
+            'db'   :
+            [
+                'tabTitle'          : 'Db',
+                'tabInclude'        : 'core/form/database/db'
+            ]
+        ]
+    %}
+{% elseif core['settings']['databasetype'] === 'ff' %}
+    {% set dbType =
+        [
+            'ff'   :
+            [
+                'tabTitle'          : 'Flat File',
+                'tabInclude'        : 'core/form/database/ff'
+            ]
+        ]
+    %}
+{% elseif core['settings']['databasetype'] === 'db' %}
+    {% set dbType =
+        [
+            'db'   :
+            [
+                'tabTitle'          : 'Db',
+                'tabInclude'        : 'core/form/database/db'
+            ]
+        ]
+    %}
+{% endif %}
+<div class="row">
+    <div class="col">
         {{adminltetags.useTag('tabs',
             [
                 'component'                     : component,
@@ -10,15 +115,15 @@
                 'tabsStyle'                     : 'card-outline-tabs',
                 'tabsData'                      :
                     [
-                        'backup'   :
+                        'ff'   :
                         [
-                            'tabTitle'          : 'Backup',
-                            'tabInclude'        : 'core/form/database/backup'
+                            'tabTitle'          : 'Flat File',
+                            'tabInclude'        : 'core/form/database/ff'
                         ],
-                        'restore'   :
+                        'db'   :
                         [
-                            'tabTitle'          : 'Restore',
-                            'tabInclude'        : 'core/form/database/restore'
+                            'tabTitle'          : 'Db',
+                            'tabInclude'        : 'core/form/database/db'
                         ]
                     ]
             ]
