@@ -57,9 +57,9 @@ class Ff
     public function init($resetSync = false, $syncEnabled = true)
     {
         if (isset($this->baseConfig->ff) && $this->baseConfig->ff->databaseDir) {
-            $this->databaseDir = base_path($this->baseConfig->ff->databaseDir);
+            $this->databaseDir = base_path('.ff/' . $this->baseConfig->ff->databaseDir);
         } else {
-            $this->databaseDir = base_path('.ff/');
+            $this->databaseDir = base_path('.ff/sp/');
         }
 
         $this->checkDatabasePath();
@@ -565,7 +565,6 @@ class Ff
 
     public function reSync()
     {
-        var_dump($this->baseConfig);die();
         if ($this->mode === 'db') {
             throw new \Exception('Database type set to RDBMS.');
         }

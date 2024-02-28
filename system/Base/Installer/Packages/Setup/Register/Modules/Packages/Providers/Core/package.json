@@ -64,12 +64,13 @@
 		"auto_off_debug" : 0,
 		"databasetype" : "hybrid",
 		"dbs" : [],
-		"ff" :
+		"ffs" :
 		{
-			"ff" :
+			"sp" :
 			{
+				"ffname" : "sp",
 				"active" : true,
-				"databaseDir" : ".ff/"
+				"databaseDir" : "sp/"
 			}
 		},
 		"cache" : 

@@ -4,7 +4,7 @@ private/*
 *.sublime-project
 *.sublime-workspace
 /vendor/*
-.backups
+.backup*
 .dbbackups
 .downloads
 composer.lock

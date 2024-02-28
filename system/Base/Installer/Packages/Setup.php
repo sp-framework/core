@@ -283,10 +283,42 @@ class Setup
 		return true;
 	}
 
+	protected function cleanOldFfs()
+	{
+		$files = $this->basepackages->utils->init($this->container)->scanDir('.ff/');
+		var_dump($files);die();
+		foreach ($files['files'] as $key => $file) {
+			try {
+				if (strpos($file, 'ff') === false) {
+					$this->localContent->delete($file);
+				}
+			} catch (FilesystemException | UnableToDeleteFile $exception) {
+				throw $exception;
+			}
+		}
+
+		return true;
+	}
+
 	protected function cleanOldBackups()
 	{
-		$files = $this->basepackages->utils->init($this->container)->scanDir('.backups/');
+		$dirs =
+			[
+				'.backupsdb/',
+				'.backupsff/'
+			];
 
+		foreach ($dirs as $dir) {
+			$files = $this->basepackages->utils->init($this->container)->scanDir($dir);
+
+			$this->cleanOldBackupsFiles($files);
+		}
+
+		return true;
+	}
+
+	protected function cleanOldBackupsFiles($files)
+	{
 		foreach ($files['files'] as $key => $file) {
 			try {
 				$this->localContent->delete($file);

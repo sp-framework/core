@@ -25,7 +25,9 @@ class Core extends BasePackage
 
 	protected $backupInfo;
 
-	protected $backupLocation = '.dbbackups/';
+	protected $backupFfLocation = '.backupsff/';
+
+	protected $backupDbLocation = '.backupsdb/';
 
 	protected $now;
 
@@ -43,8 +45,12 @@ class Core extends BasePackage
 
 		$this->backupInfo = [];
 
-		if (!$this->localContent->fileExists($this->backupLocation)) {
-			$this->localContent->createDirectory($this->backupLocation);
+		if (!$this->localContent->fileExists($this->backupFfLocation)) {
+			$this->localContent->createDirectory($this->backupFfLocation);
+		}
+
+		if (!$this->localContent->fileExists($this->backupDbLocation)) {
+			$this->localContent->createDirectory($this->backupDbLocation);
 		}
 
 		if (!$this->localContent->fileExists('var/tmp/')) {
@@ -59,7 +65,7 @@ class Core extends BasePackage
 		return $this->core['version'];
 	}
 
-	public function dbBackup($data)
+	public function backupDb($data)
 	{
 		if (!isset($data['db'])) {
 			$this->addResponse('Please provide db name', 1, []);
@@ -93,7 +99,7 @@ class Core extends BasePackage
 		$this->backupInfo['createdBy'] = $this->auth->account() ? $this->auth->account()['email'] : 'System';
 		$this->backupInfo['backupName'] = 'db' . $data['db'] . $this->now->getTimestamp() . '.zip';
 
-		$this->zip->open(base_path($this->backupLocation . $this->backupInfo['backupName']), $this->zip::CREATE);
+		$this->zip->open(base_path($this->backupDbLocation . $this->backupInfo['backupName']), $this->zip::CREATE);
 
 		$db = $this->core['settings']['dbs'][$this->backupInfo['request']['db']];
 		$db['password'] = $this->crypt->decryptBase64($db['password'], $this->getDbKey($db));
@@ -135,10 +141,10 @@ class Core extends BasePackage
 
 		if ($this->basepackages->storages->storeFile(
 				'private',
-				'.dbbackups',
+				'.backupsdb',
 				null,
 				$this->backupInfo['backupName'],
-				filesize(base_path('.dbbackups/' . $this->backupInfo['backupName'])),
+				filesize(base_path('.backupsdb/' . $this->backupInfo['backupName'])),
 				'application/zip',
 				true
 			)
@@ -165,72 +171,7 @@ class Core extends BasePackage
 		return false;
 	}
 
-	protected function zipBackupFiles()
-	{
-		if (isset($this->backupInfo['request']['password_protect']) && $this->backupInfo['request']['password_protect'] !== '') {
-			$this->backupInfo['request']['password_protect'] =
-				$this->secTools->hashPassword($this->backupInfo['request']['password_protect'], 4);
-		}
-
-		try {
-			$this->localContent->write('var/tmp/backupInfo.json' , Json::encode($this->backupInfo));
-		} catch (FilesystemException | UnableToWriteFile $exception) {
-			throw $exception;
-		}
-
-		//Dont Encrypt info file as we need to know if encryption is applied or not during restore. We can encrypt the content in case we want to hide something (like we are encrypting the password_protect password)
-		if (!$this->addToZip(base_path('var/tmp/backupInfo.json'), 'backupInfo.json', false)) {
-			return false;
-		}
-
-		$this->zip->close();
-
-		return true;
-	}
-
-	protected function addToZip($absolutePath, $relativePath, $encrypt = true, $passwordProtectOrg = null)
-	{
-		if (isset($this->backupInfo['request']['password_protect']) &&
-			$this->backupInfo['request']['password_protect'] !== '' &&
-			$encrypt
-		) {
-			if (!$passwordProtectOrg) {
-				$passwordProtectOrg = $this->backupInfo['request']['password_protect'];
-			}
-
-			$this->zip->addFile($absolutePath, $relativePath);
-
-			if (!$this->zip->setEncryptionName($relativePath, \ZipArchive::EM_AES_256, $passwordProtectOrg)) {
-				$name = $this->zip->getNameIndex($this->zip->numFiles - 1);
-
-				if ($relativePath === $name) {
-					$this->zip->deleteIndex($this->zip->numFiles - 1);
-				}
-
-				$this->zip->close();
-
-				$this->addResponse('Could not set provided password for file ' . $name, 1, []);
-
-				$this->basepackages->progress->resetProgress();
-
-				return false;
-			}
-		} else {
-			if (!$this->zip->addFile($absolutePath, $relativePath)) {
-				$name = $this->zip->getNameIndex($this->zip->numFiles - 1);
-
-				$this->addResponse('Could not zip file: ' . $name, 1, []);
-
-				$this->basepackages->progress->resetProgress();
-
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	public function dbRestore($data)
+	public function restoreDb($data)
 	{
 		if (!isset($data['id'])) {
 			$this->addResponse('Please provide backup file id', 1, []);
@@ -417,56 +358,6 @@ class Core extends BasePackage
 		return false;
 	}
 
-	public function removeDb(array $data)
-	{
-		if (!isset($data['db'])) {
-			$this->addResponse('Please provide database name', 1, []);
-
-			return false;
-		}
-
-		$dbConfig = $this->getDb(false, $data['db']);
-
-		if ($dbConfig['active'] == 'true') {
-			$this->addResponse('Cannot remove active database', 1, []);
-
-			return false;
-		}
-
-		if (!isset($data['username']) || !isset($data['password'])) {
-			$this->addResponse('Please provide username and password that has delete rights on database.', 1, []);
-
-			return false;
-		}
-
-		$dbConfig['username'] = $data['username'];
-		$dbConfig['password'] = $data['password'];
-
-		try {
-			$this->db = new Mysql($dbConfig);
-
-			$this->executeSQL("DROP DATABASE IF EXISTS `" . $dbConfig['dbname'] . "`;");
-
-			if (isset($data['removeUser']) && $data['removeUser'] == 'true' && isset($data['userToRemove'])) {
-				$this->executeSQL("DROP USER IF EXISTS `" . $data['userToRemove'] . "`;");
-			}
-
-			$this->removeDbKey($dbConfig['dbname']);
-		} catch (\PDOException | \Exception$e) {
-			if ($e->getCode() !== 1049) {
-				$this->addResponse('Remove Error: ' . $e->getMessage(), 1);
-
-				return false;
-			}
-		}
-
-		unset($this->core['settings']['dbs'][$dbConfig['dbname']]);
-
-		$this->update($this->core);
-
-		$this->addResponse('Database removed', 0, []);
-	}
-
 	public function updateDb(array $data)
 	{
 		if (!isset($data['db']['dbname'])) {
@@ -542,141 +433,57 @@ class Core extends BasePackage
 		$this->addResponse('Database updated', 0, []);
 	}
 
-	public function updateCore(array $data)
+	public function removeDb(array $data)
 	{
-		if (isset($data['debug'])) {
-			$this->core['settings']['debug'] = $data['debug'];
-		}
-		if (isset($data['auto_off_debug'])) {
-			$this->core['settings']['auto_off_debug'] = $data['auto_off_debug'];
+		if (!isset($data['db'])) {
+			$this->addResponse('Please provide database name', 1, []);
+
+			return false;
 		}
 
-		if (isset($data['databasetype'])) {
-			$this->core['settings']['databasetype'] = $data['databasetype'];
+		$dbConfig = $this->getDb(false, $data['db']);
+
+		if ($dbConfig['active'] == 'true') {
+			$this->addResponse('Cannot remove active database', 1, []);
+
+			return false;
 		}
 
-		if (isset($data['cache'])) {
-			$this->core['settings']['cache']['enabled'] = $data['cache'];
-		}
-		if (isset($data['cache_timeout'])) {
-			$this->core['settings']['cache']['timeout'] = $data['cache_timeout'];
-		}
-		if (isset($data['cache_service'])) {
-			$this->core['settings']['cache']['service'] = $data['cache_service'];
+		if (!isset($data['username']) || !isset($data['password'])) {
+			$this->addResponse('Please provide username and password that has delete rights on database.', 1, []);
+
+			return false;
 		}
 
-		if (isset($data['passwordWorkFactor'])) {
-			$this->core['settings']['security']['passwordWorkFactor'] = $data['passwordWorkFactor'];
-		}
-		if (isset($data['cookiesWorkFactor'])) {
-			$this->core['settings']['security']['cookiesWorkFactor'] = $data['cookiesWorkFactor'];
-		}
+		$dbConfig['username'] = $data['username'];
+		$dbConfig['password'] = $data['password'];
 
-		if (isset($data['logs'])) {
-			$this->core['settings']['logs']['enabled'] = $data['logs'];
-		}
-		if (isset($data['logs_level'])) {
-			$this->core['settings']['logs']['level'] = $data['logs_level'];
-		}
-		if (isset($data['logs_exceptions'])) {
-			$this->core['settings']['logs']['exceptions'] = $data['logs_exceptions'];
-		}
-		if (isset($data['emergency_logs_email'])) {
-			$this->core['settings']['logs']['emergencyLogsEmail'] = $data['emergency_logs_email'];
-		}
-		if (isset($data['emergency_logs_email_addresses'])) {
-			if ($data['emergency_logs_email_addresses'] !== '') {
-				$data['emergency_logs_email_addresses'] = explode(',', $data['emergency_logs_email_addresses']);
+		try {
+			$this->db = new Mysql($dbConfig);
 
-				if (count($data['emergency_logs_email_addresses']) > 0) {
-					foreach ($data['emergency_logs_email_addresses'] as &$address) {
-						$address = trim($address);
+			$this->executeSQL("DROP DATABASE IF EXISTS `" . $dbConfig['dbname'] . "`;");
 
-						$validateEmail = $this->validateEmail(['email' => $address]);
-
-						if ($validateEmail !== true) {
-							$this->addResponse($validateEmail, 1);
-
-							return false;
-						}
-					}
-				}
-
+			if (isset($data['removeUser']) && $data['removeUser'] == 'true' && isset($data['userToRemove'])) {
+				$this->executeSQL("DROP USER IF EXISTS `" . $data['userToRemove'] . "`;");
 			}
 
-			$this->core['settings']['logs']['emergencyLogsEmailAddresses'] = $data['emergency_logs_email_addresses'];
-		}
-		if (isset($data['dbs']) && $data['dbs'] !== '') {
-			$data['dbs'] = Json::decode($data['dbs'], true);
-			$this->core['settings']['dbs'] = $data['dbs'];
+			$this->removeDbKey($dbConfig['dbname']);
+		} catch (\PDOException | \Exception$e) {
+			if ($e->getCode() !== 1049) {
+				$this->addResponse('Remove Error: ' . $e->getMessage(), 1);
+
+				return false;
+			}
 		}
 
-		if (isset($data['websocket_protocol'])) {
-			$this->core['settings']['websocket']['protocol'] = $data['websocket_protocol'];
-		}
-		if (isset($data['websocket_host'])) {
-			$this->core['settings']['websocket']['host'] = $data['websocket_host'];
-		}
-		if (isset($data['websocket_port'])) {
-			$this->core['settings']['websocket']['port'] = $data['websocket_port'];
-		}
+		unset($this->core['settings']['dbs'][$dbConfig['dbname']]);
 
 		$this->update($this->core);
 
-		$this->writeBaseConfig();
+		$this->addResponse('Database removed', 0, []);
 	}
 
-	protected function checkKeys()
-	{
-		try {
-			$fileExists = $this->localContent->fileExists('system/.keys');
-		} catch (FilesystemException | UnableToRetrieveMetadata $exception) {
-			throw $exception;
-		}
-
-		if (!$fileExists) {
-			$this->createKeys();
-
-			$this->getKeys();
-		} else {
-			$this->getKeys();
-		}
-	}
-
-	public function refreshKeys()
-	{
-		$this->createKeys();
-	}
-
-	protected function createKeys()
-	{
-		$keys['sigKey'] = $this->random->base58();
-		$keys['sigText'] = $this->random->base58(32);
-		$keys['cookiesSig'] = $this->crypt->encryptBase64($keys['sigKey'], $keys['sigText']);
-
-		try {
-			$this->localContent->write('system/.keys', Json::encode($keys));
-		} catch (FilesystemException | UnableToWriteFile $exception) {
-			throw $exception;
-		}
-	}
-
-	protected function getKeys()
-	{
-		try {
-			$keysFile = $this->localContent->read('system/.keys');
-		} catch (FilesystemException | UnableToReadFile | \Exception $exception) {
-			throw $exception;
-		}
-
-		$keys = Json::decode($keysFile, true);
-
-		$this->core['settings']['sigKey'] = $keys['sigKey'];
-		$this->core['settings']['sigText'] = $keys['sigText'];
-		$this->core['settings']['cookiesSig'] = $keys['cookiesSig'];
-	}
-
-	public function maintainDb($data)
+	public function maintainFf($data)
 	{
 		if (!isset($data['task'])) {
 			$this->addResponse('Task not set', 1);
@@ -755,6 +562,511 @@ class Core extends BasePackage
 				return false;
 			}
 		}
+	}
+
+	public function backupFf($data)
+	{
+		if (!isset($data['ff'])) {
+			$this->addResponse('Please provide flat file name', 1, []);
+
+			return false;
+		}
+
+		if (!isset($this->core['settings']['ffs'][$data['ff']])) {
+			$this->addResponse('Flat File does not exist.', 1, []);
+
+			return false;
+		}
+
+		if (!isset($data['password_protect']) ||
+			(isset($data['password_protect']) &&
+			$data['password_protect'] === '')
+		) {
+			$this->addResponse('Protect password missing!', 1, []);
+
+			return false;
+		}
+
+		$tokenkey = array_search($this->security->getRequestToken(), $data);
+		if ($tokenkey) {
+			unset($data[$tokenkey]);
+		}
+
+		$this->now = Carbon::now();
+		$this->backupInfo['request'] = $data;
+		$this->backupInfo['takenAt'] = $this->now->format('Y-m-d H:i:s');
+		$this->backupInfo['createdBy'] = $this->auth->account() ? $this->auth->account()['email'] : 'System';
+		$this->backupInfo['backupName'] = 'ff' . $data['ff'] . $this->now->getTimestamp() . '.zip';
+
+		$this->zip->open(base_path($this->backupFfLocation . $this->backupInfo['backupName']), $this->zip::CREATE);
+
+		try {
+			$files = $this->localContent->listContents('.ff/' . $data['ff'], true);
+
+			foreach ($files as $file) {
+				if ($file instanceof \League\Flysystem\FileAttributes) {
+					if (!$this->addToZip(base_path($file->path()), $file->path())) {
+						return false;
+					}
+				}
+			}
+		} catch (FilesystemException | \Exception $exception) {
+			throw $exception;
+		}
+
+		$this->zipBackupFiles();
+
+		if ($this->basepackages->storages->storeFile(
+				'private',
+				'.backupsff',
+				null,
+				$this->backupInfo['backupName'],
+				filesize(base_path('.backupsff/' . $this->backupInfo['backupName'])),
+				'application/zip',
+				true
+			)
+		) {
+			$this->basepackages->storages->changeOrphanStatus(
+				null,
+				null,
+				false,
+				null,
+				$this->backupInfo['backupName']
+			);
+
+			$this->addResponse('Generated backup ' . $this->backupInfo['backupName'] . '.',
+							   0,
+							   ['filename'  => $this->backupInfo['backupName'],
+								'uuid'      => $this->basepackages->storages->packagesData->responseData['uuid'],
+								'request'   => $data
+							   ]
+			);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	public function restoreFf($data)
+	{
+		if (!isset($data['id'])) {
+			$this->addResponse('Please provide backup file id', 1, []);
+
+			return false;
+		}
+
+		$fileInfo = $this->basepackages->storages->getFileInfo($data['id']);
+
+		if ($fileInfo) {
+			if ($this->zip->open(base_path($fileInfo['uuid_location'] . $fileInfo['org_file_name']))) {
+				$backupInfo = $this->zip->getFromName('backupInfo.json');
+
+				if (!$backupInfo) {
+					$this->addResponse('Error reading backupInfo.json file. Please upload backup again.', 1);
+
+					return false;
+				}
+
+				try {
+					$this->backupInfo = Json::decode($backupInfo, true);
+				} catch (\InvalidArgumentException $exception) {
+					$this->addResponse('Error reading contents of backupInfo.json file. Please check if file is in correct Json format.', 1);
+
+					return false;
+				}
+
+				if (isset($this->backupInfo['request']['password_protect']) && $this->backupInfo['request']['password_protect'] !== '') {
+					if (!isset($data['password_protect_restore'])) {
+						$this->addResponse('Please provide backup file password', 1, []);
+
+						return false;
+					}
+
+					if (!$this->security->checkHash($data['password_protect_restore'], $this->backupInfo['request']['password_protect'])) {
+						$this->addResponse('Backup password incorrect! Please provide correct password', 1, []);
+
+						return false;
+					}
+
+					$this->zip->setPassword($data['password_protect_restore']);
+				}
+
+				$fileNameLocation = explode('.zip', $this->backupInfo['backupName'])[0];
+
+				if (!$this->zip->extractTo(base_path('var/tmp/' . $fileNameLocation))) {
+					$this->addResponse('Error unzipping backup file. Please upload backup again.', 1);
+
+					return false;
+				}
+
+				try {
+					$backupInfo = $this->localContent->read('var/tmp/' . $fileNameLocation . '/backupInfo.json');
+
+					$backupInfo = Json::decode($backupInfo, true);
+
+					$ffFolderName = $backupInfo['request']['ff'];
+				} catch (FilesystemException | UnableToReadFile | \Exception $exception) {
+					throw $exception;
+				}
+
+				try {
+					$this->localContent->deleteDirectory('var/tmp/' . $fileNameLocation . '/.ff/' . $fileNameLocation);
+					$this->localContent->deleteDirectory('.ff/' . $fileNameLocation);
+
+					rename(base_path('var/tmp/' . $fileNameLocation . '/.ff/' . $ffFolderName), base_path('var/tmp/' . $fileNameLocation . '/.ff/' . $fileNameLocation));
+					rename(base_path('var/tmp/' . $fileNameLocation . '/.ff/' . $fileNameLocation), base_path('.ff/' . $fileNameLocation));
+				} catch (\Exception $e) {
+					$this->addResponse('Restore Error: ' . $e->getMessage(), 1);
+
+					return false;
+				}
+
+				$newFf['active'] = false;
+				$newFf['ffname'] = $fileNameLocation;
+				$newFf['databaseDir'] = $fileNameLocation . '/';
+
+				$this->core['settings']['ffs'][$fileNameLocation] = $newFf;
+
+				$this->update($this->core);
+
+				$this->addResponse($this->backupInfo['backupName'] . ' restored!', 0, ['newFf' => $newFf]);
+			} else {
+				$this->addResponse('Error opening backup zip file. Please upload backup again.', 1);
+			}
+		} else {
+			$this->addResponse('File ' . $data['filename'] . ' not found on system!', 1);
+		}
+
+		return false;
+	}
+
+	public function updateFf(array $data)
+	{
+		if (!isset($data['db']['dbname'])) {
+			$this->addResponse('Please provide database name', 1, []);
+
+			return false;
+		}
+
+		$dbConfig = $this->getDb(false, $data['db']['dbname']);
+
+		if ($dbConfig['active'] == 'true') {
+			$this->addResponse('Cannot update active database', 1, []);
+
+			return false;
+		}
+
+		$oldPassword = $dbConfig['password'];
+		$changePassword = false;
+
+		$dbConfig = array_merge($dbConfig, $data['db']);
+		if (isset($data['db']['password']) && $data['db']['password'] === '') {
+			$dbConfig['password'] = $oldPassword;
+			$dbConfig['password'] = $this->crypt->decryptBase64($dbConfig['password'], $this->getDbKey($dbConfig));
+		} else {
+			$changePassword = true;
+		}
+
+		// Try Connecting to DB with new information
+		try {
+			$this->db = new Mysql($dbConfig);
+
+			$checkCharsetCollation =
+				$this->executeSQL(
+					"SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?",
+					[$dbConfig['dbname']]
+				);
+
+			if ($checkCharsetCollation->numRows() > 0) {
+				$dbCharsetOnServer = $checkCharsetCollation->fetchArray();
+
+				if (isset($dbCharsetOnServer['DEFAULT_CHARACTER_SET_NAME']) && $dbCharsetOnServer['DEFAULT_CHARACTER_SET_NAME'] !== $data['db']['charset']) {
+					throw new \Exception(
+						'Database Charset is set to ' . $dbCharsetOnServer['DEFAULT_CHARACTER_SET_NAME'] . ' and provided is ' . $data['db']['charset']
+					);
+				}
+				if (isset($dbCharsetOnServer['DEFAULT_COLLATION_NAME']) && $dbCharsetOnServer['DEFAULT_COLLATION_NAME'] !== $data['db']['collation']) {
+					throw new \Exception(
+						'Database Charset is set to ' . $dbCharsetOnServer['DEFAULT_COLLATION_NAME'] . ' and provided is ' . $data['db']['collation']
+					);
+				}
+
+			}
+		} catch (\PDOException | \Exception $e) {
+			$this->addResponse('Update Error: ' . $e->getMessage(), 1);
+
+			return false;
+		}
+
+		$dbConfig['password'] = $this->crypt->encryptBase64($dbConfig['password'], $this->getDbKey($dbConfig));
+
+		if (isset($data['changeActive']) && $data['changeActive'] == true) {
+			foreach ($this->core['settings']['dbs'] as $dbKey => &$db) {
+				$db['active'] = false;//Make all active false.
+			}
+
+			$this->writeBaseConfig($dbConfig);
+		}
+
+		$this->core['settings']['dbs'][$dbConfig['dbname']] = $dbConfig;
+
+		$this->update($this->core);
+
+		$this->addResponse('Database updated', 0, []);
+	}
+
+	public function removeFf(array $data)
+	{
+		if (!isset($data['db'])) {
+			$this->addResponse('Please provide database name', 1, []);
+
+			return false;
+		}
+
+		$dbConfig = $this->getDb(false, $data['db']);
+
+		if ($dbConfig['active'] == 'true') {
+			$this->addResponse('Cannot remove active database', 1, []);
+
+			return false;
+		}
+
+		if (!isset($data['username']) || !isset($data['password'])) {
+			$this->addResponse('Please provide username and password that has delete rights on database.', 1, []);
+
+			return false;
+		}
+
+		$dbConfig['username'] = $data['username'];
+		$dbConfig['password'] = $data['password'];
+
+		try {
+			$this->db = new Mysql($dbConfig);
+
+			$this->executeSQL("DROP DATABASE IF EXISTS `" . $dbConfig['dbname'] . "`;");
+
+			if (isset($data['removeUser']) && $data['removeUser'] == 'true' && isset($data['userToRemove'])) {
+				$this->executeSQL("DROP USER IF EXISTS `" . $data['userToRemove'] . "`;");
+			}
+
+			$this->removeDbKey($dbConfig['dbname']);
+		} catch (\PDOException | \Exception$e) {
+			if ($e->getCode() !== 1049) {
+				$this->addResponse('Remove Error: ' . $e->getMessage(), 1);
+
+				return false;
+			}
+		}
+
+		unset($this->core['settings']['dbs'][$dbConfig['dbname']]);
+
+		$this->update($this->core);
+
+		$this->addResponse('Database removed', 0, []);
+	}
+
+	protected function zipBackupFiles()
+	{
+		if (isset($this->backupInfo['request']['password_protect']) && $this->backupInfo['request']['password_protect'] !== '') {
+			$this->backupInfo['request']['password_protect'] =
+				$this->secTools->hashPassword($this->backupInfo['request']['password_protect'], 4);
+		}
+
+		try {
+			$this->localContent->write('var/tmp/backupInfo.json' , Json::encode($this->backupInfo));
+		} catch (FilesystemException | UnableToWriteFile $exception) {
+			throw $exception;
+		}
+
+		//Dont Encrypt info file as we need to know if encryption is applied or not during restore. We can encrypt the content in case we want to hide something (like we are encrypting the password_protect password)
+		if (!$this->addToZip(base_path('var/tmp/backupInfo.json'), 'backupInfo.json', false)) {
+			return false;
+		}
+
+		$this->zip->close();
+
+		return true;
+	}
+
+	protected function addToZip($absolutePath, $relativePath, $encrypt = true, $passwordProtectOrg = null)
+	{
+		if (isset($this->backupInfo['request']['password_protect']) &&
+			$this->backupInfo['request']['password_protect'] !== '' &&
+			$encrypt
+		) {
+			if (!$passwordProtectOrg) {
+				$passwordProtectOrg = $this->backupInfo['request']['password_protect'];
+			}
+
+			$this->zip->addFile($absolutePath, $relativePath);
+
+			if (!$this->zip->setEncryptionName($relativePath, \ZipArchive::EM_AES_256, $passwordProtectOrg)) {
+				$name = $this->zip->getNameIndex($this->zip->numFiles - 1);
+
+				if ($relativePath === $name) {
+					$this->zip->deleteIndex($this->zip->numFiles - 1);
+				}
+
+				$this->zip->close();
+
+				$this->addResponse('Could not set provided password for file ' . $name, 1, []);
+
+				$this->basepackages->progress->resetProgress();
+
+				return false;
+			}
+		} else {
+			if (!$this->zip->addFile($absolutePath, $relativePath)) {
+				$name = $this->zip->getNameIndex($this->zip->numFiles - 1);
+
+				$this->addResponse('Could not zip file: ' . $name, 1, []);
+
+				$this->basepackages->progress->resetProgress();
+
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public function updateCore(array $data)
+	{
+		if (isset($data['debug'])) {
+			$this->core['settings']['debug'] = $data['debug'];
+		}
+		if (isset($data['auto_off_debug'])) {
+			$this->core['settings']['auto_off_debug'] = $data['auto_off_debug'];
+		}
+
+		if (isset($data['databasetype'])) {
+			$this->core['settings']['databasetype'] = $data['databasetype'];
+		}
+
+		if (isset($data['cache'])) {
+			$this->core['settings']['cache']['enabled'] = $data['cache'];
+		}
+		if (isset($data['cache_timeout'])) {
+			$this->core['settings']['cache']['timeout'] = $data['cache_timeout'];
+		}
+		if (isset($data['cache_service'])) {
+			$this->core['settings']['cache']['service'] = $data['cache_service'];
+		}
+
+		if (isset($data['passwordWorkFactor'])) {
+			$this->core['settings']['security']['passwordWorkFactor'] = $data['passwordWorkFactor'];
+		}
+		if (isset($data['cookiesWorkFactor'])) {
+			$this->core['settings']['security']['cookiesWorkFactor'] = $data['cookiesWorkFactor'];
+		}
+
+		if (isset($data['logs'])) {
+			$this->core['settings']['logs']['enabled'] = $data['logs'];
+		}
+		if (isset($data['logs_level'])) {
+			$this->core['settings']['logs']['level'] = $data['logs_level'];
+		}
+		if (isset($data['logs_exceptions'])) {
+			$this->core['settings']['logs']['exceptions'] = $data['logs_exceptions'];
+		}
+		if (isset($data['emergency_logs_email'])) {
+			$this->core['settings']['logs']['emergencyLogsEmail'] = $data['emergency_logs_email'];
+		}
+		if (isset($data['emergency_logs_email_addresses'])) {
+			if ($data['emergency_logs_email_addresses'] !== '') {
+				$data['emergency_logs_email_addresses'] = explode(',', $data['emergency_logs_email_addresses']);
+
+				if (count($data['emergency_logs_email_addresses']) > 0) {
+					foreach ($data['emergency_logs_email_addresses'] as &$address) {
+						$address = trim($address);
+
+						$validateEmail = $this->validateEmail(['email' => $address]);
+
+						if ($validateEmail !== true) {
+							$this->addResponse($validateEmail, 1);
+
+							return false;
+						}
+					}
+				}
+
+			}
+
+			$this->core['settings']['logs']['emergencyLogsEmailAddresses'] = $data['emergency_logs_email_addresses'];
+		}
+		if (isset($data['dbs']) && $data['dbs'] !== '') {
+			$data['dbs'] = Json::decode($data['dbs'], true);
+			$this->core['settings']['dbs'] = $data['dbs'];
+		}
+		if (isset($data['ffs']) && $data['ffs'] !== '') {
+			$data['ffs'] = Json::decode($data['ffs'], true);
+			$this->core['settings']['ffs'] = $data['ffs'];
+		}
+
+		if (isset($data['websocket_protocol'])) {
+			$this->core['settings']['websocket']['protocol'] = $data['websocket_protocol'];
+		}
+		if (isset($data['websocket_host'])) {
+			$this->core['settings']['websocket']['host'] = $data['websocket_host'];
+		}
+		if (isset($data['websocket_port'])) {
+			$this->core['settings']['websocket']['port'] = $data['websocket_port'];
+		}
+
+		$this->update($this->core);
+
+		$this->writeBaseConfig();
+	}
+
+	protected function checkKeys()
+	{
+		try {
+			$fileExists = $this->localContent->fileExists('system/.keys');
+		} catch (FilesystemException | UnableToRetrieveMetadata $exception) {
+			throw $exception;
+		}
+
+		if (!$fileExists) {
+			$this->createKeys();
+
+			$this->getKeys();
+		} else {
+			$this->getKeys();
+		}
+	}
+
+	public function refreshKeys()
+	{
+		$this->createKeys();
+	}
+
+	protected function createKeys()
+	{
+		$keys['sigKey'] = $this->random->base58();
+		$keys['sigText'] = $this->random->base58(32);
+		$keys['cookiesSig'] = $this->crypt->encryptBase64($keys['sigKey'], $keys['sigText']);
+
+		try {
+			$this->localContent->write('system/.keys', Json::encode($keys));
+		} catch (FilesystemException | UnableToWriteFile $exception) {
+			throw $exception;
+		}
+	}
+
+	protected function getKeys()
+	{
+		try {
+			$keysFile = $this->localContent->read('system/.keys');
+		} catch (FilesystemException | UnableToReadFile | \Exception $exception) {
+			throw $exception;
+		}
+
+		$keys = Json::decode($keysFile, true);
+
+		$this->core['settings']['sigKey'] = $keys['sigKey'];
+		$this->core['settings']['sigText'] = $keys['sigText'];
+		$this->core['settings']['cookiesSig'] = $keys['cookiesSig'];
 	}
 
 	public function reset()

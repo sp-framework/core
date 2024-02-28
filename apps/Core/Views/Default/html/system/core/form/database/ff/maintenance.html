@@ -1,3 +1,9 @@
+{% set activeFf = '' %}
+{% for ffkey, ff in core['settings']['ffs'] %}
+    {% if ff['active'] is defined and ff['active'] === true %}
+        {% set activeFf = ff['databaseDir'] %}
+    {% endif %}
+{% endfor %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -6,13 +12,34 @@
                 'componentName'                  : componentName,
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
+                'fieldId'                        : 'ff-databasedir',
+                'fieldLabel'                     : 'Active Flat File Database Directory',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Active Flat File Database Directory',
+                'fieldDisabled'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : activeFf
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
                 'fieldId'                        : 'check_uncheck_all',
-                'fieldLabel'                     : false,
+                'fieldLabel'                     : 'CHECK/UNCHECK ALL',
                 'fieldHelp'                      : false,
                 'fieldHelpTooltipContent'        : '',
                 'fieldRequired'                  : false,
                 'fieldType'                      : 'checkbox',
-                'fieldCheckboxLabel'             : 'CHECK/UNCHECK ALL',
                 'fieldCheckboxType'              : 'primary',
                 'fieldBazJstreeSearch'           : false,
                 'fieldBazPostOnCreate'           : false,

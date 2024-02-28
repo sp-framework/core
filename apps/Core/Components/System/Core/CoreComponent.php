@@ -57,7 +57,7 @@ class CoreComponent extends BaseComponent
                     'conditions'    => 'uuid_location = :uuidLocation: AND storages_id = :storagesId: AND orphan = :orphan:',
                     'bind'          =>
                         [
-                            'uuidLocation'    => '.dbbackups/',
+                            'uuidLocation'    => '.backupsdb/',
                             'storagesId'      => $storage['id'],
                             'orphan'          => 0
                         ]
@@ -67,7 +67,7 @@ class CoreComponent extends BaseComponent
                 [
                     'conditions'    =>
                         [
-                            ['uuid_location', '=', '.dbbackups/'],
+                            ['uuid_location', '=', '.backupsdb/'],
                             ['storages_id', '=', $storage['id']]
                         ]
                 ];
@@ -92,6 +92,33 @@ class CoreComponent extends BaseComponent
         $this->view->dbStorageFiles = $storageFiles;
 
         if ($this->config->databasetype !== 'db') {
+            $params =
+                [
+                    'conditions'    =>
+                        [
+                            ['uuid_location', '=', '.backupsff/'],
+                            ['storages_id', '=', $storage['id']]
+                        ]
+                ];
+
+            $ffStorageFiles =
+                $this->basepackages->storages->getFiles(
+                    ['storagetype'  => $storage['permission'],
+                     'params'       => $params
+                    ]
+                );
+
+            if ($ffStorageFiles && count($ffStorageFiles) > 0) {
+                foreach ($ffStorageFiles as $ffStorageFileKey => &$ffStorageFile) {
+                    if (strpos($ffStorageFile['org_file_name'], 'ff') === false) {
+                        unset($ffStorageFiles[$ffStorageFileKey]);
+                        continue;
+                    }
+                }
+            }
+
+            $this->view->ffStorageFiles = $ffStorageFiles;
+
             $ffStoresArr = $this->ff->getAllStores();
 
             $ffStores = [];
@@ -147,14 +174,14 @@ class CoreComponent extends BaseComponent
         }
     }
 
-    public function dbBackupAction()
+    public function backupDbAction()
     {
         if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            if ($this->core->dbBackup($this->postData())) {
+            if ($this->core->backupDb($this->postData())) {
                 $this->addResponse(
                     $this->core->packagesData->responseMessage,
                     $this->core->packagesData->responseCode,
@@ -171,14 +198,14 @@ class CoreComponent extends BaseComponent
         }
     }
 
-    public function dbRestoreAction()
+    public function restoreDbAction()
     {
         if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            if ($this->core->dbRestore($this->postData())) {
+            if ($this->core->restoreDb($this->postData())) {
                 $this->addResponse(
                     $this->core->packagesData->responseMessage,
                     $this->core->packagesData->responseCode,
@@ -243,17 +270,113 @@ class CoreComponent extends BaseComponent
         }
     }
 
-    public function maintainDbAction()
+    public function maintainFfAction()
     {
         if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            if ($this->core->maintainDb($this->postData())) {
+            if ($this->core->maintainFf($this->postData())) {
                 $this->addResponse(
                     $this->core->packagesData->responseMessage,
                     $this->core->packagesData->responseCode
+                );
+            } else {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode
+                );
+            }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function backupFfAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->core->backupFf($this->postData())) {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode,
+                    $this->core->packagesData->responseData,
+                );
+            } else {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode
+                );
+            }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function restoreFfAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->core->restoreFf($this->postData())) {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode,
+                    $this->core->packagesData->responseData,
+                );
+            } else {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode
+                );
+            }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function removeFfAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->core->removeFf($this->postData())) {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode,
+                    $this->core->packagesData->responseData,
+                );
+            } else {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode
+                );
+            }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function updateFfAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->core->updateFf($this->postData())) {
+                $this->addResponse(
+                    $this->core->packagesData->responseMessage,
+                    $this->core->packagesData->responseCode,
+                    $this->core->packagesData->responseData,
                 );
             } else {
                 $this->addResponse(
