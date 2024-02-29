@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Functions extends BasePackage
@@ -77,7 +76,7 @@ class Functions extends BasePackage
             }
 
             if (isset($packagesData->responseData)) {
-                $job['response_data'] = Json::encode($packagesData->responseData);
+                $job['response_data'] = $this->helper->encode($packagesData->responseData);
             }
 
             $this->basepackages->workers->jobs->update($job, false);
@@ -88,7 +87,7 @@ class Functions extends BasePackage
     {
         if (isset($args['task']['parameters']) && $args['task']['parameters'] !== '') {
             try {
-                return Json::decode($args['task']['parameters'], true);
+                return $this->helper->decode($args['task']['parameters'], true);
             } catch (\Exception $e) {
                 if (str_contains($e->getMessage(), "json_decode")) {
                     $thisFunction->packagesData->responseMessage = 'Task parameters format is incorrect. Make sure the format is json.';

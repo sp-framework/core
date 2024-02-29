@@ -3,7 +3,6 @@
 namespace Apps\Core\Packages\Adminltetags\Tags\Fields;
 
 use Apps\Core\Packages\Adminltetags\Adminltetags;
-use Phalcon\Helper\Json;
 
 class Jstree
 {
@@ -378,8 +377,8 @@ class Jstree
 
         $this->fieldParams['fieldJstreePlugins'] =
             isset($this->params['fieldJstreePlugins']) ?
-            Json::encode($this->params['fieldJstreePlugins']) :
-            Json::encode(["search", "types", "dnd"]);
+            $this->helper->encode($this->params['fieldJstreePlugins']) :
+            $this->helper->encode(["search", "types", "dnd"]);
 
         return
         '<script type="text/javascript" charset="utf-8">

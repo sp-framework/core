@@ -25,11 +25,12 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 					$session = $container->getShared('session');
 					$localContent = $container->getShared('localContent');
 					$crypt = $container->getShared('crypt');
+					$helper = $container->getShared('helper');
 
 					if (PHP_SAPI === 'cli') {
-						return (new PdoCli($dbConfig, $localContent, $crypt))->init();
+						return (new PdoCli($dbConfig, $localContent, $crypt, $helper))->init();
 					} else {
-						return (new Pdo($config, $session, $localContent, $crypt))->init();
+						return (new Pdo($config, $session, $localContent, $crypt, $helper))->init();
 					}
 				}
 			);
@@ -55,7 +56,9 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 						$session = $container->getShared('session');
 						$localContent = $container->getShared('localContent');
 						$crypt = $container->getShared('crypt');
-						$db = (new Pdo($config, $session, $localContent, $crypt))->init();
+						$helper = $container->getShared('helper');
+
+						$db = (new Pdo($config, $session, $localContent, $crypt, $helper))->init();
 
 						$container->setShared('db', $db);
 

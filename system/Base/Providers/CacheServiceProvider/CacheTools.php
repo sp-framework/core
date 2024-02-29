@@ -5,7 +5,6 @@ namespace System\Base\Providers\CacheServiceProvider;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToWriteFile;
-use Phalcon\Helper\Json;
 
 class CacheTools
 {
@@ -83,7 +82,7 @@ class CacheTools
 
 	public function generateCacheKey($cacheKey)
 	{
-		$cacheKey = Json::encode($cacheKey);
+		$cacheKey = $this->helper->encode($cacheKey);
 
 		$cacheKey = preg_replace('/[^A-Za-z0-9.-]/', '', $cacheKey);
 
@@ -141,7 +140,7 @@ class CacheTools
 			if (!$this->localContent->fileExists('var/storage/cache/stream/index/' . $cacheName . '.json') ||
 				$recreate
 			) {
-				$this->localContent->write('var/storage/cache/stream/index/' . $cacheName . '.json', Json::encode($content));
+				$this->localContent->write('var/storage/cache/stream/index/' . $cacheName . '.json', $this->helper->encode($content));
 			}
 		}
 	}
@@ -185,7 +184,7 @@ class CacheTools
 				$this->opCache->resetCache($cacheName, $index, 'index');
 			} else {
 				try {
-					$this->localContent->write('var/storage/cache/stream/index/' . $cacheName . '.json', Json::encode($index));
+					$this->localContent->write('var/storage/cache/stream/index/' . $cacheName . '.json', $this->helper->encode($index));
 				} catch (FilesystemException | UnableToWriteFile | \Exception $e) {
 					return false;
 				}
@@ -235,7 +234,7 @@ class CacheTools
 			if ($this->opCache) {
 				$this->opCache->resetCache($cacheName, $this->index, 'index');
 			} else {
-				$this->localContent->write('var/storage/cache/stream/index/' . $cacheName . '.json', Json::encode($this->index));
+				$this->localContent->write('var/storage/cache/stream/index/' . $cacheName . '.json', $this->helper->encode($this->index));
 			}
 		}
 
@@ -297,7 +296,7 @@ class CacheTools
 			try {
 				$index = $this->localContent->read('var/storage/cache/stream/index/' . $cacheName . '.json');
 
-				$index = Json::decode($index, true);
+				$index = $this->helper->decode($index, true);
 
 				$this->index = $index;
 

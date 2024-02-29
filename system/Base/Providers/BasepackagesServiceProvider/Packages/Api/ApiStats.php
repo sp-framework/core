@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Api;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Api\BasepackagesApiCalls;
 
@@ -20,14 +19,14 @@ class ApiStats extends BasePackage
     {
         if ($this->localContent->fileExists($this->statsDirectory . $data['provider'] . '.json')) {
             $callStats =
-                Json::decode($this->localContent->read($this->statsDirectory . $data['provider'] . '.json'), true);
+                $this->helper->decode($this->localContent->read($this->statsDirectory . $data['provider'] . '.json'), true);
         }
 
         if (!isset($callStats[$data['id']])) {
             $callStats[$data['id']] = [];
         }
 
-        $this->localContent->write($this->statsDirectory . $data['provider'] . '.json', Json::encode($callStats));
+        $this->localContent->write($this->statsDirectory . $data['provider'] . '.json', $this->helper->encode($callStats));
     }
 
     public function removeApiCallStats(array $data)
@@ -36,21 +35,21 @@ class ApiStats extends BasePackage
 
         if ($this->localContent->fileExists($this->statsDirectory . $data['provider'] . '.json')) {
             $callStats =
-                Json::decode($this->localContent->read($this->statsDirectory . $data['provider'] . '.json'), true);
+                $this->helper->decode($this->localContent->read($this->statsDirectory . $data['provider'] . '.json'), true);
         }
 
         if (isset($callStats[$data['id']])) {
             unset($callStats[$data['id']]);
         }
 
-        $this->localContent->write($this->statsDirectory . $data['provider'] . '.json', Json::encode($callStats));
+        $this->localContent->write($this->statsDirectory . $data['provider'] . '.json', $this->helper->encode($callStats));
     }
 
     public function getApiCallStats(array $data)
     {
         if ($this->localContent->fileExists($this->statsDirectory . $data['provider'] . '.json')) {
             $callStats =
-                Json::decode($this->localContent->read($this->statsDirectory . $data['provider'] . '.json'), true);
+                $this->helper->decode($this->localContent->read($this->statsDirectory . $data['provider'] . '.json'), true);
         }
 
         if (isset($callStats[$data['api_id']])) {
@@ -64,14 +63,14 @@ class ApiStats extends BasePackage
     {
         if ($this->localContent->fileExists($this->statsDirectory . $data['provider'] . '.json')) {
             $callStats =
-                Json::decode($this->localContent->read($this->statsDirectory . $data['provider'] . '.json'), true);
+                $this->helper->decode($this->localContent->read($this->statsDirectory . $data['provider'] . '.json'), true);
         }
 
         $callStats[$data['api_id']]['timestamp'] = new \DateTime('now');
 
         $callStats[$data['api_id']]['rateLimits'] = $callData['rateLimits'];
 
-        $this->localContent->write($this->statsDirectory . $data['provider'] . '.json', Json::encode($callStats));
+        $this->localContent->write($this->statsDirectory . $data['provider'] . '.json', $this->helper->encode($callStats));
     }
 
     public function updateApiCallStats($callMethod, $apiId, $callStats)
@@ -83,7 +82,7 @@ class ApiStats extends BasePackage
         $data['call_exec_time'] = $callStats['total_time'];
         $data['call_response_code'] = $callStats['http_code'];
         $data['api_id'] = $apiId;
-        $data['call_stats'] = Json::encode($callStats);
+        $data['call_stats'] = $this->helper->encode($callStats);
 
         $this->add($data);
     }

@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesActivityLogs;
 
@@ -67,7 +66,7 @@ class ActivityLogs extends BasePackage
             $log['created_at'] = $data['created_at'];
         }
 
-        $log['log'] = Json::encode($data);
+        $log['log'] = $this->helper->encode($data);
 
         if ($this->add($log, false)) {
             $this->packagesData->responseCode = 0;
@@ -123,7 +122,7 @@ class ActivityLogs extends BasePackage
                 }
 
                 if ($log['log'] !== '') {
-                    $log['log'] = Json::decode($log['log'], true);
+                    $log['log'] = $this->helper->decode($log['log'], true);
                 }
             }
 

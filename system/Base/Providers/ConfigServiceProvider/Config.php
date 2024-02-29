@@ -2,8 +2,8 @@
 
 namespace System\Base\Providers\ConfigServiceProvider;
 
-use Phalcon\Config as PhalconConfig;
 use Phalcon\Config\Adapter\Grouped;
+use Phalcon\Config\Config as PhalconConfig;
 use System\Base\Installer\Components\Setup;
 
 class Config
@@ -73,7 +73,11 @@ class Config
 
         require_once base_path('system/Base/Installer/Components/Setup.php');
 
-        (new Setup($this->session, $configsObj))->run();
+        if (isset($this->request->getPost()['session'])) {
+            (new Setup($this->session, $configsObj, true))->run();
+        } else {
+            (new Setup($this->session, $configsObj))->run();
+        }
 
         exit;
     }

@@ -2,8 +2,6 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Storages;
 
-use Phalcon\Helper\Json;
-
 class Storages
 {
     protected $db;
@@ -66,14 +64,14 @@ class Storages
                 'type'                          => $type,
                 'description'                   => '',
                 'permission'                    => $permission,
-                'allowed_image_mime_types'      => Json::encode($allowedImageMimeTypes),
-                'allowed_image_sizes'           => Json::encode($allowedImageSizes),
+                'allowed_image_mime_types'      => $this->helper->encode($allowedImageMimeTypes),
+                'allowed_image_sizes'           => $this->helper->encode($allowedImageSizes),
                 'images_path'                   => 'images',
                 'cache_path'                    => 'cache',
                 'max_image_size'                => 2000,
                 'default_image_quality'         => 100,
                 'max_image_file_size'           => $maxBytes,
-                'allowed_file_mime_types'       => Json::encode($allowedFileMimeTypes),
+                'allowed_file_mime_types'       => $this->helper->encode($allowedFileMimeTypes),
                 'data_path'                     => 'data',
                 'max_data_file_size'            => $maxBytes
             ];

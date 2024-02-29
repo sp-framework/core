@@ -9,8 +9,6 @@ use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToReadFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class BackupRestore extends BasePackage
@@ -195,7 +193,7 @@ class BackupRestore extends BasePackage
         }
 
         try {
-            $this->localContent->write('var/tmp/backupInfo.json' , Json::encode($this->backupInfo));
+            $this->localContent->write('var/tmp/backupInfo.json' , $this->helper->encode($this->backupInfo));
         } catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
             throw $exception;
         }
@@ -419,7 +417,7 @@ class BackupRestore extends BasePackage
                 $dbConfig['dbname'] = 'mysql';
 
                 try {
-                    $dbkeys = Json::decode($this->localContent->read('var/tmp/backups/' . $this->fileNameLocation . '/system/.dbkeys'), true);
+                    $dbkeys = $this->helper->decode($this->localContent->read('var/tmp/backups/' . $this->fileNameLocation . '/system/.dbkeys'), true);
 
                     foreach ($data['dbs'] as $dbs) {
                         $dbConfig['username'] = $data['root_username'];
@@ -479,7 +477,7 @@ class BackupRestore extends BasePackage
         }
 
         try {
-            $backupInfo = Json::decode($this->localContent->read('var/tmp/backups/' . $this->fileNameLocation . '/backupInfo.json'), true);
+            $backupInfo = $this->helper->decode($this->localContent->read('var/tmp/backups/' . $this->fileNameLocation . '/backupInfo.json'), true);
         } catch (\ErrorException | FilesystemException | UnableToReadFile | InvalidArgumentException $exception) {
             $this->addResponse('Error reading/accessing backupInfo.json file. Please upload backup again with correct file.', 1);
 
@@ -597,7 +595,7 @@ class BackupRestore extends BasePackage
                 }
 
                 try {
-                    $this->backupInfo = Json::decode($backupInfo, true);
+                    $this->backupInfo = $this->helper->decode($backupInfo, true);
                 } catch (\InvalidArgumentException $exception) {
                     $this->addResponse('Error reading contents of backupInfo.json file. Please check if file is in correct Json format.', 1);
 
@@ -671,9 +669,9 @@ class BackupRestore extends BasePackage
         $pathArr = explode('/', $path);
 
         if ($files) {
-            $structure = ['id' => strtolower(Arr::last($pathArr)), 'title' => Arr::last($pathArr), 'data' => ['type' => 'file', 'pathId' => $pathKey]];
+            $structure = ['id' => strtolower($this->helper->last($pathArr)), 'title' => $this->helper->last($pathArr), 'data' => ['type' => 'file', 'pathId' => $pathKey]];
         } else {
-            $structure = ['id' => strtolower(Arr::last($pathArr)), 'title' => Arr::last($pathArr), 'data' => ['type' => 'folder', 'pathId' => $pathKey]];
+            $structure = ['id' => strtolower($this->helper->last($pathArr)), 'title' => $this->helper->last($pathArr), 'data' => ['type' => 'folder', 'pathId' => $pathKey]];
         }
 
         while ($key = array_pop($pathArr)) {
@@ -693,10 +691,10 @@ class BackupRestore extends BasePackage
             $keys = $this->localContent->read('system/.dbkeys');
 
             if ($dbConfig) {
-                return Json::decode($keys, true)[$dbConfig['dbname']];
+                return $this->helper->decode($keys, true)[$dbConfig['dbname']];
             }
 
-            return Json::decode($keys, true);
+            return $this->helper->decode($keys, true);
         } catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
             return false;
         }

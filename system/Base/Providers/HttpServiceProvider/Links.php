@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\HttpServiceProvider;
 
-use Phalcon\Url;
+use Phalcon\Mvc\Url;
 
 class Links
 {

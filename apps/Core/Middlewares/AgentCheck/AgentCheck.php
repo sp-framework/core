@@ -2,7 +2,6 @@
 
 namespace Apps\Core\Middlewares\AgentCheck;
 
-use Phalcon\Helper\Json;
 use System\Base\BaseMiddleware;
 
 class AgentCheck extends BaseMiddleware

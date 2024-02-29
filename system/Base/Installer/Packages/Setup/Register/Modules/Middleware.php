@@ -2,18 +2,16 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Modules;
 
-use Phalcon\Helper\Json;
-
 class Middleware
 {
 	public function register($db, $ff, $middlewareFile)
 	{
 		if ($middlewareFile['name'] === 'Auth') {
-			$apps = Json::encode(['1' => ['enabled' => true, 'sequence' => 1]]);
+			$apps = $this->helper->encode(['1' => ['enabled' => true, 'sequence' => 1]]);
 		} else if ($middlewareFile['name'] === 'Acl') {
-			$apps = Json::encode(['1' => ['enabled' => true, 'sequence' => 2]]);
+			$apps = $this->helper->encode(['1' => ['enabled' => true, 'sequence' => 2]]);
 		} else {
-			$apps = Json::encode(['1' => ['enabled' => false, 'sequence' => 0]]);
+			$apps = $this->helper->encode(['1' => ['enabled' => false, 'sequence' => 0]]);
 		}
 
 		$middleware =
@@ -29,19 +27,19 @@ class Middleware
 				'class'					=> $middlewareFile['class'],
 				'settings'				=>
 					isset($middlewareFile['settings']) ?
-					Json::encode($middlewareFile['settings']) :
-					Json::encode([]),
+					$this->helper->encode($middlewareFile['settings']) :
+					$this->helper->encode([]),
 				'dependencies'		 	=>
 					isset($middlewareFile['dependencies']) ?
-					Json::encode($middlewareFile['dependencies']) :
-					Json::encode([]),
+					$this->helper->encode($middlewareFile['dependencies']) :
+					$this->helper->encode([]),
 				'apps'					=> $apps,
 				'api_id'				=> 1,
 				'installed'				=> 1,
 				'files'					=>
 					isset($middlewareFile['files']) ?
-					Json::encode($middlewareFile['files']) :
-					Json::encode([]),
+					$this->helper->encode($middlewareFile['files']) :
+					$this->helper->encode([]),
 				'updated_by'			=> 0
 			];
 

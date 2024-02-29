@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesMiddlewares;
 
@@ -22,7 +21,7 @@ class Middlewares extends BasePackage
 	public function getMiddlewareByNameForAppId($name, $appId)
 	{
 		foreach($this->middlewares as $middleware) {
-			$middleware['apps'] = Json::decode($middleware['apps'], true);
+			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 
 			if (isset($middleware['apps'][$appId]) &&
 				$middleware['apps'][$appId]['enabled'] === true &&
@@ -105,7 +104,7 @@ class Middlewares extends BasePackage
 		$middlewares = [];
 
 		foreach($this->middlewares as $middleware) {
-			$middleware['apps'] = Json::decode($middleware['apps'], true);
+			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 
 			if (isset($middleware['apps'][$appId]) &&
 				$middleware['apps'][$appId]['enabled'] == true
@@ -129,7 +128,7 @@ class Middlewares extends BasePackage
 				$middlewares[$middleware['id']] = $middleware;
 
 				if ($appId) {
-					$middleware['apps'] = Json::decode($middleware['apps'], true);
+					$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 					if (isset($middleware['apps'][$appId])) {
 						if (isset($middleware['apps'][$appId]['sequence'])) {
 							$middlewares[$middleware['id']]['sequence'] = $middleware['apps'][$appId]['sequence'];
@@ -161,7 +160,7 @@ class Middlewares extends BasePackage
 				$middlewares[$middleware['id']] = $middleware;
 
 				if ($appId) {
-					$middleware['apps'] = Json::decode($middleware['apps'], true);
+					$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 					if (isset($middleware['apps'][$appId])) {
 						if (isset($middleware['apps'][$appId]['sequence'])) {
 							$middlewares[$middleware['id']]['sequence'] = $middleware['apps'][$appId]['sequence'];
@@ -192,12 +191,12 @@ class Middlewares extends BasePackage
 
 		$dependencyArray = [];
 
-		$middlewares = Json::decode($data['middlewares'], true);
+		$middlewares = $this->helper->decode($data['middlewares'], true);
 
 		foreach ($middlewares['middlewares'] as $middlewareId => $status) {
 			$middleware = $this->getById($middlewareId);
 
-			$middleware['apps'] = Json::decode($middleware['apps'], true);
+			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 
 			if ($status === true) {
 				$middleware['apps'][$data['id']]['enabled'] = true;
@@ -212,7 +211,7 @@ class Middlewares extends BasePackage
 				$middleware['apps'][$data['id']]['enabled'] = true;				
 			}
 
-			$middleware['apps'] = Json::encode($middleware['apps']);
+			$middleware['apps'] = $this->helper->encode($middleware['apps']);
 
 			$this->update($middleware);
 		}
@@ -224,7 +223,7 @@ class Middlewares extends BasePackage
 		foreach ($middlewares['sequence'] as $sequence => $middlewareId) {
 			$middleware = $this->getById($middlewareId);
 
-			$middleware['apps'] = Json::decode($middleware['apps'], true);
+			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 
 			//System Middlewares
 			if ($middleware['name'] === 'IpFilter') {
@@ -243,7 +242,7 @@ class Middlewares extends BasePackage
 				$nonSystemMiddlewaresSeqStart++;
 			}
 
-			$middleware['apps'] = Json::encode($middleware['apps']);
+			$middleware['apps'] = $this->helper->encode($middleware['apps']);
 
 			$this->update($middleware);
 		}
@@ -254,7 +253,7 @@ class Middlewares extends BasePackage
 		$dependencyArray = [];
 
 		if (is_string($middleware['dependencies'])) {
-			$middleware['dependencies'] = Json::decode($middleware['dependencies'], true);
+			$middleware['dependencies'] = $this->helper->decode($middleware['dependencies'], true);
 		}
 
 		if (!isset($middleware['dependencies']['middlewares'])) {
@@ -269,11 +268,11 @@ class Middlewares extends BasePackage
 			$dependencyMiddleware = $this->getFirst('name', $dependency['name'], false, true, null, [], true);
 
 			if ($dependencyMiddleware) {
-				$dependencyMiddleware['apps'] = Json::decode($dependencyMiddleware['apps'], true);
+				$dependencyMiddleware['apps'] = $this->helper->decode($dependencyMiddleware['apps'], true);
 
 				$dependencyMiddleware['apps'][$data['id']]['enabled'] = true;
 
-				$dependencyMiddleware['apps'] = Json::encode($dependencyMiddleware['apps']);
+				$dependencyMiddleware['apps'] = $this->helper->encode($dependencyMiddleware['apps']);
 
 				$middlewares['middlewares'][$dependencyMiddleware['id']] = true;
 

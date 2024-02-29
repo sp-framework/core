@@ -3,7 +3,6 @@
 namespace Apps\Core\Packages\Adminltetags\Tags\Addresses;
 
 use Apps\Core\Packages\Adminltetags\Adminltetags;
-use Phalcon\Helper\Json;
 
 class Multiple
 {
@@ -348,7 +347,7 @@ class Multiple
                                 </div>
                                 <hr>';
                         }
-                        $addressTypesIds = Json::encode($addressTypesIds);
+                        $addressTypesIds = $this->helper->encode($addressTypesIds);
                     }
                 $this->content .=
                 '</div>

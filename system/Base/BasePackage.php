@@ -3,8 +3,6 @@
 namespace System\Base;
 
 use League\Flysystem\StorageAttributes;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use Phalcon\Mvc\Controller;
 use Phalcon\Mvc\Model\Transaction\Manager;
 use Phalcon\Paginator\Adapter\Model;
@@ -117,7 +115,7 @@ abstract class BasePackage extends Controller
 	protected function setNames()
 	{
 		if (!$this->packageName) {
-			$this->packageName = strtolower(Arr::last($this->getClassName()));
+			$this->packageName = strtolower($this->helper->last($this->getClassName()));
 		}
 
 		if (!$this->packageNameModel) {
@@ -132,7 +130,7 @@ abstract class BasePackage extends Controller
 	protected function buildGetQueryParamsArr()
 	{
 		if ($this->request->isGet()) {
-			$arr = Arr::chunk($this->dispatcher->getParams(), 2);
+			$arr = $this->helper->chunk($this->dispatcher->getParams(), 2);
 
 			foreach ($arr as $value) {
 				if (isset($value[1])) {
@@ -368,7 +366,7 @@ abstract class BasePackage extends Controller
 
 			if (isset($params['order'])) {
 				$orderParamsArr = explode(' ', $params['order']);
-				$orderParamsArr = Arr::chunk($orderParamsArr, 2);
+				$orderParamsArr = $this->helper->chunk($orderParamsArr, 2);
 
 				$orderParams = [];
 
@@ -625,10 +623,10 @@ abstract class BasePackage extends Controller
 			$conditionArr = explode('|', $condition);
 
 			if (isset($modelColumnMap['model'][$conditionArr[1]])) {
-				$model = Arr::last(explode('\\', $modelColumnMap['model'][$conditionArr[1]]));
+				$model = $this->helper->last(explode('\\', $modelColumnMap['model'][$conditionArr[1]]));
 				$queries[$model]['model'] = $modelColumnMap['model'][$conditionArr[1]];
 			} else {
-				$model = Arr::last(explode('\\', $this->modelToUse));
+				$model = $this->helper->last(explode('\\', $this->modelToUse));
 				$queries[$model]['model'] = $this->modelToUse;
 			}
 
@@ -643,7 +641,7 @@ abstract class BasePackage extends Controller
 				$conditionArr[1] = '[' . $conditionArr[1] . ']';
 			}
 
-			if (Arr::firstKey($postConditions) !== $conditionKey) {
+			if ($this->helper->firstKey($postConditions) !== $conditionKey) {
 				if ($conditionArr[0] === '') {
 					$queries[$model]['andor'] = 'AND';//Default for AND/OR
 				} else {
@@ -698,7 +696,7 @@ abstract class BasePackage extends Controller
 						'baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
 					] = $valueValue;
 
-					if (Arr::lastKey($valueArr) !== $valueKey) {
+					if ($this->helper->lastKey($valueArr) !== $valueKey) {
 						$condition .= ' AND';
 					}
 				}
@@ -717,7 +715,7 @@ abstract class BasePackage extends Controller
 							'baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
 						] = $valueValue;
 
-						if (Arr::lastKey($valueArr) !== $valueKey) {
+						if ($this->helper->lastKey($valueArr) !== $valueKey) {
 							$condition .= ' OR ';
 						}
 					}
@@ -961,7 +959,7 @@ abstract class BasePackage extends Controller
 				$model = $modelColumnMap['ff'][$conditionArr[1]];
 				$queries[$model]['ff'] = $modelColumnMap['ff'][$conditionArr[1]];
 			} else {
-				$model = Arr::first($modelColumnMap['ff']);
+				$model = $this->helper->first($modelColumnMap['ff']);
 				$queries[$model]['ff'] = $this->ffStoreToUse;
 			}
 
@@ -1028,7 +1026,7 @@ abstract class BasePackage extends Controller
 						'baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
 					] = $valueValue;
 
-					if (Arr::lastKey($valueArr) !== $valueKey) {
+					if ($this->helper->lastKey($valueArr) !== $valueKey) {
 						$condition .= ' AND';
 					}
 				}
@@ -1053,7 +1051,7 @@ abstract class BasePackage extends Controller
 
 						array_push($ffConditions, [$conditionArr[1], $sign, $valueValue]);
 
-						if (Arr::lastKey($valueArr) != $valueKey) {
+						if ($this->helper->lastKey($valueArr) != $valueKey) {
 							array_push($ffConditions, 'OR');
 						}
 					}
@@ -1084,9 +1082,9 @@ abstract class BasePackage extends Controller
 						array_push($ffConditions, 'AND');
 						array_push($ffConditions, [$conditionArr[1], $sign, $conditionArr[3]]);
 					} else if ($or) {
-						$previousKey = Arr::lastKey($ffConditions);
-						$previous = Arr::last($ffConditions);
-						unset($ffConditions[Arr::lastKey($ffConditions)]);
+						$previousKey = $this->helper->lastKey($ffConditions);
+						$previous = $this->helper->last($ffConditions);
+						unset($ffConditions[$this->helper->lastKey($ffConditions)]);
 						$orArr = [];
 						array_push($orArr, $previous);
 						array_push($orArr, 'OR');
@@ -1298,14 +1296,14 @@ abstract class BasePackage extends Controller
 	{
 		if ($decode) {
 			if (is_string($data)) {
-				$data = Json::decode($data, true);
+				$data = $this->helper->decode($data, true);
 			}
 
 			array_walk_recursive($data, 'json_decode_recursive');
 		} else {
 			foreach ($data as $dataKey => $dataValue) {
 				if (is_array($dataValue)) {
-					$data[$dataKey] = Json::encode($dataValue);
+					$data[$dataKey] = $this->helper->encode($dataValue);
 				}
 			}
 		}
@@ -1531,7 +1529,7 @@ abstract class BasePackage extends Controller
 	{
 		return
 			$this->modules->packages->getPackageByNameForAppId(
-				Arr::last(explode('\\', $packageClass)),
+				$this->helper->last(explode('\\', $packageClass)),
 				$this->app['id']
 			);
 	}
@@ -1965,7 +1963,7 @@ abstract class BasePackage extends Controller
 				foreach ($columnsArr as $columnsArrKey => $column) {
 					$columns .= '`' . $column . '`';
 
-					if ($columnsArrKey != Arr::lastKey($columnsArr)) {
+					if ($columnsArrKey != $this->helper->lastKey($columnsArr)) {
 						$columns .= ',';
 					}
 				}
@@ -2078,7 +2076,7 @@ abstract class BasePackage extends Controller
 			}
 
 			if ($package['notification_subscriptions'] && $package['notification_subscriptions'] !== '') {
-				$package['notification_subscriptions'] = Json::decode($package['notification_subscriptions'], true);
+				$package['notification_subscriptions'] = $this->helper->decode($package['notification_subscriptions'], true);
 
 				if (count($package['notification_subscriptions']) === 0) {
 					return;
@@ -2156,7 +2154,7 @@ abstract class BasePackage extends Controller
 
 		if (!$data['ref_id'] || $data['ref_id'] === '') {
 			if (isset($data['entity_id'])) {
-				$packageName = Arr::last($this->getClassName());
+				$packageName = $this->helper->last($this->getClassName());
 
 				$entitiesPackage = new \Apps\Core\Packages\Business\Entities\Entities;
 

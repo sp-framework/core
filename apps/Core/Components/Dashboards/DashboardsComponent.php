@@ -2,8 +2,6 @@
 
 namespace Apps\Core\Components\Dashboards;
 
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class DashboardsComponent extends BaseComponent
@@ -31,7 +29,7 @@ class DashboardsComponent extends BaseComponent
                 $app = $this->apps->getAppInfo();
 
                 if (is_string($app['settings'])) {
-                    $app['settings'] = Json::decode($app['settings'], true);
+                    $app['settings'] = $this->helper->decode($app['settings'], true);
                 }
 
                 if (isset($app['settings']['defaultDashboard'])) {

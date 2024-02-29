@@ -3,8 +3,6 @@
 namespace Apps\Core\Components\Apps;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class AppsComponent extends BaseComponent
@@ -52,7 +50,7 @@ class AppsComponent extends BaseComponent
 
                 if (isset($app['can_login_role_ids'])) {
                     if (is_string($app['can_login_role_ids'])) {
-                        $app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
+                        $app['can_login_role_ids'] = $this->helper->decode($app['can_login_role_ids'], true);
                     }
 
                     if (isset($app['can_login_role_ids']['data'])) {
@@ -68,7 +66,7 @@ class AppsComponent extends BaseComponent
 
                 if (isset($app['acceptable_usernames']) && $app['acceptable_usernames'] !== '') {
                     if (is_string($app['acceptable_usernames'])) {
-                        $app['acceptable_usernames'] = Json::decode($app['acceptable_usernames'], true);
+                        $app['acceptable_usernames'] = $this->helper->decode($app['acceptable_usernames'], true);
                     }
                 }
 
@@ -85,7 +83,7 @@ class AppsComponent extends BaseComponent
 
                 if ($app['menu_structure']) {
                     if (is_string($app['menu_structure'])) {
-                        $app['menu_structure'] = Json::decode($app['menu_structure'], true);
+                        $app['menu_structure'] = $this->helper->decode($app['menu_structure'], true);
                     }
 
                     if (count($app['menu_structure']) > 0) {
@@ -98,7 +96,7 @@ class AppsComponent extends BaseComponent
 
                 if ($app['settings']) {
                     if (is_string($app['settings'])) {
-                        $app['settings'] = Json::decode($app['settings'], true);
+                        $app['settings'] = $this->helper->decode($app['settings'], true);
                     }
                 }
 
@@ -108,7 +106,7 @@ class AppsComponent extends BaseComponent
 
                 foreach ($componentsArr as $key => &$componentValue) {
                     if ($componentValue['apps']) {
-                        $componentValue['apps'] = Json::decode($componentValue['apps'], true);
+                        $componentValue['apps'] = $this->helper->decode($componentValue['apps'], true);
 
                         if (!isset($componentValue['apps'][$app['id']]['needAuth'])) {
                             $componentValue['apps'][$app['id']]['needAuth'] = false;
@@ -123,7 +121,7 @@ class AppsComponent extends BaseComponent
 
                     if ($componentValue['settings']) {
                         if (is_string($componentValue['settings'])) {
-                            $componentValue['settings'] = Json::decode($componentValue['settings'], true);
+                            $componentValue['settings'] = $this->helper->decode($componentValue['settings'], true);
                         }
 
                         if (isset($componentValue['settings']['mandatory']) &&
@@ -159,7 +157,7 @@ class AppsComponent extends BaseComponent
                 foreach ($middlewaresArr as $key => &$middlewareValue) {
                     if ($middlewareValue['settings']) {
                         if (is_string($middlewareValue['settings'])) {
-                            $middlewareValue['settings'] = Json::decode($middlewareValue['settings'], true);
+                            $middlewareValue['settings'] = $this->helper->decode($middlewareValue['settings'], true);
                         }
 
                         if (isset($middlewareValue['settings']['mandatory']) &&
@@ -178,19 +176,19 @@ class AppsComponent extends BaseComponent
                 $viewsArr = $this->modules->views->getViewsForAppType($app['app_type']);
 
                 if (count($viewsArr) === 1) {
-                    array_push($mandatoryViews, Arr::first($viewsArr)['name']);
+                    array_push($mandatoryViews, $this->helper->first($viewsArr)['name']);
 
-                    $views[Arr::first($viewsArr)['id']] = Arr::first($viewsArr);
+                    $views[$this->helper->first($viewsArr)['id']] = $this->helper->first($viewsArr);
 
-                    if ($views[Arr::first($viewsArr)['id']]['apps']) {
-                        if (is_string($views[Arr::first($viewsArr)['id']]['apps'])) {
-                            $views[Arr::first($viewsArr)['id']]['apps'] = Json::decode($views[Arr::first($viewsArr)['id']]['apps'], true);
+                    if ($views[$this->helper->first($viewsArr)['id']]['apps']) {
+                        if (is_string($views[$this->helper->first($viewsArr)['id']]['apps'])) {
+                            $views[$this->helper->first($viewsArr)['id']]['apps'] = $this->helper->decode($views[$this->helper->first($viewsArr)['id']]['apps'], true);
                         }
                     }
 
-                    if ($views[Arr::first($viewsArr)['id']]['settings']) {
-                        if (is_string($views[Arr::first($viewsArr)['id']]['settings'])) {
-                            $views[Arr::first($viewsArr)['id']]['settings'] = Json::decode($views[Arr::first($viewsArr)['id']]['settings'], true);
+                    if ($views[$this->helper->first($viewsArr)['id']]['settings']) {
+                        if (is_string($views[$this->helper->first($viewsArr)['id']]['settings'])) {
+                            $views[$this->helper->first($viewsArr)['id']]['settings'] = $this->helper->decode($views[$this->helper->first($viewsArr)['id']]['settings'], true);
                         }
                     }
                 } else {
@@ -201,13 +199,13 @@ class AppsComponent extends BaseComponent
 
                         if ($viewValue['apps']) {
                             if (is_string($viewValue['apps'])) {
-                                $viewValue['apps'] = Json::decode($viewValue['apps'], true);
+                                $viewValue['apps'] = $this->helper->decode($viewValue['apps'], true);
                             }
                         }
 
                         if ($viewValue['settings']) {
                             if (is_string($viewValue['settings'])) {
-                                $viewValue['settings'] = Json::decode($viewValue['settings'], true);
+                                $viewValue['settings'] = $this->helper->decode($viewValue['settings'], true);
                             }
 
                             if (isset($viewValue['settings']['mandatory']) && $viewValue['settings']['mandatory'] == true) {

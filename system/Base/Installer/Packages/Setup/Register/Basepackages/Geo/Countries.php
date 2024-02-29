@@ -2,8 +2,6 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Geo;
 
-use Phalcon\Helper\Json;
-
 class Countries
 {
     public $trackCounter;
@@ -15,7 +13,7 @@ class Countries
     public function register($db, $ff, $localContent)
     {
         $countries =
-            Json::decode(
+            $this->helper->decode(
                 $localContent->read(
                     '/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/AllCountries.json'
                 ),
@@ -39,7 +37,7 @@ class Countries
                     'subregion'         => $country['subregion'],
                     'emoji'             => $country['emoji'],
                     'emojiU'            => $country['emojiU'],
-                    'translations'      => Json::encode($country['translations']),
+                    'translations'      => $this->helper->encode($country['translations']),
                     'latitude'          => (int) $country['latitude'],
                     'longitude'         => (int) $country['longitude'],
                     'installed'         => 0,
@@ -165,7 +163,7 @@ class Countries
                 set_time_limit(900);//15Mins
             }
 
-            $countryData = Json::decode($localContent->read($this->sourceDir . $country['iso2'] . '.json'), true);
+            $countryData = $this->helper->decode($localContent->read($this->sourceDir . $country['iso2'] . '.json'), true);
 
             foreach ($countryData['states'] as $key => $state) {
                 $state['country_id'] = $country['id'];

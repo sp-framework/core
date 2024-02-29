@@ -51,18 +51,20 @@
                                         <div class="row vdivide justify-content-center">
                                             <div class="col-6 p-3">
                                                 <legend class="text-uppercase">Database</legend>
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <div class="form-group">
-                                                            <label class="text-uppercase text-xs" for="host">Select Database Type *</label>
-                                                            <select class="custom-select rounded-0 input-xs" style="padding: 0.375rem 1.75rem 0.375rem 0.75rem;" id="databasetype">
-                                                                <option value="hybrid" selected="">Flat File + MySQL (Recommended)</option>
-                                                                <option value="ff">Flat File Only</option>
-                                                                <option value="db">MySQL Only</option>
-                                                            </select>
+                                                <?php if (!$onlyUpdateDb) { ?>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <label class="text-uppercase text-xs" for="host">Select Database Type *</label>
+                                                                <select class="custom-select rounded-0 input-xs" style="padding: 0.375rem 1.75rem 0.375rem 0.75rem;" id="databasetype">
+                                                                    <option value="hybrid" selected="">Flat File + MySQL (Recommended)</option>
+                                                                    <option value="ff">Flat File Only</option>
+                                                                    <option value="db">MySQL Only</option>
+                                                                </select>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                <?php } ?>
                                                 <div id="mysql">
                                                     <div class="row">
                                                         <div class="col">
@@ -325,7 +327,9 @@
                                         </div>
                                     <?php } ?>
                                     <hr>
-                                    <div id="installer-progress" class="mb-3" hidden></div>
+                                    <?php if (!$onlyUpdateDb) { ?>
+                                        <div id="installer-progress" class="mb-3" hidden></div>
+                                    <?php } ?>
                                     <div class="row text-center p-3">
                                         <?php if (!$onlyUpdateDb) { ?>
                                             <?php if (!$precheckFail) { ?>
@@ -363,14 +367,16 @@
                                             </div>
                                         <?php } ?>
                                     </div>
-                                    <div class="row">
-                                        <div class="col" id="external-div" hidden>
-                                            <div class="form-group">
-                                                <label class="text-uppercase text-xs" for="username">External Package Installer Logs</label>
-                                                <textarea id="external-data" class="form-control form-control-sm rounded-0" rows="10" disabled>Downloading & installing external packages...</textarea>
+                                    <?php if (!$onlyUpdateDb) { ?>
+                                        <div class="row">
+                                            <div class="col" id="external-div" hidden>
+                                                <div class="form-group">
+                                                    <label class="text-uppercase text-xs" for="username">External Package Installer Logs</label>
+                                                    <textarea id="external-data" class="form-control form-control-sm rounded-0" rows="10" disabled>Downloading & installing external packages...</textarea>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    <?php } ?>
                                 </div>
                             </form>
                         </div>
@@ -388,30 +394,33 @@
             <?php if ($precheckFail) { ?>
                 BazProgress.buildProgressBar($('#installer-progress'), true);
             <?php } else { ?>
-                BazProgress.buildProgressBar($('#installer-progress'), false, true);
+                <?php if (!$onlyUpdateDb) { ?>
+                    BazProgress.buildProgressBar($('#installer-progress'), false, true);
 
-                $('#databasetype').change(function() {
-                    if ($('#databasetype').find(':selected').val() === 'ff') {
-                        $('#mysql').attr('hidden', true);
-                    } else {
-                        $('#mysql').attr('hidden', false);
-                    }
-                });
+                    $('#databasetype').change(function() {
+                        if ($('#databasetype').find(':selected').val() === 'ff') {
+                            $('#mysql').attr('hidden', true);
+                        } else {
+                            $('#mysql').attr('hidden', false);
+                        }
+                    });
 
-                $('#create, #create-grant').click(function() {
-                    if ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) {
-                        $('#create-username, #create-password').attr('disabled', false);
-                    } else if ($('#create')[0].checked === false && $('#create-grant')[0].checked === false) {
-                        $('#create-username, #create-password').attr('disabled', true);
-                    }
-                });
+                    $('#create, #create-grant').click(function() {
+                        if ($('#create')[0].checked === true || $('#create-grant')[0].checked === true) {
+                            $('#create-username, #create-password').attr('disabled', false);
+                        } else if ($('#create')[0].checked === false && $('#create-grant')[0].checked === false) {
+                            $('#create-username, #create-password').attr('disabled', true);
+                        }
+                    });
+                <?php } ?>
             <?php } ?>
 
-            BazTunnels.initPusherTunnel({'tunnelsToInit' : ['progress']});
+            <?php if (!$onlyUpdateDb) { ?>
+                BazTunnels.initPusherTunnel({'tunnelsToInit' : ['progress']});
+            <?php } ?>
 
             $('#submit, #update').click(function(e) {
                 e.preventDefault();
-
 
                 <?php if ($precheckFail) { ?>
                     $(this).attr('disabled', true);
@@ -490,6 +499,12 @@
                         onlyFf = true;
                     }
 
+                    <?php if (!$onlyUpdateDb) { ?>
+                        var onlyUpdateDb = false;
+                    <?php } else { ?>
+                        var onlyUpdateDb = true;
+                    <?php } ?>
+
                     if ($('#host').val() === '' && !onlyFf) {
                         $('#host').addClass('is-invalid');
                         $('#host').focus(function() {
@@ -539,22 +554,22 @@
                         $('#create-password').focus(function() {
                             $(this).removeClass('is-invalid');
                         });
-                    } else if ($('#email').val() === '') {
+                    } else if ($('#email').val() === '' && !onlyUpdateDb) {
                         $('#email').addClass('is-invalid');
                         $('#email').focus(function() {
                             $(this).removeClass('is-invalid');
                         });
-                    } else if ($('#pass').val() === '') {
+                    } else if ($('#pass').val() === '' && !onlyUpdateDb) {
                         $('#pass').addClass('is-invalid');
                         $('#pass').focus(function() {
                             $(this).removeClass('is-invalid');
                         });
-                    } else if ($('#pwf').val() === '') {
+                    } else if ($('#pwf').val() === '' && !onlyUpdateDb) {
                         $('#pwf').addClass('is-invalid');
                         $('#pwf').focus(function() {
                             $(this).removeClass('is-invalid');
                         });
-                    } else if ($('#cwf').val() === '') {
+                    } else if ($('#cwf').val() === '' && !onlyUpdateDb) {
                         $('#cwf').addClass('is-invalid');
                         $('#cwf').focus(function() {
                             $(this).removeClass('is-invalid');
@@ -564,12 +579,16 @@
                         $('#submit-spinner, #update-spinner').attr('hidden', false);
                         $('#alert').attr('hidden', true);
 
-                        $('.installer-progress-bar').removeClass(function (index, className) {
-                            return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
-                        }).addClass('bg-info');
+                        <?php if (!$onlyUpdateDb) { ?>
+                            $('.installer-progress-bar').removeClass(function (index, className) {
+                                return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
+                            }).addClass('bg-info');
+                        <?php } ?>
 
                         var data = { };
-                        if ($('#databasetype').find(':selected').val() !== 'ff') {
+                        if ($('#databasetype').find(':selected').val() &&
+                            $('#databasetype').find(':selected').val() !== 'ff'
+                        ) {
                             data = $.extend(data,
                                 {
                                     "host"                  : $('#host').val(),
@@ -590,7 +609,19 @@
                                     "create-user"           : $('#create-grant')[0].checked
                                 });
                             }
+                        } else {
+                            data = $.extend(data,
+                                {
+                                    "host"                  : $('#host').val(),
+                                    "port"                  : $('#port').val(),
+                                    "dbname"                : $('#dbname').val(),
+                                    "charset"               : $('#charset').val(),
+                                    "collation"             : $('#collation').val(),
+                                    "username"              : $('#username').val(),
+                                    "password"              : $('#password').val()
+                                });
                         }
+
                     <?php if (!$onlyUpdateDb) { ?>
                         data = $.extend(data,
                             {
@@ -604,11 +635,11 @@
                                 "country"               : $('#country').val(),
                                 "ip2location"           : $('#ip2location')[0].checked
                             });
-                    <?php } ?>
+
                         $('.installer-progress-bar').css('width', '0%');
                         $('.installer-progress-bar').attr('aria-valuenow', 0);
                         $('.progress-bar').addClass('progress-bar-animated');
-
+                    <?php } ?>
                         $.ajax({
                             type    : 'POST',
                             url     : '/',
@@ -676,79 +707,71 @@
                 <?php } ?>
             });
 
-            BazProgress.setCallable({
-                beforeProcess : function(response) {
-                    if (!response.responseData) {
-                        return;
-                    }
-
-                    if (response.responseCode !== 0) {
-                        return;
-                    }
-
-                    var responseData;
-
-                    if (typeof response.responseData === 'string' || response.responseData instanceof String) {
-                        responseData = JSON.parse(response.responseData);
-                    } else {
-                        responseData = response.responseData;
-                    }
-
-                    if (responseData['runners'] &&
-                        responseData['runners']['running'] &&
-                        responseData['runners']['running']['method'] === 'executeComposer'
-                    ) {
-                        $('#installer-progress').attr('hidden', true);
-                        $('#external-div').attr('hidden', false);
-                    }
-                    if (responseData.composer) {
-                        $('#external-data').val(responseData.composer);
-                        $('#external-data').scrollTop($('#external-data')[0].scrollHeight);
-                    }
-
-                    return true;
-                },
-                afterProcess : function(response) {
-                    if (!response.responseData) {
-                        return;
-                    }
-
-                    if (response.responseCode !== 0) {
-                        if (response.responseData.composer_error && response.responseData.composer_error == true) {
-                            $('#external-data').val(response.responseData.composer);
-                            $('#external-data').scrollTop($('#external-data')[0].scrollHeight);
-                            $('#external-div').attr('hidden', false);
+            <?php if (!$onlyUpdateDb) { ?>
+                BazProgress.setCallable({
+                    beforeProcess : function(response) {
+                        if (!response.responseData) {
+                            return;
                         }
 
-                        return;
-                    }
+                        if (response.responseCode !== 0) {
+                            return;
+                        }
 
-                    var responseData, timerId;
+                        var responseData;
 
-                    if (typeof response.responseData === 'string' || response.responseData instanceof String) {
-                        responseData = JSON.parse(response.responseData);
-                    } else {
-                        responseData = response.responseData;
-                    }
+                        if (typeof response.responseData === 'string' || response.responseData instanceof String) {
+                            responseData = JSON.parse(response.responseData);
+                        } else {
+                            responseData = response.responseData;
+                        }
 
-                    if (responseData['runners'] &&
-                        responseData['runners']['running'] &&
-                        responseData['runners']['running']['method'] === 'executeComposer'
-                    ) {
-                        if (BazHelpers.getTimerId('composer') === false) {
-                            if (BazHelpers.getTimerId('getProgress') !== false) {
-                                BazHelpers.setTimeoutTimers.stop(BazHelpers.getTimerId('getProgress'), null, 'getProgress');
+                        if (responseData['runners'] &&
+                            responseData['runners']['running'] &&
+                            responseData['runners']['running']['method'] === 'executeComposer'
+                        ) {
+                            $('#installer-progress').attr('hidden', true);
+                            $('#external-div').attr('hidden', false);
+                        }
+                        if (responseData.composer) {
+                            $('#external-data').val(responseData.composer);
+                            $('#external-data').scrollTop($('#external-data')[0].scrollHeight);
+                        }
+
+                        return true;
+                    },
+                    afterProcess : function(response) {
+                        if (!response.responseData) {
+                            return;
+                        }
+
+                        if (response.responseCode !== 0) {
+                            if (response.responseData.composer_error && response.responseData.composer_error == true) {
+                                $('#external-data').val(response.responseData.composer);
+                                $('#external-data').scrollTop($('#external-data')[0].scrollHeight);
+                                $('#external-div').attr('hidden', false);
                             }
 
-                            BazProgress.getProgress({
-                                'url' : '/',
-                                'postData' : {
-                                    'session' : $('#session-token').val(),
-                                    'composer' : 'true'
-                                }
-                            }, true);
+                            return;
+                        }
 
-                            BazHelpers.setTimeoutTimers.add(function() {
+                        var responseData, timerId;
+
+                        if (typeof response.responseData === 'string' || response.responseData instanceof String) {
+                            responseData = JSON.parse(response.responseData);
+                        } else {
+                            responseData = response.responseData;
+                        }
+
+                        if (responseData['runners'] &&
+                            responseData['runners']['running'] &&
+                            responseData['runners']['running']['method'] === 'executeComposer'
+                        ) {
+                            if (BazHelpers.getTimerId('composer') === false) {
+                                if (BazHelpers.getTimerId('getProgress') !== false) {
+                                    BazHelpers.setTimeoutTimers.stop(BazHelpers.getTimerId('getProgress'), null, 'getProgress');
+                                }
+
                                 BazProgress.getProgress({
                                     'url' : '/',
                                     'postData' : {
@@ -756,30 +779,40 @@
                                         'composer' : 'true'
                                     }
                                 }, true);
-                            }, 300, null, 'composer');
+
+                                BazHelpers.setTimeoutTimers.add(function() {
+                                    BazProgress.getProgress({
+                                        'url' : '/',
+                                        'postData' : {
+                                            'session' : $('#session-token').val(),
+                                            'composer' : 'true'
+                                        }
+                                    }, true);
+                                }, 300, null, 'composer');
+                            }
+                        } else {
+                            timerId = BazHelpers.getTimerId('composer');
+                            if (timerId) {
+                                BazHelpers.setTimeoutTimers.add(function(timerId) {
+                                    BazHelpers.setTimeoutTimers.stop(timerId, null, 'composer');
+                                });
+                            }
                         }
-                    } else {
-                        timerId = BazHelpers.getTimerId('composer');
-                        if (timerId) {
-                            BazHelpers.setTimeoutTimers.add(function(timerId) {
-                                BazHelpers.setTimeoutTimers.stop(timerId, null, 'composer');
-                            });
+                        return true;
+                    },
+                    onComplete : function(response) {
+                        BazHelpers.setTimeoutTimers.stopAll();
+                        if (response.responseCode == 0) {
+                            setTimeout(function() {
+                                $('#access').addClass('btn-success');
+                                $('#access').children('i').addClass('fa-check');
+                                $('#access-div').attr('hidden', false);
+                                $('#submit-div').attr('hidden', true);
+                            }, 1000);
                         }
                     }
-                    return true;
-                },
-                onComplete : function(response) {
-                    BazHelpers.setTimeoutTimers.stopAll();
-                    if (response.responseCode == 0) {
-                        setTimeout(function() {
-                            $('#access').addClass('btn-success');
-                            $('#access').children('i').addClass('fa-check');
-                            $('#access-div').attr('hidden', false);
-                            $('#submit-div').attr('hidden', true);
-                        }, 1000);
-                    }
-                }
-            });
+                });
+            <?php } ?>
 
             <?php if (!$precheckFail) { ?>
                 $('#auto-encrypt-level').click(function() {

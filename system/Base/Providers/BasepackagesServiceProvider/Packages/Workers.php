@@ -5,8 +5,6 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 use Carbon\Carbon;
 use GO\Scheduler;
 use GO\Traits\Interval;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Jobs;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Schedules;
@@ -139,7 +137,7 @@ class Workers extends BasePackage
                 $this->scheduledJobs[$id]['status'] = 4;//Error
                 $this->scheduledJobs[$id]['response_code'] = 1;
                 $this->scheduledJobs[$id]['response_message'] = $failedJob->getException()->getMessage();
-                $this->scheduledJobs[$id]['response_data'] = Json::encode([]);
+                $this->scheduledJobs[$id]['response_data'] = $this->helper->encode([]);
 
                 $this->jobs->updateJob($this->scheduledJobs[$id]);
             }
@@ -383,10 +381,10 @@ class Workers extends BasePackage
 
             if ($secsLeft > 43200) {//gt 12 hrs means the time has passed so get next time.
                 if (count($schedule['params']['weekly_days']) > 1) {
-                    if ($this->dayOfWeek == Arr::last($schedule['params']['weekly_days'])) {//If Saturday, the next day of execution will be 1st of array.
+                    if ($this->dayOfWeek == $this->helper->last($schedule['params']['weekly_days'])) {//If Saturday, the next day of execution will be 1st of array.
                         $this->cron =
                             $this->weekly(
-                                (int) Arr::first($schedule['params']['weekly_days']),
+                                (int) $this->helper->first($schedule['params']['weekly_days']),
                                 (int) $schedule['params']['weekly_hours'],
                                 (int) $schedule['params']['weekly_minutes']
                             )->executionTime;
@@ -423,10 +421,10 @@ class Workers extends BasePackage
 
             if ($secsLeft > 86400) { //gt 1 day means the time has passed so get next time.
                 if (count($schedule['params']['monthly_months']) > 1) {
-                    if ($this->month == Arr::last($schedule['params']['monthly_months'])) {//If December, the next day of execution will be 1st of array.
+                    if ($this->month == $this->helper->last($schedule['params']['monthly_months'])) {//If December, the next day of execution will be 1st of array.
                         $this->cron =
                             $this->monthly(
-                                (int) Arr::first($schedule['params']['monthly_months']),
+                                (int) $this->helper->first($schedule['params']['monthly_months']),
                                 (int) $this->dateOfMonth,
                                 (int) $schedule['params']['monthly_hours'],
                                 (int) $schedule['params']['monthly_minutes']

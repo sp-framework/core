@@ -2,14 +2,17 @@
 
 namespace System\Base\Providers\SessionServiceProvider;
 
-use Phalcon\Helper\Str;
+use Phalcon\Support\Helper\Str\Random;
 
 class Connection
 {
 	protected $connectionId;
 
-	public function __construct()
+	protected $helper;
+
+	public function __construct($helper)
 	{
+		$this->helper = $helper;
 	}
 
 	public function init()
@@ -20,7 +23,7 @@ class Connection
 	public function getId()
 	{
 		if (!$this->connectionId) {
-			$this->connectionId = Str::random(Str::RANDOM_ALNUM);
+			$this->connectionId = $this->helper->random(Random::RANDOM_ALNUM);
 		}
 
 		return $this->connectionId;

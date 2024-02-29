@@ -10,7 +10,6 @@ use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
-use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Email;
 use System\Base\BasePackage;
 use System\Base\Providers\CoreServiceProvider\Model\ServiceProviderCore;
@@ -37,7 +36,7 @@ class Core extends BasePackage
 
 		$this->core = $this->core[0];
 
-		$this->core['settings'] = Json::decode($this->core['settings'], true);
+		$this->core['settings'] = $this->helper->decode($this->core['settings'], true);
 
 		$this->checkKeys();
 
@@ -192,7 +191,7 @@ class Core extends BasePackage
 				}
 
 				try {
-					$this->backupInfo = Json::decode($backupInfo, true);
+					$this->backupInfo = $this->helper->decode($backupInfo, true);
 				} catch (\InvalidArgumentException $exception) {
 					$this->addResponse('Error reading contents of backupInfo.json file. Please check if file is in correct Json format.', 1);
 
@@ -669,7 +668,7 @@ class Core extends BasePackage
 				}
 
 				try {
-					$this->backupInfo = Json::decode($backupInfo, true);
+					$this->backupInfo = $this->helper->decode($backupInfo, true);
 				} catch (\InvalidArgumentException $exception) {
 					$this->addResponse('Error reading contents of backupInfo.json file. Please check if file is in correct Json format.', 1);
 
@@ -703,7 +702,7 @@ class Core extends BasePackage
 				try {
 					$backupInfo = $this->localContent->read('var/tmp/' . $fileNameLocation . '/backupInfo.json');
 
-					$backupInfo = Json::decode($backupInfo, true);
+					$backupInfo = $this->helper->decode($backupInfo, true);
 
 					$ffFolderName = $backupInfo['request']['ff'];
 				} catch (FilesystemException | UnableToReadFile | \Exception $exception) {
@@ -874,7 +873,7 @@ class Core extends BasePackage
 		}
 
 		try {
-			$this->localContent->write('var/tmp/backupInfo.json' , Json::encode($this->backupInfo));
+			$this->localContent->write('var/tmp/backupInfo.json' , $this->helper->encode($this->backupInfo));
 		} catch (FilesystemException | UnableToWriteFile $exception) {
 			throw $exception;
 		}
@@ -996,11 +995,11 @@ class Core extends BasePackage
 			$this->core['settings']['logs']['emergencyLogsEmailAddresses'] = $data['emergency_logs_email_addresses'];
 		}
 		if (isset($data['dbs']) && $data['dbs'] !== '') {
-			$data['dbs'] = Json::decode($data['dbs'], true);
+			$data['dbs'] = $this->helper->decode($data['dbs'], true);
 			$this->core['settings']['dbs'] = $data['dbs'];
 		}
 		if (isset($data['ffs']) && $data['ffs'] !== '') {
-			$data['ffs'] = Json::decode($data['ffs'], true);
+			$data['ffs'] = $this->helper->decode($data['ffs'], true);
 			$this->core['settings']['ffs'] = $data['ffs'];
 		}
 
@@ -1048,7 +1047,7 @@ class Core extends BasePackage
 		$keys['cookiesSig'] = $this->crypt->encryptBase64($keys['sigKey'], $keys['sigText']);
 
 		try {
-			$this->localContent->write('system/.keys', Json::encode($keys));
+			$this->localContent->write('system/.keys', $this->helper->encode($keys));
 		} catch (FilesystemException | UnableToWriteFile $exception) {
 			throw $exception;
 		}
@@ -1062,7 +1061,7 @@ class Core extends BasePackage
 			throw $exception;
 		}
 
-		$keys = Json::decode($keysFile, true);
+		$keys = $this->helper->decode($keysFile, true);
 
 		$this->core['settings']['sigKey'] = $keys['sigKey'];
 		$this->core['settings']['sigText'] = $keys['sigText'];
@@ -1202,7 +1201,7 @@ return
 		$keys[$dbname] = $this->random->base58(4);
 
 		try {
-			$this->localContent->write('system/.dbkeys', Json::encode($keys));
+			$this->localContent->write('system/.dbkeys', $this->helper->encode($keys));
 		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
 			throw $exception;
 		}
@@ -1216,10 +1215,10 @@ return
 			$keys = $this->localContent->read('system/.dbkeys');
 
 			if ($dbConfig) {
-				return Json::decode($keys, true)[$dbConfig['dbname']];
+				return $this->helper->decode($keys, true)[$dbConfig['dbname']];
 			}
 
-			return Json::decode($keys, true);
+			return $this->helper->decode($keys, true);
 		} catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
 			return false;
 		}
@@ -1234,7 +1233,7 @@ return
 		}
 
 		try {
-			$this->localContent->write('system/.dbkeys', Json::encode($keys));
+			$this->localContent->write('system/.dbkeys', $this->helper->encode($keys));
 		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
 			throw $exception;
 		}

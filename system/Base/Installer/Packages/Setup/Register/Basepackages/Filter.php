@@ -3,7 +3,6 @@
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages;
 
 use Phalcon\Db\Enum;
-use Phalcon\Helper\Json;
 
 class Filter
 {

@@ -2,8 +2,6 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\User;
 
-use Phalcon\Helper\Json;
-
 class Account
 {
     public function register($db, $ff, $email, $password)
@@ -39,7 +37,7 @@ class Account
                 'password'              => $password,
                 'role_id'               => 1,
                 'override_role'         => 0,
-                'permissions'           => Json::encode([])
+                'permissions'           => $this->helper->encode([])
             ];
 
         if ($db) {

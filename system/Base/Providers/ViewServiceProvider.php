@@ -5,6 +5,7 @@ namespace System\Base\Providers;
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
 use Phalcon\Mvc\ViewBaseInterface;
+use System\Base\Providers\ViewServiceProvider\Assets;
 use System\Base\Providers\ViewServiceProvider\Escaper;
 use System\Base\Providers\ViewServiceProvider\SimpleView;
 use System\Base\Providers\ViewServiceProvider\Tag;
@@ -51,17 +52,29 @@ class ViewServiceProvider implements ServiceProviderInterface
 				return new VoltTools($volt, $view);
 			}
 		);
-		$container->setShared(
-			'tag',
-			function () {
-				return (new Tag())->init();
-			}
-		);
 
 		$container->setShared(
 			'escaper',
 			function () {
 				return (new Escaper())->init();
+			}
+		);
+
+		$container->setShared(
+			'tag',
+			function () use ($container) {
+				$escaper = $container->getShared('escaper');
+
+				return (new Tag($escaper))->init();
+			}
+		);
+
+		$container->setShared(
+			'assets',
+			function () use ($container) {
+				$tag = $container->getShared('tag');
+
+				return (new Assets($tag))->init();
 			}
 		);
 

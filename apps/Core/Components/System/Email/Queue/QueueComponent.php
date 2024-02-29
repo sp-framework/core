@@ -3,7 +3,6 @@
 namespace Apps\Core\Components\System\Email\Queue;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
-use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class QueueComponent extends BaseComponent
@@ -136,7 +135,7 @@ class QueueComponent extends BaseComponent
 
     protected function formatToAddresses($rowId, $data)
     {
-        $data['to_addresses'] = Json::decode($data['to_addresses'], true);
+        $data['to_addresses'] = $this->helper->decode($data['to_addresses'], true);
 
         $data['to_addresses'] = implode(',', $data['to_addresses']);
 

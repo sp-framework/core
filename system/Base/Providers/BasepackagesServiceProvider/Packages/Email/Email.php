@@ -5,7 +5,6 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Email;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailException;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailServices;
@@ -72,7 +71,7 @@ class Email extends BasePackage
                 $this->domain = $this->domains->getById($domainId);
 
                 if (!is_array($this->domain['apps']) && $this->domain['apps'] !== '') {
-                    $this->domain['apps'] = Json::decode($this->domain['apps'], true);
+                    $this->domain['apps'] = $this->helper->decode($this->domain['apps'], true);
                 }
             }
 

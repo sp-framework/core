@@ -3,8 +3,6 @@
 namespace Apps\Core\Packages\Adminltetags\Tags;
 
 use Apps\Core\Packages\Adminltetags\Adminltetags;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 
 class Notes extends Adminltetags
 {
@@ -236,9 +234,9 @@ class Notes extends Adminltetags
         }
 
         if (isset($this->params['notes']['paginationCounters'])) {
-            $this->notesPaginationCounters = Json::encode($this->params['notes']['paginationCounters']);
+            $this->notesPaginationCounters = $this->helper->encode($this->params['notes']['paginationCounters']);
         } else {
-            $this->notesPaginationCounters = Json::encode([]);
+            $this->notesPaginationCounters = $this->helper->encode([]);
         }
 
         $this->content .= $this->inclNotesJs();
@@ -414,7 +412,7 @@ class Notes extends Adminltetags
 
                                         if ($this->packagesData->storage['permission'] === 'public') {
                                             if (!isset($attachment['links'][$this->notesParams['lightboxSize']])) {
-                                                $this->notesParams['lightboxSize'] = Arr::lastKey($attachment['links']);
+                                                $this->notesParams['lightboxSize'] = $this->helper->lastKey($attachment['links']);
                                             }
                                             $footer .=
                                             '<a class="chocolat-image" title="' . $attachment['org_file_name'] . '" href="' . $attachment['links'][$this->notesParams['lightboxSize']] . '">

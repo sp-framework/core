@@ -3,7 +3,6 @@
 namespace Apps\Core\Components\System\Users\Roles;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
-use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class RolesComponent extends BaseComponent
@@ -45,7 +44,7 @@ class RolesComponent extends BaseComponent
                 foreach ($middlewares as $key => &$middleware) {
                     if ($middleware['name'] === 'Acl') {
                         if (isset($middleware['apps']) && is_string($middleware['apps'])) {
-                            $middleware['apps'] = Json::decode($middleware['apps'], true);
+                            $middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 
                             foreach ($middleware['apps'] as $appId => $value) {
                                 if (isset($value['enabled']) && $value['enabled'] === true) {

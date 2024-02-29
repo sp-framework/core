@@ -11,7 +11,6 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
 use League\Flysystem\UnableToDeleteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
-use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Api\Apis\Repos as RegisterRepos;
@@ -163,7 +162,17 @@ class Setup
 
 	protected $configs;
 
-	public function __construct($container, $postData, $precheckFail = false)
+	protected $validation;
+
+	protected $security;
+
+	protected $cookies;
+
+	protected $remoteWebContent;
+
+	protected $onlyUpdateDb = false;
+
+	public function __construct($container, $postData, $precheckFail = false, $onlyUpdateDb = false)
 	{
 		$this->container = $container;
 
@@ -235,18 +244,24 @@ class Setup
 				], $this->request))->init($reset, false);
 		}
 
-		$this->progress = $this->basepackages->progress;
+		if (!$onlyUpdateDb) {
+			$this->progress = $this->basepackages->progress;
+		}
 
 		if (!$precheckFail) {
 			$this->localContent = $this->container['localContent'];
 			$this->remoteWebContent = $this->container['remoteWebContent'];
 		}
+
+		$this->onlyUpdateDb = $onlyUpdateDb;
 	}
 
 	public function __call($method, $arguments)
 	{
 		if (method_exists($this, $method)) {
-			$this->progress->updateProgress($method, null, false);
+			if (!$this->onlyUpdateDb) {
+				$this->progress->updateProgress($method, null, false);
+			}
 
 			$call = call_user_func_array([$this, $method], $arguments);
 
@@ -256,7 +271,9 @@ class Setup
 				$call = true;
 			}
 
-			$this->progress->updateProgress($method, $call, false);
+			if (!$this->onlyUpdateDb) {
+				$this->progress->updateProgress($method, $call, false);
+			}
 
 			return $callResult;
 		}
@@ -672,7 +689,7 @@ class Setup
 				if (strpos($adminComponent, 'component.json')) {
 					try {
 						$jsonFile =
-							Json::decode(
+							$this->helper->decode(
 								$this->localContent->read($adminComponent),
 								true
 							);
@@ -720,7 +737,7 @@ class Setup
 				if (strpos($adminPackage, 'package.json')) {
 					try {
 						$jsonFile =
-							Json::decode(
+							$this->helper->decode(
 								$this->localContent->read($adminPackage),
 								true
 							);
@@ -755,7 +772,7 @@ class Setup
 				if (strpos($adminMiddleware, 'middleware.json')) {
 					try {
 						$jsonFile =
-							Json::decode(
+							$this->helper->decode(
 								$this->localContent->read($adminMiddleware),
 								true
 							);
@@ -775,7 +792,7 @@ class Setup
 		} else if ($type === 'views') {
 			try {
 				$jsonFile =
-					Json::decode(
+					$this->helper->decode(
 						$this->localContent->read('apps/Core/Views/Default/view.json'),
 						true
 					);
@@ -1009,7 +1026,7 @@ class Setup
 				foreach ($columnsArr as $columnsArrKey => $column) {
 					$columns .= '`' . $column . '`';
 
-					if ($columnsArrKey != Arr::lastKey($columnsArr)) {
+					if ($columnsArrKey != $this->helper->lastKey($columnsArr)) {
 						$columns .= ',';
 					}
 				}

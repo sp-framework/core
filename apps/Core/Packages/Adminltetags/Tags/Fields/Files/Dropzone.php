@@ -3,8 +3,6 @@
 namespace Apps\Core\Packages\Adminltetags\Tags\Fields\Files;
 
 use Apps\Core\Packages\Adminltetags\Adminltetags;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 
 class Dropzone
 {
@@ -125,22 +123,22 @@ class Dropzone
 
         if (isset($this->params['allowedUploads']) && $this->params['allowedUploads'] === 'images') {
             $this->fieldParams['allowedImageMimeType'] =
-                Json::encode($this->params['storage']['allowed_image_mime_types']);
+                $this->helper->encode($this->params['storage']['allowed_image_mime_types']);
 
-            $this->fieldParams['allowedFileMimeType'] = Json::encode([]);
+            $this->fieldParams['allowedFileMimeType'] = $this->helper->encode([]);
         } else if (isset($this->params['allowedUploads']) && $this->params['allowedUploads'] === 'files') {
-            $this->fieldParams['allowedImageMimeType'] = Json::encode([]);
+            $this->fieldParams['allowedImageMimeType'] = $this->helper->encode([]);
 
             $this->fieldParams['allowedFileMimeType'] =
-                Json::encode($this->params['storage']['allowed_file_mime_types']);
+                $this->helper->encode($this->params['storage']['allowed_file_mime_types']);
         } else {
             $this->params['allowedUploads'] = 'files';
 
             $this->fieldParams['allowedImageMimeType'] =
-                Json::encode($this->params['storage']['allowed_image_mime_types']);
+                $this->helper->encode($this->params['storage']['allowed_image_mime_types']);
 
             $this->fieldParams['allowedFileMimeType'] =
-                Json::encode($this->params['storage']['allowed_file_mime_types']);
+                $this->helper->encode($this->params['storage']['allowed_file_mime_types']);
         }
 
         $dropzoneButtons = [];
@@ -336,7 +334,7 @@ class Dropzone
 
                                                             if ($this->params['storage']['permission'] === 'public') {
                                                                 if (!isset($attachment['links'][$this->fieldParams['lightboxSize']])) {
-                                                                    $this->fieldParams['lightboxSize'] = Arr::lastKey($attachment['links']);
+                                                                    $this->fieldParams['lightboxSize'] = $this->helper->lastKey($attachment['links']);
                                                                 }
                                                                 $this->content .=
                                                                 '<a class="chocolat-image" title="' . $attachment['org_file_name'] . '" href="' . $attachment['links'][$this->fieldParams['lightboxSize']] . '">

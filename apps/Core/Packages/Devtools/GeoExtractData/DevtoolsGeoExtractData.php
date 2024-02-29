@@ -7,8 +7,6 @@ use League\Csv\Statement;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToWriteFile;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class DevtoolsGeoExtractData extends BasePackage
@@ -80,7 +78,7 @@ class DevtoolsGeoExtractData extends BasePackage
 
         try {
             if ($this->localContent->fileExists($this->sourceDir . 'countries+states+cities.json')) {
-                $this->sourceFile = Json::decode($this->localContent->read($this->sourceDir . 'countries+states+cities.json'), true);
+                $this->sourceFile = $this->helper->decode($this->localContent->read($this->sourceDir . 'countries+states+cities.json'), true);
             }
         } catch (FilesystemException | UnableToReadFile | throwable $e) {
             $this->addResponse($e->getMessage(), 1);
@@ -132,7 +130,7 @@ class DevtoolsGeoExtractData extends BasePackage
     protected function zipData()
     {
         try {
-            $allCountries = Json::decode($this->localContent->read($this->sourceDir . 'AllCountries.json'), true);
+            $allCountries = $this->helper->decode($this->localContent->read($this->sourceDir . 'AllCountries.json'), true);
 
             foreach ($allCountries as $country) {
                 $this->compressZip($country['iso2']);
@@ -205,7 +203,7 @@ class DevtoolsGeoExtractData extends BasePackage
             }
         }
 
-        $allCountries = Json::decode($this->localContent->read($this->sourceDir . 'AllCountries.json'), true);
+        $allCountries = $this->helper->decode($this->localContent->read($this->sourceDir . 'AllCountries.json'), true);
 
         foreach ($allCountries as $country) {
             if (isset($country['timezones']) && count($country['timezones']) > 0) {
@@ -352,22 +350,22 @@ class DevtoolsGeoExtractData extends BasePackage
         }
 
         try {
-            $allCountries = Json::decode($this->localContent->read($this->sourceDir . 'ip2location/AllCountries.json'), true);
+            $allCountries = $this->helper->decode($this->localContent->read($this->sourceDir . 'ip2location/AllCountries.json'), true);
 
             foreach ($allCountries as $country) {
                 $countryData = [];
 
                 if ($this->localContent->fileExists($this->sourceDir . $country . '.json')) {
-                    $countryData = Json::decode($this->localContent->read($this->sourceDir . $country . '.json'), true);
+                    $countryData = $this->helper->decode($this->localContent->read($this->sourceDir . $country . '.json'), true);
 
                     $iplocationv4Data = [];
                     if ($this->localContent->fileExists($this->sourceDir . 'ip2location/ip2locationv4/' . $country . '.json')) {
-                        $iplocationv4Data = Json::decode($this->localContent->read($this->sourceDir . 'ip2location/ip2locationv4/' . $country . '.json'), true);
+                        $iplocationv4Data = $this->helper->decode($this->localContent->read($this->sourceDir . 'ip2location/ip2locationv4/' . $country . '.json'), true);
                     }
 
                     $iplocationv6Data = [];
                     if ($this->localContent->fileExists($this->sourceDir . 'ip2location/ip2locationv6/' . $country . '.json')) {
-                        $iplocationv6Data = Json::decode($this->localContent->read($this->sourceDir . 'ip2location/ip2locationv6/' . $country . '.json'), true);
+                        $iplocationv6Data = $this->helper->decode($this->localContent->read($this->sourceDir . 'ip2location/ip2locationv6/' . $country . '.json'), true);
                     }
 
                     $countryGeoData = array_replace_recursive($countryData, $iplocationv4Data, $iplocationv6Data);

@@ -4,8 +4,6 @@ namespace Apps\Core\Middlewares\Acl;
 
 use Phalcon\Acl\Component;
 use Phalcon\Acl\Role;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BaseMiddleware;
 use System\Base\Providers\AccessServiceProvider\Exceptions\PermissionDeniedException;
 
@@ -54,7 +52,7 @@ class Acl extends BaseMiddleware
         if ($this->auth->account()) {
             $this->account = $this->auth->account();
 
-            $this->accountPermissions = Json::decode($this->account['security']['permissions'], true);
+            $this->accountPermissions = $this->helper->decode($this->account['security']['permissions'], true);
 
             //System Admin bypasses the ACL if they don't have any permissions defined.
             if ($this->account['id'] === '1' &&
@@ -75,7 +73,7 @@ class Acl extends BaseMiddleware
                         new Role($this->accountEmail, 'User Override Role')
                     );
 
-                    $permissions = Json::decode($this->account['permissions'], true);
+                    $permissions = $this->helper->decode($this->account['permissions'], true);
 
                     $this->generateComponentsArr();
 
@@ -126,13 +124,13 @@ class Acl extends BaseMiddleware
                 new Role($this->roleName, $this->role['description'])
             );
 
-            $this->rolePermissions = Json::decode($this->role['permissions'], true);
+            $this->rolePermissions = $this->helper->decode($this->role['permissions'], true);
 
             foreach ($this->rolePermissions as $appKey => $app) {
                 foreach ($app as $componentKey => $permission) {
                     if ($this->app['id'] == $appKey) {
                         if ($this->components[$componentKey]['route'] === $this->controllerRoute &&
-                            Arr::has($this->components[$componentKey]['acls'], $this->action)
+                            $this->helper->has($this->components[$componentKey]['acls'], $this->action)
                         ) {
                             $this->found = true;
                             $this->buildAndTestAcl($this->roleName, $componentKey, $permission);
@@ -170,7 +168,7 @@ class Acl extends BaseMiddleware
             $url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
 
             if ($this->request->isPost()) {
-                unset($url[Arr::lastKey($url)]);
+                unset($url[$this->helper->lastKey($url)]);
             }
 
             if (isset($this->domains->domain['exclusive_to_default_app']) &&

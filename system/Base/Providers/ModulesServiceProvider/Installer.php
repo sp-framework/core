@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use z4kn4fein\SemVer\Version;
 
@@ -141,7 +140,7 @@ class Installer extends BasePackage
                                     } else {
                                         if (is_string($moduleInfo['repo_details'])) {
                                             try {
-                                                $moduleInfo['repo_details'] = Json::decode($moduleInfo['repo_details'], true);
+                                                $moduleInfo['repo_details'] = $this->helper->decode($moduleInfo['repo_details'], true);
                                             } catch (\Exception $e) {
                                                 $this->addResponse('Could not retrieve repository information for module: ' . $moduleInfo['name']);
 
@@ -263,7 +262,7 @@ class Installer extends BasePackage
             $names = explode('-', $moduleName);
 
             try {
-                $jsonFile = Json::decode($this->localContent->read($module['location'] . 'Install/' . substr($names[1], 0, -1) . '.json'), true);
+                $jsonFile = $this->helper->decode($this->localContent->read($module['location'] . 'Install/' . substr($names[1], 0, -1) . '.json'), true);
             } catch (\throwable $e) {
                 $this->preCheckResult[$moduleName]['result'] = 'error';
                 $this->preCheckResult[$moduleName]['logs'] .= 'Reading module ' . $moduleName . ' install JSON file resulted in error. ';

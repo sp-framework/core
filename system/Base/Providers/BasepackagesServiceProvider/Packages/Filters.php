@@ -3,8 +3,6 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use Apps\Core\Packages\Hrms\Employees\Employees;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesFilters;
 
@@ -120,7 +118,7 @@ class Filters extends BasePackage
 
                         if ($filter['shared_ids']) {//Im Sharing
 
-                            $filter['shared_ids'] = Json::decode($filter['shared_ids'], true);
+                            $filter['shared_ids'] = $this->helper->decode($filter['shared_ids'], true);
 
                             //Role Ids
                             if (isset($filter['shared_ids']['rids']) &&
@@ -167,7 +165,7 @@ class Filters extends BasePackage
                                 }
                             }
 
-                            $filter['shared_ids'] = $this->escaper->escapeHtml(Json::encode($filter['shared_ids']));
+                            $filter['shared_ids'] = $this->escaper->escapeHtml($this->helper->encode($filter['shared_ids']));
                         }
                     }
                     $filters[$filter['id']] = $filter;
@@ -202,7 +200,7 @@ class Filters extends BasePackage
 
                     if (!in_array($filter['id'], $myFilters)) {
 
-                        $filter['shared_ids'] = Json::decode($filter['shared_ids'], true);
+                        $filter['shared_ids'] = $this->helper->decode($filter['shared_ids'], true);
 
                         if (isset($filter['shared_ids']['rids']) &&
                             count($filter['shared_ids']['rids']) > 0
@@ -224,7 +222,7 @@ class Filters extends BasePackage
                                         }
                                     }
 
-                                    $filter['shared_ids'] = $this->escaper->escapeHtml(Json::encode($filter['shared_ids']));
+                                    $filter['shared_ids'] = $this->escaper->escapeHtml($this->helper->encode($filter['shared_ids']));
 
                                     $filter['shared'] = '1';
 
@@ -252,7 +250,7 @@ class Filters extends BasePackage
                                         }
                                     }
 
-                                    $filter['shared_ids'] = $this->escaper->escapeHtml(Json::encode($filter['shared_ids']));
+                                    $filter['shared_ids'] = $this->escaper->escapeHtml($this->helper->encode($filter['shared_ids']));
 
                                     $filter['shared'] = '1';
 
@@ -585,7 +583,7 @@ class Filters extends BasePackage
 
         if ($this->checkDefaultFilter($data)) {
             if (isset($data['shared_ids']) && is_string($data['shared_ids'])) {
-                $data['shared_ids'] = Json::decode($data['shared_ids'], true);
+                $data['shared_ids'] = $this->helper->decode($data['shared_ids'], true);
             }
 
             if (isset($data['shared_ids']) && is_array($data['shared_ids'])) {
@@ -603,7 +601,7 @@ class Filters extends BasePackage
                     }
                     unset($data['shared_ids']['eids']);
                 }
-                $data['shared_ids'] = Json::encode($data['shared_ids']);
+                $data['shared_ids'] = $this->helper->encode($data['shared_ids']);
             }
 
             $update = $this->update($data);

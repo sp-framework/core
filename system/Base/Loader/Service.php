@@ -2,7 +2,7 @@
 
 namespace System\Base\Loader;
 
-use Phalcon\Loader;
+use Phalcon\Autoload\Loader;
 
 class Service
 {
@@ -45,11 +45,11 @@ class Service
 
 		self::$loader = new Loader();
 
-		self::$loader->registerNamespaces($this->getNamespaces());
+		self::$loader->setNamespaces($this->getNamespaces());
 
-		self::$loader->registerClasses($this->getClasses());
+		self::$loader->setClasses($this->getClasses());
 
-		self::$loader->registerFiles($this->getFiles());
+		self::$loader->setFiles($this->getFiles());
 
 		self::$loader->register();
 	}

@@ -3,7 +3,6 @@
 namespace Apps\Core\Components\Viewssettings;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
-use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class ViewssettingsComponent extends BaseComponent
@@ -46,7 +45,7 @@ class ViewssettingsComponent extends BaseComponent
                         $apps[$value['id']]['views'][$view['id']]['name'] = $view['name'];
                         $apps[$value['id']]['views'][$view['id']]['display_name'] = $view['display_name'];
                         if (is_string($view['settings'])) {
-                            $view['settings'] = Json::decode($view['settings'], true);
+                            $view['settings'] = $this->helper->decode($view['settings'], true);
                         }
                         if (is_array($view['settings']['branding'])) {
                             foreach ($view['settings']['branding'] as $brandKey => $brand) {
@@ -97,7 +96,7 @@ class ViewssettingsComponent extends BaseComponent
 
             if (isset($viewssettings)) {
                 if (is_string($viewssettings['settings'])) {
-                    $viewssettings['settings'] = Json::decode($viewssettings['settings'], true);
+                    $viewssettings['settings'] = $this->helper->decode($viewssettings['settings'], true);
                 }
 
                 $viewssettings['app_type'] = $apps[$viewssettings['app_id']]['app_type'];

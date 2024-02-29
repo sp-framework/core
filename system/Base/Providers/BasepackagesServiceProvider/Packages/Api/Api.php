@@ -2,8 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Api;
 
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\ApiStats;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Api\BasepackagesApi;
@@ -126,7 +124,7 @@ class Api extends BasePackage
             if ($item instanceof \League\Flysystem\DirectoryAttributes) {
                 $path = explode('/', $item->path());
 
-                $folderName = Arr::last($path);
+                $folderName = $this->helper->last($path);
 
                 if (!isset($this->apiCategories[$folderName])) {
                     $this->apiCategories[strtolower($folderName)] =
@@ -142,7 +140,7 @@ class Api extends BasePackage
                     if ($subCategory instanceof \League\Flysystem\DirectoryAttributes) {
                         $path = explode('/', $subCategory->path());
 
-                        $subCategoryFolderName = Arr::last($path);
+                        $subCategoryFolderName = $this->helper->last($path);
 
                         if (!isset($this->apiCategories[strtolower($folderName)]['childs'][$subCategoryFolderName])) {
                             $this->apiCategories[strtolower($folderName)]['childs'][strtolower($subCategoryFolderName)] =

@@ -4,8 +4,6 @@ namespace System\Base\Providers\ModulesServiceProvider;
 
 use Carbon\Carbon;
 use GuzzleHttp\Exception\ClientException;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\ObjectSerializer;
 use System\Base\Providers\ModulesServiceProvider\Installer;
@@ -113,7 +111,7 @@ class Manager extends BasePackage
             if ($module['repo_details']) {
                 if (is_string($module['repo_details'])) {
                     try {
-                        $module['repo_details'] = Json::decode($module['repo_details'], true);
+                        $module['repo_details'] = $this->helper->decode($module['repo_details'], true);
                     } catch (\Exception $e) {
                         $module['repo_details'] = null;
                     }
@@ -146,7 +144,7 @@ class Manager extends BasePackage
             if (strtolower($this->apiConfig['provider']) === 'gitea') {
                 $collection = 'RepositoryApi';
                 $method = 'repoGet';
-                $args = [$this->apiConfig['org_user'], Arr::last($repoNameArr)];
+                $args = [$this->apiConfig['org_user'], $this->helper->last($repoNameArr)];
             } else if (strtolower($this->apiConfig['provider']) === 'github') {
                 //For github
             }
@@ -155,7 +153,7 @@ class Manager extends BasePackage
 
             if ($responseArr) {
                 if (is_string($module['repo_details'])) {
-                    $module['repo_details'] = Json::decode($module['repo_details'], true);
+                    $module['repo_details'] = $this->helper->decode($module['repo_details'], true);
                 }
 
                 $module['repo_details']['details'] = $responseArr;
@@ -505,10 +503,10 @@ class Manager extends BasePackage
 
                     $registerRemotePackage['settings'] =
                         isset($registerRemotePackage['settings']) ?
-                        Json::encode($registerRemotePackage['settings']) :
-                        Json::encode([]);
+                        $this->helper->encode($registerRemotePackage['settings']) :
+                        $this->helper->encode([]);
 
-                    $registerRemotePackage['apps'] = Json::encode([]);
+                    $registerRemotePackage['apps'] = $this->helper->encode([]);
 
                     $registerRemotePackage['installed'] = 0;
 

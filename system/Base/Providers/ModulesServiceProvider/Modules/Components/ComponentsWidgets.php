@@ -31,20 +31,20 @@ class ComponentsWidgets
 
         $this->view->sectionId = 'main';
 
-        $reflection = Arr::sliceRight(explode('\\', $this->componentObj->reflection->getName()), 3);
+        $reflection = $this->helper->sliceRight(explode('\\', $this->componentObj->reflection->getName()), 3);
 
         if (count($reflection) === 1) {
-            $parents = str_replace('Component', '', Arr::last($reflection));
+            $parents = str_replace('Component', '', $this->helper->last($reflection));
             $this->view->parents = $parents;
             $this->view->parent = strtolower($parents);
         } else {
-            $reflection[Arr::lastKey($reflection)] =
-                str_replace('Component', '', Arr::last($reflection));
+            $reflection[$this->helper->lastKey($reflection)] =
+                str_replace('Component', '', $this->helper->last($reflection));
 
             $parents = $reflection;
 
             $this->view->parents = $parents;
-            $this->view->parent = strtolower(Arr::last($parents));
+            $this->view->parent = strtolower($this->helper->last($parents));
         }
 
         $this->views = $this->componentObj->modules->views;

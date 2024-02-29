@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 
-use Phalcon\Helper\Json;
 use Phalcon\Http\Message\UploadedFile;
 use Phalcon\Image\Adapter\Imagick;
 use Phalcon\Image\Enum;
@@ -86,21 +85,21 @@ class Local extends BasePackage
 
         $this->storage['allowed_image_mime_types'] =
             isset($this->storage['allowed_image_mime_types']) ?
-            Json::decode($this->storage['allowed_image_mime_types']) :
+            $this->helper->decode($this->storage['allowed_image_mime_types']) :
             [];
 
         $this->imageMimeTypes = $this->storage['allowed_image_mime_types'];
 
         $this->storage['allowed_image_sizes'] =
             isset($this->storage['allowed_image_sizes']) ?
-            Json::decode($this->storage['allowed_image_sizes']) :
+            $this->helper->decode($this->storage['allowed_image_sizes']) :
             [30, 80, 200, 800, 1200, 2000];
 
         $this->allowedImageSizes = $this->storage['allowed_image_sizes'];
 
         $this->storage['allowed_file_mime_types'] =
             isset($this->storage['allowed_file_mime_types']) ?
-            Json::decode($this->storage['allowed_file_mime_types']) :
+            $this->helper->decode($this->storage['allowed_file_mime_types']) :
             [];
 
         $this->fileMimeTypes = $this->storage['allowed_file_mime_types'];
@@ -532,7 +531,7 @@ class Local extends BasePackage
         }
 
         if (isset($file[0]['links'])) {
-            $file[0]['links'] = Json::decode($file[0]['links'], true);
+            $file[0]['links'] = $this->helper->decode($file[0]['links'], true);
         }
 
         if ($width) {
@@ -578,7 +577,7 @@ class Local extends BasePackage
     protected function updateFileLink($file, $width = null, $link)
     {
         if ($file['links'] && !is_array($file['links'])) {
-            $file['links'] = Json::decode($file['links'], true);
+            $file['links'] = $this->helper->decode($file['links'], true);
         }
 
         if ($width) {
@@ -586,7 +585,7 @@ class Local extends BasePackage
         } else {
             $file['links']['data'] = $link;
         }
-        $file['links'] = Json::encode($file['links']);
+        $file['links'] = $this->helper->encode($file['links']);
 
         $this->update($file);
     }
@@ -774,7 +773,7 @@ class Local extends BasePackage
     {
         if ($array) {
             if ($oldUUID) {
-                $olduuids = Json::decode($oldUUID, true);
+                $olduuids = $this->helper->decode($oldUUID, true);
 
                 foreach ($olduuids as $olduuidKey => $olduuid) {
                     if (!$status) {
@@ -786,7 +785,7 @@ class Local extends BasePackage
             }
 
             if ($newUUID) {
-                $uuids = Json::decode($newUUID, true);
+                $uuids = $this->helper->decode($newUUID, true);
                 foreach ($uuids as $uuidKey => $newuuid) {
                     if (!$status) {
                         $status = 0;

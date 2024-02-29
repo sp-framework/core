@@ -2,8 +2,6 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages;
 
-use Phalcon\Helper\Json;
-
 class Menu
 {
     public function register($db, $ff, $appType, array $menu)
@@ -19,8 +17,8 @@ class Menu
 
         $menuToRegister =
             [
-                'menu'                  => Json::encode($menu),
-                'apps'                  => Json::encode(['1' => ['enabled'  => true]]),
+                'menu'                  => $this->helper->encode($menu),
+                'apps'                  => $this->helper->encode(['1' => ['enabled'  => true]]),
                 'app_type'              => $appType,
                 'sequence'              => $sequence
             ];

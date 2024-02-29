@@ -3,7 +3,6 @@
 namespace Apps\Core\Packages\Adminltetags\Tags;
 
 use Apps\Core\Packages\Adminltetags\Adminltetags;
-use Phalcon\Helper\Json;
 
 class Wizard extends Adminltetags
 {
@@ -233,7 +232,7 @@ class Wizard extends Adminltetags
                     "canCancel"                     : "'. $this->params['wizardCanCancel'] .'",
                     "componentId"                   : "'. $this->wizardParams['componentId'] .'",
                     "sectionId"                     : "'. $this->wizardParams['sectionId'] .'",
-                    "steps"                         : JSON.parse("' . $this->escaper->escapeJs(Json::encode($this->params["wizardSteps"])) . '"),
+                    "steps"                         : JSON.parse("' . $this->escaper->escapeJs($this->helper->encode($this->params["wizardSteps"])) . '"),
                 });
             </script>';
 

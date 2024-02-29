@@ -2,8 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Phalcon\Helper\Json;
-use Phalcon\Helper\Str;
 use Spatie\Ssr\Engines\Node;
 use Spatie\Ssr\Renderer;
 use System\Base\BasePackage;
@@ -68,7 +66,7 @@ class Templates extends BasePackage
 
         if ($this->postData()['test_data'] !== '') {
             try {
-                $testData = Json::decode($this->postData()['test_data'], true);
+                $testData = $this->helper->decode($this->postData()['test_data'], true);
             } catch (\Exception $e) {
                 $this->addResponse('Test data format needs to be JSON.', 1, []);
 

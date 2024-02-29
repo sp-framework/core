@@ -5,7 +5,6 @@ namespace System\Base\Providers\AccessServiceProvider;
 use Apps\Core\Packages\System\Tools\Qrcodes\Qrcodes;
 use OTPHP\TOTP;
 use ParagonIE\ConstantTime\Base32;
-use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Confirmation;
 use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
@@ -363,7 +362,7 @@ class Auth
             if ($canLogin === false) {
                 if ($this->app['can_login_role_ids']) {
                     if (is_string($this->app['can_login_role_ids'])) {
-                        $this->app['can_login_role_ids'] = Json::decode($this->app['can_login_role_ids'], true);
+                        $this->app['can_login_role_ids'] = $this->helper->decode($this->app['can_login_role_ids'], true);
                     }
 
                     if (in_array($this->account['security']['role_id'], $this->app['can_login_role_ids'])) {
@@ -1368,7 +1367,7 @@ class Auth
         $emailData['status'] = 1;
         $emailData['priority'] = 1;
         $emailData['confidential'] = 1;
-        $emailData['to_addresses'] = Json::encode([$this->account['email']]);
+        $emailData['to_addresses'] = $this->helper->encode([$this->account['email']]);
         $emailData['subject'] = 'Verification Code for ' . $this->domains->getDomain()['name'];
         $emailData['body'] = $verificationCode;
 

@@ -4,10 +4,9 @@ namespace System\Base\Providers\DatabaseServiceProvider;
 
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
+use Phalcon\Config\Config as PhalconConfig;
 use Phalcon\Db\Adapter\Pdo\Mysql;
-use Phalcon\Helper\Json;
 use System\Base\Installer\Components\Setup;
-use Phalcon\Config as PhalconConfig;
 
 class Pdo
 {
@@ -21,9 +20,11 @@ class Pdo
 
 	protected $crypt;
 
+	protected $helper;
+
 	protected $configsObj;
 
-	public function __construct($config, $session, $localContent, $crypt)
+	public function __construct($config, $session, $localContent, $crypt, $helper)
 	{
 		$this->config = $config;
 
@@ -34,6 +35,8 @@ class Pdo
 		$this->localContent = $localContent;
 
 		$this->crypt = $crypt;
+
+		$this->helper = $helper;
 
 		$this->configsObj = new PhalconConfig($this->config->toArray());
 	}
@@ -52,7 +55,13 @@ class Pdo
 					return true;
 				}
 
-				$dbConfig['password'] = $this->crypt->decryptBase64($dbConfig['password'], $key);
+				try {
+					$dbConfig['password'] = $this->crypt->decryptBase64($dbConfig['password'], $key);
+				} catch (\Exception $e) {
+					$this->runSetup(true, $e->getMessage(), $this->configsObj);
+
+					return true;
+				}
 
 				return new Mysql($dbConfig);
 			} catch (\PDOException $e) {
@@ -88,7 +97,7 @@ class Pdo
 
 		require_once base_path('system/Base/Installer/Components/Setup.php');
 
-		(new Setup($this->session, $this->configsObj))->run($onlyUpdateDb, $message);
+		(new Setup($this->session, $this->configsObj, $onlyUpdateDb))->run($onlyUpdateDb, $message);
 
 		exit;
 	}
@@ -98,7 +107,7 @@ class Pdo
 		try {
 			$keys = $this->localContent->read('system/.dbkeys');
 
-			return Json::decode($keys, true)[$dbConfig['dbname']];
+			return $this->helper->decode($keys, true)[$dbConfig['dbname']];
 		} catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
 			return false;
 		}

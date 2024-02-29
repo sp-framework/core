@@ -3,7 +3,6 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use Apps\Ecom\Admin\Packages\Channels\Channels;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesStorages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages\Local;
@@ -61,12 +60,12 @@ class Storages extends BasePackage
 
     protected function extractSelectData(array $data)
     {
-        $data['allowed_image_mime_types'] = Json::decode($data['allowed_image_mime_types'], true);
-        $data['allowed_image_mime_types'] = Json::encode($data['allowed_image_mime_types']['data']);
-        $data['allowed_image_sizes'] = Json::decode($data['allowed_image_sizes'], true);
-        $data['allowed_image_sizes'] = Json::encode($data['allowed_image_sizes']['data']);
-        $data['allowed_file_mime_types'] = Json::decode($data['allowed_file_mime_types'], true);
-        $data['allowed_file_mime_types'] = Json::encode($data['allowed_file_mime_types']['data']);
+        $data['allowed_image_mime_types'] = $this->helper->decode($data['allowed_image_mime_types'], true);
+        $data['allowed_image_mime_types'] = $this->helper->encode($data['allowed_image_mime_types']['data']);
+        $data['allowed_image_sizes'] = $this->helper->decode($data['allowed_image_sizes'], true);
+        $data['allowed_image_sizes'] = $this->helper->encode($data['allowed_image_sizes']['data']);
+        $data['allowed_file_mime_types'] = $this->helper->decode($data['allowed_file_mime_types'], true);
+        $data['allowed_file_mime_types'] = $this->helper->encode($data['allowed_file_mime_types']['data']);
 
         return $data;
     }
@@ -114,13 +113,13 @@ class Storages extends BasePackage
 
         foreach ($storages as $key => $storage) {
             if ($storage['allowed_image_mime_types']) {
-                $storage['allowed_image_mime_types'] = Json::decode($storage['allowed_image_mime_types']);
+                $storage['allowed_image_mime_types'] = $this->helper->decode($storage['allowed_image_mime_types']);
             }
             if ($storage['allowed_image_sizes']) {
-                $storage['allowed_image_sizes'] = Json::decode($storage['allowed_image_sizes']);
+                $storage['allowed_image_sizes'] = $this->helper->decode($storage['allowed_image_sizes']);
             }
             if ($storage['allowed_file_mime_types']) {
-                $storage['allowed_file_mime_types'] = Json::decode($storage['allowed_file_mime_types']);
+                $storage['allowed_file_mime_types'] = $this->helper->decode($storage['allowed_file_mime_types']);
             }
             $appStorages[$storage['permission']] = $storage;
         }
@@ -260,10 +259,10 @@ class Storages extends BasePackage
 
             $channel = $channels->getById($this->request->getPost()['channel']);
 
-            $channel['settings'] = Json::decode($channel['settings'], true);
+            $channel['settings'] = $this->helper->decode($channel['settings'], true);
 
             $domain = $this->domains->getById($channel['settings']['domain_id']);
-            $domain['apps'] = Json::decode($domain['apps'], true);
+            $domain['apps'] = $this->helper->decode($domain['apps'], true);
 
             $app = $this->apps->getById($channel['settings']['app_id']);
 
@@ -277,7 +276,7 @@ class Storages extends BasePackage
             $domain = $this->domains->getById(1);
 
             if (!is_array($domain['apps']) && $domain['apps'] !== '') {
-                $domain['apps'] = Json::decode($domain['apps'], true);
+                $domain['apps'] = $this->helper->decode($domain['apps'], true);
             }
         }
 

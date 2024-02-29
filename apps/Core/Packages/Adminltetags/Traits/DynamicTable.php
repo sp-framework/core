@@ -3,7 +3,6 @@
 namespace Apps\Core\Packages\Adminltetags\Traits;
 
 use Apps\Core\Packages\Adminltetags\Adminltetags;
-use Phalcon\Helper\Json;
 
 trait DynamicTable {
     public function generateDTContent(

@@ -3,7 +3,6 @@
 namespace System\Base\Installer\Packages\Setup\Write;
 
 use League\Flysystem\UnableToReadFile;
-use Phalcon\Helper\Json;
 
 class Configs
 {
@@ -142,7 +141,7 @@ return
 		$this->coreJson['settings']['debug'] = $debug == 'true'? true : false;
 		$this->coreJson['settings']['cache']['enabled'] = $cache == 'true'? true : false;
 		$this->coreJson['settings']['dev'] = $dev == 'true'? true : false;
-		$this->coreJson['settings']['databasetype'] = $this->postData['databasetype'];
+		$this->coreJson['settings']['databasetype'] = $this->postData['databasetype'] ?? $this->coreJson['settings']['databasetype'];
 		if ($this->coreJson['settings']['databasetype'] !== 'ff') {
 			$this->coreJson['settings']['dbs'][$this->postData['dbname']]['active'] = true;
 			$this->coreJson['settings']['dbs'][$this->postData['dbname']]['host'] = $this->postData['host'];
@@ -265,7 +264,7 @@ if ($this->coreJson['settings']['databasetype'] !== 'ff') {
 		$keys[$this->postData['dbname']] = $this->container['random']->base58(4);
 
 		try {
-			$this->container['localContent']->write('system/.dbkeys', Json::encode($keys));
+			$this->container['localContent']->write('system/.dbkeys', $this->container['helper']->encode($keys));
 		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
 			throw $exception;
 		}
@@ -281,6 +280,6 @@ if ($this->coreJson['settings']['databasetype'] !== 'ff') {
 			throw $exception;
 		}
 
-		return Json::decode($keys, true)[$this->postData['dbname']];
+		return $this->helper->decode($keys, true)[$this->postData['dbname']];
 	}
 }

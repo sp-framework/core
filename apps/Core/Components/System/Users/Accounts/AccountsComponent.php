@@ -6,7 +6,6 @@ use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use Apps\Core\Packages\Business\Directory\Contacts\Contacts;
 use Apps\Core\Packages\Crms\Customers\Customers;
 use Apps\Core\Packages\Hrms\Employees\Employees;
-use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class AccountsComponent extends BaseComponent
@@ -64,7 +63,7 @@ class AccountsComponent extends BaseComponent
                 foreach ($middlewares as $key => &$middleware) {
                     if ($middleware['name'] === 'Acl') {
                         if (isset($middleware['apps']) && is_string($middleware['apps'])) {
-                            $middleware['apps'] = Json::decode($middleware['apps'], true);
+                            $middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 
                             foreach ($middleware['apps'] as $appId => $value) {
                                 if (isset($value['enabled']) && $value['enabled'] === true) {

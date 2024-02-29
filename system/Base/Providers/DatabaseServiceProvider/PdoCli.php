@@ -5,7 +5,6 @@ namespace System\Base\Providers\DatabaseServiceProvider;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
-use Phalcon\Helper\Json;
 
 class PdoCli
 {
@@ -15,13 +14,17 @@ class PdoCli
 
     protected $crypt;
 
-    public function __construct($dbConfig, $localContent, $crypt)
+    protected $helper;
+
+    public function __construct($dbConfig, $localContent, $crypt, $helper)
     {
         $this->dbConfig = $dbConfig;
 
         $this->localContent = $localContent;
 
         $this->crypt = $crypt;
+
+        $this->helper = $helper;
     }
 
     public function init()
@@ -54,7 +57,7 @@ class PdoCli
         try {
             $keys = $this->localContent->read('system/.dbkeys');
 
-            return Json::decode($keys, true)[$dbConfig['dbname']];
+            return $this->helper->decode($keys, true)[$dbConfig['dbname']];
         } catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
             return false;
         }

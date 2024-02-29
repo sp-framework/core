@@ -3,7 +3,6 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use League\Flysystem\StorageAttributes;
-use Phalcon\Helper\Json;
 use Seld\JsonLint\JsonParser;
 use System\Base\BasePackage;
 use ZxcvbnPhp\Zxcvbn;
@@ -94,7 +93,7 @@ class Utils extends BasePackage
         }
 
         if (is_array($data['json'])) {
-            $data['json'] = Json::encode($data['json'], JSON_UNESCAPED_SLASHES);
+            $data['json'] = $this->helper->encode($data['json'], JSON_UNESCAPED_SLASHES);
         }
 
         $return = "\n";
@@ -227,7 +226,7 @@ class Utils extends BasePackage
         }
 
         if (isset($data['returnJson']) && $data['returnJson'] === 'array') {
-            $data['json'] = Json::decode($data['json'], true);
+            $data['json'] = $this->helper->decode($data['json'], true);
         } else if (isset($data['returnJson']) && $data['returnJson'] === 'formatted') {
             $data['json'] = $this->basepackages->utils->formatJson($data);
         }

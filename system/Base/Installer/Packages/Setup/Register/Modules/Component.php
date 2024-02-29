@@ -2,8 +2,6 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Modules;
 
-use Phalcon\Helper\Json;
-
 class Component
 {
 	public function register($db, $ff, $componentFile, $menuId)
@@ -31,29 +29,29 @@ class Component
 				'repo'					=> $componentFile['repo'],
 				'dependencies'		 	=>
 					isset($componentFile['dependencies']) ?
-					Json::encode($componentFile['dependencies']) :
-					Json::encode([]),
+					$this->helper->encode($componentFile['dependencies']) :
+					$this->helper->encode([]),
 				'menu'		 			=>
 					isset($componentFile['menu']) ?
-					Json::encode($componentFile['menu']) :
+					$this->helper->encode($componentFile['menu']) :
 					false,
 				'menu_id'				=> $menuId,
 				'api_id'				=> 1,
 				'installed'				=> 1,
 				'apps'					=>
-					Json::encode($componentApp),
+					$this->helper->encode($componentApp),
 				'files'					=>
 					isset($componentFile['files']) ?
-					Json::encode($componentFile['files']) :
-					Json::encode([]),
+					$this->helper->encode($componentFile['files']) :
+					$this->helper->encode([]),
 				'settings'				=>
 					isset($componentFile['settings']) ?
-					Json::encode($componentFile['settings']) :
-					Json::encode([]),
+					$this->helper->encode($componentFile['settings']) :
+					$this->helper->encode([]),
 				'widgets'				=>
 					isset($componentFile['widgets']) ?
-					Json::encode($componentFile['widgets']) :
-					Json::encode([]),
+					$this->helper->encode($componentFile['widgets']) :
+					$this->helper->encode([]),
 				'updated_by'			=> 0
 			];
 

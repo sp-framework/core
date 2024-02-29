@@ -4,7 +4,6 @@ namespace System\Base\Providers;
 
 use Phalcon\Di\Injectable;
 use Phalcon\Events\Event;
-use Phalcon\Helper\Json;
 use Phalcon\Mvc\DispatcherInterface;
 
 class MiddlewaresServiceProvider extends Injectable
@@ -187,7 +186,7 @@ class MiddlewaresServiceProvider extends Injectable
                 $match === true
             ) {
                 if ($componentValue['apps']) {
-                    $componentValue['apps'] = Json::decode($componentValue['apps'], true);
+                    $componentValue['apps'] = $this->helper->decode($componentValue['apps'], true);
 
                     if (!isset($componentValue['apps'][$this->data['app']['id']]['needAuth'])) {
                         return false;

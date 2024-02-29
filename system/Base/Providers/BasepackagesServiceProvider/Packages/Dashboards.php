@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesDashboards;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Dashboards\BasepackagesDashboardsWidgets;
@@ -28,7 +27,7 @@ class Dashboards extends BasePackage
 
         if ($this->model) {
             $dashboard = $this->model->toArray();
-            $dashboard['settings'] = Json::decode($dashboard['settings'], true);
+            $dashboard['settings'] = $this->helper->decode($dashboard['settings'], true);
 
             if ($getwidgets) {
                 if ($this->model->getwidgets()) {
@@ -57,7 +56,7 @@ class Dashboards extends BasePackage
             foreach ($dashboard['widgets'] as $key => $widget) {
                 if ($id == $widget['id']) {
                     if ($widget['settings']) {
-                        $widget['settings'] = Json::decode($widget['settings'], true);
+                        $widget['settings'] = $this->helper->decode($widget['settings'], true);
                     }
                     return $widget;
                 }
@@ -132,9 +131,9 @@ class Dashboards extends BasePackage
                 if ($dbWidget) {
                     unset($widget['id']);
 
-                    $dbWidget->settings = Json::decode($dbWidget->settings, true);
+                    $dbWidget->settings = $this->helper->decode($dbWidget->settings, true);
                     $dbWidget->settings = array_merge($dbWidget->settings, $widget);
-                    $dbWidget->settings = Json::encode($dbWidget->settings);
+                    $dbWidget->settings = $this->helper->encode($dbWidget->settings);
 
                     $dbWidget->update();
                 }

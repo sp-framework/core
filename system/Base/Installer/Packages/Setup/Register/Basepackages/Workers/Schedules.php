@@ -2,8 +2,6 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Workers;
 
-use Phalcon\Helper\Json;
-
 class Schedules
 {
     public function register($db, $ff)
@@ -51,7 +49,7 @@ class Schedules
                 'name'          => 'Every Minute',
                 'description'   => $descriptions['everyminute'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $this->helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -69,7 +67,7 @@ class Schedules
                 'name'          => 'Every 15 Minutes',
                 'description'   => $descriptions['everyxminutes'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $this->helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -87,7 +85,7 @@ class Schedules
                 'name'          => 'Every 30 Minutes',
                 'description'   => $descriptions['everyxminutes'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $this->helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -107,7 +105,7 @@ class Schedules
                 'name'          => 'Business hours (Every Minute 08:00 - 17:00)',
                 'description'   => $descriptions['businesshours'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $this->helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -125,7 +123,7 @@ class Schedules
                 'name'          => 'Every Hour',
                 'description'   => $descriptions['hourly'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $this->helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -144,7 +142,7 @@ class Schedules
                 'name'          => 'Everyday',
                 'description'   => $descriptions['daily'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $this->helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -163,7 +161,7 @@ class Schedules
                 'name'          => 'Everyday 6th Hour',
                 'description'   => $descriptions['daily6'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $this->helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -182,7 +180,7 @@ class Schedules
                 'name'          => 'Everyday 12th Hour',
                 'description'   => $descriptions['daily12'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $this->helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -201,7 +199,7 @@ class Schedules
                 'name'          => 'Everyday 18th Hour',
                 'description'   => $descriptions['daily18'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $this->helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -222,7 +220,7 @@ class Schedules
                 'name'          => 'Every Month (Day 1)',
                 'description'   => $descriptions['monthly'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $this->helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 

@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\ValidationServiceProvider;
 
-use Phalcon\Validation as PhalconValidation;
+use Phalcon\Filter\Validation as PhalconValidation;
 
 class Validation
 {

@@ -8,9 +8,6 @@ use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
-use Phalcon\Helper\Str;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use System\Base\BasePackage;
@@ -103,7 +100,7 @@ class DevtoolsModules extends BasePackage
         }
 
         if ($data['apps'] === '') {
-            $data['apps'] = Json::encode([]);
+            $data['apps'] = $this->helper->encode([]);
         }
 
         try {
@@ -236,7 +233,7 @@ class DevtoolsModules extends BasePackage
     protected function checkTypeAndCategory($data)
     {
         if (isset($data['app_type']) && str_contains($data['app_type'], '"data"')) {
-            $data['app_type'] = Json::decode($data['app_type'], true);
+            $data['app_type'] = $this->helper->decode($data['app_type'], true);
             if (isset($data['app_type']['data'][0])) {
                 $data['app_type'] = $data['app_type']['data'][0];
             } else if (isset($data['app_type']['newTags'][0])) {
@@ -256,7 +253,7 @@ class DevtoolsModules extends BasePackage
         }
 
         if (isset($data['category']) && str_contains($data['category'], '"data"')) {
-            $data['category'] = Json::decode($data['category'], true);
+            $data['category'] = $this->helper->decode($data['category'], true);
             if (isset($data['category']['data'][0])) {
                 $data['category'] = $data['category']['data'][0];
             } else if (isset($data['category']['newTags'][0])) {
@@ -304,7 +301,7 @@ class DevtoolsModules extends BasePackage
     {
         $defaultSettings = [];
 
-        return Json::encode($defaultSettings);
+        return $this->helper->encode($defaultSettings);
     }
 
     public function getDefaultDependencies($type = null)
@@ -323,7 +320,7 @@ class DevtoolsModules extends BasePackage
             unset($defaultDependencies['external']);
         }
 
-        return Json::encode($defaultDependencies);
+        return $this->helper->encode($defaultDependencies);
     }
 
     protected function updateModuleJson($data)
@@ -365,7 +362,7 @@ class DevtoolsModules extends BasePackage
         if ($data['module_type'] === 'components') {
             $jsonContent["widgets"] = $data["widgets"];
         }
-        $jsonContent = Json::encode($jsonContent, JSON_UNESCAPED_SLASHES);
+        $jsonContent = $this->helper->encode($jsonContent, JSON_UNESCAPED_SLASHES);
 
         $jsonContent = str_replace('\\"', '"', $jsonContent);
         $jsonContent = str_replace('"{', '{', $jsonContent);
@@ -392,7 +389,7 @@ class DevtoolsModules extends BasePackage
             $baseViewJsonLocation = $this->getModuleJsonFileLocation($baseView);
 
             try {
-                $baseViewJson = Json::decode($this->localContent->read($baseViewJsonLocation), true);
+                $baseViewJson = $this->helper->decode($this->localContent->read($baseViewJsonLocation), true);
             } catch (FilesystemException | UnableToReadFile $exception) {
                 $this->addResponse('Unable to read base view json content to file: ' . $baseViewJsonLocation);
 
@@ -597,7 +594,7 @@ class DevtoolsModules extends BasePackage
             if ($data['category'] === 'basepackages') {
                 $pathArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
 
-                unset($pathArr[Arr::lastKey($pathArr)]);
+                unset($pathArr[$this->helper->lastKey($pathArr)]);
 
                 return
                     $moduleLocation .
@@ -652,7 +649,7 @@ class DevtoolsModules extends BasePackage
     {
         $this->addUpdateComponentMenu($data);
 
-        $componentName = ucfirst(Arr::last(explode('/', $data['route']))) . 'Component';
+        $componentName = ucfirst($this->helper->last(explode('/', $data['route']))) . 'Component';
 
         try {
             $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/Component.txt');
@@ -663,7 +660,7 @@ class DevtoolsModules extends BasePackage
         }
 
         $data['class'] = explode('\\', $data['class']);
-        unset($data['class'][Arr::lastKey($data['class'])]);
+        unset($data['class'][$this->helper->lastKey($data['class'])]);
         $namespaceClass = implode('\\', $data['class']);
 
         $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass, $file);
@@ -679,7 +676,7 @@ class DevtoolsModules extends BasePackage
         }
 
         if (isset($data['widgets']) && $data['widgets'] !== '') {
-            $data['widgets'] = Json::decode($data['widgets'], true);
+            $data['widgets'] = $this->helper->decode($data['widgets'], true);
 
             try {
                 $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/ComponentWidget.txt');
@@ -734,7 +731,7 @@ $file .= '
         }
 
         $data['class'] = explode('\\', $data['class']);
-        unset($data['class'][Arr::lastKey($data['class'])]);
+        unset($data['class'][$this->helper->lastKey($data['class'])]);
         $namespaceClass = implode('\\', $data['class']);
 
         $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass . ';', $file);
@@ -742,7 +739,7 @@ $file .= '
         $file = str_replace('"PACKAGENAMELC"', strtolower($data['name']), $file);
 
         if ($data['category'] === 'basepackages') {
-            $fileName = $moduleFilesLocation . Arr::last(preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY)) . '.php';
+            $fileName = $moduleFilesLocation . $this->helper->last(preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY)) . '.php';
         } else {
             $fileName = $moduleFilesLocation . $data['name'] . '.php';
         }
@@ -849,7 +846,7 @@ $file .= '
                 if (count($nameArr) === 1) {
                     $moduleFilesLocation = $moduleFilesLocation . $nameArr[0];
                 } else {
-                    unset($nameArr[Arr::lastKey($nameArr)]);
+                    unset($nameArr[$this->helper->lastKey($nameArr)]);
                     $moduleFilesLocation = $moduleFilesLocation . implode('/', $nameArr);
                 }
 
@@ -893,7 +890,7 @@ $file .= '
             $modulePublicFilesLocation = $this->getNewFilesLocation($data, true);
             try {
                 if (is_string($data['settings'])) {
-                    $data['settings'] = Json::decode($data['settings'], true);
+                    $data['settings'] = $this->helper->decode($data['settings'], true);
                 }
 
                 $this->localContent->createDirectory($moduleFilesLocation . 'html');
@@ -964,7 +961,7 @@ $file .= '
         }
 
         if ($data['menu'] != 'false' && $data['menu'] != '') {
-            $data['menu'] = Json::decode($data['menu'], true);
+            $data['menu'] = $this->helper->decode($data['menu'], true);
 
             if (isset($menu)) {
                 $this->basepackages->menus->updateMenu($data['menu_id'], $data['app_type'], $data['menu']);
@@ -1267,7 +1264,7 @@ $file .= '
             $newRepo = $this->createRepo($data);
         }
 
-        $data['repo'] = Arr::last(explode('/', $data['repo']));
+        $data['repo'] = $this->helper->last(explode('/', $data['repo']));
 
         //Check for bundle.json file
         if (strtolower($this->apiConfig['provider']) === 'gitea') {
@@ -1293,9 +1290,9 @@ $file .= '
         $jsonContent["module_type"] = $data["module_type"];
         $jsonContent["app_type"] = $data["app_type"];
         $jsonContent["repo"] = $data["repo"];
-        $jsonContent["bundle_modules"] = Json::decode($data["bundle_modules"], true);
+        $jsonContent["bundle_modules"] = $this->helper->decode($data["bundle_modules"], true);
 
-        $jsonContent = Json::encode($jsonContent, JSON_UNESCAPED_SLASHES);
+        $jsonContent = $this->helper->encode($jsonContent, JSON_UNESCAPED_SLASHES);
 
         $jsonContent = str_replace('\\"', '"', $jsonContent);
         $jsonContent = str_replace('"{', '{', $jsonContent);
@@ -1353,7 +1350,7 @@ $file .= '
             return false;
         }
 
-        $data['repo'] = Arr::last(explode('/', $data['repo']));
+        $data['repo'] = $this->helper->last(explode('/', $data['repo']));
 
         //Check Repo if exists
         if (strtolower($this->apiConfig['provider']) === 'gitea') {
@@ -1386,7 +1383,7 @@ $file .= '
             return false;
         }
 
-        $data['repo'] = Arr::last(explode('/', $data['repo']));
+        $data['repo'] = $this->helper->last(explode('/', $data['repo']));
 
         if (strtolower($this->apiConfig['provider']) === 'gitea') {
             $collection = 'OrganizationApi';

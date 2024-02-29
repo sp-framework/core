@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\ViewServiceProvider;
 
-use Phalcon\Escaper as PhalconEscaper;
+use Phalcon\Html\Escaper as PhalconEscaper;
 
 class Escaper
 {

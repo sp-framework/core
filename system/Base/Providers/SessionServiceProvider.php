@@ -21,8 +21,9 @@ class SessionServiceProvider implements ServiceProviderInterface
 
 		$container->setShared(
 			'connection',
-			function () {
-				return (new Connection())->init();
+			function () use ($container) {
+				$helper = $container->getShared('helper');
+				return (new Connection($helper))->init();
 			}
 		);
 

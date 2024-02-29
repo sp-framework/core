@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesComponents;
 
@@ -95,7 +94,7 @@ class Components extends BasePackage
 	public function getComponentByRouteForAppId($route, $appId)
 	{
 		foreach($this->components as $component) {
-			$component['apps'] = Json::decode($component['apps'], true);
+			$component['apps'] = $this->helper->decode($component['apps'], true);
 
 			if (isset($component['apps'][$appId])) {
 				if (isset($component['apps'][$appId]['enabled']) &&
@@ -113,7 +112,7 @@ class Components extends BasePackage
 	public function getComponentByNameForAppId($name, $appId)
 	{
 		foreach($this->components as $component) {
-			$component['apps'] = Json::decode($component['apps'], true);
+			$component['apps'] = $this->helper->decode($component['apps'], true);
 
 			if (isset($component['apps'][$appId])) {
 				if (isset($component['apps'][$appId]['enabled']) &&
@@ -133,7 +132,7 @@ class Components extends BasePackage
 		$components = [];
 
 		foreach($this->components as $component) {
-			$component['apps'] = Json::decode($component['apps'], true);
+			$component['apps'] = $this->helper->decode($component['apps'], true);
 
 			if (isset($component['apps'][$appId]['enabled']) &&
 				$component['apps'][$appId]['enabled'] === true
@@ -201,7 +200,7 @@ class Components extends BasePackage
 
 		foreach($this->components as $component) {
 			if (is_string($component['settings'])) {
-				$component['settings'] = Json::decode($component['settings'], true);
+				$component['settings'] = $this->helper->decode($component['settings'], true);
 			}
 
 			if (isset($component['settings']['import']) &&
@@ -233,7 +232,7 @@ class Components extends BasePackage
 
 		foreach($this->components as $component) {
 			if (is_string($component['settings'])) {
-				$component['settings'] = Json::decode($component['settings'], true);
+				$component['settings'] = $this->helper->decode($component['settings'], true);
 			}
 
 			if (isset($component['settings']['export']) &&
@@ -256,18 +255,18 @@ class Components extends BasePackage
 
 	public function updateComponents(array $data)
 	{
-		$components = Json::decode($data['components'], true);
-		$needAuths = Json::decode($data['need_auths'], true);
+		$components = $this->helper->decode($data['components'], true);
+		$needAuths = $this->helper->decode($data['need_auths'], true);
 
 		foreach ($components as $componentId => $status) {
 			$component = $this->getById($componentId);
 
 			if (is_string($component['apps'])) {
-				$component['apps'] = Json::decode($component['apps'], true);
+				$component['apps'] = $this->helper->decode($component['apps'], true);
 			}
 
 			if (is_string($component['settings'])) {
-				$component['settings'] = Json::decode($component['settings'], true);
+				$component['settings'] = $this->helper->decode($component['settings'], true);
 			}
 
 			if ($status === true) {
@@ -288,7 +287,7 @@ class Components extends BasePackage
 				}
 
 				if (is_string($component['dependencies'])) {
-					$component['dependencies'] = Json::decode($component['dependencies'], true);
+					$component['dependencies'] = $this->helper->decode($component['dependencies'], true);
 				}
 
 				if (isset($component['dependencies']['packages']) && count($component['dependencies']['packages']) > 0) {
@@ -298,24 +297,24 @@ class Components extends BasePackage
 						$package = $this->modules->packages->getPackageByNameForRepo($dependencyPackage['name'], $dependencyPackage['repo']);
 
 						if ($package) {
-							$package['apps'] = Json::decode($package['apps'], true);
+							$package['apps'] = $this->helper->decode($package['apps'], true);
 
 							$package['apps'][$data['id']]['enabled'] = true;
 
-							$package['apps'] = Json::encode($package['apps']);
+							$package['apps'] = $this->helper->encode($package['apps']);
 
 							$this->modules->packages->update($package);
 						}
 					}
 				}
 
-				$component['dependencies'] = Json::encode($component['dependencies'], JSON_UNESCAPED_SLASHES);
+				$component['dependencies'] = $this->helper->encode($component['dependencies'], JSON_UNESCAPED_SLASHES);
 
 			} else if ($status === false) {
 				$component['apps'][$data['id']]['enabled'] = false;
 			}
 
-			$component['apps'] = Json::encode($component['apps']);
+			$component['apps'] = $this->helper->encode($component['apps']);
 
 			$this->update($component);
 		}
@@ -327,7 +326,7 @@ class Components extends BasePackage
 	{
 		$component = $this->getById($data['module_id']);
 
-		$component['settings'] = Json::decode($component['settings'], true);
+		$component['settings'] = $this->helper->decode($component['settings'], true);
 
 		foreach ($data as $key => $settingsData) {
 			if ($key !== 'module_id' &&
@@ -335,14 +334,14 @@ class Components extends BasePackage
 				$settingsData !== $this->security->getRequestToken()
 			) {
 				if (isset($component['settings'][$key])) {
-					$settingsData = Json::decode($settingsData, true);
+					$settingsData = $this->helper->decode($settingsData, true);
 
 					$component['settings'][$key] = $settingsData;
 				}
 			}
 		}
 
-		$component['settings'] = Json::encode($component['settings']);
+		$component['settings'] = $this->helper->encode($component['settings']);
 
 		$this->update($component);
 	}

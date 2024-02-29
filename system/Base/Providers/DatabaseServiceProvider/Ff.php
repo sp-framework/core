@@ -29,6 +29,8 @@ class Ff
 
     protected $syncEnabled = true;
 
+    protected $baseConfig;
+
     public $mode;
 
     public function __construct($baseConfig, $request, $db = null, $basepackages = null)

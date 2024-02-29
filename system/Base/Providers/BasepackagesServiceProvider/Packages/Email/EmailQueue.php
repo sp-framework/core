@@ -2,8 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Email;
 
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Email\BasepackagesEmailQueue;
 
@@ -132,15 +130,15 @@ class EmailQueue extends BasePackage
 
                     $this->basepackages->email->setSender($queueEmailSettings['from_address'], $queueEmailSettings['from_address']);
 
-                    $queueEmail['to_addresses'] = Json::decode($queueEmail['to_addresses'], true);
+                    $queueEmail['to_addresses'] = $this->helper->decode($queueEmail['to_addresses'], true);
                     if (count($queueEmail['to_addresses']) > 1) {
                         foreach ($queueEmail['to_addresses'] as $key => $toAddress) {
                             $this->basepackages->email->setRecipientTo($toAddress, $toAddress);
                         }
                     } else {
-                        $this->basepackages->email->setRecipientTo(Arr::first($queueEmail['to_addresses']), Arr::first($queueEmail['to_addresses']));
+                        $this->basepackages->email->setRecipientTo($this->helper->first($queueEmail['to_addresses']), $this->helper->first($queueEmail['to_addresses']));
                     }
-                    $queueEmail['to_addresses'] = Json::encode($queueEmail['to_addresses']);
+                    $queueEmail['to_addresses'] = $this->helper->encode($queueEmail['to_addresses']);
 
                     $this->basepackages->email->setSubject($queueEmail['subject']);
 

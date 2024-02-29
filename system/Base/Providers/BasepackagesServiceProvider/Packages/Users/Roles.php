@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Users;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersRoles;
 
@@ -162,7 +161,7 @@ class Roles extends BasePackage
 
             if ($role) {
                 if ($role['permissions'] && $role['permissions'] !== '') {
-                    $permissionsArr = Json::decode($role['permissions'], true);
+                    $permissionsArr = $this->helper->decode($role['permissions'], true);
                 } else {
                     $permissionsArr = [];
                 }
@@ -191,9 +190,9 @@ class Roles extends BasePackage
                     }
                 }
 
-                $this->packagesData->acls = Json::encode($acls);
+                $this->packagesData->acls = $this->helper->encode($acls);
 
-                $role['permissions'] = Json::encode($permissions);
+                $role['permissions'] = $this->helper->encode($permissions);
 
                 $this->packagesData->role = $role;
             } else {
@@ -228,8 +227,8 @@ class Roles extends BasePackage
                 }
             }
 
-            $this->packagesData->acls = Json::encode($acls);
-            $role['permissions'] = Json::encode($permissions);
+            $this->packagesData->acls = $this->helper->encode($acls);
+            $role['permissions'] = $this->helper->encode($permissions);
             $this->packagesData->role = $role;
         }
 
