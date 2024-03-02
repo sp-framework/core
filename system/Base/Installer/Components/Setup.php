@@ -833,8 +833,8 @@ Class Setup
 				$composerJsonFile['config'] = $coreJsonFile['dependencies']['composer']['config'];
 			}
 
-			if (isset($coreJsonFile['dependencies']['composer']['extras'])) {
-				$composerJsonFile['extras'] = $coreJsonFile['dependencies']['composer']['extras'];
+			if (isset($coreJsonFile['dependencies']['composer']['extra'])) {
+				$composerJsonFile['extra'] = $coreJsonFile['dependencies']['composer']['extra'];
 			}
 
 			file_put_contents(base_path('external/composer.json'), $this->helper->encode($composerJsonFile, JSON_PRETTY_PRINT));

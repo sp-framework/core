@@ -1,0 +1,10 @@
+--- src/Ratchet/Server/IoConnection.php    2021-12-14 11:20:41.000000000 +1100
++++ src/Ratchet/Server/IoConnection.php    2024-03-02 18:36:08.489395322 +1100
+@@ -6,6 +6,7 @@
+ /**
+  * {@inheritdoc}
+  */
++#[\AllowDynamicProperties]
+ class IoConnection implements ConnectionInterface {
+     /**
+      * @var \React\Socket\ConnectionInterface

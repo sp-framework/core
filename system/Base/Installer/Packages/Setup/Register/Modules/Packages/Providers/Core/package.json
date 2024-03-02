@@ -62,8 +62,14 @@
 					"cweagans/composer-patches": true
 				}
 			},
-			"extras": {
+			"extra": {
 				"patches": {
+					"react/socket" : {
+						"phpv8.3 support" : "/var/www/html/sp/external/patches/react_socket_connection.patch"
+					},
+					"cboden/ratchet" : {
+						"phpv8.3 support" : "/var/www/html/sp/external/patches/cboden_ratchet_ioconnection.patch"
+					}
 				}
 			}
 		}

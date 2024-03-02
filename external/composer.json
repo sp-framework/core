@@ -8,7 +8,7 @@
             "cweagans/composer-patches": true
         }
     },
-    "extras": {
+    "extra": {
         "patches": {
         }
     }
