@@ -377,8 +377,8 @@ class Jstree
 
         $this->fieldParams['fieldJstreePlugins'] =
             isset($this->params['fieldJstreePlugins']) ?
-            $this->helper->encode($this->params['fieldJstreePlugins']) :
-            $this->helper->encode(["search", "types", "dnd"]);
+            $this->adminLTETags->helper->encode($this->params['fieldJstreePlugins']) :
+            $this->adminLTETags->helper->encode(["search", "types", "dnd"]);
 
         return
         '<script type="text/javascript" charset="utf-8">

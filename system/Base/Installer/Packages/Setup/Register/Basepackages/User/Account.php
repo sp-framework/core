@@ -4,7 +4,7 @@ namespace System\Base\Installer\Packages\Setup\Register\Basepackages\User;
 
 class Account
 {
-    public function register($db, $ff, $email, $password)
+    public function register($db, $ff, $email, $password, $helper)
     {
         $account =
             [
@@ -26,10 +26,10 @@ class Account
             $accountStore->updateOrInsert($account);
         }
 
-        $this->registerAccountSecurity($db, $ff, $password);
+        $this->registerAccountSecurity($db, $ff, $password, $helper);
     }
 
-    protected function registerAccountSecurity($db, $ff, $password)
+    protected function registerAccountSecurity($db, $ff, $password, $helper)
     {
         $security =
             [
@@ -37,7 +37,7 @@ class Account
                 'password'              => $password,
                 'role_id'               => 1,
                 'override_role'         => 0,
-                'permissions'           => $this->helper->encode([])
+                'permissions'           => $helper->encode([])
             ];
 
         if ($db) {

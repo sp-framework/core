@@ -394,8 +394,8 @@ class Local extends BasePackage
             if ($this->storage['permission'] === 'public') {
                 $this->updateFileLink(
                     $file[0],
-                    null,
-                    '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid']
+                    '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid'],
+                    null
                 );
             }
 
@@ -513,8 +513,8 @@ class Local extends BasePackage
             if ($this->storage['permission'] === 'public') {
                 $this->updateFileLink(
                     $file,
-                    $this->width,
-                    '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width . $imageFormat
+                    '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width . $imageFormat,
+                    $this->width
                 );
             }
 
@@ -574,7 +574,7 @@ class Local extends BasePackage
         }
     }
 
-    protected function updateFileLink($file, $width = null, $link)
+    protected function updateFileLink($file, $link, $width = null)
     {
         if ($file['links'] && !is_array($file['links'])) {
             $file['links'] = $this->helper->decode($file['links'], true);

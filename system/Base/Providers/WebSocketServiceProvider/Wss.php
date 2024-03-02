@@ -14,9 +14,13 @@ class Wss
 
     protected $socket;
 
-    public function __construct($config)
+    protected $helper;
+
+    public function __construct($config, $helper)
     {
         $this->config = $config;
+
+        $this->helper = $helper;
     }
 
     public function init()

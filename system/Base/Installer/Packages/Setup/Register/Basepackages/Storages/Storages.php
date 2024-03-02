@@ -8,11 +8,15 @@ class Storages
 
     protected $ff;
 
-    public function register($db, $ff, $packageFile)
+    protected $helper;
+
+    public function register($db, $ff, $packageFile, $helper)
     {
         $this->db = $db;
 
         $this->ff = $ff;
+
+        $this->helper = $helper;
 
         $allowedImageMimeTypes = [];
         $allowedImageSizes = [];

@@ -4,10 +4,10 @@ namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Geo;
 
 class Timezones
 {
-    public function register($db, $ff, $localContent)
+    public function register($db, $ff, $localContent, $helper)
     {
         $timezonesData =
-            $this->helper->decode(
+            $helper->decode(
                 $localContent->read(
                     '/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/TimeZones.json'
                 ),

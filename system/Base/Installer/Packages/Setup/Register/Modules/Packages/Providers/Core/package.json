@@ -65,10 +65,10 @@
 			"extra": {
 				"patches": {
 					"react/socket" : {
-						"phpv8.3 support" : "/var/www/html/sp/external/patches/react_socket_connection.patch"
+						"phpv8.3 support" : "external/patches/react_socket_connection.patch"
 					},
 					"cboden/ratchet" : {
-						"phpv8.3 support" : "/var/www/html/sp/external/patches/cboden_ratchet_ioconnection.patch"
+						"phpv8.3 support" : "external/patches/cboden_ratchet_ioconnection.patch"
 					}
 				}
 			}

@@ -2,8 +2,8 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Users;
 
-use Phalcon\Validation\Validator\Email;
-use Phalcon\Validation\Validator\PresenceOf;
+use Phalcon\Filter\Validation\Validator\Email;
+use Phalcon\Filter\Validation\Validator\PresenceOf;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;

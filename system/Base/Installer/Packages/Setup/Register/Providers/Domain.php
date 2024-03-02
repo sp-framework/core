@@ -10,7 +10,7 @@ class Domain
 {
 	protected $request;
 
-	public function register($db, $ff, $request)
+	public function register($db, $ff, $request, $helper)
 	{
 		$this->request = $request;
 
@@ -32,7 +32,7 @@ class Domain
 
 		if (count($record) > 0) {
 			$isInternal = isset($record['internal']) ? $record['internal'] : '1';
-			$record = $this->helper->encode($record);
+			$record = $helper->encode($record);
 		} else {
 			$isInternal = '1';
 			$record = [];
@@ -44,10 +44,10 @@ class Domain
 				'description' 						=> '',
 				"default_app_id"					=> 1,
 				"exclusive_to_default_app"			=> 0,
-				"apps"			    				=> $this->helper->encode($apps),
+				"apps"			    				=> $helper->encode($apps),
 				"dns_record"						=> $record,
 				"is_internal"						=> $isInternal,
-				'settings'			 				=> $this->helper->encode([])
+				'settings'			 				=> $helper->encode([])
 			];
 
 		if ($db) {

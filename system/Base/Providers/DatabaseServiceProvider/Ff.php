@@ -23,6 +23,8 @@ class Ff
 
     protected $request;
 
+    public $helper;
+
     protected $store;
 
     protected $syncFile;
@@ -33,7 +35,7 @@ class Ff
 
     public $mode;
 
-    public function __construct($baseConfig, $request, $db = null, $basepackages = null)
+    public function __construct($baseConfig, $request, $helper, $db = null, $basepackages = null)
     {
         $this->baseConfig = $baseConfig;
 
@@ -44,6 +46,8 @@ class Ff
         $this->mode = $this->baseConfig->databaseType;
 
         $this->request = $request;
+
+        $this->helper = $helper;
 
         if ($db && $basepackages) {
             $this->db = $db;

@@ -129,9 +129,16 @@ Class Setup
 			}
 
 			$container->setShared(
+				'helper',
+				function () {
+					return (new Helper())->init();
+				}
+			);
+
+			$container->setShared(
 				'wss',
-				function () use ($configsObj) {
-					return (new Wss($configsObj))->init();
+				function () use ($configsObj, $container) {
+					return (new Wss($configsObj, $container->getShared('helper')))->init();
 				}
 			);
 
@@ -146,13 +153,6 @@ Class Setup
 				'remoteWebContent',
 				function () {
 					return (new RemoteWebContent())->init();
-				}
-			);
-
-			$container->setShared(
-				'helper',
-				function () {
-					return (new Helper())->init();
 				}
 			);
 
@@ -178,7 +178,7 @@ Class Setup
 
 			$this->helper = $this->container->getShared('helper');
 
-			if (!$onlyUpdateDb) {
+			if ($onlyUpdateDb === false) {
 				$this->progress = $this->basepackages->progress->init($this->container);
 			}
 

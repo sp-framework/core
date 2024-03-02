@@ -10,7 +10,7 @@ use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
-use Phalcon\Validation\Validator\Email;
+use Phalcon\Filter\Validation\Validator\Email;
 use System\Base\BasePackage;
 use System\Base\Providers\CoreServiceProvider\Model\ServiceProviderCore;
 
@@ -883,7 +883,7 @@ class Core extends BasePackage
 			return false;
 		}
 
-		$this->zip->close();
+		$this->zip::close();
 
 		return true;
 	}
@@ -907,7 +907,7 @@ class Core extends BasePackage
 					$this->zip->deleteIndex($this->zip->numFiles - 1);
 				}
 
-				$this->zip->close();
+				$this->zip::close();
 
 				$this->addResponse('Could not set provided password for file ' . $name, 1, []);
 

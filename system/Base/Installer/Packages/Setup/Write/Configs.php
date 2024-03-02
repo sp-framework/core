@@ -240,7 +240,7 @@ if ($this->coreJson['settings']['databasetype'] !== 'ff') {
 		for ($workFactor = 4; $workFactor <= 16 ; $workFactor ++) {
 			$timeStart = $this->microtimeFloat();
 
-			$this->container['security']->hash(rand(), $workFactor);
+			$this->container['security']->hash(rand(), ['cost' => $workFactor]);
 
 			$timeEnd = $this->microtimeFloat();
 

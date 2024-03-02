@@ -73,8 +73,16 @@ class Config
 
         require_once base_path('system/Base/Installer/Components/Setup.php');
 
-        if (isset($this->request->getPost()['session'])) {
+        if (isset($this->request->getPost()['session']) &&
+            isset($this->request->getPost()['composer'])
+        ) {
+            (new Setup($this->session, $configsObj))->run();
+        } else if (isset($this->request->getPost()['session']) &&
+                   isset($this->request->getPost()['onlyUpdateDb'])
+        ) {
             (new Setup($this->session, $configsObj, true))->run();
+        } else if (isset($this->request->getPost()['session'])) {
+            (new Setup($this->session, $configsObj))->run();
         } else {
             (new Setup($this->session, $configsObj))->run();
         }

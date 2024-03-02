@@ -152,7 +152,7 @@ class DevtoolsGeoExtractData extends BasePackage
             $zip->extractTo(base_path($this->sourceDir));
         }
 
-        $zip->close($sourceFile);
+        $zip->close();
 
         return true;
     }

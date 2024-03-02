@@ -620,6 +620,13 @@
                                     "username"              : $('#username').val(),
                                     "password"              : $('#password').val()
                                 });
+
+                            <?php if ($onlyUpdateDb) { ?>
+                                data = $.extend(data,
+                                    {
+                                        "onlyUpdateDb"      : true
+                                    });
+                            <?php } ?>
                         }
 
                     <?php if (!$onlyUpdateDb) { ?>

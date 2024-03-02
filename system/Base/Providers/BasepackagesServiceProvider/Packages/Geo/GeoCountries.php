@@ -177,7 +177,7 @@ class GeoCountries extends BasePackage
                 return false;
             }
 
-            $zip->close(base_path($this->sourceDir . $country . '.zip'));
+            $zip->close();
 
             return true;
         } catch (\Exception $e) {

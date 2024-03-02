@@ -10,6 +10,7 @@ class TestComponent extends BaseComponent
 
     public function viewAction()
     {
+        return;
         $jobStore = $this->ff->store('basepackages_workers_jobs');
 
         var_dump($jobStore->truncate(true));

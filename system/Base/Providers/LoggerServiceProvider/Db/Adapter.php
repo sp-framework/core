@@ -15,11 +15,15 @@ class Adapter extends AbstractAdapter
 
     protected $oneDbEntry;//True to make only 1 DB Entry
 
-    public function __construct($oneDbEntry)
+    protected $helper;
+
+    public function __construct($oneDbEntry, $helper)
     {
         $this->logs = new Logs;
 
         $this->oneDbEntry = $oneDbEntry;
+
+        $this->helper = $helper;
     }
 
     public function process(Item $item): void

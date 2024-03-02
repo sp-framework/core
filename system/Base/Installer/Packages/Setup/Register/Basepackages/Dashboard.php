@@ -4,14 +4,14 @@ namespace System\Base\Installer\Packages\Setup\Register\Basepackages;
 
 class Dashboard
 {
-    public function register($db, $ff, $componentFile)
+    public function register($db, $ff, $componentFile, $helper)
     {
         $dashboard =
             [
                 'name'                  => 'Default',
                 'app_id'                => 1,
                 'created_by'            => 1,
-                'settings'              => $this->helper->encode($componentFile['settings'])
+                'settings'              => $helper->encode($componentFile['settings'])
             ];
 
         if ($db) {

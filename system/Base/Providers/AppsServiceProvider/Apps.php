@@ -120,6 +120,10 @@ class Apps extends BasePackage
 
 	public function getAppByRoute($route)
 	{
+		if (!$route) {
+			return false;
+		}
+
 		foreach($this->apps as $app) {
 			if (strtolower($app['route']) == strtolower($route)) {
 				return $app;

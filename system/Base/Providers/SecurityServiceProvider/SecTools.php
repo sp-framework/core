@@ -47,7 +47,7 @@ class SecTools
         }
 
         try {
-            return $this->security->hash($password, $this->security->getWorkFactor());
+            return $this->security->hash($password, ['cost' => $this->security->getWorkFactor()]);
         } catch (\Exception $e) {
             throw $e;
         }

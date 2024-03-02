@@ -4,7 +4,7 @@ namespace System\Base\Installer\Packages\Setup\Register\Modules;
 
 class Component
 {
-	public function register($db, $ff, $componentFile, $menuId)
+	public function register($db, $ff, $componentFile, $menuId, $helper)
 	{
 		$componentApp = ['1' => ['enabled'=>true]];
 
@@ -29,29 +29,29 @@ class Component
 				'repo'					=> $componentFile['repo'],
 				'dependencies'		 	=>
 					isset($componentFile['dependencies']) ?
-					$this->helper->encode($componentFile['dependencies']) :
-					$this->helper->encode([]),
+					$helper->encode($componentFile['dependencies']) :
+					$helper->encode([]),
 				'menu'		 			=>
 					isset($componentFile['menu']) ?
-					$this->helper->encode($componentFile['menu']) :
+					$helper->encode($componentFile['menu']) :
 					false,
 				'menu_id'				=> $menuId,
 				'api_id'				=> 1,
 				'installed'				=> 1,
 				'apps'					=>
-					$this->helper->encode($componentApp),
+					$helper->encode($componentApp),
 				'files'					=>
 					isset($componentFile['files']) ?
-					$this->helper->encode($componentFile['files']) :
-					$this->helper->encode([]),
+					$helper->encode($componentFile['files']) :
+					$helper->encode([]),
 				'settings'				=>
 					isset($componentFile['settings']) ?
-					$this->helper->encode($componentFile['settings']) :
-					$this->helper->encode([]),
+					$helper->encode($componentFile['settings']) :
+					$helper->encode([]),
 				'widgets'				=>
 					isset($componentFile['widgets']) ?
-					$this->helper->encode($componentFile['widgets']) :
-					$this->helper->encode([]),
+					$helper->encode($componentFile['widgets']) :
+					$helper->encode([]),
 				'updated_by'			=> 0
 			];
 

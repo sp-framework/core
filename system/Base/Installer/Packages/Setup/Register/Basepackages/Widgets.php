@@ -4,8 +4,12 @@ namespace System\Base\Installer\Packages\Setup\Register\Basepackages;
 
 class Widgets
 {
-    public function register($db, $ff, $componentFile, $registeredComponentId, $path, $localContent)
+    protected $helper;
+
+    public function register($db, $ff, $componentFile, $registeredComponentId, $path, $localContent, $helper)
     {
+        $this->helper = $helper;
+
         $registeredComponentClassArr = explode('\\', $componentFile['class']);
         array_pop($registeredComponentClassArr);
 

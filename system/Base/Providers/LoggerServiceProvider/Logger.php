@@ -106,7 +106,7 @@ class Logger
 
                 } else if ($this->logsConfig->service === 'dbLogs') {
 
-                    $dbAdapter = new DbAdapter($this->oneDbEntry);
+                    $dbAdapter = new DbAdapter($this->oneDbEntry, $this->helper);
                     $dbAdapter->setFormatter($this->customFormatter);
 
                     $this->log = new PhalconLogger(
@@ -120,7 +120,7 @@ class Logger
                 $this->setLogLevel();
 
                 if ($this->email && $this->logsConfig->emergencyLogsEmail) {
-                    $emailAdapter = new EmailAdapter($this->email, $this->logsConfig);
+                    $emailAdapter = new EmailAdapter($this->email, $this->logsConfig, $this->helper);
                     $emailAdapter->setFormatter($this->customFormatter);
 
                     $this->logEmail = new PhalconLogger(
@@ -191,11 +191,13 @@ class Logger
                 }
             }
         }
+
+        $this->commitEmail();
     }
 
     public function commitEmail($message = null, $type = 'alert')
     {
-        if ($this->logsConfig->emergencyLogsEmail) {
+        if ($this->email && $this->logsConfig->emergencyLogsEmail) {
             if ($message) {
                 $this->logEmail->$type($message);
             }

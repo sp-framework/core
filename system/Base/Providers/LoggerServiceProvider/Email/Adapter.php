@@ -13,22 +13,26 @@ class Adapter extends AbstractAdapter
 
     protected $logsConfig;
 
+    protected $helper;
+
     protected $messages = [];
 
-    public function __construct($email, $logsConfig)
+    public function __construct($email, $logsConfig, $helper)
     {
         $this->email = $email;
 
         $this->logsConfig = $logsConfig;
+
+        $this->helper = $helper;
     }
 
     public function process(Item $item): void
     {
-        if ($item->getType() === 0) {
+        if ($item->getLevel() === 0) {
             $this->messages['emergency'] = $this->helper->decode($this->formatter->format($item), true);
-        } else if ($item->getType() === 1) {
+        } else if ($item->getLevel() === 1) {
             $this->messages['critical'] = $this->helper->decode($this->formatter->format($item), true);
-        } else if ($item->getType() === 2) {
+        } else if ($item->getLevel() === 2) {
             $this->messages['alert'] = $this->helper->decode($this->formatter->format($item), true);
         }
     }

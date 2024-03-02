@@ -1,4 +1,5 @@
 <?php
+// (new Phalcon\Support\Debug())->listen();
 // require_once "../vendor/autoload.php";
 
 // $config = array(

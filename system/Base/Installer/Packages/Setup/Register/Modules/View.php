@@ -4,7 +4,7 @@ namespace System\Base\Installer\Packages\Setup\Register\Modules;
 
 class View
 {
-	public function register($db, $ff, $viewFile)
+	public function register($db, $ff, $viewFile, $helper)
 	{
 		$view =
 			[
@@ -20,20 +20,20 @@ class View
 				'repo'		 			=> $viewFile['repo'],
 				'settings'				=>
 					isset($viewFile['settings']) ?
-					$this->helper->encode($viewFile['settings']) :
-					$this->helper->encode([]),
+					$helper->encode($viewFile['settings']) :
+					$helper->encode([]),
 				'dependencies'			=>
 					isset($viewFile['dependencies']) ?
-					$this->helper->encode($viewFile['dependencies']) :
-					$this->helper->encode([]),
+					$helper->encode($viewFile['dependencies']) :
+					$helper->encode([]),
 				'apps'					=>
-					$this->helper->encode(['1'=>['enabled'=>true]]),
+					$helper->encode(['1'=>['enabled'=>true]]),
 				'api_id'				=> 1,
 				'installed'				=> 1,
 				'files'					=>
 					isset($viewFile['files']) ?
-					$this->helper->encode($viewFile['files']) :
-					$this->helper->encode([]),
+					$helper->encode($viewFile['files']) :
+					$helper->encode([]),
 				'updated_by'			=> 0
 			];
 
@@ -44,8 +44,8 @@ class View
 				'app_id'	 			=> 1,
 				'settings'				=>
 					isset($viewFile['settings']) ?
-					$this->helper->encode($viewFile['settings']) :
-					$this->helper->encode([])
+					$helper->encode($viewFile['settings']) :
+					$helper->encode([])
 			];
 
 		if ($db) {

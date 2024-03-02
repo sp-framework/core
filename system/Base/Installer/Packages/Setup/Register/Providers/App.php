@@ -6,7 +6,7 @@ use Phalcon\Db\Enum;
 
 class App
 {
-	public function register($db, $ff)
+	public function register($db, $ff, $helper)
 	{
 		$coreApp =
 			[
@@ -16,10 +16,10 @@ class App
 				'app_type'       			=> 'core',
 				'default_component'			=> 0,
 				'errors_component'			=> 0,
-				'can_login_role_ids'		=> $this->helper->encode(['1']),
-				'acceptable_usernames'		=> $this->helper->encode(["email", "username"]),
+				'can_login_role_ids'		=> $helper->encode(['1']),
+				'acceptable_usernames'		=> $helper->encode(["email", "username"]),
 				'ip_filter_default_action'	=> 0,
-				'settings'					=> $this->helper->encode(["defaultDashboard" => 1])
+				'settings'					=> $helper->encode(["defaultDashboard" => 1])
 			];
 
 		if ($db) {

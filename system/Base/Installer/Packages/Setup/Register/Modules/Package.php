@@ -4,7 +4,7 @@ namespace System\Base\Installer\Packages\Setup\Register\Modules;
 
 class Package
 {
-	public function register($db, $ff, $packageFile)
+	public function register($db, $ff, $packageFile, $helper)
 	{
 		$package =
 			[
@@ -19,20 +19,20 @@ class Package
 				'class'					=> $packageFile['class'],
 				'settings'				=>
 					isset($packageFile['settings']) ?
-					$this->helper->encode($packageFile['settings']) :
-					$this->helper->encode([]),
+					$helper->encode($packageFile['settings']) :
+					$helper->encode([]),
 				'dependencies'		 	=>
 					isset($packageFile['dependencies']) ?
-					$this->helper->encode($packageFile['dependencies']) :
-					$this->helper->encode([]),
+					$helper->encode($packageFile['dependencies']) :
+					$helper->encode([]),
 				'apps'					=>
-					$this->helper->encode(['1'=>['enabled'=>true]]),
+					$helper->encode(['1'=>['enabled'=>true]]),
 				'api_id'				=> 1,
 				'installed'				=> 1,
 				'files'					=>
 					isset($packageFile['files']) ?
-					$this->helper->encode($packageFile['files']) :
-					$this->helper->encode([]),
+					$helper->encode($packageFile['files']) :
+					$helper->encode([]),
 				'updated_by'			=> 0
 			];
 

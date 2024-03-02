@@ -347,7 +347,7 @@ class Multiple
                                 </div>
                                 <hr>';
                         }
-                        $addressTypesIds = $this->helper->encode($addressTypesIds);
+                        $addressTypesIds = $this->adminLTETags->helper->encode($addressTypesIds);
                     }
                 $this->content .=
                 '</div>

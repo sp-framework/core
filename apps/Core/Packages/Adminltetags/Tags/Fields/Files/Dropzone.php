@@ -123,22 +123,22 @@ class Dropzone
 
         if (isset($this->params['allowedUploads']) && $this->params['allowedUploads'] === 'images') {
             $this->fieldParams['allowedImageMimeType'] =
-                $this->helper->encode($this->params['storage']['allowed_image_mime_types']);
+                $this->adminLTETags->helper->encode($this->params['storage']['allowed_image_mime_types']);
 
-            $this->fieldParams['allowedFileMimeType'] = $this->helper->encode([]);
+            $this->fieldParams['allowedFileMimeType'] = $this->adminLTETags->helper->encode([]);
         } else if (isset($this->params['allowedUploads']) && $this->params['allowedUploads'] === 'files') {
-            $this->fieldParams['allowedImageMimeType'] = $this->helper->encode([]);
+            $this->fieldParams['allowedImageMimeType'] = $this->adminLTETags->helper->encode([]);
 
             $this->fieldParams['allowedFileMimeType'] =
-                $this->helper->encode($this->params['storage']['allowed_file_mime_types']);
+                $this->adminLTETags->helper->encode($this->params['storage']['allowed_file_mime_types']);
         } else {
             $this->params['allowedUploads'] = 'files';
 
             $this->fieldParams['allowedImageMimeType'] =
-                $this->helper->encode($this->params['storage']['allowed_image_mime_types']);
+                $this->adminLTETags->helper->encode($this->params['storage']['allowed_image_mime_types']);
 
             $this->fieldParams['allowedFileMimeType'] =
-                $this->helper->encode($this->params['storage']['allowed_file_mime_types']);
+                $this->adminLTETags->helper->encode($this->params['storage']['allowed_file_mime_types']);
         }
 
         $dropzoneButtons = [];
@@ -334,7 +334,7 @@ class Dropzone
 
                                                             if ($this->params['storage']['permission'] === 'public') {
                                                                 if (!isset($attachment['links'][$this->fieldParams['lightboxSize']])) {
-                                                                    $this->fieldParams['lightboxSize'] = $this->helper->lastKey($attachment['links']);
+                                                                    $this->fieldParams['lightboxSize'] = $this->adminLTETags->helper->lastKey($attachment['links']);
                                                                 }
                                                                 $this->content .=
                                                                 '<a class="chocolat-image" title="' . $attachment['org_file_name'] . '" href="' . $attachment['links'][$this->fieldParams['lightboxSize']] . '">
