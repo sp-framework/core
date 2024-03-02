@@ -367,7 +367,7 @@
                                             </div>
                                         <?php } ?>
                                     </div>
-                                    <?php if (!$onlyUpdateDb) { ?>
+                                    <?php if (!$onlyUpdateDb && $precheckFail) { ?>
                                         <div class="row">
                                             <div class="col" id="external-div" hidden>
                                                 <div class="form-group">

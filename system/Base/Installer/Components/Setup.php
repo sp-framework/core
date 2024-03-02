@@ -834,6 +834,18 @@ Class Setup
 			}
 
 			if (isset($coreJsonFile['dependencies']['composer']['extra'])) {
+				if (isset($coreJsonFile['dependencies']['composer']['extra']['patches']) &&
+					is_array($coreJsonFile['dependencies']['composer']['extra']['patches'])
+				) {
+					foreach ($coreJsonFile['dependencies']['composer']['extra']['patches'] as $package => &$patchDetails) {
+						if (is_array($patchDetails)) {
+							foreach ($patchDetails as $description => &$location) {
+								$location = base_path($location);
+							}
+						}
+					}
+				}
+
 				$composerJsonFile['extra'] = $coreJsonFile['dependencies']['composer']['extra'];
 			}
 
