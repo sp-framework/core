@@ -823,10 +823,18 @@ Class Setup
 		try {
 			$coreJsonFile = $this->helper->decode(file_get_contents(base_path('system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json')), true);
 
-			foreach ($coreJsonFile['dependencies']['external'] as $external => $version) {
-				if (!isset($composerJsonFile['require'][$external])) {
-					$composerJsonFile['require'][$external] = $version;
+			foreach ($coreJsonFile['dependencies']['composer']['require'] as $composer => $version) {
+				if (!isset($composerJsonFile['require'][$composer])) {
+					$composerJsonFile['require'][$composer] = $version;
 				}
+			}
+
+			if (isset($coreJsonFile['dependencies']['composer']['config'])) {
+				$composerJsonFile['config'] = $coreJsonFile['dependencies']['composer']['config'];
+			}
+
+			if (isset($coreJsonFile['dependencies']['composer']['extras'])) {
+				$composerJsonFile['extras'] = $coreJsonFile['dependencies']['composer']['extras'];
 			}
 
 			file_put_contents(base_path('external/composer.json'), $this->helper->encode($composerJsonFile, JSON_PRETTY_PRINT));

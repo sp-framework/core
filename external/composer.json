@@ -1,5 +1,15 @@
 {
     "require": {
-        "composer/composer": "^2.7.1"
+        "composer/composer": "^2.7",
+        "cweagans/composer-patches": "^1.7"
+    },
+    "config": {
+        "allow-plugins": {
+            "cweagans/composer-patches": true
+        }
+    },
+    "extras": {
+        "patches": {
+        }
     }
 }
