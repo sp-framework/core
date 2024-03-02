@@ -160,7 +160,7 @@ class Manager extends BasePackage
 
                 $this->remoteModules[$module['module_type']] = [$responseArr];
 
-                $latestRelease = $this->moduleNeedsUpgrade($module, $responseArr);
+                $latestRelease = $this->moduleNeedsUpgrade($responseArr, $module);
 
                 if ($latestRelease) {
                     $module['repo_details']['latestRelease'] = $latestRelease;
@@ -557,7 +557,7 @@ class Manager extends BasePackage
                 $localModule['repo_details'] = [];
                 $localModule['repo_details']['details'] = $remoteModule;
 
-                $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($localModule, $remoteModule);
+                $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($remoteModule, $localModule);
 
                 if ($moduleNeedsUpgrade) {
                     if ($this->getRemoteModuleJson($remoteModulesType, $localModule, true)) {
@@ -581,7 +581,7 @@ class Manager extends BasePackage
             } else {
                 $remoteModule['repo_details'] = [];
                 $remoteModule['repo_details']['details'] = $remoteModule;
-                $moduleNeedsUpgrade = $this->moduleNeedsUpgrade(null, $remoteModule);
+                $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($remoteModule);
                 $remoteModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
 
                 $modules['new'][$remoteModuleKey] = $remoteModule;
@@ -591,7 +591,7 @@ class Manager extends BasePackage
         return $modules;
     }
 
-    protected function moduleNeedsUpgrade($localModule = null, $remoteModule, $returnLatestReleaseOnly = false)
+    protected function moduleNeedsUpgrade($remoteModule, $localModule = null, $returnLatestReleaseOnly = false)
     {
         if (strtolower($this->apiConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';

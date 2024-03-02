@@ -509,11 +509,11 @@ class Api extends BasePackage
     protected function decryptPassToken(array $data)
     {
         if (isset($data['auth_type'])) {
-            if ($data['auth_type'] == 'auth') {
+            if ($data['auth_type'] == 'auth' && $data['password'] !== '') {
                 $data['password'] = $this->crypt->decryptBase64($data['password'], $this->secTools->getSigKey());
-            } else if ($data['auth_type'] == 'access_token') {
+            } else if ($data['auth_type'] == 'access_token' && $data['access_token'] !== '') {
                 $data['access_token'] = $this->crypt->decryptBase64($data['access_token'], $this->secTools->getSigKey());
-            } else if ($data['auth_type'] == 'autho') {
+            } else if ($data['auth_type'] == 'autho' && $data['authorization'] !== '') {
                 $data['authorization'] = $this->crypt->decryptBase64($data['authorization'], $this->secTools->getSigKey());
             }
         }
