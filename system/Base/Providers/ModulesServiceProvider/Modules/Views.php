@@ -257,7 +257,9 @@ class Views extends BasePackage
             }
             if ($this->view) {
                 if (!$this->viewSettings) {
-                    $this->viewSettings = $this->helper->decode($this->view['settings'], true);
+                    if (is_string($this->view['settings'])) {
+                        $this->viewSettings = $this->helper->decode($this->view['settings'], true);
+                    }
                 }
 
                 $this->cache = $this->config->cache->enabled;

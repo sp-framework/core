@@ -189,7 +189,9 @@ class Apps extends BasePackage
 			foreach ($domains as $domain) {
 				$domain = $this->domains->getDomainById($domain);
 
-				$domain['apps'] = $this->helper->decode($domain['apps'], true);
+				if (is_string($domain['apps'])) {
+					$domain['apps'] = $this->helper->decode($domain['apps'], true);
+				}
 
 				$domain['apps'][$data['id']]['allowed'] = true;
 				$domain['apps'][$data['id']]['view'] = $data['view'];
@@ -212,7 +214,9 @@ class Apps extends BasePackage
 		}
 
 		if (isset($app['can_login_role_ids'])) {
-			$app['can_login_role_ids'] = $this->helper->decode($app['can_login_role_ids'], true);
+			if (is_string($app['can_login_role_ids'])) {
+				$app['can_login_role_ids'] = $this->helper->decode($app['can_login_role_ids'], true);
+			}
 
 			if (isset($app['can_login_role_ids']['data'])) {
 				$app['can_login_role_ids'] = $this->helper->encode($app['can_login_role_ids']['data']);
@@ -254,7 +258,9 @@ class Apps extends BasePackage
 		}
 
 		if ($app['acceptable_usernames']) {
-			$app['acceptable_usernames'] = $this->helper->decode($app['acceptable_usernames'], true);
+			if (is_string($app['acceptable_usernames'])) {
+				$app['acceptable_usernames'] = $this->helper->decode($app['acceptable_usernames'], true);
+			}
 
 			if (isset($app['acceptable_usernames']['data'])) {
 				$app['acceptable_usernames'] = $this->helper->encode($app['acceptable_usernames']['data']);

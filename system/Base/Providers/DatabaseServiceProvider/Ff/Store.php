@@ -1270,7 +1270,7 @@ class Store
 
     protected function writeNewDocumentToStore(array $storeData): array
     {
-        if (isset($storeData[$this->primaryKey])) {
+        if (isset($storeData[$this->primaryKey]) && $storeData[$this->primaryKey] != 0) {
             throw new IdNotAllowedException(
                 "The $this->primaryKey\" index is reserved, please delete the $this->primaryKey key and try again"
             );

@@ -223,9 +223,9 @@ abstract class BasePackage extends Controller
 				$this->cacheTools->updateIndex(
 					$this->cacheName,
 					$parameters,
+					$this->model,
 					null,
-					true,
-					$this->model
+					true
 				);
 
 				if (!$returnArray) {
@@ -1143,9 +1143,9 @@ abstract class BasePackage extends Controller
 				$this->cacheTools->updateIndex(
 					$this->cacheName,
 					$parameters,
+					$this->model,
 					null,
-					true,
-					$this->model
+					true
 				);
 			}
 
@@ -1156,9 +1156,9 @@ abstract class BasePackage extends Controller
 				$this->cacheTools->updateIndex(
 					$this->cacheName,
 					$parameters,
+					$this->model,
 					true,
-					null,
-					$this->model
+					null
 				);
 			}
 

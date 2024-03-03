@@ -145,7 +145,7 @@ class CacheTools
 		}
 	}
 
-	public function updateIndex($cacheName, $parameters, $list = false, $id = false, $object)
+	public function updateIndex($cacheName, $parameters, $object, $list = false, $id = false)
 	{
 		if (!isset($parameters['cache']) && !isset($parameters['cache']['key'])) {
 			return;
