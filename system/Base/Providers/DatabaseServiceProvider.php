@@ -16,6 +16,7 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 	{
 		$config = $container->getShared('config');
 		$request = $container->getShared('request');
+		$helper = $container->getShared('helper');
 
 		if ($config->databasetype === 'db') {
 			$container->setShared(
@@ -25,11 +26,12 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 					$session = $container->getShared('session');
 					$localContent = $container->getShared('localContent');
 					$crypt = $container->getShared('crypt');
+					$helper = $container->getShared('helper');
 
 					if (PHP_SAPI === 'cli') {
-						return (new PdoCli($dbConfig, $localContent, $crypt))->init();
+						return (new PdoCli($dbConfig, $localContent, $crypt, $helper))->init();
 					} else {
-						return (new Pdo($config, $session, $localContent, $crypt))->init();
+						return (new Pdo($config, $session, $localContent, $crypt, $helper))->init();
 					}
 				}
 			);
@@ -51,24 +53,25 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 			if ($config->databasetype === 'hybrid') {
 				$container->setShared(
 					'ff',
-					function () use ($container, $config, $request) {
+					function () use ($container, $config, $request, $helper) {
 						$session = $container->getShared('session');
 						$localContent = $container->getShared('localContent');
 						$crypt = $container->getShared('crypt');
-						$db = (new Pdo($config, $session, $localContent, $crypt))->init();
+
+						$db = (new Pdo($config, $session, $localContent, $crypt, $helper))->init();
 
 						$container->setShared('db', $db);
 
 						$basepackages = $container->getShared('basepackages');
 
-						return (new Ff($config, $request, $db, $basepackages))->init();
+						return (new Ff($config, $request, $helper, $db, $basepackages))->init();
 					}
 				);
 			} else {
 				$container->setShared(
 					'ff',
-					function () use ($config, $request) {
-						return (new Ff($config, $request))->init();
+					function () use ($config, $request, $helper) {
+						return (new Ff($config, $request, $helper))->init();
 					}
 				);
 			}

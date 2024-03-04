@@ -2,12 +2,14 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages;
 
-use Phalcon\Helper\Json;
-
 class Widgets
 {
-    public function register($db, $ff, $componentFile, $registeredComponentId, $path, $localContent)
+    protected $helper;
+
+    public function register($db, $ff, $componentFile, $registeredComponentId, $path, $localContent, $helper)
     {
+        $this->helper = $helper;
+
         $registeredComponentClassArr = explode('\\', $componentFile['class']);
         array_pop($registeredComponentClassArr);
 
@@ -38,7 +40,7 @@ class Widgets
                 'component_id'          => $registeredComponentId,
                 'multiple'              => isset($widget['multiple']) && $widget['multiple'] === true ? 1 : 0,
                 'max_multiple'          => isset($widget['max_multiple']) ? $widget['max_multiple'] : 5,//Max instances of same widget
-                'settings'              => isset($widget['settings']) ? Json::encode($widget['settings']) : null
+                'settings'              => isset($widget['settings']) ? $this->helper->encode($widget['settings']) : null
             ];
 
         if ($db) {

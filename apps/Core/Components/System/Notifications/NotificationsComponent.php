@@ -3,7 +3,6 @@
 namespace Apps\Core\Components\System\Notifications;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
-use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class NotificationsComponent extends BaseComponent
@@ -220,7 +219,7 @@ class NotificationsComponent extends BaseComponent
 
         foreach ($this->modules->packages->packages as $packageKey => $package) {
             if ($package['settings'] && $package['settings'] !== '' && $package['settings'] !== '[]') {
-                $package['settings'] = Json::decode($package['settings'], true);
+                $package['settings'] = $this->helper->decode($package['settings'], true);
                 if (isset($package['settings']['componentRoute'])) {
                     $routeLinks[$package['name']] = $package['settings']['componentRoute'];
                 }

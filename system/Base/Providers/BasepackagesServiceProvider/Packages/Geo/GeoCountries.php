@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Geo;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCountries as GeoCountriesModel;
 
@@ -122,7 +121,7 @@ class GeoCountries extends BasePackage
             return false;
         }
 
-        $countryData = Json::decode($this->localContent->read($this->sourceDir . $data['country_iso2'] . '.json'), true);
+        $countryData = $this->helper->decode($this->localContent->read($this->sourceDir . $data['country_iso2'] . '.json'), true);
 
         $this->registerStates($countryData['states'], $countryData['id']);
             // dump($countryData);
@@ -178,7 +177,7 @@ class GeoCountries extends BasePackage
                 return false;
             }
 
-            $zip->close(base_path($this->sourceDir . $country . '.zip'));
+            $zip->close();
 
             return true;
         } catch (\Exception $e) {

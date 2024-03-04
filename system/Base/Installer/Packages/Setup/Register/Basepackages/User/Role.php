@@ -2,18 +2,18 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\User;
 
-use Phalcon\Helper\Json;
-
 class Role
 {
-    public function registerCoreRole($db, $ff)
+    protected $helper;
+
+    public function registerCoreRole($db, $ff, $helper)
     {
         $role =
             [
                 'name'              => 'System Administrators',
                 'description'       => 'System Administrators Role',
                 'type'              => 0,
-                'permissions'       => Json::encode([])
+                'permissions'       => $helper->encode([])
             ];
 
         if ($db) {
@@ -27,14 +27,14 @@ class Role
         }
     }
 
-    public function registerRegisteredUserAndGuestRoles($db, $ff)
+    public function registerRegisteredUserAndGuestRoles($db, $ff, $helper)
     {
         $registered =
             [
                 'name'              => 'Registered Users',
                 'description'       => 'Registered Users Role',
                 'type'              => 0,
-                'permissions'       => Json::encode([])
+                'permissions'       => $helper->encode([])
             ];
 
         $guest =
@@ -42,7 +42,7 @@ class Role
                 'name'              => 'Guests',
                 'description'       => 'Guests Role',
                 'type'              => 0,
-                'permissions'       => Json::encode([])
+                'permissions'       => $helper->encode([])
             ];
 
 

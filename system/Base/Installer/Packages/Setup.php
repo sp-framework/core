@@ -11,9 +11,8 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
 use League\Flysystem\UnableToDeleteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
-use Phalcon\Helper\Json;
-use Phalcon\Validation\Validator\Email;
-use Phalcon\Validation\Validator\PresenceOf;
+use Phalcon\Filter\Validation\Validator\Email;
+use Phalcon\Filter\Validation\Validator\PresenceOf;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Api\Apis\Repos as RegisterRepos;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Dashboard as RegisterCoreDashboard;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Filter as RegisterFilter;
@@ -163,7 +162,19 @@ class Setup
 
 	protected $configs;
 
-	public function __construct($container, $postData, $precheckFail = false)
+	protected $validation;
+
+	protected $security;
+
+	protected $cookies;
+
+	protected $helper;
+
+	protected $remoteWebContent;
+
+	protected $onlyUpdateDb = false;
+
+	public function __construct($container, $postData, $precheckFail = false, $onlyUpdateDb = false)
 	{
 		$this->container = $container;
 
@@ -178,6 +189,8 @@ class Setup
 		$this->security = $this->container->getShared('security');
 
 		$this->cookies = $this->container->getShared('cookies');
+
+		$this->helper = $this->container->getShared('helper');
 
 		if ($this->request->isPost() && !$precheckFail && isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'ff') {
 			$this->dbConfig =
@@ -232,21 +245,27 @@ class Setup
 						'timeout' => 0
 					],
 					'databaseType' => $this->postData['databasetype']
-				], $this->request))->init($reset, false);
+				], $this->request, $this->helper))->init($reset, false);
 		}
 
-		$this->progress = $this->basepackages->progress;
+		if (!$onlyUpdateDb) {
+			$this->progress = $this->basepackages->progress;
+		}
 
 		if (!$precheckFail) {
 			$this->localContent = $this->container['localContent'];
 			$this->remoteWebContent = $this->container['remoteWebContent'];
 		}
+
+		$this->onlyUpdateDb = $onlyUpdateDb;
 	}
 
 	public function __call($method, $arguments)
 	{
 		if (method_exists($this, $method)) {
-			$this->progress->updateProgress($method, null, false);
+			if (!$this->onlyUpdateDb) {
+				$this->progress->updateProgress($method, null, false);
+			}
 
 			$call = call_user_func_array([$this, $method], $arguments);
 
@@ -256,7 +275,9 @@ class Setup
 				$call = true;
 			}
 
-			$this->progress->updateProgress($method, $call, false);
+			if (!$this->onlyUpdateDb) {
+				$this->progress->updateProgress($method, $call, false);
+			}
 
 			return $callResult;
 		}
@@ -637,7 +658,7 @@ class Setup
 
 	protected function registerDomain()
 	{
-		(new RegisterDomain())->register($this->db, $this->ff, $this->request);
+		(new RegisterDomain())->register($this->db, $this->ff, $this->request, $this->helper);
 
 		return true;
 	}
@@ -656,7 +677,7 @@ class Setup
 
 	protected function registerCoreApp()
 	{
-		return (new RegisterCoreApp())->register($this->db, $this->ff);
+		return (new RegisterCoreApp())->register($this->db, $this->ff, $this->helper);
 	}
 
 	protected function registerModule($type)
@@ -672,7 +693,7 @@ class Setup
 				if (strpos($adminComponent, 'component.json')) {
 					try {
 						$jsonFile =
-							Json::decode(
+							$this->helper->decode(
 								$this->localContent->read($adminComponent),
 								true
 							);
@@ -720,7 +741,7 @@ class Setup
 				if (strpos($adminPackage, 'package.json')) {
 					try {
 						$jsonFile =
-							Json::decode(
+							$this->helper->decode(
 								$this->localContent->read($adminPackage),
 								true
 							);
@@ -755,7 +776,7 @@ class Setup
 				if (strpos($adminMiddleware, 'middleware.json')) {
 					try {
 						$jsonFile =
-							Json::decode(
+							$this->helper->decode(
 								$this->localContent->read($adminMiddleware),
 								true
 							);
@@ -775,7 +796,7 @@ class Setup
 		} else if ($type === 'views') {
 			try {
 				$jsonFile =
-					Json::decode(
+					$this->helper->decode(
 						$this->localContent->read('apps/Core/Views/Default/view.json'),
 						true
 					);
@@ -797,17 +818,17 @@ class Setup
 
 	protected function registerCoreComponent(array $componentFile, $menuId)
 	{
-		return (new RegisterComponent())->register($this->db, $this->ff, $componentFile, $menuId);
+		return (new RegisterComponent())->register($this->db, $this->ff, $componentFile, $menuId, $this->helper);
 	}
 
 	protected function registerCoreDashboard(array $componentFile)
 	{
-		return (new RegisterCoreDashboard())->register($this->db, $this->ff, $componentFile);
+		return (new RegisterCoreDashboard())->register($this->db, $this->ff, $componentFile, $this->helper);
 	}
 
 	protected function registerCoreWidgets(array $componentFile, $registeredComponentId, $path)
 	{
-		return (new RegisterCoreWidgets())->register($this->db, $this->ff, $componentFile, $registeredComponentId, $path, $this->localContent);
+		return (new RegisterCoreWidgets())->register($this->db, $this->ff, $componentFile, $registeredComponentId, $path, $this->localContent, $this->helper);
 	}
 
 	protected function updateCoreAppComponents()
@@ -817,22 +838,22 @@ class Setup
 
 	protected function registerCoreMenu($appType, array $menu)
 	{
-		return (new RegisterMenu())->register($this->db, $this->ff, $appType, $menu);
+		return (new RegisterMenu())->register($this->db, $this->ff, $appType, $menu, $this->helper);
 	}
 
 	protected function registerCorePackage(array $packageFile)
 	{
-		return (new RegisterPackage())->register($this->db, $this->ff, $packageFile);
+		return (new RegisterPackage())->register($this->db, $this->ff, $packageFile, $this->helper);
 	}
 
 	protected function registerCoreMiddleware(array $middlewareFile)
 	{
-		return (new RegisterMiddleware())->register($this->db, $this->ff, $middlewareFile);
+		return (new RegisterMiddleware())->register($this->db, $this->ff, $middlewareFile, $this->helper);
 	}
 
 	protected function registerCoreView(array $viewFile)
 	{
-		return (new RegisterView())->register($this->db, $this->ff, $viewFile);
+		return (new RegisterView())->register($this->db, $this->ff, $viewFile, $this->helper);
 	}
 
 	public function validateData()
@@ -856,19 +877,19 @@ class Setup
 
 	protected function registerCoreRole()
 	{
-		return (new RegisterRole())->registerCoreRole($this->db, $this->ff);
+		return (new RegisterRole())->registerCoreRole($this->db, $this->ff, $this->helper);
 	}
 
 	protected function registerRegisteredUserAndGuestRoles()
 	{
-		return (new RegisterRole())->registerRegisteredUserAndGuestRoles($this->db, $this->ff);
+		return (new RegisterRole())->registerRegisteredUserAndGuestRoles($this->db, $this->ff, $this->helper);
 	}
 
 	protected function registerCoreAccount($workFactor = 12)
 	{
-		$password = $this->container['security']->hash($this->postData['pass'], $workFactor);
+		$password = $this->container['security']->hash($this->postData['pass'], ['cost' => $workFactor]);
 
-		return (new RegisterRootCoreAccount())->register($this->db, $this->ff, $this->postData['email'], $password);
+		return (new RegisterRootCoreAccount())->register($this->db, $this->ff, $this->postData['email'], $password, $this->helper);
 	}
 
 	protected function registerCoreProfile()
@@ -921,7 +942,7 @@ class Setup
 
 	protected function registerCountries()
 	{
-		return (new RegisterCountries())->register($this->db, $this->ff, $this->localContent, $this->postData['country']);
+		return (new RegisterCountries())->register($this->db, $this->ff, $this->localContent, $this->helper);
 	}
 
 	protected function downloadCountriesStateAndCities()
@@ -931,17 +952,17 @@ class Setup
 
 	protected function registerCountriesStateAndCities()
 	{
-		return (new RegisterCountries())->registerSelectedCountryStatesAndCities($this->ff, $this->localContent, $this->remoteWebContent, $this->postData['country'], $this->postData['ip2location']);
+		return (new RegisterCountries())->registerSelectedCountryStatesAndCities($this->ff, $this->localContent, $this->remoteWebContent, $this->postData['country'], $this->postData['ip2location'], $this->helper);
 	}
 
 	protected function registerTimezones()
 	{
-		return (new RegisterTimezones())->register($this->db, $this->ff, $this->localContent);
+		return (new RegisterTimezones())->register($this->db, $this->ff, $this->localContent, $this->helper);
 	}
 
 	protected function registerStorages(array $packageFile)
 	{
-		return (new RegisterStorages())->register($this->db, $this->ff, $packageFile);
+		return (new RegisterStorages())->register($this->db, $this->ff, $packageFile, $this->helper);
 	}
 
 	protected function registerWorkers()
@@ -953,7 +974,7 @@ class Setup
 
 	protected function registerSchedules()
 	{
-		(new RegisterSchedules())->register($this->db, $this->ff);
+		(new RegisterSchedules())->register($this->db, $this->ff, $this->helper);
 
 		return true;
 	}
@@ -1009,7 +1030,7 @@ class Setup
 				foreach ($columnsArr as $columnsArrKey => $column) {
 					$columns .= '`' . $column . '`';
 
-					if ($columnsArrKey != Arr::lastKey($columnsArr)) {
+					if ($columnsArrKey != $this->helper->lastKey($columnsArr)) {
 						$columns .= ',';
 					}
 				}

@@ -6,8 +6,6 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToWriteFile;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Progress extends BasePackage
@@ -124,7 +122,7 @@ class Progress extends BasePackage
             return $progress;
         }
 
-        return Json::encode($progress);
+        return $this->helper->encode($progress);
     }
 
     public function getCallResult($method)
@@ -339,7 +337,7 @@ class Progress extends BasePackage
             return $this->opCache->getCache($this->progressFileName, 'progress');
         } else {
             try {
-                return Json::decode($this->localContent->read('/var/progress/' . $this->progressFileName . '.json'), true);
+                return $this->helper->decode($this->localContent->read('/var/progress/' . $this->progressFileName . '.json'), true);
             } catch (\ErrorException | FilesystemException | UnableToReadFile | \InvalidArgumentException $exception) {
                 return false;
             }
@@ -448,7 +446,7 @@ class Progress extends BasePackage
             }
         } else {
             try {
-                $this->localContent->write('var/progress/' . $this->progressFileName . '.json' , Json::encode($file));
+                $this->localContent->write('var/progress/' . $this->progressFileName . '.json' , $this->helper->encode($file));
             } catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
                 throw $exception;
             }

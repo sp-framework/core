@@ -3,8 +3,6 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Apis\Repos;
 
 use GuzzleHttp\TransferStats;
-use Phalcon\Helper\Json;
-use Phalcon\Helper\Str;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\Configuration;
 
@@ -80,7 +78,7 @@ class Repos extends BasePackage
     {
         $this->config = new Configuration;
 
-        $this->config->setHost(Str::reduceSlashes($this->apiConfig['api_url'] . '/api/v1'));
+        $this->config->setHost($this->helper->reduceSlashes($this->apiConfig['api_url'] . '/api/v1'));
 
         if (isset($this->apiConfig['debug']) && $this->apiConfig['debug'] === true) {
             $this->config->setDebug(true);
@@ -137,10 +135,10 @@ class Repos extends BasePackage
 
         if ($this->response && is_array($this->response)) {
             foreach ($this->response as $key => $response) {
-                $responseArr[$key] = Json::decode($response->__toString(), true);
+                $responseArr[$key] = $this->helper->decode($response->__toString(), true);
             }
         } else {
-            $responseArr = Json::decode($this->response->__toString(), true);
+            $responseArr = $this->helper->decode($this->response->__toString(), true);
         }
 
         return $responseArr;

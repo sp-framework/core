@@ -5,7 +5,6 @@ namespace System\Base\Providers\DatabaseServiceProvider\Ff;
 use Exception;
 use Opis\JsonSchema\Helper;
 use Opis\JsonSchema\Validator;
-use Phalcon\Helper\Arr;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Utils;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Classes\IndexHandler;
 use System\Base\Providers\DatabaseServiceProvider\Ff\Classes\IoHelper;
@@ -706,7 +705,7 @@ class Store
                                     $fields = explode(':', $relation[4]);
 
                                     if (count($fields) > 0 && count($fields) % 2 == 0) {
-                                        $fieldsArr = Arr::chunk($fields, 2);
+                                        $fieldsArr = $this->ff->helper->chunk($fields, 2);
                                         $criteria = [];
 
                                         foreach ($fieldsArr as $fieldArr) {
@@ -746,7 +745,7 @@ class Store
                             if ((count($intermediateFields) > 0 && count($intermediateFields) % 2 == 0) &&
                                 (count($fields) > 0 && count($fields) % 2 == 0)
                             ) {
-                                $fieldsArr = Arr::chunk($intermediateFields, 2);
+                                $fieldsArr = $this->ff->helper->chunk($intermediateFields, 2);
                                 $criteria = [];
 
                                 if (count($fieldsArr) === 1) {
@@ -764,7 +763,7 @@ class Store
 
                                     $storeData = $store->findOneBy($criteria);
 
-                                    $fieldsArr = Arr::chunk($fields, 2);
+                                    $fieldsArr = $this->ff->helper->chunk($fields, 2);
                                     $criteria = [];
 
                                     if ($storeData && count($storeData) > 0) {
@@ -930,7 +929,7 @@ class Store
                                     $fields = explode(':', $relation[4]);
 
                                     if (count($fields) > 0 && count($fields) % 2 == 0) {
-                                        $fieldsArr = Arr::chunk($fields, 2);
+                                        $fieldsArr = $this->ff->helper->chunk($fields, 2);
                                         $criteria = [];
 
                                         foreach ($fieldsArr as $fieldArr) {
@@ -971,7 +970,7 @@ class Store
                             if ((count($intermediateFields) > 0 && count($intermediateFields) % 2 == 0) &&
                                 (count($fields) > 0 && count($fields) % 2 == 0)
                             ) {
-                                $fieldsArr = Arr::chunk($intermediateFields, 2);
+                                $fieldsArr = $this->ff->helper->chunk($intermediateFields, 2);
                                 $criteria = [];
 
                                 if (count($fieldsArr) === 1) {
@@ -989,7 +988,7 @@ class Store
 
                                     $storeData = $store->findOneBy($criteria);
 
-                                    $fieldsArr = Arr::chunk($fields, 2);
+                                    $fieldsArr = $this->ff->helper->chunk($fields, 2);
                                     $criteria = [];
 
                                     if ($storeData && count($storeData) > 0) {
@@ -1271,7 +1270,7 @@ class Store
 
     protected function writeNewDocumentToStore(array $storeData): array
     {
-        if (isset($storeData[$this->primaryKey])) {
+        if (isset($storeData[$this->primaryKey]) && $storeData[$this->primaryKey] != 0) {
             throw new IdNotAllowedException(
                 "The $this->primaryKey\" index is reserved, please delete the $this->primaryKey key and try again"
             );

@@ -2,8 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Barcodes extends BasePackage
@@ -20,7 +18,7 @@ class Barcodes extends BasePackage
 
         if ($this->barcodesPackage) {
             if (is_string($this->barcodesPackage['settings'])) {
-                $this->barcodesSettings = Json::decode($this->barcodesPackage['settings'], true);
+                $this->barcodesSettings = $this->helper->decode($this->barcodesPackage['settings'], true);
             } else {
                 $this->barcodesSettings = $this->barcodesPackage['settings'];
             }
@@ -44,7 +42,7 @@ class Barcodes extends BasePackage
     {
         $this->getBarcodesSettings();
 
-        $data['enabledCodes'] = Json::decode($data['enabledCodes'], true);
+        $data['enabledCodes'] = $this->helper->decode($data['enabledCodes'], true);
         $this->barcodesSettings['enabledCodes'] = $data['enabledCodes'];
         $this->barcodesSettings['defaultGenerator'] = $data['defaultGenerator'];
         $this->barcodesSettings['widthFactor'] = $data['widthFactor'];
@@ -57,7 +55,7 @@ class Barcodes extends BasePackage
         }
         $this->barcodesSettings['defaultTextPlacement'] = $data['defaultTextPlacement'];
 
-        $this->barcodesPackage['settings'] = Json::encode($this->barcodesSettings);
+        $this->barcodesPackage['settings'] = $this->helper->encode($this->barcodesSettings);
 
         $this->modules->packages->updatePackages($this->barcodesPackage);
 
@@ -175,7 +173,7 @@ class Barcodes extends BasePackage
             $reflection = new \ReflectionClass($e);
             $classnameArr = explode('\\', $reflection->name);
 
-            if (Arr::last($classnameArr) === 'InvalidCheckDigitException') {
+            if ($this->helper->last($classnameArr) === 'InvalidCheckDigitException') {
                 $this->packagesData->responseCode = 1;
 
                 $this->packagesData->responseMessage = 'Invalid Barcode. Please enter correct barcode and try again.';

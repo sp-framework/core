@@ -4,7 +4,6 @@ namespace Apps\Core\Components\System\Tools\Importexport;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use Apps\Core\Packages\System\Tools\ImportExport\ImportExport;
-use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class ImportexportComponent extends BaseComponent
@@ -51,19 +50,19 @@ class ImportexportComponent extends BaseComponent
                         $this->view->filters = $componentData['filters'];
                     }
 
-                    $importexport['fields'] = Json::decode($importexport['fields'], true);
+                    $importexport['fields'] = $this->helper->decode($importexport['fields'], true);
 
-                    $importexport['email_to'] = implode(',', Json::decode($importexport['email_to'], true));
+                    $importexport['email_to'] = implode(',', $this->helper->decode($importexport['email_to'], true));
 
                     if ($importexport['file'] && $importexport['file'] !== '') {
                         $importexport['file'] = $this->links->url('system/storages/q/uuid/' . $importexport['file']);
                     }
                 } else if ($importexport['type'] === 'import' && isset($importexport['component_id'])) {
-                    $importexport['email_to'] = implode(',', Json::decode($importexport['email_to'], true));
+                    $importexport['email_to'] = implode(',', $this->helper->decode($importexport['email_to'], true));
 
                     if ($importexport['file'] && $importexport['file'] !== '') {
                         try {
-                            $importexport['file'] = Json::decode($importexport['file'], true);
+                            $importexport['file'] = $this->helper->decode($importexport['file'], true);
                             $importexport['file'] = $importexport['file'][0];
 
                             $this->view->file = $this->basepackages->storages->getFileInfo($importexport['file']);
@@ -169,7 +168,7 @@ class ImportexportComponent extends BaseComponent
             }
 
             if ($data['email_to'] && $data['email_to'] !== '') {
-                $data['email_to'] = Json::decode($data['email_to'], true);
+                $data['email_to'] = $this->helper->decode($data['email_to'], true);
 
                 $data['email_to'] = implode(',', $data['email_to']);
             }

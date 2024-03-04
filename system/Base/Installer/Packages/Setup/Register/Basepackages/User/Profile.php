@@ -2,8 +2,6 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\User;
 
-use Phalcon\Helper\Json;
-
 class Profile
 {
     public function register($db, $ff)

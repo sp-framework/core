@@ -1,0 +1,10 @@
+--- src/Connection.php  2023-12-15 22:02:10.000000000 +1100
++++ src/Connection.php  2024-03-02 17:47:39.500497582 +1100
+@@ -17,6 +17,7 @@
+  * @see ConnectionInterface
+  * @internal
+  */
++#[\AllowDynamicProperties]
+ class Connection extends EventEmitter implements ConnectionInterface
+ {
+     /**

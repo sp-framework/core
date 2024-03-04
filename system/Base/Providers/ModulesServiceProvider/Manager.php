@@ -4,8 +4,6 @@ namespace System\Base\Providers\ModulesServiceProvider;
 
 use Carbon\Carbon;
 use GuzzleHttp\Exception\ClientException;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Base\ObjectSerializer;
 use System\Base\Providers\ModulesServiceProvider\Installer;
@@ -113,7 +111,7 @@ class Manager extends BasePackage
             if ($module['repo_details']) {
                 if (is_string($module['repo_details'])) {
                     try {
-                        $module['repo_details'] = Json::decode($module['repo_details'], true);
+                        $module['repo_details'] = $this->helper->decode($module['repo_details'], true);
                     } catch (\Exception $e) {
                         $module['repo_details'] = null;
                     }
@@ -146,7 +144,7 @@ class Manager extends BasePackage
             if (strtolower($this->apiConfig['provider']) === 'gitea') {
                 $collection = 'RepositoryApi';
                 $method = 'repoGet';
-                $args = [$this->apiConfig['org_user'], Arr::last($repoNameArr)];
+                $args = [$this->apiConfig['org_user'], $this->helper->last($repoNameArr)];
             } else if (strtolower($this->apiConfig['provider']) === 'github') {
                 //For github
             }
@@ -155,14 +153,14 @@ class Manager extends BasePackage
 
             if ($responseArr) {
                 if (is_string($module['repo_details'])) {
-                    $module['repo_details'] = Json::decode($module['repo_details'], true);
+                    $module['repo_details'] = $this->helper->decode($module['repo_details'], true);
                 }
 
                 $module['repo_details']['details'] = $responseArr;
 
                 $this->remoteModules[$module['module_type']] = [$responseArr];
 
-                $latestRelease = $this->moduleNeedsUpgrade($module, $responseArr);
+                $latestRelease = $this->moduleNeedsUpgrade($responseArr, $module);
 
                 if ($latestRelease) {
                     $module['repo_details']['latestRelease'] = $latestRelease;
@@ -505,10 +503,10 @@ class Manager extends BasePackage
 
                     $registerRemotePackage['settings'] =
                         isset($registerRemotePackage['settings']) ?
-                        Json::encode($registerRemotePackage['settings']) :
-                        Json::encode([]);
+                        $this->helper->encode($registerRemotePackage['settings']) :
+                        $this->helper->encode([]);
 
-                    $registerRemotePackage['apps'] = Json::encode([]);
+                    $registerRemotePackage['apps'] = $this->helper->encode([]);
 
                     $registerRemotePackage['installed'] = 0;
 
@@ -559,7 +557,7 @@ class Manager extends BasePackage
                 $localModule['repo_details'] = [];
                 $localModule['repo_details']['details'] = $remoteModule;
 
-                $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($localModule, $remoteModule);
+                $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($remoteModule, $localModule);
 
                 if ($moduleNeedsUpgrade) {
                     if ($this->getRemoteModuleJson($remoteModulesType, $localModule, true)) {
@@ -583,7 +581,7 @@ class Manager extends BasePackage
             } else {
                 $remoteModule['repo_details'] = [];
                 $remoteModule['repo_details']['details'] = $remoteModule;
-                $moduleNeedsUpgrade = $this->moduleNeedsUpgrade(null, $remoteModule);
+                $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($remoteModule);
                 $remoteModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
 
                 $modules['new'][$remoteModuleKey] = $remoteModule;
@@ -593,7 +591,7 @@ class Manager extends BasePackage
         return $modules;
     }
 
-    protected function moduleNeedsUpgrade($localModule = null, $remoteModule, $returnLatestReleaseOnly = false)
+    protected function moduleNeedsUpgrade($remoteModule, $localModule = null, $returnLatestReleaseOnly = false)
     {
         if (strtolower($this->apiConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';

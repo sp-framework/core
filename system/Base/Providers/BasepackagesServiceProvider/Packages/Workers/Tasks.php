@@ -4,7 +4,6 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
 use Carbon\Carbon;
 use League\Flysystem\StorageAttributes;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersTasks;
 
@@ -227,7 +226,7 @@ class Tasks extends BasePackage
             }
 
             if (is_string($task['parameters']) && $task['parameters'] !== '') {
-                $task['parameters'] = Json::decode($task['parameters'], true);
+                $task['parameters'] = $this->helper->decode($task['parameters'], true);
 
                 if (recursive_array_search($parameterValue, $task['parameters'], $parameterKey)) {
                     return $task;

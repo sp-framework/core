@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Phalcon\Helper\Json;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
@@ -81,7 +80,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
 
     public function onNewPush($newPush)
     {
-        $newPush = Json::decode($newPush, true);
+        $newPush = $this->helper->decode($newPush, true);
 
         if (!array_key_exists($newPush['type'], $this->subscriptions)) {
             return;

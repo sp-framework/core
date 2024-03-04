@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\AppsServiceProvider;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\AppsServiceProvider\Types;
 use System\Base\Providers\AppsServiceProvider\Exceptions\AppNotFoundException;
@@ -121,6 +120,10 @@ class Apps extends BasePackage
 
 	public function getAppByRoute($route)
 	{
+		if (!$route) {
+			return false;
+		}
+
 		foreach($this->apps as $app) {
 			if (strtolower($app['route']) == strtolower($route)) {
 				return $app;
@@ -150,8 +153,8 @@ class Apps extends BasePackage
 		$data['default_component'] = 0;
 		$data['errors_component'] = 0;
 		$data['ip_filter_default_action'] = 0;
-		$data['can_login_role_ids'] = Json::encode(['1']);
-		$data['acceptable_usernames'] = Json::encode(['email']);
+		$data['can_login_role_ids'] = $this->helper->encode(['1']);
+		$data['acceptable_usernames'] = $this->helper->encode(['email']);
 
 		if (isset($data['default_dashboard']) && $data['default_dashboard']) {
 			$data['settings']['defaultDashboard'] = $data['default_dashboard'];
@@ -177,7 +180,7 @@ class Apps extends BasePackage
 	public function updateApp(array $data)
 	{
 		if (isset($data['domains'])) {//Coming via app wizard.
-			$domains = Json::decode($data['domains'], true);
+			$domains = $this->helper->decode($data['domains'], true);
 
 			if (isset($domains['data'])) {
 				$domains = $domains['data'];
@@ -186,7 +189,9 @@ class Apps extends BasePackage
 			foreach ($domains as $domain) {
 				$domain = $this->domains->getDomainById($domain);
 
-				$domain['apps'] = Json::decode($domain['apps'], true);
+				if (is_string($domain['apps'])) {
+					$domain['apps'] = $this->helper->decode($domain['apps'], true);
+				}
 
 				$domain['apps'][$data['id']]['allowed'] = true;
 				$domain['apps'][$data['id']]['view'] = $data['view'];
@@ -209,17 +214,19 @@ class Apps extends BasePackage
 		}
 
 		if (isset($app['can_login_role_ids'])) {
-			$app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
+			if (is_string($app['can_login_role_ids'])) {
+				$app['can_login_role_ids'] = $this->helper->decode($app['can_login_role_ids'], true);
+			}
 
 			if (isset($app['can_login_role_ids']['data'])) {
-				$app['can_login_role_ids'] = Json::encode($app['can_login_role_ids']['data']);
+				$app['can_login_role_ids'] = $this->helper->encode($app['can_login_role_ids']['data']);
 			} else {
-				$app['can_login_role_ids'] = Json::encode($app['can_login_role_ids']);
+				$app['can_login_role_ids'] = $this->helper->encode($app['can_login_role_ids']);
 			}
 		}
 
 		if (isset($app['views']) && $app['views'] !== '') {
-			$views = Json::decode($app['views'], true);
+			$views = $this->helper->decode($app['views'], true);
 
 			foreach ($views as $viewId => $view) {
 				if ($view === false) {
@@ -251,15 +258,17 @@ class Apps extends BasePackage
 		}
 
 		if ($app['acceptable_usernames']) {
-			$app['acceptable_usernames'] = Json::decode($app['acceptable_usernames'], true);
+			if (is_string($app['acceptable_usernames'])) {
+				$app['acceptable_usernames'] = $this->helper->decode($app['acceptable_usernames'], true);
+			}
 
 			if (isset($app['acceptable_usernames']['data'])) {
-				$app['acceptable_usernames'] = Json::encode($app['acceptable_usernames']['data']);
+				$app['acceptable_usernames'] = $this->helper->encode($app['acceptable_usernames']['data']);
 			} else {
-				$app['acceptable_usernames'] = Json::encode($app['acceptable_usernames']);
+				$app['acceptable_usernames'] = $this->helper->encode($app['acceptable_usernames']);
 			}
 		} else {
-			$app['acceptable_usernames'] = Json::encode(['email']);
+			$app['acceptable_usernames'] = $this->helper->encode(['email']);
 		}
 
 		if ($this->update($app)) {
@@ -346,7 +355,7 @@ class Apps extends BasePackage
 
 		if (isset($app['acceptable_usernames']) && $app['acceptable_usernames'] !== '') {
 			if (is_string($app['acceptable_usernames'])) {
-				$app['acceptable_usernames'] = Json::decode($app['acceptable_usernames'], true);
+				$app['acceptable_usernames'] = $this->helper->decode($app['acceptable_usernames'], true);
 			}
 		}
 

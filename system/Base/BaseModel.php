@@ -50,7 +50,7 @@ abstract class BaseModel extends Model
 	{
 		return
 			$this->modules->packages->getPackageByNameForAppId(
-				Arr::last(explode('\\', $packageClass)),
+				$this->helper->last(explode('\\', $packageClass)),
 				$this->app['id']
 			);
 	}

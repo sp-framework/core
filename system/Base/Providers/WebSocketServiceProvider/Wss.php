@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\WebSocketServiceProvider;
 
-use Phalcon\Helper\Json;
 use ZMQContext;
 
 class Wss
@@ -15,9 +14,13 @@ class Wss
 
     protected $socket;
 
-    public function __construct($config)
+    protected $helper;
+
+    public function __construct($config, $helper)
     {
         $this->config = $config;
+
+        $this->helper = $helper;
     }
 
     public function init()
@@ -82,7 +85,7 @@ class Wss
 
         $this->socket->connect($this->connector);
 
-        $this->socket->send(Json::encode($data));
+        $this->socket->send($this->helper->encode($data));
 
         return true;
     }

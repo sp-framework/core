@@ -3,11 +3,10 @@
 namespace System\Base\Installer\Packages\Setup\Register\Providers;
 
 use Phalcon\Db\Enum;
-use Phalcon\Helper\Json;
 
 class App
 {
-	public function register($db, $ff)
+	public function register($db, $ff, $helper)
 	{
 		$coreApp =
 			[
@@ -17,10 +16,10 @@ class App
 				'app_type'       			=> 'core',
 				'default_component'			=> 0,
 				'errors_component'			=> 0,
-				'can_login_role_ids'		=> Json::encode(['1']),
-				'acceptable_usernames'		=> Json::encode(["email", "username"]),
+				'can_login_role_ids'		=> $helper->encode(['1']),
+				'acceptable_usernames'		=> $helper->encode(["email", "username"]),
 				'ip_filter_default_action'	=> 0,
-				'settings'					=> Json::encode(["defaultDashboard" => 1])
+				'settings'					=> $helper->encode(["defaultDashboard" => 1])
 			];
 
 		if ($db) {

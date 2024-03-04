@@ -1,0 +1,14 @@
+If in case you want to generate a patch:
+1) Modify file and save it as {filename}New.php, example, Connection.php and ConnectionNew.php
+2) Execute Command:
+diff -Naur Connection.php ConnectionNew.php > {project}_{name}_{filename}.patch. Example: react_socket_connection.patch
+3) Move the patch file to external/patches folder
+4) Modify Core Package.json file to install the new patch on next composer run.
+Example:
+            "extra": {
+                "patches": {
+                    "react/socket" : {
+                        "phpv8.3 support" : "/var/www/html/sp/external/patches/react_socket_connection.patch"
+                    }
+                }
+            }

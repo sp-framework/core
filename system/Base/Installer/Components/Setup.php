@@ -5,7 +5,6 @@ namespace System\Base\Installer\Components;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
 use Phalcon\Di\FactoryDefault;
-use Phalcon\Helper\Json;
 use Phalcon\Http\Response\Cookies;
 use Phalcon\Mvc\View\Simple;
 use System\Base\Installer\Packages\Setup as SetupPackage;
@@ -17,6 +16,7 @@ use System\Base\Providers\SecurityServiceProvider\Crypt;
 use System\Base\Providers\SecurityServiceProvider\Random;
 use System\Base\Providers\SecurityServiceProvider\Security;
 use System\Base\Providers\SessionServiceProvider\Session;
+use System\Base\Providers\SupportServiceProvider\Helper;
 use System\Base\Providers\ValidationServiceProvider\Validation;
 use System\Base\Providers\WebSocketServiceProvider\Wss;
 
@@ -34,7 +34,27 @@ Class Setup
 
 	protected $config;
 
-	public function __construct($session, $configsObj)
+	protected $request;
+
+	protected $response;
+
+	protected $postData;
+
+	protected $security;
+
+	protected $random;
+
+	protected $session;
+
+	protected $cookies;
+
+	protected $basepackages;
+
+	protected $helper;
+
+	protected $progress;
+
+	public function __construct($session, $configsObj, $onlyUpdateDb = false)
 	{
 		try {
 			$container = new FactoryDefault();
@@ -109,9 +129,16 @@ Class Setup
 			}
 
 			$container->setShared(
+				'helper',
+				function () {
+					return (new Helper())->init();
+				}
+			);
+
+			$container->setShared(
 				'wss',
-				function () use ($configsObj) {
-					return (new Wss($configsObj))->init();
+				function () use ($configsObj, $container) {
+					return (new Wss($configsObj, $container->getShared('helper')))->init();
 				}
 			);
 
@@ -149,7 +176,11 @@ Class Setup
 
 			$this->basepackages = $this->container->getShared('basepackages');
 
-			$this->progress = $this->basepackages->progress->init($this->container);
+			$this->helper = $this->container->getShared('helper');
+
+			if ($onlyUpdateDb === false) {
+				$this->progress = $this->basepackages->progress->init($this->container);
+			}
 
 			$this->config = $configsObj->toArray();
 
@@ -173,7 +204,7 @@ Class Setup
 	{
 		try {
 			if (!isset($this->postData['session'])) {
-				$this->setupPackage = new SetupPackage($this->container, $this->postData);
+				$this->setupPackage = new SetupPackage($this->container, $this->postData, false, $onlyUpdateDb);
 
 				if (!$onlyUpdateDb) {
 					if ($this->progress->checkProgressFile()) {
@@ -184,9 +215,11 @@ Class Setup
 				}
 			}
 		} catch (\Exception $e) {
-			$this->progress->preCheckComplete(false);
+			if (!$onlyUpdateDb) {
+				$this->progress->preCheckComplete(false);
 
-			$this->progress->resetProgress();
+				$this->progress->resetProgress();
+			}
 
 			$this->view->responseCode = 1;
 			$this->view->responseMessage = $e->getMessage();
@@ -225,7 +258,7 @@ Class Setup
 					}
 				}
 			} else if (isset($this->postData['dev']) && $this->postData['dev'] == 'true') {
-				$this->progress->unregisterMethods(['downloadCountriesStateAndCities', 'registerCountriesStateAndCities']);
+				// $this->progress->unregisterMethods(['downloadCountriesStateAndCities', 'registerCountriesStateAndCities']);
 			}
 
 			if (!$onlyUpdateDb) {
@@ -246,50 +279,62 @@ Class Setup
 
 					return;
 				}
-			}
 
-			$checkDb = true;
-			$checkUser = true;
-			if (!isset($this->postData['create-db']) ||
-				(isset($this->postData['create-db']) && $this->postData['create-db'] == 'false')
-			) {
-				$this->progress->unregisterMethods(['createNewDb']);
-				$checkDb = false;
-			}
+				$checkDb = true;
+				$checkUser = true;
 
-			if (!isset($this->postData['create-user']) ||
-				(isset($this->postData['create-user']) && $this->postData['create-user'] == 'false')
-			) {
-				$this->progress->unregisterMethods(['checkUser']);
-				$checkUser = false;
-			}
-
-			if ($checkDb || $checkUser) {
-				if (isset($this->postData['create-username']) &&
-					isset($this->postData['create-password'])
+				if (!isset($this->postData['create-db']) ||
+					(isset($this->postData['create-db']) && $this->postData['create-db'] == 'false')
 				) {
-					$this->progress->preCheckComplete();
+					$this->progress->unregisterMethods(['createNewDb']);
+					$checkDb = false;
+				}
 
-					try {
-						if ($checkDb) {
-							$this->setupPackage->createNewDb();
+				if (!isset($this->postData['create-user']) ||
+					(isset($this->postData['create-user']) && $this->postData['create-user'] == 'false')
+				) {
+					$this->progress->unregisterMethods(['checkUser']);
+					$checkUser = false;
+				}
+
+				if ($checkDb || $checkUser) {
+					if (isset($this->postData['create-username']) &&
+						isset($this->postData['create-password'])
+					) {
+						$this->progress->preCheckComplete();
+
+						try {
+							if ($checkDb) {
+								$this->setupPackage->createNewDb();
+							}
+
+							if ($checkUser) {
+								$this->setupPackage->checkUser();
+							}
+
+							unset($this->postData['create-username']);
+							unset($this->postData['create-password']);
+
+							$this->setupPackage = new SetupPackage($this->container, $this->postData, false, $onlyUpdateDb);
+						} catch (\Exception $e) {
+							$this->progress->preCheckComplete(false);
+
+							$this->progress->resetProgress();
+
+							$this->view->responseCode = 1;
+							$this->view->responseMessage = $e->getMessage();
+
+							if ($this->response->isSent() !== true) {
+								$this->response->setJsonContent($this->view->getParamsToView());
+
+								return $this->response->send();
+							}
 						}
-
-						if ($checkUser) {
-							$this->setupPackage->checkUser();
-						}
-
-						unset($this->postData['create-username']);
-						unset($this->postData['create-password']);
-
-						$this->setupPackage = new SetupPackage($this->container, $this->postData);
-					} catch (\Exception $e) {
-						$this->progress->preCheckComplete(false);
-
+					} else {
 						$this->progress->resetProgress();
 
 						$this->view->responseCode = 1;
-						$this->view->responseMessage = $e->getMessage();
+						$this->view->responseMessage = 'Database username and password with create permission not provided.';
 
 						if ($this->response->isSent() !== true) {
 							$this->response->setJsonContent($this->view->getParamsToView());
@@ -297,22 +342,11 @@ Class Setup
 							return $this->response->send();
 						}
 					}
-				} else {
-					$this->progress->resetProgress();
-
-					$this->view->responseCode = 1;
-					$this->view->responseMessage = 'Database username and password with create permission not provided.';
-
-					if ($this->response->isSent() !== true) {
-						$this->response->setJsonContent($this->view->getParamsToView());
-
-						return $this->response->send();
-					}
 				}
 			}
 
 			$this->coreJson =
-				Json::decode(
+				$this->helper->decode(
 					$this->localContent->read('system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json'),
 					true
 				);
@@ -751,7 +785,7 @@ Class Setup
 
 		if (!$precheckFail) {
 			$this->view->countries =
-				Json::decode(
+				$this->helper->decode(
 					$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/AllCountries.json'),
 					true
 				);
@@ -779,7 +813,7 @@ Class Setup
 		}
 
 		try {
-			$composerJsonFile = Json::decode(file_get_contents(base_path('external/composer.json')), true);
+			$composerJsonFile = $this->helper->decode(file_get_contents(base_path('external/composer.json')), true);
 		} catch (\throwable $exception) {
 			$this->view->responseCode = 1;
 
@@ -787,15 +821,35 @@ Class Setup
 		}
 
 		try {
-			$coreJsonFile = Json::decode(file_get_contents(base_path('system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json')), true);
+			$coreJsonFile = $this->helper->decode(file_get_contents(base_path('system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json')), true);
 
-			foreach ($coreJsonFile['dependencies']['external'] as $external => $version) {
-				if (!isset($composerJsonFile['require'][$external])) {
-					$composerJsonFile['require'][$external] = $version;
+			foreach ($coreJsonFile['dependencies']['composer']['require'] as $composer => $version) {
+				if (!isset($composerJsonFile['require'][$composer])) {
+					$composerJsonFile['require'][$composer] = $version;
 				}
 			}
 
-			file_put_contents(base_path('external/composer.json'), Json::encode($composerJsonFile, JSON_PRETTY_PRINT));
+			if (isset($coreJsonFile['dependencies']['composer']['config'])) {
+				$composerJsonFile['config'] = $coreJsonFile['dependencies']['composer']['config'];
+			}
+
+			if (isset($coreJsonFile['dependencies']['composer']['extra'])) {
+				if (isset($coreJsonFile['dependencies']['composer']['extra']['patches']) &&
+					is_array($coreJsonFile['dependencies']['composer']['extra']['patches'])
+				) {
+					foreach ($coreJsonFile['dependencies']['composer']['extra']['patches'] as $package => &$patchDetails) {
+						if (is_array($patchDetails)) {
+							foreach ($patchDetails as $description => &$location) {
+								$location = base_path($location);
+							}
+						}
+					}
+				}
+
+				$composerJsonFile['extra'] = $coreJsonFile['dependencies']['composer']['extra'];
+			}
+
+			file_put_contents(base_path('external/composer.json'), $this->helper->encode($composerJsonFile, JSON_PRETTY_PRINT));
 		} catch (\throwable $exception) {
 			$this->view->responseCode = 1;
 

@@ -3,7 +3,6 @@
 namespace Apps\Core\Components\System\Storages;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
-use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class StoragesComponent extends BaseComponent
@@ -37,9 +36,9 @@ class StoragesComponent extends BaseComponent
                         return $this->throwIdNotFound();
                     }
 
-                    $storage['allowed_image_mime_types'] = Json::decode($storage['allowed_image_mime_types']);
-                    $storage['allowed_image_sizes'] = Json::decode($storage['allowed_image_sizes']);
-                    $storage['allowed_file_mime_types'] = Json::decode($storage['allowed_file_mime_types']);
+                    $storage['allowed_image_mime_types'] = $this->helper->decode($storage['allowed_image_mime_types']);
+                    $storage['allowed_image_sizes'] = $this->helper->decode($storage['allowed_image_sizes']);
+                    $storage['allowed_file_mime_types'] = $this->helper->decode($storage['allowed_file_mime_types']);
 
                     $this->view->storage = $storage;
 
@@ -51,7 +50,7 @@ class StoragesComponent extends BaseComponent
                 $storagePackage = $this->modules->packages->getPackageByName('Storages');
 
                 if (is_string($storagePackage['settings'])) {
-                    $storagePackage['settings'] = Json::decode($storagePackage['settings'], true);
+                    $storagePackage['settings'] = $this->helper->decode($storagePackage['settings'], true);
                 }
 
                 $this->view->allowedImageMimeTypes = $storagePackage['settings']['allowedImageMimeTypes'];

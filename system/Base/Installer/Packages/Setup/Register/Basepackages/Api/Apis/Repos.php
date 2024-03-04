@@ -13,7 +13,7 @@ class Repos
                 'repo_url'              => 'https://dev.bazaari.com.au/sp-core',
                 'branch'                => 'main',
                 'auth_type'             => 'autho',
-                'authorization'         => '5b7987057a61adfe7be9994b5a5e8d569d385138'//bcust Token
+                'authorization'         => ''//5b7987057a61adfe7be9994b5a5e8d569d385138 - bcust Token
             ];
 
         $coreApi =
@@ -35,7 +35,7 @@ class Repos
                 'repo_url'              => 'https://dev.bazaari.com.au/sp-modules',
                 'branch'                => 'main',
                 'auth_type'             => 'autho',
-                'authorization'         => '5b7987057a61adfe7be9994b5a5e8d569d385138'//bcust Token
+                'authorization'         => ''//5b7987057a61adfe7be9994b5a5e8d569d385138 - bcust Token
             ];
 
         $modulesApi =

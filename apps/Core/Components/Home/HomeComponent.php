@@ -22,9 +22,9 @@ class HomeComponent extends BaseComponent
             }
 
             $defaultComponent = $this->modules->components->getById($defaultComponentId);
-            $controller = Arr::last(explode('/', $defaultComponent['route']));
+            $controller = $this->helper->last(explode('/', $defaultComponent['route']));
             $routeArr = explode('/', $defaultComponent['route']);
-            unset($routeArr[Arr::lastKey($routeArr)]);
+            unset($routeArr[$this->helper->lastKey($routeArr)]);
             $viewPath = join('/', $routeArr);
 
             $reflection = new \ReflectionClass(($defaultComponent['class']));

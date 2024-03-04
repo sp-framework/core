@@ -2,11 +2,9 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Modules;
 
-use Phalcon\Helper\Json;
-
 class Package
 {
-	public function register($db, $ff, $packageFile)
+	public function register($db, $ff, $packageFile, $helper)
 	{
 		$package =
 			[
@@ -21,20 +19,20 @@ class Package
 				'class'					=> $packageFile['class'],
 				'settings'				=>
 					isset($packageFile['settings']) ?
-					Json::encode($packageFile['settings']) :
-					Json::encode([]),
+					$helper->encode($packageFile['settings']) :
+					$helper->encode([]),
 				'dependencies'		 	=>
 					isset($packageFile['dependencies']) ?
-					Json::encode($packageFile['dependencies']) :
-					Json::encode([]),
+					$helper->encode($packageFile['dependencies']) :
+					$helper->encode([]),
 				'apps'					=>
-					Json::encode(['1'=>['enabled'=>true]]),
+					$helper->encode(['1'=>['enabled'=>true]]),
 				'api_id'				=> 1,
 				'installed'				=> 1,
 				'files'					=>
 					isset($packageFile['files']) ?
-					Json::encode($packageFile['files']) :
-					Json::encode([]),
+					$helper->encode($packageFile['files']) :
+					$helper->encode([]),
 				'updated_by'			=> 0
 			];
 

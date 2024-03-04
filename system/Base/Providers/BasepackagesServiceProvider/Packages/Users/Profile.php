@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Users;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
@@ -52,7 +51,7 @@ class Profile extends BasePackage
                     !is_array($profile['settings']) &&
                     $profile['settings'] !== ''
                 ) {
-                    $profile['settings'] = Json::decode($profile['settings'], true);
+                    $profile['settings'] = $this->helper->decode($profile['settings'], true);
                 } else {
                     $profile['settings'] = [];
                 }
@@ -136,7 +135,7 @@ class Profile extends BasePackage
         }
 
         if (is_array($profile['settings'])) {
-            $profile['settings'] = Json::encode($profile['settings']);
+            $profile['settings'] = $this->helper->encode($profile['settings']);
         }
 
         if ($this->update($profile)) {
@@ -153,7 +152,7 @@ class Profile extends BasePackage
         }
 
         if (isset($data['subscriptions']) && $data['subscriptions'] !== '') {
-            $data['subscriptions'] = Json::decode($data['subscriptions'], true);
+            $data['subscriptions'] = $this->helper->decode($data['subscriptions'], true);
             $this->modules->packages->updateNotificationSubscriptions($data['subscriptions']);
             unset($data['subscriptions']);
         }
@@ -194,7 +193,7 @@ class Profile extends BasePackage
         $portrait = $this->getProfile($this->auth->account()['id'])['portrait'];
 
         if (is_array($profile['settings'])) {
-            $profile['settings'] = Json::encode($profile['settings']);
+            $profile['settings'] = $this->helper->encode($profile['settings']);
         }
 
         if ($this->update($profile)) {
@@ -381,7 +380,7 @@ class Profile extends BasePackage
                             !is_array($package['notification_subscriptions']) &&
                             $package['notification_subscriptions'] !== ''
                         ) {
-                            $package['notification_subscriptions'] = Json::decode($package['notification_subscriptions'], true);
+                            $package['notification_subscriptions'] = $this->helper->decode($package['notification_subscriptions'], true);
                         }
 
                         $reflector = $this->annotations->get($package['class']);
@@ -440,9 +439,9 @@ class Profile extends BasePackage
             }
         }
 
-        $this->packagesData->subscriptions = Json::encode($subscriptions);
+        $this->packagesData->subscriptions = $this->helper->encode($subscriptions);
 
-        $this->packagesData->notifications = Json::encode($notifications);
+        $this->packagesData->notifications = $this->helper->encode($notifications);
 
         //We grab agents instead of sessions so we can clear stale agents as well as sessions. Number of agents can be more then sessions and each agent will have its session ID.
         $this->packagesData->sessions = [];

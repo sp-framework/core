@@ -84,7 +84,7 @@ class Filters extends Adminltetags
             }
         }
         if ($defaultFilter === null) {
-            $defaultFilter = Arr::firstKey($filters);
+            $defaultFilter = $this->helper->firstKey($filters);
         }
 
         if ($defaultFilter === 0) {

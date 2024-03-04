@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\HttpServiceProvider;
 
-use Phalcon\Helper\Json;
 use Phalcon\Http\Response\Cookies as PhalconCookies;
 
 class Cookies

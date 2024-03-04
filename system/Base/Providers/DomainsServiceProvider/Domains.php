@@ -5,7 +5,6 @@ namespace System\Base\Providers\DomainsServiceProvider;
 use BlueLibraries\Dns\DnsRecords;
 use BlueLibraries\Dns\Handlers\Types\TCP;
 use BlueLibraries\Dns\Records\RecordTypes;
-use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Url;
 use System\Base\BasePackage;
 use System\Base\Providers\DomainsServiceProvider\Model\ServiceProviderDomains;
@@ -47,7 +46,7 @@ class Domains extends BasePackage
 
 		if ($this->domain) {
 			if (is_string($this->domain['apps']) && $this->domain['apps'] !== '') {
-				$this->domain['apps'] = Json::decode($this->domain['apps'], true);
+				$this->domain['apps'] = $this->helper->decode($this->domain['apps'], true);
 			}
 		}
 	}
@@ -147,7 +146,7 @@ class Domains extends BasePackage
 	protected function checkAppsData($data, $exclusive = true)
 	{
 		if (!is_array($data['apps'])) {
-			$data['apps'] = Json::decode($data['apps'], true);
+			$data['apps'] = $this->helper->decode($data['apps'], true);
 		}
 
 		if (count($data['apps']) >= 1) {
@@ -263,11 +262,11 @@ class Domains extends BasePackage
 			}
 
 			if (is_string($domain['apps'])) {
-				$domain['apps'] = Json::decode($domain['apps'], true);
+				$domain['apps'] = $this->helper->decode($domain['apps'], true);
 			}
 			if ($domain['settings']) {
 				if (is_string($domain['settings'])) {
-					$domain['settings'] = Json::decode($domain['settings'], true);
+					$domain['settings'] = $this->helper->decode($domain['settings'], true);
 				}
 			} else {
 				$domain['settings'] = [];
@@ -284,14 +283,14 @@ class Domains extends BasePackage
 	{
 		foreach ($this->domains as $domainkey => $domain) {
 			if (!is_array($domain['apps'])) {
-				$domain['apps'] = Json::decode($domain['apps'], true);
+				$domain['apps'] = $this->helper->decode($domain['apps'], true);
 			}
 
 			if (isset($domain['apps'][$id])) {
 				unset($domain['apps'][$id]);
 			}
 
-			$domain['apps'] = Json::encode($domain['apps']);
+			$domain['apps'] = $this->helper->encode($domain['apps']);
 
 			$this->update($domain);
 		}
@@ -390,7 +389,7 @@ class Domains extends BasePackage
 	{
 		foreach ($this->domains as $domain) {
 			if (is_string($domain['apps'])) {
-				$domain['apps'] = Json::decode($domain['apps'], true);
+				$domain['apps'] = $this->helper->decode($domain['apps'], true);
 			}
 
 			if (isset($domain['apps'][$appId])) {

@@ -4,8 +4,6 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use League\Csv\Reader;
 use League\Csv\Writer;
-use Phalcon\Helper\Json;
-use Phalcon\Helper\Str;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesImportExport;
 
@@ -57,7 +55,7 @@ class ImportExport extends BasePackage
         }
 
         if (isset($data['fields'])) {
-            $data['fields'] = Json::decode($data['fields'], true);
+            $data['fields'] = $this->helper->decode($data['fields'], true);
         }
 
         if (isset($data['fields']['data']) && is_array($data['fields']['data'])) {
@@ -100,7 +98,7 @@ class ImportExport extends BasePackage
         $component = $this->modules->components->getComponentById($id);
 
         if ($component) {
-            $component['settings'] = Json::decode($component['settings'], true);
+            $component['settings'] = $this->helper->decode($component['settings'], true);
 
             $package = $this->modules->packages->getPackageByName($component['settings']['importExportPackage']);
 
@@ -190,12 +188,12 @@ class ImportExport extends BasePackage
     {
         $export['job_id'] = $jobId;
 
-        $header = Json::decode($export['fields']);
+        $header = $this->helper->decode($export['fields']);
 
         $component = $this->modules->components->getComponentById($export['component_id']);
 
         if ($component) {
-            $component['settings'] = Json::decode($component['settings'], true);
+            $component['settings'] = $this->helper->decode($component['settings'], true);
 
             $package = $this->modules->packages->getPackageByName($component['settings']['importExportPackage']);
 
@@ -308,7 +306,7 @@ class ImportExport extends BasePackage
         $component = $this->modules->components->getComponentById($data['component_id']);
 
         if ($component) {
-            $component['settings'] = Json::decode($component['settings'], true);
+            $component['settings'] = $this->helper->decode($component['settings'], true);
 
             if (isset($component['settings']['importexportSample'])) {
                 $file = $this->writeStructureCSVFile($data, $component['settings']['importexportSample']);
@@ -376,7 +374,7 @@ class ImportExport extends BasePackage
         }
 
         if ($viaImport) {
-            $data['uuid'] = Json::decode($data['uuid']);
+            $data['uuid'] = $this->helper->decode($data['uuid']);
             $data['uuid'] = $data['uuid'][0];
         }
 
@@ -429,7 +427,7 @@ class ImportExport extends BasePackage
                 $component = $this->modules->components->getComponentById($data['component_id']);
 
                 if ($component) {
-                    $component['settings'] = Json::decode($component['settings'], true);
+                    $component['settings'] = $this->helper->decode($component['settings'], true);
 
                     $package = $this->modules->packages->getPackageByName($component['settings']['importExportPackage']);
 
@@ -520,7 +518,7 @@ class ImportExport extends BasePackage
                     if ($recType) {
                         if ($fields['dataTypes'][$recKey] === 15) {//JSON
                             try {
-                                Json::decode($rec, true);
+                                $this->helper->decode($rec, true);
                             } catch (\Exception $e) {
                                 $records[$recordNo]['csvrowstatus'] = 'ERROR';
                                 $records[$recordNo][$recKey] = 'ERROR: Field should be JSON.';
@@ -589,7 +587,7 @@ class ImportExport extends BasePackage
             return false;
         }
 
-        $component['settings'] = Json::decode($component['settings'], true);
+        $component['settings'] = $this->helper->decode($component['settings'], true);
 
         if (!isset($component['settings']['importExportPackage'])) {
             throw new \Exception("Import package missing");
@@ -658,7 +656,7 @@ class ImportExport extends BasePackage
             0
         );
 
-        $emailToAddressesArr = Json::decode($task['email_to'], true);
+        $emailToAddressesArr = $this->helper->decode($task['email_to'], true);
         $emailToAddresses = [];
 
         if (count($emailToAddressesArr) > 0) {
@@ -674,7 +672,7 @@ class ImportExport extends BasePackage
         $emailData['status'] = 1;
         $emailData['priority'] = 2;
         $emailData['confidential'] = 0;
-        $emailData['to_addresses'] = Json::encode($emailToAddresses);
+        $emailData['to_addresses'] = $this->helper->encode($emailToAddresses);
         $emailData['subject'] = ucfirst($task['type']) . ' request complete.';
 
         if ($task['app_id'] != 0) {
@@ -689,7 +687,7 @@ class ImportExport extends BasePackage
             $domain = $this->domains->domains[0]['name'];
         }
 
-        $url = Str::reduceSlashes('https://' . $domain . '/' . $route . '/' . 'system/tools/importexport/q/id/' . $task['id']);
+        $url = $this->helper->reduceSlashes('https://' . $domain . '/' . $route . '/' . 'system/tools/importexport/q/id/' . $task['id']);
 
         if ($task['type'] === 'export') {
             $emailData['body'] =

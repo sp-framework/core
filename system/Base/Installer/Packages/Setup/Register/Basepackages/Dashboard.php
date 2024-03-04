@@ -2,18 +2,16 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages;
 
-use Phalcon\Helper\Json;
-
 class Dashboard
 {
-    public function register($db, $ff, $componentFile)
+    public function register($db, $ff, $componentFile, $helper)
     {
         $dashboard =
             [
                 'name'                  => 'Default',
                 'app_id'                => 1,
                 'created_by'            => 1,
-                'settings'              => Json::encode($componentFile['settings'])
+                'settings'              => $helper->encode($componentFile['settings'])
             ];
 
         if ($db) {

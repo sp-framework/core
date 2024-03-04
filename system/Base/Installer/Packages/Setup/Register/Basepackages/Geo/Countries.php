@@ -2,8 +2,6 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Geo;
 
-use Phalcon\Helper\Json;
-
 class Countries
 {
     public $trackCounter;
@@ -12,10 +10,10 @@ class Countries
 
     protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/';
 
-    public function register($db, $ff, $localContent)
+    public function register($db, $ff, $localContent, $helper)
     {
         $countries =
-            Json::decode(
+            $helper->decode(
                 $localContent->read(
                     '/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/AllCountries.json'
                 ),
@@ -39,7 +37,7 @@ class Countries
                     'subregion'         => $country['subregion'],
                     'emoji'             => $country['emoji'],
                     'emojiU'            => $country['emojiU'],
-                    'translations'      => Json::encode($country['translations']),
+                    'translations'      => $helper->encode($country['translations']),
                     'latitude'          => (int) $country['latitude'],
                     'longitude'         => (int) $country['longitude'],
                     'installed'         => 0,
@@ -128,7 +126,7 @@ class Countries
                 return false;
             }
 
-            $zip->close(base_path($this->sourceDir . $country['iso2'] . '.zip'));
+            $zip->close();
 
             return true;
         } catch (\Exception $e) {
@@ -136,7 +134,7 @@ class Countries
         }
     }
 
-    public function registerSelectedCountryStatesAndCities($ff, $localContent, $remoteWebContent, $country, $ip2location)
+    public function registerSelectedCountryStatesAndCities($ff, $localContent, $remoteWebContent, $country, $ip2location, $helper)
     {
         // /etc/apache2.conf - Change the timeout to 3600 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
         // Timeout 3600
@@ -165,7 +163,7 @@ class Countries
                 set_time_limit(900);//15Mins
             }
 
-            $countryData = Json::decode($localContent->read($this->sourceDir . $country['iso2'] . '.json'), true);
+            $countryData = $helper->decode($localContent->read($this->sourceDir . $country['iso2'] . '.json'), true);
 
             foreach ($countryData['states'] as $key => $state) {
                 $state['country_id'] = $country['id'];

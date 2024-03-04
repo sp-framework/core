@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\AppsServiceProvider;
 
-use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Ip;
 use System\Base\BasePackage;
 use System\Base\Providers\AppsServiceProvider\Exceptions\IpFilterBlockedException;
@@ -36,7 +35,7 @@ class IpFilter extends BasePackage
         $filters = [];
 
         if (!isset($data['app_id'])) {
-            return Json::encode([]);//blank array
+            return $this->helper->encode([]);//blank array
         }
 
         if ($this->config->databasetype === 'db') {

@@ -5,6 +5,7 @@ return
 		'mvc'	=>
 			[
 				'System\Base\Providers\ConfigServiceProvider',
+				'System\Base\Providers\SupportServiceProvider',
 				'System\Base\Providers\EventsServiceProvider',
 				'System\Base\Providers\AnnotationsServiceProvider',
 				'System\Base\Providers\SecurityServiceProvider',
@@ -32,6 +33,7 @@ return
 		'cli'	=>
 			[
 				'System\Base\Providers\ConfigServiceProvider',
+				'System\Base\Providers\SupportServiceProvider',
 				'System\Base\Providers\EventsServiceProvider',
 				'System\Base\Providers\HttpServiceProvider',
 				// 'System\Base\Providers\AnnotationsServiceProvider',
@@ -59,6 +61,7 @@ return
 		'micro'	=>
 			[
 				'System\Base\Providers\ConfigServiceProvider',
+				'System\Base\Providers\SupportServiceProvider',
 				'System\Base\Providers\EventsServiceProvider',
 				'System\Base\Providers\AnnotationsServiceProvider',
 				'System\Base\Providers\SecurityServiceProvider',

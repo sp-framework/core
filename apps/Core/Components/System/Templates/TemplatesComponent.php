@@ -3,7 +3,6 @@
 namespace Apps\Core\Components\System\Templates;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
-use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class TemplatesComponent extends BaseComponent

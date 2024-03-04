@@ -4,6 +4,8 @@ namespace System\Base\Providers\WidgetServiceProvider;
 
 class Widget
 {
+	protected $session;
+
 	protected $connection;
 
 	protected $request;

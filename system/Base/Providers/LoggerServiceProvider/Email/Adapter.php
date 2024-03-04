@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\LoggerServiceProvider\Email;
 
-use Phalcon\Helper\Json;
 use Phalcon\Logger\Adapter\AbstractAdapter;
 use Phalcon\Logger\Item;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailException;
@@ -14,23 +13,27 @@ class Adapter extends AbstractAdapter
 
     protected $logsConfig;
 
+    protected $helper;
+
     protected $messages = [];
 
-    public function __construct($email, $logsConfig)
+    public function __construct($email, $logsConfig, $helper)
     {
         $this->email = $email;
 
         $this->logsConfig = $logsConfig;
+
+        $this->helper = $helper;
     }
 
     public function process(Item $item): void
     {
-        if ($item->getType() === 0) {
-            $this->messages['emergency'] = Json::decode($this->formatter->format($item), true);
-        } else if ($item->getType() === 1) {
-            $this->messages['critical'] = Json::decode($this->formatter->format($item), true);
-        } else if ($item->getType() === 2) {
-            $this->messages['alert'] = Json::decode($this->formatter->format($item), true);
+        if ($item->getLevel() === 0) {
+            $this->messages['emergency'] = $this->helper->decode($this->formatter->format($item), true);
+        } else if ($item->getLevel() === 1) {
+            $this->messages['critical'] = $this->helper->decode($this->formatter->format($item), true);
+        } else if ($item->getLevel() === 2) {
+            $this->messages['alert'] = $this->helper->decode($this->formatter->format($item), true);
         }
     }
 

@@ -5,13 +5,12 @@ namespace System\Base\Installer\Packages\Setup\Register\Providers;
 use BlueLibraries\Dns\DnsRecords;
 use BlueLibraries\Dns\Handlers\Types\TCP;
 use BlueLibraries\Dns\Records\RecordTypes;
-use Phalcon\Helper\Json;
 
 class Domain
 {
 	protected $request;
 
-	public function register($db, $ff, $request)
+	public function register($db, $ff, $request, $helper)
 	{
 		$this->request = $request;
 
@@ -33,7 +32,7 @@ class Domain
 
 		if (count($record) > 0) {
 			$isInternal = isset($record['internal']) ? $record['internal'] : '1';
-			$record = Json::encode($record);
+			$record = $helper->encode($record);
 		} else {
 			$isInternal = '1';
 			$record = [];
@@ -45,10 +44,10 @@ class Domain
 				'description' 						=> '',
 				"default_app_id"					=> 1,
 				"exclusive_to_default_app"			=> 0,
-				"apps"			    				=> Json::encode($apps),
+				"apps"			    				=> $helper->encode($apps),
 				"dns_record"						=> $record,
 				"is_internal"						=> $isInternal,
-				'settings'			 				=> Json::encode([])
+				'settings'			 				=> $helper->encode([])
 			];
 
 		if ($db) {

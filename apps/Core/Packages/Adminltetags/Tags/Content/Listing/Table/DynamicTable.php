@@ -4,7 +4,6 @@ namespace Apps\Core\Packages\Adminltetags\Tags\Content\Listing\Table;
 
 use Apps\Core\Packages\Adminltetags\Adminltetags;
 use Apps\Core\Packages\Adminltetags\Tags\Content\Listing\Filters;
-use Phalcon\Helper\Json;
 
 class DynamicTable
 {
@@ -145,7 +144,7 @@ class DynamicTable
 
         if (isset($this->params["dtColumns"])) {
             $this->dtParams["dtColumns"] =
-                $this->escaper->escapeJs(Json::encode([$this->params["dtColumns"]]));
+                $this->escaper->escapeJs($this->adminLTETags->helper->encode([$this->params["dtColumns"]]));
         } else {
             throw new \Exception('Datatable columns missing');
         }
@@ -158,7 +157,7 @@ class DynamicTable
 
         $this->dtParams["dtPostUrlParams"] =
             isset($this->params["dtPostUrlParams"]) ?
-            $this->escaper->escapeJs(Json::encode($this->params["dtPostUrlParams"])) :
+            $this->escaper->escapeJs($this->adminLTETags->helper->encode($this->params["dtPostUrlParams"])) :
             null;
 
         $this->dtParams["dtNoOfColumnsToShow"] =
@@ -198,8 +197,8 @@ class DynamicTable
 
         $this->dtParams["dtOrder"] =
             isset($this->params["dtOrder"]) ?
-            $this->escaper->escapeJs(Json::encode($this->params["dtOrder"])) :
-            $this->escaper->escapeJs(Json::encode([]));
+            $this->escaper->escapeJs($this->adminLTETags->helper->encode($this->params["dtOrder"])) :
+            $this->escaper->escapeJs($this->adminLTETags->helper->encode([]));
 
         $this->dtParams["dtStateSave"] =
             isset($this->params["dtStateSave"]) ?
@@ -228,8 +227,8 @@ class DynamicTable
 
         $this->dtParams["dtLengthMenu"] =
             isset($this->params["dtLengthMenu"]) ?
-            $this->escaper->escapeJs(Json::encode($this->params["dtLengthMenu"])) :
-            $this->escaper->escapeJs(Json::encode([20, 40, 60, 80, 100]));
+            $this->escaper->escapeJs($this->adminLTETags->helper->encode($this->params["dtLengthMenu"])) :
+            $this->escaper->escapeJs($this->adminLTETags->helper->encode([20, 40, 60, 80, 100]));
 
         $this->dtParams["dtSelect"] =
             isset($this->params["dtSelect"]) ?
@@ -248,8 +247,8 @@ class DynamicTable
 
         $this->dtParams["dtDisableColumnsOrdering"] =
             isset($this->params["dtDisableColumnsOrdering"]) ?
-            Json::encode($this->params["dtDisableColumnsOrdering"]) :
-            Json::encode([]);
+            $this->adminLTETags->helper->encode($this->params["dtDisableColumnsOrdering"]) :
+            $this->adminLTETags->helper->encode([]);
 
         $this->dtParams["dtZeroRecords"] =
             isset($this->params["dtZeroRecords"]) ?
@@ -526,7 +525,7 @@ class DynamicTable
         }
 
         $this->content .=
-            Json::encode(
+            $this->adminLTETags->helper->encode(
                 [
                     'data'              => $rowsData,
                     'pagination'        => isset($this->params["dtPagination"]) ? $this->params["dtPagination"] : false,

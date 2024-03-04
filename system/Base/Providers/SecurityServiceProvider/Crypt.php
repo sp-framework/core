@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\SecurityServiceProvider;
 
-use Phalcon\Crypt as PhalconCrypt;
+use Phalcon\Encryption\Crypt as PhalconCrypt;
 
 class Crypt
 {

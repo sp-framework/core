@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\SecurityServiceProvider;
 
-use Phalcon\Security as PhalconSecurity;
+use Phalcon\Encryption\Security as PhalconSecurity;
 
 class Security
 {

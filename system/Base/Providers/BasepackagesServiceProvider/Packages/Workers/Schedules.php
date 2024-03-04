@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersSchedules;
 
@@ -129,14 +128,14 @@ class Schedules extends BasePackage
             $objData['schedule']['params']['daily_minutes'] = $data['daily_minutes'];
         } else if ($data['schedule'] === 'weekly') {
             $objData['schedule']['type'] = $data['schedule'];
-            $data['weekly_days'] = Json::decode($data['weekly_days'], true);
+            $data['weekly_days'] = $this->helper->decode($data['weekly_days'], true);
             $data['weekly_days'] = $data['weekly_days']['data'];
             $objData['schedule']['params']['weekly_days'] = $data['weekly_days'];
             $objData['schedule']['params']['weekly_hours'] = $data['weekly_hours'];
             $objData['schedule']['params']['weekly_minutes'] = $data['weekly_minutes'];
         } else if ($data['schedule'] === 'monthly') {
             $objData['schedule']['type'] = $data['schedule'];
-            $data['monthly_months'] = Json::decode($data['monthly_months'], true);
+            $data['monthly_months'] = $this->helper->decode($data['monthly_months'], true);
             $data['monthly_months'] = $data['monthly_months']['data'];
             $objData['schedule']['params']['monthly_months'] = $data['monthly_months'];
             $objData['schedule']['params']['monthly_day'] = $data['monthly_day'];
@@ -156,7 +155,7 @@ class Schedules extends BasePackage
                         $function = $function->toArray();
 
                         if ($function['id'] == $id) {
-                            $function['schedule'] = Json::decode($function['schedule'], true);
+                            $function['schedule'] = $this->helper->decode($function['schedule'], true);
 
                             return $function['schedule'];
                         }
@@ -173,7 +172,7 @@ class Schedules extends BasePackage
                 if ($function['id'] == $id) {
 
                     if (is_string($function['schedule'])) {
-                        $function['schedule'] = Json::decode($function['schedule'], true);
+                        $function['schedule'] = $this->helper->decode($function['schedule'], true);
                     }
 
                     return $function['schedule'];

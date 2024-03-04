@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules\Views;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesViewsSettings;
 
@@ -100,7 +99,7 @@ class ViewsSettings extends BasePackage
     protected function mergeViewsSettings($data, $view)
     {
         if (is_string($view['settings'])) {
-            $view['settings'] = Json::decode($view['settings'], true);
+            $view['settings'] = $this->helper->decode($view['settings'], true);
         }
 
         foreach ($view['settings']['branding'] as $brandingKey => $branding) {
@@ -133,7 +132,7 @@ class ViewsSettings extends BasePackage
             unset($data['id']);
         }
 
-        $data['settings'] = Json::encode($data['settings']);
+        $data['settings'] = $this->helper->encode($data['settings']);
 
         return $data['settings'];
     }

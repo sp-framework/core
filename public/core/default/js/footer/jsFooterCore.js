@@ -11927,9 +11927,9 @@ var BazProgress = function() {
                         }
 
                         if (manualShowHide) {
-                            $(element).attr('hidden', false);
-                        } else {
                             $(element).attr('hidden', true);
+                        } else {
+                            $(element).attr('hidden', false);
                         }
 
                         if (callableFunc && callableFunc['onComplete']) {

@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesPackages;
 
@@ -22,7 +21,7 @@ class Packages extends BasePackage
 	public function getPackageByNameForAppId($name, $appId)
 	{
 		foreach($this->packages as $package) {
-			$package['apps'] = Json::decode($package['apps'], true);
+			$package['apps'] = $this->helper->decode($package['apps'], true);
 
 			if (isset($package['apps'][$appId])) {
 				if (strtolower($package['name']) === strtolower($name) &&
@@ -140,7 +139,7 @@ class Packages extends BasePackage
 		$packages = [];
 
 		foreach($this->packages as $package) {
-			$package['apps'] = Json::decode($package['apps'], true);
+			$package['apps'] = $this->helper->decode($package['apps'], true);
 
 			if (isset($package['apps'][$appId]['enabled']) &&
 				$package['apps'][$appId]['enabled'] == 'true'
@@ -202,7 +201,7 @@ class Packages extends BasePackage
 		foreach ($this->packages as $packageKey => $package) {
 			if ($package['class'] && $package['class'] !== '') {
 				if ($package['notification_subscriptions'] && $package['notification_subscriptions'] !== '') {
-					$package['notification_subscriptions'] = Json::decode($package['notification_subscriptions'], true);
+					$package['notification_subscriptions'] = $this->helper->decode($package['notification_subscriptions'], true);
 
 					foreach ($appsArr as $appKey => $app) {
 						if (isset($subscriptions[$app['id']][$package['id']])) {
@@ -312,7 +311,7 @@ class Packages extends BasePackage
 						}
 					}
 				}
-				$package['notification_subscriptions'] = Json::encode($package['notification_subscriptions']);
+				$package['notification_subscriptions'] = $this->helper->encode($package['notification_subscriptions']);
 
 				$this->update($package);
 			}
@@ -323,7 +322,7 @@ class Packages extends BasePackage
 	{
 		$package = $this->getById($data['module_id']);
 
-		$package['settings'] = Json::decode($package['settings'], true);
+		$package['settings'] = $this->helper->decode($package['settings'], true);
 
 		foreach ($data as $key => $settingsData) {
 			if ($key !== 'module_id' &&
@@ -331,14 +330,14 @@ class Packages extends BasePackage
 				$settingsData !== $this->security->getRequestToken()
 			) {
 				if (isset($package['settings'][$key])) {
-					$settingsData = Json::decode($settingsData, true);
+					$settingsData = $this->helper->decode($settingsData, true);
 
 					$package['settings'][$key] = $settingsData;
 				}
 			}
 		}
 
-		$package['settings'] = Json::encode($package['settings']);
+		$package['settings'] = $this->helper->encode($package['settings']);
 
 		$this->update($package);
 	}

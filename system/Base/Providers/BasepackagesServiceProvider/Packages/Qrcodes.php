@@ -8,8 +8,6 @@ use Endroid\QrCode\Label\Font\Font;
 use Endroid\QrCode\Label\Label;
 use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\QrCode;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Qrcodes extends BasePackage
@@ -26,7 +24,7 @@ class Qrcodes extends BasePackage
 
         if ($this->qrcodesPackage) {
             if (is_string($this->qrcodesPackage['settings'])) {
-                $this->qrcodesSettings = Json::decode($this->qrcodesPackage['settings'], true);
+                $this->qrcodesSettings = $this->helper->decode($this->qrcodesPackage['settings'], true);
             } else {
                 $this->qrcodesSettings = $this->qrcodesPackage['settings'];
             }
@@ -77,7 +75,7 @@ class Qrcodes extends BasePackage
         $this->qrcodesSettings['labelColor'] = $data['labelColor'];
         $this->qrcodesSettings['labelText'] = $data['labelText'];
 
-        $this->qrcodesPackage['settings'] = Json::encode($this->qrcodesSettings);
+        $this->qrcodesPackage['settings'] = $this->helper->encode($this->qrcodesSettings);
 
 
         $this->modules->packages->updatePackages($this->qrcodesPackage);

@@ -2,11 +2,9 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Modules;
 
-use Phalcon\Helper\Json;
-
 class View
 {
-	public function register($db, $ff, $viewFile)
+	public function register($db, $ff, $viewFile, $helper)
 	{
 		$view =
 			[
@@ -22,20 +20,20 @@ class View
 				'repo'		 			=> $viewFile['repo'],
 				'settings'				=>
 					isset($viewFile['settings']) ?
-					Json::encode($viewFile['settings']) :
-					Json::encode([]),
+					$helper->encode($viewFile['settings']) :
+					$helper->encode([]),
 				'dependencies'			=>
 					isset($viewFile['dependencies']) ?
-					Json::encode($viewFile['dependencies']) :
-					Json::encode([]),
+					$helper->encode($viewFile['dependencies']) :
+					$helper->encode([]),
 				'apps'					=>
-					Json::encode(['1'=>['enabled'=>true]]),
+					$helper->encode(['1'=>['enabled'=>true]]),
 				'api_id'				=> 1,
 				'installed'				=> 1,
 				'files'					=>
 					isset($viewFile['files']) ?
-					Json::encode($viewFile['files']) :
-					Json::encode([]),
+					$helper->encode($viewFile['files']) :
+					$helper->encode([]),
 				'updated_by'			=> 0
 			];
 
@@ -46,8 +44,8 @@ class View
 				'app_id'	 			=> 1,
 				'settings'				=>
 					isset($viewFile['settings']) ?
-					Json::encode($viewFile['settings']) :
-					Json::encode([])
+					$helper->encode($viewFile['settings']) :
+					$helper->encode([])
 			];
 
 		if ($db) {

@@ -4,7 +4,6 @@ namespace System\Base\Providers;
 
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
-use Phalcon\Helper\Json;
 use System\Base\Providers\HttpServiceProvider\Cookies;
 use System\Base\Providers\HttpServiceProvider\Links;
 use System\Base\Providers\HttpServiceProvider\Request;

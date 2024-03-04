@@ -2,9 +2,8 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Users;
 
-use Phalcon\Helper\Json;
-use Phalcon\Validation\Validator\Email;
-use Phalcon\Validation\Validator\PresenceOf;
+use Phalcon\Filter\Validation\Validator\Email;
+use Phalcon\Filter\Validation\Validator\PresenceOf;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
@@ -229,12 +228,12 @@ class Accounts extends BasePackage
         if (!isset($data['override_role']) ||
             $data['override_role'] == 0
         ) {
-            $data['permissions'] = Json::encode([]);
+            $data['permissions'] = $this->helper->encode([]);
         } else if (isset($data['override_role']) && $data['override_role'] == 1) {
             //Prevent lockout of logged in user
             if ($data['id'] == $this->auth->account()['id']) {
                 if (is_string($data['permissions'])) {
-                    $data['permissions'] = Json::decode($data['permissions'], true);
+                    $data['permissions'] = $this->helper->decode($data['permissions'], true);
                 }
 
                 $component = $this->modules->components->getComponentByRoute('system/users/accounts');
@@ -242,7 +241,7 @@ class Accounts extends BasePackage
                 $data['permissions'][$this->apps->getAppInfo()['id']][$component['id']]['view'] = 1;
                 $data['permissions'][$this->apps->getAppInfo()['id']][$component['id']]['update'] = 1;
 
-                $data['permissions'] = Json::encode($data['permissions']);
+                $data['permissions'] = $this->helper->encode($data['permissions']);
             }
         }
 
@@ -373,7 +372,7 @@ class Accounts extends BasePackage
         $data['role_id'] = $this->app['registration_role_id'];
         $data['email_new_password'] = '1';
         $data['override_role'] = '0';
-        $data['permissions'] = Json::encode([]);
+        $data['permissions'] = $this->helper->encode([]);
         $data['force_pwreset'] = '1';
         $data['status'] = '1';
 
@@ -387,7 +386,7 @@ class Accounts extends BasePackage
             $data['status'] = '0';
         }
 
-        $data['can_login'] = Json::encode(
+        $data['can_login'] = $this->helper->encode(
             [
                 strtolower($this->app['id']) => $canLogin
             ]
@@ -420,6 +419,7 @@ class Accounts extends BasePackage
         $agents = true,
         $tunnels = true
     ) {
+        var_dump($account);
         if ($security) {
             if ($accountObj->getsecurity()) {
                 $accountObj->getsecurity()->delete();
@@ -509,7 +509,7 @@ class Accounts extends BasePackage
     public function addUpdateCanLogin($id, $canLogin)
     {
         if ($canLogin !== '') {
-            $canLogin = Json::decode($canLogin, true);
+            $canLogin = $this->helper->decode($canLogin, true);
 
             if (count($canLogin) > 0) {
                 $canloginModel = new BasepackagesUsersAccountsCanlogin;
@@ -609,7 +609,7 @@ class Accounts extends BasePackage
 
             if ($this->app['acceptable_usernames'] && $this->app['acceptable_usernames'] !== '') {
                 if (is_string($this->app['acceptable_usernames'])) {
-                    $this->app['acceptable_usernames'] = Json::decode($this->app['acceptable_usernames'], true);
+                    $this->app['acceptable_usernames'] = $this->helper->decode($this->app['acceptable_usernames'], true);
                 }
 
                 foreach ($this->app['acceptable_usernames'] as $acceptableUsername) {
@@ -840,7 +840,7 @@ class Accounts extends BasePackage
         $emailData['status'] = 1;
         $emailData['priority'] = 1;
         $emailData['confidential'] = 1;
-        $emailData['to_addresses'] = Json::encode([$email]);
+        $emailData['to_addresses'] = $this->helper->encode([$email]);
         $emailData['subject'] = 'OTP for ' . $this->domains->getDomain()['name'];
         $emailData['body'] = $password;
 
@@ -1091,7 +1091,7 @@ class Accounts extends BasePackage
 
                 if ($account['security']['permissions'] && $account['security']['permissions'] !== '') {
                     if (is_string($account['security']['permissions'])) {
-                        $permissionsArr = Json::decode($account['security']['permissions'], true);
+                        $permissionsArr = $this->helper->decode($account['security']['permissions'], true);
                     }
                 } else {
                     $permissionsArr = [];
@@ -1121,9 +1121,9 @@ class Accounts extends BasePackage
                         }
                     }
                 }
-                $this->packagesData->acls = Json::encode($acls);
+                $this->packagesData->acls = $this->helper->encode($acls);
 
-                $account['permissions'] = Json::encode($permissions);
+                $account['permissions'] = $this->helper->encode($permissions);
                 $account['profile'] = $this->basepackages->profile->getProfile($account['id']);
 
                 $this->packagesData->account = $account;
@@ -1160,8 +1160,8 @@ class Accounts extends BasePackage
                 }
             }
 
-            $this->packagesData->acls = Json::encode($acls);
-            $account['security']['permissions'] = Json::encode($permissions);
+            $this->packagesData->acls = $this->helper->encode($acls);
+            $account['security']['permissions'] = $this->helper->encode($permissions);
             $this->packagesData->account = $account;
         }
 

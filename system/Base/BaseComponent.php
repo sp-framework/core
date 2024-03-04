@@ -3,8 +3,6 @@
 namespace System\Base;
 
 use Phalcon\Di\DiInterface;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use Phalcon\Mvc\Controller;
 use Phalcon\Mvc\View;
 use System\Base\Exceptions\ControllerNotFoundException;
@@ -79,7 +77,7 @@ abstract class BaseComponent extends Controller
 		$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
 
 		if ($this->request->isPost()) {
-			unset($url[Arr::lastKey($url)]);
+			unset($url[$this->helper->lastKey($url)]);
 		}
 
 		if (isset($url[0]) && $url[0] === $this->app['route']) {
@@ -209,7 +207,7 @@ abstract class BaseComponent extends Controller
 		if ($this->view->usedModules) {
 			if (isset($this->getData()['settings']) && $this->getData()['settings'] == 'true') {
 
-				$this->view->pick(Arr::last(explode('/', $this->component['route'])) . '/msview');
+				$this->view->pick($this->helper->last(explode('/', $this->component['route'])) . '/msview');
 			}
 		}
 	}
@@ -291,7 +289,7 @@ abstract class BaseComponent extends Controller
 	{
 		if ($this->auth->account()) {
 			if ($this->auth->account()['security']['permissions'] !== '') {
-				$permissions = Json::decode($this->auth->account()['security']['permissions'], true);
+				$permissions = $this->helper->decode($this->auth->account()['security']['permissions'], true);
 			}
 
 			if (is_array($permissions) && count($permissions) === 0) {
@@ -300,7 +298,7 @@ abstract class BaseComponent extends Controller
 				}
 
 				if ($this->auth->account()['role']['permissions'] !== '') {
-					$permissions = Json::decode($this->auth->account()['role']['permissions'], true);
+					$permissions = $this->helper->decode($this->auth->account()['role']['permissions'], true);
 				}
 			}
 
@@ -355,20 +353,20 @@ abstract class BaseComponent extends Controller
 		$this->view->componentId =
 			strtolower($this->view->appRoute) . '-' . strtolower($this->componentName);
 
-		$reflection = Arr::sliceRight(explode('\\', $this->reflection->getName()), 3);
+		$reflection = $this->helper->sliceRight(explode('\\', $this->reflection->getName()), 3);
 
 		if (count($reflection) === 1) {
-			$parents = str_replace('Component', '', Arr::last($reflection));
+			$parents = str_replace('Component', '', $this->helper->last($reflection));
 			$this->view->parents = $parents;
 			$this->view->parent = strtolower($parents);
 		} else {
-			$reflection[Arr::lastKey($reflection)] =
-				str_replace('Component', '', Arr::last($reflection));
+			$reflection[$this->helper->lastKey($reflection)] =
+				str_replace('Component', '', $this->helper->last($reflection));
 
 			$parents = $reflection;
 
 			$this->view->parents = $parents;
-			$this->view->parent = strtolower(Arr::last($parents));
+			$this->view->parent = strtolower($this->helper->last($parents));
 		}
 
 		$this->view->viewName = $this->views['name'];
@@ -409,8 +407,10 @@ abstract class BaseComponent extends Controller
 			$this->getNewToken();
 		}
 
-		$this->response->setHeader('tokenKey', $this->tokenKey);
-		$this->response->setHeader('token', $this->token);
+		if ($this->tokenKey && $this->token) {
+			$this->response->setHeader('tokenKey', $this->tokenKey);
+			$this->response->setHeader('token', $this->token);
+		}
 
 		if ($this->request->isPost() && $this->isJson()) {
 			return $this->sendJson();
@@ -423,7 +423,7 @@ abstract class BaseComponent extends Controller
 			} else {
 				if (is_string($this->app['menu_structure'])) {
 					$this->view->menus =
-						Json::decode($this->app['menu_structure'], true);
+						$this->helper->decode($this->app['menu_structure'], true);
 				} else {
 					$this->view->menus = $this->app['menu_structure'];
 				}
@@ -469,8 +469,8 @@ abstract class BaseComponent extends Controller
 	{
 		$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
 
-		$firstKey = Arr::firstKey($url);
-		$lastKey = Arr::lastKey($url);
+		$firstKey = $this->helper->firstKey($url);
+		$lastKey = $this->helper->lastKey($url);
 
 		if (isset($this->domain['exclusive_to_default_app']) &&
 			$this->domain['exclusive_to_default_app'] == 1
@@ -498,7 +498,7 @@ abstract class BaseComponent extends Controller
 			if (count($this->dispatcher->getParams()) > 0) {
 				$this->buildGetQueryParamsArr();
 
-				if (Arr::has($this->getQueryArr, 'layout')) {
+				if ($this->helper->has($this->getQueryArr, 'layout')) {
 					if ($this->getQueryArr['layout'] === '1') {
 						$this->modules->views->buildAssets($this->componentName);
 						return;
@@ -518,7 +518,7 @@ abstract class BaseComponent extends Controller
 			if (count($this->dispatcher->getParams()) > 0) {
 				$this->buildGetQueryParamsArr();
 
-				if (Arr::has($this->getQueryArr, 'layout')) {
+				if ($this->helper->has($this->getQueryArr, 'layout')) {
 					if ($this->getQueryArr['layout'] === '0') {
 						$this->disableViewLevel();
 						return;
@@ -535,7 +535,7 @@ abstract class BaseComponent extends Controller
 				return;
 			}
 		} else if ($this->request->isPost()) {
-			if (Arr::has($this->request->getPost(), 'layout')) {
+			if ($this->helper->has($this->request->getPost(), 'layout')) {
 				if ($this->request->getPost('layout') === '0') {
 					$this->disableViewLevel();
 					return;
@@ -584,7 +584,7 @@ abstract class BaseComponent extends Controller
 	protected function buildGetQueryParamsArr()
 	{
 		if ($this->request->isGet()) {
-			$arr = Arr::chunk($this->dispatcher->getParams(), 2);
+			$arr = $this->helper->chunk($this->dispatcher->getParams(), 2);
 
 			foreach ($arr as $value) {
 				if (isset($value[1])) {
@@ -626,7 +626,7 @@ abstract class BaseComponent extends Controller
 		} else {
 			if ($this->checkPackage($packageClass)) {
 				$package = (new $packageClass())->init();
-				$packageClass = Arr::last(explode('\\', $packageClass));
+				$packageClass = $this->helper->last(explode('\\', $packageClass));
 			} else {
 				throw new \Exception(
 					'Package class : ' . $packageClass .
@@ -638,7 +638,7 @@ abstract class BaseComponent extends Controller
 		if ($getSettings === 'components' || $getSettings === true) {
 			$thisComponent['id'] = $this->component['id'];
 			$thisComponent['name'] = $this->component['name'];
-			$thisComponent['settings'] = Json::decode($this->component['settings'], true);
+			$thisComponent['settings'] = $this->helper->decode($this->component['settings'], true);
 
 			if (!isset($usedModules['components'])) {
 				$usedModules['components'] = [];
@@ -654,7 +654,7 @@ abstract class BaseComponent extends Controller
 			$thisPackage['id'] = $packageInfo['id'];
 			$thisPackage['name'] = $packageInfo['name'];
 			if (is_string($packageInfo['settings'])) {
-				$thisPackage['settings'] = Json::decode($packageInfo['settings'], true);
+				$thisPackage['settings'] = $this->helper->decode($packageInfo['settings'], true);
 			}
 
 			if (!isset($usedModules['packages'])) {
@@ -708,7 +708,7 @@ abstract class BaseComponent extends Controller
 	{
 		return
 			$this->modules->packages->getPackageByNameForAppId(
-				Arr::last(explode('\\', $packageClass)),
+				$this->helper->last(explode('\\', $packageClass)),
 				$this->app['id']
 			);
 	}
@@ -731,7 +731,7 @@ abstract class BaseComponent extends Controller
 	{
 		return
 			$this->modules->components->getComponentByNameForAppId(
-				str_replace('Component', '', Arr::last(explode('\\', $componentClass))),
+				str_replace('Component', '', $this->helper->last(explode('\\', $componentClass))),
 				$this->app['id']
 			);
 	}
@@ -794,7 +794,7 @@ abstract class BaseComponent extends Controller
 				$this->app['errors_component'] != 0
 			) {
 				$errorClassArr = explode('\\', $component['class']);
-				unset($errorClassArr[Arr::lastKey($errorClassArr)]);
+				unset($errorClassArr[$this->helper->lastKey($errorClassArr)]);
 				$errorComponent = ucfirst($component['route']);
 				$namespace = implode('\\', $errorClassArr);
 				$this->view->setViewsDir($this->modules->views->getPhalconViewPath());

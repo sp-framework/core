@@ -3,8 +3,6 @@
 namespace Apps\Core\Packages\Adminltetags\Tags;
 
 use Apps\Core\Packages\Adminltetags\Adminltetags;
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 
 class Activitylogs extends Adminltetags
 {
@@ -127,7 +125,7 @@ class Activitylogs extends Adminltetags
                     $logKey = str_replace('_', ' ', $logKey);
 
                     if (is_array($log)) {
-                        $log = Json::encode($log);
+                        $log = $this->helper->encode($log);
 
                         if ($log === '[]') {
                             $log = '';
@@ -193,7 +191,7 @@ class Activitylogs extends Adminltetags
 
         $this->content .=
             '<script type="text/javascript">
-                var paginationCounters = JSON.parse(\'' . Json::encode($this->params['activityLogs']['paginationCounters']) . '\');
+                var paginationCounters = JSON.parse(\'' . $this->helper->encode($this->params['activityLogs']['paginationCounters']) . '\');
 
                 $(".activity-logs-previous, .activity-logs-next").click(function(e) {
                     e.preventDefault();

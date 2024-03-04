@@ -2,8 +2,6 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Workers;
 
-use Phalcon\Helper\Json;
-
 class Tasks
 {
     public function register($db, $ff)

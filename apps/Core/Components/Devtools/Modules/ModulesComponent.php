@@ -3,7 +3,7 @@
 namespace Apps\Core\Components\Devtools\Modules;
 
 use Apps\Core\Packages\Devtools\Modules\DevtoolsModules;
-use Phalcon\Helper\Json;
+
 use System\Base\BaseComponent;
 
 class ModulesComponent extends BaseComponent
@@ -120,7 +120,7 @@ class ModulesComponent extends BaseComponent
 			}
 		}
 
-		$this->view->modulesJson = Json::encode($modulesJson);
+		$this->view->modulesJson = $this->helper->encode($modulesJson);
 
 		$apisArr = $this->basepackages->api->init()->getAll()->api;
 		if (count($apisArr) > 0) {
@@ -163,8 +163,8 @@ class ModulesComponent extends BaseComponent
 			$this->view->moduleTypes = $this->modulesPackage->getModuleTypes();
 			$this->view->moduleSettings = $this->modulesPackage->getDefaultSettings();
 			$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies($type);
-			$this->view->moduleMenu = Json::encode([]);
-			$this->view->moduleWidgets = Json::encode([]);
+			$this->view->moduleMenu = $this->helper->encode([]);
+			$this->view->moduleWidgets = $this->helper->encode([]);
 
 			if ($this->getData()['id'] != 0) {
 				if ($type !== 'core') {
@@ -175,7 +175,7 @@ class ModulesComponent extends BaseComponent
 					if ($module['module_details']['module_type'] === 'components') {
 						$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Components/';
 						if ($module['module_details']['menu']) {
-							$this->view->moduleMenu = Json::encode(Json::decode($module['module_details']['menu'], true));
+							$this->view->moduleMenu = $this->helper->encode($this->helper->decode($module['module_details']['menu'], true));
 							$this->view->menuBaseStructure = $this->basepackages->menus->getMenusForAppType($module['module_details']['app_type']);
 						} else {
 							$this->view->moduleMenu = false;
@@ -268,15 +268,15 @@ class ModulesComponent extends BaseComponent
 				}
 
 				if (isset($module['widgets']) && is_array($module['widgets'])) {
-					$this->view->moduleWidgets = $module['widgets'] = Json::encode($module['widgets']);
+					$this->view->moduleWidgets = $module['widgets'] = $this->helper->encode($module['widgets']);
 				} else {
-					$this->view->moduleWidgets = $module['widgets'] = Json::encode([]);
+					$this->view->moduleWidgets = $module['widgets'] = $this->helper->encode([]);
 				}
 				if (is_array($module['settings'])) {
-					$this->view->moduleSettings = $module['settings'] = Json::encode($module['settings']);
+					$this->view->moduleSettings = $module['settings'] = $this->helper->encode($module['settings']);
 				}
 				if (is_array($module['dependencies'])) {
-					$this->view->moduleDependencies = $module['dependencies'] = Json::encode($module['dependencies']);
+					$this->view->moduleDependencies = $module['dependencies'] = $this->helper->encode($module['dependencies']);
 				}
 
 				$this->view->module = $module;

@@ -2,8 +2,6 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use Phalcon\Tag;
 use Phalcon\Assets\Inline;
 use System\Base\BasePackage;
@@ -242,7 +240,7 @@ class Views extends BasePackage
 
                 if ($viewsSettings) {
                     if (is_string($viewsSettings['settings'])) {
-                        $this->viewSettings = Json::decode($viewsSettings['settings'], true);
+                        $this->viewSettings = $this->helper->decode($viewsSettings['settings'], true);
                     } else {
                         $this->viewSettings = $viewsSettings['settings'];
                     }
@@ -259,7 +257,9 @@ class Views extends BasePackage
             }
             if ($this->view) {
                 if (!$this->viewSettings) {
-                    $this->viewSettings = Json::decode($this->view['settings'], true);
+                    if (is_string($this->view['settings'])) {
+                        $this->viewSettings = $this->helper->decode($this->view['settings'], true);
+                    }
                 }
 
                 $this->cache = $this->config->cache->enabled;
@@ -278,7 +278,7 @@ class Views extends BasePackage
     {
         return
             $this->modules->packages->getPackageByNameForAppId(
-                Arr::last(explode('\\', $packageName)),
+                $this->helper->last(explode('\\', $packageName)),
                 $this->apps->getAppInfo()['id']
             );
     }
@@ -286,7 +286,7 @@ class Views extends BasePackage
     public function getViewByNameForAppId($name, $appId)
     {
         foreach($this->views as $view) {
-            $view['apps'] = Json::decode($view['apps'], true);
+            $view['apps'] = $this->helper->decode($view['apps'], true);
 
             if ((isset($view['apps'][$appId]['enabled']) &&
                 $view['apps'][$appId]['enabled'] == true) &&
@@ -305,7 +305,7 @@ class Views extends BasePackage
         $views = [];
 
         foreach($this->views as $view) {
-            $view['apps'] = Json::decode($view['apps'], true);
+            $view['apps'] = $this->helper->decode($view['apps'], true);
 
             if (isset($view['apps'][$appId]['enabled']) &&
                 $view['apps'][$appId]['enabled'] == 'true'
@@ -431,12 +431,12 @@ class Views extends BasePackage
 
     public function updateViews(array $data)
     {
-        $views = Json::decode($data['views'], true);
+        $views = $this->helper->decode($data['views'], true);
 
         foreach ($views as $viewId => $status) {
             $view = $this->getById($viewId);
 
-            $view['apps'] = Json::decode($view['apps'], true);
+            $view['apps'] = $this->helper->decode($view['apps'], true);
 
             if ($status === true) {
                 $view['apps'][$data['id']]['enabled'] = true;
@@ -444,27 +444,27 @@ class Views extends BasePackage
                 $view['apps'][$data['id']]['enabled'] = false;
             }
 
-            $view['apps'] = Json::encode($view['apps']);
+            $view['apps'] = $this->helper->encode($view['apps']);
 
             if (is_string($view['settings'])) {
-                $view['settings'] = Json::decode($view['settings'], true);
+                $view['settings'] = $this->helper->decode($view['settings'], true);
             }
 
             if (isset($view['settings']['tags'])) {
                 $package = $this->modules->packages->getPackageByName($view['settings']['tags']);
 
                 if ($package) {
-                    $package['apps'] = Json::decode($package['apps'], true);
+                    $package['apps'] = $this->helper->decode($package['apps'], true);
 
                     $package['apps'][$data['id']]['enabled'] = true;
 
-                    $package['apps'] = Json::encode($package['apps']);
+                    $package['apps'] = $this->helper->encode($package['apps']);
 
                     $this->modules->packages->update($package);
                 }
             }
 
-            $view['settings'] = Json::encode($view['settings']);
+            $view['settings'] = $this->helper->encode($view['settings']);
 
             $this->update($view);
         }
@@ -527,7 +527,7 @@ class Views extends BasePackage
             }
         }
 
-        $this->buildAssetsTitle();
+        // $this->buildAssetsTitle();
         $this->buildAssetsMeta();
         $this->buildAssetsHeadCss();
         $this->buildAssetsHeadJs();

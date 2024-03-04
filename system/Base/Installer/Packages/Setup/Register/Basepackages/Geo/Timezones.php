@@ -2,14 +2,12 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Geo;
 
-use Phalcon\Helper\Json;
-
 class Timezones
 {
-    public function register($db, $ff, $localContent)
+    public function register($db, $ff, $localContent, $helper)
     {
         $timezonesData =
-            Json::decode(
+            $helper->decode(
                 $localContent->read(
                     '/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/TimeZones.json'
                 ),

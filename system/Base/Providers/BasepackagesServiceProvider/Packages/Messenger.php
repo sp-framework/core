@@ -4,7 +4,6 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use Phalcon\Cache\AdapterFactory;
 use Phalcon\Cache\CacheFactory;
-use Phalcon\Helper\Json;
 use Phalcon\Storage\SerializerFactory;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
@@ -86,7 +85,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
     public function onMessage(ConnectionInterface $from, $msg)
     {
         // var_dump($from, $msg);die();
-        // $message = Json::decode($msg, true);
+        // $message = $this->helper->decode($msg, true);
 
         var_dump($from->resourceId, $msg);
         // if (isset($message['changeStatus'])) {
@@ -196,7 +195,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
                 $profile['settings']['messenger']['status'] = $data['status'];
             }
 
-            $profile['settings'] = Json::encode($profile['settings']);
+            $profile['settings'] = $this->helper->encode($profile['settings']);
 
             $this->basepackages->profile->update($profile);
 
@@ -476,7 +475,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
             }
         }
 
-        $profile['settings'] = Json::encode($profile['settings']);
+        $profile['settings'] = $this->helper->encode($profile['settings']);
 
         $this->basepackages->profile->updateProfile($profile);
 

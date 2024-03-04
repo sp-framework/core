@@ -3,7 +3,6 @@
 namespace Apps\Core\Components\System\Workers\Schedules;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
-use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class SchedulesComponent extends BaseComponent
@@ -34,7 +33,7 @@ class SchedulesComponent extends BaseComponent
                     return $this->throwIdNotFound();
                 }
 
-                $schedule['schedule'] = Json::decode($schedule['schedule'], true);
+                $schedule['schedule'] = $this->helper->decode($schedule['schedule'], true);
 
                 $this->view->schedule = $schedule;
             }

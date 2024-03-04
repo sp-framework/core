@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesWidgets;
 
@@ -104,7 +103,7 @@ class Widgets extends BasePackage
         $widgetsData = [];
 
         foreach ($data as $key => $dashboardWidget) {
-            $dashboardWidget['settings'] = Json::decode($dashboardWidget['settings'], true);
+            $dashboardWidget['settings'] = $this->helper->decode($dashboardWidget['settings'], true);
             $widgetsData[$key] = $dashboardWidget;
             $widget = $this->getWidget($dashboardWidget['widget_id'], 'content', $dashboardWidget);
             $widgetsData[$key]['widget'] = $widget;

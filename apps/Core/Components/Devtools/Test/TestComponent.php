@@ -2,7 +2,6 @@
 
 namespace Apps\Core\Components\Devtools\Test;
 
-use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class TestComponent extends BaseComponent
@@ -11,6 +10,7 @@ class TestComponent extends BaseComponent
 
     public function viewAction()
     {
+        return;
         $jobStore = $this->ff->store('basepackages_workers_jobs');
 
         var_dump($jobStore->truncate(true));
@@ -83,7 +83,7 @@ class TestComponent extends BaseComponent
         // $ipv6Store = $this->ff->store('geo_cities_ip2locationv6');
 
         // $countries =
-        //     Json::decode(
+        //     $this->helper->decode(
         //         $this->localContent->read(
         //             '/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/AllCountries.json'
         //         ),
@@ -107,7 +107,7 @@ class TestComponent extends BaseComponent
         //             'subregion'         => $country['subregion'],
         //             'emoji'             => $country['emoji'],
         //             'emojiU'            => $country['emojiU'],
-        //             'translations'      => Json::encode($country['translations']),
+        //             'translations'      => $this->helper->encode($country['translations']),
         //             'latitude'          => $country['latitude'],
         //             'longitude'         => $country['longitude'],
         //             'installed'         => 0,
@@ -119,7 +119,7 @@ class TestComponent extends BaseComponent
 
         // $allCountries = $countriesStore->findAll();
         // $country = $countriesStore->findOneBy(['iso3', '=', 'USA']);
-        // $countryData = Json::decode($this->localContent->read($this->sourceDir . $country['iso2'] . '.json'), true);
+        // $countryData = $this->helper->decode($this->localContent->read($this->sourceDir . $country['iso2'] . '.json'), true);
 
         // $cal = $statesStore->findOneBy(['name', '=', 'California']);
         // $ab = $citiesStore->findBy(['name', '=', 'San Jose']);

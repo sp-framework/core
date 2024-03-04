@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMenus;
 
@@ -39,7 +38,7 @@ class Menus extends BasePackage
         $buildMenu = [];
 
         foreach (msort($menus, 'sequence') as $key => $menu) {
-            $menu = Json::decode($menu['menu'], true);
+            $menu = $this->helper->decode($menu['menu'], true);
 
             if ($menu) {
                 $buildMenu = array_replace_recursive($buildMenu, $menu);
@@ -54,7 +53,7 @@ class Menus extends BasePackage
         $menus = [];
 
         foreach($this->menus as $menu) {
-            $menu['apps'] = Json::decode($menu['apps'], true);
+            $menu['apps'] = $this->helper->decode($menu['apps'], true);
 
             if (count($menu['apps']) > 0) {
                 if (isset($menu['apps'][$appId]) &&
@@ -84,20 +83,20 @@ class Menus extends BasePackage
 
     public function updateMenus($data)
     {
-        $menus = Json::decode($data['menus'], true);
+        $menus = $this->helper->decode($data['menus'], true);
 
         if (count($menus) > 0) {
             foreach ($menus as $menuId => $value) {
                 $menu = $this->getById($menuId);
 
-                $menu['apps'] = Json::decode($menu['apps'], true);
+                $menu['apps'] = $this->helper->decode($menu['apps'], true);
 
                 $menu['apps'] = array_replace($menu['apps'], $value);
 
-                $menu['apps'] = Json::encode($menu['apps']);
+                $menu['apps'] = $this->helper->encode($menu['apps']);
 
-                $menu['menu'] = Json::decode($menu['menu'], true);
-                $menu['menu'] = Json::encode($menu['menu'], JSON_UNESCAPED_SLASHES);
+                $menu['menu'] = $this->helper->decode($menu['menu'], true);
+                $menu['menu'] = $this->helper->encode($menu['menu'], JSON_UNESCAPED_SLASHES);
 
                 $this->update($menu);
             }
@@ -118,8 +117,8 @@ class Menus extends BasePackage
         $menu = $this->addSequence($menu, $sequence);
 
         $insertMenu = $this->add([
-                'menu'                  => Json::encode($menu),
-                'apps'                  => Json::encode([]),
+                'menu'                  => $this->helper->encode($menu),
+                'apps'                  => $this->helper->encode([]),
                 'app_type'              => $appType,
                 'sequence'              => $sequence
             ]
@@ -145,8 +144,8 @@ class Menus extends BasePackage
 
         $this->update([
                 'id'                    => $id,
-                'menu'                  => Json::encode($menu),
-                'apps'                  => Json::encode([]),
+                'menu'                  => $this->helper->encode($menu),
+                'apps'                  => $this->helper->encode([]),
                 'app_type'              => $appType,
                 'sequence'              => $sequence
             ]

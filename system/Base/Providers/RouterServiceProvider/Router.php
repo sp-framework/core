@@ -3,7 +3,6 @@
 namespace System\Base\Providers\RouterServiceProvider;
 
 use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use Phalcon\Mvc\Router as PhalconRouter;
 use System\Base\Providers\RouterServiceProvider\Exceptions\AppNotAllowedException;
 use System\Base\Providers\RouterServiceProvider\Exceptions\DomainNotRegisteredException;
@@ -50,7 +49,11 @@ class Router
 
 	protected $uri;
 
-	public function __construct($domains, $apps, $components, $views, $logger, $request, $response)
+	protected $getQuery;
+
+	protected $helper;
+
+	public function __construct($domains, $apps, $components, $views, $logger, $request, $response, $helper)
 	{
 		$this->domains = $domains;
 
@@ -65,6 +68,8 @@ class Router
 		$this->request = $request;
 
 		$this->response = $response;
+
+		$this->helper = $helper;
 
 		$this->requestUri = $this->request->getURI();
 
@@ -210,17 +215,17 @@ class Router
 		}
 
 		if ($this->request->isGet()) {
-			$this->controller = Arr::last($routeArray);
+			$this->controller = $this->helper->last($routeArray);
 			$this->action = 'view';
-			unset($routeArray[Arr::lastKey($routeArray)]);
+			unset($routeArray[$this->helper->lastKey($routeArray)]);
 			foreach ($routeArray as $route) {
 				$this->givenRouteClass .= '\\' . ucfirst($route);
 			}
 		} elseif ($this->request->isPost()) {
-			$this->action = Arr::last($routeArray);
-			unset($routeArray[Arr::lastKey($routeArray)]);
-			$this->controller = Arr::last($routeArray);
-			unset($routeArray[Arr::lastKey($routeArray)]);
+			$this->action = $this->helper->last($routeArray);
+			unset($routeArray[$this->helper->lastKey($routeArray)]);
+			$this->controller = $this->helper->last($routeArray);
+			unset($routeArray[$this->helper->lastKey($routeArray)]);
 			foreach ($routeArray as $route) {
 				$this->givenRouteClass .= '\\' . ucfirst($route);
 			}

@@ -2,7 +2,6 @@
 
 namespace Apps\Core\Middlewares\IpFilter;
 
-use Phalcon\Helper\Json;
 use Phalcon\Mvc\View;
 use System\Base\BaseMiddleware;
 

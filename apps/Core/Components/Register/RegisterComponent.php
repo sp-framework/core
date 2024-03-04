@@ -2,7 +2,6 @@
 
 namespace Apps\Core\Components\Register;
 
-use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class RegisterComponent extends BaseComponent

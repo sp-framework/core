@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\SecurityServiceProvider;
 
-use Phalcon\Helper\Json;
 use Phalcon\Security as PhalconSecurity;
 
 class SecTools
@@ -48,7 +47,7 @@ class SecTools
         }
 
         try {
-            return $this->security->hash($password, $this->security->getWorkFactor());
+            return $this->security->hash($password, ['cost' => $this->security->getWorkFactor()]);
         } catch (\Exception $e) {
             throw $e;
         }
@@ -73,7 +72,7 @@ class SecTools
     public function getSigKey()
     {
         if (!is_array($this->core->core['settings'])) {
-            $this->core->core['settings'] = Json::decode($this->core->core['settings'], true);
+            $this->core->core['settings'] = $this->helper->decode($this->core->core['settings'], true);
         }
 
         return $this->core->core['settings']['sigKey'];
@@ -82,7 +81,7 @@ class SecTools
     public function getCookiesSig()
     {
         if (!is_array($this->core->core['settings'])) {
-            $this->core->core['settings'] = Json::decode($this->core->core['settings'], true);
+            $this->core->core['settings'] = $this->helper->decode($this->core->core['settings'], true);
         }
 
         return $this->core->core['settings']['cookiesSig'];
@@ -91,7 +90,7 @@ class SecTools
     public function getSecWorkFactor()
     {
         if (!is_array($this->core->core['settings'])) {
-            $this->core->core['settings'] = Json::decode($this->core->core['settings'], true);
+            $this->core->core['settings'] = $this->helper->decode($this->core->core['settings'], true);
         }
 
         return $this->core->core['settings']['security']['passwordWorkFactor'];

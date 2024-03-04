@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\LoggerServiceProvider;
 
-use Phalcon\Logger as PhalconLogger;
+use Phalcon\Logger\Logger as PhalconLogger;
 use Phalcon\Logger\Adapter\Noop;
 use Phalcon\Logger\Adapter\Stream;
 use Phalcon\Logger\Formatter\Json;
@@ -27,13 +27,15 @@ class Logger
 
     protected $request;
 
+    protected $helper;
+
     protected $email;
 
     protected $customFormatter;
 
     protected $oneDbEntry = true;//True to make only 1 DB Entry
 
-    public function __construct($logsConfig, $session, $connection, $request, $email = null)
+    public function __construct($logsConfig, $session, $connection, $request, $helper, $email = null)
     {
         $this->logsConfig = $logsConfig;
 
@@ -44,6 +46,8 @@ class Logger
         $this->request = $request;
 
         $this->email = $email;
+
+        $this->helper = $helper;
     }
 
     public function init()
@@ -56,10 +60,11 @@ class Logger
 
         $this->customFormatter =
             new CustomFormat(
-                'c',
+                $this->request->getClientAddress(),
                 $this->session->getId(),
                 $this->connection->getId(),
-                $this->request->getClientAddress()
+                $this->helper,
+                'c',
             );
 
         $streamAdapter = new Stream($savePath . 'exceptions.log');
@@ -101,7 +106,7 @@ class Logger
 
                 } else if ($this->logsConfig->service === 'dbLogs') {
 
-                    $dbAdapter = new DbAdapter($this->oneDbEntry);
+                    $dbAdapter = new DbAdapter($this->oneDbEntry, $this->helper);
                     $dbAdapter->setFormatter($this->customFormatter);
 
                     $this->log = new PhalconLogger(
@@ -115,7 +120,7 @@ class Logger
                 $this->setLogLevel();
 
                 if ($this->email && $this->logsConfig->emergencyLogsEmail) {
-                    $emailAdapter = new EmailAdapter($this->email, $this->logsConfig);
+                    $emailAdapter = new EmailAdapter($this->email, $this->logsConfig, $this->helper);
                     $emailAdapter->setFormatter($this->customFormatter);
 
                     $this->logEmail = new PhalconLogger(
@@ -186,11 +191,13 @@ class Logger
                 }
             }
         }
+
+        $this->commitEmail();
     }
 
     public function commitEmail($message = null, $type = 'alert')
     {
-        if ($this->logsConfig->emergencyLogsEmail) {
+        if ($this->email && $this->logsConfig->emergencyLogsEmail) {
             if ($message) {
                 $this->logEmail->$type($message);
             }

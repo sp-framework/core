@@ -217,7 +217,7 @@ class Tabs extends Adminltetags
                     $aria = 'aria-selected="false"';
                     $active = '';
                 }
-            } else if ($tabTitleKey === Arr::firstKey($this->params['tabsData'])) {
+            } else if ($tabTitleKey === $this->helper->firstKey($this->params['tabsData'])) {
                 $aria = 'aria-selected="true"';
                 $active = 'active';
             } else {
@@ -256,7 +256,7 @@ class Tabs extends Adminltetags
                         $aria = 'aria-selected="false"';
                         $active = '';
                     }
-                } else if ($tabLinkKey === Arr::firstKey($this->params['tabsData'])) {
+                } else if ($tabLinkKey === $this->helper->firstKey($this->params['tabsData'])) {
                     $aria = 'aria-selected="true"';
                     $active = 'active show';
                 } else {
