@@ -200,6 +200,15 @@ class Apps extends BasePackage
 				$domain['apps'][$data['id']]['privateStorage'] = $data['private'];
 
 				$this->domains->updateDomain($domain);
+
+				//add new viewsettings
+				$viewSettingsData = [];
+				$viewSettingsData['view_id'] = $data['view'];
+				$viewSettingsData['domain_id'] = $domain['id'];
+				$viewSettingsData['app_id'] = $data['id'];
+				$viewSettingsData['via_app'] = true;
+
+				$this->modules->viewsSettings->addViewsSettings($viewSettingsData);
 			}
 
 			return true;

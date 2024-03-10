@@ -102,6 +102,14 @@ class ViewsSettings extends BasePackage
             $view['settings'] = $this->helper->decode($view['settings'], true);
         }
 
+        if (isset($data['via_app']) && $data['via_app'] === true) {
+            $data['settings'] = $view['settings'];
+
+            $data['settings'] = $this->helper->encode($data['settings']);
+
+            return $data['settings'];
+        }
+
         foreach ($view['settings']['branding'] as $brandingKey => $branding) {
             if (isset($data[$brandingKey])) {
                 if ($data[$brandingKey] !== $view['settings']['branding'][$brandingKey]['brand']) {
