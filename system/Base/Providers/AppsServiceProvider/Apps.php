@@ -216,6 +216,10 @@ class Apps extends BasePackage
 
 		$app = $this->getById($data['id']);
 
+		if (isset($data['default_dashboard']) && $data['default_dashboard']) {
+			$data['settings']['defaultDashboard'] = $data['default_dashboard'];
+		}
+
 		$app = array_merge($app, $data);
 
 		if (isset($app['reset_structure']) && $app['reset_structure'] == '1') {

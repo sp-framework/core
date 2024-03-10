@@ -260,7 +260,7 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-app_type').on('select2:select', function (e) {
                     var data = e.params.data;
 
-                    if (data.id === 'dash') {
+                    if (data.id === 'dash' || data.id === 'core') {
                         $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', false);
                         $('#default_dashboard').attr('hidden', false);
                         $('#{{componentId}}-{{sectionId}}-default_dashboard').val(0).trigger('change');
