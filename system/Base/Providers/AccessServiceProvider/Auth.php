@@ -324,17 +324,19 @@ class Auth
             return true;
         }
 
+        if ($this->secTools->passwordNeedsRehash($this->account['security']['password'])) {
+            $this->account['security']['password'] = $this->secTools->hashPassword($data['pass'], $this->config->security->passwordWorkFactor);
+            $this->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
+        }
+
+        $this->setSessionAndRecaller($data);
+
         if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
             $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
         } else {
             $this->packagesData->redirectUrl = $this->links->url('home');
         }
 
-        if ($this->secTools->passwordNeedsRehash($this->account['security']['password'])) {
-            $this->account['security']['password'] = $this->secTools->hashPassword($data['pass'], $this->config->security->passwordWorkFactor);
-        }
-
-        $this->setSessionAndRecaller($data);
 
         $this->logger->log->debug($this->account['email'] . ' authenticated successfully on app ' . $this->app['name']);
 
