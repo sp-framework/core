@@ -284,7 +284,7 @@ $(document).ready(function(){
     }
 
     function failed(response) {
-        if (response.redirectUrl) {
+        if (response && response.redirectUrl) {
             window.location = response.redirectUrl;
             return;
         }
@@ -317,7 +317,7 @@ $(document).ready(function(){
         $('.login-spinner').attr('hidden', true);
         $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
 
-        if (response.redirectUrl) {
+        if (response && response.redirectUrl) {
             window.location = response.redirectUrl;
             return;
         }
@@ -345,7 +345,7 @@ $(document).ready(function(){
         $('.login-box-msg').removeClass('text-danger').addClass('text-success font-weight-bold');
 
         if ($('#{{componentId}}-form-auth').length > 0) {
-            if (response.redirectUrl) {
+            if (response && response.redirectUrl) {
                 window.location = response.redirectUrl;
                 return;
             } else {
@@ -453,7 +453,7 @@ $(document).ready(function(){
                 }, 'json');
             });
         } else if ($('#{{componentId}}-form-reset').length > 0) {
-            if (response.redirectUrl) {
+            if (response && response.redirectUrl) {
                 window.location = response.redirectUrl;
 
                 return;
@@ -466,7 +466,7 @@ $(document).ready(function(){
             if (thisButton.id === '{{componentId}}-form-send-verification') {
                 verify();
             } else if (thisButton.id === '{{componentId}}-form-verify') {
-                if (response.redirectUrl) {
+                if (response && response.redirectUrl) {
                     window.location = response.redirectUrl;
                 } else {
                     window.location = '/{{appRoute}}/';

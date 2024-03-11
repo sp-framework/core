@@ -6,6 +6,10 @@
 {% if core['settings']['cache']['enabled'] == 'true' %}
     {% set coreSettingsCache = 'cacheon' %}
 {% endif %}
+{% set coreSettingsSSO = 'ssooff' %}
+{% if core['settings']['security']['sso'] == 'true' %}
+    {% set coreSettingsSSO = 'ssoon' %}
+{% endif %}
 {% set coreSettingsLog = 'logsoff' %}
 {% set coreSettingsLogLevelDisabled = true %}
 {% if core['settings']['logs']['enabled'] == 'true' %}
@@ -285,6 +289,43 @@
             ]
         )}}
         <div class="row">
+            <div class="col-md-4">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'single_sign_on',
+                        'fieldLabel'                     : 'Single Sign On',
+                        'fieldType'                      : 'radio',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'If single sign on is set to ON, users can carry forward their session between apps. If is set to OFF, user will have to login in each app.',
+                        'fieldRequired'                  : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true,
+                        'fieldRadioPlacementType'        : 'horizontal',
+                        'fieldRadioButtons'              :
+                            [
+                                'ssooff' :
+                                    [
+                                        'title'                           : 'OFF',
+                                        'type'                            : 'secondary',
+                                        'dataValue'                       : 'ssooff'
+                                    ],
+                                'ssoon' :
+                                    [
+                                        'title'                           : 'ON',
+                                        'type'                            : 'primary',
+                                        'dataValue'                       : 'ssoon'
+                                    ]
+                            ],
+                        'fieldRadioChecked'              : coreSettingsSSO
+                    ]
+                )}}
+            </div>
             <div class="col">
                 {% set minNumber = 4 %}
                 {% set maxNumber = 16 %}
@@ -451,7 +492,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col">
+            <div class="col-md-4">
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,

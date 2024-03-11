@@ -98,6 +98,7 @@
 		},
 		"security" : 
 		{
+			"sso" : false,
 			"passwordWorkFactor" : 8,
 			"cookiesWorkFactor" : 4
 		},

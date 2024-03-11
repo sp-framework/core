@@ -54,13 +54,17 @@ return
 		"db"				=> [],
 		"ff" 				=>
 		[
-			"databaseDir" 					=> ".ff/"
+			"databaseDir" 					=> "sp/"
 		],
 		"cache"				=>
 		[
 			"enabled"						=> false, //Global Cache value //true - Production false - Development
 			"timeout"						=> 60, //Global Cache timeout in seconds
 			"service"						=> "streamCache"
+		],
+		"security"			=>
+		[
+			"sso"							=> false
 		],
 		"logs"				=>
 		[
@@ -69,7 +73,7 @@ return
 			"level"							=> "DEBUG",
 			"service"						=> "streamLogs",
 			"emergencyLogsEmail"			=> false,
-			"emergencyLogsEmailAddresses"	=> "",
+			"emergencyLogsEmailAddresses"	=> ""
 		],
 		"websocket"			=>
 		[
@@ -136,11 +140,12 @@ return
 			$dev = $this->coreJson['settings']['dev'] == 'true' ? 'true' : 'false';
 		}
 		$setup = 'false';
+		$sso = 'false';
 
-		$this->coreJson['settings']['setup'] = $setup == 'true'? true : false;
-		$this->coreJson['settings']['debug'] = $debug == 'true'? true : false;
-		$this->coreJson['settings']['cache']['enabled'] = $cache == 'true'? true : false;
-		$this->coreJson['settings']['dev'] = $dev == 'true'? true : false;
+		$this->coreJson['settings']['setup'] = $setup == 'true' ? true : false;
+		$this->coreJson['settings']['debug'] = $debug == 'true' ? true : false;
+		$this->coreJson['settings']['cache']['enabled'] = $cache == 'true' ? true : false;
+		$this->coreJson['settings']['dev'] = $dev == 'true' ? true : false;
 		$this->coreJson['settings']['databasetype'] = $this->postData['databasetype'] ?? $this->coreJson['settings']['databasetype'];
 		if ($this->coreJson['settings']['databasetype'] !== 'ff') {
 			$this->coreJson['settings']['dbs'][$this->postData['dbname']]['active'] = true;
@@ -154,6 +159,7 @@ return
 			$this->coreJson['settings']['dbs'][$this->postData['dbname']]['collation'] = $this->postData['collation'];
 		}
 		$this->coreJson['settings']['logs']['level'] = $logLevel;
+		$this->coreJson['settings']['security']['sso'] = $sso;
 		$this->coreJson['settings']['security']['passwordWorkFactor'] = $pwf;
 		$this->coreJson['settings']['security']['cookiesWorkFactor'] = $cwf;
 
@@ -167,7 +173,7 @@ return
 		"debug"				=> ' . $debug . ',
 		"auto_off_debug"	=> ' . $this->coreJson['settings']['auto_off_debug'] . ',
 		"databasetype" 		=> "' . $this->coreJson['settings']['databasetype'] . '",';
-if ($this->coreJson['settings']['databasetype'] !== 'ff') {
+if ($this->coreJson['settings']['databasetype'] === 'hybrid') {
 		$this->baseFileContent .= '
 		"db" 				=>
 		[
@@ -183,11 +189,23 @@ if ($this->coreJson['settings']['databasetype'] !== 'ff') {
 		[
 			"databaseDir" 					=> "' . $this->coreJson['settings']['ffs']['sp']['databaseDir'] . '"
 		],';
-} else {
+} else if ($this->coreJson['settings']['databasetype'] === 'ff') {
 		$this->baseFileContent .= '
 		"ff" 				=>
 		[
 			"databaseDir" 					=> "' . $this->coreJson['settings']['ffs']['sp']['databaseDir'] . '"
+		],';
+} else if ($this->coreJson['settings']['databasetype'] === 'db') {
+		$this->baseFileContent .= '
+		"db" 				=>
+		[
+			"host" 							=> "' . $this->postData['host'] . '",
+			"port" 							=> "' . $this->postData['port'] . '",
+			"dbname" 						=> "' . $this->postData['dbname'] . '",
+			"charset" 	 	    			=> "' . $this->postData['charset'] . '",
+			"collation" 	    			=> "' . $this->postData['collation'] . '",
+			"username" 						=> "' . $this->postData['username'] . '",
+			"password" 						=> "' . $this->postData['password'] . '"
 		],';
 }
 		$this->baseFileContent .= '
@@ -199,6 +217,7 @@ if ($this->coreJson['settings']['databasetype'] !== 'ff') {
 		],
 		"security"			=>
 		[
+			"sso"							=> ' . $sso . ',
 			"passwordWorkFactor"			=> ' . $pwf . ',
 			"cookiesWorkFactor" 			=> ' . $cwf . ',
 		],

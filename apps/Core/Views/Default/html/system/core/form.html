@@ -160,6 +160,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-cache_service'                           : {
             placeholder : 'SELECT CACHE SERVICE'
         },
+        '{{componentId}}-{{sectionId}}-single_sign_on'                          : { },
         '{{componentId}}-{{sectionId}}-passwordWorkFactor'                      : { },
         '{{componentId}}-{{sectionId}}-cookiesWorkFactor'                       : { },
         '{{componentId}}-{{sectionId}}-logs'                                    : {
@@ -892,6 +893,11 @@ dataCollectionSection =
                     dataCollectionSection['dataToSubmit']['cache'] = true;
                 } else {
                     dataCollectionSection['dataToSubmit']['cache'] = false;
+                }
+                if (dataCollectionSection['dataToSubmit']['single_sign_on'] === 'ssoon') {
+                    dataCollectionSection['dataToSubmit']['single_sign_on'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['single_sign_on'] = false;
                 }
                 if (dataCollectionSection['dataToSubmit']['logs'] === 'logson') {
                     dataCollectionSection['dataToSubmit']['logs'] = true;

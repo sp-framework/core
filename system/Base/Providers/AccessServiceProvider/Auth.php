@@ -61,6 +61,8 @@ class Auth
 
     protected $ff;
 
+    protected $core;
+
     public $packagesData;
 
     public $agent;
@@ -86,7 +88,8 @@ class Auth
         $email,
         $emailQueue,
         $domains,
-        $ff
+        $ff,
+        $core
     ) {
         $this->request = $request;
 
@@ -123,6 +126,8 @@ class Auth
         $this->domains = $domains;
 
         $this->ff = $ff;
+
+        $this->core = $core;
 
         $this->packagesData = new PackagesData;
     }
@@ -238,8 +243,12 @@ class Auth
         if ($this->config->databasetype === 'db') {
             $session = $sessionModel::findFirst(
                 [
-                'session_id = :sessionId:',
-                'bind'      => ['sessionId' => $this->session->getId()]
+                'session_id = :sessionId: AND app = :app:',
+                'bind'      =>
+                    [
+                        'sessionId' => $this->session->getId(),
+                        'app'       => $this->getKey()
+                    ]
                 ]
             );
 
@@ -249,7 +258,7 @@ class Auth
                 }
             }
         } else {
-            $sessionStore->findOneBy(['session_id', '=', $this->session->getId()]);
+            $sessionStore->findOneBy([['session_id', '=', $this->session->getId()], "AND", ['app', '=', $this->getKey()]]);
 
             if ($sessionStore->toArray()) {
                 $sessionStore->deleteById($sessionStore->toArray()['id']);
@@ -715,7 +724,7 @@ class Auth
 
     protected function setKey()
     {
-        $this->key = strtolower($this->app['route']);
+        $this->key = $this->core->core['settings']['security']['sso'] == 'true' ? '*' : strtolower($this->app['route']);
     }
 
     public function setUserFromSession()
@@ -731,7 +740,10 @@ class Auth
 
             if ($this->account['sessions'] && is_array($this->account['sessions']) && count($this->account['sessions']) > 0) {
                 foreach ($this->account['sessions'] as $session) {
-                    if (isset($session['session_id']) && $session['session_id'] === $this->session->getId()) {
+                    if (isset($session['session_id']) &&
+                        $session['session_id'] === $this->session->getId() &&
+                        $session['app'] === $this->getKey()
+                    ) {
                         return true;
                     }
                 }

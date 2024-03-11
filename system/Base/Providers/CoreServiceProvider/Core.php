@@ -37,7 +37,7 @@ class Core extends BasePackage
 		$this->core = $this->core[0];
 
 		if (is_string($this->core['settings'])) {
-		$this->core['settings'] = $this->helper->decode($this->core['settings'], true);
+			$this->core['settings'] = $this->helper->decode($this->core['settings'], true);
 		}
 
 		$this->checkKeys();
@@ -955,6 +955,9 @@ class Core extends BasePackage
 			$this->core['settings']['cache']['service'] = $data['cache_service'];
 		}
 
+		if (isset($data['single_sign_on'])) {
+			$this->core['settings']['security']['sso'] = $data['single_sign_on'];
+		}
 		if (isset($data['passwordWorkFactor'])) {
 			$this->core['settings']['security']['passwordWorkFactor'] = $data['passwordWorkFactor'];
 		}
@@ -1081,9 +1084,19 @@ class Core extends BasePackage
 		}
 	}
 
-	private function writeBaseConfig($dbConfig = null)
+	private function writeBaseConfig($dbConfig = null, $ffConfig = null)
 	{
-		if (!$dbConfig) {
+		if ($this->core['settings']['databasetype'] === 'hybrid') {
+			if (!$dbConfig) {
+				$dbConfig = $this->getDb();//Get the active config
+			}
+
+			if (!$ffConfig) {
+				$ffConfig = $this->getFf();//Get the active ff config
+			}
+		} else if ($this->core['settings']['databasetype'] === 'ff' && !$ffConfig) {
+			$ffConfig = $this->getFf();//Get the active ff config
+		} else if ($this->core['settings']['databasetype'] === 'db' && !$dbConfig) {
 			$dbConfig = $this->getDb();//Get the active config
 		}
 
@@ -1091,6 +1104,7 @@ class Core extends BasePackage
 		$this->core['settings']['dev'] = $this->core['settings']['dev'] == 'true' ? 'true' : 'false';
 		$this->core['settings']['debug'] = $this->core['settings']['debug'] == 'true' ? 'true' : 'false';
 		$this->core['settings']['cache']['enabled'] = $this->core['settings']['cache']['enabled'] == 'true' ? 'true' : 'false';
+		$this->core['settings']['security']['sso'] = $this->core['settings']['security']['sso'] == 'true' ? 'true' : 'false';
 		$this->core['settings']['logs']['emergencyLogsEmailAddresses'] =
 			is_array($this->core['settings']['logs']['emergencyLogsEmailAddresses']) ?
 			implode(',', $this->core['settings']['logs']['emergencyLogsEmailAddresses']) :
@@ -1112,7 +1126,11 @@ return
 		"dev"    			=> ' . $this->core['settings']['dev'] . ', //true - Development false - Production
 		"debug"				=> ' . $this->core['settings']['debug'] . ',
 		"auto_off_debug"	=> ' . $this->core['settings']['auto_off_debug'] . ',
-		"databasetype"	    => "' . $this->core['settings']['databasetype'] . '",
+		"databasetype"	    => "' . $this->core['settings']['databasetype'] . '",';
+
+if ($this->core['settings']['databasetype'] === 'hybrid') {
+		$baseFileContent .=
+'
 		"db" 				=>
 		[
 			"host" 							=> "' . $dbConfig['host'] . '",
@@ -1123,6 +1141,34 @@ return
 			"username" 						=> "' . $dbConfig['username'] . '",
 			"password" 						=> "' . $dbConfig['password'] . '",
 		],
+		"ff" 				=>
+		[
+			"databaseDir" 					=> "' . $ffConfig['databaseDir'] . '"
+		],';
+} else if ($this->core['settings']['databasetype'] === 'ff') {
+		$baseFileContent .=
+'
+		"ff" 				=>
+		[
+			"databaseDir" 					=> "' . $ffConfig['databaseDir'] . '"
+		],';
+} else if ($this->core['settings']['databasetype'] === 'db') {
+		$baseFileContent .=
+'
+		"db" 				=>
+		[
+			"host" 							=> "' . $dbConfig['host'] . '",
+			"port" 							=> "' . $dbConfig['port'] . '",
+			"dbname" 						=> "' . $dbConfig['dbname'] . '",
+			"charset" 	 	    			=> "' . $dbConfig['charset'] . '",
+			"collation" 	    			=> "' . $dbConfig['collation'] . '",
+			"username" 						=> "' . $dbConfig['username'] . '",
+			"password" 						=> "' . $dbConfig['password'] . '",
+		],';
+}
+
+		$baseFileContent .=
+'
 		"cache"				=>
 		[
 			"enabled"						=> ' . $this->core['settings']['cache']['enabled'] . ', //Global Cache value //true - Production false - Development
@@ -1131,6 +1177,7 @@ return
 		],
 		"security"			=>
 		[
+			"sso"	  				 		=> ' . $this->core['settings']['security']['sso'] . ',
 			"passwordWorkFactor"			=> ' . $this->core['settings']['security']['passwordWorkFactor'] . ',
 			"cookiesWorkFactor" 			=> ' . $this->core['settings']['security']['cookiesWorkFactor'] . ',
 		],
@@ -1251,6 +1298,22 @@ return
 					   $dbName === $db['dbname']
 			) {
 				return $db;
+			}
+		}
+
+		return false;
+	}
+
+	public function getFf($active = true, $ffName = null)
+	{
+		foreach ($this->core['settings']['ffs'] as $ff) {
+			if ($active === true && $ff['active'] == 'true') {
+				return $ff;
+			} else if ($active === false &&
+					   $ffName &&
+					   $ffName === $ff['ffname']
+			) {
+				return $ff;
 			}
 		}
 
