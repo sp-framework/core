@@ -192,7 +192,12 @@ class Setup
 
 		$this->helper = $this->container->getShared('helper');
 
-		if ($this->request->isPost() && !$precheckFail && isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'ff') {
+		if (($this->request->isPost() &&
+			 !$precheckFail &&
+			 isset($this->postData['databasetype']) &&
+			 $this->postData['databasetype'] !== 'ff') ||
+			$onlyUpdateDb && $this->request->isPost()
+		) {
 			$this->dbConfig =
 					[
 						'db' =>
@@ -986,10 +991,34 @@ class Setup
 		return true;
 	}
 
-	protected function writeConfigs($coreJson = null, $writeBaseFile = false)
+	protected function writeConfigs($coreJson = null, $writeBaseFile = false, $onlyUpdateDb = false)
 	{
 		if (!$this->configs) {
 			$this->configs = new Configs($this->container, $this->postData, $coreJson);
+		}
+
+		if ($onlyUpdateDb) {
+			$coreJson = $this->configs->write($writeBaseFile);
+
+			if (isset($coreJson['settings']['db'])) {
+				unset($coreJson['settings']['db']);
+			}
+			if (isset($coreJson['settings']['ff'])) {
+				unset($coreJson['settings']['ff']);
+			}
+
+			$this->ff = (new Ff(
+				(object) [
+					'cache' => (object) [
+						'enabled' => false,
+						'timeout' => 0
+					],
+					'databaseType' => $coreJson['settings']['databasetype']
+				], $this->request, $this->helper))->init(false, false);
+
+			(new RegisterCore())->onlyUpdateDb($coreJson['settings']['dbs'], $this->helper, $this->db, $this->ff);
+
+			return $coreJson;
 		}
 
 		return $this->configs->write($writeBaseFile);
