@@ -356,7 +356,7 @@ Class Setup
 					$this->coreJson['settings'] = array_replace($this->coreJson['settings'], $this->config);
 				}
 
-				$this->setupPackage->writeConfigs($this->coreJson, true);
+				$this->setupPackage->writeConfigs($this->coreJson, true, true);
 
 				$this->view->responseCode = 0;
 

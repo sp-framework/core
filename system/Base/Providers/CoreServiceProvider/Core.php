@@ -36,7 +36,9 @@ class Core extends BasePackage
 
 		$this->core = $this->core[0];
 
+		if (is_string($this->core['settings'])) {
 		$this->core['settings'] = $this->helper->decode($this->core['settings'], true);
+		}
 
 		$this->checkKeys();
 

@@ -28,7 +28,7 @@ class Configs
 		if ($writeBaseFile) {
 			$this->writeBaseFile();
 
-			return;
+			return $this->coreJson;
 		}
 
 		$this->writeBaseConfig();
