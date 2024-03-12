@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\AccessServiceProvider;
 
-use Apps\Core\Packages\System\Tools\Qrcodes\Qrcodes;
 use OTPHP\TOTP;
 use ParagonIE\ConstantTime\Base32;
 use Phalcon\Filter\Validation\Validator\Confirmation;
@@ -1035,7 +1034,13 @@ class Auth
         if ($this->verifyTwoFa($data['code'], $security->two_fa_secret)) {
             $security->two_fa_status = '1';
 
-            $security->update();
+            if ($this->config->databasetype === 'db') {
+                $security->update();
+            } else {
+                $securityStore = $this->ff->store('basepackages_users_accounts_security');
+
+                $securityStore->update((array) $security);
+            }
 
             return true;
         }
@@ -1052,7 +1057,13 @@ class Auth
 
             $security->two_fa_secret = null;
 
-            $security->update();
+            if ($this->config->databasetype === 'db') {
+                $security->update();
+            } else {
+                $securityStore = $this->ff->store('basepackages_users_accounts_security');
+
+                $securityStore->update((array) $security);
+            }
 
             $this->packagesData->responseCode = 0;
 
@@ -1089,12 +1100,14 @@ class Auth
 
         $security = $this->getAccountSecurityObject();
 
-        if ($this->config->databasetype === 'db') {
-            $security->two_fa_secret = $twoFaSecret;
+        $security->two_fa_secret = $twoFaSecret;
 
+        if ($this->config->databasetype === 'db') {
             $security->update();
         } else {
-            //
+            $securityStore = $this->ff->store('basepackages_users_accounts_security');
+
+            $securityStore->update((array) $security);
         }
 
         return $twoFaSecret;
