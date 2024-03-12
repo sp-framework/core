@@ -91,6 +91,10 @@ class MiddlewaresServiceProvider extends Injectable
                 if ($middleware['name'] !== 'Acl' &&
                     $middleware['enabled'] == true
                 ) {
+                    if ($this->checkRoute($middleware)) {
+                        return true;
+                    }
+
                     try {
                         $mw = (new $middleware['class']())->process($this->data);
                     } catch (\Exception $e) {
