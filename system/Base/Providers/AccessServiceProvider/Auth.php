@@ -136,7 +136,7 @@ class Auth
     {
         $this->cookieKey = 'remember_' . $this->getKey();
 
-        $this->cookieTimeout = time() + 86400;//Get this time from configuration
+        $this->cookieTimeout = time() + $this->config->timeout->cookies;
 
         return $this;
     }

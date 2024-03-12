@@ -9,7 +9,7 @@
 	"version" : "0.0.0",
 	"repo" : "https://dev.bazaari.com.au/sp-core/core",
 	"class" : "System\\Base\\Providers\\CoreServiceProvider\\Core",
-	"dependencies" : 
+	"dependencies" :
 	{
 		"composer" :
 		{
@@ -74,7 +74,7 @@
 			}
 		}
 	},
-	"settings" : 
+	"settings" :
 	{
 		"dev" : false,
 		"debug" : false,
@@ -90,19 +90,19 @@
 				"databaseDir" : "sp/"
 			}
 		},
-		"cache" : 
+		"cache" :
 		{
 			"enabled" : false,
 			"timeout" : 60,
 			"service" : "streamCache"
 		},
-		"security" : 
+		"security" :
 		{
 			"sso" : false,
 			"passwordWorkFactor" : 8,
 			"cookiesWorkFactor" : 4
 		},
-		"logs" : 
+		"logs" :
 		{
 			"enabled" : false,
 			"exceptions" : false,
@@ -111,11 +111,15 @@
 			"emergencyLogsEmail" : false,
 			"emergencyLogsEmailAddresses" : ""
 		},
-		"websocket" : 
+		"websocket" :
 		{
 			"protocol" : "tcp",
 			"host" : "localhost",
 			"port" : 5555
+		},
+		"timeout" :
+		{
+			"cookies" : 86400
 		}
 	}
 }

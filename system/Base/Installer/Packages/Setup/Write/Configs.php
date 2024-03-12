@@ -80,6 +80,10 @@ return
 			"protocol"						=> "tcp",
 			"host"							=> "localhost",
 			"port"							=> 5555
+		],
+		"timeout"			=>
+		[
+			"cookies"						=> 86400
 		]
 	];';
 			$this->writeBaseFile();
@@ -235,6 +239,10 @@ if ($this->coreJson['settings']['databasetype'] === 'hybrid') {
 			"protocol"						=> "' . $this->coreJson['settings']['websocket']['protocol'] . '",
 			"host"							=> "' . $this->coreJson['settings']['websocket']['host'] . '",
 			"port"							=> ' . $this->coreJson['settings']['websocket']['port'] . '
+		],
+		"timeout"			=>
+		[
+			"cookies"						=> ' . $this->coreJson['settings']['timeout']['cookies'] . '
 		]
 	];';
 

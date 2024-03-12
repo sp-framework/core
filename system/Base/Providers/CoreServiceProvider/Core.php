@@ -1017,6 +1017,9 @@ class Core extends BasePackage
 		if (isset($data['websocket_port'])) {
 			$this->core['settings']['websocket']['port'] = $data['websocket_port'];
 		}
+		if (isset($data['timeout_cookies'])) {
+			$this->core['settings']['timeout']['cookies'] = $data['timeout_cookies'];
+		}
 
 		$this->update($this->core);
 
@@ -1195,6 +1198,10 @@ if ($this->core['settings']['databasetype'] === 'hybrid') {
 			"protocol"						=> "' . $this->core['settings']['websocket']['protocol'] . '",
 			"host"							=> "' . $this->core['settings']['websocket']['host'] . '",
 			"port"							=> ' . $this->core['settings']['websocket']['port'] . '
+		],
+		"timeout"			=>
+		[
+			"cookies"						=> ' . $this->core['settings']['timeout']['cookies'] . '
 		]
 	];';
 
@@ -1233,6 +1240,10 @@ return
 			"protocol"						=> "tcp",
 			"host"							=> "localhost",
 			"port"							=> 5555
+		],
+		"timeout"			=>
+		[
+			"cookies"						=> 86400
 		]
 	];';
 
