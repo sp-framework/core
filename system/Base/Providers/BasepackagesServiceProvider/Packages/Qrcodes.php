@@ -2,13 +2,13 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Endroid\QrCode\Color\Color;
-use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\Label\Font\Font;
-use Endroid\QrCode\Label\Label;
-use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\QrCode;
 use System\Base\BasePackage;
+use Endroid\QrCode\Logo\Logo;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Label\Label;
+use Endroid\QrCode\Label\Font\Font;
+use Endroid\QrCode\Encoding\Encoding;
 
 class Qrcodes extends BasePackage
 {
@@ -99,8 +99,8 @@ class Qrcodes extends BasePackage
         $qrCode->setSize($this->qrcodesSettings['defaultSize']);
         $qrCode->setMargin($this->qrcodesSettings['defaultMargin']);
         $qrCode->setEncoding(new Encoding($this->qrcodesSettings['defaultEncoding']));
-        $ecl = '\Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevel' . ucfirst(strtolower($this->qrcodesSettings['defaultECL']));
-        $qrCode->setErrorCorrectionLevel(new $ecl());
+        $ecl = ucfirst(strtolower($this->qrcodesSettings['defaultECL']));
+        $qrCode->setErrorCorrectionLevel(constant("\Endroid\QrCode\ErrorCorrectionLevel::$ecl"));
         $qrCode->setForegroundColor(
             new Color(
                 $this->qrcodesSettings['codeForegroundColor']['r'],
@@ -135,8 +135,8 @@ class Qrcodes extends BasePackage
 
         if ($this->qrcodesSettings['showLabel'] === 'true') {
             $label = Label::create($this->qrcodesSettings['labelText']);
-            $alignment = '\Endroid\QrCode\Label\Alignment\LabelAlignment' . ucfirst(strtolower($this->qrcodesSettings['defaultLabelAlignment']));
-            $label->setAlignment(new $alignment());
+            $alignment = ucfirst(strtolower($this->qrcodesSettings['defaultLabelAlignment']));
+            $label->setAlignment(constant("\Endroid\QrCode\Label\LabelAlignment::$alignment"));
             $label->setFont(new Font(base_path('external/vendor/endroid/qr-code/assets/noto_sans.otf'), $this->qrcodesSettings['labelFontSize']));
             $label->setTextColor(
                 new Color(

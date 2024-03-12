@@ -63,6 +63,8 @@ class Auth
 
     protected $core;
 
+    protected $basepackages;
+
     public $packagesData;
 
     public $agent;
@@ -89,7 +91,8 @@ class Auth
         $emailQueue,
         $domains,
         $ff,
-        $core
+        $core,
+        $basepackages
     ) {
         $this->request = $request;
 
@@ -128,6 +131,8 @@ class Auth
         $this->ff = $ff;
 
         $this->core = $core;
+
+        $this->basepackages = $basepackages;
 
         $this->packagesData = new PackagesData;
     }
@@ -962,12 +967,10 @@ class Auth
 
             $totp->setIssuer('Bazaari');
 
-            $qrCodesPackage = new Qrcodes();
-
             $this->packagesData->provisionUrl = $totp->getProvisioningUri();
 
             $this->packagesData->qrcode =
-                $qrCodesPackage->generateQrCode(
+                $this->basepackages->qrcodes->generateQrCode(
                     $totp->getProvisioningUri(),
                     [
                         'showLabel'     => 'true',
