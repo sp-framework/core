@@ -55,8 +55,9 @@
             }
         },
         "head"      : {
-            "title" : "Bazaari Core",
-            "meta"  : {
+            "doctype"   : "XHTML5",
+            "title"     : "Bazaari Core",
+            "meta"      : {
                 "author"        : "guru@bazaari.com.au",
                 "charset"       : "UTF-8",
                 "keywords"      : "HTML, CSS, JavaScript",

@@ -5,6 +5,7 @@ namespace System\Base\Providers\ModulesServiceProvider\Modules;
 use Phalcon\Tag;
 use Phalcon\Assets\Inline;
 use System\Base\BasePackage;
+use Phalcon\Html\Helper\Doctype;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesViews;
 
 class Views extends BasePackage
@@ -527,7 +528,8 @@ class Views extends BasePackage
             }
         }
 
-        // $this->buildAssetsTitle();
+        $this->buildAssetsDoctype();
+        $this->buildAssetsTitle();
         $this->buildAssetsMeta();
         $this->buildAssetsHeadCss();
         $this->buildAssetsHeadJs();
@@ -536,19 +538,39 @@ class Views extends BasePackage
         $this->buildAssetsFooterJs();
     }
 
+    protected function buildAssetsDoctype()
+    {
+        $this->assetsCollections['doctype'] = $this->assets->collection('doctype');
+
+        $docType = $this->tag->newInstance('doctype');
+
+        if (isset($this->viewSettings['head']['doctype'])) {
+            $settingsDoctype = $this->viewSettings['head']['doctype'];
+            $docType = $docType(constant("Phalcon\Html\Helper\Doctype::$settingsDoctype"));
+        } else {
+            $docType = $docType(Doctype::HTML5);
+        }
+
+        $this->assetsCollections['doctype']->addInline(new Inline('doctype', $docType->__toString()));
+    }
+
     protected function buildAssetsTitle()
     {
-        $this->tag::setDocType(Tag::XHTML5);
+        $this->assetsCollections['title'] = $this->assets->collection('title');
+
+        $title = $this->tag->newInstance('title');
 
         if (isset($this->viewSettings['head']['title'])) {
-            Tag::setTitle($this->viewSettings['head']['title'] . ' - ' . ucfirst($this->app['name']));
+            $title->set($this->viewSettings['head']['title'] . ' - ' . ucfirst($this->app['name']));
         } else {
-            Tag::setTitle(ucfirst($this->app['name']));
+            $title->set(ucfirst($this->app['name']));
         }
 
         if (isset($this->componentName)) {
-            Tag::appendTitle(' - ' . $this->componentName);
+            $title->append(' - ' . $this->componentName);
         }
+
+        $this->assetsCollections['title']->addInline(new Inline('title', $title->__toString()));
     }
 
     protected function buildAssetsMeta()
@@ -580,6 +602,7 @@ class Views extends BasePackage
     protected function buildAssetsHeadCss()
     {
         $this->assetsCollections['headLinks'] = $this->assets->collection('headLinks');
+
         $links = $this->viewSettings['head']['link']['href'];
 
         if ($this->config->dev && isset($links['assets']['dev'])) {
@@ -614,6 +637,7 @@ class Views extends BasePackage
     protected function buildAssetsHeadJs()
     {
         $this->assetsCollections['headJs'] = $this->assets->collection('headJs');
+
         $scripts = $this->viewSettings['head']['script']['src'];
 
         if ($this->config->dev && isset($scripts['assets']['dev'])) {
@@ -648,6 +672,7 @@ class Views extends BasePackage
     protected function buildAssetsBranding()
     {
         $this->assetsCollections['branding'] = $this->assets->collection('branding');
+
         if (is_array($this->viewSettings['branding']) && count($this->viewSettings['branding']) > 0) {
             foreach ($this->viewSettings['branding'] as $key => $brand) {
                 if (isset($brand['brand'])) {
@@ -667,6 +692,7 @@ class Views extends BasePackage
     protected function buildAssetsFooter()
     {
         $this->assetsCollections['footer'] = $this->assets->collection('footer');
+
         $this->assetsCollections['footer']->addInline(new Inline('footerCopyrightfromYear', $this->viewSettings['footer']['copyright']['fromYear']));
         $this->assetsCollections['footer']->addInline(new Inline('footerCopyrightSite', $this->viewSettings['footer']['copyright']['site']));
         $this->assetsCollections['footer']->addInline(new Inline('footerCopyrightName', $this->viewSettings['footer']['copyright']['name']));
@@ -675,6 +701,7 @@ class Views extends BasePackage
     protected function buildAssetsFooterJs()
     {
         $this->assetsCollections['footerJs'] = $this->assets->collection('footerJs');
+
         $scripts = $this->viewSettings['footer']['script']['src'];
 
         if ($this->config->dev && isset($scripts['assets']['dev'])) {
@@ -709,6 +736,7 @@ class Views extends BasePackage
     protected function extractRoute()
     {
         $route = $this->router->getMatchedRoute()->getPattern();
+
         if ($this->domain['exclusive_to_default_app'] == 1 &&
             $this->domain['default_app_id'] == $this->app['id']
         ) {
