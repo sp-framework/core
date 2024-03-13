@@ -42,18 +42,18 @@
             }
         ],
         "tags"      : "Adminltetags",
-        "branding"  : {
-            "small"     : {
-                "brand"     : "baz/logo/justlogo33x30.png",
-                "maxWidth"  : 35,
-                "maxHeight"  : 30
+        "branding"  : [
+            {
+            "brand"     : "baz/logo/justlogo33x30.png",
+            "maxWidth"  : 35,
+            "maxHeight"  : 30
             },
-            "large"    : {
+            {
                 "brand" : "baz/logo/fulllogo168x30.png",
                 "maxWidth"  : 200,
                 "maxHeight"  : 30
             }
-        },
+        ],
         "head"      : {
             "doctype"   : "XHTML5",
             "title"     : "Bazaari Core",
