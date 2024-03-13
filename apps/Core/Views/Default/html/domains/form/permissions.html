@@ -415,10 +415,10 @@ dataCollectionSection =
                                 $('#' + checkbox)[0].checked = false;
                                 $('#' + checkbox).attr('disabled', true);
                                 dataCollectionSection['data']['apps'][appId]['allowed'] = false;
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true).val(0).trigger('change');
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true).val(0).trigger('change');
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true).val(0).trigger('change');
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true).val(0).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true);
                             }
                         }
                     } else {
@@ -470,10 +470,10 @@ dataCollectionSection =
                         } else {
                             if ($('#{{componentId}}-{{sectionId}}-exclusive_to_default_app')[0].checked === true) {
                                 $('#' + checkbox).attr('disabled', true);
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true).val(0).trigger('change');
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true).val(0).trigger('change');
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true).val(0).trigger('change');
-                                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true).val(0).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true);
                             } else {
                                 $('#' + checkbox).attr('disabled', false);
                             }
@@ -544,13 +544,9 @@ dataCollectionSectionForm['funcs']['extractData'] =
             } else {
                 dataCollectionSection['data']['apps'][appId]['allowed'] = false;
                 $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true);
-                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').val(0).trigger('change');
                 $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true);
-                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').val(0).trigger('change');
                 $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true);
-                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').val(0).trigger('change');
                 $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true);
-                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').val(0).trigger('change');
             }
         } else if (select2 && select2Type) {
             dataCollectionSection['data']['apps'][appId][select2Type] =
