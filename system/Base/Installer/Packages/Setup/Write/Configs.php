@@ -291,7 +291,7 @@ if ($this->coreJson['settings']['databasetype'] === 'hybrid') {
 		$keys[$this->postData['dbname']] = $this->container['random']->base58(4);
 
 		try {
-			$this->container['localContent']->write('system/.dbkeys', $this->container['helper']->encode($keys));
+			$this->container['localContent']->write('system/.dbkeys', $this->container['helper']->encode($keys), ['visibility' => 'private']);
 		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
 			throw $exception;
 		}

@@ -1055,7 +1055,7 @@ class Core extends BasePackage
 		$keys['cookiesSig'] = $this->crypt->encryptBase64($keys['sigKey'], $keys['sigText']);
 
 		try {
-			$this->localContent->write('system/.keys', $this->helper->encode($keys));
+			$this->localContent->write('system/.keys', $this->helper->encode($keys), ['visibility' => 'private']);
 		} catch (FilesystemException | UnableToWriteFile $exception) {
 			throw $exception;
 		}
@@ -1261,7 +1261,7 @@ return
 		$keys[$dbname] = $this->random->base58(4);
 
 		try {
-			$this->localContent->write('system/.dbkeys', $this->helper->encode($keys));
+			$this->localContent->write('system/.dbkeys', $this->helper->encode($keys), ['visibility' => 'private']);
 		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
 			throw $exception;
 		}
@@ -1293,7 +1293,7 @@ return
 		}
 
 		try {
-			$this->localContent->write('system/.dbkeys', $this->helper->encode($keys));
+			$this->localContent->write('system/.dbkeys', $this->helper->encode($keys), ['visibility' => 'private']);
 		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
 			throw $exception;
 		}
