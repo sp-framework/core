@@ -21,7 +21,8 @@ class RouterServiceProvider implements ServiceProviderInterface
 				$request = $container->getShared('request');
 				$response = $container->getShared('response');
 				$helper = $container->getShared('helper');
-				return (new Router($domains, $apps, $components, $views, $logger, $request, $response, $helper))->init();
+				$config = $container->getShared('config');
+				return (new Router($domains, $apps, $components, $views, $logger, $request, $response, $helper, $config))->init();
 			}
 		);
 	}
