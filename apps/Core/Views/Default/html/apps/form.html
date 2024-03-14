@@ -128,13 +128,10 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-registration_allowed').click(function() {
                     if ($(this)[0].checked === true) {
                         $('#{{componentId}}-{{sectionId}}-approve_accounts_manually').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-enforce_2fa').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', false);
                     } else {
                         $('#{{componentId}}-{{sectionId}}-approve_accounts_manually').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-approve_accounts_manually')[0].checked = false;
-                        $('#{{componentId}}-{{sectionId}}-enforce_2fa').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-enforce_2fa')[0].checked = false;
                         $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-registration_role_id').val(null).trigger('change');
                     }

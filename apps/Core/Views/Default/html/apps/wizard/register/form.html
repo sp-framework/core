@@ -18,12 +18,10 @@
     {% if app['registration_allowed'] == true %}
         {% set registrationAllowed = true %}
         {% set registrationApproveAccountsManuallyDisabled = false %}
-        {% set registrationEnforce2FADisabled = false %}
         {% set registrationRoleDisabled = false %}
     {% else %}
         {% set registrationAllowed = false %}
         {% set registrationApproveAccountsManuallyDisabled = true %}
-        {% set registrationEnforce2FADisabled = true %}
         {% set registrationRoleDisabled = true %}
     {% endif %}
     {% set approveAccountsManually = false %}
