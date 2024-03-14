@@ -35,7 +35,7 @@ class Domain
 			$record = $helper->encode($record);
 		} else {
 			$isInternal = '1';
-			$record = [];
+			$record = $helper->encode([]);
 		}
 
 		$domain =
