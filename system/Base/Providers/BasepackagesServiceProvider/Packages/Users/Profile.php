@@ -3,10 +3,11 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Users;
 
 use System\Base\BasePackage;
+use LasseRafn\InitialAvatarGenerator\InitialAvatar;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersProfiles;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersProfiles;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
 
 class Profile extends BasePackage
 {
@@ -119,6 +120,14 @@ class Profile extends BasePackage
     {
         $profile = $this->getProfile($data['id']);
 
+        if (isset($data['first_name']) && isset($data['last_name'])) {
+            if ($data['first_name'] !== $profile['first_name'] ||
+                $data['last_name'] !== $profile['last_name']
+            ) {
+                $data['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
+            }
+        }
+
         unset($data['id']);
 
         $profile = array_merge($profile, $data);
@@ -158,6 +167,12 @@ class Profile extends BasePackage
         }
 
         $profile = $this->getProfile($this->auth->account()['id']);
+
+        if ($data['first_name'] !== $profile['first_name'] ||
+            $data['last_name'] !== $profile['last_name']
+        ) {
+            $data['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
+        }
 
         $profile = array_merge($profile, $data);
 
@@ -555,5 +570,15 @@ class Profile extends BasePackage
         }
 
         $this->addResponse('Could not add to members users', 1);
+    }
+
+    protected function generateInitialsAvatar($profileData)
+    {
+        $avatar = new InitialAvatar();
+
+        $avatars['small'] = base64_encode($avatar->name($profileData['first_name'] . ' ' . $profileData['last_name'])->autoColor()->height(30)->width(30)->generate()->stream('png', 100));
+        $avatars['large'] = base64_encode($avatar->name($profileData['first_name'] . ' ' . $profileData['last_name'])->autoColor()->height(200)->width(200)->generate()->stream('png', 100));
+
+        return $avatars;
     }
 }

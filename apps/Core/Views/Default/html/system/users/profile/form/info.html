@@ -17,6 +17,11 @@
         {% else %}
             {% set portraitLink = '' %}
         {% endif %}
+        {% if profile['initials_avatar']['large'] is defined and profile['initials_avatar']['large'] !== '' %}
+            {% set initialsAvatar = profile['initials_avatar'] %}
+        {% else %}
+            {% set initialsAvatar = '' %}
+        {% endif %}
         {{adminltetags.useTag('fields',
             [
                 'component'                      : component,
@@ -28,6 +33,7 @@
                 'fieldType'                      : 'files/croppie',
                 'fieldValue'                     : profile['portrait'],
                 'imageType'                      : 'portrait',
+                'initialsAvatar'                 : initialsAvatar,
                 'storageType'                    : 'private',
                 'upload'                         : canUpload,
                 'avatar'                         : canAvatar,

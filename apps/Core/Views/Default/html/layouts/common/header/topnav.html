@@ -69,8 +69,11 @@
                     <img src="{{links.url('system/storages/q/uuid/' ~ profile['portrait'] ~ '/w/30')}}" class="rounded-sm" style="position:relative;top: -3px; width:25px;" alt="User Image">
                     <i class="fa fa-fw fa-user" hidden></i>
                     {% set profilePortrait = links.url('system/storages/q/uuid/' ~ profile['portrait'] ~ '/w/80') %}
+                {% elseif profile['initials_avatar']['small'] is defined and profile['initials_avatar']['small'] !== '' %}
+                    <img src="data:image/png;base64,{{profile['initials_avatar']['small']}}" class="rounded-sm" style="position:relative;top: -3px; width:25px;" alt="User Image">
+                    <i class="fa fa-fw fa-user" hidden></i>
+                    {% set profilePortrait = profile['initials_avatar']['small'] %}
                 {% else %}
-                    <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="rounded-sm" style="position:relative;top: -3px; width:25px;" alt="User Image" hidden>
                     <i class="fa fa-fw fa-user"></i>
                     {% set profilePortrait = links.images('general/user.png') %}
                 {% endif %}

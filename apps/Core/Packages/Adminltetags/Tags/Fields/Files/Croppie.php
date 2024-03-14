@@ -374,7 +374,14 @@ class Croppie
                 } else if ($this->params['imageType'] === 'image') {
                     $fileName = $this->links->images('general/img.png');
                 } else if ($this->params['imageType'] === 'portrait') {
-                    $fileName = $this->links->images('general/portrait.png');
+                    if (isset($this->params['initialsAvatar']) &&
+                        is_array($this->params['initialsAvatar']) &&
+                        isset($this->params['initialsAvatar']['large'])
+                    ) {
+                        $fileName = 'Initials Avatar';
+                    } else {
+                        $fileName = $this->links->images('general/portrait.png');
+                    }
                 }
             } else {
                 if (!str_starts_with($this->params['fieldValue'], 'http')) {
@@ -434,7 +441,7 @@ class Croppie
         } else if ($this->params['imageType'] === 'portrait') {
             if (isset($this->params['portraitLink']) &&
                 ($this->params['portraitLink'] !== '' && $this->params['portraitLink'] !== '#')
-        ) {
+            ) {
                 if (!str_starts_with($this->params['portraitLink'], 'http')) {
                     $this->params['portraitLink'] = ltrim($this->params['portraitLink'], '/');
                     if (str_starts_with($this->params['portraitLink'], 'public')) {
@@ -445,18 +452,44 @@ class Croppie
                     }
                 }
 
-                $this->content .=
-                    '<img id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image" alt="portrait" data-type="portrait" data-orgimage="' . $this->links->images('general/portrait.png') . '" src="' . $this->params['portraitLink'] . '" class="user-portrait img-fluid img-thumbnail" style="max-width:' . $this->params['maxWidth'] . 'px;max-height:' . $this->params['maxHeight'] . 'px;">';
+                if (isset($this->params['initialsAvatar']) &&
+                    is_array($this->params['initialsAvatar']) &&
+                    isset($this->params['initialsAvatar']['large'])
+                ) {
+                    $this->content .=
+                        '<img id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image" alt="portrait" data-type="portrait" data-orgimage="data:image/png;base64,' . $this->params['initialsAvatar']['large'] . '" src="' . $this->params['portraitLink'] . '" class="user-portrait img-fluid img-thumbnail" style="max-width:' . $this->params['maxWidth'] . 'px;max-height:' . $this->params['maxHeight'] . 'px;">';
+                } else {
+                    $this->content .=
+                        '<img id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image" alt="portrait" data-type="portrait" data-orgimage="' . $this->links->images('general/portrait.png') . '" src="' . $this->params['portraitLink'] . '" class="user-portrait img-fluid img-thumbnail" style="max-width:' . $this->params['maxWidth'] . 'px;max-height:' . $this->params['maxHeight'] . 'px;">';
+                }
             } else {
-                $this->content .=
+                if (isset($this->params['initialsAvatar']) &&
+                    is_array($this->params['initialsAvatar']) &&
+                    isset($this->params['initialsAvatar']['large'])
+                ) {
+                    $this->content .=
+                        '<img id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image" alt="portrait" data-type="portrait" data-orgimage="data:image/png;base64,' . $this->params['initialsAvatar']['large'] . '" src="data:image/png;base64,' . $this->params['initialsAvatar']['large'] . '" class="user-portrait img-fluid img-thumbnail" style="max-width:' . $this->params['maxWidth'] . 'px;max-height:' . $this->params['maxHeight'] . 'px;">';
+                } else {
+                    $this->content .=
                     '<img id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image" alt="portrait" data-type="portrait" data-orgimage="' . $this->links->images('general/portrait.png') . '" src="' . $this->links->images('general/portrait.png') . '" class="user-image img-fluid img-thumbnail" style="max-width:' . $this->params['maxWidth'] . 'px;max-height:' . $this->params['maxHeight'] . 'px;">';
+                }
             }
+        }
+
+        if (isset($this->params['initialsAvatar']) &&
+            is_array($this->params['initialsAvatar']) &&
+            isset($this->params['initialsAvatar']['small'])
+        ) {
+            $this->params['smallIntialsAvatar'] = $this->params['initialsAvatar']['small'];
+        } else {
+            $this->params['smallIntialsAvatar'] = '';
         }
 
         $this->content .=
                 '<div class="image-text">' . $fileName . '</div>
             </div>
         <div id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie" hidden></div>' .
+
 
         $this->inclJs();
     }
@@ -476,6 +509,7 @@ class Croppie
                             var deleteUUIDs = [];
                             var imageBlob, newImage, oldImage, imageName;
                             var orgImage = $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image").data("orgimage");
+                            var smallInitialsAvatar = "' . $this->params['smallIntialsAvatar'] . '";
 
                             if ($("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image").attr("src") !== $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image").data("orgimage")) {
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload").attr("hidden", true);
@@ -611,7 +645,11 @@ class Croppie
                             $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-remove").click(function (e) {
                                 e.preventDefault();
                                 croppieReset();
-                                $(".' . $this->compSecId . '-' . $this->params['fieldId'] . '-image-content .image-text").html($("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image").data("orgimage"));
+                                if (smallInitialsAvatar === "") {
+                                    $(".' . $this->compSecId . '-' . $this->params['fieldId'] . '-image-content .image-text").html($("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image").data("orgimage"));
+                                } else {
+                                    $(".' . $this->compSecId . '-' . $this->params['fieldId'] . '-image-content .image-text").html("Initials Avatar");
+                                }
                             });
 
                             function readFile(input) {
@@ -842,9 +880,15 @@ class Croppie
                                 $("body").off("sectionWithFormDataUpdated");
                                 $("body").on("sectionWithFormDataUpdated", function() {
                                     if (remove) {
-                                        $("#profile-portrait").children("i").attr("hidden", false);
-                                        $("#profile-portrait").children("img").attr("src", "");
-                                        $("#profile-portrait").children("img").attr("hidden", true);
+                                        if (smallInitialsAvatar === "") {
+                                            $("#profile-portrait").children("i").attr("hidden", false);
+                                            $("#profile-portrait").children("img").attr("src", "");
+                                            $("#profile-portrait").children("img").attr("hidden", true);
+                                        } else {
+                                            $("#profile-portrait").children("i").attr("hidden", true);
+                                            $("#profile-portrait").children("img").attr("src", "data:image/png;base64," + smallInitialsAvatar);
+                                            $("#profile-portrait").children("img").attr("hidden", false);
+                                        }
                                     } else {
                                         $("#profile-portrait").children("i").attr("hidden", true);
                                         $("#profile-portrait").children("img").attr("src", window.dataCollection.env.rootPath + window.dataCollection.env.appRoute +
@@ -853,6 +897,8 @@ class Croppie
                                         window.dataCollection.env.profile.portrait =
                                             window.dataCollection.env.rootPath + window.dataCollection.env.appRoute + "/system/storages/q/uuid/" + uploadUUIDs[0] + "/w/80";
                                     }
+
+                                    $("body").off("sectionWithFormDataUpdated");
                                 });
 
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").off();
