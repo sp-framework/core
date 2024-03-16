@@ -78,7 +78,11 @@ class AuthComponent extends BaseComponent
 
             $auth = $this->auth->attempt($this->postData());
 
-            $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
+            if (isset($this->auth->packagesData->responseData)) {
+                $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode, $this->auth->packagesData->responseData);
+            } else {
+                $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
+            }
 
             if ($auth) {
                 $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
@@ -161,6 +165,25 @@ class AuthComponent extends BaseComponent
         }
     }
 
+    public function sendTwoFaEmailAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->auth->sendTwoFaEmail($this->postData());
+
+            if (isset($this->auth->packagesData->responseData)) {
+                $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode, $this->auth->packagesData->responseData);
+            } else {
+                $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
+            }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
     public function checkPwStrengthAction()
     {
         if ($this->request->isPost()) {
@@ -207,14 +230,14 @@ class AuthComponent extends BaseComponent
         }
     }
 
-    public function enableTwoFaAction()
+    public function enableTwoFaTotpAction()
     {
         if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            if ($this->auth->enableTwoFa($this->postData())) {
+            if ($this->auth->enableTwoFaTotp($this->postData())) {
                 $this->view->provisionUrl = $this->auth->packagesData->provisionUrl;
 
                 $this->view->qrcode = $this->auth->packagesData->qrcode;
@@ -232,14 +255,14 @@ class AuthComponent extends BaseComponent
         }
     }
 
-    public function verifyTwoFaAction()
+    public function verifyTwoFaTotpAction()
     {
         if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            if ($this->auth->enableVerifyTwoFa($this->postData())) {
+            if ($this->auth->verifyTwoFaTotp($this->postData())) {
                 $this->view->redirectUrl = $this->links->url('/');
             }
 

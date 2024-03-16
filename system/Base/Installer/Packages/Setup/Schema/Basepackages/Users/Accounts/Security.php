@@ -64,17 +64,32 @@ class Security
                         ]
                     ),
                     new Column(
-                        'two_fa_status',
+                        'two_fa_totp_status',
                         [
                             'type'          => Column::TYPE_BOOLEAN,
                             'notNull'       => false,
                         ]
                     ),
                     new Column(
-                        'two_fa_secret',
+                        'two_fa_totp_secret',
                         [
                             'type'          => Column::TYPE_VARCHAR,
                             'size'          => 1024,
+                            'notNull'       => false
+                        ]
+                        ),
+                    new Column(
+                        'two_fa_email_code',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 1024,
+                            'notNull'       => false
+                        ]
+                        ),
+                    new Column(
+                        'two_fa_email_code_sent_on',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
                             'notNull'       => false
                         ]
                     )

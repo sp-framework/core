@@ -144,11 +144,12 @@ class MiddlewaresServiceProvider extends Injectable
                 $this->data['appRoute'] . '/auth/pwreset',
                 $this->data['appRoute'] . '/auth/checkpwstrength',
                 $this->data['appRoute'] . '/auth/generatepw',
-                $this->data['appRoute'] . '/auth/enabletwofa',
-                $this->data['appRoute'] . '/auth/verifytwofa',
+                $this->data['appRoute'] . '/auth/enabletwofatotp',
+                $this->data['appRoute'] . '/auth/verifytwofatotp',
                 $this->data['appRoute'] . '/auth/logout',
                 $this->data['appRoute'] . '/auth/sendverification',
                 $this->data['appRoute'] . '/auth/verify',
+                $this->data['appRoute'] . '/auth/sendtwofaemail',
                 $this->data['appRoute'] . '/register/registernewaccount',
             ];
         }

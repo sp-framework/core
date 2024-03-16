@@ -33,6 +33,7 @@ class AccessServiceProvider implements ServiceProviderInterface
                 $ff = $container->getShared('ff');
                 $core = $container->getShared('core');
                 $basepackages = $container->getShared('basepackages');
+                $helper = $container->getShared('helper');
 
                 return (
                     new Auth(
@@ -54,7 +55,8 @@ class AccessServiceProvider implements ServiceProviderInterface
                         $domains,
                         $ff,
                         $core,
-                        $basepackages
+                        $basepackages,
+                        $helper
                     ))->init();
             }
         );

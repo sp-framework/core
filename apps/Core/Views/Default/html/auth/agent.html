@@ -95,27 +95,48 @@ $(document).ready(function(){
         overlay: '{{links.images("/vegas/2.4.4/overlays/01.png")}}'
     });
 
-    var url, thisButton;
+    var url, thisButton, countDownTimer;
     var postData = { };
-    function getAjaxUrlData() {
+    function getAjaxUrlData(thisButton) {
         $('#{{componentId}}-form-auth, ' +
           '#{{componentId}}-form-forgot, ' +
           '#{{componentId}}-form-reset, ' +
           '#{{componentId}}-form-send-verification, ' +
+          '#{{componentId}}-form-send-2faemail, ' +
           '#{{componentId}}-form-verify').attr('disabled', true);
 
         $('.login-spinner').attr('hidden', false);
 
         if ($('#{{componentId}}-form-auth').length > 0) {
-            url = '{{links.url("auth/login")}}';
-            postData = {
-                'user'      : $('#{{componentId}}-form-user').val().trim(),
-                'pass'      : $('#{{componentId}}-form-pass').val().trim(),
-                'remember'  : $('#{{componentId}}-form-remember')[0].checked
-            };
+            if ($('#twofa-email').hasClass('d-none') === false) {
+                if (thisButton.id === '{{componentId}}-form-send-2faemail') {
+                    url = '{{links.url("auth/sendtwofaemail")}}';
+                    postData = {
+                        'user'      : $('#{{componentId}}-form-user').val().trim(),
+                        'pass'      : $('#{{componentId}}-form-pass').val().trim()
+                    };
+                    clearInterval(countDownTimer);
+                } else {
+                    url = '{{links.url("auth/login")}}';
+                    postData = {
+                        'user'          : $('#{{componentId}}-form-user').val().trim(),
+                        'pass'          : $('#{{componentId}}-form-pass').val().trim(),
+                        'code'          : $('#{{componentId}}-form-twofa-email').val().trim(),
+                        'twofa_using'   : 'email'
+                    };
+                }
+            } else {
+                url = '{{links.url("auth/login")}}';
+                postData = {
+                    'user'      : $('#{{componentId}}-form-user').val().trim(),
+                    'pass'      : $('#{{componentId}}-form-pass').val().trim(),
+                    'remember'  : $('#{{componentId}}-form-remember')[0].checked
+                };
 
-            if ($('#{{componentId}}-form-twofa').val().trim() !== '') {
-                postData['code'] = $('#{{componentId}}-form-twofa').val().trim();
+                if ($('#{{componentId}}-form-twofa-totp').val().trim() !== '') {
+                    postData['code'] = $('#{{componentId}}-form-twofa-totp').val().trim();
+                    postData['twofa_using'] = 'totp';
+                }
             }
         } else if ($('#{{componentId}}-form-forgot').length > 0) {
             url = '{{links.url("auth/forgot")}}';
@@ -135,12 +156,12 @@ $(document).ready(function(){
                 url = '{{links.url("auth/sendVerification")}}';
             } else if (thisButton.id === '{{componentId}}-form-verify') {
                 postData = {
-                    'code'      : $('#{{componentId}}-form-verification-code').val().trim()
+                    'code'          : $('#{{componentId}}-form-verification-code').val().trim()
                 };
                 url = '{{links.url("auth/verify")}}';
             }
         } else if ($('#{{componentId}}-form-generate-code').length > 0) {
-            url = '{{links.url("auth/enableTwoFa")}}';
+            url = '{{links.url("auth/enableTwoFaTotp")}}';
             postData = {
                 'user'              : $('#{{componentId}}-form-user').val().trim(),
                 'pass'              : $('#{{componentId}}-form-pass').val().trim()
@@ -153,11 +174,12 @@ $(document).ready(function(){
       '#{{componentId}}-form-forgot, ' +
       '#{{componentId}}-form-reset, ' +
       '#{{componentId}}-form-send-verification, ' +
+      '#{{componentId}}-form-send-2faemail, ' +
       '#{{componentId}}-form-generate-code, ' +
       '#{{componentId}}-form-verify').click(function(e) {
             e.preventDefault();
             thisButton = this;
-            getAjaxUrlData();
+            getAjaxUrlData(thisButton);
             runAjax();
         });
 
@@ -227,14 +249,20 @@ $(document).ready(function(){
             window.location = response.redirectUrl;
             return;
         }
-
-        $('.login-spinner').attr('hidden', true);
-        $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
-        $('#{{componentId}}-form :input').prop('disabled', false);
-        $('#{{componentId}}-form :input').not('.token').val('');
-        $('#{{componentId}}-form-user').focus();
-        $('#{{componentId}}-form-auth').attr('disabled', false);
-        $('#{{componentId}}-form-twofa').parents('.form-group').addClass('d-none');
+        if ($('#{{componentId}}-form-auth').length > 0) {
+            $('.login-spinner').attr('hidden', true);
+            $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+            $('#{{componentId}}-form :input').prop('disabled', false);
+            if ($('#twofa-email').hasClass('d-none') === false) {
+                $('#{{componentId}}-form-twofa-email').val('');
+                setEmailTimer(response.responseData.code_sent_on, response.responseData.email_timeout);
+            } else {
+                $('#{{componentId}}-form :input').not('.token').val('');
+                $('#{{componentId}}-form-user').focus();
+                $('#{{componentId}}-form-auth').attr('disabled', false);
+                $('#{{componentId}}-form-twofa-totp').parents('.form-group').addClass('d-none');
+            }
+        }
         setTimeout(function () {
             $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
 
@@ -256,14 +284,59 @@ $(document).ready(function(){
         $('.login-spinner').attr('hidden', true);
         $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
 
-        if (response && response.redirectUrl) {
-            window.location = response.redirectUrl;
-            return;
+        if (response.responseData['allowed_methods'].includes('totp')) {
+            $('#{{componentId}}-form :input').prop('disabled', false);
+            $('#{{componentId}}-form-twofa-totp').parents('.form-group').removeClass('d-none');
+            $('#twofa-totp').removeClass('d-none');
+            $('#{{componentId}}-form-twofa-totp').focus();
+            if (!response.responseData.totp_status ||
+                response.responseData.totp_status && response.responseData.totp_status != '1'
+            ) {
+                $('#twofa-totp-register').removeClass('d-none');
+            }
+        } else if (response.responseData['allowed_methods'].includes('email')) {
+            $('#{{componentId}}-form :input').prop('disabled', false);
+            $('#{{componentId}}-form-twofa-email').parents('.form-group').removeClass('d-none');
+            $('#twofa-email').removeClass('d-none');
         }
 
-        $('#{{componentId}}-form :input').prop('disabled', false);
-        $('#{{componentId}}-form-twofa').parents('.form-group').removeClass('d-none');
-        $('#{{componentId}}-form-twofa').focus();
+        if (response.responseData['allowed_methods'].length > 1) {
+            $('#twofa-methods').removeClass('d-none');
+            $('#twofa-methods a').off();
+            $('#twofa-methods a').click(function(e) {
+                e.preventDefault();
+
+                if ($('#twofa-methods').hasClass('email')) {
+                    $($('#twofa-methods span')[0]).html('Use Authenticator 2FA');
+                    $('#twofa-methods').removeClass('email').addClass('authenticator');
+                    $('#twofa-email').removeClass('d-none');
+                    $('#{{componentId}}-form-twofa-totp').parents('.form-group').addClass('d-none');
+                    $('#{{componentId}}-form-twofa-totp').val('');
+                    $('#{{componentId}}-form-twofa-email').parents('.form-group').removeClass('d-none');
+                    $('#{{componentId}}-form-twofa-email').val('');
+                    if (!response.responseData.totp_status ||
+                        response.responseData.totp_status && response.responseData.totp_status != '1'
+                    ) {
+                        $('#twofa-totp-register').addClass('d-none');
+                    }
+                } else {
+                    $($('#twofa-methods span')[0]).html('Use Email 2FA');
+                    $('#twofa-methods').removeClass('authenticator').addClass('email');
+                    $('#twofa-email').addClass('d-none');
+                    $('#{{componentId}}-form-twofa-totp').parents('.form-group').removeClass('d-none');
+                    $('#{{componentId}}-form-twofa-totp').val('');
+                    $('#{{componentId}}-form-twofa-email').parents('.form-group').addClass('d-none');
+                    $('#{{componentId}}-form-twofa-email').val('');
+                    if (!response.responseData.totp_status ||
+                        response.responseData.totp_status && response.responseData.totp_status != '1'
+                    ) {
+                        $('#twofa-totp-register').removeClass('d-none');
+                    }
+                }
+            });
+
+
+        }
         setTimeout(function () {
             $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
 
@@ -284,12 +357,33 @@ $(document).ready(function(){
         $('.login-box-msg').removeClass('text-danger').addClass('text-success font-weight-bold');
 
         if ($('#{{componentId}}-form-auth').length > 0) {
-            if (response && response.redirectUrl) {
-                window.location = response.redirectUrl;
-                return;
+            if ($('#twofa-email').hasClass('d-none') === false) {
+                if (response.responseMessage && response.responseMessage.includes('Authenticated')) {
+                    if (response && response.redirectUrl) {
+                        window.location = response.redirectUrl;
+                        return;
+                    } else {
+                        window.location = '/{{appRoute}}/';
+                        return;
+                    }
+                } else {
+                    $('#{{componentId}}-form :input').prop('disabled', false);
+                    $('#{{componentId}}-form-twofa-email').val('');
+                    setTimeout(function () {
+                        $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
+                        $('.login-box-msg').text('Login to start {{appRoute}} session');
+                        $('.login-box-msg').addClass('animated fadeIn');
+                    }, 5000);
+                    setEmailTimer(null, response.responseData.email_timeout);
+                }
             } else {
-                window.location = '/{{appRoute}}/';
-                return;
+                if (response && response.redirectUrl) {
+                    window.location = response.redirectUrl;
+                    return;
+                } else {
+                    window.location = '/{{appRoute}}/';
+                    return;
+                }
             }
         } else if ($('#{{componentId}}-form-forgot').length > 0) {
             //
@@ -325,7 +419,7 @@ $(document).ready(function(){
                 postData['pass'] = $('#{{componentId}}-form-pass').val().trim();
                 postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-                var url = '{{links.url("auth/enableTwoFa")}}';
+                var url = '{{links.url("auth/enableTwoFaTotp")}}';
 
                 $.post(url, postData, function(response) {
                     if (response.responseCode === 0) {
@@ -362,7 +456,7 @@ $(document).ready(function(){
                 postData['user'] = $('#{{componentId}}-form-user').val().trim();
                 postData['pass'] = $('#{{componentId}}-form-pass').val().trim();
 
-                var url = '{{links.url("auth/verifytwofa")}}';
+                var url = '{{links.url("auth/verifytwofatotp")}}';
 
                 $.post(url, postData, function(response) {
                     if (response.responseCode === 0) {
@@ -412,6 +506,34 @@ $(document).ready(function(){
                 }
             }
         }
+    }
+
+    function setEmailTimer(oldsenttime = null, emailtimeout = 60) {
+        $('#{{componentId}}-form-send-2faemail').attr('disabled', true);
+        $('.resend-timer').removeClass('d-none');
+        var expiryTimer;
+
+        if (oldsenttime) {
+            expiryTimer = (oldsenttime * 1000) + (emailtimeout * 1000);
+        } else {
+            expiryTimer = new Date().getTime() + (emailtimeout * 1000);
+        }
+
+        countDownTimer = setInterval(() => {
+            var seconds, now, tillExpiry;
+
+            now = new Date().getTime();
+            tillExpiry = expiryTimer - now;
+            seconds = Math.floor((tillExpiry % (emailtimeout * 1000)) / 1000);
+
+            $('.resend-timer').html('Wait for ' + seconds + 's to resend email...');
+
+            if (tillExpiry < 0) {
+                clearInterval(countDownTimer);
+                $('#{{componentId}}-form-send-2faemail').attr('disabled', false);
+                $('.resend-timer').addClass('d-none');
+            }
+        }, 1000);
     }
 
     function verify() {

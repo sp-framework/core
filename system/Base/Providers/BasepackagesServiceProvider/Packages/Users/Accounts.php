@@ -256,9 +256,9 @@ class Accounts extends BasePackage
             $data['password'] = $this->secTools->hashPassword($password);
         }
 
-        if (isset($data['disable_two_fa']) && $data['disable_two_fa'] === '1') {
-            $data['two_fa_status'] = null;
-            $data['two_fa_secret'] = null;
+        if (isset($data['disable_two_fa_totp']) && $data['disable_two_fa_totp'] === '1') {
+            $data['two_fa_totp_status'] = null;
+            $data['two_fa_totp_secret'] = null;
         }
 
         if (!isset($data['package_name']) ||
@@ -419,7 +419,6 @@ class Accounts extends BasePackage
         $agents = true,
         $tunnels = true
     ) {
-        var_dump($account);
         if ($security) {
             if ($accountObj->getsecurity()) {
                 $accountObj->getsecurity()->delete();

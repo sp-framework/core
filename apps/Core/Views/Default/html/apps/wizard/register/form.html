@@ -29,9 +29,23 @@
         {% set approveAccountsManually = true %}
     {% endif %}
     {% set enforce2FA = false %}
+    {% set twofaUsingDisabled = true %}
+    {% set twofaEmailTimeoutDisabled = true %}
+    {% set twofaTotpTimeoutDisabled = true %}
     {% if app['enforce_2fa'] == true %}
         {% set enforce2FA = true %}
+        {% set twofaUsingDisabled = false %}
     {% endif %}
+    {% set app2faUsing = app['twofa_using'] %}
+    {% if in_array('email', app2faUsing) %}
+        {% set twofaEmailTimeoutDisabled = false %}
+    {% endif %}
+    {% if in_array('totp', app2faUsing) %}
+        {% set twofaTotpTimeoutDisabled = false %}
+    {% endif %}
+    {% set app2faEmailTimeout = app['twofa_email_timeout'] %}
+    {% set app2faTotpTimeout = app['twofa_totp_timeout'] %}
+
     {% set appRegistrationRoleId = app['registration_role_id'] %}
     {% set appGuestRoleId = app['guest_role_id'] %}
     {% set appCanLoginRoleIds = app['can_login_role_ids'] %}
@@ -63,6 +77,9 @@
     {% set wizard = true %}
     {% set defaultDashboardHidden = 'hidden' %}
     {% set defaultDashboard = '' %}
+    {% set app2faUsing = '' %}
+    {% set app2faEmailTimeout = '300' %}
+    {% set app2faTotpTimeout = '30' %}
 {% endif %}
 {% if wizard === true %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
@@ -286,8 +303,7 @@ dataCollectionSection =
             'placeholder'   : 'SELECT ROLES'
         },
         '{{componentId}}-{{sectionId}}-acceptable_usernames'                : {
-            'placeholder'   : 'SELECT OR ENTER NEW PREFIX',
-            'tags'          : true
+            'placeholder'   : 'SELECT OR ENTER NEW PREFIX'
         },
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',

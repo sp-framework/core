@@ -119,7 +119,7 @@
                 'componentId'                           : componentId,
                 'sectionId'                             : sectionId,
                 'fieldId'                               : 'twofa',
-                'fieldLabel'                            : 'Two Factor Authentication',
+                'fieldLabel'                            : 'Two Factor Authentication TOTP',
                 'fieldLabelLegend'                      : true,
                 'fieldHidden'                           : false,
                 'fieldType'                             : 'html',
@@ -127,12 +127,12 @@
                 'fieldBazPostOnCreate'                  : false,
                 'fieldBazPostOnUpdate'                  : false,
                 'fieldBazJstreeSearch'                  : true,
-                'fieldHtmlContent'                      : 'Two Factor Authentication (2FA) is an extended method of authentication which uses an authenticator app like Google Authenticator or Authy.'
+                'fieldHtmlContent'                      : 'Two Factor Authentication (2FA) TOTP is an extended method of authentication which uses an authenticator app like Google Authenticator or Authy.'
             ]
         )}}
     </div>
 </div>
-{% if account['security']['two_fa_status'] == '1' %}
+{% if account['security']['two_fa_totp_status'] == '1' %}
     {% set disableHidden = false %}
     {% set enableHidden = true %}
 {% else %}
@@ -150,16 +150,16 @@
                 'buttonType'                : 'button',
                 'buttons'                   :
                     {
-                        'enable-twofa-button' : {
-                            'title'                   : 'Enable Two Factor Authentication',
+                        'enable-twofa-totp-button' : {
+                            'title'                   : 'Enable Two Factor Authentication (TOTP)',
                             'size'                    : 'sm',
                             'type'                    : 'primary',
                             'icon'                    : 'cog fa-spin',
                             'iconHidden'              : true,
                             'hidden'                  : enableHidden
                         },
-                        'disable-twofa-button' : {
-                            'title'                   : 'Disable Two Factor Authentication',
+                        'disable-twofa-totp-button' : {
+                            'title'                   : 'Disable Two Factor Authentication (TOTP)',
                             'size'                    : 'sm',
                             'type'                    : 'danger',
                             'icon'                    : 'cog fa-spin',
@@ -249,7 +249,7 @@ $('#{{componentId}}-{{sectionId}}-pwreset-button').click(function(e) {
     }, 'json');
 });
 
-$('#{{componentId}}-{{sectionId}}-enable-twofa-button').click(function(e) {
+$('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').click(function(e) {
     e.preventDefault();
 
     $(this).attr('disabled', true);
@@ -258,7 +258,7 @@ $('#{{componentId}}-{{sectionId}}-enable-twofa-button').click(function(e) {
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-    var url = '{{links.url("system/users/profile/enabletwofa")}}';
+    var url = '{{links.url("system/users/profile/enabletwofatotp")}}';
 
     $.post(url, postData, function(response) {
         if (response.responseCode === 0) {
@@ -267,7 +267,7 @@ $('#{{componentId}}-{{sectionId}}-enable-twofa-button').click(function(e) {
             );
             $('#twofa-details').attr('hidden', false);
             $('#twofa-secret').empty().append(response.secret);
-            $('#{{componentId}}-{{sectionId}}-enable-twofa-button').html(
+            $('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').html(
                 '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> REGENERATE TWO FACTOR AUTHENTICATION QR CODE'
             );
         } else {
@@ -281,8 +281,8 @@ $('#{{componentId}}-{{sectionId}}-enable-twofa-button').click(function(e) {
             $('#security-token').val(response.token);
         }
 
-        $('#{{componentId}}-{{sectionId}}-enable-twofa-button').attr('disabled', false);
-        $('#{{componentId}}-{{sectionId}}-enable-twofa-button').children('i').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').children('i').attr('hidden', true);
 
     }, 'json');
 });
@@ -305,7 +305,7 @@ $('#{{componentId}}-{{sectionId}}-verify').click(function(e) {
     postData[$('#security-token').attr('name')] = $('#security-token').val();
     postData['code'] = $('#{{componentId}}-{{sectionId}}-verification').val().trim();
 
-    var url = '{{links.url("system/users/profile/verifytwofa")}}';
+    var url = '{{links.url("system/users/profile/verifytwofatotp")}}';
 
     $.post(url, postData, function(response) {
         if (response.responseCode === 0) {
@@ -317,9 +317,9 @@ $('#{{componentId}}-{{sectionId}}-verify').click(function(e) {
             $('#twofa-qrcode').empty();
             $('#twofa-secret').empty();
             $('#twofa-details').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-enable-twofa-button').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-disable-twofa-button').attr('hidden', false);
-            $('#{{componentId}}-{{sectionId}}-enable-twofa-button').html(
+            $('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-disable-twofa-totp-button').attr('hidden', false);
+            $('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').html(
                 '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> ENABLE TWO FACTOR AUTHENTICATION'
             );
         } else {
@@ -339,7 +339,7 @@ $('#{{componentId}}-{{sectionId}}-verify').click(function(e) {
     }, 'json');
 });
 
-$('#{{componentId}}-{{sectionId}}-disable-twofa-button').click(function(e) {
+$('#{{componentId}}-{{sectionId}}-disable-twofa-totp-button').click(function(e) {
     e.preventDefault();
 
     Swal.fire({
@@ -373,12 +373,12 @@ $('#{{componentId}}-{{sectionId}}-disable-twofa-button').click(function(e) {
             postData[$('#security-token').attr('name')] = $('#security-token').val();
             postData['code'] = result.value;
 
-            var url = '{{links.url("system/users/profile/disabletwofa")}}';
+            var url = '{{links.url("system/users/profile/disabletwofatotp")}}';
 
             $.post(url, postData, function(response) {
                 if (response.responseCode === 0) {
-                    $('#{{componentId}}-{{sectionId}}-disable-twofa-button').attr('hidden', true);
-                    $('#{{componentId}}-{{sectionId}}-enable-twofa-button').attr('hidden', false);
+                    $('#{{componentId}}-{{sectionId}}-disable-twofa-totp-button').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').attr('hidden', false);
                     PNotify.success({
                         'title' : response.responseMessage
                     });

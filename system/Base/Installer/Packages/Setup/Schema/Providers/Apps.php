@@ -87,7 +87,29 @@ class Apps
 						'type'    => Column::TYPE_BOOLEAN,
 						'notNull' => false,
 					]
-				),								
+				),
+				new Column(
+					'twofa_using',
+					[
+						'type'    => Column::TYPE_JSON,
+						'size'    => 4096,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'twofa_email_timeout',
+					[
+						'type'    => Column::TYPE_INTEGER,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'twofa_totp_timeout',
+					[
+						'type'    => Column::TYPE_INTEGER,
+						'notNull' => false,
+					]
+				),
 				new Column(
 					'registration_role_id',
 					[
