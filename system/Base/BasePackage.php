@@ -1920,7 +1920,7 @@ abstract class BasePackage extends Controller
 		$this->db->dropTable($table);
 	}
 
-	public function createTable(string $table, string $dbName = '', array $columns, $drop = false)
+	public function createTable(string $table, string $dbName, array $columns, $drop = false)
 	{
 		try {
 			if ($drop) {
