@@ -587,7 +587,7 @@ $(document).ready(function(){
             tillExpiry = expiryTimer - now;
             seconds = Math.floor((tillExpiry % (emailtimeout * 1000)) / 1000);
 
-            $('.resend-timer').html('Wait for ' + seconds + 's to resend email...');
+            $('.resend-timer').html('Code sent valid for ' + seconds + 's...');
 
             if (tillExpiry < 0) {
                 clearInterval(countDownTimer);
