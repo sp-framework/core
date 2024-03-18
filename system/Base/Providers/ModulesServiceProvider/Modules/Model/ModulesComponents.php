@@ -14,11 +14,11 @@ class ModulesComponents extends BaseModel
 
     public $description;
 
+    public $module_type;
+
     public $app_type;
 
     public $category;
-
-    public $subcategory;
 
     public $version;
 
@@ -29,6 +29,8 @@ class ModulesComponents extends BaseModel
     public $settings;
 
     public $user_settings;
+
+    public $widgets;
 
     public $dependencies;
 
@@ -41,6 +43,8 @@ class ModulesComponents extends BaseModel
     public $apps;
 
     public $files;
+
+    public $api_id;
 
     public $update_available;
 

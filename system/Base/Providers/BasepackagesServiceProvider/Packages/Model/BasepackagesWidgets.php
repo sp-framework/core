@@ -16,5 +16,7 @@ class BasepackagesWidgets extends BaseModel
 
     public $multiple;
 
+    public $max_multiple;
+
     public $settings;
 }

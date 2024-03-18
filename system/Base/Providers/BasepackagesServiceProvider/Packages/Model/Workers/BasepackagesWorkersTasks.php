@@ -20,13 +20,15 @@ class BasepackagesWorkersTasks extends BaseModel
 
     public $is_raw;
 
+    public $is_on_demand;
+
     public $priority;
 
     public $enabled;
 
     public $status;
 
-    public $type;//System OR User
+    public $type;
 
     public $previous_run;
 

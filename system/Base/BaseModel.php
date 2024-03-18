@@ -9,6 +9,12 @@ abstract class BaseModel extends Model
 {
 	protected $app;
 
+	protected $apps;
+
+	protected $modules;
+
+	protected $db;
+
 	protected $modelRelations;
 
 	public function onConstruct()

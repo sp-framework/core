@@ -10,6 +10,8 @@ class BasepackagesEmailQueue extends BaseModel
 
     public $app_id;
 
+    public $domain_id;
+
     public $status;
 
     public $priority;

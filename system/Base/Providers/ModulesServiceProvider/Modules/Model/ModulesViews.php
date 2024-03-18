@@ -10,7 +10,11 @@ class ModulesViews extends BaseModel
 
     public $name;
 
+    public $display_name;
+
     public $description;
+
+    public $module_type;
 
     public $app_type;
 
@@ -35,6 +39,8 @@ class ModulesViews extends BaseModel
     public $installed;
 
     public $files;
+
+    public $api_id;
 
     public $update_available;
 

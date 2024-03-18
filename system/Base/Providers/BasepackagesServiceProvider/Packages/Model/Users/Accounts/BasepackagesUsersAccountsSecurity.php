@@ -23,9 +23,13 @@ class BasepackagesUsersAccountsSecurity extends BaseModel
 
     public $force_pwreset;
 
-    public $two_fa_status;
+    public $two_fa_totp_status;
 
-    public $two_fa_secret;
+    public $two_fa_totp_secret;
+
+    public $two_fa_email_code;
+
+    public $two_fa_email_code_sent_on;
 
     public function initialize()
     {

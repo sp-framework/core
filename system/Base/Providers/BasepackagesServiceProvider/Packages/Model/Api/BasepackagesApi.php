@@ -8,21 +8,21 @@ class BasepackagesApi extends BaseModel
 {
     public $id;
 
-    public $api_id;
+    public $api_category_id;
 
     public $name;
 
     public $category;
 
-    public $provider_name;
-
-    public $type;
+    public $provider;
 
     public $in_use;
 
     public $used_by;
 
     public $setup;
+
+    public $location;
 
     public $description;
 }

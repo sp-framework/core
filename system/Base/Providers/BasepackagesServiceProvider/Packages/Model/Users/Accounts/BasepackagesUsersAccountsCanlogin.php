@@ -13,7 +13,7 @@ class BasepackagesUsersAccountsCanlogin extends BaseModel
 
     public $account_id;
 
-    public $app;
+    public $app_id;
 
     public $allowed;
 

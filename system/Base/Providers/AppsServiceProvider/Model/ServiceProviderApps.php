@@ -25,17 +25,33 @@ class ServiceProviderApps extends BaseModel
 
     public $registration_allowed;
 
+    public $approve_accounts_manually;
+
+    public $enforce_2fa;
+
+    public $twofa_using;
+
+    public $twofa_email_timeout;
+
+    public $twofa_totp_timeout;
+
+    public $agent_email_timeout;
+
     public $registration_role_id;
 
     public $guest_role_id;
 
     public $can_login_role_ids;
 
+    public $acceptable_usernames;
+
     public $ip_filter_default_action;
 
     public $incorrect_login_attempt_block_ip;
 
     public $menu_structure;
+
+    public $settings;
 
     public function initialize()
     {

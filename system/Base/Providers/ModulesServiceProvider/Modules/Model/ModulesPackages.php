@@ -14,15 +14,17 @@ class ModulesPackages extends BaseModel
 
     public $description;
 
+    public $module_type;
+
     public $app_type;
 
     public $category;
 
-    public $subcategory;
-
     public $version;
 
     public $repo;
+
+    public $class;
 
     public $settings;
 
@@ -35,6 +37,8 @@ class ModulesPackages extends BaseModel
     public $installed;
 
     public $files;
+
+    public $api_id;
 
     public $update_available;
 

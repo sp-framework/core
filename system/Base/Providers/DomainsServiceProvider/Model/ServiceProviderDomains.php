@@ -18,5 +18,9 @@ class ServiceProviderDomains extends BaseModel
 
     public $apps;
 
+    public $dns_record;
+
+    public $is_internal;
+
     public $settings;
 }

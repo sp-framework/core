@@ -14,7 +14,7 @@ class BasepackagesFilters extends BaseModel
 
     public $conditions;
 
-    public $type;
+    public $filter_type;
 
     public $auto_generated;
 
