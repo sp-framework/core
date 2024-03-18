@@ -101,6 +101,7 @@ class Profile extends BasePackage
 
         $data['account_id'] = $accountId;
         $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
+        $data['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
         $data['contact_phone'] = '0';
         $data['contact_mobile'] = '0';
 
@@ -121,8 +122,9 @@ class Profile extends BasePackage
         $profile = $this->getProfile($data['id']);
 
         if (isset($data['first_name']) && isset($data['last_name'])) {
-            if ($data['first_name'] !== $profile['first_name'] ||
-                $data['last_name'] !== $profile['last_name']
+            if (($data['first_name'] !== $profile['first_name'] ||
+                $data['last_name'] !== $profile['last_name']) ||
+                !$profile['initials_avatar']
             ) {
                 $data['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
             }
@@ -168,8 +170,9 @@ class Profile extends BasePackage
 
         $profile = $this->getProfile($this->auth->account()['id']);
 
-        if ($data['first_name'] !== $profile['first_name'] ||
-            $data['last_name'] !== $profile['last_name']
+        if (($data['first_name'] !== $profile['first_name'] ||
+            $data['last_name'] !== $profile['last_name']) ||
+            !$profile['initials_avatar']
         ) {
             $data['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
         }
