@@ -602,6 +602,12 @@ class Ff
                 foreach ($storeDataArr as $storeData) {
                     $model = new $config['model'];
 
+                    foreach ($storeData as $storeDataKey => &$storeDataValue) {
+                        if (is_array($storeDataValue)) {
+                            $storeDataValue = $this->helper->encode($storeDataValue);
+                        }
+                    }
+
                     $model->assign($storeData);
 
                     $model->create();
