@@ -77,7 +77,7 @@ class Security
                             'size'          => 1024,
                             'notNull'       => false
                         ]
-                        ),
+                    ),
                     new Column(
                         'two_fa_email_code',
                         [
@@ -85,7 +85,7 @@ class Security
                             'size'          => 1024,
                             'notNull'       => false
                         ]
-                        ),
+                    ),
                     new Column(
                         'two_fa_email_code_sent_on',
                         [

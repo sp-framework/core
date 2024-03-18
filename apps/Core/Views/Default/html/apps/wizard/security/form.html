@@ -1,3 +1,20 @@
+{{adminltetags.useTag('fields',
+    [
+        'component'                             : component,
+        'componentName'                         : componentName,
+        'componentId'                           : componentId,
+        'sectionId'                             : sectionId,
+        'fieldId'                               : 'permissions',
+        'fieldLabel'                            : 'Permissions',
+        'fieldLabelLegend'                      : true,
+        'fieldHidden'                           : false,
+        'fieldType'                             : 'html',
+        'fieldBazScan'                          : false,
+        'fieldBazPostOnCreate'                  : false,
+        'fieldBazPostOnUpdate'                  : false,
+        'fieldHtmlContent'                      : ''
+    ]
+)}}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -152,6 +169,24 @@
         )}}
     </div>
 </div>
+<hr>
+{{adminltetags.useTag('fields',
+[
+    'component'                             : component,
+    'componentName'                         : componentName,
+    'componentId'                           : componentId,
+    'sectionId'                             : sectionId,
+    'fieldId'                               : '2fa',
+    'fieldLabel'                            : '2 Factor Authentication',
+    'fieldLabelLegend'                      : true,
+    'fieldHidden'                           : false,
+    'fieldType'                             : 'html',
+    'fieldBazScan'                          : false,
+    'fieldBazPostOnCreate'                  : false,
+    'fieldBazPostOnUpdate'                  : false,
+    'fieldHtmlContent'                      : ''
+]
+)}}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -251,5 +286,51 @@
                 'fieldValue'                            : app2faTotpTimeout
             ]
         )}}
+    </div>
+</div>
+<div id="agent-settings" {{agentSettingsHidden}}>
+    <hr>
+    {{adminltetags.useTag('fields',
+    [
+        'component'                             : component,
+        'componentName'                         : componentName,
+        'componentId'                           : componentId,
+        'sectionId'                             : sectionId,
+        'fieldId'                               : 'agent-verification',
+        'fieldLabel'                            : 'Agent Verification',
+        'fieldLabelLegend'                      : true,
+        'fieldType'                             : 'html',
+        'fieldBazScan'                          : false,
+        'fieldBazPostOnCreate'                  : false,
+        'fieldBazPostOnUpdate'                  : false,
+        'fieldHtmlContent'                      : ''
+        ]
+        )}}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'agent_email_timeout',
+                    'fieldLabel'                            : 'Agent Email Code Timeout (seconds)',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Timeout of the email code that is sent to the user. After the timeout, user has to generate a new code.',
+                    'fieldInputTypeTextFilter'              : 'positiveInt',
+                    'fieldRequired'                         : true,
+                    'fieldDisabled'                         : false,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldDataInputMinNumber'               : 60,
+                    'fieldDataInputMaxNumber'               : 3600,
+                    'fieldDataInputMaxLength'               : 4,
+                    'fieldValue'                            : appAgentEmailTimeout
+                ]
+            )}}
+        </div>
     </div>
 </div>

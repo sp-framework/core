@@ -440,7 +440,7 @@ class Auth
         if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
             if (isset($data['twofa_using'])) {
                 if ($data['twofa_using'] === 'email' && in_array('email', $this->app['twofa_using'])) {
-                    if (time() > $security->two_fa_email_code_sent_on + $this->app['twofa_email_timeout'] ?? 60) {
+                    if (time() > $security->two_fa_email_code_sent_on + ($this->app['twofa_email_timeout'] ?? 60)) {
                         $security->two_fa_email_code_sent_on = null;
                         $security->two_fa_email_code = null;
 
@@ -827,6 +827,8 @@ class Auth
         if ($task === 'auth') {
             $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid user name."]);
             $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
+        } else if ($task === 'agent') {
+            $this->validation->add('code', PresenceOf::class, ["message" => "Enter valid code."]);
         } else if ($task === 'forgot') {
             $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid user name."]);
         } else if ($task === 'reset') {
@@ -1416,6 +1418,25 @@ class Auth
                 $agent = $agentStore->findOneBy([['session_id', '=', $this->session->getId()], ['account_id', '=', $this->account()['id']]]);
             }
         }
+        if (isset($agent['email_code_sent_on'])) {
+            if (time() < $agent['email_code_sent_on'] + ($this->app['agent_email_timeout'] ?? 60)) {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Email already sent, please wait...';
+
+                $this->packagesData->responseData =
+                    [
+                        'code_sent_on' => $agent['email_code_sent_on'],
+                        'email_timeout' => $this->app['agent_email_timeout'] ?? 60
+                    ];
+
+                return false;
+            }
+
+            $agent['email_code_sent_on'] = time();
+        } else {
+            $agent['email_code_sent_on'] = time();
+        }
 
         $code = $this->secTools->random->base62(12);
 
@@ -1438,6 +1459,8 @@ class Auth
 
             $this->packagesData->responseCode = 0;
 
+            $this->packagesData->responseData = ['email_timeout' => $this->app['agent_email_timeout'] ?? 60];
+
             return;
         }
 
@@ -1456,7 +1479,7 @@ class Auth
         $emailData['priority'] = 1;
         $emailData['confidential'] = 1;
         $emailData['to_addresses'] = $this->helper->encode([$this->account['email']]);
-        $emailData['subject'] = 'Verification Code for ' . $this->domains->getDomain()['name'];
+        $emailData['subject'] = 'Agent verification code for ' . $this->domains->getDomain()['name'];
         $emailData['body'] = $verificationCode;
 
         return $this->emailQueue->addToQueue($emailData);
@@ -1464,6 +1487,16 @@ class Auth
 
     public function verifyVerficationCode(array $data)
     {
+        $validate = $this->validateData($data, 'agent');
+
+        if ($validate !== true) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = $validate;
+
+            return false;
+        }
+
         if (!$this->account) {
             $this->setUserFromSession();
         }
@@ -1506,6 +1539,23 @@ class Auth
             }
         }
 
+        if (time() > $agent['email_code_sent_on'] + ($this->app['agent_email_timeout'] ?? 60)) {
+            $agent['email_code_sent_on'] = null;
+            $agent['verification_code'] = null;
+
+            if ($this->config->databasetype === 'db') {
+                $agentObj->assign($agent)->update();
+            } else {
+                $agentStore->update($agent);
+            }
+
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Code Expired! Request new code...';
+
+            return false;
+        }
+
         if ($this->secTools->checkPassword($data['code'], $agent['verification_code'])) {
             if ($agent['client_address'] === $clientAddress &&
                 $agent['user_agent'] === $userAgent &&
@@ -1518,6 +1568,7 @@ class Auth
                 } else {
                     $agent['verified'] = 1;
                     $agent['verification_code'] = null;
+                    $agent['email_code_sent_on'] = null;
 
                     $agentStore->update($agent);
                 }
@@ -1571,7 +1622,7 @@ class Auth
         $security = $this->getAccountSecurityObject();
 
         if (isset($security->two_fa_email_code_sent_on)) {
-            if (time() < $security->two_fa_email_code_sent_on + $this->app['twofa_email_timeout'] ?? 60) {
+            if (time() < $security->two_fa_email_code_sent_on + ($this->app['twofa_email_timeout'] ?? 60)) {
                 $this->packagesData->responseCode = 1;
 
                 $this->packagesData->responseMessage = 'Email already sent, please wait...';
@@ -1618,7 +1669,6 @@ class Auth
 
         $this->packagesData->responseCode = 1;
     }
-
     protected function emailTwoFaEmailCode($twofaCode)
     {
         $emailData['app_id'] = $this->app['id'];
@@ -1627,7 +1677,7 @@ class Auth
         $emailData['priority'] = 1;
         $emailData['confidential'] = 1;
         $emailData['to_addresses'] = $this->helper->encode([$this->account['email']]);
-        $emailData['subject'] = '2FA Code for ' . $this->domains->getDomain()['name'];
+        $emailData['subject'] = '2FA code for ' . $this->domains->getDomain()['name'];
         $emailData['body'] = $twofaCode;
 
         return $this->emailQueue->addToQueue($emailData);

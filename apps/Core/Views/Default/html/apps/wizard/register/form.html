@@ -6,12 +6,16 @@
     {% set appTypeDisabled = true %}
     {% set appDescription = app['description'] %}
     {% set registrationEnabled = false %}
+    {% set agentSettingsHidden = 'hidden' %}
     {% for middleware in middlewares %}
         {% if middleware['name'] === 'Auth' %}
             {% if middleware['enabled'] == 1 %}
                 {% set registrationEnabled = false %}
-            {% elseif middleware['enabled'] == 0 %}
-                {% set registrationEnabled = true %}
+            {% endif %}
+        {% endif %}
+        {% if middleware['name'] === 'AgentCheck' %}
+            {% if middleware['enabled'] == 1 %}
+                {% set agentSettingsHidden = '' %}
             {% endif %}
         {% endif %}
     {% endfor %}
@@ -59,7 +63,8 @@
     {% if app['settings']['defaultDashboard'] is defined %}
         {% set defaultDashboard = app['settings']['defaultDashboard'] %}
     {% endif %}
-{% else %}
+    {% set appAgentEmailTimeout = app['agent_email_timeout'] %}
+    {% else %}
     {% set appId = '' %}
     {% set appName = '' %}
     {% set appRoute = '' %}
@@ -80,6 +85,7 @@
     {% set app2faUsing = '' %}
     {% set app2faEmailTimeout = '300' %}
     {% set app2faTotpTimeout = '30' %}
+    {% set appAgentEmailTimeout = '30' %}
 {% endif %}
 {% if wizard === true %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">

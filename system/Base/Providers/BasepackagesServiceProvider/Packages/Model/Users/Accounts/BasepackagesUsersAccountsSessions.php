@@ -39,7 +39,10 @@ class BasepackagesUsersAccountsSessions extends BaseModel
         $this->modelRelations['sessions']['relationObj'] = $this->hasOne(
             'session_id',
             BasepackagesUsersAccountsAgents::class,
-            'session_id'
+            'session_id',
+            [
+                'alias'         => 'agents'
+            ]
         );
 
         parent::initialize();

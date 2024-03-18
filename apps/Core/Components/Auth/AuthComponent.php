@@ -144,7 +144,11 @@ class AuthComponent extends BaseComponent
 
             $this->auth->sendVerificationEmail();
 
-            $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
+            if (isset($this->auth->packagesData->responseData)) {
+                $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode, $this->auth->packagesData->responseData);
+            } else {
+                $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
+            }
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }

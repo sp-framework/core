@@ -304,6 +304,9 @@ class Apps extends BasePackage
 		if (isset($app['totp_timeout']) && $app['totp_timeout'] < 30) {
 			$app['totp_timeout'] = 30;
 		}
+		if (isset($app['agent_email_timeout']) && $app['agent_email_timeout'] < 60) {
+			$app['agent_email_timeout'] = 60;
+		}
 
 		if ($this->update($app)) {
 			$this->addActivityLog($data, $app);

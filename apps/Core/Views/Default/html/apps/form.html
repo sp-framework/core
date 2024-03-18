@@ -69,10 +69,10 @@
                                 'tabTitle'          : 'Modules',
                                 'tabInclude'        : 'apps/wizard/modules/form'
                             ],
-                            'permissions'   :
+                            'security'   :
                             [
-                                'tabTitle'          : 'Permissions',
-                                'tabInclude'        : 'apps/wizard/permissions/form',
+                                'tabTitle'          : 'Security',
+                                'tabInclude'        : 'apps/wizard/security/form',
                                 'tabHidden'         : authTabHidden
                             ],
                             'filters'   :
@@ -201,6 +201,7 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-twofa_email_timeout'             : { },
         '{{componentId}}-{{sectionId}}-twofa_totp_timeout'              : { },
+        '{{componentId}}-{{sectionId}}-agent_email_timeout'             : { },
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules: {
@@ -210,6 +211,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-registration_role_id'        : 'required',
                 '{{componentId}}-{{sectionId}}-twofa_using'                 : 'required',
                 '{{componentId}}-{{sectionId}}-twofa_email_timeout'         : 'required',
+                '{{componentId}}-{{sectionId}}-agent_email_timeout'         : 'required',
                 '{{componentId}}-{{sectionId}}-twofa_totp_timeout'          : 'required',
                 '{{componentId}}-{{sectionId}}-guest_role_id'               : 'required',
                 '{{componentId}}-{{sectionId}}-default_component'           : 'required',
@@ -224,6 +226,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-twofa_using'             : 'Please select 2FA Method(s)',
                 '{{componentId}}-{{sectionId}}-twofa_email_timeout'     : 'Please enter email timeout (seconds)',
                 '{{componentId}}-{{sectionId}}-twofa_totp_timeout'      : 'Please enter totp timeout (seconds)',
+                '{{componentId}}-{{sectionId}}-agent_email_timeout'     : 'Please enter email timeout (seconds)',
                 '{{componentId}}-{{sectionId}}-guest_role_id'           : 'Please select guest role',
                 '{{componentId}}-{{sectionId}}-default_component'       : 'Please select app default component',
                 '{{componentId}}-{{sectionId}}-errors_component'        : 'Please select app errors component',

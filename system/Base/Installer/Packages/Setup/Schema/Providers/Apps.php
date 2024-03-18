@@ -111,6 +111,13 @@ class Apps
 					]
 				),
 				new Column(
+					'agent_email_timeout',
+					[
+						'type'    => Column::TYPE_INTEGER,
+						'notNull' => false,
+					]
+				),
+				new Column(
 					'registration_role_id',
 					[
 						'type'    => Column::TYPE_SMALLINTEGER,
