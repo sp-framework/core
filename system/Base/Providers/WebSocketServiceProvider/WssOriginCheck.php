@@ -14,7 +14,7 @@ class WssOriginCheck extends OriginCheck
 
     private $logger;
 
-    public function __construct(MessageComponentInterface $component, array $allowed = [], $logger, $domains) {
+    public function __construct(MessageComponentInterface $component, $logger, $domains, array $allowed = []) {
         $this->logger = $logger;
 
         $allowed = ['localhost'];

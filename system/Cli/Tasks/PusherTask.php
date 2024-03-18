@@ -3,13 +3,13 @@
 namespace System\Cli\Tasks;
 
 use Phalcon\Cli\Task;
+use React\ZMQ\Context;
+use React\Socket\Server;
+use React\EventLoop\Loop;
 use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
 use Ratchet\Wamp\WampServer;
 use Ratchet\WebSocket\WsServer;
-use React\EventLoop\Factory;
-use React\Socket\Server;
-use React\ZMQ\Context;
 use System\Base\Providers\WebSocketServiceProvider\WssOriginCheck;
 
 class PusherTask extends Task
@@ -42,15 +42,15 @@ class PusherTask extends Task
                             $this->basepackages->pusher->setCliLogger($this->logger)
                         )
                     ),
-                    [],
                     $this->logger,
-                    $this->domains->domains
+                    $this->domains->domains,
+                    []
                 );
         }
 
         $this->checkLogPath();
 
-        $loop = Factory::create();
+        $loop = Loop::get();
 
         $context = new Context($loop);
 

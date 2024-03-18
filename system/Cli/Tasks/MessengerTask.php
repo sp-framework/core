@@ -3,10 +3,10 @@
 namespace System\Cli\Tasks;
 
 use Phalcon\Cli\Task;
+use React\EventLoop\Loop;
 use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
-use React\EventLoop\Factory;
 use System\Base\Providers\WebSocketServiceProvider\WssOriginCheck;
 
 class MessengerTask extends Task
@@ -19,7 +19,7 @@ class MessengerTask extends Task
     public function startAction()
     {
 
-        $loop = Factory::create();
+        $loop = Loop::get();
 
         $wsserver = new WsServer($this->basepackages->messenger->setCliLogger($this->logger));
         $wsserver->enableKeepAlive($loop);
@@ -36,9 +36,9 @@ class MessengerTask extends Task
             $originCheck =
                 new WssOriginCheck(
                     $wsserver,
-                    [],
                     $this->logger,
-                    $this->domains->domains
+                    $this->domains->domains,
+                    []
                 );
         }
 

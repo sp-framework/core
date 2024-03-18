@@ -508,9 +508,10 @@ abstract class BaseComponent extends Controller
 					}
 				} else {
 					$this->disableViewLevel();
-						return;
+					return;
 				}
 			} else {
+				$this->modules->views->buildAssets($this->componentName);
 				$this->disableViewLevel();
 				return;
 			}
