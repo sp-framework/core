@@ -221,7 +221,7 @@ class Auth
             1,
             '/',
             null,
-            null,
+            $this->domains->getDomain()['name'],
             true
         );
 
@@ -233,7 +233,7 @@ class Auth
             1,
             '/',
             null,
-            null,
+            $this->domains->getDomain()['name'],
             true
         );
 
@@ -563,7 +563,7 @@ class Auth
             $this->cookieTimeout,
             '/',
             null,
-            null,
+            $this->domains->getDomain()['name'],
             true
         );
 
@@ -714,7 +714,7 @@ class Auth
             $this->cookieTimeout,
             '/',
             null,
-            null,
+            $this->domains->getDomain()['name'],
             true
         );
 
