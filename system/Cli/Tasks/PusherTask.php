@@ -4,11 +4,11 @@ namespace System\Cli\Tasks;
 
 use Phalcon\Cli\Task;
 use React\ZMQ\Context;
-use React\Socket\Server;
 use React\EventLoop\Loop;
 use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
 use Ratchet\Wamp\WampServer;
+use React\Socket\SocketServer;
 use Ratchet\WebSocket\WsServer;
 use System\Base\Providers\WebSocketServiceProvider\WssOriginCheck;
 
@@ -58,7 +58,7 @@ class PusherTask extends Task
         $pull->bind('tcp://127.0.0.1:5555');
         $pull->on('message', array($this->basepackages->pusher, 'onNewPush'));
 
-        $webSock = new Server('0.0.0.0:4444', $loop);
+        $webSock = new SocketServer('0.0.0.0:4444', $loop);
 
         try {
             $webServer = new IoServer(
