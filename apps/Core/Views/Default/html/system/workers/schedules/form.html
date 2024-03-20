@@ -9,8 +9,11 @@
     {% set scheduleName = '' %}
     {% set scheduleDescription = '' %}
     {% set scheduleType = '1' %}
-    {% set scheduleScheduleType = 'everyminute' %}
+    {% set scheduleScheduleType = 'everyxseconds' %}
 {% endif %}
+
+{% set everyxsecondsHidden = 'hidden' %}
+{% set everyxSeconds = '00,15,30,45' %}
 
 {% set everyminuteHidden = 'hidden' %}
 
@@ -40,34 +43,51 @@
 {% set monthlyHours = '00' %}
 {% set monthlyMinutes = '00' %}
 
-{% if scheduleScheduleType === 'everyminute' %}
+{% if scheduleScheduleType === 'everyxseconds' %}
+    {% set everyxsecondsHidden = '' %}
+    {% if schedule['id'] is defined %}
+        {% set everyxSeconds = schedule['schedule']['params']['seconds'] %}
+    {% endif %}
+{% elseif scheduleScheduleType === 'everyminute' %}
     {% set everyminuteHidden = '' %}
 {% elseif scheduleScheduleType === 'everyxminutes' %}
     {% set everyxminutesHidden = '' %}
-    {% set everyxminutesMinutes = schedule['schedule']['params']['minutes'] %}
+    {% if schedule['id'] is defined %}
+        {% set everyxminutesMinutes = schedule['schedule']['params']['minutes'] %}
+    {% endif %}
 {% elseif scheduleScheduleType === 'everyxminutesbetween' %}
     {% set everyxminutesbetweenHidden = '' %}
-    {% set everyxminutesbetweenMinutes = schedule['schedule']['params']['minutes'] %}
-    {% set everyxminutesbetweenStart = schedule['schedule']['params']['start'] %}
-    {% set everyxminutesbetweenEnd = schedule['schedule']['params']['end'] %}
+    {% if schedule['id'] is defined %}
+        {% set everyxminutesbetweenMinutes = schedule['schedule']['params']['minutes'] %}
+        {% set everyxminutesbetweenStart = schedule['schedule']['params']['start'] %}
+        {% set everyxminutesbetweenEnd = schedule['schedule']['params']['end'] %}
+    {% endif %}
 {% elseif scheduleScheduleType === 'hourly' %}
     {% set hourlyHidden = '' %}
-    {% set hourlyMinutes = schedule['schedule']['params']['hourly_minutes'] %}
+    {% if schedule['id'] is defined %}
+        {% set hourlyMinutes = schedule['schedule']['params']['hourly_minutes'] %}
+    {% endif %}
 {% elseif scheduleScheduleType === 'daily' %}
     {% set dailyHidden = '' %}
-    {% set dailyHours = schedule['schedule']['params']['daily_hours'] %}
-    {% set dailyMinutes = schedule['schedule']['params']['daily_minutes'] %}
+    {% if schedule['id'] is defined %}
+        {% set dailyHours = schedule['schedule']['params']['daily_hours'] %}
+        {% set dailyMinutes = schedule['schedule']['params']['daily_minutes'] %}
+    {% endif %}
 {% elseif scheduleScheduleType === 'weekly' %}
     {% set weeklyHidden = '' %}
-    {% set weeklyDays = schedule['schedule']['params']['weekly_days'] %}
-    {% set weeklyHours = schedule['schedule']['params']['weekly_hours'] %}
-    {% set weeklyMinutes = schedule['schedule']['params']['weekly_minutes'] %}
+    {% if schedule['id'] is defined %}
+        {% set weeklyDays = schedule['schedule']['params']['weekly_days'] %}
+        {% set weeklyHours = schedule['schedule']['params']['weekly_hours'] %}
+        {% set weeklyMinutes = schedule['schedule']['params']['weekly_minutes'] %}
+    {% endif %}
 {% elseif scheduleScheduleType === 'monthly' %}
     {% set monthlyHidden = '' %}
-    {% set monthlyMonths = schedule['schedule']['params']['monthly_months'] %}
-    {% set monthlyDay = schedule['schedule']['params']['monthly_day'] %}
-    {% set monthlyHours = schedule['schedule']['params']['monthly_hours'] %}
-    {% set monthlyMinutes = schedule['schedule']['params']['monthly_minutes'] %}
+    {% if schedule['id'] is defined %}
+        {% set monthlyMonths = schedule['schedule']['params']['monthly_months'] %}
+        {% set monthlyDay = schedule['schedule']['params']['monthly_day'] %}
+        {% set monthlyHours = schedule['schedule']['params']['monthly_hours'] %}
+        {% set monthlyMinutes = schedule['schedule']['params']['monthly_minutes'] %}
+    {% endif %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -185,6 +205,12 @@
                         'fieldBazScan'                   : true,
                         'fieldRadioButtons'              :
                             [
+                                'everyxseconds' :
+                                    [
+                                        'title'          : 'Every X Seconds of a Minute',
+                                        'type'           : 'danger',
+                                        'dataValue'      : 'everyxseconds'
+                                    ],
                                 'everyminute' :
                                     [
                                         'title'          : 'Every Minute',
@@ -231,6 +257,35 @@
                         'fieldRadioChecked'              : scheduleScheduleType
                     ]
                 )}}
+            </div>
+            <div class="col schedules" id="{{componentId}}-{{sectionId}}-everyxseconds" {{everyxsecondsHidden}}>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'everyxseconds',
+                                'fieldLabel'                            : 'Seconds',
+                                'fieldType'                             : 'input',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Seconds of the minute. Example: If you want to run a script/function every 10th and 20th second, enter 10,20 in the field.',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldValue'                            : everyxSeconds
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="callout callout-danger">
+                    <h5>Every X Seconds of the minute</h5>
+                    <p>Task with this schedule will run every <span class="text-warning" id="{{componentId}}-{{sectionId}}-everyxminutes-span">{{everyxSeconds}}</span> seconds of the minute.</p>
+                </div>
             </div>
             <div class="col schedules" id="{{componentId}}-{{sectionId}}-everyminute" {{everyminuteHidden}}>
                 <div class="callout callout-danger">
@@ -655,6 +710,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-name'                                    : { },
         '{{componentId}}-{{sectionId}}-description'                             : { },
         '{{componentId}}-{{sectionId}}-type'                                    : { },
+        '{{componentId}}-{{sectionId}}-everyxseconds'                           : { },
         '{{componentId}}-{{sectionId}}-everyxminutes_minutes'                   : { },
         '{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes'            : { },
         '{{componentId}}-{{sectionId}}-everyxminutesbetween_start'              : {
@@ -706,7 +762,18 @@ dataCollectionSection =
                 });
 
                 function initSchedules() {
-                    if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'everyminute') {
+                    if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'everyxseconds') {
+                        $('.schedules').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-everyxseconds').attr('hidden', false);
+
+                        $('#{{componentId}}-{{sectionId}}-everyxseconds').on('input propertychange', function() {
+                            if ($('#{{componentId}}-{{sectionId}}-everyxseconds').val().length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-everyxseconds-span').html('X');
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-everyxseconds-span').html($('#{{componentId}}-{{sectionId}}-everyxseconds').val());
+                            }
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'everyminute') {
                         $('.schedules').attr('hidden', true);
                         $('#{{componentId}}-{{sectionId}}-everyminute').attr('hidden', false);
                     } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'everyxminutes') {
@@ -866,6 +933,7 @@ dataCollectionSection =
             ignore      : ':submit, :reset, :image, :hidden, .ignore, .cr-slider',
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                            : 'required',
+                '{{componentId}}-{{sectionId}}-everyxseconds'                   : 'required',
                 '{{componentId}}-{{sectionId}}-everyxminutes_minutes'           : 'required',
                 '{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes'    : 'required',
                 '{{componentId}}-{{sectionId}}-everyxminutesbetween_start'      : 'required',
@@ -883,6 +951,7 @@ dataCollectionSection =
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                            : 'Please enter schedule name',
+                '{{componentId}}-{{sectionId}}-everyxseconds'                   : 'Please enter seconds (comma separated)',
                 '{{componentId}}-{{sectionId}}-everyxminutes_minutes'           : 'Please enter minutes',
                 '{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes'    : 'Please enter minutes',
                 '{{componentId}}-{{sectionId}}-everyxminutesbetween_start'      : 'Please select start time',

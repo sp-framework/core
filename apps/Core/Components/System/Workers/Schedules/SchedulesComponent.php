@@ -35,6 +35,10 @@ class SchedulesComponent extends BaseComponent
 
                 $schedule['schedule'] = $this->helper->decode($schedule['schedule'], true);
 
+                if ($schedule['schedule']['type'] === 'everyxseconds') {
+                    $schedule['schedule']['params']['seconds'] = implode(',', $schedule['schedule']['params']['seconds']);
+                }
+
                 $this->view->schedule = $schedule;
             }
             $this->view->pick('schedules/view');

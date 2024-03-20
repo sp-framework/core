@@ -25,6 +25,7 @@ class Schedules
     {
         $descriptions =
             [
+                'everyxseconds'             => 'Task with this schedule will run every X seconds of the minute.',
                 'everyminute'               => 'Task with this schedule will run every minute.',
                 'everyxminutes'             => 'Task with this schedule will run every X minutes from the moment it starts.',
                 'hourly'                    => 'Task with this schedule will run every hour. If minutes are specified the task will run X minutes past the hour.',
@@ -38,6 +39,24 @@ class Schedules
             ];
 
         $schedulesArr = [];
+
+        //Every 15 Seconds
+        $schedule =
+            [
+                'type'      => 'everyxseconds',
+                'params'    =>
+                    [
+                        'seconds'   => ['0','15','30','45']
+                    ]
+            ];
+        $scheduleEntry =
+            [
+                'name'          => 'Every 15 Seconds',
+                'description'   => $descriptions['everyxseconds'],
+                'type'          => 0,
+                'schedule'      => $helper->encode($schedule)
+            ];
+        array_push($schedulesArr, $scheduleEntry);
 
         //EveryMinute
         $schedule =
