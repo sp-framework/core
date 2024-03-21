@@ -1430,6 +1430,8 @@ class Store
                         if ($property['format'] === 'json') {
                             if (isset($data[$propertyKey]) && is_array($data[$propertyKey])) {
                                 $data[$propertyKey] = json_encode($data[$propertyKey]);
+                            } else if (isset($data[$propertyKey]) && $data[$propertyKey] === '') {
+                                $data[$propertyKey] = null;
                             }
                         }
                     }
