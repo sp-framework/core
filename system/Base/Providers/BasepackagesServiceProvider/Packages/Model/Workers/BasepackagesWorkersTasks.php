@@ -30,14 +30,6 @@ class BasepackagesWorkersTasks extends BaseModel
 
     public $call_args;
 
-    public $php;
-
-    public $php_args;
-
-    public $raw;
-
-    public $raw_args;
-
     public $pid;
 
     public $previous_run;

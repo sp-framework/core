@@ -102,36 +102,6 @@ class Tasks
                         ]
                     ),
                     new Column(
-                        'php',
-                        [
-                            'type'          => Column::TYPE_TEXT,
-                            'size'          => 2048,
-                            'notNull'       => false,
-                        ]
-                        ),
-                    new Column(
-                        'php_args',
-                        [
-                            'type'          => Column::TYPE_JSON,
-                            'notNull'       => false,
-                        ]
-                        ),
-                    new Column(
-                        'raw',
-                        [
-                            'type'          => Column::TYPE_TEXT,
-                            'size'          => 2048,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'raw_args',
-                        [
-                            'type'          => Column::TYPE_JSON,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
                         'pid',
                         [
                             'type'          => Column::TYPE_INTEGER,

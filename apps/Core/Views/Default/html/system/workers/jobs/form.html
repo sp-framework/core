@@ -1,20 +1,20 @@
 {% if job['id'] is defined %}
     {% set jobResult = '' %}
     {% if job['response_code'] is defined and job['response_code'] !== '' %}
-        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-code"><strong class="text-uppercase">Code:</strong> ' ~ job['response_code'] ~ '</div><br>' %}
+        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-code"><strong class="text-uppercase">Code: </strong> ' ~ job['response_code'] ~ '</div><br>' %}
     {% else %}
-        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-code"><strong class="text-uppercase">Code:</strong> -</div><br>' %}
+        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-code"><strong class="text-uppercase">Code: </strong> -</div><br>' %}
     {% endif %}
     {% if job['response_message'] is defined and job['response_message'] !== '' %}
-        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-message"><strong class="text-uppercase">Message:</strong> ' ~ job['response_message'] ~ '</div><br>' %}
+        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-message"><strong class="text-uppercase">Message: </strong> ' ~ job['response_message'] ~ '</div><br>' %}
     {% else %}
-        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-message"><strong class="text-uppercase">Message:</strong> -</div><br>' %}
+        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-message"><strong class="text-uppercase">Message: </strong> -</div><br>' %}
     {% endif %}
     {% if job['response_data'] is defined and job['response_data'] !== '' %}
-        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-data"><strong class="text-uppercase">Data:</strong> ' ~ job['response_data'] ~ '</div><br>' %}
+        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-data"><strong class="text-uppercase">Data: </strong> ' ~ job['response_data'] ~ '</div><br>' %}
         {% set jobResult = jobResult ~ '<button class="btn btn-xs btn-info mr-1" id="' ~ componentId ~ '-' ~ sectionId ~ '-format-data" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"><i class="fas fa-fw fa-magic"></i> FORMAT DATA</button><br><br>' %}
     {% else %}
-        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-data"><strong class="text-uppercase">Data:</strong> -</div><br>' %}
+        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-data"><strong class="text-uppercase">Data: </strong> -</div><br>' %}
     {% endif %}
     {% if job['calls'] is defined and job['calls']|length > 0 %}
         {% set jobCallsArr = json_encode(job['calls'], 16) %}
@@ -130,7 +130,7 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-format-data').click(function(e) {
                     e.preventDefault();
 
-                    var html = '{{job["response_data"]}}';
+                    var html = '{{job["response_code"]}}';
                     var regex = /{.*}/g;
                     var found = html.match(regex);
 
@@ -142,7 +142,39 @@ dataCollectionSection =
                         var obj = JSON.parse(data);
 
                         if (obj) {
-                            $('#{{componentId}}-{{sectionId}}-data').html('Data: ' + BazHelpers.createHtmlList({'obj': obj}));
+                            $('#{{componentId}}-{{sectionId}}-code').html('<strong class="text-uppercase">Code: </strong>' + BazHelpers.createHtmlList({'obj': obj}));
+                        }
+                    }
+
+                    html = '{{job["response_message"]}}';
+                    regex = /{.*}/g;
+                    found = html.match(regex);
+
+                    if (found) {
+                        //eslint-disable-next-line
+                        data = found[0].replaceAll('\"', '"');
+                        //eslint-disable-next-line
+                        data = data.replaceAll('\\', '\\\\\\\\');
+                        obj = JSON.parse(data);
+
+                        if (obj) {
+                            $('#{{componentId}}-{{sectionId}}-message').html('<strong class="text-uppercase">Message: </strong>' + BazHelpers.createHtmlList({'obj': obj}));
+                        }
+                    }
+
+                    html = '{{job["response_data"]}}';
+                    regex = /{.*}/g;
+                    found = html.match(regex);
+
+                    if (found) {
+                        //eslint-disable-next-line
+                        data = found[0].replaceAll('\"', '"');
+                        //eslint-disable-next-line
+                        data = data.replaceAll('\\', '\\\\\\\\');
+                        obj = JSON.parse(data);
+
+                        if (obj) {
+                            $('#{{componentId}}-{{sectionId}}-data').html('<strong class="text-uppercase">Data: </strong>' + BazHelpers.createHtmlList({'obj': obj}));
                         }
                     }
 

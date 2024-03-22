@@ -28,10 +28,30 @@ class Jobs extends BasePackage
             return false;
         }
 
+        if (is_array($job['response_code']) && count($job['response_code']) === 1) {
+            $job['response_code'] = $job['response_code'][array_key_first($job['response_code'])];
+        } else if (is_array($job['response_code']) && count($job['response_code']) > 1) {
+            $job['response_code'] = $this->helper->encode($job['response_code']);
+        }
+
+        if (is_array($job['response_message']) && count($job['response_message']) === 1) {
+            $job['response_message'] = $job['response_message'][array_key_first($job['response_message'])];
+        } else if (is_array($job['response_message']) && count($job['response_message']) > 1) {
+            $job['response_message'] = $this->helper->encode($job['response_message']);
+        }
+
+        if (is_array($job['response_data'])) {
+            $job['response_data'] = $this->helper->encode($job['response_data']);
+        }
+
         $apiModel = BasepackagesApiCalls::class;
 
-        if ($job['run_on'] && $job['run_on'] !== '' && $job['run_on'] != '0' && $job['run_on'] !== '-') {
-            $start = $job['run_on'];
+        if (is_string($job['run_on'])) {
+            $job['run_on'] = $this->helper->decode($job['run_on'], true);
+        }
+
+        if (isset($job['run_on'][0]) && $job['run_on'][0] !== '' && $job['run_on'][0] != '0' && $job['run_on'][0] !== '-') {
+            $start = $job['run_on'][0];
             $timeRan = Carbon::createFromFormat('Y-m-d H:i:s', $start);
             $timeRan->addSeconds((float) round($job['execution_time'] ?? 0));
             $end = $timeRan->format('Y-m-d H:i:s');

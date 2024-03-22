@@ -28,11 +28,24 @@ class Calls extends BasePackage
 
             if ($status == 2) {
                 $this->startTime = microtime(true);
-                $job['run_on'] = date('Y-m-d H:i:s');
+                if ($job['run_on']) {
+                    if (is_string($job['run_on'])) {
+                        $job['run_on'] = $this->helper->decode($job['run_on'], true);
+                    }
+                    if (!in_array(date('Y-m-d H:i:s'), $job['run_on'])) {
+                        array_push($job['run_on'], date('Y-m-d H:i:s'));
+                    }
+                } else {
+                    $job['run_on'] = [date('Y-m-d H:i:s')];
+                }
             } else if ($status == 3) {
                 $this->stopTime = microtime(true);
 
-                $job['execution_time'] = round($this->stopTime - $this->startTime, 3);
+                if ($job['execution_time']) {
+                    $job['execution_time'] = round($job['execution_time'] + round($this->stopTime - $this->startTime, 3), 3);
+                } else {
+                    $job['execution_time'] = round($this->stopTime - $this->startTime, 3);
+                }
             }
 
             $this->basepackages->workers->jobs->update($job, false);
@@ -50,7 +63,11 @@ class Calls extends BasePackage
                 $task['status'] = 1;
                 $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
 
-                $task['previous_run'] = $job['run_on'];
+                if (is_string($job['run_on'])) {
+                    $job['run_on'] = $this->helper->decode($job['run_on'], true);
+                }
+
+                $task['previous_run'] = $job['run_on'][0];
             }
 
             $task['via_job'] = 1;
@@ -65,18 +82,70 @@ class Calls extends BasePackage
             $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
 
             if (isset($packagesData->responseCode)) {
-                $job['response_code'] = $packagesData->responseCode;
                 if ($packagesData->responseCode != 0) {
                     $job['status'] = 4;
                 }
             }
 
-            if (isset($packagesData->responseMessage)) {
-                $job['response_message'] = $packagesData->responseMessage;
-            }
+            if (isset($args['schedule']['type']) &&
+                $args['schedule']['type'] === 'everyxseconds'
+            ) {
+                $responseCode = [];
+                $responseMessage = [];
+                $responseData = [];
 
-            if (isset($packagesData->responseData)) {
-                $job['response_data'] = $this->helper->encode($packagesData->responseData);
+                $jobRunOn = date('Y-m-d H:i:s');
+
+                if (isset($packagesData->responseCode)) {
+                    $responseCode[$jobRunOn] = $packagesData->responseCode;
+                }
+
+                if ($job['response_code'] && is_string($job['response_code'])) {
+                    $job['response_code'] = $this->helper->decode($job['response_code'], true);
+                }
+
+                if ($job['response_code']) {
+                    $job['response_code'] = $this->helper->encode(array_merge($job['response_code'], $responseCode));
+                } else {
+                    $job['response_code'] = $this->helper->encode($responseCode);
+                }
+
+                if (isset($packagesData->responseMessage)) {
+                    $responseMessage[$jobRunOn] = $packagesData->responseMessage;
+                }
+
+                if ($job['response_message'] && is_string($job['response_message'])) {
+                    $job['response_message'] = $this->helper->decode($job['response_message'], true);
+                }
+
+                if ($job['response_message']) {
+                    $job['response_message'] = $this->helper->encode(array_merge($job['response_message'], $responseMessage));
+                } else {
+                    $job['response_message'] = $this->helper->encode($responseMessage);
+                }
+
+
+                if (isset($packagesData->responseData)) {
+                    $responseData[$jobRunOn] = $packagesData->responseData;
+                }
+
+                if ($job['response_data']) {
+                    $job['response_data'] = $this->helper->encode(array_merge($job['response_data'], $responseData));
+                } else {
+                    $job['response_data'] = $this->helper->encode($responseData);
+                }
+            } else {
+                if (isset($packagesData->responseCode)) {
+                    $job['response_code'] = $this->helper->encode([$packagesData->responseCode]);
+                }
+
+                if (isset($packagesData->responseMessage)) {
+                    $job['response_message'] = $this->helper->encode([$packagesData->responseMessage]);
+                }
+
+                if (isset($packagesData->responseData)) {
+                    $job['response_data'] = $this->helper->encode($packagesData->responseData);
+                }
             }
 
             $this->basepackages->workers->jobs->update($job, false);
@@ -85,7 +154,7 @@ class Calls extends BasePackage
 
     protected function extractCallArgs($thisCall, $args)
     {
-        if (isset($args['task']['call_args']) && $args['task']['call_args'] !== '') {
+        if (isset($args['task']['call_args']) && is_string($args['task']['call_args']) && $args['task']['call_args'] !== '') {
             try {
                 return $this->helper->decode($args['task']['call_args'], true);
             } catch (\Exception $e) {
@@ -107,6 +176,10 @@ class Calls extends BasePackage
 
                 return false;
             }
+        } else if (is_array($args['task']['call_args'])) {
+            return $args['task']['call_args'];
         }
+
+        return false;
     }
 }

@@ -31,25 +31,25 @@ class Tasks extends BasePackage
 
     public function getAllCalls()
     {
-        $functionsArr =
+        $callsArr =
             $this->localContent->listContents($this->callsDir, true)
             ->filter(fn (StorageAttributes $attributes) => $attributes->isFile())
             ->map(fn (StorageAttributes $attributes) => $attributes->path())
             ->toArray();
 
-        $functions = [];
+        $calls = [];
 
-        if (count($functionsArr) > 0) {
-            foreach ($functionsArr as $key => $function) {
-                $function = ucfirst($function);
-                $function = str_replace('/', '\\', $function);
-                $function = str_replace('.php', '', $function);
+        if (count($callsArr) > 0) {
+            foreach ($callsArr as $key => $call) {
+                $call = ucfirst($call);
+                $call = str_replace('/', '\\', $call);
+                $call = str_replace('.php', '', $call);
 
                 try {
-                    $function = new $function();
+                    $call = new $call();
 
-                    $functions[$function->packageName]['func'] = $function->packageName;
-                    $functions[$function->packageName]['name'] = $function->funcName;
+                    $calls[$call->packageName]['func'] = $call->packageName;
+                    $calls[$call->packageName]['name'] = $call->funcName;
 
                 } catch (\throwable $e) {
 
@@ -61,7 +61,7 @@ class Tasks extends BasePackage
             }
         }
 
-        return $functions;
+        return $calls;
     }
 
     public function addTask(array $data)
@@ -183,7 +183,7 @@ class Tasks extends BasePackage
 
             if ($task['force_next_run'] == 1) {
                 $task['org_schedule_id'] = $task['schedule_id'];
-                $task['schedule_id'] = 1;//Make it minute so it can be picked by the scheduler for next run
+                $task['schedule_id'] = 2;//Make it minute so it can be picked by the scheduler for next run
                 array_push($taskArr, $task);
             } else if ($task['enabled'] == 1 && $task['status'] != 2) {//Enabled and not running
                 array_push($taskArr, $task);

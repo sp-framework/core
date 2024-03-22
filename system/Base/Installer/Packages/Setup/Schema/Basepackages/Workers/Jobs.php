@@ -37,8 +37,7 @@ class Jobs
                     new Column(
                         'run_on',
                         [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 1024,
+                            'type'          => Column::TYPE_JSON,
                             'notNull'       => false,
                         ]
                     ),
@@ -66,21 +65,21 @@ class Jobs
                     new Column(
                         'response_code',
                         [
-                            'type'          => Column::TYPE_TINYINTEGER,
+                            'type'          => Column::TYPE_JSON,
                             'notNull'       => false,
                         ]
                     ),
                     new Column(
                         'response_message',
                         [
-                            'type'          => Column::TYPE_TEXT,
+                            'type'          => Column::TYPE_JSON,
                             'notNull'       => false,
                         ]
                     ),
                     new Column(
                         'response_data',
                         [
-                            'type'          => Column::TYPE_MEDIUMTEXT,
+                            'type'          => Column::TYPE_JSON,
                             'notNull'       => false,
                         ]
                     )

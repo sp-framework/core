@@ -26,9 +26,9 @@ class TasksComponent extends BaseComponent
         $this->schedules = $this->basepackages->workers->schedules->schedules;
 
         if (isset($this->getData()['id'])) {
-            $functions = $this->tasks->getAllCalls();
+            $calls = $this->tasks->getAllCalls();
 
-            $this->view->functions = $functions;
+            $this->view->calls = $calls;
 
             $this->view->schedules = $this->schedules;
 
@@ -41,12 +41,6 @@ class TasksComponent extends BaseComponent
 
                 if (is_array($task['call_args'])) {
                     $task['call_args'] = $this->helper->encode($task['call_args']);
-                }
-                if (is_array($task['php_args'])) {
-                    $task['php_args'] = $this->helper->encode($task['php_args']);
-                }
-                if (is_array($task['raw_args'])) {
-                    $task['raw_args'] = $this->helper->encode($task['raw_args']);
                 }
 
                 $this->view->task = $task;

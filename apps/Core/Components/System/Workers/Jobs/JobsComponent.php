@@ -31,6 +31,7 @@ class JobsComponent extends BaseComponent
 
                 $this->view->job = $job;
             }
+
             $this->view->pick('jobs/view');
 
             return;
@@ -82,9 +83,10 @@ class JobsComponent extends BaseComponent
     protected function replaceColumns($dataArr)
     {
         foreach ($dataArr as $dataKey => &$data) {
-            $data = $this->formatStatus($dataKey, $data);
-            $data = $this->formatWorker($dataKey, $data);
             $data = $this->formatTask($dataKey, $data);
+            $data = $this->formatWorker($dataKey, $data);
+            $data = $this->formatRunon($dataKey, $data);
+            $data = $this->formatStatus($dataKey, $data);
         }
 
         return $dataArr;
@@ -134,6 +136,21 @@ class JobsComponent extends BaseComponent
 
         return $data;
     }
+
+    protected function formatRunon($rowId, $data)
+    {
+        if (is_string($data['run_on'])) {
+            $data['run_on'] = $this->helper->decode($data['run_on']);
+        }
+
+        if (is_array($data['run_on']) && isset($data['run_on'][0])) {
+            $data['run_on'] = $data['run_on'][0];
+        }
+
+        return $data;
+    }
+
+
     // /**
     //  * @acl(name="add")
     //  */
