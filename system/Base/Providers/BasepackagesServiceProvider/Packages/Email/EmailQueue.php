@@ -67,7 +67,7 @@ class EmailQueue extends BasePackage
         return $this->queueLock;
     }
 
-    public function processQueue($processPriority = 0, $id = null)
+    public function processQueue($processPriority = 0, $confidential = false, $id = null)
     {
         if ($this->queueLock === true && $processPriority === $this->priorityToProcess) {
             $this->addResponse('Another process is clearing the queue, please wait...', 1);
@@ -93,6 +93,16 @@ class EmailQueue extends BasePackage
                         'bind'          =>
                             [
                                 'id'    => $id,
+                            ]
+                    ];
+            } else if ($confidential) {
+                $conditions =
+                    [
+                        'conditions'    => 'status = :status: AND confidential = :confidential:',
+                        'bind'          =>
+                            [
+                                'status'        => self::STATUS_IN_QUEUE,
+                                'confidential'  => 1
                             ]
                     ];
             } else {

@@ -214,17 +214,22 @@ class QueueComponent extends BaseComponent
             }
 
             $priority = 0;
+            $confidential = false;
             $id = null;
 
             if (isset($this->postData()['priority'])) {
                 $priority = $this->postData()['priority'];
             }
 
+            if (isset($this->postData()['confidential'])) {
+                $confidential = $this->postData()['confidential'];
+            }
+
             if (isset($this->postData()['id'])) {
                 $id = $this->postData()['id'];
             }
 
-            $this->emailqueue->processQueue($priority, $id);
+            $this->emailqueue->processQueue($priority, $confidential, $id);
 
             $this->addResponse(
                 $this->emailqueue->packagesData->responseMessage,

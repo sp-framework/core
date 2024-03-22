@@ -37,7 +37,11 @@ class ProcessEmailQueue extends Calls
                 return;
             }
 
-            $this->basepackages->emailqueue->processQueue((int) $this->args['priority']);
+            if (isset($this->args['confidential']) && $this->args['confidential'] == 'true') {
+                $this->basepackages->emailqueue->processQueue((int) $this->args['priority'], true);
+            } else {
+                $this->basepackages->emailqueue->processQueue((int) $this->args['priority']);
+            }
 
             $this->addJobResult($this->basepackages->emailqueue->packagesData, $args);
 

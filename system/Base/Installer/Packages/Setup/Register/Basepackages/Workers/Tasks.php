@@ -25,11 +25,27 @@ class Tasks
     {
         $taskArr = [];
 
+        //Email High Priority (encrypted - with codes)
+        $taskEntry =
+            [
+                'name'              => 'Email (confidential)',
+                'description'       => 'High priority emails that are confidential (with passwords or codes) that are time sensitive.',
+                'exec_type'         => 'php',
+                'call'              => 'processemailqueue',
+                'call_args'         => '{"priority":"1", "confidential":true}',
+                'schedule_id'       => 1,
+                'is_on_demand'      => 0,
+                'priority'          => 10,
+                'enabled'           => 1,
+                'type'              => 0
+            ];
+        array_push($taskArr, $taskEntry);
+
         //Email High Priority
         $taskEntry =
             [
                 'name'              => 'Email (High Priority)',
-                'description'       => 'High priority emails like password recovery emails.',
+                'description'       => 'High priority emails.',
                 'exec_type'         => 'call',
                 'call'              => 'processemailqueue',
                 'call_args'         => '{"priority":"1"}',
