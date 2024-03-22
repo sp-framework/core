@@ -31,17 +31,9 @@ class Tasks
                     new Column(
                         'description',
                         [
-                            'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 2048,
-                            'notNull' => false,
-                        ]
-                    ),
-                    new Column(
-                        'function',
-                        [
                             'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 1027,
-                            'notNull'       => true,
+                            'size'          => 2048,
+                            'notNull'       => false,
                         ]
                     ),
                     new Column(
@@ -52,14 +44,7 @@ class Tasks
                         ]
                     ),
                     new Column(
-                        'is_external',
-                        [
-                            'type'          => Column::TYPE_TINYINTEGER,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'is_raw',
+                        'priority',
                         [
                             'type'          => Column::TYPE_TINYINTEGER,
                             'notNull'       => false,
@@ -73,20 +58,13 @@ class Tasks
                         ]
                     ),
                     new Column(
-                        'priority',
-                        [
-                            'type'          => Column::TYPE_TINYINTEGER,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
                         'enabled',
                         [
                             'type'          => Column::TYPE_TINYINTEGER,
                             'notNull'       => true,
                         ]
                     ),
-                    new Column(
+                    new Column(//Running, error
                         'status',
                         [
                             'type'          => Column::TYPE_TINYINTEGER,
@@ -98,6 +76,66 @@ class Tasks
                         [
                             'type'          => Column::TYPE_TINYINTEGER,
                             'notNull'       => true,
+                        ]
+                    ),
+                    new Column(//call, php, raw
+                        'exec_type',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 50,
+                            'notNull'       => true,
+                        ]
+                    ),
+                    new Column(
+                        'call',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 2048,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'call_args',
+                        [
+                            'type'          => Column::TYPE_JSON,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'php',
+                        [
+                            'type'          => Column::TYPE_TEXT,
+                            'size'          => 2048,
+                            'notNull'       => false,
+                        ]
+                        ),
+                    new Column(
+                        'php_args',
+                        [
+                            'type'          => Column::TYPE_JSON,
+                            'notNull'       => false,
+                        ]
+                        ),
+                    new Column(
+                        'raw',
+                        [
+                            'type'          => Column::TYPE_TEXT,
+                            'size'          => 2048,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'raw_args',
+                        [
+                            'type'          => Column::TYPE_JSON,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'pid',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => false,
                         ]
                     ),
                     new Column(
@@ -124,17 +162,10 @@ class Tasks
                         ]
                     ),
                     new Column(
-                        'parameters',
-                        [
-                            'type'          => Column::TYPE_TEXT,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
                         'email',
                         [
                             'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 1024,
+                            'size'          => 2048,
                             'notNull'       => false,
                         ]
                     ),

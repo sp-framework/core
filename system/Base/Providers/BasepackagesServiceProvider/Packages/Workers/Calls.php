@@ -4,13 +4,13 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
 use System\Base\BasePackage;
 
-class Functions extends BasePackage
+class Calls extends BasePackage
 {
     protected $startTime;
 
     protected $stopTime;
 
-    protected function updateJobTask($status, $args)
+    public function updateJobTask($status, $args)
     {
         $this->updateJob($status, $args);
 
@@ -59,7 +59,7 @@ class Functions extends BasePackage
         }
     }
 
-    protected function addJobResult($packagesData, $args)
+    public function addJobResult($packagesData, $args)
     {
         if (isset($args['job'])) {
             $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
@@ -83,27 +83,27 @@ class Functions extends BasePackage
         }
     }
 
-    protected function extractParameters($thisFunction, $args)
+    protected function extractCallArgs($thisCall, $args)
     {
-        if (isset($args['task']['parameters']) && $args['task']['parameters'] !== '') {
+        if (isset($args['task']['call_args']) && $args['task']['call_args'] !== '') {
             try {
-                return $this->helper->decode($args['task']['parameters'], true);
+                return $this->helper->decode($args['task']['call_args'], true);
             } catch (\Exception $e) {
                 if (str_contains($e->getMessage(), "json_decode")) {
-                    $thisFunction->packagesData->responseMessage = 'Task parameters format is incorrect. Make sure the format is json.';
+                    $thisCall->packagesData->responseMessage = 'Task call arguments format is incorrect. Make sure the format is json.';
                 } else {
-                    $thisFunction->packagesData->responseMessage = 'Exception: Please check exceptions log for more details.';
+                    $thisCall->packagesData->responseMessage = 'Exception: Please check exceptions log for more details.';
                 }
 
                 if ($this->config->logs->exceptions) {
                     $this->logger->logExceptions->debug($e);
                 }
 
-                $thisFunction->packagesData->responseCode = 1;
+                $thisCall->packagesData->responseCode = 1;
 
-                $this->addJobResult($thisFunction->packagesData, $args);
+                $this->addJobResult($thisCall->packagesData, $args);
 
-                $thisFunction->updateJobTask(3, $args);
+                $thisCall->updateJobTask(3, $args);
 
                 return false;
             }

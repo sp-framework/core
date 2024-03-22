@@ -71,7 +71,7 @@ class ImportExport extends BasePackage
                 $this->basepackages->storages->changeOrphanStatus($data['file'], null, true);
             }
 
-            $task = $this->basepackages->workers->tasks->findByParameter($data['type'], 'process');
+            $task = $this->basepackages->workers->tasks->findByCallArgs($data['type'], 'process');
 
             if ($task && $task['force_next_run'] === null) {
                 $this->basepackages->workers->tasks->forceNextRun(['id' => $task['id']]);

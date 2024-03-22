@@ -6,9 +6,7 @@
     {% else %}
         {% set taskIsOnDemandChecked = false %}
     {% endif %}
-    {% set taskFunction = task['function'] %}
     {% set taskDescription = task['description'] %}
-    {% set taskParameters = task['parameters'] %}
     {% set taskPriority = task['priority'] %}
     {% set taskSchedule = task['schedule_id'] %}
     {% set taskScheduleDisabled = false %}
@@ -23,18 +21,46 @@
         {% set taskEnableDisabled = true %}
         {% set taskScheduleDisabled = true %}
     {% endif %}
+    {% set taskExecType = task['exec_type'] %}
+    {% set taskCall = task['call'] %}
+    {% set taskCallArgs = task['call_args'] %}
+    {% set taskPhp = task['php'] %}
+    {% set taskPhpArgs = task['php_args'] %}
+    {% set taskRaw = task['raw'] %}
+    {% set taskRawArgs = task['raw_args'] %}
 {% else %}
     {% set taskId = '' %}
     {% set taskName = '' %}
     {% set taskIsOnDemandChecked = false %}
-    {% set taskFunction = '' %}
     {% set taskDescription = '' %}
-    {% set taskParameters = '' %}
     {% set taskPriority = '' %}
     {% set taskSchedule = '' %}
     {% set taskEnableChecked = false %}
     {% set taskEnableDisabled = false %}
     {% set taskScheduleDisabled = false %}
+    {% set taskExecType = 'call' %}
+    {% set taskCall = '' %}
+    {% set taskCallArgs = '' %}
+    {% set taskPhp = '' %}
+    {% set taskPhpArgs = '' %}
+    {% set taskRaw = '' %}
+    {% set taskRawArgs = '' %}
+{% endif %}
+{% if taskExecType === 'call' %}
+    {% set callHidden = '' %}
+    {% set customCallHidden = 'hidden' %}
+    {% set phpHidden = 'hidden' %}
+    {% set rawHidden = 'hidden' %}
+{% elseif taskExecType === 'php' %}
+    {% set callHidden = 'hidden' %}
+    {% set customCallHidden = 'hidden' %}
+    {% set phpHidden = '' %}
+    {% set rawHidden = 'hidden' %}
+{% elseif taskExecType === 'raw' %}
+    {% set callHidden = 'hidden' %}
+    {% set customCallHidden = 'hidden' %}
+    {% set phpHidden = 'hidden' %}
+    {% set rawHidden = '' %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -133,54 +159,6 @@
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'description',
-                        'fieldLabel'                     : 'Description',
-                        'fieldType'                      : 'textarea',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Description',
-                        'fieldRequired'                  : false,
-                        'fieldBazScan'                   : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMaxLength'        : 1024,
-                        'fieldTextareaRows'              : 2,
-                        'fieldValue'                     : taskDescription
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'parameters',
-                        'fieldLabel'                     : 'Function Parameters',
-                        'fieldType'                      : 'textarea',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Function Parameters that can be passed to the function in Json Format.',
-                        'fieldRequired'                  : false,
-                        'fieldBazScan'                   : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMaxLength'        : 4096,
-                        'fieldTextareaRows'              : 2,
-                        'fieldValue'                     : taskParameters
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
                         'component'                             : component,
                         'componentName'                         : componentName,
                         'componentId'                           : componentId,
@@ -227,29 +205,232 @@
                     ]
                 )}}
             </div>
+        </div>
+        <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                             : component,
-                        'componentName'                         : componentName,
-                        'componentId'                           : componentId,
-                        'sectionId'                             : sectionId,
-                        'fieldId'                               : 'function',
-                        'fieldLabel'                            : 'Function',
-                        'fieldType'                             : 'select2',
-                        'fieldHelp'                             : true,
-                        'fieldHelpTooltipContent'               : "Task's function",
-                        'fieldRequired'                         : true,
-                        'fieldBazScan'                          : true,
-                        'fieldBazPostOnCreate'                  : true,
-                        'fieldBazPostOnUpdate'                  : true,
-                        'fieldDataSelect2Options'               : functions,
-                        'fieldDataSelect2OptionsKey'            : 'func',
-                        'fieldDataSelect2OptionsValue'          : 'name',
-                        'fieldDataSelect2OptionsArray'          : true,
-                        'fieldDataSelect2OptionsSelected'       : taskFunction
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'description',
+                        'fieldLabel'                     : 'Description',
+                        'fieldType'                      : 'textarea',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Description',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldTextareaRows'              : 2,
+                        'fieldValue'                     : taskDescription
                     ]
                 )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'exec_type',
+                        'fieldLabel'                     : 'Execution Type?',
+                        'fieldType'                      : 'radio',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select which to execute, script or function.',
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true,
+                        'fieldRadioButtons'              :
+                            [
+                                'call' :
+                                    [
+                                        'title'                           : 'Call a function',
+                                        'type'                            : 'primary',
+                                        'dataValue'                       : 'call'
+                                    ],
+                                'php' :
+                                    [
+                                        'title'                           : 'Execute PHP script',
+                                        'type'                            : 'primary',
+                                        'dataValue'                       : 'php'
+                                    ],
+                                'raw' :
+                                    [
+                                        'title'                           : 'Execute raw command',
+                                        'type'                            : 'primary',
+                                        'dataValue'                       : 'raw'
+                                    ]
+                            ],
+                        'fieldRadioChecked'              : taskExecType
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                <div id="call-div" {{callHidden}}>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                             : component,
+                                    'componentName'                         : componentName,
+                                    'componentId'                           : componentId,
+                                    'sectionId'                             : sectionId,
+                                    'fieldId'                               : 'call',
+                                    'fieldLabel'                            : 'Call Function',
+                                    'fieldType'                             : 'select2',
+                                    'fieldHelp'                             : true,
+                                    'fieldHelpTooltipContent'               : "Task's function to call",
+                                    'fieldRequired'                         : true,
+                                    'fieldBazScan'                          : true,
+                                    'fieldBazPostOnCreate'                  : true,
+                                    'fieldBazPostOnUpdate'                  : true,
+                                    'fieldDataSelect2Options'               : functions,
+                                    'fieldDataSelect2OptionsKey'            : 'func',
+                                    'fieldDataSelect2OptionsValue'          : 'name',
+                                    'fieldDataSelect2OptionsArray'          : true,
+                                    'fieldDataSelect2OptionsSelected'       : taskCall
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'call_args',
+                                    'fieldLabel'                     : 'Call Function Arguments',
+                                    'fieldType'                      : 'textarea',
+                                    'fieldHelp'                      : true,
+                                    'fieldHelpTooltipContent'        : 'Function Arguments that can be passed to the function in Json Format.',
+                                    'fieldRequired'                  : false,
+                                    'fieldBazScan'                   : true,
+                                    'fieldBazJstreeSearch'           : true,
+                                    'fieldBazPostOnCreate'           : true,
+                                    'fieldBazPostOnUpdate'           : true,
+                                    'fieldDataInputMaxLength'        : 2048,
+                                    'fieldTextareaRows'              : 2,
+                                    'fieldValue'                     : taskCallArgs
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                </div>
+                <div id="php-div" {{phpHidden}}>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'php',
+                                    'fieldLabel'                     : 'PHP Script',
+                                    'fieldType'                      : 'textarea',
+                                    'fieldHelp'                      : true,
+                                    'fieldHelpTooltipContent'        : 'PHP Script command line that needs to be run.',
+                                    'fieldRequired'                  : true,
+                                    'fieldBazScan'                   : true,
+                                    'fieldBazJstreeSearch'           : true,
+                                    'fieldBazPostOnCreate'           : true,
+                                    'fieldBazPostOnUpdate'           : true,
+                                    'fieldDataInputMaxLength'        : 2048,
+                                    'fieldTextareaRows'              : 2,
+                                    'fieldValue'                     : taskPhp
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'php_args',
+                                    'fieldLabel'                     : 'PHP Arguments',
+                                    'fieldType'                      : 'textarea',
+                                    'fieldHelp'                      : true,
+                                    'fieldHelpTooltipContent'        : 'PHP Arguments that can be passed to the script in Json Format.',
+                                    'fieldRequired'                  : false,
+                                    'fieldBazScan'                   : true,
+                                    'fieldBazJstreeSearch'           : true,
+                                    'fieldBazPostOnCreate'           : true,
+                                    'fieldBazPostOnUpdate'           : true,
+                                    'fieldDataInputMaxLength'        : 2048,
+                                    'fieldTextareaRows'              : 2,
+                                    'fieldValue'                     : taskPhpArgs
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                </div>
+                <div id="raw-div" {{rawHidden}}>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'raw',
+                                    'fieldLabel'                     : 'Raw Cli Command',
+                                    'fieldType'                      : 'textarea',
+                                    'fieldHelp'                      : true,
+                                    'fieldHelpTooltipContent'        : 'Raw cli command line that needs to be run.',
+                                    'fieldRequired'                  : true,
+                                    'fieldBazScan'                   : true,
+                                    'fieldBazJstreeSearch'           : true,
+                                    'fieldBazPostOnCreate'           : true,
+                                    'fieldBazPostOnUpdate'           : true,
+                                    'fieldDataInputMaxLength'        : 2048,
+                                    'fieldTextareaRows'              : 2,
+                                    'fieldValue'                     : taskRaw
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'raw_args',
+                                    'fieldLabel'                     : 'Raw Command Arguments',
+                                    'fieldType'                      : 'textarea',
+                                    'fieldHelp'                      : true,
+                                    'fieldHelpTooltipContent'        : 'Raw Command Arguments that can be passed to the command in Json Format.',
+                                    'fieldRequired'                  : false,
+                                    'fieldBazScan'                   : true,
+                                    'fieldBazJstreeSearch'           : true,
+                                    'fieldBazPostOnCreate'           : true,
+                                    'fieldBazPostOnUpdate'           : true,
+                                    'fieldDataInputMaxLength'        : 2048,
+                                    'fieldTextareaRows'              : 2,
+                                    'fieldValue'                     : taskRawArgs
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </fieldset>
@@ -302,26 +483,74 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-enabled'                 : { },
         '{{componentId}}-{{sectionId}}-description'             : { },
-        '{{componentId}}-{{sectionId}}-parameters'              : { },
+        '{{componentId}}-{{sectionId}}-exec_type'               : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-exec_type').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'call') {
+                        $('#call-div').attr('hidden', false);
+                        $('#custom-call-div').attr('hidden', true);
+                        $('#php-div').attr('hidden', true);
+                        $('#raw-div').attr('hidden', true);
+
+                        $('#{{componentId}}-{{sectionId}}-call, #{{componentId}}-{{sectionId}}-call_args').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-php').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-php_args').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-raw').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-raw_args').attr('disabled', true);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'php') {
+                        $('#call-div').attr('hidden', true);
+                        $('#custom-call-div').attr('hidden', true);
+                        $('#php-div').attr('hidden', false);
+                        $('#raw-div').attr('hidden', true);
+
+                        $('#{{componentId}}-{{sectionId}}-call, #{{componentId}}-{{sectionId}}-call_args').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-php').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-php_args').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-raw').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-raw_args').attr('disabled', true);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'raw') {
+                        $('#call-div').attr('hidden', true);
+                        $('#custom-call-div').attr('hidden', true);
+                        $('#php-div').attr('hidden', true);
+                        $('#raw-div').attr('hidden', false);
+
+                        $('#{{componentId}}-{{sectionId}}-call, #{{componentId}}-{{sectionId}}-call_args').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-php').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-php_args').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-raw').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-raw_args').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-call_args'               : { },
+        '{{componentId}}-{{sectionId}}-php'                     : { },
+        '{{componentId}}-{{sectionId}}-php_args'                : { },
+        '{{componentId}}-{{sectionId}}-raw'                     : { },
+        '{{componentId}}-{{sectionId}}-raw_args'                : { },
         '{{componentId}}-{{sectionId}}-priority'                : { },
         '{{componentId}}-{{sectionId}}-schedule_id'             : {
             placeholder : "SELECT SCHEDULE"
         },
-        '{{componentId}}-{{sectionId}}-function'                : {
-            placeholder : "SELECT FUNCTION"
+        '{{componentId}}-{{sectionId}}-call'                    : {
+            placeholder : "SELECT FUNCTION TO CALL"
         },
         '{{componentId}}-{{sectionId}}-form'                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'required',
                 '{{componentId}}-{{sectionId}}-priority'                : 'required',
                 '{{componentId}}-{{sectionId}}-schedule_id'             : 'required',
-                '{{componentId}}-{{sectionId}}-function'                : 'required',
+                '{{componentId}}-{{sectionId}}-call'                    : 'required',
+                '{{componentId}}-{{sectionId}}-php'                     : 'required',
+                '{{componentId}}-{{sectionId}}-raw'                     : 'required'
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'Please enter Service name',
                 '{{componentId}}-{{sectionId}}-priority'                : 'Please enter priority between 1 and 10',
                 '{{componentId}}-{{sectionId}}-schedule_id'             : 'Please select a schedule',
-                '{{componentId}}-{{sectionId}}-function'                : 'Please select a function',
+                '{{componentId}}-{{sectionId}}-call'                    : 'Please select a function to call',
+                '{{componentId}}-{{sectionId}}-php'                     : 'Please enter the php script to execute',
+                '{{componentId}}-{{sectionId}}-raw'                     : 'Please enter the cli command to execute'
             }
         }
     });

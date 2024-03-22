@@ -439,7 +439,7 @@ class Ff
 
     protected function addToSchedule()
     {
-        $task = $this->basepackages->workers->tasks->findByFunction('processdbsync');
+        $task = $this->basepackages->workers->tasks->findByCall('processdbsync');
 
         if ($task) {//We have to update it manually from here as updating via task will cause a loop
             $time = Carbon::now();

@@ -41,7 +41,7 @@ class EmailQueue extends BasePackage
         if ($this->add($data)){
             $this->addResponse('Added email to queue with ID ' . $this->packagesData->last['id'], 0, null, true);
 
-            $task = $this->basepackages->workers->tasks->findByParameter($data['priority'], "priority", 'processemailqueue');
+            $task = $this->basepackages->workers->tasks->findByCallArgs($data['priority'], "priority", 'processemailqueue');
 
             if ($task && $task['force_next_run'] === null) {
                 $this->basepackages->workers->tasks->forceNextRun(['id' => $task['id']]);
@@ -180,7 +180,7 @@ class EmailQueue extends BasePackage
         $email['logs'] = '';
 
         if ($this->update($email)) {
-            $task = $this->basepackages->workers->tasks->findByParameter($email['priority'], "priority", 'processemailqueue');
+            $task = $this->basepackages->workers->tasks->findByCallArgs($email['priority'], "priority", 'processemailqueue');
 
             if ($task && $task['force_next_run'] === null) {
                 $this->basepackages->workers->tasks->forceNextRun(['id' => $task['id']]);

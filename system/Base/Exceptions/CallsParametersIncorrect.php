@@ -2,7 +2,7 @@
 
 namespace System\Base\Exceptions;
 
-class FunctionParametersIncorrect extends \Exception
+class CallsParametersIncorrect extends \Exception
 {
     //If workers function parameters are incorrect.
 }

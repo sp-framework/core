@@ -33,7 +33,7 @@ class Jobs extends BasePackage
         if ($job['run_on'] && $job['run_on'] !== '' && $job['run_on'] != '0' && $job['run_on'] !== '-') {
             $start = $job['run_on'];
             $timeRan = Carbon::createFromFormat('Y-m-d H:i:s', $start);
-            $timeRan->addSeconds((float) round($job['execution_time']));
+            $timeRan->addSeconds((float) round($job['execution_time'] ?? 0));
             $end = $timeRan->format('Y-m-d H:i:s');
 
             if ($this->config->databasetype === 'db') {

@@ -73,6 +73,17 @@ class ExceptionHandlers extends BaseComponent
 		return redirect('/auth/login');
 	}
 
+	public function handleInvalidDataException($exception)
+	{
+		$this->addResponse($exception->getMessage(), 1);
+
+		if (str_contains($exception->getMessage(), "The data must match the 'json' format.")) {
+			$this->addResponse("Json data provided is incorrect.", 1);
+		}
+
+		return $this->sendJson();
+	}
+
 	private function setViewsDir($partial)
 	{
 		$this->view->setViewsDir(base_path($this->baseErrorDir));

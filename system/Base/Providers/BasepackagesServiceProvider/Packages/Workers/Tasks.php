@@ -13,13 +13,13 @@ class Tasks extends BasePackage
 
     protected $packageName = 'tasks';
 
-    protected $functionsDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Workers/Functions/';
+    protected $callsDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Workers/Calls/';
 
     public $tasks;
 
     public function getFunctionsDir()
     {
-        return $this->functionsDir;
+        return $this->callsDir;
     }
 
     public function init(bool $resetCache = false)
@@ -29,10 +29,10 @@ class Tasks extends BasePackage
         return $this;
     }
 
-    public function getAllFunctions()
+    public function getAllCalls()
     {
         $functionsArr =
-            $this->localContent->listContents($this->functionsDir, true)
+            $this->localContent->listContents($this->callsDir, true)
             ->filter(fn (StorageAttributes $attributes) => $attributes->isFile())
             ->map(fn (StorageAttributes $attributes) => $attributes->path())
             ->toArray();
@@ -78,8 +78,6 @@ class Tasks extends BasePackage
 
         $data['status'] = 0;
         $data['type'] = 1;//1 for user and 0 for system
-        $data['previous_run'] = 0;
-        $data['next_run'] = 0;
 
         if ($this->add($data)) {
             $this->addResponse('Added new task ' . $data['name']);
@@ -140,7 +138,7 @@ class Tasks extends BasePackage
 
         if (isset($data['cancel']) && $data['cancel'] == 'true') {
             if ($this->config->databasetype === 'hybrid' &&
-                $task['function'] === 'processdbsync'
+                $task['call'] === 'processdbsync'
             ) {
                 $this->ff->setSync(false);
             }
@@ -214,21 +212,21 @@ class Tasks extends BasePackage
         return $taskArr;
     }
 
-    public function findByParameter($parameterValue, $parameterKey = null, $function = null)
+    public function findByCallArgs($argValue, $argKey = null, $function = null)
     {
         if (!$this->tasks) {
             $this->init();
         }
 
         foreach ($this->tasks as $taskKey => $task) {
-            if ($function && $task['function'] !== $function) {
+            if ($function && $task['call'] !== $function) {
                 continue;
             }
 
-            if (is_string($task['parameters']) && $task['parameters'] !== '') {
-                $task['parameters'] = $this->helper->decode($task['parameters'], true);
+            if (is_string($task['call_args']) && $task['call_args'] !== '') {
+                $task['call_args'] = $this->helper->decode($task['call_args'], true);
 
-                if (recursive_array_search($parameterValue, $task['parameters'], $parameterKey)) {
+                if (recursive_array_search($argValue, $task['call_args'], $argKey)) {
                     return $task;
                 }
             }
@@ -237,14 +235,14 @@ class Tasks extends BasePackage
         return false;
     }
 
-    public function findByFunction($function)
+    public function findByCall($function)
     {
         if (!$this->tasks) {
             $this->init();
         }
 
         foreach ($this->tasks as $taskKey => $task) {
-            if ($task['function'] === $function) {
+            if ($task['call'] === $function) {
                 return $task;
             }
         }
