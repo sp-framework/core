@@ -116,6 +116,8 @@ class EmailQueue extends BasePackage
 
         $queue = $this->getByParams($conditions, true, false);
 
+        $queueProcessedIds = [];
+
         if ($queue && is_array($queue) && count($queue) > 0) {
             foreach ($queue as $key => $queueEmail) {
                 if (!$this->basepackages->email->setup(null, $queueEmail['domain_id'], $queueEmail['app_id'])) {
@@ -157,11 +159,15 @@ class EmailQueue extends BasePackage
                         $queueEmail['logs'] = 'Sent';
                         $queueEmail['sent_on'] = date("F j, Y, g:i a");
 
+                        array_push($queueProcessedIds, $queueEmail['id']);
+
                         $this->update($queueEmail);
                     }
                 }
             }
         }
+
+        $this->queueLock = false;
 
         if ($hadErrors) {
             $this->addResponse('Queue processed with some errors. Please check the email queue for details.', 1);
@@ -169,7 +175,7 @@ class EmailQueue extends BasePackage
             return;
         }
 
-        $this->addResponse('Queue processed successfully.');
+        $this->addResponse('Queue processed successfully.', 0, ['queueProcessedIds' => $queueProcessedIds]);
     }
 
     public function requeue(array $data)
