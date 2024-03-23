@@ -23,6 +23,8 @@ class BasepackagesUsersAccountsAgents extends BaseModel
 
     public $verification_code;
 
+    public $email_code_sent_on;
+
     public function initialize()
     {
         $this->modelRelations['sessions']['relationObj'] = $this->belongsTo(
