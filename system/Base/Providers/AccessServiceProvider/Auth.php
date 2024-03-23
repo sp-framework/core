@@ -327,7 +327,6 @@ class Auth
             $this->packagesData->redirectUrl = $this->links->url('home');
         }
 
-
         $this->logger->log->debug($this->account['email'] . ' authenticated successfully on app ' . $this->app['name']);
 
         return true;
@@ -497,6 +496,14 @@ class Auth
             $this->packagesData->responseCode = 3;
 
             $this->packagesData->responseMessage = '2FA Code Required!';
+
+            if (in_array('email', $this->app['twofa_using']) && !$this->email->setup()) {
+                unset($this->app['twofa_using'][array_keys($this->app['twofa_using'], 'email')[0]]);
+            }
+
+            if (count($this->app['twofa_using']) === 0) {//if totp is not set and email service is not configured, we authenticate.
+                return true;
+            }
 
             $this->packagesData->responseData = ['allowed_methods' => $this->app['twofa_using']];
 
