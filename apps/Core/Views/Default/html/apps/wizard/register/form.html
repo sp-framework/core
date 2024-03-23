@@ -41,10 +41,10 @@
         {% set twofaUsingDisabled = false %}
     {% endif %}
     {% set app2faUsing = app['twofa_using'] %}
-    {% if in_array('email', app2faUsing) %}
+    {% if app2faUsing !== null and in_array('email', app2faUsing) %}
         {% set twofaEmailTimeoutDisabled = false %}
     {% endif %}
-    {% if in_array('totp', app2faUsing) %}
+    {% if app2faUsing !== null and in_array('totp', app2faUsing) %}
         {% set twofaTotpTimeoutDisabled = false %}
     {% endif %}
     {% set app2faEmailTimeout = app['twofa_email_timeout'] %}
