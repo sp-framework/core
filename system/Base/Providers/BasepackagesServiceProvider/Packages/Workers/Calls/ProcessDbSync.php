@@ -21,7 +21,6 @@ class ProcessDbSync extends Calls
             $result['result'] = $this->ff->sync();
 
             $reSync = true;
-
             if ($result['result'] && isset($result['result']['errors']) && count($result['result']['errors']) === 0) {
                 $thisCall->packagesData->responseCode = 0;
 

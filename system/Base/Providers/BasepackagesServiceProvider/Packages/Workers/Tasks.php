@@ -204,7 +204,7 @@ class Tasks extends BasePackage
         $taskArr = [];
 
         foreach ($this->tasks as $taskKey => $task) {
-            if ($task['status'] == 2) {
+            if ($task['status'] == 2 && $task['exec_type'] === 'call') {
                 array_push($taskArr, $task);
             }
         }

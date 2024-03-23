@@ -46,7 +46,7 @@ class Tasks
             [
                 'name'              => 'Email (High Priority)',
                 'description'       => 'High priority emails.',
-                'exec_type'         => 'call',
+                'exec_type'         => 'php',
                 'call'              => 'processemailqueue',
                 'call_args'         => '{"priority":"1"}',
                 'schedule_id'       => 0,
@@ -62,7 +62,7 @@ class Tasks
             [
                 'name'              => 'Email (Medium Priority)',
                 'description'       => 'Medium priority emails like notification emails.',
-                'exec_type'         => 'call',
+                'exec_type'         => 'php',
                 'call'              => 'processemailqueue',
                 'call_args'         => '{"priority":"2"}',
                 'schedule_id'       => 0,
@@ -78,7 +78,7 @@ class Tasks
             [
                 'name'              => 'Email (Low Priority)',
                 'description'       => 'Low priority emails like notification emails.',
-                'exec_type'         => 'call',
+                'exec_type'         => 'php',
                 'call'              => 'processemailqueue',
                 'call_args'         => '{"priority":"3"}',
                 'schedule_id'       => 0,
@@ -94,7 +94,7 @@ class Tasks
             [
                 'name'              => 'Import/Export (Export)',
                 'description'       => 'Import/Export Tools - Export',
-                'exec_type'         => 'call',
+                'exec_type'         => 'php',
                 'call'              => 'processimportexportqueue',
                 'call_args'         => '{"process":"export"}',
                 'schedule_id'       => 0,
@@ -110,7 +110,7 @@ class Tasks
             [
                 'name'              => 'Import/Export (Low Priority)',
                 'description'       => 'Import/Export Tools - Import',
-                'exec_type'         => 'call',
+                'exec_type'         => 'php',
                 'call'              => 'processimportexportqueue',
                 'call_args'         => '{"process":"import"}',
                 'schedule_id'       => 0,
@@ -126,7 +126,7 @@ class Tasks
             [
                 'name'              => 'DB Sync (Hybric Mode)',
                 'description'       => 'Update database with changed made to the FF Store.',
-                'exec_type'         => 'call',
+                'exec_type'         => 'php',
                 'call'              => 'processdbsync',
                 'call_args'         => '{}',
                 'schedule_id'       => 0,

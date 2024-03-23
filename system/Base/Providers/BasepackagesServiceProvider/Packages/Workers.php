@@ -120,7 +120,6 @@ class Workers extends BasePackage
                 continue;
             }
 
-
             if ($schedule['type'] === 'everyxseconds' || $schedule['type'] === 'everyminute') {
                 $this->scheduleEveryMinute($task, $schedule, $class);
             } else if ($schedule['type'] === 'everyxminutes') {
@@ -146,19 +145,19 @@ class Workers extends BasePackage
         // die();
         $this->scheduler->run();
         // var_dump('done');
-        $failedJobs = $this->scheduler->getFailedJobs();
-        // var_dump($failedJobs);die();
-        if (count($failedJobs) > 0) {
-            foreach ($failedJobs as $failedJobKey => $failedJob) {
-                $id = $failedJob->getJob()->getId();
-                $this->scheduledJobs[$id]['status'] = 4;//Error
-                $this->scheduledJobs[$id]['response_code'] = 1;
-                $this->scheduledJobs[$id]['response_message'] = $failedJob->getException()->getMessage();
-                $this->scheduledJobs[$id]['response_data'] = $this->helper->encode([]);
+        // $failedJobs = $this->scheduler->getFailedJobs();
+        // var_dump($failedJobs);
+        // if (count($failedJobs) > 0) {
+        //     foreach ($failedJobs as $failedJobKey => $failedJob) {
+        //         $id = $failedJob->getJob()->getId();
+        //         $this->scheduledJobs[$id]['status'] = 4;//Error
+        //         $this->scheduledJobs[$id]['response_code'] = ["1"];
+        //         $this->scheduledJobs[$id]['response_message'] = [$failedJob->getException()->getMessage()];
+        //         $this->scheduledJobs[$id]['response_data'] = $this->helper->encode([]);
 
-                $this->jobs->updateJob($this->scheduledJobs[$id]);
-            }
-        }
+        //         $this->jobs->updateJob($this->scheduledJobs[$id]);
+        //     }
+        // }
 
         // $executedJobs = $this->scheduler->getExecutedJobs();
 
@@ -175,7 +174,7 @@ class Workers extends BasePackage
         // }
 
         $stuckTasks = $this->tasks->getRunningTasks();
-
+        // var_dump($stuckTasks);
         if ($stuckTasks && count($stuckTasks) > 0) {
             foreach ($this->scheduledJobs as  $scheduledJob) {
                 foreach ($stuckTasks as $stuckTaskKey => $stuckTask) {
@@ -189,8 +188,8 @@ class Workers extends BasePackage
 
                         if ($stuckJob && $stuckJob['status'] != 4) {
                             $stuckJob['status'] = 4;
-                            $stuckJob['response_code'] = 1;
-                            $stuckJob['response_message'] = 'Job was stuck and is free now!';
+                            $stuckJob['response_code'] = ["1"];
+                            $stuckJob['response_message'] = ['Job was stuck and is free now!'];
 
                             $this->jobs->updateJob($stuckJob);
                         }
@@ -220,7 +219,7 @@ class Workers extends BasePackage
 
         $args = ['task' => $task, 'job' => $job, 'schedule' => $schedule];
 
-        if ($schedule['type'] === 'everyxseconds') {
+        if ($schedule && $schedule['type'] === 'everyxseconds') {
             $this->work($call, $args, $schedule);
 
             return;
@@ -234,8 +233,8 @@ class Workers extends BasePackage
         try {
             $call->run($args)();
         } catch (\Exception $e) {
-            $data['responseCode'] = 1;
-            $data['responseMessage'] = $e->getMessage();
+            $data['responseCode'] = ["1"];
+            $data['responseMessage'] = [$e->getMessage()];
             $data['responseData'] = [];
 
             $call->addJobResult((object) $data, $args);
@@ -267,8 +266,8 @@ class Workers extends BasePackage
             }
 
         } catch (\Exception $e) {
-            $data['responseCode'] = 1;
-            $data['responseMessage'] = $e->getMessage();
+            $data['responseCode'] = ["1"];
+            $data['responseMessage'] = [$e->getMessage()];
             $data['responseData'] = [];
 
             $call->addJobResult((object) $data, $args);
@@ -560,8 +559,8 @@ class Workers extends BasePackage
             $newJob['type']                 =  0;
             $newJob['status']               =  5;//Warning
             $newJob['execution_time']       =  '0.000';
-            $newJob['response_code']        =  '1';
-            $newJob['response_message']     =  'Task rescheduled for next run as no worker was available. Add more workers to avoid this situation.';
+            $newJob['response_code']        =  ['1'];
+            $newJob['response_message']     =  ['Task rescheduled for next run as no worker was available. Add more workers to avoid this situation.'];
             $newJob['response_data']        =  '';
 
             $this->tasks->forceNextRun($task);
