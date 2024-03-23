@@ -64,7 +64,8 @@ return
 		],
 		"security"			=>
 		[
-			"sso"							=> false
+			"sso"							=> false,
+			"passwordPolicy"				=> false
 		],
 		"logs"				=>
 		[
@@ -145,6 +146,7 @@ return
 		}
 		$setup = 'false';
 		$sso = 'false';
+		$passwordPolicy = 'false';
 
 		$this->coreJson['settings']['setup'] = $setup == 'true' ? true : false;
 		$this->coreJson['settings']['debug'] = $debug == 'true' ? true : false;
@@ -166,6 +168,7 @@ return
 		$this->coreJson['settings']['security']['sso'] = $sso;
 		$this->coreJson['settings']['security']['passwordWorkFactor'] = $pwf;
 		$this->coreJson['settings']['security']['cookiesWorkFactor'] = $cwf;
+		$this->coreJson['settings']['security']['passwordPolicy'] = $passwordPolicy;
 
 		$this->baseFileContent =
 '<?php
@@ -224,6 +227,7 @@ if ($this->coreJson['settings']['databasetype'] === 'hybrid') {
 			"sso"							=> ' . $sso . ',
 			"passwordWorkFactor"			=> ' . $pwf . ',
 			"cookiesWorkFactor" 			=> ' . $cwf . ',
+			"passwordPolicy"     			=> ' . $passwordPolicy . ',
 		],
 		"logs"				=>
 		[

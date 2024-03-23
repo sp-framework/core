@@ -983,11 +983,11 @@ class Auth
 
     public function generateNewPassword()
     {
-        $this->packagesData->responseCode = 0;
+        $this->basepackages->utils->generateNewPassword();
 
-        $this->packagesData->responseData = $this->secTools->random->base62(12);
-
-        $this->packagesData->responseMessage = 'Password Generate Successfully';
+        $this->packagesData->responseCode = $this->basepackages->utils->packagesData->responseCode;
+        $this->packagesData->responseMessage = $this->basepackages->utils->packagesData->responseMessage;
+        $this->packagesData->responseData = $this->basepackages->utils->packagesData->responseData['password'];
     }
 
     public function enableTwoFaTotp(array $data = null)

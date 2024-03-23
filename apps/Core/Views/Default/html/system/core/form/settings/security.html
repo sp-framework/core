@@ -1,0 +1,569 @@
+
+{% set coreSettingsSSO = 'ssooff' %}
+{% if core['settings']['security']['sso'] == 'true' %}
+    {% set coreSettingsSSO = 'ssoon' %}
+{% endif %}
+{% set coreSettingsPasswordPolicy = 'passwordpolicyoff' %}
+{% set passwordPolicyLengthDisabled = true %}
+{% set passwordPolicyComplexityDisabled = true %}
+{% if core['settings']['security']['passwordPolicy'] == 'true' %}
+    {% set coreSettingsPasswordPolicy = 'passwordpolicyon' %}
+    {% set passwordPolicyLengthDisabled = false %}
+    {% set passwordPolicyComplexityDisabled = false %}
+{% endif %}
+{% set passwordPolicyLength = 8 %}
+{% if core['settings']['security']['passwordPolicyLength'] is defined %}
+    {% set passwordPolicyLength = core['settings']['security']['passwordPolicyLength'] %}
+{% endif %}
+{% set passwordPolicyComplexity = 'simple' %}
+{% if core['settings']['security']['passwordPolicyComplexity'] is defined %}
+    {% set passwordPolicyComplexity = core['settings']['security']['passwordPolicyComplexity'] %}
+{% endif %}
+{% set complexityHidden = 'hidden' %}
+{% set passwordPolicyLowercaseChecked = false %}
+{% set passwordPolicyUppercaseChecked = false %}
+{% set passwordPolicyNumbersChecked = false %}
+{% set passwordPolicySymbolsChecked = false %}
+{% set passwordPolicyLowercaseCountDisabled = true %}
+{% set passwordPolicyUppercaseCountDisabled = true %}
+{% set passwordPolicyNumbersCountDisabled = true %}
+{% set passwordPolicySymbolsCountDisabled = true %}
+{% set passwordPolicyLowercaseIncludeDisabled = true %}
+{% set passwordPolicyUppercaseIncludeDisabled = true %}
+{% set passwordPolicyNumbersIncludeDisabled = true %}
+{% set passwordPolicySymbolsIncludeDisabled = true %}
+
+{% set passwordPolicyLowercaseCount = '2' %}
+{% set passwordPolicyUppercaseCount = '2' %}
+{% set passwordPolicyNumbersCount = '2' %}
+{% set passwordPolicySymbolsCount = '2' %}
+{% set passwordPolicyLowercaseInclude = 'abcdefghijklmnopqrstuvwxyz' %}
+{% set passwordPolicyUppercaseInclude = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+{% set passwordPolicyNumbersInclude = '0123456789' %}
+{% set passwordPolicySymbolsInclude = '!@$%^&*()<>,.?/[]{}-=_+' %}
+
+{% if passwordPolicyComplexity === 'complex' %}
+    {% set complexityHidden = '' %}
+    {% if core['settings']['security']['passwordPolicyLowercase'] is defined %}
+        {% set passwordPolicyLowercase = core['settings']['security']['passwordPolicyLowercase'] %}
+        {% if passwordPolicyLowercase == 'true' %}
+            {% set passwordPolicyLowercaseCountDisabled = false %}
+            {% set passwordPolicyLowercaseIncludeDisabled = false %}
+        {% endif %}
+    {% endif %}
+    {% if core['settings']['security']['passwordPolicyLowercaseCount'] is defined %}
+        {% set passwordPolicyLowercaseCount = core['settings']['security']['passwordPolicyLowercaseCount'] %}
+    {% endif %}
+    {% if core['settings']['security']['passwordPolicyLowercaseInclude'] is defined %}
+        {% set passwordPolicyLowercaseInclude = core['settings']['security']['passwordPolicyLowercaseInclude'] %}
+    {% endif %}
+    {% if core['settings']['security']['passwordPolicyUppercase'] is defined %}
+        {% set passwordPolicyUppercase = core['settings']['security']['passwordPolicyUppercase'] %}
+        {% if passwordPolicyUppercase == 'true' %}
+            {% set passwordPolicyUppercaseCountDisabled = false %}
+            {% set passwordPolicyUppercaseIncludeDisabled = false %}
+        {% endif %}
+    {% endif %}
+    {% if core['settings']['security']['passwordPolicyUppercaseCount'] is defined %}
+        {% set passwordPolicyUppercaseCount = core['settings']['security']['passwordPolicyUppercaseCount'] %}
+    {% endif %}
+    {% if core['settings']['security']['passwordPolicyUppercaseInclude'] is defined %}
+        {% set passwordPolicyUppercaseInclude = core['settings']['security']['passwordPolicyUppercaseInclude'] %}
+    {% endif %}
+    {% if core['settings']['security']['passwordPolicyNumbers'] is defined %}
+        {% set passwordPolicyNumbers = core['settings']['security']['passwordPolicyNumbers'] %}
+        {% if passwordPolicyNumbers == 'true' %}
+            {% set passwordPolicyNumbersCountDisabled = false %}
+            {% set passwordPolicyNumbersIncludeDisabled = false %}
+        {% endif %}
+    {% endif %}
+    {% if core['settings']['security']['passwordPolicyNumbersCount'] is defined %}
+        {% set passwordPolicyNumbersCount = core['settings']['security']['passwordPolicyNumbersCount'] %}
+    {% endif %}
+    {% if core['settings']['security']['passwordPolicyNumbersInclude'] is defined %}
+        {% set passwordPolicyNumbersCoInclude = core['settings']['security']['passwordPolicyNumbersInclude'] %}
+    {% endif %}
+    {% if core['settings']['security']['passwordPolicySymbols'] is defined %}
+        {% set passwordPolicySymbols = core['settings']['security']['passwordPolicySymbols'] %}
+        {% if passwordPolicySymbols == 'true' %}
+            {% set passwordPolicySymbolsCountDisabled = false %}
+            {% set passwordPolicySymbolsIncludeDisabled = false %}
+        {% endif %}
+    {% endif %}
+    {% if core['settings']['security']['passwordPolicySymbolsCount'] is defined %}
+        {% set passwordPolicySymbolsCount = core['settings']['security']['passwordPolicySymbolsCount'] %}
+    {% endif %}
+    {% if core['settings']['security']['passwordPolicySymbolsInclude'] is defined %}
+        {% set passwordPolicySymbolsCoInclude = core['settings']['security']['passwordPolicySymbolsInclude'] %}
+    {% endif %}
+{% endif %}
+<div class="row">
+    <div class="col-md-4">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'single_sign_on',
+                'fieldLabel'                     : 'Single Sign On',
+                'fieldType'                      : 'radio',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'If single sign on is set to ON, users can carry forward their session between apps. If is set to OFF, user will have to login in each app.',
+                'fieldRequired'                  : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioPlacementType'        : 'horizontal',
+                'fieldRadioButtons'              :
+                    [
+                        'ssooff' :
+                            [
+                                'title'                           : 'OFF',
+                                'type'                            : 'secondary',
+                                'dataValue'                       : 'ssooff'
+                            ],
+                        'ssoon' :
+                            [
+                                'title'                           : 'ON',
+                                'type'                            : 'primary',
+                                'dataValue'                       : 'ssoon'
+                            ]
+                    ],
+                'fieldRadioChecked'              : coreSettingsSSO
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {% set minNumber = 4 %}
+        {% set maxNumber = 16 %}
+        {% if core['settings']['dev'] == true %}
+            {% set minNumber = 2 %}
+        {% endif %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'passwordWorkFactor',
+                'fieldLabel'                            : 'Password Encryption Level',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Level of encryption on the password. The higher the number, the longer server will take to encrypt.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : false,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : minNumber,
+                'fieldDataInputMaxNumber'               : maxNumber,
+                'fieldDataInputMaxLength'               : 2,
+                'fieldValue'                            : core['settings']['security']['passwordWorkFactor']
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'cookiesWorkFactor',
+                'fieldLabel'                            : 'Cookies Encryption Level',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Level of encryption on the cookies. The higher the number, the longer server will take to encrypt.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : false,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : minNumber,
+                'fieldDataInputMaxNumber'               : maxNumber,
+                'fieldDataInputMaxLength'               : 2,
+                'fieldValue'                            : core['settings']['security']['cookiesWorkFactor']
+            ]
+        )}}
+    </div>
+</div>
+<small class="text-danger">Note: These numbers are set during installation. Changing these numbers will require all users to change their password and will be logged out of the system.</small>
+<hr>
+<div class="row">
+    <div class="col-md-4">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'password_policy',
+                'fieldLabel'                     : 'Password Policy',
+                'fieldType'                      : 'radio',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Switch on to configure password policy across the platform.',
+                'fieldRequired'                  : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioPlacementType'        : 'horizontal',
+                'fieldRadioButtons'              :
+                    [
+                        'passwordpolicyoff' :
+                            [
+                                'title'                           : 'OFF',
+                                'type'                            : 'secondary',
+                                'dataValue'                       : 'passwordpolicyoff'
+                            ],
+                        'passwordpolicyon' :
+                            [
+                                'title'                           : 'ON',
+                                'type'                            : 'primary',
+                                'dataValue'                       : 'passwordpolicyon'
+                            ]
+                    ],
+                'fieldRadioChecked'              : coreSettingsPasswordPolicy
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'password_policy_length',
+                'fieldLabel'                            : 'Password Length',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Minimum length of the password.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : passwordPolicyLengthDisabled,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : 4,
+                'fieldDataInputMaxNumber'               : 20,
+                'fieldValue'                            : passwordPolicyLength
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'password_policy_complexity',
+                'fieldLabel'                            : 'Password Complexity',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select complexity of the password policy.',
+                'fieldBazScan'                          : true,
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : passwordPolicyComplexityDisabled,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataSelect2Options'               : availableComplexities,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : passwordPolicyComplexity
+            ]
+        )}}
+    </div>
+</div>
+<div id="complexity-div" {{complexityHidden}}>
+    <div class="row">
+        <div class="col-md-4">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'password_policy_lowercase',
+                    'fieldLabel'                     : 'Include Lowercase',
+                    'fieldType'                      : 'checkbox',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Check if password should include lowercase characters.',
+                    'fieldRequired'                  : false,
+                    'fieldDisabled'                  : false,
+                    'fieldCheckboxType'              : 'primary',
+                    'fieldCheckboxChecked'           : passwordPolicyLowercaseChecked,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazScan'                   : true
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'password_policy_lowercase_count',
+                    'fieldLabel'                            : 'Lowercase Count',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Minimum count of lowercase characters password should have.',
+                    'fieldInputTypeTextFilter'              : 'positiveInt',
+                    'fieldRequired'                         : false,
+                    'fieldDisabled'                         : passwordPolicyLowercaseCountDisabled,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldDataInputMinNumber'               : 0,
+                    'fieldDataInputMaxNumber'               : 20,
+                    'fieldValue'                            : passwordPolicyLowercaseCount
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'password_policy_lowercase_include',
+                    'fieldLabel'                            : 'Lowercase Characters Include',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Lowercase characters to include in the password.',
+                    'fieldRequired'                         : true,
+                    'fieldDisabled'                         : passwordPolicyLowercaseIncludeDisabled,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldDataInputMaxLength'               : 26,
+                    'fieldValue'                            : passwordPolicyLowercaseInclude
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'password_policy_uppercase',
+                    'fieldLabel'                     : 'Include Uppercase',
+                    'fieldType'                      : 'checkbox',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Check if password should include uppercase characters.',
+                    'fieldRequired'                  : false,
+                    'fieldDisabled'                  : false,
+                    'fieldCheckboxType'              : 'primary',
+                    'fieldCheckboxChecked'           : passwordPolicyUppercaseChecked,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazScan'                   : true
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'password_policy_uppercase_count',
+                    'fieldLabel'                            : 'Uppercase Count',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Minimum count of uppercase characters password should have.',
+                    'fieldInputTypeTextFilter'              : 'positiveInt',
+                    'fieldRequired'                         : false,
+                    'fieldDisabled'                         : passwordPolicyUppercaseCountDisabled,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldDataInputMinNumber'               : 0,
+                    'fieldDataInputMaxNumber'               : 20,
+                    'fieldValue'                            : passwordPolicyUppercaseCount
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'password_policy_uppercase_include',
+                    'fieldLabel'                            : 'Uppercase Characters Include',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Uppercase characters to include in the password.',
+                    'fieldRequired'                         : true,
+                    'fieldDisabled'                         : passwordPolicyUppercaseIncludeDisabled,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldDataInputMaxLength'               : 26,
+                    'fieldValue'                            : passwordPolicyUppercaseInclude
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'password_policy_numbers',
+                    'fieldLabel'                     : 'Include Numbers',
+                    'fieldType'                      : 'checkbox',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Check if password should include numbers.',
+                    'fieldRequired'                  : false,
+                    'fieldDisabled'                  : false,
+                    'fieldCheckboxType'              : 'primary',
+                    'fieldCheckboxChecked'           : passwordPolicyNumbersChecked,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazScan'                   : true
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'password_policy_numbers_count',
+                    'fieldLabel'                            : 'Numbers Count',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Minimum count of numbers password should have.',
+                    'fieldInputTypeTextFilter'              : 'positiveInt',
+                    'fieldRequired'                         : false,
+                    'fieldDisabled'                         : passwordPolicyNumbersCountDisabled,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldDataInputMinNumber'               : 0,
+                    'fieldDataInputMaxNumber'               : 20,
+                    'fieldValue'                            : passwordPolicyNumbersCount
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'password_policy_numbers_include',
+                    'fieldLabel'                            : 'Numbers Include',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Numbers to include in the password.',
+                    'fieldRequired'                         : true,
+                    'fieldDisabled'                         : passwordPolicyNumbersIncludeDisabled,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldDataInputMaxLength'               : 10,
+                    'fieldValue'                            : passwordPolicyNumbersInclude
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'password_policy_symbols',
+                    'fieldLabel'                     : 'Include Symbols',
+                    'fieldType'                      : 'checkbox',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Check if password should include symbols.',
+                    'fieldRequired'                  : false,
+                    'fieldDisabled'                  : false,
+                    'fieldCheckboxType'              : 'primary',
+                    'fieldCheckboxChecked'           : passwordPolicySymbolsChecked,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazScan'                   : true
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'password_policy_symbols_count',
+                    'fieldLabel'                            : 'Symbols Count',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Minimum count of symbols password should have.',
+                    'fieldInputTypeTextFilter'              : 'positiveInt',
+                    'fieldRequired'                         : false,
+                    'fieldDisabled'                         : passwordPolicySymbolsCountDisabled,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldDataInputMinNumber'               : 0,
+                    'fieldDataInputMaxNumber'               : 20,
+                    'fieldValue'                            : passwordPolicySymbolsCount
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'password_policy_symbols_include',
+                    'fieldLabel'                            : 'Symbols Include',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Symbols to include in the password.',
+                    'fieldRequired'                         : true,
+                    'fieldDisabled'                         : passwordPolicySymbolsIncludeDisabled,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldDataInputMaxLength'               : 23,
+                    'fieldValue'                            : passwordPolicySymbolsInclude
+                ]
+            )}}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,167 @@
+{% set coreSettingsLog = 'logsoff' %}
+{% set coreSettingsLogLevelDisabled = true %}
+{% if core['settings']['logs']['enabled'] == 'true' %}
+    {% set coreSettingsLog = 'logson' %}
+    {% set coreSettingsLogLevelDisabled = false %}
+{% endif %}
+{% set coreSettingsLogExceptionsChecked = false %}
+{% if core['settings']['logs']['exceptions'] == 'true' %}
+    {% set coreSettingsLogExceptionsChecked = true %}
+{% endif %}
+{% set coreSettingsLogEmergency = 'emergencyoff' %}
+{% if core['settings']['logs']['emergencyLogsEmail'] == 'true' %}
+    {% set coreSettingsLogEmergency = 'emergencyon' %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'logs',
+                'fieldLabel'                     : 'Logging',
+                'fieldType'                      : 'radio',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Logging on/off.',
+                'fieldRequired'                  : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioPlacementType'        : 'horizontal',
+                'fieldRadioButtons'              :
+                    [
+                        'logsoff' :
+                            [
+                                'title'                           : 'OFF',
+                                'type'                            : 'primary',
+                                'dataValue'                       : 'logsoff'
+                            ],
+                        'logson' :
+                            [
+                                'title'                           : 'ON',
+                                'type'                            : 'success',
+                                'dataValue'                       : 'logson'
+                            ]
+                    ],
+                'fieldRadioChecked'              : coreSettingsLog
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'logs_level',
+                'fieldLabel'                     : 'Logs Level',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select level of logs to log.',
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : coreSettingsLogLevelDisabled,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataSelect2Options'        : logLevels,
+                'fieldDataSelect2OptionsKey'     : 'id',
+                'fieldDataSelect2OptionsValue'   : 'name',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': core['settings']['logs']['level']
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'logs_exceptions',
+                'fieldLabel'                     : 'Log Exceptions?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Log exceptions that are thrown?',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'info',
+                'fieldCheckboxChecked'           : coreSettingsLogExceptionsChecked,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'emergency_logs_email',
+                'fieldLabel'                     : 'Email Emergency, Critical & Alert?',
+                'fieldType'                      : 'radio',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Email Emergency, Critical & Alert?',
+                'fieldRequired'                  : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioPlacementType'        : 'horizontal',
+                'fieldRadioButtons'              :
+                    [
+                        'emergencyoff' :
+                            [
+                                'title'                           : 'NO',
+                                'type'                            : 'secondary',
+                                'dataValue'                       : 'emergencyoff'
+                            ],
+                        'emergencyon' :
+                            [
+                                'title'                           : 'YES',
+                                'type'                            : 'primary',
+                                'dataValue'                       : 'emergencyon'
+                            ]
+                    ],
+                'fieldRadioChecked'              : coreSettingsLogEmergency
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {% set emergencyEmailDisabled = true %}
+        {% if core['settings']['logs']['emergencyLogsEmail'] == 'true' %}
+            {% set emergencyEmailDisabled = false %}
+        {% endif %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'emergency_logs_email_addresses',
+                'fieldLabel'                     : 'Email Addresses',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Email Addresses, comma saperated.',
+                'fieldRequired'                  : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldDisabled'                  : emergencyEmailDisabled,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 1024,
+                'fieldValue'                     : core['settings']['logs']['emergencyLogsEmailAddresses']
+            ]
+        )}}
+    </div>
+</div>

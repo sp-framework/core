@@ -1,0 +1,102 @@
+{% set coreSettingsDebug = 'debugoff' %}
+{% if core['settings']['debug'] == 'true' %}
+    {% set coreSettingsDebug = 'debugon' %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'debug',
+                'fieldLabel'                     : 'Debug',
+                'fieldType'                      : 'radio',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Debug on/off at core level.',
+                'fieldRequired'                  : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioPlacementType'        : 'horizontal',
+                'fieldRadioButtons'              :
+                    [
+                        'debugoff' :
+                            [
+                                'title'                           : 'OFF',
+                                'type'                            : 'success',
+                                'dataValue'                       : 'debugoff'
+                            ],
+                        'debugon' :
+                            [
+                                'title'                           : 'ON',
+                                'type'                            : 'warning',
+                                'dataValue'                       : 'debugon'
+                            ]
+                    ],
+                'fieldRadioChecked'              : coreSettingsDebug
+            ]
+        )}}
+    </div>
+    {% set autoOffDisabled = true %}
+    {% set debugFieldDataInputMinNumber = 1 %}
+    {% set debugFieldHelpTooltipContent = '' %}
+    {% set debugFieldValue = core['settings']['auto_off_debug'] %}
+    {% if core['settings']['debug'] == 'true' %}
+        {% set autoOffDisabled = false %}
+    {% endif %}
+    {% if core['settings']['dev'] == 'true' %}
+        {% set debugFieldDataInputMinNumber = 0 %}
+        {% set debugFieldHelpTooltipContent = ' With 0 being no time limit.' %}
+    {% endif %}
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'auto_off_debug',
+                'fieldLabel'                            : 'Auto Off Debug (Minutes)',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               :
+                    'Switch off debug after # of minutes. Values between ' ~ debugFieldDataInputMinNumber ~ ' & 60.' ~ debugFieldHelpTooltipContent,
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : autoOffDisabled,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : debugFieldDataInputMinNumber,
+                'fieldDataInputMaxNumber'               : 60,
+                'fieldDataInputMaxLength'               : 2,
+                'fieldValue'                            : debugFieldValue
+            ]
+        )}}
+    </div>
+    {% if core['settings']['dev'] is defined and core['settings']['dev'] == true %}
+        <div class="col text-center">
+            {{adminltetags.useTag('buttons',
+                {
+                    'component'             : component,
+                    'componentName'         : componentName,
+                    'componentId'           : componentId,
+                    'sectionId'             : 'main',
+                    'buttonType'            : 'button',
+                    'buttons'               :
+                        {
+                            'reset' : {
+                                'title'                   : 'Reset & Run setup',
+                                'size'                    : 'sm',
+                                'type'                    : 'danger',
+                                'icon'                    : 'exclamation'
+                            }
+                        }
+                }
+            )}}
+        </div>
+    {% endif %}
+</div>

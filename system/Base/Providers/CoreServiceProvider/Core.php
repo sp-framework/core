@@ -964,6 +964,9 @@ class Core extends BasePackage
 		if (isset($data['cookiesWorkFactor'])) {
 			$this->core['settings']['security']['cookiesWorkFactor'] = $data['cookiesWorkFactor'];
 		}
+		if (isset($data['password_policy'])) {
+			$this->core['settings']['security']['passwordPolicy'] = $data['password_policy'];
+		}
 
 		if (isset($data['logs'])) {
 			$this->core['settings']['logs']['enabled'] = $data['logs'];

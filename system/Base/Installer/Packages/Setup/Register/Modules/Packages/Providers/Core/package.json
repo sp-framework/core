@@ -56,7 +56,8 @@
 				"z4kn4fein/php-semver": "^2.0",
 				"opis/json-schema": "^2.3",
 				"league/flysystem-sftp-v3": "^3.23",
-				"lasserafn/php-initial-avatar-generator": "^4.3"
+				"lasserafn/php-initial-avatar-generator": "^4.3",
+				"hackzilla/password-generator": "^1.6"
 			},
 			"config": {
 				"allow-plugins": {
@@ -101,7 +102,8 @@
 		{
 			"sso" : false,
 			"passwordWorkFactor" : 8,
-			"cookiesWorkFactor" : 4
+			"cookiesWorkFactor" : 4,
+			"passwordPolicy" : false
 		},
 		"logs" :
 		{

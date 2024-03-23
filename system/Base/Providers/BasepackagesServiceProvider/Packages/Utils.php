@@ -79,9 +79,11 @@ class Utils extends BasePackage
         return false;
     }
 
-    public function generateNewPassword()
+    public function generateNewPassword($len = 12)
     {
-        $this->addResponse('Password Generate Successfully', 0, ['password' => $this->secTools->random->base62(12)]);
+        $password = $this->secTools->random->base62($len);
+
+        $this->addResponse('Password Generate Successfully', 0, ['password' => $password]);
     }
 
     public function formatJson($data)

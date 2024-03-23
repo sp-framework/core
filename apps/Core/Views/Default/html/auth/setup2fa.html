@@ -696,8 +696,8 @@ $(document).ready(function(){
                 if (response.responseData) {
                     $('#{{componentId}}-form-newpass').val(response.responseData).trigger('change');
                     $('#{{componentId}}-form-confirmnewpass').val(response.responseData);
-                    $('#{{componentId}}-form-newpass').attr('type', 'text');
-                    $('#{{componentId}}-form-confirmnewpass').attr('type', 'text');
+                    $('#{{componentId}}-form-newpass, #{{componentId}}-form-confirmnewpass').attr('type', 'text');
+                    $('#{{componentId}}-form-newpass-visibility, #{{componentId}}-form-confirmnewpass-visibility').children('i').removeClass('fa-eye-slash').addClass('fa-eye');
                 }
             } else {
                 PNotify.error(response.responseMessage);

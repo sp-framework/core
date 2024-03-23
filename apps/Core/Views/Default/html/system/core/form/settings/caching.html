@@ -1,0 +1,106 @@
+{% set coreSettingsCache = 'cacheoff' %}
+{% if core['settings']['cache']['enabled'] == 'true' %}
+    {% set coreSettingsCache = 'cacheon' %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'cache',
+                'fieldLabel'                     : 'Cache',
+                'fieldType'                      : 'radio',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Cache on/off at core level.',
+                'fieldRequired'                  : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioPlacementType'        : 'horizontal',
+                'fieldRadioButtons'              :
+                    [
+                        'cacheoff' :
+                            [
+                                'title'                           : 'OFF',
+                                'type'                            : 'primary',
+                                'dataValue'                       : 'cacheoff'
+                            ],
+                        'cacheon' :
+                            [
+                                'title'                           : 'ON',
+                                'type'                            : 'success',
+                                'dataValue'                       : 'cacheon'
+                            ]
+                    ],
+                'fieldRadioChecked'              : coreSettingsCache
+            ]
+        )}}
+    </div>
+    {% set cacheTimerDisabled = true %}
+    {% set cacheServiceDisabled = true %}
+    {% set cacheFieldDataInputMinNumber = 3600 %}
+    {% set cacheFieldHelpTooltipContent = 'Values between 3600 (1 Hour) & 604800 (1 week).' %}
+    {% set cacheFieldValue = core['settings']['cache']['timeout'] %}
+    {% if core['settings']['cache']['enabled'] == 'true' %}
+        {% set cacheTimerDisabled = false %}
+        {% set cacheServiceDisabled = false %}
+    {% endif %}
+    {% if core['settings']['dev'] == 'true' %}
+        {% set cacheFieldDataInputMinNumber = 10 %}
+        {% set cacheFieldHelpTooltipContent = 'Values between 10 seconds & 604800 (1 week).' %}
+    {% endif %}
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'cache_timeout',
+                'fieldLabel'                            : 'Cache Timeout (Seconds)',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : cacheFieldHelpTooltipContent,
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : cacheTimerDisabled,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : cacheFieldDataInputMinNumber,
+                'fieldDataInputMaxNumber'               : 604800,
+                'fieldDataInputMaxLength'               : 6,
+                'fieldValue'                            : cacheFieldValue
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'cache_service',
+                'fieldLabel'                     : 'Select Cache Service',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select cache service to use at core level.',
+                'fieldBazScan'                   : true,
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : cacheServiceDisabled,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataSelect2Options'        : availableCaches,
+                'fieldDataSelect2OptionsKey'     : 'id',
+                'fieldDataSelect2OptionsValue'   : 'name',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': core['settings']['cache']['service']
+            ]
+        )}}
+    </div>
+</div>

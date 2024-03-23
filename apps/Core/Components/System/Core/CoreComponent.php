@@ -48,6 +48,18 @@ class CoreComponent extends BaseComponent
 
         $this->view->core = $core;
         $this->view->availableCaches = $availableCaches;
+        $this->view->availableComplexities =
+            [
+                'simple'    => [
+                    'id'    => 'simple',
+                    'name'  => 'Simple'
+                ],
+                'complex'   => [
+                    'id'    => 'complex',
+                    'name'  => 'Complex'
+                ],
+            ];
+
         $this->view->logLevels = $this->logger->getLogLevels();
         $storage = $this->useStorage('private');
 

@@ -163,6 +163,47 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-single_sign_on'                          : { },
         '{{componentId}}-{{sectionId}}-passwordWorkFactor'                      : { },
         '{{componentId}}-{{sectionId}}-cookiesWorkFactor'                       : { },
+        '{{componentId}}-{{sectionId}}-password_policy'                         : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-password_policy').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'passwordpolicyon') {
+                        $('#{{componentId}}-{{sectionId}}-password_policy_length').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-password_policy_complexity').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-password_policy_length').val('8');
+                        $('#{{componentId}}-{{sectionId}}-password_policy_length').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-password_policy_complexity').attr('disabled', true);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-password_policy_length'                  : { },
+        '{{componentId}}-{{sectionId}}-password_policy_complexity'              : {
+            placeholder : 'SELECT PASSWORD COMPLEXITY',
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-password_policy_complexity').on('select2:select', function(e) {
+                    if (e.params.data.id === 'simple') {
+                        $('#complexity-div').attr('hidden', true);
+                    } else if (e.params.data.id === 'complex') {
+                        $('#complexity-div').attr('hidden', false);
+                    }
+                });
+
+                //
+            }
+        },
+        '{{componentId}}-{{sectionId}}-password_policy_lowercase'               : { },
+        '{{componentId}}-{{sectionId}}-password_policy_lowercase_count'         : { },
+        '{{componentId}}-{{sectionId}}-password_policy_lowercase_include'       : { },
+        '{{componentId}}-{{sectionId}}-password_policy_uppercase'               : { },
+        '{{componentId}}-{{sectionId}}-password_policy_uppercase_count'         : { },
+        '{{componentId}}-{{sectionId}}-password_policy_uppercase_include'       : { },
+        '{{componentId}}-{{sectionId}}-password_policy_numbers'                 : { },
+        '{{componentId}}-{{sectionId}}-password_policy_numbers_count'           : { },
+        '{{componentId}}-{{sectionId}}-password_policy_numbers_include'         : { },
+        '{{componentId}}-{{sectionId}}-password_policy_symbols'                 : { },
+        '{{componentId}}-{{sectionId}}-password_policy_symbols_count'           : { },
+        '{{componentId}}-{{sectionId}}-password_policy_symbols_include'         : { },
         '{{componentId}}-{{sectionId}}-logs'                                    : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-logs').click(function() {
@@ -899,6 +940,11 @@ dataCollectionSection =
                     dataCollectionSection['dataToSubmit']['single_sign_on'] = true;
                 } else {
                     dataCollectionSection['dataToSubmit']['single_sign_on'] = false;
+                }
+                if (dataCollectionSection['dataToSubmit']['password_policy'] === 'passwordpolicyon') {
+                    dataCollectionSection['dataToSubmit']['password_policy'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['password_policy'] = false;
                 }
                 if (dataCollectionSection['dataToSubmit']['logs'] === 'logson') {
                     dataCollectionSection['dataToSubmit']['logs'] = true;

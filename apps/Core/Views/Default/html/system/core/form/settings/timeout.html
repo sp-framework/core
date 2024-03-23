@@ -1,0 +1,26 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'timeout_cookies',
+                'fieldLabel'                            : 'Cookies',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Cookies timeout in seconds.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : 1,
+                'fieldDataInputMaxNumber'               : 31536000,
+                'fieldDataInputMaxLength'               : 8,
+                'fieldValue'                            : core['settings']['timeout']['cookies']
+            ]
+        )}}
+    </div>
+</div>

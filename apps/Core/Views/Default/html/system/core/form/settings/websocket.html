@@ -1,0 +1,86 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'websocket_protocol',
+                'fieldLabel'                     : 'Websocket Procotcol',
+                'fieldType'                      : 'radio',
+                'fieldBazJstreeSearch'           : true,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Websocket Procotcol TCP/UDP.',
+                'fieldRequired'                  : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioPlacementType'        : 'horizontal',
+                'fieldRadioButtons'              :
+                    [
+                        'tcp' :
+                            [
+                                'title'                           : 'TCP',
+                                'type'                            : 'primary',
+                                'dataValue'                       : 'tcp'
+                            ],
+                        'udp' :
+                            [
+                                'title'                           : 'UDP',
+                                'type'                            : 'primary',
+                                'dataValue'                       : 'udp'
+                            ]
+                    ],
+                'fieldRadioChecked'              : core['settings']['websocket']['protocol']
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'websocket_host',
+                'fieldLabel'                     : 'Websocket Host',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Websocket Host',
+                'fieldRequired'                  : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 1024,
+                'fieldValue'                     : core['settings']['websocket']['host']
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'websocket_port',
+                'fieldLabel'                            : 'Websocket Port',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Websocket Port',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : 1,
+                'fieldDataInputMaxNumber'               : 65535,
+                'fieldDataInputMaxLength'               : 5,
+                'fieldValue'                            : core['settings']['websocket']['port']
+            ]
+        )}}
+    </div>
+</div>
