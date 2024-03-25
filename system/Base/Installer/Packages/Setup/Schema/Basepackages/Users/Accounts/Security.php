@@ -92,6 +92,27 @@ class Security
                             'type'          => Column::TYPE_INTEGER,
                             'notNull'       => false
                         ]
+                    ),
+                    new Column(
+                        'password_history',
+                        [
+                            'type'          => Column::TYPE_JSON,
+                            'notNull'       => false
+                        ]
+                    ),
+                    new Column(
+                        'password_set_on',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => true
+                        ]
+                    ),
+                    new Column(
+                        'force_pwreset_after',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => false
+                        ]
                     )
                 ],
                 'options' => [

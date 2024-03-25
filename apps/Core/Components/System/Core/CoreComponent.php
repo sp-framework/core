@@ -60,6 +60,26 @@ class CoreComponent extends BaseComponent
                 ],
             ];
 
+        $this->view->availablePasswordStrengthLevels =
+            [
+                '1'   => [
+                    'id'    => '1',
+                    'name'  => '1 - Weak Strength'
+                ],
+                '2'   => [
+                    'id'    => '2',
+                    'name'  => '2 - Normal Strength'
+                ],
+                '3'   => [
+                    'id'    => '3',
+                    'name'  => '3 - Good Strength'
+                ],
+                '4'   => [
+                    'id'    => '4',
+                    'name'  => '4 - Best Strength'
+                ],
+            ];
+
         $this->view->logLevels = $this->logger->getLogLevels();
         $storage = $this->useStorage('private');
 

@@ -372,6 +372,20 @@ var BazContentFields = function() {
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
+                    if ($('#' + sectionId + '-password_policy_acceptable_level').length > 0 &&
+                        $('#' + sectionId + '-password_policy_acceptable_level') != '0'
+                    ) {
+                        postData['complexity'] = 'simple';
+                        if ($('#' + sectionId + '-password_policy_acceptable_level').val() == '1') {
+                            postData['lengthMin'] = '4';
+                        } else if ($('#' + sectionId + '-password_policy_acceptable_level').val() == '2') {
+                            postData['lengthMin'] = '8';
+                        } else if ($('#' + sectionId + '-password_policy_acceptable_level').val() == '3') {
+                            postData['lengthMin'] = '10';
+                        } else if ($('#' + sectionId + '-password_policy_acceptable_level').val() == '4') {
+                            postData['lengthMin'] = '12';
+                        }
+                    }
                     var url = dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/home/generatePw'
                     $.post(url, postData, function(response) {
                         if (response.responseCode == 0) {

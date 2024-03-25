@@ -1,90 +1,16 @@
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'pwreset',
-                'fieldLabel'                            : 'Password Reset',
-                'fieldLabelLegend'                      : true,
-                'fieldHidden'                           : false,
-                'fieldType'                             : 'html',
-                'fieldBazScan'                          : false,
-                'fieldBazPostOnCreate'                  : false,
-                'fieldBazPostOnUpdate'                  : false,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldHtmlContent'                      : ''
-            ]
-        )}}
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                             : component,
-                        'componentName'                         : componentName,
-                        'componentId'                           : componentId,
-                        'sectionId'                             : sectionId,
-                        'fieldId'                               : 'current_password',
-                        'fieldLabel'                            : 'Current Password',
-                        'fieldHidden'                           : false,
-                        'fieldType'                             : 'input',
-                        'fieldInputType'                        : 'password',
-                        'fieldInputPasswordToggleVisibility'    : true,
-                        'fieldRequired'                         : true,
-                        'fieldBazScan'                          : true,
-                        'fieldBazPostOnCreate'                  : false,
-                        'fieldBazPostOnUpdate'                  : false
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                             : component,
-                        'componentName'                         : componentName,
-                        'componentId'                           : componentId,
-                        'sectionId'                             : sectionId,
-                        'fieldId'                               : 'new_password',
-                        'fieldLabel'                            : 'New Password',
-                        'fieldHidden'                           : false,
-                        'fieldType'                             : 'input',
-                        'fieldInputType'                        : 'password',
-                        'fieldInputPasswordToggleVisibility'    : true,
-                        'fieldInputPasswordGenerate'            : true,
-                        'fieldInputPasswordStrengthMeter'       : true,
-                        'fieldRequired'                         : true,
-                        'fieldBazScan'                          : true,
-                        'fieldBazPostOnCreate'                  : false,
-                        'fieldBazPostOnUpdate'                  : false,
-                        'fieldAdditionalClass'                  : 'mb-0'
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                             : component,
-                        'componentName'                         : componentName,
-                        'componentId'                           : componentId,
-                        'sectionId'                             : sectionId,
-                        'fieldId'                               : 'confirm_password',
-                        'fieldLabel'                            : 'Confirm Password',
-                        'fieldHidden'                           : false,
-                        'fieldType'                             : 'input',
-                        'fieldInputType'                        : 'password',
-                        'fieldInputPasswordToggleVisibility'    : true,
-                        'fieldBazScan'                          : true,
-                        'fieldRequired'                         : true,
-                        'fieldBazPostOnCreate'                  : false,
-                        'fieldBazPostOnUpdate'                  : false
-                    ]
-                )}}
-            </div>
-        </div>
-    </div>
-</div>
+{% if coreSettings['security']['passwordPolicy'] is defined and coreSettings['security']['passwordPolicy'] == true %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] is defined  %}
+        {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] === 'simple' %}
+            {% include 'profile/form/security/pwresetsimple.html' %}
+        {% elseif coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] === 'complex' %}
+            {% include 'profile/form/security/pwresetcomplex.html' %}
+        {% endif %}
+    {% else %}
+        {% include 'profile/form/security/pwresetsimple.html' %}
+    {% endif %}
+{% else %}
+    {% include 'profile/form/security/pwresetsimple.html' %}
+{% endif %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('buttons',

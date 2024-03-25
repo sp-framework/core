@@ -968,6 +968,82 @@ class Core extends BasePackage
 			$this->core['settings']['security']['passwordPolicy'] = $data['password_policy'];
 		}
 
+		if (isset($data['password_policy_pwreset_need_2fa'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyPwresetNeed2fa'] = $data['password_policy_pwreset_need_2fa'];
+		}
+		if (isset($data['password_policy_force_pwreset_after'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyForcePwresetAfter'] = $data['password_policy_force_pwreset_after'];
+		}
+		if (isset($data['password_policy_block_previous_passwords'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'] = $data['password_policy_block_previous_passwords'];
+		}
+		if (isset($data['password_policy_complexity'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyComplexity'] = $data['password_policy_complexity'];
+		}
+		if (isset($data['password_policy_simple_acceptable_level'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel'] = $data['password_policy_simple_acceptable_level'];
+		}
+		if (isset($data['password_policy_length_min'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyLengthMin'] = $data['password_policy_length_min'];
+		}
+		if (isset($data['password_policy_length_max'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyLengthMax'] = $data['password_policy_length_max'];
+		}
+		if (isset($data['password_policy_uppercase'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyUppercase'] = $data['password_policy_uppercase'];
+		}
+		if (isset($data['password_policy_uppercase_min_count'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyUppercaseMinCount'] = $data['password_policy_uppercase_min_count'];
+		}
+		if (isset($data['password_policy_uppercase_max_count'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyUppercaseMaxCount'] = $data['password_policy_uppercase_max_count'];
+		}
+		if (isset($data['password_policy_uppercase_include'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyUppercaseInclude'] = $data['password_policy_uppercase_include'];
+		}
+		if (isset($data['password_policy_lowercase'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyLowercase'] = $data['password_policy_lowercase'];
+		}
+		if (isset($data['password_policy_lowercase_min_count'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyLowercaseMinCount'] = $data['password_policy_lowercase_min_count'];
+		}
+		if (isset($data['password_policy_lowercase_max_count'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyLowercaseMaxCount'] = $data['password_policy_lowercase_max_count'];
+		}
+		if (isset($data['password_policy_lowercase_include'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyLowercaseInclude'] = $data['password_policy_lowercase_include'];
+		}
+		if (isset($data['password_policy_numbers'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyNumbers'] = $data['password_policy_numbers'];
+		}
+		if (isset($data['password_policy_numbers_min_count'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyNumbersMinCount'] = $data['password_policy_numbers_min_count'];
+		}
+		if (isset($data['password_policy_numbers_max_count'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyNumbersMaxCount'] = $data['password_policy_numbers_max_count'];
+		}
+		if (isset($data['password_policy_numbers_include'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyNumbersInclude'] = $data['password_policy_numbers_include'];
+		}
+		if (isset($data['password_policy_symbols'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicySymbols'] = $data['password_policy_symbols'];
+		}
+		if (isset($data['password_policy_symbols_min_count'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicySymbolsMinCount'] = $data['password_policy_symbols_min_count'];
+		}
+		if (isset($data['password_policy_symbols_max_count'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicySymbolsMaxCount'] = $data['password_policy_symbols_max_count'];
+		}
+		if (isset($data['password_policy_symbols_include'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicySymbolsInclude'] = $data['password_policy_symbols_include'];
+		}
+		if (isset($data['password_policy_avoid_similar'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyAvoidSimilar'] = $data['password_policy_avoid_similar'];
+		}
+		if (isset($data['password_policy_avoid_similar_characters'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyAvoidSimilarCharacters'] = $data['password_policy_avoid_similar_characters'];
+		}
+
 		if (isset($data['logs'])) {
 			$this->core['settings']['logs']['enabled'] = $data['logs'];
 		}

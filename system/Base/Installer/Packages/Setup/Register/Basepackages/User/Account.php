@@ -37,7 +37,8 @@ class Account
                 'password'              => $password,
                 'role_id'               => 1,
                 'override_role'         => 0,
-                'permissions'           => $helper->encode([])
+                'permissions'           => $helper->encode([]),
+                'password_set_on'       => time()
             ];
 
         if ($db) {

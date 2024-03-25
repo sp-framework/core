@@ -31,6 +31,12 @@ class BasepackagesUsersAccountsSecurity extends BaseModel
 
     public $two_fa_email_code_sent_on;
 
+    public $password_history;
+
+    public $password_set_on;
+
+    public $force_pwreset_after;
+
     public function initialize()
     {
         $this->modelRelations['accounts']['relationObj'] = $this->belongsTo(

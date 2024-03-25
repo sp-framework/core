@@ -307,8 +307,14 @@ class Auth
 
         $this->packagesData->responseMessage = 'Authenticated. Redirecting...';
 
-        if ($this->account['security']['force_pwreset'] && $this->account['security']['force_pwreset'] == '1') {
-
+        if (($this->account['security']['force_pwreset'] &&
+             $this->account['security']['force_pwreset'] == '1') ||
+            (isset($this->account['security']['force_pwreset_after']) &&
+             $this->account['security']['force_pwreset_after'] !== null &&
+             $this->account['security']['force_pwreset_after'] != '0' &&
+             time() > $this->account['security']['force_pwreset_after']
+            )
+        ) {
             $this->packagesData->redirectUrl = $this->links->url('auth/q/pwreset/true');
 
             return true;
@@ -930,6 +936,8 @@ class Auth
         $this->account['security']['password'] = $this->secTools->hashPassword($data['newpass'], $this->config->security->passwordWorkFactor);
 
         $this->account['security']['force_pwreset'] = null;
+
+        $this->account['security']['password_set_on'] = time();
 
         if ($this->accounts->addUpdateSecurity($this->account['id'], $this->account['security'])) {
             $this->logger->log->info('Password reset successful for account ' . $this->account['email'] . ' via pwreset.');

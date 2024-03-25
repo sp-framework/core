@@ -273,7 +273,7 @@ abstract class BaseComponent extends Controller
 				return;
 			}
 
-			$this->basepackages->utils->generateNewPassword();
+			$this->basepackages->utils->generateNewPassword($this->postData());
 
 			$this->addResponse(
 				$this->basepackages->utils->packagesData->responseMessage,

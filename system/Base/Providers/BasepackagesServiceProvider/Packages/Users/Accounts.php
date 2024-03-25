@@ -128,9 +128,11 @@ class Accounts extends BasePackage
             return false;
         }
 
-        $password = $this->generateNewPassword();
+        $password = $this->basepackages->utils->generateNewPassword()['password'];
 
         $data['password'] = $this->secTools->hashPassword($password);
+
+        $data['password_set_on'] = time();
 
         if (!isset($data['package_name'])) {
             $data['package_name'] = 'profiles';
@@ -251,7 +253,7 @@ class Accounts extends BasePackage
 
         if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
 
-            $password = $this->generateNewPassword();
+            $password = $this->basepackages->utils->generateNewPassword()['password'];
 
             $data['password'] = $this->secTools->hashPassword($password);
         }
@@ -825,11 +827,6 @@ class Accounts extends BasePackage
         } else {
             return true;
         }
-    }
-
-    protected function generateNewPassword()
-    {
-        return $this->random->base62(12);
     }
 
     protected function emailNewPassword($email, $password)

@@ -13,13 +13,14 @@
         progressBar: function(input, options) {
             var defaults = {
                 input: input.parent().siblings().children().find('input'),
+                smallText: $(input).parents('.form-group').siblings('.input-small-text').children(),
                 container: input.parent(),
                 base: 5,
                 hierarchy: {
                     '0': 'progress-bar-striped bg-danger',
                     '20': 'progress-bar-striped bg-danger',
                     '40': 'progress-bar-striped bg-warning',
-                    '60': 'progress-bar-striped bg-warning',
+                    '60': 'progress-bar-striped bg-info',
                     '80': 'progress-bar-striped bg-success',
                     '100': 'progress-bar-striped bg-success'
                 }
@@ -31,7 +32,12 @@
                 settings.hierarchy = options.hierarchy;
             }
 
-            var template = '<div class="progress progress-xs mb-3"><div class="progress-bar" role="progressbar"></div></div>';
+            var margin = '3';
+            if (input.parents('.form-group').siblings('.input-small-text').children()) {
+                margin = '1';
+            }
+
+            var template = '<div class="progress progress-xs mb-' + margin + '"><div class="progress-bar" role="progressbar"></div></div>';
             var progress;
             var progressBar;
             var passcheckTimeout;
@@ -95,6 +101,20 @@
                         value = value.result;
                     }
 
+                    if (defaults.smallText.length > 0) {
+                        var strengthText = ' (Enter Password to text strength)';
+
+                        if (value == '1') {
+                            strengthText = ' (Weak Strength)';
+                        } else if (value == '2') {
+                            strengthText = ' (Normal Strength)';
+                        } else if (value == '3') {
+                            strengthText = ' (Good Strength)';
+                        } else if (value == '2') {
+                            strengthText = ' (Best Strength)';
+                        }
+                        $(defaults.smallText).html('<span class="text-info text-uppercase">Password strength : ' + value + strengthText + '</span');
+                    }
                     var width = Math.floor((value/settings.base)*100);
 
                     if (width > 100 || width >= 80) {
