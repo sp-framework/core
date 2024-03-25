@@ -1,0 +1,148 @@
+{{var_dump(coreSettings['security']['passwordPolicySettings'])}}
+{% set htmlContent = 'Enter your new password as per these policies or press the magic wand to generated new password.' %}
+coreSettings['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords']
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'pwreset-complex',
+                'fieldLabel'                            : 'Password Reset',
+                'fieldLabelLegend'                      : true,
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : false,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldHtmlContent'                      : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row vdivide">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'password-policy',
+                'fieldLabel'                            : 'Password Policy:',
+                'fieldLabelLegend'                      : false,
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : false,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldDataAttributes'                   :
+                [
+                    'length_min'                        : coreSettings['security']['passwordPolicySettings']['passwordPolicyLengthMin'],
+                    'length_max'                        : coreSettings['security']['passwordPolicySettings']['passwordPolicyLengthMax'],
+                    'uppercase'                         : coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercase'],
+                    'uppercase_min_count'               : coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseMinCount'],
+                    'uppercase_max_count'               : coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseMaxCount'],
+                    'uppercase_include'                 : coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseInclude'],
+                    'lowercase'                         : coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercase'],
+                    'lowercase_min_count'               : coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseMinCount'],
+                    'lowercase_max_count'               : coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseMaxCount'],
+                    'lowercase_include'                 : coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseInclude'],
+                    'numbers'                           : coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbers'],
+                    'numbers_min_count'                 : coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersMinCount'],
+                    'numbers_max_count'                 : coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersMaxCount'],
+                    'numbers_include'                   : coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersInclude'],
+                    'symbols'                           : coreSettings['security']['passwordPolicySettings']['passwordPolicySymbols'],
+                    'symbols_min_count'                 : coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsMinCount'],
+                    'symbols_max_count'                 : coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsMaxCount'],
+                    'symbols_include'                   : coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsInclude'],
+                    'avoid_similar'                     : coreSettings['security']['passwordPolicySettings']['passwordPolicyAvoidSimilar'],
+                    'avoid_similar_characters'          : coreSettings['security']['passwordPolicySettings']['passwordPolicyAvoidSimilarCharacters']
+                ],
+                'fieldHtmlContent'                      : htmlContent
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'current_password',
+                        'fieldLabel'                            : 'Current Password',
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'input',
+                        'fieldInputType'                        : 'password',
+                        'fieldInputPasswordToggleVisibility'    : true,
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'new_password',
+                        'fieldLabel'                            : 'New Password',
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'input',
+                        'fieldInputType'                        : 'password',
+                        'fieldInputPasswordToggleVisibility'    : true,
+                        'fieldInputPasswordGenerate'            : true,
+                        'fieldInputPasswordStrengthMeter'       : true,
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldDataInputMinLength'               : coreSettings['security']['passwordPolicySettings']['passwordPolicyLengthMin'],
+                        'fieldDataInputMaxLength'               : coreSettings['security']['passwordPolicySettings']['passwordPolicyLengthMax'],
+                        'fieldAdditionalClass'                  : 'mb-0'
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'confirm_password',
+                        'fieldLabel'                            : 'Confirm Password',
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'input',
+                        'fieldInputType'                        : 'password',
+                        'fieldInputPasswordToggleVisibility'    : true,
+                        'fieldBazScan'                          : true,
+                        'fieldRequired'                         : true,
+                        'fieldDataInputMinLength'               : coreSettings['security']['passwordPolicySettings']['passwordPolicyLengthMin'],
+                        'fieldDataInputMaxLength'               : coreSettings['security']['passwordPolicySettings']['passwordPolicyLengthMax'],
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>
+{% if coreSettings['security']['passwordPolicySettings']['passwordPolicyPwresetNeed2fa'] is defined and coreSettings['security']['passwordPolicySettings']['passwordPolicyPwresetNeed2fa'] == 'true' and canUse2fa is defined and canUse2fa === true %}
+    {% include 'profile/form/security/pwreset2fa.html' %}
+{% endif %}

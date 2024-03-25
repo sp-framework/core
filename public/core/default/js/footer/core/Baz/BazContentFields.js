@@ -386,6 +386,14 @@ var BazContentFields = function() {
                             postData['lengthMin'] = '12';
                         }
                     }
+
+                    if ($('#' + sectionId + '-pwreset-simple').length > 0) {
+                        postData['complexity'] = 'simple';
+                    } else if ($('#' + sectionId + '-pwreset-complex').length > 0) {
+                        postData['complexity'] = 'complex';
+                        postData = $.extend(postData, $('#' + sectionId + '-password-policy').data());
+                    }
+
                     var url = dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/home/generatePw'
                     $.post(url, postData, function(response) {
                         if (response.responseCode == 0) {

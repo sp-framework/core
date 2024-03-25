@@ -49,6 +49,10 @@ class ProfileComponent extends BaseComponent
             $this->view->canEmail = $this->profile->packagesData->canEmail;
 
             $this->view->sessions = $this->profile->packagesData->sessions;
+
+            $this->view->coreSettings = $this->profile->packagesData->coreSettings;
+
+            $this->view->canUse2fa = $this->profile->packagesData->canUse2fa;
         } else {
             return;
         }

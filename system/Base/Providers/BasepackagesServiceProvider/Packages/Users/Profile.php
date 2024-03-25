@@ -500,6 +500,19 @@ class Profile extends BasePackage
 
         $this->packagesData->sessions = $agents;
 
+        $this->packagesData->coreSettings = $this->core->core['settings'];
+
+        $canUse2fa = false;
+        if (isset($this->apps->app['enforce_2fa']) && $this->apps->app['enforce_2fa'] == 'true') {
+            if ((isset($account['security']['two_fa_totp_status']) && $account['security']['two_fa_totp_status'] == 'true') ||
+                $this->basepackages->email->setup()
+            ) {
+                $canUse2fa = true;
+            }
+        }
+
+        $this->packagesData->canUse2fa = $canUse2fa;
+
         return true;
     }
 
