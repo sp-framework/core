@@ -674,14 +674,33 @@ abstract class BaseComponent extends Controller
 		return $package;
 	}
 
-	protected function useStorage($storageType, array $overrideSettings = null)
+	protected function initStorages()
 	{
 		$storages = $this->basepackages->storages->getAppStorages();
 
-		if ($storages && isset($storages[$storageType])) {//Assign type of storage for uploads
+		$this->view->storages = false;
+
+		if ($storages) {
 			$this->view->storages = $storages;
 
-			$storage = $storages[$storageType];
+			return $storages;
+		}
+
+		return false;
+	}
+
+	protected function useStorage($storageType = null, array $overrideSettings = null)
+	{
+		$storages = $this->initStorages();
+
+		if (!$storages) {
+			$this->view->storage = false;
+
+			return false;
+		}
+
+		if ($storageType && isset($storages[$storageType])) {//Assign type of storage for uploads
+			$storage = &$storages[$storageType];
 
 			if ($overrideSettings) {//add settings condition as needed
 				if (isset($storage['allowed_file_mime_types']) &&
@@ -690,17 +709,13 @@ abstract class BaseComponent extends Controller
 					$storage['allowed_file_mime_types'] = $overrideSettings['allowed_file_mime_types'];
 				}
 			}
-
-			$this->view->storage = $storage;
-		} else {
-			$this->view->storages = [];
 		}
 
-		if (!isset($this->domains->domain['apps'][$this->app['id']][$storageType . 'Storage'])) {
-			$this->view->storages = [];
-		}
+		$this->view->storages = $storages;
 
 		if (isset($storage)) {
+			$this->view->storage = $storage;
+
 			return $storage;
 		}
 	}

@@ -100,27 +100,20 @@ class Storages extends BasePackage
 
         $app = $this->apps->getAppInfo();
 
-        if ((isset($domain['apps'][$app['id']]['publicStorage']) &&
-            $domain['apps'][$app['id']]['publicStorage'] !== '') &&
-            (isset($domain['apps'][$app['id']]['privateStorage']) &&
-            $domain['apps'][$app['id']]['privateStorage'] !== '')
-        ) {
+        if (isset($domain['apps'][$app['id']]['publicStorage']) && $domain['apps'][$app['id']]['publicStorage'] !== '') {
             $storages['public'] = $this->getById($domain['apps'][$app['id']]['publicStorage']);
+        }
+        if (isset($domain['apps'][$app['id']]['privateStorage']) && $domain['apps'][$app['id']]['privateStorage'] !== '') {
             $storages['private'] = $this->getById($domain['apps'][$app['id']]['privateStorage']);
-        } else {
+        }
+
+        if (count($storages) === 0) {
             return false;
         }
 
         foreach ($storages as $key => $storage) {
-            if ($storage['allowed_image_mime_types']) {
-                $storage['allowed_image_mime_types'] = $this->helper->decode($storage['allowed_image_mime_types']);
-            }
-            if ($storage['allowed_image_sizes']) {
-                $storage['allowed_image_sizes'] = $this->helper->decode($storage['allowed_image_sizes']);
-            }
-            if ($storage['allowed_file_mime_types']) {
-                $storage['allowed_file_mime_types'] = $this->helper->decode($storage['allowed_file_mime_types']);
-            }
+            $storage = $this->jsonData($storage, true);
+
             $appStorages[$storage['permission']] = $storage;
         }
 
