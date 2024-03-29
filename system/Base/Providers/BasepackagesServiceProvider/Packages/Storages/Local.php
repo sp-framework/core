@@ -568,7 +568,7 @@ class Local extends BasePackage
                 return $file[0]['links']['data'];
             }
 
-            $this->get(['uuid' => $uuid]);
+            $this->getFile(['uuid' => $uuid]);
 
             return $this->getPublicLink($uuid);
         }
