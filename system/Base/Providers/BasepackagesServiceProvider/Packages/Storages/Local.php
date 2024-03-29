@@ -394,7 +394,7 @@ class Local extends BasePackage
             if ($this->storage['permission'] === 'public') {
                 $this->updateFileLink(
                     $file[0],
-                    '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid'],
+                    '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid'],
                     null
                 );
             }
@@ -493,10 +493,10 @@ class Local extends BasePackage
         $sizedImage =
             '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width . $imageFormat;
 
-        if ($this->localContent->fileExists($sizedImage) && !isset($this->getData['quality'])) {
-
+        if ($this->localContent->fileExists($sizedImage) && !isset($this->getData['quality']) &&
+            (is_array($file['links']) && in_array($sizedImage, $file['links']))
+        ) {
             return $sizedImage;
-
         } else {
             $image->resize($this->width, null, Enum::WIDTH);
 
@@ -513,7 +513,7 @@ class Local extends BasePackage
             if ($this->storage['permission'] === 'public') {
                 $this->updateFileLink(
                     $file,
-                    '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width . $imageFormat,
+                    '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width . $imageFormat,
                     $this->width
                 );
             }
@@ -530,7 +530,9 @@ class Local extends BasePackage
             return '#';
         }
 
-        if (isset($file[0]['links'])) {
+        if (isset($file[0]['links']) &&
+            ($file[0]['links'] !== null && $file[0]['links'] !== '')
+        ) {
             $file[0]['links'] = $this->helper->decode($file[0]['links'], true);
         }
 

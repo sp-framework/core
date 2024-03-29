@@ -401,7 +401,7 @@ class Croppie
         if ($this->params['imageType'] === 'logo') {
             if (isset($this->params['logoLink']) &&
                 ($this->params['logoLink'] !== '' && $this->params['logoLink'] !== '#')
-        ) {
+            ) {
                 if (!str_starts_with($this->params['logoLink'], 'http')) {
                     $this->params['logoLink'] = ltrim($this->params['logoLink'], '/');
                     if (str_starts_with($this->params['logoLink'], 'public')) {
