@@ -284,30 +284,6 @@ class Apps extends BasePackage
 			$app['acceptable_usernames'] = $this->helper->encode(['email']);
 		}
 
-		if ($app['twofa_using']) {
-			if (is_string($app['twofa_using'])) {
-				$app['twofa_using'] = $this->helper->decode($app['twofa_using'], true);
-			}
-
-			if (isset($app['twofa_using']['data'])) {
-				$app['twofa_using'] = $this->helper->encode($app['twofa_using']['data']);
-			} else {
-				$app['twofa_using'] = $this->helper->encode($app['twofa_using']);
-			}
-		} else {
-			$app['twofa_using'] = $this->helper->encode(['totp']);
-		}
-
-		if (isset($app['twofa_email_timeout']) && $app['twofa_email_timeout'] < 60) {
-			$app['twofa_email_timeout'] = 60;
-		}
-		if (isset($app['totp_timeout']) && $app['totp_timeout'] < 30) {
-			$app['totp_timeout'] = 30;
-		}
-		if (isset($app['agent_email_timeout']) && $app['agent_email_timeout'] < 60) {
-			$app['agent_email_timeout'] = 60;
-		}
-
 		if ($this->update($app)) {
 			$this->addActivityLog($data, $app);
 
@@ -386,28 +362,6 @@ class Apps extends BasePackage
 						'type'      	=> 'username',
 						'name'          => 'Username',
 					]
-			];
-	}
-
-	public function get2faUsingOptions()
-	{
-		return
-			[
-				'email'   =>
-					[
-						'type'      	=> 'email',
-						'name'          => 'Email'
-					],
-				'totp'    =>
-					[
-						'type'      	=> 'totp',
-						'name'          => 'TOTP',
-					],
-				// 'sms'    =>
-				// 	[
-				// 		'type'      	=> 'sms',
-				// 		'name'          => 'sms',
-				// 	]
 			];
 	}
 }

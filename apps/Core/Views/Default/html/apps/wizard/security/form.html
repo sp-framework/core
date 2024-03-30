@@ -58,6 +58,28 @@
             ]
         )}}
     </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'enforce_2fa',
+                'fieldLabel'                     : 'Enforce 2FA at login?',
+                'fieldType'                      : 'checkbox',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Enforce user accounts to login/enable 2FA.',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : enforce2FA,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+    </div>
 </div>
 <div class="row">
     <div class="col">
@@ -167,170 +189,5 @@
                 'fieldDataSelect2OptionsSelected': appAcceptableUsernames
             ]
         )}}
-    </div>
-</div>
-<hr>
-{{adminltetags.useTag('fields',
-[
-    'component'                             : component,
-    'componentName'                         : componentName,
-    'componentId'                           : componentId,
-    'sectionId'                             : sectionId,
-    'fieldId'                               : '2fa',
-    'fieldLabel'                            : '2 Factor Authentication',
-    'fieldLabelLegend'                      : true,
-    'fieldHidden'                           : false,
-    'fieldType'                             : 'html',
-    'fieldBazScan'                          : false,
-    'fieldBazPostOnCreate'                  : false,
-    'fieldBazPostOnUpdate'                  : false,
-    'fieldHtmlContent'                      : ''
-]
-)}}
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'enforce_2fa',
-                'fieldLabel'                     : 'Enforce 2FA?',
-                'fieldType'                      : 'checkbox',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Enforce user accounts to enable 2FA.',
-                'fieldCheckboxType'              : 'success',
-                'fieldCheckboxChecked'           : enforce2FA,
-                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                'fieldBazScan'                   : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'twofa_using',
-                'fieldLabel'                            : 'Enforce 2FA Using?',
-                'fieldType'                             : 'select2',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Select which method(s) 2FA should be used. Example: Email, TOTP, SMS',
-                'fieldBazScan'                          : true,
-                'fieldBazPostOnCreate'                  : true,
-                'fieldBazPostOnUpdate'                  : true,
-                'fieldRequired'                         : true,
-                'fieldDisabled'                         : twofaUsingDisabled,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldDataSelect2Multiple'              : true,
-                'fieldDataSelect2Options'               : twofaUsingOptions,
-                'fieldDataSelect2OptionsKey'            : 'type',
-                'fieldDataSelect2OptionsValue'          : 'name',
-                'fieldDataSelect2OptionsArray'          : true,
-                'fieldDataSelect2OptionsSelected'       : app2faUsing
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'twofa_email_timeout',
-                'fieldLabel'                            : 'Email Code Timeout (seconds)',
-                'fieldType'                             : 'input',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Timeout of the email code that is sent to the user. After the timeout, user has to generate a new code.',
-                'fieldInputTypeTextFilter'              : 'positiveInt',
-                'fieldRequired'                         : true,
-                'fieldDisabled'                         : twofaEmailTimeoutDisabled,
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldBazPostOnUpdate'                  : true,
-                'fieldDataInputMinNumber'               : 60,
-                'fieldDataInputMaxNumber'               : 3600,
-                'fieldDataInputMaxLength'               : 4,
-                'fieldValue'                            : app2faEmailTimeout
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'twofa_totp_timeout',
-                'fieldLabel'                            : 'Totp Code Timeout (seconds)',
-                'fieldType'                             : 'input',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Timeout of the totp code.',
-                'fieldInputTypeTextFilter'              : 'positiveInt',
-                'fieldRequired'                         : true,
-                'fieldDisabled'                         : twofaTotpTimeoutDisabled,
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldBazPostOnUpdate'                  : true,
-                'fieldDataInputMinNumber'               : 30,
-                'fieldDataInputMaxNumber'               : 300,
-                'fieldDataInputMaxLength'               : 4,
-                'fieldValue'                            : app2faTotpTimeout
-            ]
-        )}}
-    </div>
-</div>
-<div id="agent-settings" {{agentSettingsHidden}}>
-    <hr>
-    {{adminltetags.useTag('fields',
-    [
-        'component'                             : component,
-        'componentName'                         : componentName,
-        'componentId'                           : componentId,
-        'sectionId'                             : sectionId,
-        'fieldId'                               : 'agent-verification',
-        'fieldLabel'                            : 'Agent Verification',
-        'fieldLabelLegend'                      : true,
-        'fieldType'                             : 'html',
-        'fieldBazScan'                          : false,
-        'fieldBazPostOnCreate'                  : false,
-        'fieldBazPostOnUpdate'                  : false,
-        'fieldHtmlContent'                      : ''
-        ]
-        )}}
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                [
-                    'component'                             : component,
-                    'componentName'                         : componentName,
-                    'componentId'                           : componentId,
-                    'sectionId'                             : sectionId,
-                    'fieldId'                               : 'agent_email_timeout',
-                    'fieldLabel'                            : 'Agent Email Code Timeout (seconds)',
-                    'fieldType'                             : 'input',
-                    'fieldHelp'                             : true,
-                    'fieldHelpTooltipContent'               : 'Timeout of the email code that is sent to the user. After the timeout, user has to generate a new code.',
-                    'fieldInputTypeTextFilter'              : 'positiveInt',
-                    'fieldRequired'                         : true,
-                    'fieldDisabled'                         : false,
-                    'fieldBazScan'                          : true,
-                    'fieldBazJstreeSearch'                  : true,
-                    'fieldBazPostOnUpdate'                  : true,
-                    'fieldDataInputMinNumber'               : 60,
-                    'fieldDataInputMaxNumber'               : 3600,
-                    'fieldDataInputMaxLength'               : 4,
-                    'fieldValue'                            : appAgentEmailTimeout
-                ]
-            )}}
-        </div>
     </div>
 </div>

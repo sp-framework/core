@@ -236,7 +236,6 @@ class AppsComponent extends BaseComponent
                     return;
                 }
                 $this->view->acceptableUsernames = $this->apps->getAcceptableUsernamesForAppId();
-                $this->view->twofaUsingOptions = $this->apps->get2faUsingOptions();
             } else {
                 $this->view->app = null;
                 $domains = $this->domains->domains;

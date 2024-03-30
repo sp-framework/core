@@ -29,14 +29,6 @@ class ServiceProviderApps extends BaseModel
 
     public $enforce_2fa;
 
-    public $twofa_using;
-
-    public $twofa_email_timeout;
-
-    public $twofa_totp_timeout;
-
-    public $agent_email_timeout;
-
     public $registration_role_id;
 
     public $guest_role_id;

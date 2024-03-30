@@ -159,49 +159,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-can_login_role_ids'              : {
             'placeholder'   : 'SELECT ROLES'
         },
-        '{{componentId}}-{{sectionId}}-enforce_2fa'                     : {
-            afterInit: function() {
-                $('#{{componentId}}-{{sectionId}}-enforce_2fa').click(function() {
-                    if ($(this)[0].checked === true) {
-                        $('#{{componentId}}-{{sectionId}}-twofa_using').attr('disabled', false);
-                    } else {
-                        $('#{{componentId}}-{{sectionId}}-twofa_using').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-twofa_email_timeout').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-twofa_totp_timeout').attr('disabled', true);
-                    }
-                });
-            }
-        },
-        '{{componentId}}-{{sectionId}}-twofa_using'                     : {
-            'placeholder'   : 'SELECT 2FA METHODS',
-            afterInit       : function() {
-                function enableDisableFields(select) {
-                    if (select.selected === true) {
-                        if (select.id === 'email') {
-                            $('#{{componentId}}-{{sectionId}}-twofa_email_timeout').attr('disabled', false);
-                        } else if (select.id === 'totp') {
-                            $('#{{componentId}}-{{sectionId}}-twofa_totp_timeout').attr('disabled', false);
-                        }
-                    } else {
-                        if (select.id === 'email') {
-                            $('#{{componentId}}-{{sectionId}}-twofa_email_timeout').attr('disabled', true);
-                        } else if (select.id === 'totp') {
-                            $('#{{componentId}}-{{sectionId}}-twofa_totp_timeout').attr('disabled', true);
-                        }
-                    }
-                }
-
-                $('#{{componentId}}-{{sectionId}}-twofa_using').on('select2:select', function(e) {
-                    enableDisableFields(e.params.data);
-                });
-                $('#{{componentId}}-{{sectionId}}-twofa_using').on('select2:unselect', function(e) {
-                    enableDisableFields(e.params.data);
-                });
-            }
-        },
-        '{{componentId}}-{{sectionId}}-twofa_email_timeout'             : { },
-        '{{componentId}}-{{sectionId}}-twofa_totp_timeout'              : { },
-        '{{componentId}}-{{sectionId}}-agent_email_timeout'             : { },
+        '{{componentId}}-{{sectionId}}-enforce_2fa'                     : { },
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider, :hidden',
             rules: {
@@ -209,10 +167,6 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-route'                       : 'required',
                 '{{componentId}}-{{sectionId}}-app_type'                    : 'required',
                 '{{componentId}}-{{sectionId}}-registration_role_id'        : 'required',
-                '{{componentId}}-{{sectionId}}-twofa_using'                 : 'required',
-                '{{componentId}}-{{sectionId}}-twofa_email_timeout'         : 'required',
-                '{{componentId}}-{{sectionId}}-agent_email_timeout'         : 'required',
-                '{{componentId}}-{{sectionId}}-twofa_totp_timeout'          : 'required',
                 '{{componentId}}-{{sectionId}}-guest_role_id'               : 'required',
                 '{{componentId}}-{{sectionId}}-default_component'           : 'required',
                 '{{componentId}}-{{sectionId}}-errors_component'            : 'required',
@@ -223,10 +177,6 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-route'                   : 'Please enter app route',
                 '{{componentId}}-{{sectionId}}-app_type'                : 'Please select app type',
                 '{{componentId}}-{{sectionId}}-registration_role_id'    : 'Please select registration role',
-                '{{componentId}}-{{sectionId}}-twofa_using'             : 'Please select 2FA Method(s)',
-                '{{componentId}}-{{sectionId}}-twofa_email_timeout'     : 'Please enter email timeout (seconds)',
-                '{{componentId}}-{{sectionId}}-twofa_totp_timeout'      : 'Please enter totp timeout (seconds)',
-                '{{componentId}}-{{sectionId}}-agent_email_timeout'     : 'Please enter email timeout (seconds)',
                 '{{componentId}}-{{sectionId}}-guest_role_id'           : 'Please select guest role',
                 '{{componentId}}-{{sectionId}}-default_component'       : 'Please select app default component',
                 '{{componentId}}-{{sectionId}}-errors_component'        : 'Please select app errors component',
