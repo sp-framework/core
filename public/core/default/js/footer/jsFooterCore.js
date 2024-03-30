@@ -8938,9 +8938,10 @@ var BazContentFields = function() {
 
                     if ($('#' + sectionId + '-pwreset-simple').length > 0) {
                         postData['complexity'] = 'simple';
+                        postData = $.extend(postData, $('#' + sectionId + '-password-policy-simple').data());
                     } else if ($('#' + sectionId + '-pwreset-complex').length > 0) {
                         postData['complexity'] = 'complex';
-                        postData = $.extend(postData, $('#' + sectionId + '-password-policy').data());
+                        postData = $.extend(postData, $('#' + sectionId + '-password-policy-complex').data());
                     }
 
                     var url = dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/home/generatePw'

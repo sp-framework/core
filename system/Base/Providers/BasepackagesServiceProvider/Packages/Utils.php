@@ -201,23 +201,48 @@ class Utils extends BasePackage
             $maxCountTotal = $maxCountTotal + $symbolsMaxCount;
         }
 
-        if ($uppercaseMinCount > $uppercaseMaxCount ||
-            $lowercaseMinCount > $lowercaseMaxCount ||
-            $numbersMinCount > $numbersMaxCount ||
-            $symbolsMinCount > $symbolsMaxCount
+        if ($maxCountTotal !== 0 &&
+            ($uppercaseMaxCount && $uppercaseMinCount > $uppercaseMaxCount)
         ) {
-            $this->addResponse('Max value has to be greater than min value.', 1);
+            $this->addResponse('Max uppercase value has to be greater than min value.', 1);
+
+            return;
+        }
+        if ($maxCountTotal !== 0 &&
+            ($lowercaseMaxCount && $lowercaseMinCount > $lowercaseMaxCount)
+        ) {
+            $this->addResponse('Max lowercase value has to be greater than min value.', 1);
+
+            return;
+        }
+        if ($maxCountTotal !== 0 &&
+            ($numbersMaxCount && $numbersMinCount > $numbersMaxCount)
+        ) {
+            $this->addResponse('Max numbers value has to be greater than min value.', 1);
+
+            return;
+        }
+        if ($maxCountTotal !== 0 &&
+            ($symbolsMaxCount && $symbolsMinCount > $symbolsMaxCount)
+        ) {
+            $this->addResponse('Max symbols value has to be greater than min value.', 1);
 
             return;
         }
 
-        if ($maxCountTotal < (int) $params['length_min']) {
+        if ($maxCountTotal !== 0 &&
+            $maxCountTotal < (int) $params['length_min'] &&
+            $uppercaseMaxCount && $lowercaseMaxCount && $numbersMaxCount && $symbolsMaxCount
+        ) {
             $this->addResponse('Max value total has to be greater than minimum length.', 1);
 
             return;
         }
 
-        if ($maxCountTotal > (int) $params['length_max']) {
+        if ($maxCountTotal !== 0 &&
+            $maxCountTotal > (int) $params['length_max'] &&
+            $uppercaseMaxCount && $lowercaseMaxCount && $numbersMaxCount && $symbolsMaxCount
+        ) {
             $this->addResponse('Max value total has to be smaller than maximum length.', 1);
 
             return;
