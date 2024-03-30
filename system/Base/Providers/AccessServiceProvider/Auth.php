@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\AccessServiceProvider;
 
+use OTPHP\HOTP;
 use OTPHP\TOTP;
 use ParagonIE\ConstantTime\Base32;
 use Phalcon\Filter\Validation\Validator\Confirmation;
@@ -71,6 +72,8 @@ class Auth
     public $agent;
 
     public $blackWhiteList;
+
+    protected $otp;
 
     protected $cookieTimeout = 0;
 
@@ -445,9 +448,9 @@ class Auth
         if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
             if (isset($data['twofa_using'])) {
                 if ($data['twofa_using'] === 'email' && in_array('email', $this->app['twofa_using'])) {
-                    if (time() > $security->two_fa_email_code_sent_on + ($this->app['twofa_email_timeout'] ?? 60)) {
-                        $security->two_fa_email_code_sent_on = null;
-                        $security->two_fa_email_code = null;
+                    if (time() > $security->twofa_email_code_sent_on + ($this->app['twofa_email_timeout'] ?? 60)) {
+                        $security->twofa_email_code_sent_on = null;
+                        $security->twofa_email_code = null;
 
                         if ($this->config->databasetype === 'db') {
                             $security->update();
@@ -464,9 +467,9 @@ class Auth
                         return false;
                     }
 
-                    if ($this->secTools->checkPassword($data['code'], $security->two_fa_email_code)) {
-                        $this->account['security']['two_fa_email_code_sent_on'] = null;
-                        $this->account['security']['two_fa_email_code'] = null;
+                    if ($this->secTools->checkPassword($data['code'], $security->twofa_email_code)) {
+                        $this->account['security']['twofa_email_code_sent_on'] = null;
+                        $this->account['security']['twofa_email_code'] = null;
 
                         return true;
                     }
@@ -476,8 +479,8 @@ class Auth
                     $this->packagesData->responseMessage = 'Error: Username/Password/2FA Code incorrect!';
 
                     return false;
-                } else if ($data['twofa_using'] === 'totp' && in_array('totp', $this->app['twofa_using'])) {
-                    if ($security->two_fa_totp_status == '1' && !isset($data['code'])) {
+                } else if ($data['twofa_using'] === 'otp' && in_array('otp', $this->app['twofa_using'])) {
+                    if ($security->twofa_otp_status == '1' && !isset($data['code'])) {
                         $this->packagesData->responseCode = 3;
 
                         $this->packagesData->responseMessage = '2FA Code Required';
@@ -485,8 +488,8 @@ class Auth
                         return false;
                     }
 
-                    if (($security->two_fa_totp_status == '1' && isset($data['code'])) &&
-                        (isset($security->two_fa_totp_secret) && !$this->verifyTotp($data['code'], $security->two_fa_totp_secret))
+                    if (($security->twofa_otp_status == '1' && isset($data['code'])) &&
+                        (isset($security->twofa_otp_secret) && !$this->verifyOtp($data['code'], $security->twofa_otp_secret))
                     ) {
                         $this->packagesData->responseCode = 1;
 
@@ -507,14 +510,14 @@ class Auth
                 unset($this->app['twofa_using'][array_keys($this->app['twofa_using'], 'email')[0]]);
             }
 
-            if (count($this->app['twofa_using']) === 0) {//if totp is not set and email service is not configured, we authenticate.
+            if (count($this->app['twofa_using']) === 0) {//if otp is not set and email service is not configured, we authenticate.
                 return true;
             }
 
             $this->packagesData->responseData = ['allowed_methods' => $this->app['twofa_using']];
 
-            if (in_array('totp', $this->app['twofa_using'])) {
-                $this->packagesData->responseData = array_merge($this->packagesData->responseData, ['totp_status' => $security->two_fa_totp_status]);
+            if (in_array('otp', $this->app['twofa_using'])) {
+                $this->packagesData->responseData = array_merge($this->packagesData->responseData, ['otp_status' => $security->twofa_otp_status]);
             }
 
             return false;
@@ -998,7 +1001,84 @@ class Auth
         $this->packagesData->responseData = $this->basepackages->utils->packagesData->responseData['password'];
     }
 
-    public function enableTwoFaTotp(array $data = null)
+    protected function initOtp($secret, $verify = false)
+    {
+        if ((!isset($this->core->core['settings']['security']['twofa']) ||
+             !isset($this->core->core['settings']['security']['twofaSettings']['twofaOtp'])) ||
+             (isset($this->core->core['settings']['security']['twofa']) &&
+              $this->core->core['settings']['security']['twofa'] == 'false'
+             )
+        ) {
+            throw new \Exception('OTP is not configured. Please configure it via Core settings.');
+        }
+
+        if ($this->core->core['settings']['security']['twofaSettings']['twofaOtp'] === 'totp') {
+            $this->otp = TOTP::create($secret);
+        } else if ($this->core->core['settings']['security']['twofaSettings']['twofaOtp'] === 'hotp') {
+            $this->otp = HOTP::create($secret);
+        }
+
+        $this->otp->setDigest('sha256');
+
+        if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpAlgorithm'])) {
+            $this->otp->setDigest($this->core->core['settings']['security']['twofaSettings']['twofaOtpAlgorithm']);
+        }
+
+        $period = 30;
+
+        if ($this->core->core['settings']['security']['twofaSettings']['twofaOtp'] === 'totp') {
+            $period = 30;
+
+            if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpTotpTimeout'])) {
+                $period =
+                    $this->core->core['settings']['security']['twofaSettings']['twofaOtpTotpTimeout'] >= 30 &&
+                    $this->core->core['settings']['security']['twofaSettings']['twofaOtpTotpTimeout'] <= 300
+                    ?
+                    $this->core->core['settings']['security']['twofaSettings']['twofaOtpTotpTimeout']
+                    :
+                    30;
+            }
+
+            $this->otp->setPeriod($period);
+        } else if ($this->core->core['settings']['security']['twofaSettings']['twofaOtp'] === 'hotp') {
+            $this->otp->setCounter(0);
+
+            if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpHotpCounter'])) {
+                $this->otp->setCounter($this->core->core['settings']['security']['twofaSettings']['twofaOtpHotpCounter']);
+            }
+
+            if ($verify) {
+                $security = $this->getAccountSecurityObject();
+                if ($security->twofa_otp_hotp_counter !== null) {
+                    $this->otp->setCounter($security->twofa_otp_hotp_counter);
+                }
+            }
+        }
+
+        if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpLabel'])) {
+            $this->otp->setLabel($this->core->core['settings']['security']['twofaSettings']['twofaOtpLabel']);
+        }
+
+        if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpIssuer'])) {
+            $this->otp->setIssuer($this->core->core['settings']['security']['twofaSettings']['twofaOtpIssuer']);
+        }
+
+        if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'])) {
+            $this->otp->setDigits($this->core->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength']);
+        }
+
+        if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpLogo']) &&
+            $this->core->core['settings']['security']['twofaSettings']['twofaOtpLogo'] !== ''
+        ) {
+            $logoLink = $this->core->get2faLogoLink($this->core->core['settings']['security']['twofaSettings']['twofaOtpLogo'], 80);
+
+            if ($logoLink) {
+                $this->otp->setParameter('image', $logoLink);
+            }
+        }
+    }
+
+    public function enableTwoFaOtp(array $data = null)
     {
         if ($data) {
             $validate = $this->validateData($data, 'auth');
@@ -1020,7 +1100,7 @@ class Auth
 
         $security = $this->getAccountSecurityObject();
 
-        if ($security->two_fa_totp_status && $security->two_fa_totp_status == '1') {
+        if ($security->twofa_otp_status && $security->twofa_otp_status == '1') {
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = "2FA already enabled! Contact Administrator.";
@@ -1029,23 +1109,17 @@ class Auth
         }
 
         try {
-            $totp = TOTP::create($this->updateTwoFaTotpSecret());
+            $this->initOtp($this->updateTwoFaOtpSecret());
 
-            $totp->setPeriod($this->app['twofa_totp_timeout'] ?? 30);
-
-            $totp->setLabel($this->account['email']);
-
-            $totp->setIssuer('Bazaari');
-
-            $this->packagesData->provisionUrl = $totp->getProvisioningUri();
+            $this->packagesData->provisionUrl = $this->otp->getProvisioningUri();
 
             $this->packagesData->qrcode =
                 $this->basepackages->qrcodes->generateQrCode(
-                    $totp->getProvisioningUri(),
+                    $this->otp->getProvisioningUri(),
                     [
                         'showLabel'     => 'true',
                         'labelFontSize' => '8',
-                        'labelText'     => $totp->getSecret(),
+                        'labelText'     => $this->otp->getSecret(),
                         'labelColor'    =>
                         [
                             'r'         => '0',
@@ -1056,11 +1130,23 @@ class Auth
                     ]
                 );
 
-            $this->packagesData->secret = $totp->getSecret();
+            $this->packagesData->secret = $this->otp->getSecret();
 
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Generated 2FA Code';
+
+            $security = $this->getAccountSecurityObject();
+
+            $security = $this->updateTwoFaOtpHotpCounter($security);
+
+            if ($this->config->databasetype === 'db') {
+                $security->update();
+            } else {
+                $securityStore = $this->ff->store('basepackages_users_accounts_security');
+
+                $securityStore->update((array) $security);
+            }
 
             return true;
         } catch (\Exception $e) {
@@ -1072,7 +1158,25 @@ class Auth
         }
     }
 
-    public function verifyTwoFaTotp(array $data)
+    protected function updateTwoFaOtpHotpCounter($security)
+    {
+        //Update user counter
+        if ($this->core->core['settings']['security']['twofaSettings']['twofaOtp'] === 'hotp') {
+            if ($security->twofa_otp_hotp_counter !== null) {
+                $security->twofa_otp_hotp_counter = $this->otp->getCounter();
+            } else {
+                if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpHotpCounter'])) {
+                    $security->twofa_otp_hotp_counter = $this->otp->getCounter();
+                } else {
+                    $security->twofa_otp_hotp_counter = 0;
+                }
+            }
+
+            return $security;
+        }
+    }
+
+    public function verifyTwoFaOtp(array $data)
     {
         if (isset($data['user']) && isset($data['pass'])) {
             $validate = $this->validateData($data, 'auth');
@@ -1094,7 +1198,7 @@ class Auth
 
         $security = $this->getAccountSecurityObject();
 
-        if ($security->two_fa_totp_status && $security->two_fa_totp_status == '1') {
+        if ($security->twofa_otp_status && $security->twofa_otp_status == '1') {
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = "2FA already enabled! Contact Administrator.";
@@ -1102,8 +1206,10 @@ class Auth
             return false;
         }
 
-        if ($this->verifyTotp($data['code'], $security->two_fa_totp_secret)) {
-            $security->two_fa_totp_status = '1';
+        if ($this->verifyOtp($data['code'], $security->twofa_otp_secret)) {
+            $security->twofa_otp_status = '1';
+
+            $security = $this->updateTwoFaOtpHotpCounter($security);
 
             if ($this->config->databasetype === 'db') {
                 $security->update();
@@ -1117,18 +1223,24 @@ class Auth
         }
     }
 
-    public function disableTwoFaTotp(int $code)
+    public function disableTwoFaOtp(int $code)
     {
         $security = $this->getAccountSecurityObject();
 
-        $totp = TOTP::create($security->two_fa_totp_secret);
+        try {
+            $this->initOtp($security->twofa_otp_secret, true);
+        } catch (\Exception $e) {
+            $this->packagesData->responseCode = 1;
 
-        $totp->setPeriod($this->app['twofa_totp_timeout'] ?? 30);
+            $this->packagesData->responseMessage = $e->getMessage();
 
-        if ($totp->verify($code)) {
-            $security->two_fa_totp_status = null;
+            return false;
+        }
 
-            $security->two_fa_totp_secret = null;
+        if ($this->otp->verify($code, null, 5)) {
+            $security->twofa_otp_status = null;
+            $security->twofa_otp_secret = null;
+            $security->twofa_otp_hotp_counter = null;
 
             if ($this->config->databasetype === 'db') {
                 $security->update();
@@ -1148,13 +1260,19 @@ class Auth
         }
     }
 
-    public function verifyTotp(int $code, $secret)
+    public function verifyOtp($code, $secret)
     {
-        $totp = TOTP::create($secret);
+        try {
+            $this->initOtp($secret, true);
+        } catch (\Exception $e) {
+            $this->packagesData->responseCode = 1;
 
-        $totp->setPeriod($this->app['twofa_totp_timeout'] ?? 30);
+            $this->packagesData->responseMessage = $e->getMessage();
 
-        if ($totp->verify($code)) {
+            return false;
+        }
+
+        if ($this->otp->verify($code, null, 5)) {
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = "2FA verification success.";
@@ -1169,13 +1287,17 @@ class Auth
         }
     }
 
-    protected function updateTwoFaTotpSecret()
+    protected function updateTwoFaOtpSecret()
     {
-        $twoFaSecret = trim(Base32::encodeUpper(random_bytes(16)), '=');
+        $secretSize = 16;
+        if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpSecretSize'])) {
+            $secretSize = $this->core->core['settings']['security']['twofaSettings']['twofaOtpSecretSize'];
+        }
+        $twoFaSecret = strtoupper($this->secTools->random->base62($secretSize));
 
         $security = $this->getAccountSecurityObject();
 
-        $security->two_fa_totp_secret = $twoFaSecret;
+        $security->twofa_otp_secret = $twoFaSecret;
 
         if ($this->config->databasetype === 'db') {
             $security->update();
@@ -1434,7 +1556,7 @@ class Auth
             }
         }
         if (isset($agent['email_code_sent_on'])) {
-            if (time() < $agent['email_code_sent_on'] + ($this->app['agent_email_timeout'] ?? 60)) {
+            if (time() < $agent['email_code_sent_on'] + ($this->core->core['settings']['security']['agent_email_timeout'] ?? 60)) {
                 $this->packagesData->responseCode = 1;
 
                 $this->packagesData->responseMessage = 'Email already sent, please wait...';
@@ -1442,7 +1564,7 @@ class Auth
                 $this->packagesData->responseData =
                     [
                         'code_sent_on' => $agent['email_code_sent_on'],
-                        'email_timeout' => $this->app['agent_email_timeout'] ?? 60
+                        'email_timeout' => $this->core->core['settings']['security']['agent_email_timeout'] ?? 60
                     ];
 
                 return false;
@@ -1474,7 +1596,7 @@ class Auth
 
             $this->packagesData->responseCode = 0;
 
-            $this->packagesData->responseData = ['email_timeout' => $this->app['agent_email_timeout'] ?? 60];
+            $this->packagesData->responseData = ['email_timeout' => $this->core->core['settings']['security']['agent_email_timeout'] ?? 60];
 
             return;
         }
@@ -1554,7 +1676,7 @@ class Auth
             }
         }
 
-        if (time() > $agent['email_code_sent_on'] + ($this->app['agent_email_timeout'] ?? 60)) {
+        if (time() > $agent['email_code_sent_on'] + ($this->core->core['settings']['security']['agent_email_timeout'] ?? 60)) {
             $agent['email_code_sent_on'] = null;
             $agent['verification_code'] = null;
 
@@ -1636,23 +1758,28 @@ class Auth
 
         $security = $this->getAccountSecurityObject();
 
-        if (isset($security->two_fa_email_code_sent_on)) {
-            if (time() < $security->two_fa_email_code_sent_on + ($this->app['twofa_email_timeout'] ?? 60)) {
+        if (isset($security->twofa_email_code_sent_on)) {
+            if (time() < $security->twofa_email_code_sent_on + ($this->core->core['settings']['security']['twofaSettings']['twofa_email_timeout'] ?? 60)
+            ) {
                 $this->packagesData->responseCode = 1;
 
                 $this->packagesData->responseMessage = 'Email already sent, please wait...';
 
-                $this->packagesData->responseData = ['code_sent_on' => $security->two_fa_email_code_sent_on, 'email_timeout' => $this->app['twofa_email_timeout'] ?? 60];
+                $this->packagesData->responseData =
+                    [
+                        'code_sent_on' => $security->twofa_email_code_sent_on,
+                        'email_timeout' => $this->core->core['settings']['security']['twofaSettings']['twofa_email_timeout'] ?? 60
+                    ];
 
                 return false;
             }
 
-            $security->two_fa_email_code_sent_on = time();
+            $security->twofa_email_code_sent_on = time();
         } else {
-            $security->two_fa_email_code_sent_on = time();
+            $security->twofa_email_code_sent_on = time();
         }
 
-        $security->two_fa_email_code = $this->secTools->hashPassword($code, $this->config->security->passwordWorkFactor);
+        $security->twofa_email_code = $this->secTools->hashPassword($code, $this->config->security->passwordWorkFactor);
 
         if ($this->config->databasetype === 'db') {
             $security->update();

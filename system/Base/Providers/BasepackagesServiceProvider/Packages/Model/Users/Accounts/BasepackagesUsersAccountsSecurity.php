@@ -23,13 +23,15 @@ class BasepackagesUsersAccountsSecurity extends BaseModel
 
     public $force_pwreset;
 
-    public $two_fa_totp_status;
+    public $twofa_otp_status;
 
-    public $two_fa_totp_secret;
+    public $twofa_otp_secret;
 
-    public $two_fa_email_code;
+    public $twofa_otp_hotp_counter;
 
-    public $two_fa_email_code_sent_on;
+    public $twofa_email_code;
+
+    public $twofa_email_code_sent_on;
 
     public $password_history;
 

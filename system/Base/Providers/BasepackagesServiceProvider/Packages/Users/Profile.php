@@ -502,13 +502,29 @@ class Profile extends BasePackage
 
         $this->packagesData->coreSettings = $this->core->core['settings'];
 
-        $canUse2fa = false;
-        if (isset($this->apps->app['enforce_2fa']) && $this->apps->app['enforce_2fa'] == 'true') {
-            if ((isset($account['security']['two_fa_totp_status']) && $account['security']['two_fa_totp_status'] == 'true') ||
-                $this->basepackages->email->setup()
-            ) {
-                $canUse2fa = true;
+        $canUse2fa = [];
+
+        if (isset($this->core->core['settings']['security']['twofa']) &&
+            $this->core->core['settings']['security']['twofa'] == 'true'
+        ) {
+            if (isset($this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
+                if (is_string($this->core->core['settings']['security']['twofaSettings']['twofaUsing']) &&
+                    $this->core->core['settings']['security']['twofaSettings']['twofaUsing'] !== ''
+                ) {
+                    $this->core->core['settings']['security']['twofaSettings']['twofaUsing'] =
+                        $this->helper->decode($this->core->core['settings']['security']['twofaSettings']['twofaUsing']);
+
+                    if (is_array($this->core->core['settings']['security']['twofaSettings']['twofaUsing']) &&
+                        count($this->core->core['settings']['security']['twofaSettings']['twofaUsing']) > 0 &&
+                        in_array('otp', $this->core->core['settings']['security']['twofaSettings']['twofaUsing'])
+                    ) {
+                        array_push($canUse2fa, 'otp');
+                    }
+                }
             }
+        }
+        if ($this->basepackages->email->setup()) {
+            array_push($canUse2fa, 'email');
         }
 
         $this->packagesData->canUse2fa = $canUse2fa;

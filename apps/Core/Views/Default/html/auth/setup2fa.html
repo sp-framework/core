@@ -199,9 +199,9 @@ $(document).ready(function(){
                     'remember'  : $('#{{componentId}}-form-remember')[0].checked
                 };
 
-                if ($('#{{componentId}}-form-twofa-totp').val().trim() !== '') {
-                    postData['code'] = $('#{{componentId}}-form-twofa-totp').val().trim();
-                    postData['twofa_using'] = 'totp';
+                if ($('#{{componentId}}-form-twofa-otp').val().trim() !== '') {
+                    postData['code'] = $('#{{componentId}}-form-twofa-otp').val().trim();
+                    postData['twofa_using'] = 'otp';
                 }
             }
         } else if ($('#{{componentId}}-form-forgot').length > 0) {
@@ -227,7 +227,7 @@ $(document).ready(function(){
                 url = '{{links.url("auth/verify")}}';
             }
         } else if ($('#{{componentId}}-form-generate-code').length > 0) {
-            url = '{{links.url("auth/enableTwoFaTotp")}}';
+            url = '{{links.url("auth/enableTwoFaOtp")}}';
             postData = {
                 'user'              : $('#{{componentId}}-form-user').val().trim(),
                 'pass'              : $('#{{componentId}}-form-pass').val().trim()
@@ -338,7 +338,7 @@ $(document).ready(function(){
                 $('#{{componentId}}-form :input').not('.token').val('');
                 $('#{{componentId}}-form-user').focus();
                 $('#{{componentId}}-form-auth').attr('disabled', false);
-                $('#{{componentId}}-form-twofa-totp').parents('.form-group').addClass('d-none');
+                $('#{{componentId}}-form-twofa-otp').parents('.form-group').addClass('d-none');
             }
         } else if ($('#{{componentId}}-form-verify').length > 0) {
             $('.email-spinner').attr('hidden', true);
@@ -374,15 +374,15 @@ $(document).ready(function(){
         $('.email-spinner').attr('hidden', true);
         $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
 
-        if (response.responseData['allowed_methods'].includes('totp')) {
+        if (response.responseData['allowed_methods'].includes('otp')) {
             $('#{{componentId}}-form :input').prop('disabled', false);
-            $('#{{componentId}}-form-twofa-totp').parents('.form-group').removeClass('d-none');
-            $('#twofa-totp').removeClass('d-none');
-            $('#{{componentId}}-form-twofa-totp').focus();
-            if (!response.responseData.totp_status ||
-                response.responseData.totp_status && response.responseData.totp_status != '1'
+            $('#{{componentId}}-form-twofa-otp').parents('.form-group').removeClass('d-none');
+            $('#twofa-otp').removeClass('d-none');
+            $('#{{componentId}}-form-twofa-otp').focus();
+            if (!response.responseData.otp_status ||
+                response.responseData.otp_status && response.responseData.otp_status != '1'
             ) {
-                $('#twofa-totp-register').removeClass('d-none');
+                $('#twofa-otp-register').removeClass('d-none');
             }
         } else if (response.responseData['allowed_methods'].includes('email')) {
             $('#{{componentId}}-form :input').prop('disabled', false);
@@ -400,27 +400,27 @@ $(document).ready(function(){
                     $($('#twofa-methods span')[0]).html('Use Authenticator 2FA');
                     $('#twofa-methods').removeClass('email').addClass('authenticator');
                     $('#twofa-email').removeClass('d-none');
-                    $('#{{componentId}}-form-twofa-totp').parents('.form-group').addClass('d-none');
-                    $('#{{componentId}}-form-twofa-totp').val('');
+                    $('#{{componentId}}-form-twofa-otp').parents('.form-group').addClass('d-none');
+                    $('#{{componentId}}-form-twofa-otp').val('');
                     $('#{{componentId}}-form-twofa-email').parents('.form-group').removeClass('d-none');
                     $('#{{componentId}}-form-twofa-email').val('');
-                    if (!response.responseData.totp_status ||
-                        response.responseData.totp_status && response.responseData.totp_status != '1'
+                    if (!response.responseData.otp_status ||
+                        response.responseData.otp_status && response.responseData.otp_status != '1'
                     ) {
-                        $('#twofa-totp-register').addClass('d-none');
+                        $('#twofa-otp-register').addClass('d-none');
                     }
                 } else {
                     $($('#twofa-methods span')[0]).html('Use Email 2FA');
                     $('#twofa-methods').removeClass('authenticator').addClass('email');
                     $('#twofa-email').addClass('d-none');
-                    $('#{{componentId}}-form-twofa-totp').parents('.form-group').removeClass('d-none');
-                    $('#{{componentId}}-form-twofa-totp').val('');
+                    $('#{{componentId}}-form-twofa-otp').parents('.form-group').removeClass('d-none');
+                    $('#{{componentId}}-form-twofa-otp').val('');
                     $('#{{componentId}}-form-twofa-email').parents('.form-group').addClass('d-none');
                     $('#{{componentId}}-form-twofa-email').val('');
-                    if (!response.responseData.totp_status ||
-                        response.responseData.totp_status && response.responseData.totp_status != '1'
+                    if (!response.responseData.otp_status ||
+                        response.responseData.otp_status && response.responseData.otp_status != '1'
                     ) {
-                        $('#twofa-totp-register').removeClass('d-none');
+                        $('#twofa-otp-register').removeClass('d-none');
                     }
                 }
             });
@@ -510,7 +510,7 @@ $(document).ready(function(){
                 postData['pass'] = $('#{{componentId}}-form-pass').val().trim();
                 postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-                var url = '{{links.url("auth/enableTwoFaTotp")}}';
+                var url = '{{links.url("auth/enableTwoFaOtp")}}';
 
                 $.post(url, postData, function(response) {
                     if (response.responseCode === 0) {
@@ -547,7 +547,7 @@ $(document).ready(function(){
                 postData['user'] = $('#{{componentId}}-form-user').val().trim();
                 postData['pass'] = $('#{{componentId}}-form-pass').val().trim();
 
-                var url = '{{links.url("auth/verifytwofatotp")}}';
+                var url = '{{links.url("auth/verifytwofaotp")}}';
 
                 $.post(url, postData, function(response) {
                     if (response.responseCode === 0) {

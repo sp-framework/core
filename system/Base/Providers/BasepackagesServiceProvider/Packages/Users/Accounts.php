@@ -258,9 +258,9 @@ class Accounts extends BasePackage
             $data['password'] = $this->secTools->hashPassword($password);
         }
 
-        if (isset($data['disable_two_fa_totp']) && $data['disable_two_fa_totp'] === '1') {
-            $data['two_fa_totp_status'] = null;
-            $data['two_fa_totp_secret'] = null;
+        if (isset($data['disable_twofa_otp']) && $data['disable_twofa_otp'] === '1') {
+            $data['twofa_otp_status'] = null;
+            $data['twofa_otp_secret'] = null;
         }
 
         if (!isset($data['package_name']) ||

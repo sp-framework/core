@@ -1,4 +1,68 @@
-{% if coreSettings['security']['passwordPolicy'] is defined and coreSettings['security']['passwordPolicy'] == true %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'pwreset',
+                'fieldLabel'                            : 'Password Reset',
+                'fieldLabelLegend'                      : true,
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : false,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldHtmlContent'                      : ''
+            ]
+        )}}
+    </div>
+</div>
+{% if coreSettings['security']['passwordPolicy'] is defined and coreSettings['security']['passwordPolicySettings'] is defined and coreSettings['security']['passwordPolicy'] == true %}
+    {% set minLengthText =
+        '<span class="text-danger mr-1 length_min"><i class="fa fas fa-times-circle"></i></span>
+        <span class="mb-1">Minimum password length should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyLengthMin'] ~ '</strong> characters</span>
+        <br>'
+    %}
+    {% set maxLengthText =
+        '<span class="text-success mr-1 length_max"><i class="fa fas fa-check-circle"></i></span>
+        <span class="mb-1">Maximum password length should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyLengthMax'] ~ '</strong> characters</span>
+        <br>'
+    %}
+    {% set previousPasswordsText =
+        '<span class="text-success mr-1 length_max"><i class="fa fas fa-check-circle"></i></span>
+        <span class="mb-1">Number of previous password you cannot use : <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'] ~ '</strong></span>
+        <br>'
+    %}
+    <div class="row">
+        <div class="col">
+            Enter your new password as per these policies or press the magic wand to generated new password. Password should meet all the policies.<br><br>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'pwreset-policies',
+                    'fieldLabel'                            : 'Password Reset Policies',
+                    'fieldLabelLegend'                      : false,
+                    'fieldHidden'                           : false,
+                    'fieldType'                             : 'html',
+                    'fieldBazScan'                          : false,
+                    'fieldBazPostOnCreate'                  : false,
+                    'fieldBazPostOnUpdate'                  : false,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldHtmlContent'                      : '<div class="row"><div class="col">' ~ minLengthText ~ '</div><div class="col">' ~ maxLengthText ~ '</div><div class="col">' ~ previousPasswordsText ~ '</div></div>'
+                ]
+            )}}
+        </div>
+    </div>
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] is defined  %}
         {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] === 'simple' %}
             {% include 'profile/form/security/pwresetsimple.html' %}
@@ -8,9 +72,8 @@
     {% else %}
         {% include 'profile/form/security/pwresetsimple.html' %}
     {% endif %}
-{% else %}
-    {% include 'profile/form/security/pwresetsimple.html' %}
 {% endif %}
+{% include 'profile/form/security/pwresetfields.html' %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('buttons',
@@ -28,6 +91,7 @@
                             'type'                    : 'primary',
                             'icon'                    : 'cog fa-spin',
                             'iconHidden'              : true,
+                            'disabled'                : true,
                             'position'                : 'right'
                         }
                     }
@@ -35,116 +99,122 @@
         )}}
     </div>
 </div>
-<hr>
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'twofa',
-                'fieldLabel'                            : 'Two Factor Authentication TOTP',
-                'fieldLabelLegend'                      : true,
-                'fieldHidden'                           : false,
-                'fieldType'                             : 'html',
-                'fieldBazScan'                          : false,
-                'fieldBazPostOnCreate'                  : false,
-                'fieldBazPostOnUpdate'                  : false,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldHtmlContent'                      : 'Two Factor Authentication (2FA) TOTP is an extended method of authentication which uses an authenticator app like Google Authenticator or Authy.'
-            ]
-        )}}
-    </div>
-</div>
-{% if account['security']['two_fa_totp_status'] == '1' %}
-    {% set disableHidden = false %}
-    {% set enableHidden = true %}
-{% else %}
-    {% set disableHidden = true %}
-    {% set enableHidden = false %}
+{% set otpHidden = 'hidden' %}
+{% if in_array('otp', canUse2fa) %}
+    {% set otpHidden = '' %}
 {% endif %}
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('buttons',
-            [
-                'component'                 : component,
-                'componentName'             : componentName,
-                'componentId'               : componentId,
-                'sectionId'                 : sectionId,
-                'buttonType'                : 'button',
-                'buttons'                   :
-                    {
-                        'enable-twofa-totp-button' : {
-                            'title'                   : 'Enable Two Factor Authentication (TOTP)',
-                            'size'                    : 'sm',
-                            'type'                    : 'primary',
-                            'icon'                    : 'cog fa-spin',
-                            'iconHidden'              : true,
-                            'hidden'                  : enableHidden
-                        },
-                        'disable-twofa-totp-button' : {
-                            'title'                   : 'Disable Two Factor Authentication (TOTP)',
-                            'size'                    : 'sm',
-                            'type'                    : 'danger',
-                            'icon'                    : 'cog fa-spin',
-                            'iconHidden'              : true,
-                            'hidden'                  : disableHidden
-                        }
-                    }
-            ]
-        )}}
-    </div>
-</div>
-<br>
-<div id="twofa-details" class="row vdivide" hidden>
-    <div class="col-md-3 d-flex justify-content-center">
-        <div id="twofa-qrcode"></div>
-    </div>
-    <div class="col">
-        <div id="twofa-instructions">
-            <h5>INSTRUCTIONS:</h5>
-            <ul>
-                <li>Scan the shown QR Code on your authenticator app.</li>
-                <li>If, for any reason, you cannot scan the QR Code, you can type in this secret code manually. <br>Secret Code: <span class="font-weight-bold" id="twofa-secret"></span></li>
-                <li>Once successfully added into your app, enter the generated code from the app and click verify.</li>
-            </ul>
-        </div>
-        <div id="twofa-verification">
-            <h5>VERIFICATION:</h5>
+<div {{otpHidden}}>
+    <hr>
+    <div class="row">
+        <div class="col">
             {{adminltetags.useTag('fields',
                 [
                     'component'                             : component,
                     'componentName'                         : componentName,
                     'componentId'                           : componentId,
                     'sectionId'                             : sectionId,
-                    'fieldId'                               : 'verification',
-                    'fieldLabel'                            : 'Generated Code',
-                    'fieldType'                             : 'input',
-                    'fieldGroupPostAddonButtons'          :
-                        [
-                            'verify'   : [
-                                'title'                   : 'Verify',
-                                'icon'                    : 'cog fa-spin',
-                                'iconHidden'              : true,
-                                'noMargin'                : true,
-                                'disabled'                : true,
-                                'buttonAdditionalClass'   : 'rounded-0 text-white',
-                                'position'                : 'right'
-                            ]
-                        ],
-                    'fieldInputTypeTextFilter'              : 'positiveInt',
-                    'fieldHelp'                             : true,
-                    'fieldHelpTooltipContent'               : 'Code generated via the authenticator app.',
+                    'fieldId'                               : 'twofa',
+                    'fieldLabel'                            : 'Two Factor Authentication OTP',
+                    'fieldLabelLegend'                      : true,
+                    'fieldHidden'                           : false,
+                    'fieldType'                             : 'html',
                     'fieldBazScan'                          : false,
                     'fieldBazPostOnCreate'                  : false,
                     'fieldBazPostOnUpdate'                  : false,
-                    'fieldBazJstreeSearch'                  : false,
-                    'fieldDataInputMinLength'               : 6,
-                    'fieldDataInputMaxLength'               : 6
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldHtmlContent'                      : 'Two Factor Authentication (2FA) OTP is an extended method of authentication which uses an authenticator app like Google Authenticator or Authy.'
                 ]
             )}}
+        </div>
+    </div>
+    {% if account['security']['twofa_otp_status'] == '1' %}
+        {% set disableHidden = false %}
+        {% set enableHidden = true %}
+    {% else %}
+        {% set disableHidden = true %}
+        {% set enableHidden = false %}
+    {% endif %}
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('buttons',
+                [
+                    'component'                 : component,
+                    'componentName'             : componentName,
+                    'componentId'               : componentId,
+                    'sectionId'                 : sectionId,
+                    'buttonType'                : 'button',
+                    'buttons'                   :
+                        {
+                            'enable-twofa-otp-button'   : {
+                                'title'                   : 'Enable Two Factor Authentication (OTP)',
+                                'size'                    : 'sm',
+                                'type'                    : 'primary',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true,
+                                'hidden'                  : enableHidden
+                            },
+                            'disable-twofa-otp-button'  : {
+                                'title'                   : 'Disable Two Factor Authentication (OTP)',
+                                'size'                    : 'sm',
+                                'type'                    : 'danger',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true,
+                                'hidden'                  : disableHidden
+                            }
+                        }
+                ]
+            )}}
+        </div>
+    </div>
+    <br>
+    <div id="twofa-otp-details" class="row vdivide" hidden>
+        <div class="col-md-3 d-flex justify-content-center">
+            <div id="twofa-otp-qrcode"></div>
+        </div>
+        <div class="col">
+            <div id="twofa-otp-instructions">
+                <h5>INSTRUCTIONS:</h5>
+                <ul>
+                    <li>Scan the shown QR Code on your authenticator app.</li>
+                    <li>If, for any reason, you cannot scan the QR Code, you can type in this secret code manually. <br>Secret Code: <span class="font-weight-bold" id="twofa-otp-secret"></span></li>
+                    <li>Once successfully added into your app, enter the generated code from the app and click verify.</li>
+                </ul>
+            </div>
+            <div id="twofa-otp-verification">
+                <h5>VERIFICATION:</h5>
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'verification',
+                        'fieldLabel'                            : 'Generated Code',
+                        'fieldType'                             : 'input',
+                        'fieldGroupPostAddonButtons'          :
+                            [
+                                'verify'   : [
+                                    'title'                   : 'Verify',
+                                    'icon'                    : 'cog fa-spin',
+                                    'iconHidden'              : true,
+                                    'noMargin'                : true,
+                                    'disabled'                : true,
+                                    'buttonAdditionalClass'   : 'rounded-0 text-white',
+                                    'position'                : 'right'
+                                ]
+                            ],
+                        'fieldInputTypeTextFilter'              : 'positiveInt',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Code generated via the authenticator app.',
+                        'fieldBazScan'                          : false,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazJstreeSearch'                  : false,
+                        'fieldDataInputMinLength'               : 4,
+                        'fieldDataInputMaxLength'               : 10
+                    ]
+                )}}
+            </div>
         </div>
     </div>
 </div>
@@ -175,25 +245,25 @@ $('#{{componentId}}-{{sectionId}}-pwreset-button').click(function(e) {
     }, 'json');
 });
 
-$('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').click(function(e) {
+$('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').click(function(e) {
     e.preventDefault();
 
-    $(this).attr('disabled', true);
+    // $(this).attr('disabled', true);
     $(this).children('i').attr('hidden', false);
 
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-    var url = '{{links.url("system/users/profile/enabletwofatotp")}}';
+    var url = '{{links.url("system/users/profile/enabletwofaotp")}}';
 
     $.post(url, postData, function(response) {
         if (response.responseCode === 0) {
-            $('#twofa-qrcode').empty().append(
+            $('#twofa-otp-qrcode').empty().append(
                 '<img src="' + response.qrcode + '" />'
             );
-            $('#twofa-details').attr('hidden', false);
-            $('#twofa-secret').empty().append(response.secret);
-            $('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').html(
+            $('#twofa-otp-details').attr('hidden', false);
+            $('#twofa-otp-secret').empty().append(response.secret);
+            $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').html(
                 '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> REGENERATE TWO FACTOR AUTHENTICATION QR CODE'
             );
         } else {
@@ -207,14 +277,14 @@ $('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').click(function(e) {
             $('#security-token').val(response.token);
         }
 
-        $('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').attr('disabled', false);
-        $('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').children('i').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').children('i').attr('hidden', true);
 
     }, 'json');
 });
 
 $('#{{componentId}}-{{sectionId}}-verification').on('input propertychange', function() {
-    if ($(this).val().length === 6) {
+    if ($(this).val().length > 4) {
         $('#{{componentId}}-{{sectionId}}-verify').attr('disabled', false);
     } else {
         $('#{{componentId}}-{{sectionId}}-verify').attr('disabled', true);
@@ -224,14 +294,14 @@ $('#{{componentId}}-{{sectionId}}-verification').on('input propertychange', func
 $('#{{componentId}}-{{sectionId}}-verify').click(function(e) {
     e.preventDefault();
 
-    $(this).attr('disabled', true);
+    // $(this).attr('disabled', true);
     $(this).children('i').attr('hidden', false);
 
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
     postData['code'] = $('#{{componentId}}-{{sectionId}}-verification').val().trim();
 
-    var url = '{{links.url("system/users/profile/verifytwofatotp")}}';
+    var url = '{{links.url("system/users/profile/verifytwofaotp")}}';
 
     $.post(url, postData, function(response) {
         if (response.responseCode === 0) {
@@ -240,12 +310,12 @@ $('#{{componentId}}-{{sectionId}}-verify').click(function(e) {
             });
 
             $('#{{componentId}}-{{sectionId}}-verification').val('');
-            $('#twofa-qrcode').empty();
-            $('#twofa-secret').empty();
-            $('#twofa-details').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').attr('hidden', true);
-            $('#{{componentId}}-{{sectionId}}-disable-twofa-totp-button').attr('hidden', false);
-            $('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').html(
+            $('#twofa-otp-qrcode').empty();
+            $('#twofa-otp-secret').empty();
+            $('#twofa-otp-details').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-disable-twofa-otp-button').attr('hidden', false);
+            $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').html(
                 '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> ENABLE TWO FACTOR AUTHENTICATION'
             );
         } else {
@@ -265,7 +335,7 @@ $('#{{componentId}}-{{sectionId}}-verify').click(function(e) {
     }, 'json');
 });
 
-$('#{{componentId}}-{{sectionId}}-disable-twofa-totp-button').click(function(e) {
+$('#{{componentId}}-{{sectionId}}-disable-twofa-otp-button').click(function(e) {
     e.preventDefault();
 
     Swal.fire({
@@ -299,12 +369,12 @@ $('#{{componentId}}-{{sectionId}}-disable-twofa-totp-button').click(function(e) 
             postData[$('#security-token').attr('name')] = $('#security-token').val();
             postData['code'] = result.value;
 
-            var url = '{{links.url("system/users/profile/disabletwofatotp")}}';
+            var url = '{{links.url("system/users/profile/disabletwofaotp")}}';
 
             $.post(url, postData, function(response) {
                 if (response.responseCode === 0) {
-                    $('#{{componentId}}-{{sectionId}}-disable-twofa-totp-button').attr('hidden', true);
-                    $('#{{componentId}}-{{sectionId}}-enable-twofa-totp-button').attr('hidden', false);
+                    $('#{{componentId}}-{{sectionId}}-disable-twofa-otp-button').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').attr('hidden', false);
                     PNotify.success({
                         'title' : response.responseMessage
                     });

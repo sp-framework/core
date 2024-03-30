@@ -85,7 +85,7 @@
                 ]
             )}}
         </div>
-        {% if account['security']['two_fa_totp_status'] !== null and account['security']['two_fa_totp_status'] !== 0 %}
+        {% if account['security']['twofa_otp_status'] !== null and account['security']['twofa_otp_status'] !== 0 %}
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -93,10 +93,10 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'disable_two_fa_totp',
-                        'fieldLabel'                     : 'Disable 2FA TOTP',
+                        'fieldId'                        : 'disable_twofa_otp',
+                        'fieldLabel'                     : 'Disable 2FA OTP',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Disable Two Factor Authentication (TOTP). Note: Will force logout user.',
+                        'fieldHelpTooltipContent'        : 'Disable Two Factor Authentication (OTP). Note: Will force logout user.',
                         'fieldRequired'                  : false,
                         'fieldType'                      : 'checkbox',
                         'fieldCheckboxType'              : 'danger',

@@ -113,14 +113,14 @@ class ProfileComponent extends BaseComponent
         }
     }
 
-    public function enableTwoFaTotpAction()
+    public function enableTwoFaOtpAction()
     {
         if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            if ($this->auth->enableTwoFaTotp()) {
+            if ($this->auth->enableTwoFaOtp()) {
                 $this->view->provisionUrl = $this->auth->packagesData->provisionUrl;
 
                 $this->view->qrcode = $this->auth->packagesData->qrcode;
@@ -136,14 +136,14 @@ class ProfileComponent extends BaseComponent
         }
     }
 
-    public function verifyTwoFaTotpAction()
+    public function verifyTwoFaOtpAction()
     {
         if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            $this->auth->verifyTwoFaTotp($this->postData());
+            $this->auth->verifyTwoFaOtp($this->postData());
 
             $this->addResponse(
                 $this->auth->packagesData->responseMessage,
@@ -154,14 +154,14 @@ class ProfileComponent extends BaseComponent
         }
     }
 
-    public function disableTwoFaTotpAction()
+    public function disableTwoFaOtpAction()
     {
         if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            $this->auth->disableTwoFaTotp($this->postData()['code']);
+            $this->auth->disableTwoFaOtp($this->postData()['code']);
 
             $this->addResponse(
                 $this->auth->packagesData->responseMessage,

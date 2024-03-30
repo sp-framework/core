@@ -64,14 +64,14 @@ class Security
                         ]
                     ),
                     new Column(
-                        'two_fa_totp_status',
+                        'twofa_otp_status',
                         [
                             'type'          => Column::TYPE_BOOLEAN,
                             'notNull'       => false,
                         ]
                     ),
                     new Column(
-                        'two_fa_totp_secret',
+                        'twofa_otp_secret',
                         [
                             'type'          => Column::TYPE_VARCHAR,
                             'size'          => 1024,
@@ -79,7 +79,14 @@ class Security
                         ]
                     ),
                     new Column(
-                        'two_fa_email_code',
+                        'twofa_otp_hotp_counter',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => false
+                        ]
+                    ),
+                    new Column(
+                        'twofa_email_code',
                         [
                             'type'          => Column::TYPE_VARCHAR,
                             'size'          => 1024,
@@ -87,7 +94,7 @@ class Security
                         ]
                     ),
                     new Column(
-                        'two_fa_email_code_sent_on',
+                        'twofa_email_code_sent_on',
                         [
                             'type'          => Column::TYPE_INTEGER,
                             'notNull'       => false

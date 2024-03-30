@@ -234,14 +234,14 @@ class AuthComponent extends BaseComponent
         }
     }
 
-    public function enableTwoFaTotpAction()
+    public function enableTwoFaOtpAction()
     {
         if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            if ($this->auth->enableTwoFaTotp($this->postData())) {
+            if ($this->auth->enableTwoFaOtp($this->postData())) {
                 $this->view->provisionUrl = $this->auth->packagesData->provisionUrl;
 
                 $this->view->qrcode = $this->auth->packagesData->qrcode;
@@ -259,14 +259,14 @@ class AuthComponent extends BaseComponent
         }
     }
 
-    public function verifyTwoFaTotpAction()
+    public function verifyTwoFaOtpAction()
     {
         if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            if ($this->auth->verifyTwoFaTotp($this->postData())) {
+            if ($this->auth->verifyTwoFaOtp($this->postData())) {
                 $this->view->redirectUrl = $this->links->url('/');
             }
 

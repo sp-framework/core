@@ -967,10 +967,6 @@ class Core extends BasePackage
 		if (isset($data['password_policy'])) {
 			$this->core['settings']['security']['passwordPolicy'] = $data['password_policy'];
 		}
-
-		if (isset($data['password_policy_pwreset_need_2fa'])) {
-			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyPwresetNeed2fa'] = $data['password_policy_pwreset_need_2fa'];
-		}
 		if (isset($data['password_policy_force_pwreset_after'])) {
 			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyForcePwresetAfter'] = $data['password_policy_force_pwreset_after'];
 		}
@@ -1044,6 +1040,95 @@ class Core extends BasePackage
 			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyAvoidSimilarCharacters'] = $data['password_policy_avoid_similar_characters'];
 		}
 
+		if (isset($data['twofa'])) {
+			$this->core['settings']['security']['twofa'] = $data['twofa'];
+		}
+		if (isset($data['twofa_pwreset_need_2fa'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaPwresetNeed2fa'] = $data['twofa_pwreset_need_2fa'];
+		}
+		if (isset($data['twofa_using'])) {
+			if (is_string($data['twofa_using'])) {
+				$data['twofa_using'] = $this->helper->decode($data['twofa_using'], true);
+			}
+
+			if (isset($data['twofa_using']['data'])) {
+				$data['twofa_using'] = $this->helper->encode($data['twofa_using']['data']);
+			} else {
+				$data['twofa_using'] = $this->helper->encode($data['twofa_using']);
+			}
+
+			$this->core['settings']['security']['twofaSettings']['twofaUsing'] = $data['twofa_using'];
+		}
+
+		if (isset($data['twofa_email_timeout']) && $data['twofa_email_timeout'] < 60) {
+			$data['twofa_email_timeout'] = 60;
+		}
+		if (isset($data['twofa_email_timeout'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaEmailTimeout'] = $data['twofa_email_timeout'];
+		}
+
+		if (isset($data['twofa_otp'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaOtp'] = $data['twofa_otp'];
+		}
+		if (isset($data['twofa_otp_logo'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaOtpLogo'] = $data['twofa_otp_logo'];
+		}
+		if (isset($data['twofa_otp_secret_size']) && $data['twofa_otp_secret_size'] < 8) {
+			$data['twofa_otp_secret_size'] = 8;
+		}
+		if (isset($data['twofa_otp_secret_size']) && $data['twofa_otp_secret_size'] > 64) {
+			$data['twofa_otp_secret_size'] = 64;
+		}
+		if (isset($data['twofa_otp_secret_size'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaOtpSecretSize'] = $data['twofa_otp_secret_size'];
+		}
+		if (isset($data['twofa_otp_totp_timeout']) && $data['twofa_otp_totp_timeout'] < 30) {
+			$data['twofa_otp_totp_timeout'] = 30;
+		}
+		if (isset($data['twofa_otp_totp_timeout'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaOtpTotpTimeout'] = $data['twofa_otp_totp_timeout'];
+
+			if (isset($data['twofa_otp_totp_window']) && $data['twofa_otp_totp_window'] > $data['twofa_otp_totp_timeout']) {
+				$data['twofa_otp_totp_window'] = $data['twofa_otp_totp_timeout'] - 1;
+			}
+		}
+		if (isset($data['twofa_otp_totp_window'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaOtpTotpWindow'] = $data['twofa_otp_totp_window'];
+		}
+		if (isset($data['twofa_otp_hotp_counter']) && $data['twofa_otp_hotp_counter'] < 0) {
+			$data['twofa_otp_hotp_counter'] = 0;
+		}
+		if (isset($data['twofa_otp_hotp_counter'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaOtpHotpCounter'] = $data['twofa_otp_hotp_counter'];
+		}
+		if (isset($data['twofa_otp_hotp_window'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaOtpHotpWindow'] = $data['twofa_otp_hotp_window'];
+		}
+		if (isset($data['twofa_otp_label'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaOtpLabel'] = $data['twofa_otp_label'];
+		}
+		if (isset($data['twofa_otp_issuer'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaOtpIssuer'] = $data['twofa_otp_issuer'];
+		}
+		if (!isset($data['twofa_otp_algorithm']) ||
+			(isset($data['twofa_otp_algorithm']) && !isset($this->get2faAlgorithms()[$data['twofa_otp_algorithm']]))
+		) {
+			$data['twofa_otp_algorithm'] = 'sha1';
+		}
+		if (isset($data['twofa_otp_algorithm'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaOtpAlgorithm'] = $data['twofa_otp_algorithm'];
+		}
+		if (isset($data['twofa_otp_digits_length'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'] = $data['twofa_otp_digits_length'];
+		}
+
+		if (isset($data['agent_email_timeout']) && $data['agent_email_timeout'] < 60) {
+			$data['agent_email_timeout'] = 60;
+		}
+		if (isset($data['agent_email_timeout'])) {
+			$this->core['settings']['security']['agentEmailTimeout'] = $data['agent_email_timeout'];
+		}
+
 		if (isset($data['logs'])) {
 			$this->core['settings']['logs']['enabled'] = $data['logs'];
 		}
@@ -1078,6 +1163,7 @@ class Core extends BasePackage
 
 			$this->core['settings']['logs']['emergencyLogsEmailAddresses'] = $data['emergency_logs_email_addresses'];
 		}
+
 		if (isset($data['dbs']) && $data['dbs'] !== '') {
 			$data['dbs'] = $this->helper->decode($data['dbs'], true);
 			$this->core['settings']['dbs'] = $data['dbs'];
@@ -1426,5 +1512,62 @@ return
 		} else {
 			return true;
 		}
+	}
+
+	public function get2faUsingOptions()
+	{
+		$available2fa = [];
+
+		if ($this->basepackages->email->setup()) {
+			$available2fa = array_merge($available2fa,
+				[
+					'email'   =>
+					[
+						'type'      	=> 'email',
+						'name'          => 'EMAIL'
+					]
+				]
+			);
+		}
+
+		if (class_exists("\OTPHP\TOTP") && class_exists("\OTPHP\HOTP")) {
+			$available2fa = array_merge($available2fa,
+				[
+					'otp'   =>
+					[
+						'type'      	=> 'otp',
+						'name'          => 'OTP'
+					]
+				]
+			);
+		}
+
+		return $available2fa;
+	}
+
+	public function get2faAlgorithms()
+	{
+		$hashAlgos = [];
+
+		foreach (hash_hmac_algos() as $algo) {
+			$hashAlgos[$algo]['id'] = $algo;
+			$hashAlgos[$algo]['name'] = strtoupper($algo);
+		}
+
+		return $hashAlgos;
+	}
+
+	public function get2faLogoLink($uuid, $width = 80)
+	{
+		$logoLink = $this->basepackages->storages->getPublicLink($uuid, $width);
+
+		if ($logoLink) {
+			$logoLink = str_replace('public/', '', $logoLink);
+			$logoLink = $this->links->url($logoLink, true);
+
+			return $logoLink;
+		}
+
+		return false;
 	}
 }

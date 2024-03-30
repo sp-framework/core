@@ -46,7 +46,6 @@ class CoreComponent extends BaseComponent
         unset($core['settings']['sigText']);
         unset($core['settings']['cookiesSig']);
 
-        $this->view->core = $core;
         $this->view->availableCaches = $availableCaches;
         $this->view->availableComplexities =
             [
@@ -79,6 +78,24 @@ class CoreComponent extends BaseComponent
                     'name'  => '4 - Best Strength'
                 ],
             ];
+
+        $this->view->twofaUsingOptions = $this->core->get2faUsingOptions();
+        $this->view->twofaAlgorithms = $this->core->get2faAlgorithms();
+
+        if (isset($core['settings']['security']['twofaSettings']['twofaOtpLogo']) &&
+            $core['settings']['security']['twofaSettings']['twofaOtpLogo'] !== ''
+        ) {
+            $this->view->logoLink = $this->basepackages->storages->getPublicLink($core['settings']['security']['twofaSettings']['twofaOtpLogo'], 200);
+        } else {
+            $this->view->logoLink = '';
+        }
+
+        if (isset($core['settings']['security']['twofaSettings']['twofaUsing']) &&
+            $core['settings']['security']['twofaSettings']['twofaUsing'] !== '' &&
+            is_string($core['settings']['security']['twofaSettings']['twofaUsing'])
+        ) {
+            $core['settings']['security']['twofaSettings']['twofaUsing'] = $this->helper->decode($core['settings']['security']['twofaSettings']['twofaUsing']);
+        }
 
         $this->view->logLevels = $this->logger->getLogLevels();
         $storage = $this->useStorage('private');
@@ -164,6 +181,8 @@ class CoreComponent extends BaseComponent
             }
 
             $this->view->ffStores = $ffStores;
+
+            $this->view->core = $core;
         }
     }
 

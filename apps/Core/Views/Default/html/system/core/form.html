@@ -252,7 +252,6 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-password_policy_force_pwreset_after'     : { },
-        '{{componentId}}-{{sectionId}}-password_policy_pwreset_need_2fa'        : { },
         '{{componentId}}-{{sectionId}}-password_policy_block_previous_passwords': { },
         '{{componentId}}-{{sectionId}}-password_policy_complexity'              : {
             placeholder : 'SELECT PASSWORD COMPLEXITY',
@@ -388,6 +387,78 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-password_policy_symbols_include'         : { },
         '{{componentId}}-{{sectionId}}-password_policy_avoid_similar'           : { },
         '{{componentId}}-{{sectionId}}-password_policy_avoid_similar_characters': { },
+        '{{componentId}}-{{sectionId}}-twofa'                                   : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-twofa').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'twofaon') {
+                        $('#{{componentId}}-{{sectionId}}-twofa_using, ' +
+                          '#{{componentId}}-{{sectionId}}-twofa_pwreset_need_2fa'
+                          ).attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-twofa_using, ' +
+                          '#{{componentId}}-{{sectionId}}-twofa_pwreset_need_2fa'
+                          ).attr('disabled', true);
+                        $('#twofa-email-div').attr('hidden', true);
+                        $('#twofa-otp-div').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-twofa_using').val(0).trigger('change');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-twofa_pwreset_need_2fa'                  : { },
+        '{{componentId}}-{{sectionId}}-twofa_email_timeout'                     : { },
+        '{{componentId}}-{{sectionId}}-twofa_using'                             : {
+            'placeholder'   : 'SELECT 2FA METHODS',
+            afterInit       : function() {
+                function enableDisableFields(select) {
+                    if (select.selected === true) {
+                        if (select.id === 'email') {
+                            $('#twofa-email-div').attr('hidden', false);
+                        } else if (select.id === 'otp') {
+                            $('#twofa-otp-div').attr('hidden', false);
+                        }
+                    } else {
+                        if (select.id === 'email') {
+                            $('#twofa-email-div').attr('hidden', true);
+                        } else if (select.id === 'otp') {
+                            $('#twofa-otp-div').attr('hidden', true);
+                        }
+                    }
+                }
+
+                $('#{{componentId}}-{{sectionId}}-twofa_using').on('select2:select', function(e) {
+                    enableDisableFields(e.params.data);
+                });
+                $('#{{componentId}}-{{sectionId}}-twofa_using').on('select2:unselect', function(e) {
+                    enableDisableFields(e.params.data);
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-twofa_otp'                               : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-twofa_otp').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'totp') {
+                        $('#twofa-otp-totp-settings-div').attr('hidden', false);
+                        $('#twofa-otp-hotp-settings-div').attr('hidden', true);
+                    } else {
+                        $('#twofa-otp-totp-settings-div').attr('hidden', true);
+                        $('#twofa-otp-hotp-settings-div').attr('hidden', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-twofa_otp_secret_size'                   : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp_totp_timeout'                  : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp_totp_window'                   : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp_hotp_counter'                  : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp_hotp_window'                   : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp_label'                         : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp_issuer'                        : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp_algorithm'                     : {
+            placeholder : "SELECT HASH ALGORITHM"
+        },
+        '{{componentId}}-{{sectionId}}-twofa_otp_digits_length'                 : { },
+        '{{componentId}}-{{sectionId}}-agent_email_timeout'                     : { },
         '{{componentId}}-{{sectionId}}-logs'                                    : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-logs').click(function() {
@@ -1096,6 +1167,16 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-cookiesWorkFactor'               : 'required',
                 '{{componentId}}-{{sectionId}}-password_policy_complexity'      : 'required',
                 '{{componentId}}-{{sectionId}}-password_policy_acceptable_level': 'required',
+                '{{componentId}}-{{sectionId}}-twofa_using'                     : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_email_timeout'             : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_otp_secret_size'           : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_otp_totp_timeout'          : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_otp_hotp_counter'          : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_otp_label'                 : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_otp_issuer'                : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_otp_algorithm'             : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_otp_digits_length'         : 'required',
+                '{{componentId}}-{{sectionId}}-agent_email_timeout'             : 'required',
                 '{{componentId}}-{{sectionId}}-logs_level'                      : 'required',
                 '{{componentId}}-{{sectionId}}-emergency_logs_email_addresses'  : 'required',
                 '{{componentId}}-{{sectionId}}-websocket_host'                  : 'required',
@@ -1108,6 +1189,16 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-cookiesWorkFactor'               : 'Please enter encryption level',
                 '{{componentId}}-{{sectionId}}-password_policy_complexity'      : 'Please select policy complexity',
                 '{{componentId}}-{{sectionId}}-password_policy_acceptable_level': 'Please select policy acceptable level',
+                '{{componentId}}-{{sectionId}}-twofa_using'                     : 'Please select 2FA Method(s)',
+                '{{componentId}}-{{sectionId}}-twofa_email_timeout'             : 'Please enter email timeout (seconds)',
+                '{{componentId}}-{{sectionId}}-twofa_otp_secret_size'           : 'Please enter secret size',
+                '{{componentId}}-{{sectionId}}-twofa_otp_totp_timeout'          : 'Please enter totp timeout (seconds)',
+                '{{componentId}}-{{sectionId}}-twofa_otp_hotp_counter'          : 'Please enter hotp counter (count)',
+                '{{componentId}}-{{sectionId}}-twofa_otp_label'                 : 'Please enter otp label',
+                '{{componentId}}-{{sectionId}}-twofa_otp_issuer'                : 'Please enter otp issuer',
+                '{{componentId}}-{{sectionId}}-twofa_otp_algorithm'             : 'Please select an algorithm',
+                '{{componentId}}-{{sectionId}}-twofa_otp_digits_length'         : 'Please enter the length of digits',
+                '{{componentId}}-{{sectionId}}-agent_email_timeout'             : 'Please enter email timeout (seconds)',
                 '{{componentId}}-{{sectionId}}-logs_level'                      : 'Please select logs level',
                 '{{componentId}}-{{sectionId}}-emergency_logs_email_addresses'  : 'Please enter email addresses (comma saperated)',
                 '{{componentId}}-{{sectionId}}-websocket_host'                  : 'Please enter websocket host address',
@@ -1133,6 +1224,11 @@ dataCollectionSection =
                     dataCollectionSection['dataToSubmit']['password_policy'] = true;
                 } else {
                     dataCollectionSection['dataToSubmit']['password_policy'] = false;
+                }
+                if (dataCollectionSection['dataToSubmit']['twofa'] === 'twofaon') {
+                    dataCollectionSection['dataToSubmit']['twofa'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['twofa'] = false;
                 }
                 if (dataCollectionSection['dataToSubmit']['logs'] === 'logson') {
                     dataCollectionSection['dataToSubmit']['logs'] = true;
