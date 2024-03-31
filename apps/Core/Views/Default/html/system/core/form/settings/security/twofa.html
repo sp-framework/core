@@ -5,7 +5,8 @@
 {% set core2faUsing = [] %}
 {% set twofaUsingDisabled = true %}
 {% set twofaOtpLogo = '' %}
-{% set core2faEmailTimeout = '60' %}
+{% set core2faEmailCodeTimeout = '60' %}
+{% set core2faEmailCodeLength = '4' %}
 {% set twofaOtp = 'totp' %}
 {% set twofaOtpDisabled = true %}
 {% set twofaOtpSecretSize = '8' %}
@@ -47,11 +48,14 @@
 {% elseif twofaOtp == 'hotp' %}
     {% set twofaOtpHotpSettingsDiv = '' %}
 {% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaEmailCodeTimeout'] is defined %}
+    {% set core2faEmailCodeTimeout = core['settings']['security']['twofaSettings']['twofaEmailCodeTimeout'] %}
+{% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaEmailCodeLength'] is defined %}
+    {% set core2faEmailCodeLength = core['settings']['security']['twofaSettings']['twofaEmailCodeLength'] %}
+{% endif %}
 {% if core['settings']['security']['twofaSettings']['twofaOtpLogo'] is defined %}
     {% set twofaOtpLogo = core['settings']['security']['twofaSettings']['twofaOtpLogo'] %}
-{% endif %}
-{% if core['settings']['security']['twofaSettings']['twofaEmailTimeout'] is defined %}
-    {% set core2faEmailTimeout = core['settings']['security']['twofaSettings']['twofaEmailTimeout'] %}
 {% endif %}
 {% if core['settings']['security']['twofaSettings']['twofaOtpSecretSize'] is defined %}
     {% set twofaOtpSecretSize = core['settings']['security']['twofaSettings']['twofaOtpSecretSize'] %}
@@ -180,7 +184,7 @@
                     'componentName'                         : componentName,
                     'componentId'                           : componentId,
                     'sectionId'                             : sectionId,
-                    'fieldId'                               : 'twofa_email_timeout',
+                    'fieldId'                               : 'twofa_email_code_timeout',
                     'fieldLabel'                            : 'Email Code Timeout (seconds)',
                     'fieldType'                             : 'input',
                     'fieldHelp'                             : true,
@@ -194,7 +198,32 @@
                     'fieldDataInputMinNumber'               : 60,
                     'fieldDataInputMaxNumber'               : 3600,
                     'fieldDataInputMaxLength'               : 4,
-                    'fieldValue'                            : core2faEmailTimeout
+                    'fieldValue'                            : core2faEmailCodeTimeout
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'twofa_email_code_length',
+                    'fieldLabel'                            : 'Email Code Length',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Length of the email code that is sent to the user.',
+                    'fieldInputTypeTextFilter'              : 'positiveInt',
+                    'fieldRequired'                         : true,
+                    'fieldDisabled'                         : false,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldDataInputMinNumber'               : 4,
+                    'fieldDataInputMaxNumber'               : 12,
+                    'fieldDataInputMaxLength'               : 2,
+                    'fieldValue'                            : core2faEmailCodeLength
                 ]
             )}}
         </div>

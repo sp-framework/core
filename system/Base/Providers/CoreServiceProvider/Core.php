@@ -967,6 +967,9 @@ class Core extends BasePackage
 		if (isset($data['password_policy'])) {
 			$this->core['settings']['security']['passwordPolicy'] = $data['password_policy'];
 		}
+		if (isset($data['password_policy_force_relogin_after_pwreset'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyForceReloginAfterPwreset'] = $data['password_policy_force_relogin_after_pwreset'];
+		}
 		if (isset($data['password_policy_force_pwreset_after'])) {
 			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyForcePwresetAfter'] = $data['password_policy_force_pwreset_after'];
 		}
@@ -1060,11 +1063,23 @@ class Core extends BasePackage
 			$this->core['settings']['security']['twofaSettings']['twofaUsing'] = $data['twofa_using'];
 		}
 
-		if (isset($data['twofa_email_timeout']) && $data['twofa_email_timeout'] < 60) {
-			$data['twofa_email_timeout'] = 60;
+		if (isset($data['twofa_email_code_timeout']) && $data['twofa_email_code_timeout'] < 60) {
+			$data['twofa_email_code_timeout'] = 60;
 		}
-		if (isset($data['twofa_email_timeout'])) {
-			$this->core['settings']['security']['twofaSettings']['twofaEmailTimeout'] = $data['twofa_email_timeout'];
+		if (isset($data['twofa_email_code_timeout']) && $data['twofa_email_code_timeout'] > 3600) {
+			$data['twofa_email_code_timeout'] = 3600;
+		}
+		if (isset($data['twofa_email_code_timeout'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaEmailCodeTimeout'] = $data['twofa_email_code_timeout'];
+		}
+		if (isset($data['twofa_email_code_length']) && $data['twofa_email_code_length'] < 4) {
+			$data['twofa_email_code_length'] = 4;
+		}
+		if (isset($data['twofa_email_code_length']) && $data['twofa_email_code_length'] > 12) {
+			$data['twofa_email_code_length'] = 12;
+		}
+		if (isset($data['twofa_email_code_length'])) {
+			$this->core['settings']['security']['twofaSettings']['twofaEmailCodeLength'] = $data['twofa_email_code_length'];
 		}
 
 		if (isset($data['twofa_otp'])) {
@@ -1084,6 +1099,9 @@ class Core extends BasePackage
 		}
 		if (isset($data['twofa_otp_totp_timeout']) && $data['twofa_otp_totp_timeout'] < 30) {
 			$data['twofa_otp_totp_timeout'] = 30;
+		}
+		if (isset($data['twofa_otp_totp_timeout']) && $data['twofa_otp_totp_timeout'] > 300) {
+			$data['twofa_otp_totp_timeout'] = 300;
 		}
 		if (isset($data['twofa_otp_totp_timeout'])) {
 			$this->core['settings']['security']['twofaSettings']['twofaOtpTotpTimeout'] = $data['twofa_otp_totp_timeout'];
@@ -1122,11 +1140,23 @@ class Core extends BasePackage
 			$this->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'] = $data['twofa_otp_digits_length'];
 		}
 
-		if (isset($data['agent_email_timeout']) && $data['agent_email_timeout'] < 60) {
-			$data['agent_email_timeout'] = 60;
+		if (isset($data['agent_email_code_timeout']) && $data['agent_email_code_timeout'] < 60) {
+			$data['agent_email_code_timeout'] = 60;
 		}
-		if (isset($data['agent_email_timeout'])) {
-			$this->core['settings']['security']['agentEmailTimeout'] = $data['agent_email_timeout'];
+		if (isset($data['agent_email_code_timeout']) && $data['agent_email_code_timeout'] > 3600) {
+			$data['agent_email_code_timeout'] = 3600;
+		}
+		if (isset($data['agent_email_code_timeout'])) {
+			$this->core['settings']['security']['agentEmailCodeTimeout'] = $data['agent_email_code_timeout'];
+		}
+		if (isset($data['agent_email_code_length']) && $data['agent_email_code_length'] < 4) {
+			$data['agent_email_code_length'] = 4;
+		}
+		if (isset($data['agent_email_code_length']) && $data['agent_email_code_length'] > 12) {
+			$data['agent_email_code_length'] = 12;
+		}
+		if (isset($data['agent_email_code_length'])) {
+			$this->core['settings']['security']['agentEmailCodeLength'] = $data['agent_email_code_length'];
 		}
 
 		if (isset($data['logs'])) {

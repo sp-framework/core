@@ -1,8 +1,11 @@
-{% set coreAgentEmailTimeout = '60' %}
-{% if core['settings']['security']['agentEmailTimeout'] is defined %}
-    {% set coreAgentEmailTimeout = core['settings']['security']['agentEmailTimeout'] %}
+{% set coreAgentEmailCodeTimeout = '60' %}
+{% set coreAgentEmailCodeLength = '4' %}
+{% if core['settings']['security']['agentEmailCodeTimeout'] is defined %}
+    {% set coreAgentEmailCodeTimeout = core['settings']['security']['agentEmailCodeTimeout'] %}
 {% endif %}
-
+{% if core['settings']['security']['agentEmailCodeLength'] is defined %}
+    {% set coreAgentEmailCodeLength = core['settings']['security']['agentEmailCodeLength'] %}
+{% endif %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -11,7 +14,7 @@
                 'componentName'                         : componentName,
                 'componentId'                           : componentId,
                 'sectionId'                             : sectionId,
-                'fieldId'                               : 'agent_email_timeout',
+                'fieldId'                               : 'agent_email_code_timeout',
                 'fieldLabel'                            : 'Agent Email Code Timeout (seconds)',
                 'fieldType'                             : 'input',
                 'fieldHelp'                             : true,
@@ -25,7 +28,32 @@
                 'fieldDataInputMinNumber'               : 60,
                 'fieldDataInputMaxNumber'               : 3600,
                 'fieldDataInputMaxLength'               : 4,
-                'fieldValue'                            : coreAgentEmailTimeout
+                'fieldValue'                            : coreAgentEmailCodeTimeout
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'agent_email_code_length',
+                'fieldLabel'                            : 'Agent Email Code Length',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Length of the email code that is sent to the user.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : false,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : 4,
+                'fieldDataInputMaxNumber'               : 12,
+                'fieldDataInputMaxLength'               : 2,
+                'fieldValue'                            : coreAgentEmailCodeLength
             ]
         )}}
     </div>
