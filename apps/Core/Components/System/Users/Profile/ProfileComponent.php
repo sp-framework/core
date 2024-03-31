@@ -87,14 +87,6 @@ class ProfileComponent extends BaseComponent
                 return;
             }
 
-            if ($this->postData()['pass'] === $this->postData()['newpass']) {
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'Current and new password are same!';
-
-                return;
-            }
-
             $user['user'] = $this->auth->account()['email'];
 
             $user = array_merge($user, $this->postData());
@@ -102,9 +94,13 @@ class ProfileComponent extends BaseComponent
             $pwreset = $this->auth->resetPassword($user, true);
 
             if ($pwreset) {
-                $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
+                // $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
             } else {
                 $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            }
+
+            if (isset($this->auth->packagesData->responseData)) {
+                $this->view->responseData = $this->auth->packagesData->responseData;
             }
 
             $this->view->responseCode = $this->auth->packagesData->responseCode;

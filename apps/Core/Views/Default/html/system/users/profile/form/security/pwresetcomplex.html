@@ -5,21 +5,21 @@
 {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercase'] == true %}
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseMinCount'] !== '' %}
         {% set uppercaseTextMin =
-            '<span class="text-danger mr-1 uppercase_min_count"><i class="fa fas fa-times-circle"></i></span>
+            '<span class="text-danger mr-1 policy passwordPolicyUppercaseMinCount"><i class="fa fas fa-times-circle"></i></span>
             <span class="mb-1">Minimum uppercase should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseMinCount'] ~ '</strong> characters</span>
             <br>'
         %}
     {% endif %}
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseMaxCount'] !== '' %}
         {% set uppercaseTextMax =
-            '<span class="text-danger mr-1 uppercase_max_count"><i class="fa fas fa-times-circle"></i></span>
+            '<span class="text-danger mr-1 policy passwordPolicyUppercaseMaxCount"><i class="fa fas fa-times-circle"></i></span>
             <span class="mb-1">Maximum uppercase should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseMaxCount'] ~ '</strong> characters</span>
             <br>'
         %}
     {% endif %}
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseInclude'] !== '' and coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseInclude'] !== 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'%}
         {% set uppercaseTextInclude =
-            '<span class="text-danger mr-1 uppercase_max_count"><i class="fa fas fa-times-circle"></i></span>
+            '<span class="text-danger mr-1 policy passwordPolicyUppercaseInclude"><i class="fa fas fa-times-circle"></i></span>
             <span class="mb-1">Uppercase can include <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseInclude'] ~ '</strong> characters</span>
             <br>'
         %}
@@ -31,21 +31,21 @@
 {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercase'] == true %}
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseMinCount'] !== '' %}
         {% set lowercaseTextMin =
-            '<span class="text-danger mr-1 lowercase_min_count"><i class="fa fas fa-times-circle"></i></span>
+            '<span class="text-danger mr-1 policy passwordPolicyLowercaseMinCount"><i class="fa fas fa-times-circle"></i></span>
             <span class="mb-1">Minimum lowercase should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseMinCount'] ~ '</strong> characters</span>
             <br>'
         %}
     {% endif %}
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseMaxCount'] !== '' %}
         {% set lowercaseTextMax =
-            '<span class="text-danger mr-1 lowercase_max_count"><i class="fa fas fa-times-circle"></i></span>
+            '<span class="text-danger mr-1 policy passwordPolicyLowercaseMaxCount"><i class="fa fas fa-times-circle"></i></span>
             <span class="mb-1">Maximum lowercase can be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseMaxCount'] ~ '</strong> characters</span>
             <br>'
         %}
     {% endif %}
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseInclude'] !== '' and coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseInclude'] !== 'abcdefghijklmnopqrstuvwxyz' %}
         {% set lowercaseTextInclude =
-            '<span class="text-danger mr-1 lowercase_max_count"><i class="fa fas fa-times-circle"></i></span>
+            '<span class="text-danger mr-1 policy passwordPolicyLowercaseInclude"><i class="fa fas fa-times-circle"></i></span>
             <span class="mb-1">Lowercase can include <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseInclude'] ~ '</strong> characters</span>
             <br>'
         %}
@@ -57,21 +57,21 @@
 {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbers'] == true %}
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersMinCount'] !== '' %}
         {% set numbersTextMin =
-            '<span class="text-danger mr-1 numbers_min_count"><i class="fa fas fa-times-circle"></i></span>
+            '<span class="text-danger mr-1 policy passwordPolicyNumbersMinCount"><i class="fa fas fa-times-circle"></i></span>
             <span class="mb-1">Minimum numbers should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersMinCount'] ~ '</strong> characters</span>
             <br>'
         %}
     {% endif %}
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersMaxCount'] !== '' %}
         {% set numbersTextMax =
-            '<span class="text-danger mr-1 numbers_max_count"><i class="fa fas fa-times-circle"></i></span>
+            '<span class="text-danger mr-1 policy passwordPolicyNumbersMaxCount"><i class="fa fas fa-times-circle"></i></span>
             <span class="mb-1">Maximum numbers can be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersMaxCount'] ~ '</strong> characters</span>
             <br>'
         %}
     {% endif %}
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersInclude'] !== '' and coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersInclude'] !== '0123456789' %}
         {% set numbersTextInclude =
-            '<span class="text-danger mr-1 numbers_max_count"><i class="fa fas fa-times-circle"></i></span>
+            '<span class="text-danger mr-1 policy passwordPolicyNumbersInclude"><i class="fa fas fa-times-circle"></i></span>
             <span class="mb-1">Numbers can include <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersInclude'] ~ '</strong> characters</span>
             <br>'
         %}
@@ -83,21 +83,21 @@
 {% if coreSettings['security']['passwordPolicySettings']['passwordPolicySymbols'] == true %}
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsMinCount'] !== '' %}
         {% set symbolsTextMin =
-            '<span class="text-danger mr-1 symbols_min_count"><i class="fa fas fa-times-circle"></i></span>
+            '<span class="text-danger mr-1 policy passwordPolicySymbolsMinCount"><i class="fa fas fa-times-circle"></i></span>
             <span class="mb-1">Minimum symbols should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsMinCount'] ~ '</strong> characters</span>
             <br>'
         %}
     {% endif %}
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsMaxCount'] !== '' %}
         {% set symbolsTextMax =
-            '<span class="text-danger mr-1 symbols_max_count"><i class="fa fas fa-times-circle"></i></span>
+            '<span class="text-danger mr-1 policy passwordPolicySymbolsMaxCount"><i class="fa fas fa-times-circle"></i></span>
             <span class="mb-1">Maximum symbols can be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsMaxCount'] ~ '</strong> characters</span>
             <br>'
         %}
     {% endif %}
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsInclude'] !== '' and coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsInclude'] !== '!@$%^&*()<>,.?/[]{}-=_+' %}
         {% set symbolsTextInclude =
-            '<span class="text-danger mr-1 symbols_max_count"><i class="fa fas fa-times-circle"></i></span>
+            '<span class="text-danger mr-1 policy passwordPolicySymbolsInclude"><i class="fa fas fa-times-circle"></i></span>
             <span class="mb-1">Symbols can include <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsInclude'] ~ '</strong> characters</span>
             <br>'
         %}

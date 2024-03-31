@@ -213,10 +213,27 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-cc_emails_to_secondary_email'    : { },
         '{{componentId}}-{{sectionId}}-contact_notes'                   : { },
         '{{componentId}}-{{sectionId}}-address_id'                      : { },
-        '{{componentId}}-{{sectionId}}-current_password'                : { },
+        '{{componentId}}-{{sectionId}}-current_password'                : {
+            afterInit: function() {
+                var countDownTimer;
+
+                $('#{{componentId}}-{{sectionId}}-twofa_otp-switch_to_email').click(function() {
+                    $('#{{componentId}}-{{sectionId}}-twofa_otp').val('');
+                    $('#twofa-otp').attr('hidden', true);
+                    $('#twofa-email').attr('hidden', false);
+                });
+                $('#{{componentId}}-{{sectionId}}-twofa_email-switch_to_otp').click(function() {
+                    $('#{{componentId}}-{{sectionId}}-twofa_email').val('');
+                    $('#twofa-otp').attr('hidden', false);
+                    $('#twofa-email').attr('hidden', true);
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-new_password'                    : { },
         '{{componentId}}-{{sectionId}}-strength-meter'                  : { },
         '{{componentId}}-{{sectionId}}-confirm_password'                : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp'                       : { },
+        '{{componentId}}-{{sectionId}}-twofa_email'                     : { },
         '{{componentId}}-{{sectionId}}-subscriptions'                   :
         $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-subscriptions'], {
             plugins: [

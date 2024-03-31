@@ -77,6 +77,8 @@ class Auth
 
     protected $cookieTimeout = 0;
 
+    protected $passwordPolicyErrors = [];
+
     public function __construct(
         $request,
         $config,
@@ -285,9 +287,7 @@ class Auth
         $validate = $this->validateData($data, 'auth');
 
         if ($validate !== true) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = $validate;
+            $this->addResponse($validate, 1);
 
             return false;
         }
@@ -306,9 +306,7 @@ class Auth
             return false;
         }
 
-        $this->packagesData->responseCode = 0;
-
-        $this->packagesData->responseMessage = 'Authenticated. Redirecting...';
+        $this->addResponse('Authenticated. Redirecting...');
 
         if (($this->account['security']['force_pwreset'] &&
              $this->account['security']['force_pwreset'] == '1') ||
@@ -347,9 +345,7 @@ class Auth
 
         if ($this->account) {
             if ($this->account['status'] != '1') {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
+                $this->addResponse('Error: Username/Password incorrect!', 1);
 
                 $this->logger->log->debug($data['user'] . ' is disabled!');
 
@@ -388,27 +384,21 @@ class Auth
                             );
                         }
                     } else {
-                        $this->packagesData->responseCode = 1;
-
-                        $this->packagesData->responseMessage = 'Error: Contact System Administrator';
+                        $this->addResponse('Error: Contact System Administrator', 1);
 
                         $this->logger->log->debug($this->account['email'] . ' and their role is not allowed to login to app ' . $this->app['name']);
 
                         return false;
                     }
                 } else {
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'Error: Contact System Administrator';
+                    $this->addResponse('Error: Contact System Administrator', 1);
 
                     $this->logger->log->debug('App\'s can_login_role_ids not set for app ' . $this->app['name']);
 
                     return false;
                 }
             } else if ($canLogin && is_array($canLogin) && $canLogin['allowed'] == '0') {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'Error: Contact System Administrator';
+                $this->addResponse('Error: Contact System Administrator', 1);
 
                 $this->logger->log->debug($this->account['email'] . ' and their role is not allowed to login to app ' . $this->app['name']);
 
@@ -416,12 +406,10 @@ class Auth
             }
 
             if (!$this->secTools->checkPassword($data['pass'], $this->account['security']['password'])) {//Password Fail
-                $this->packagesData->responseCode = 1;
-
                 if ($viaProfile) {
-                    $this->packagesData->responseMessage = 'Error: Current Password incorrect!';
+                    $this->addResponse('Error: Current Password incorrect!', 1);
                 } else {
-                    $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
+                    $this->addResponse('Error: Username/Password incorrect!', 1);
                 }
 
                 $this->logger->log->debug('Incorrect username/password entered by account ' . $this->account['email'] . ' on app ' . $this->app['name']);
@@ -431,9 +419,7 @@ class Auth
         } else {
             $this->secTools->hashPassword(rand());//Randomize so we take same time to respond as if the account exists.
 
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
+            $this->addResponse('Error: Username/Password incorrect!', 1);
 
             $this->logger->log->debug($data['user'] . ' is not in DB. App: ' . $this->app['name']);
 
@@ -447,76 +433,22 @@ class Auth
     {
         if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
             if (isset($data['twofa_using'])) {
-                if ($data['twofa_using'] === 'email' && in_array('email', $this->app['twofa_using'])) {
-                    if (time() > $security->twofa_email_code_sent_on + ($this->app['twofa_email_timeout'] ?? 60)) {
-                        $security->twofa_email_code_sent_on = null;
-                        $security->twofa_email_code = null;
-
-                        if ($this->config->databasetype === 'db') {
-                            $security->update();
-                        } else {
-                            $securityStore = $this->ff->store('basepackages_users_accounts_security');
-
-                            $securityStore->update((array) $security);
-                        }
-
-                        $this->packagesData->responseCode = 1;
-
-                        $this->packagesData->responseMessage = 'Code Expired! Request new code...';
-
-                        return false;
-                    }
-
-                    if ($this->secTools->checkPassword($data['code'], $security->twofa_email_code)) {
-                        $this->account['security']['twofa_email_code_sent_on'] = null;
-                        $this->account['security']['twofa_email_code'] = null;
-
-                        return true;
-                    }
-
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'Error: Username/Password/2FA Code incorrect!';
-
-                    return false;
-                } else if ($data['twofa_using'] === 'otp' && in_array('otp', $this->app['twofa_using'])) {
-                    if ($security->twofa_otp_status == '1' && !isset($data['code'])) {
-                        $this->packagesData->responseCode = 3;
-
-                        $this->packagesData->responseMessage = '2FA Code Required';
-
-                        return false;
-                    }
-
-                    if (($security->twofa_otp_status == '1' && isset($data['code'])) &&
-                        (isset($security->twofa_otp_secret) && !$this->verifyOtp($data['code'], $security->twofa_otp_secret))
-                    ) {
-                        $this->packagesData->responseCode = 1;
-
-                        $this->packagesData->responseMessage = 'Error: Username/Password/2FA Code incorrect!';
-
-                        return false;
-                    }
-
-                    return true;
-                }
+                return $this->validateTwoFaCode($security, $data, true);
             }
 
-            $this->packagesData->responseCode = 3;
+            $this->addResponse('2FA Code Required!', 3);
 
-            $this->packagesData->responseMessage = '2FA Code Required!';
-
-            if (in_array('email', $this->app['twofa_using']) && !$this->email->setup()) {
-                unset($this->app['twofa_using'][array_keys($this->app['twofa_using'], 'email')[0]]);
+            if (in_array('email', $this->core->core['settings']['security']['twofaSettings']) && !$this->email->setup()) {
+                unset($this->core->core['settings']['security']['twofaSettings'][array_keys($this->core->core['settings']['security']['twofaSettings'], 'email')[0]]);
             }
 
-            if (count($this->app['twofa_using']) === 0) {//if otp is not set and email service is not configured, we authenticate.
+            if (count($this->core->core['settings']['security']['twofaSettings']) === 0) {//if otp is not set and email service is not configured, we authenticate.
                 return true;
             }
 
-            $this->packagesData->responseData = ['allowed_methods' => $this->app['twofa_using']];
+            $this->packagesData->responseData = ['allowed_methods' => $this->core->core['settings']['security']['twofaSettings']];
 
-            if (in_array('otp', $this->app['twofa_using'])) {
+            if (in_array('otp', $this->core->core['settings']['security']['twofaSettings'])) {
                 $this->packagesData->responseData = array_merge($this->packagesData->responseData, ['otp_status' => $security->twofa_otp_status]);
             }
 
@@ -524,6 +456,82 @@ class Auth
         }
 
         return true;
+    }
+
+    protected function validateTwoFaCode($security, $data, $viaLogin = false)
+    {
+        if (!isset($this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
+            return true;
+        }
+
+        if (!is_array($this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
+            $this->core->core['settings']['security']['twofaSettings']['twofaUsing'] = $this->helper->decode($this->core->core['settings']['security']['twofaSettings']['twofaUsing'], true);
+        }
+
+        if ($data['twofa_using'] === 'email' && in_array('email', $this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
+            if (time() > $security->twofa_email_code_sent_on + ($this->core->core['settings']['security']['twofaSettings']['twofa_email_timeout'] ?? 60)) {
+                $security->twofa_email_code_sent_on = null;
+                $security->twofa_email_code = null;
+
+                if ($this->config->databasetype === 'db') {
+                    $security->update();
+                } else {
+                    $securityStore = $this->ff->store('basepackages_users_accounts_security');
+
+                    $securityStore->update((array) $security);
+                }
+
+                $this->addResponse('Code Expired! Request new code...', 1);
+
+                return false;
+            }
+
+            if ($this->secTools->checkPassword($data['code'], $security->twofa_email_code)) {
+                $this->account['security']['twofa_email_code_sent_on'] = null;
+                $this->account['security']['twofa_email_code'] = null;
+
+                return true;
+            }
+
+            if ($viaLogin) {
+                $this->addResponse('Error: Username/Password/2FA Code incorrect!', 1);
+            } else {
+                $this->addResponse('Error: 2FA Code incorrect!', 1);
+            }
+
+            return false;
+        } else if ($data['twofa_using'] === 'otp' && in_array('otp', $this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
+            if ($security->twofa_otp_status == '1' && !isset($data['code'])) {
+                $this->addResponse('2FA Code Required', 3);
+
+                return false;
+            }
+
+            if ($viaLogin &&
+                ($security->twofa_otp_status == '1' && isset($data['code'])) &&
+                (isset($security->twofa_otp_secret) && !$this->verifyOtp($data['code'], $security->twofa_otp_secret))
+            ) {
+                $this->addResponse('Error: Username/Password/2FA Code incorrect!', 1);
+
+                return false;
+            } else {
+                if (!$security->twofa_otp_status) {
+                    $this->addResponse('2FA OTP not enabled. Please enable or use email option (if available)', 1);
+
+                    return false;
+                }
+
+                if (isset($security->twofa_otp_secret) &&
+                    !$this->verifyOtp($data['code'], $security->twofa_otp_secret)
+                ) {
+                    $this->addResponse('Error: 2FA Code incorrect!', 1);
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 
     protected function setSessionAndRecaller(array $data)
@@ -851,12 +859,22 @@ class Auth
             $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid user name."]);
             $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
             $this->validation->add('newpass', PresenceOf::class, ["message" => "Enter valid new password."]);
+            $this->validation->add('confirmnewpass', PresenceOf::class, ["message" => "Enter valid confirm password."]);
             $this->validation->add('confirmnewpass', Confirmation::class,
                 [
                     "message"   => "New password and confirm password don't match.",
                     "with"      => "newpass"
                 ]
             );
+
+            if (isset($this->core->core['settings']['security']['twofa']) &&
+                $this->core->core['settings']['security']['twofa'] == true &&
+                isset($this->core->core['settings']['security']['twofaSettings']['twofaPwresetNeed2fa']) &&
+                $this->core->core['settings']['security']['twofaSettings']['twofaPwresetNeed2fa'] == true
+            ) {
+                $this->validation->add('twofa_using', PresenceOf::class, ["message" => "Error! Please contact administrator."]);
+                $this->validation->add('code', PresenceOf::class, ["message" => "Enter valid 2FA code."]);
+            }
         }
 
         $validated = $this->validation->validate($data)->jsonSerialize();
@@ -878,9 +896,7 @@ class Auth
         $validate = $this->validateData($data, 'forgot');
 
         if ($validate !== true) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = $validate;
+            $this->addResponse($validate, 1);
 
             return false;
         }
@@ -901,9 +917,7 @@ class Auth
             }
         }
 
-        $this->packagesData->responseCode = 0;
-
-        $this->packagesData->responseMessage = 'Email Sent. Please follow password reset instructions from the email.';
+        $this->addResponse('Email Sent. Please follow password reset instructions from the email.');
 
         return true;
     }
@@ -913,9 +927,7 @@ class Auth
         $validate = $this->validateData($data, 'reset');
 
         if ($validate !== true) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = $validate;
+            $this->addResponse($validate, 1);
 
             return false;
         }
@@ -924,13 +936,24 @@ class Auth
             return false;
         }
 
-        if ($this->config->dev === false) {
-            $checkPwStrength = $this->checkPwStrength($data['newpass']);
+        if (isset($this->core->core['settings']['security']['twofa']) &&
+            $this->core->core['settings']['security']['twofa'] == true &&
+            isset($this->core->core['settings']['security']['twofaSettings']['twofaPwresetNeed2fa']) &&
+            $this->core->core['settings']['security']['twofaSettings']['twofaPwresetNeed2fa'] == true
+        ) {
+            if (!$this->validateTwoFaCode($this->getAccountSecurityObject(), $data)) {
+                // return false;
+            }
+        }
 
-            if ($checkPwStrength !== false && $checkPwStrength < 4) {
-                $this->packagesData->responseCode = 1;
+        if (isset($this->core->core['settings']['security']['passwordPolicy']) &&
+            $this->core->core['settings']['security']['passwordPolicy'] == 'true'
+        ) {
+            $this->passwordPolicyErrors['passwordPolicyBlockPreviousPasswords'] = false;
+            $this->passwordPolicyErrors['passwordPolicySimpleAcceptableLevel'] = false;
 
-                $this->packagesData->responseMessage = 'Password strength is too low.';
+            if (!$this->checkPwPolicy($data)) {
+                $this->addResponse('New password failed password policy. Please try again...', 1, ['passwordPolicyErrors' => $this->passwordPolicyErrors]);
 
                 return false;
             }
@@ -945,28 +968,81 @@ class Auth
         if ($this->accounts->addUpdateSecurity($this->account['id'], $this->account['security'])) {
             $this->logger->log->info('Password reset successful for account ' . $this->account['email'] . ' via pwreset.');
 
-            $this->packagesData->responseCode = 0;
-
             if ($viaProfile) {
-                $this->logout();
+                // $this->logout();
             } else {
-                $this->packagesData->responseMessage = 'Authenticated. Password changed. Redirecting...';
+                $this->addResponse('Authenticated. Password changed. Redirecting...');
             }
 
-            if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
-                $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
-            } else {
-                $this->packagesData->redirectUrl = $this->links->url('home');
-            }
+            //Redirect as per core settings.
+            // if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
+            //     $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
+            // } else {
+            //     $this->packagesData->redirectUrl = $this->links->url('home');
+            // }
 
             return true;
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = $this->accounts->packagesData->responseMessage;
+            $this->addResponse($this->accounts->packagesData->responseMessage, 1);
 
             return false;
         }
+    }
+
+    protected function checkPasswordHistory($data)
+    {
+        if (isset($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords']) &&
+            (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'] > 0
+        ) {
+            $security = $this->getAccountSecurityObject();
+
+            if ($security->password_history && $security->password_history !== '') {
+                if (is_string($security->password_history)) {
+                    $security->password_history = $this->helper->decode($security->password_history, true);
+                }
+
+                if (count($security->password_history) > 0) {
+                    foreach ($security->password_history as $history) {
+                        if ($this->secTools->checkPassword($data['newpass'], $history)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    protected function checkPwPolicy($data)
+    {
+        if ($this->checkPasswordHistory($data)) {
+            $this->passwordPolicyErrors['passwordPolicyBlockPreviousPasswords'] = true;
+
+            return false;
+        }
+
+        if (isset($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyComplexity'])) {
+            if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyComplexity'] === 'simple') {
+                $checkPwStrength = $this->checkPwStrength($data['newpass']);
+
+                if (isset($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel']) &&
+                    (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel'] > 0
+                ) {
+                    if ($checkPwStrength !== false &&
+                        $checkPwStrength < (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel']
+                    ) {
+                        $this->passwordPolicyErrors['passwordPolicySimpleAcceptableLevel'] = true;
+
+                        return false;
+                    }
+                }
+            } else if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyComplexity'] === 'complex') {
+                //
+            }
+        }
+
+        return true;
     }
 
     public function checkPwStrength(string $pass)
@@ -976,18 +1052,12 @@ class Auth
         $result = $checkingTool->passwordStrength($pass);
 
         if ($result && is_array($result) && isset($result['score'])) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseData = $result['score'];
-
-            $this->packagesData->responseMessage = 'Checking Password Strength Success';
+            $this->addResponse('Checking Password Strength Success', 0, $result['score']);
 
             return $result['score'];
         }
 
-        $this->packagesData->responseCode = 1;
-
-        $this->packagesData->responseMessage = 'Error Checking Password Strength';
+        $this->addResponse('Error Checking Password Strength', 1);
 
         return false;
     }
@@ -996,9 +1066,11 @@ class Auth
     {
         $this->basepackages->utils->generateNewPassword();
 
-        $this->packagesData->responseCode = $this->basepackages->utils->packagesData->responseCode;
-        $this->packagesData->responseMessage = $this->basepackages->utils->packagesData->responseMessage;
-        $this->packagesData->responseData = $this->basepackages->utils->packagesData->responseData['password'];
+        $this->addResponse(
+            $this->basepackages->utils->packagesData->responseMessage,
+            $this->basepackages->utils->packagesData->responseCode,
+            $this->basepackages->utils->packagesData->responseData['password']
+        );
     }
 
     protected function initOtp($secret, $verify = false)
@@ -1084,9 +1156,7 @@ class Auth
             $validate = $this->validateData($data, 'auth');
 
             if ($validate !== true) {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = $validate;
+                $this->addResponse($validate, 1);
 
                 return false;
             }
@@ -1101,9 +1171,7 @@ class Auth
         $security = $this->getAccountSecurityObject();
 
         if ($security->twofa_otp_status && $security->twofa_otp_status == '1') {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = "2FA already enabled! Contact Administrator.";
+            $this->addResponse('2FA already enabled! Contact Administrator.', 1);
 
             return false;
         }
@@ -1132,9 +1200,7 @@ class Auth
 
             $this->packagesData->secret = $this->otp->getSecret();
 
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Generated 2FA Code';
+            $this->addResponse('Generated 2FA Code');
 
             $security = $this->getAccountSecurityObject();
 
@@ -1150,9 +1216,7 @@ class Auth
 
             return true;
         } catch (\Exception $e) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = $e->getMessage();
+            $this->addResponse($e->getMessage(), 1);
 
             return false;
         }
@@ -1171,9 +1235,9 @@ class Auth
                     $security->twofa_otp_hotp_counter = 0;
                 }
             }
-
-            return $security;
         }
+
+        return $security;
     }
 
     public function verifyTwoFaOtp(array $data)
@@ -1182,9 +1246,7 @@ class Auth
             $validate = $this->validateData($data, 'auth');
 
             if ($validate !== true) {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = $validate;
+                $this->addResponse($validate, 1);
 
                 return false;
             }
@@ -1199,9 +1261,7 @@ class Auth
         $security = $this->getAccountSecurityObject();
 
         if ($security->twofa_otp_status && $security->twofa_otp_status == '1') {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = "2FA already enabled! Contact Administrator.";
+            $this->addResponse('2FA already enabled! Contact Administrator.', 1);
 
             return false;
         }
@@ -1230,9 +1290,7 @@ class Auth
         try {
             $this->initOtp($security->twofa_otp_secret, true);
         } catch (\Exception $e) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = $e->getMessage();
+            $this->addResponse($e->getMessage(), 1);
 
             return false;
         }
@@ -1250,13 +1308,9 @@ class Auth
                 $securityStore->update((array) $security);
             }
 
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = "2FA disabled.";
+            $this->addResponse('2FA disabled.');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = "2FA disable failed.";
+            $this->addResponse('2FA disable failed.', 1);
         }
     }
 
@@ -1265,23 +1319,17 @@ class Auth
         try {
             $this->initOtp($secret, true);
         } catch (\Exception $e) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = $e->getMessage();
+            $this->addResponse($e->getMessage(), 1);
 
             return false;
         }
 
         if ($this->otp->verify($code, null, 5)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = "2FA verification success.";
+            $this->addResponse('2FA verification success.');
 
             return true;
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = "2FA verification failed.";
+            $this->addResponse('2FA verification failed.', 1);
 
             return false;
         }
@@ -1557,15 +1605,14 @@ class Auth
         }
         if (isset($agent['email_code_sent_on'])) {
             if (time() < $agent['email_code_sent_on'] + ($this->core->core['settings']['security']['agent_email_timeout'] ?? 60)) {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'Email already sent, please wait...';
-
-                $this->packagesData->responseData =
+                $this->addResponse(
+                    'Email already sent, please wait...',
+                    1,
                     [
                         'code_sent_on' => $agent['email_code_sent_on'],
                         'email_timeout' => $this->core->core['settings']['security']['agent_email_timeout'] ?? 60
-                    ];
+                    ]
+                );
 
                 return false;
             }
@@ -1592,20 +1639,14 @@ class Auth
                        ' via authentication agent. New code was emailed to the account.'
                 );
 
-            $this->packagesData->responseMessage = 'Email Sent!';
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseData = ['email_timeout' => $this->core->core['settings']['security']['agent_email_timeout'] ?? 60];
+            $this->addResponse('Email Sent!', 0, ['email_timeout' => $this->core->core['settings']['security']['agent_email_timeout'] ?? 60]);
 
             return;
         }
 
+        $this->addResponse('Please contact administrator.', 1);
+
         $this->packagesData->redirectUrl = $this->links->url('auth');
-
-        $this->packagesData->responseMessage = 'Please contact administrator.';
-
-        $this->packagesData->responseCode = 1;
     }
 
     protected function emailVerificationCode($verificationCode)
@@ -1627,9 +1668,7 @@ class Auth
         $validate = $this->validateData($data, 'agent');
 
         if ($validate !== true) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = $validate;
+            $this->addResponse($validate, 1);
 
             return false;
         }
@@ -1660,9 +1699,7 @@ class Auth
                         ]
                     );
             } else {
-                $this->packagesData->responseMessage = 'Please contact administrator.';
-
-                $this->packagesData->responseCode = 1;
+                $this->addResponse('Please contact administrator.', 1);
 
                 return;
             }
@@ -1686,9 +1723,7 @@ class Auth
                 $agentStore->update($agent);
             }
 
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Code Expired! Request new code...';
+            $this->addResponse('Code Expired! Request new code...', 1);
 
             return false;
         }
@@ -1710,9 +1745,7 @@ class Auth
                     $agentStore->update($agent);
                 }
 
-                $this->packagesData->responseCode = 0;
-
-                $this->packagesData->responseMessage = 'Authenticated. Redirecting...';
+                $this->addResponse('Authenticated. Redirecting...');
 
                 if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
                     $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
@@ -1725,16 +1758,12 @@ class Auth
                 $agent['session_id'] === $sessionId &&
                 $agent['verified'] == '1'
             ) {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'Session Incorrect... Loggin out.';
+                $this->addResponse('Session Incorrect... Loggin out.', 1);
 
                 $this->logout();
             }
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Incorrect verification code. Try again.';
+            $this->addResponse('Incorrect verification code. Try again.', 1);
         }
     }
 
@@ -1743,9 +1772,7 @@ class Auth
         $validate = $this->validateData($data, 'auth');
 
         if ($validate !== true) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = $validate;
+            $this->addResponse($validate, 1);
 
             return false;
         }
@@ -1754,22 +1781,26 @@ class Auth
             $this->checkAccount($data);
         }
 
-        $code = $this->secTools->random->base62(12);
+        $codeLength = 12;
+        if (isset($this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeLength'])) {
+            $codeLength = (int) $this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeLength'];
+        }
+
+        $code = $this->secTools->random->base62($codeLength);
 
         $security = $this->getAccountSecurityObject();
 
         if (isset($security->twofa_email_code_sent_on)) {
             if (time() < $security->twofa_email_code_sent_on + ($this->core->core['settings']['security']['twofaSettings']['twofa_email_timeout'] ?? 60)
             ) {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'Email already sent, please wait...';
-
-                $this->packagesData->responseData =
+                $this->addResponse(
+                    'Email already sent, please wait to send another code...',
+                    1,
                     [
                         'code_sent_on' => $security->twofa_email_code_sent_on,
                         'email_timeout' => $this->core->core['settings']['security']['twofaSettings']['twofa_email_timeout'] ?? 60
-                    ];
+                    ]
+                );
 
                 return false;
             }
@@ -1796,21 +1827,20 @@ class Auth
                        ' via authentication. New code was emailed to the account.'
                 );
 
-            $this->packagesData->responseMessage = 'Email Sent!';
-
-            $this->packagesData->responseData = ['email_timeout' => $this->app['twofa_email_timeout'] ?? 60];
-
-            $this->packagesData->responseCode = 0;
+            $this->addResponse(
+                'Email Sent!',
+                0,
+                ['email_timeout' => $this->core->core['settings']['security']['twofaSettings']['twofa_email_timeout'] ?? 60]
+            );
 
             return;
         }
 
+        $this->addResponse('Please contact administrator.', 1);
+
         $this->packagesData->redirectUrl = $this->links->url('auth');
-
-        $this->packagesData->responseMessage = 'Please contact administrator.';
-
-        $this->packagesData->responseCode = 1;
     }
+
     protected function emailTwoFaEmailCode($twofaCode)
     {
         $emailData['app_id'] = $this->app['id'];
@@ -1823,5 +1853,16 @@ class Auth
         $emailData['body'] = $twofaCode;
 
         return $this->emailQueue->addToQueue($emailData);
+    }
+
+    protected function addResponse($responseMessage, int $responseCode = 0, $responseData = null)
+    {
+        $this->packagesData->responseMessage = $responseMessage;
+
+        $this->packagesData->responseCode = $responseCode;
+
+        if ($responseData !== null) {
+            $this->packagesData->responseData = $responseData;
+        }
     }
 }

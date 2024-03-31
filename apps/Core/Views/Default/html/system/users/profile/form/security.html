@@ -20,22 +20,15 @@
         )}}
     </div>
 </div>
-{% if coreSettings['security']['passwordPolicy'] is defined and coreSettings['security']['passwordPolicySettings'] is defined and coreSettings['security']['passwordPolicy'] == true %}
-    {% set minLengthText =
-        '<span class="text-danger mr-1 length_min"><i class="fa fas fa-times-circle"></i></span>
-        <span class="mb-1">Minimum password length should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyLengthMin'] ~ '</strong> characters</span>
-        <br>'
-    %}
-    {% set maxLengthText =
-        '<span class="text-success mr-1 length_max"><i class="fa fas fa-check-circle"></i></span>
-        <span class="mb-1">Maximum password length should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyLengthMax'] ~ '</strong> characters</span>
-        <br>'
-    %}
-    {% set previousPasswordsText =
-        '<span class="text-success mr-1 length_max"><i class="fa fas fa-check-circle"></i></span>
-        <span class="mb-1">Number of previous password you cannot use : <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'] ~ '</strong></span>
-        <br>'
-    %}
+{% if coreSettings['security']['passwordPolicy'] is defined and coreSettings['security']['passwordPolicySettings'] is defined and coreSettings['security']['passwordPolicy'] == 'true' %}
+    {% set previousPasswordsText = '' %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'] > 0 %}
+        {% set previousPasswordsText =
+            '<span class="text-info mr-1 policy passwordPolicyBlockPreviousPasswords"><i class="fa fas fa-exclamation-circle"></i></span>
+            <span class="mb-1">Number of previous password you cannot use : <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'] ~ '</strong></span>
+            <br>'
+        %}
+    {% endif %}
     <div class="row">
         <div class="col">
             Enter your new password as per these policies or press the magic wand to generated new password. Password should meet all the policies.<br><br>
@@ -58,7 +51,7 @@
                     'fieldBazPostOnCreate'                  : false,
                     'fieldBazPostOnUpdate'                  : false,
                     'fieldBazJstreeSearch'                  : true,
-                    'fieldHtmlContent'                      : '<div class="row"><div class="col">' ~ minLengthText ~ '</div><div class="col">' ~ maxLengthText ~ '</div><div class="col">' ~ previousPasswordsText ~ '</div></div>'
+                    'fieldHtmlContent'                      : previousPasswordsText
                 ]
             )}}
         </div>
@@ -74,6 +67,7 @@
     {% endif %}
 {% endif %}
 {% include 'profile/form/security/pwresetfields.html' %}
+<br>
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('buttons',
@@ -91,7 +85,6 @@
                             'type'                    : 'primary',
                             'icon'                    : 'cog fa-spin',
                             'iconHidden'              : true,
-                            'disabled'                : true,
                             'position'                : 'right'
                         }
                     }
@@ -220,6 +213,66 @@
 </div>
 <script>
 /* global PNotify Swal */
+var countDownTimer;
+$('#{{componentId}}-{{sectionId}}-twofa_email-email_code').click(function(e) {
+    e.preventDefault();
+
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['user']  = '{{auth.account()["username"]}}';
+    postData['pass']  = $('#{{componentId}}-{{sectionId}}-current_password').val().trim();
+
+    $.post('{{links.url("auth/sendtwofaemail")}}', postData, function(response) {
+        if (response.responseCode == 0) {
+            if (response.responseData.email_timeout) {
+                setEmailTimer(null, response.responseData.email_timeout);
+            }
+        } else {
+            if (response.responseData && response.responseData.email_timeout && response.responseData.code_sent_on) {
+                setEmailTimer(response.responseData.code_sent_on, response.responseData.email_timeout);
+            }
+
+            PNotify.error(response.responseMessage);
+        }
+
+        if (response.tokenKey && response.token) {
+            $("#security-token").attr("name", response.tokenKey);
+            $("#security-token").val(response.token);
+        }
+    }, 'json');
+
+    clearInterval(countDownTimer);
+});
+
+function setEmailTimer(oldsenttime = null, emailtimeout = 60) {
+    $('#{{componentId}}-{{sectionId}}-twofa_email-email_code').attr('disabled', true);
+    $('#{{componentId}}-{{sectionId}}-twofa_email-small-text').html('');
+
+    var expiryTimer;
+
+    if (oldsenttime) {
+        expiryTimer = (oldsenttime * 1000) + (emailtimeout * 1000);
+    } else {
+        expiryTimer = new Date().getTime() + (emailtimeout * 1000);
+    }
+
+    countDownTimer = setInterval(() => {
+        var seconds, now, tillExpiry;
+
+        now = new Date().getTime();
+        tillExpiry = expiryTimer - now;
+        seconds = Math.floor((tillExpiry % (emailtimeout * 1000)) / 1000);
+
+        $('#{{componentId}}-{{sectionId}}-twofa_email-small-text').html('Code sent valid for ' + seconds + 's...');
+
+        if (tillExpiry < 0) {
+            clearInterval(countDownTimer);
+            $('#{{componentId}}-{{sectionId}}-twofa_email-email_code').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-twofa_email-small-text').html('');
+        }
+    }, 1000);
+}
+
 $('#{{componentId}}-{{sectionId}}-pwreset-button').click(function(e) {
     e.preventDefault();
 
@@ -228,16 +281,55 @@ $('#{{componentId}}-{{sectionId}}-pwreset-button').click(function(e) {
         'newpass'           : $('#{{componentId}}-{{sectionId}}-new_password').val().trim(),
         'confirmnewpass'    : $('#{{componentId}}-{{sectionId}}-confirm_password').val().trim()
     }
+
+    if ($('#twofa-otp').attr('hidden') === 'hidden') {
+        postData['code'] = $('#{{componentId}}-{{sectionId}}-twofa_email').val();
+        postData['twofa_using'] = 'email';
+    } else if ($('#twofa-email').attr('hidden') === 'hidden') {
+        postData['code'] = $('#{{componentId}}-{{sectionId}}-twofa_otp').val();
+        postData['twofa_using'] = 'otp';
+    }
+
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
     $.post('{{links.url("system/users/profile/pwreset")}}', postData, function(response) {
+        $('.policy').removeClass(function (index, className) {
+            return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+        }).addClass('text-info');
+        $('.policy').children('i').removeClass(function (index, className) {
+            return (className.match (/(^|\s)fa-\S+/g) || []).join(' ');
+        }).addClass('fa-exclamation-circle');
+
         if (response.responseCode == 0) {
             if (response.redirectUrl) {
                 window.location = response.redirectUrl;
             }
         } else {
             PNotify.error(response.responseMessage);
+
+            if (response.responseData && response.responseData.passwordPolicyErrors) {
+                if (Object.keys(response.responseData.passwordPolicyErrors).length > 0) {
+                    for (var passwordPolicyError in response.responseData.passwordPolicyErrors) {
+                        if (response.responseData.passwordPolicyErrors[passwordPolicyError] == false) {
+                            $('.' + passwordPolicyError).removeClass(function (index, className) {
+                                return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                            }).addClass('text-success');
+                            $('.' + passwordPolicyError).children('i').removeClass(function (index, className) {
+                                return (className.match (/(^|\s)fa-\S+/g) || []).join(' ');
+                            }).addClass('fa-check-circle');
+                        } else if (response.responseData.passwordPolicyErrors[passwordPolicyError] == true) {
+                            $('.' + passwordPolicyError).removeClass(function (index, className) {
+                                return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                            }).addClass('text-danger');
+                            $('.' + passwordPolicyError).children('i').removeClass(function (index, className) {
+                                return (className.match (/(^|\s)fa-\S+/g) || []).join(' ');
+                            }).addClass('fa-times-circle');
+                        }
+                    }
+                }
+            }
         }
+
         if (response.tokenKey && response.token) {
             $("#security-token").attr("name", response.tokenKey);
             $("#security-token").val(response.token);
@@ -294,7 +386,7 @@ $('#{{componentId}}-{{sectionId}}-verification').on('input propertychange', func
 $('#{{componentId}}-{{sectionId}}-verify').click(function(e) {
     e.preventDefault();
 
-    // $(this).attr('disabled', true);
+    $(this).attr('disabled', true);
     $(this).children('i').attr('hidden', false);
 
     var postData = { };

@@ -1,3 +1,4 @@
+{{var_dump(canUse2fa)}}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -62,7 +63,7 @@
             ]
         )}}
     </div>
-    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyPwresetNeed2fa'] is defined and coreSettings['security']['passwordPolicySettings']['passwordPolicyPwresetNeed2fa'] == true and canUse2fa is defined and canUse2fa|length > 0 %}
+    {% if coreSettings['security']['twofa'] is defined and coreSettings['security']['twofa'] == 'true' and coreSettings['security']['twofaSettings']['twofaPwresetNeed2fa'] is defined and coreSettings['security']['twofaSettings']['twofaPwresetNeed2fa'] == true and canUse2fa is defined and canUse2fa|length > 0 %}
         {% include 'profile/form/security/pwreset2fa.html' %}
     {% endif %}
 </div>

@@ -115,7 +115,7 @@ class Fields extends Adminltetags
                     'fieldBazScan'                          => false,
                     'fieldBazPostOnCreate'                  => false,
                     'fieldBazPostOnUpdate'                  => false,
-                    'fieldAdditionalClass'                  => 'mb-0 input-small-text'
+                    'fieldAdditionalClass'                  => 'mb-0 input-small-text text-xs text-info'
                 ]
             );
         }
