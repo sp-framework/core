@@ -93,17 +93,15 @@ class ProfileComponent extends BaseComponent
 
             $pwreset = $this->auth->resetPassword($user, true);
 
-            if ($pwreset) {
-                // $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
-            } else {
-                $this->view->responseMessage = $this->auth->packagesData->responseMessage;
-            }
+            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            $this->view->responseCode = $this->auth->packagesData->responseCode;
 
+            if (isset($this->auth->packagesData->redirectUrl)) {
+                $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
+            }
             if (isset($this->auth->packagesData->responseData)) {
                 $this->view->responseData = $this->auth->packagesData->responseData;
             }
-
-            $this->view->responseCode = $this->auth->packagesData->responseCode;
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }

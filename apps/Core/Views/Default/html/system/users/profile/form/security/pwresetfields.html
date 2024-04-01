@@ -1,4 +1,3 @@
-{{var_dump(canUse2fa)}}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -20,6 +19,10 @@
             ]
         )}}
     </div>
+    {% set strengthMeter = false %}
+    {% if coreSettings['security']['passwordPolicy'] is defined and coreSettings['security']['passwordPolicySettings'] is defined and coreSettings['security']['passwordPolicy'] == 'true' %}
+        {% set strengthMeter = true %}
+    {% endif %}
     <div class="col">
         {{adminltetags.useTag('fields',
             [
@@ -34,7 +37,7 @@
                 'fieldInputType'                        : 'password',
                 'fieldInputPasswordToggleVisibility'    : true,
                 'fieldInputPasswordGenerate'            : true,
-                'fieldInputPasswordStrengthMeter'       : true,
+                'fieldInputPasswordStrengthMeter'       : strengthMeter,
                 'fieldRequired'                         : true,
                 'fieldBazScan'                          : true,
                 'fieldBazPostOnCreate'                  : false,

@@ -304,6 +304,15 @@ $('#{{componentId}}-{{sectionId}}-pwreset-button').click(function(e) {
             if (response.redirectUrl) {
                 window.location = response.redirectUrl;
             }
+            $('#{{componentId}}-{{sectionId}}-current_password').val('');
+            $('#{{componentId}}-{{sectionId}}-new_password').val('').trigger('change');
+            $('#{{componentId}}-{{sectionId}}-confirm_password').val('');
+            if ($('#twofa-otp').attr('hidden') === 'hidden') {
+                $('#{{componentId}}-{{sectionId}}-twofa_email').val('');
+            } else if ($('#twofa-email').attr('hidden') === 'hidden') {
+                $('#{{componentId}}-{{sectionId}}-twofa_otp').val('');
+            }
+            PNotify.success(response.responseMessage);
         } else {
             PNotify.error(response.responseMessage);
 
