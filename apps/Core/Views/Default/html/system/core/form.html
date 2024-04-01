@@ -195,46 +195,45 @@ dataCollectionSection =
 
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
-
                     if ($('#{{componentId}}-{{sectionId}}-password_policy').find('input[type=radio]:checked').data('value') === 'passwordpolicyon') {
-                        postData['length_min'] = $('#{{componentId}}-{{sectionId}}-password_policy_length_min').val();
-                        if (postData['length_min'] === '' || postData['length_min'] === '0') {
-                            postData['length_min'] = 8;
+                        postData['passwordpolicylengthmin'] = $('#{{componentId}}-{{sectionId}}-password_policy_length_min').val();
+                        if (postData['passwordpolicylengthmin'] === '' || postData['passwordpolicylengthmin'] === '0') {
+                            postData['passwordpolicylengthmin'] = 8;
                         }
-                        postData['length_max'] = $('#{{componentId}}-{{sectionId}}-password_policy_length_max').val();
-                        if (postData['length_max'] === '' || postData['length_max'] === '0') {
-                            postData['length_max'] = 8;
+                        postData['passwordpolicylengthmax'] = $('#{{componentId}}-{{sectionId}}-password_policy_length_max').val();
+                        if (postData['passwordpolicylengthmax'] === '' || postData['passwordpolicylengthmax'] === '0') {
+                            postData['passwordpolicylengthmax'] = 8;
                         }
-                        postData['complexity'] = $('#{{componentId}}-{{sectionId}}-password_policy_complexity').val();
-                        if ($('#{{componentId}}-{{sectionId}}-password_policy_complexity').val() === 'complex') {
-                            postData['uppercase'] = $('#{{componentId}}-{{sectionId}}-password_policy_uppercase')[0].checked;
+                        postData['passwordpolicycomplexity'] = $('#{{componentId}}-{{sectionId}}-password_policy_complexity').val();
+                        if (postData['passwordpolicycomplexity'] === 'complex') {
+                            postData['passwordpolicyuppercase'] = $('#{{componentId}}-{{sectionId}}-password_policy_uppercase')[0].checked;
                             if ($('#{{componentId}}-{{sectionId}}-password_policy_uppercase')[0].checked === true) {
-                                postData['uppercase_min_count'] = $('#{{componentId}}-{{sectionId}}-password_policy_uppercase_min_count').val();
-                                postData['uppercase_max_count'] = $('#{{componentId}}-{{sectionId}}-password_policy_uppercase_max_count').val();
-                                postData['uppercase_include'] = $('#{{componentId}}-{{sectionId}}-password_policy_uppercase_include').val();
+                                postData['passwordpolicyuppercasemincount'] = $('#{{componentId}}-{{sectionId}}-password_policy_uppercase_min_count').val();
+                                postData['passwordpolicyuppercasemaxcount'] = $('#{{componentId}}-{{sectionId}}-password_policy_uppercase_max_count').val();
+                                postData['passwordpolicyuppercaseinclude'] = $('#{{componentId}}-{{sectionId}}-password_policy_uppercase_include').val();
                             }
-                            postData['lowercase'] = $('#{{componentId}}-{{sectionId}}-password_policy_lowercase')[0].checked;
+                            postData['passwordpolicylowercase'] = $('#{{componentId}}-{{sectionId}}-password_policy_lowercase')[0].checked;
                             if ($('#{{componentId}}-{{sectionId}}-password_policy_lowercase')[0].checked === true) {
-                                postData['lowercase_min_count'] = $('#{{componentId}}-{{sectionId}}-password_policy_lowercase_min_count').val();
-                                postData['lowercase_max_count'] = $('#{{componentId}}-{{sectionId}}-password_policy_lowercase_max_count').val();
-                                postData['lowercase_include'] = $('#{{componentId}}-{{sectionId}}-password_policy_lowercase_include').val();
+                                postData['passwordpolicylowercasemincount'] = $('#{{componentId}}-{{sectionId}}-password_policy_lowercase_min_count').val();
+                                postData['passwordpolicylowercasemaxcount'] = $('#{{componentId}}-{{sectionId}}-password_policy_lowercase_max_count').val();
+                                postData['passwordpolicylowercaseinclude'] = $('#{{componentId}}-{{sectionId}}-password_policy_lowercase_include').val();
                             }
-                            postData['numbers'] = $('#{{componentId}}-{{sectionId}}-password_policy_numbers')[0].checked;
+                            postData['passwordpolicynumbers'] = $('#{{componentId}}-{{sectionId}}-password_policy_numbers')[0].checked;
                             if ($('#{{componentId}}-{{sectionId}}-password_policy_numbers')[0].checked === true) {
-                                postData['numbers_min_count'] = $('#{{componentId}}-{{sectionId}}-password_policy_numbers_min_count').val();
-                                postData['numbers_max_count'] = $('#{{componentId}}-{{sectionId}}-password_policy_numbers_max_count').val();
-                                postData['numbers_include'] = $('#{{componentId}}-{{sectionId}}-password_policy_numbers_include').val();
+                                postData['passwordpolicynumbersmincount'] = $('#{{componentId}}-{{sectionId}}-password_policy_numbers_min_count').val();
+                                postData['passwordpolicynumbersmaxcount'] = $('#{{componentId}}-{{sectionId}}-password_policy_numbers_max_count').val();
+                                postData['passwordpolicynumbersinclude'] = $('#{{componentId}}-{{sectionId}}-password_policy_numbers_include').val();
                             }
-                            postData['symbols'] = $('#{{componentId}}-{{sectionId}}-password_policy_symbols')[0].checked;
+                            postData['passwordpolicysymbols'] = $('#{{componentId}}-{{sectionId}}-password_policy_symbols')[0].checked;
                             if ($('#{{componentId}}-{{sectionId}}-password_policy_symbols')[0].checked === true) {
-                                postData['symbols_min_count'] = $('#{{componentId}}-{{sectionId}}-password_policy_symbols_min_count').val();
-                                postData['symbols_max_count'] = $('#{{componentId}}-{{sectionId}}-password_policy_symbols_max_count').val();
-                                postData['symbols_include'] = $('#{{componentId}}-{{sectionId}}-password_policy_symbols_include').val();
+                                postData['passwordpolicysymbolsmincount'] = $('#{{componentId}}-{{sectionId}}-password_policy_symbols_min_count').val();
+                                postData['passwordpolicysymbolsmaxcount'] = $('#{{componentId}}-{{sectionId}}-password_policy_symbols_max_count').val();
+                                postData['passwordpolicysymbolsinclude'] = $('#{{componentId}}-{{sectionId}}-password_policy_symbols_include').val();
 
                             }
-                            postData['avoidSimilar'] = $('#{{componentId}}-{{sectionId}}-password_policy_avoid_similar')[0].checked;
+                            postData['passwordpolicyavoidsimilar'] = $('#{{componentId}}-{{sectionId}}-password_policy_avoid_similar')[0].checked;
                             if ($('#{{componentId}}-{{sectionId}}-password_policy_avoid_similar')[0].checked === true) {
-                                postData['avoid_similar_characters'] = $('#{{componentId}}-{{sectionId}}-password_policy_avoid_similar_characters').val();
+                                postData['passwordpolicyavoidsimilarcharacters'] = $('#{{componentId}}-{{sectionId}}-password_policy_avoid_similar_characters').val();
                             }
                         }
                     }
@@ -247,7 +246,15 @@ dataCollectionSection =
                                 $('#generate-password').html('<h5>' + response.responseData.password + '</h5>');
                             }
                         } else {
-                            PNotify.error(response.responseMessage);
+                            if (response.responseData.password) {
+                                $('#generate-password').html('<h5>' + response.responseData.password + '</h5>');
+                            }
+
+                            if (response.responseCode == 2) {
+                                PNotify.notice(response.responseMessage);
+                            } else {
+                                PNotify.error(response.responseMessage);
+                            }
                         }
                     }, 'json');
                 });

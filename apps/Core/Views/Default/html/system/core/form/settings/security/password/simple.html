@@ -1,0 +1,54 @@
+<div id="simple-div" {{simpleHidden}}>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'password_policy_simple_acceptable_level',
+                    'fieldLabel'                            : 'Acceptable Password Level',
+                    'fieldType'                             : 'select2',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Select acceptable password level for simple password.',
+                    'fieldBazScan'                          : true,
+                    'fieldRequired'                         : true,
+                    'fieldDisabled'                         : false,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldDataSelect2Options'               : availablePasswordStrengthLevels,
+                    'fieldDataSelect2OptionsKey'            : 'id',
+                    'fieldDataSelect2OptionsValue'          : 'name',
+                    'fieldDataSelect2OptionsArray'          : true,
+                    'fieldDataSelect2OptionsSelected'       : passwordPolicySimpleAcceptableLevel
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'password_policy_acceptable_test',
+                    'fieldHelp'                             : true,
+                    'fieldLabel'                            : 'Acceptable Level Password Test',
+                    'fieldHelpTooltipContent'               : 'Enter a password to check its strength.',
+                    'fieldHidden'                           : false,
+                    'fieldType'                             : 'input',
+                    'fieldInputType'                        : 'password',
+                    'fieldInputPasswordToggleVisibility'    : true,
+                    'fieldInputPasswordGenerate'            : true,
+                    'fieldInputPasswordStrengthMeter'       : true,
+                    'fieldInputInfoText'                    : true,
+                    'fieldRequired'                         : false,
+                    'fieldBazScan'                          : true,
+                    'fieldBazPostOnUpdate'                  : false,
+                    'fieldAdditionalClass'                  : 'mb-0'
+                ]
+            )}}
+        </div>
+    </div>
+</div>
