@@ -924,6 +924,11 @@ class Auth
 
     public function resetPassword(array $data, $viaProfile = null)
     {
+        if ($data['pass'] === $data['newpass']) {
+            $this->addResponse('Old and new password match!', 1);
+
+            return false;
+        }
         $validate = $this->validateData($data, 'reset');
 
         if ($validate !== true) {
@@ -946,9 +951,11 @@ class Auth
             }
         }
 
+        $passwordPolicy = false;
         if (isset($this->core->core['settings']['security']['passwordPolicy']) &&
             $this->core->core['settings']['security']['passwordPolicy'] == 'true'
         ) {
+            $passwordPolicy = true;
             $this->passwordPolicyErrors['passwordPolicyBlockPreviousPasswords'] = false;
             $this->passwordPolicyErrors['passwordPolicySimpleAcceptableLevel'] = false;
 
@@ -959,27 +966,43 @@ class Auth
             }
         }
 
-        $this->account['security']['password'] = $this->secTools->hashPassword($data['newpass'], $this->config->security->passwordWorkFactor);
+        $security = $this->getAccountSecurityObject();
 
-        $this->account['security']['force_pwreset'] = null;
+        $security->password = $this->secTools->hashPassword($data['newpass'], $this->config->security->passwordWorkFactor);
+        $security->force_pwreset = null;
+        $security->password_set_on = time();
 
-        $this->account['security']['password_set_on'] = time();
+        if ($passwordPolicy) {
+            $security = $this->setPasswordHistory($data, $security);
+        }
 
-        if ($this->accounts->addUpdateSecurity($this->account['id'], $this->account['security'])) {
+        if ($this->accounts->addUpdateSecurity($this->account['id'], (array) $security)) {
             $this->logger->log->info('Password reset successful for account ' . $this->account['email'] . ' via pwreset.');
 
+
+            if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
+                $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
+            } else {
+                $this->packagesData->redirectUrl = $this->links->url('home');
+            }
+
             if ($viaProfile) {
-                // $this->logout();
+                $this->addResponse('Password change successful.');
+
+                //Check if we need to relogin or not.
+                if (isset($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyForceReloginAfterPwreset']) &&
+                    $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyForceReloginAfterPwreset'] == true
+                ) {
+                    $this->logout();
+
+                    return true;
+                }
+
+                unset($this->packagesData->redirectUrl);
+                unset($this->packagesData->responseData);
             } else {
                 $this->addResponse('Authenticated. Password changed. Redirecting...');
             }
-
-            //Redirect as per core settings.
-            // if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
-            //     $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
-            // } else {
-            //     $this->packagesData->redirectUrl = $this->links->url('home');
-            // }
 
             return true;
         } else {
@@ -1001,17 +1024,55 @@ class Auth
                     $security->password_history = $this->helper->decode($security->password_history, true);
                 }
 
+                $security->password_history = array_reverse($security->password_history, true);//reverse to check last password first and so on.
+
                 if (count($security->password_history) > 0) {
+                    $count = 1;
                     foreach ($security->password_history as $history) {
                         if ($this->secTools->checkPassword($data['newpass'], $history)) {
                             return true;
                         }
+
+                        if ($count === (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords']) {
+                            return false;//we only check x amount of password configured, rest we ignore.
+                        }
+
+                        $count++;
                     }
                 }
             }
         }
 
         return false;
+    }
+
+    protected function setPasswordHistory($data, $security)
+    {
+        if (isset($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords']) &&
+            (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'] > 0
+        ) {
+            if ($security->password_history && $security->password_history !== '') {
+                if (is_string($security->password_history)) {
+                    $security->password_history = $this->helper->decode($security->password_history, true);
+                }
+
+                if (count($security->password_history) < (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords']) {
+                    $security->password_history[$security->password_set_on] = $security->password;
+                } else if (count($security->password_history) === (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords']) {
+                    //remove oldest password and add the new one.
+                    $security->password_history = array_slice($security->password_history, 1, null, true);
+                    $security->password_history[$security->password_set_on] = $security->password;
+                } else if (count($security->password_history) > (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords']) {
+                    $historyLengthShouldBe = count($security->password_history) - (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'];
+                    $security->password_history = array_slice($security->password_history, $historyLengthShouldBe + 1, null, true);//remove more then defined + 1 for the last password.
+                    $security->password_history[$security->password_set_on] = $security->password;
+                }
+            } else {
+                $security->password_history[$security->password_set_on] = $security->password;
+            }
+        }
+
+        return $security;
     }
 
     protected function checkPwPolicy($data)
