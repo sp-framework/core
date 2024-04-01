@@ -84,42 +84,46 @@ class Utils extends BasePackage
     {
         $password = null;
 
-        if (isset($params['length_min']) && $params['length_min'] < 4) {
-            $params['length_min'] = 4;
+        if (isset($params['passwordpolicylengthmin']) && $params['passwordpolicylengthmin'] < 4) {
+            $params['passwordpolicylengthmin'] = 4;
         }
-        if (!isset($params['length_min'])) {
-            $params['length_min'] = 8;
-        }
-
-        if (isset($params['length_max']) && $params['length_max'] > 20) {
-            $params['length_max'] = 20;
-        }
-        if (!isset($params['length_max'])) {
-            $params['length_max'] = 12;
+        if (!isset($params['passwordpolicylengthmin'])) {
+            $params['passwordpolicylengthmin'] = 8;
         }
 
-        if (!isset($params['complexity'])) {
-            $params['complexity'] = 'simple';
+        if (isset($params['passwordpolicylengthmax']) && $params['passwordpolicylengthmax'] > 20) {
+            $params['passwordpolicylengthmax'] = 20;
+        }
+        if (!isset($params['passwordpolicylengthmax'])) {
+            $params['passwordpolicylengthmax'] = 12;
         }
 
-        if ($params['complexity'] === 'simple') {
-            $password = $this->secTools->random->base62($params['length_min']);
-        } else if ($params['complexity'] === 'complex') {
-            if ((!isset($params['lowercase']) &&
-                 !isset($params['uppercase']) &&
-                 !isset($params['numbers']) &&
-                 !isset($params['symbols']) &&
-                 !isset($params['avoid_similar'])) ||
-                ((isset($params['lowercase']) && $params['lowercase'] == false) &&
-                 (isset($params['uppercase']) && $params['uppercase'] == false) &&
-                 (isset($params['numbers']) && $params['numbers'] == false) &&
-                 (isset($params['symbols']) && $params['symbols'] == false) &&
-                 (isset($params['avoid_similar']) && $params['avoid_similar'] == false)
+        if (!isset($params['passwordpolicycomplexity'])) {
+            $params['passwordpolicycomplexity'] = 'simple';
+        }
+
+        if ($params['passwordpolicycomplexity'] === 'simple') {
+            $password = $this->secTools->random->base62($params['passwordpolicylengthmin']);
+
+            $this->addResponse('Simple complexity password generate successfully', 0, ['password' => $password]);
+
+            return;
+        } else if ($params['passwordpolicycomplexity'] === 'complex') {
+            if ((!isset($params['passwordpolicyuppercase']) &&
+                 !isset($params['passwordpolicylowercase']) &&
+                 !isset($params['passwordpolicynumbers']) &&
+                 !isset($params['passwordpolicysymbols']) &&
+                 !isset($params['passwordpolicyavoidsimilar'])) ||
+                ((isset($params['passwordpolicyuppercase']) && filter_var($params['passwordpolicyuppercase'], FILTER_VALIDATE_BOOLEAN) == false) &&
+                 (isset($params['passwordpolicylowercase']) && filter_var($params['passwordpolicylowercase'], FILTER_VALIDATE_BOOLEAN) == false) &&
+                 (isset($params['passwordpolicynumbers']) && filter_var($params['passwordpolicynumbers'], FILTER_VALIDATE_BOOLEAN) == false) &&
+                 (isset($params['passwordpolicysymbols']) && filter_var($params['passwordpolicysymbols'], FILTER_VALIDATE_BOOLEAN) == false) &&
+                 (isset($params['passwordpolicyavoidsimilar']) && filter_var($params['passwordpolicyavoidsimilar'], FILTER_VALIDATE_BOOLEAN) == false)
                 )
             ) {
-                $password = $this->secTools->random->base62($params['length_min']);
+                $password = $this->secTools->random->base62($params['passwordpolicylengthmin']);
 
-                $this->addResponse('Password generated using simple generator as no option was enabled.', 1, ['password' => $password]);
+                $this->addResponse('Password generated using default generator as no option was enabled. Select complex complexity options or use simple complexity.', 2, ['password' => $password]);
 
                 return;
             } else {
@@ -131,73 +135,75 @@ class Utils extends BasePackage
                     }
 
                     $password = $generator->generatePassword();
-                } catch (\Exception $e) {//Generate Simple password if something fails.
+
+                    $this->addResponse('Complex complexity password generate successfully', 0, ['password' => $password]);
+
+                    return;
+                } catch (\Exception $e) {//Generate password using default generator if something fails.
                     $this->logger->log->debug($e->getMessage());
 
-                    $password = $this->secTools->random->base62($params['length_min']);
+                    $password = $this->secTools->random->base62($params['passwordpolicylengthmin']);
 
-                    $this->addResponse('Password generated using simple generator. Contact developer for more help.', 1, ['password' => $password]);
+                    $this->addResponse('Password generated using default generator due to an error. Contact developer for more help.', 1, ['password' => $password]);
                 }
             }
         }
 
         if (!$password) {
-            $this->addResponse('Error Generating Password', 1);
+            $this->addResponse('Error generating password', 1);
 
-            return;
+            return false;
         }
-
-        $this->addResponse('Password Generate Successfully', 0, ['password' => $password]);
     }
 
     protected function initPasswordGenerator($params = [])
     {
-        $lowercase = $uppercase = $numbers = $symbols = false;
-        $lowercaseMinCount = $uppercaseMinCount = $numbersMinCount = $symbolsMinCount = null;
-        $lowercaseMaxCount = $uppercaseMaxCount = $numbersMaxCount = $symbolsMaxCount = null;
+        $uppercase = $lowercase = $numbers = $symbols = false;
+        $uppercaseMinCount = $lowercaseMinCount = $numbersMinCount = $symbolsMinCount = null;
+        $uppercaseMaxCount = $lowercaseMaxCount = $numbersMaxCount = $symbolsMaxCount = null;
         $maxCountTotal = 0;
 
-        if (isset($params['uppercase'])) {
-            $uppercase = $params['uppercase'] == true ? true : false ;
+        if (isset($params['passwordpolicyuppercase'])) {
+            $uppercase = $params['passwordpolicyuppercase'] == true ? true : false ;
         }
-        if (isset($params['lowercase'])) {
-            $lowercase = $params['lowercase'] == true ? true : false ;
+        if (isset($params['passwordpolicylowercase'])) {
+            $lowercase = $params['passwordpolicylowercase'] == true ? true : false ;
         }
-        if (isset($params['numbers'])) {
-            $numbers = $params['numbers'] == true ? true : false ;
+        if (isset($params['passwordpolicynumbers'])) {
+            $numbers = $params['passwordpolicynumbers'] == true ? true : false ;
         }
-        if (isset($params['symbols'])) {
-            $symbols = $params['symbols'] == true ? true : false ;
+        if (isset($params['passwordpolicysymbols'])) {
+            $symbols = $params['passwordpolicysymbols'] == true ? true : false ;
         }
-        if (isset($params['avoid_similar'])) {
-            $avoid_similar = $params['avoid_similar'] == 'true' ? true : false ;
+        if (isset($params['passwordpolicyavoidsimilar'])) {
+            $avoid_similar = $params['passwordpolicyavoidsimilar'] == 'true' ? true : false ;
         }
-        if (isset($params['uppercase_min_count']) && $params['uppercase_min_count'] !== '') {
-            $uppercaseMinCount = (int) abs($params['uppercase_min_count']);
+        if (isset($params['passwordpolicyuppercasemincount']) && $params['passwordpolicyuppercasemincount'] !== '') {
+            $uppercaseMinCount = (int) abs($params['passwordpolicyuppercasemincount']);
         }
-        if (isset($params['uppercase_max_count']) && $params['uppercase_max_count'] !== '') {
-            $uppercaseMaxCount = (int) abs($params['uppercase_max_count']);
+        if (isset($params['passwordpolicyuppercasemaxcount']) && $params['passwordpolicyuppercasemaxcount'] !== '') {
+            $uppercaseMaxCount = (int) abs($params['passwordpolicyuppercasemaxcount']);
             $maxCountTotal = $maxCountTotal + $uppercaseMaxCount;
         }
-        if (isset($params['lowercase_min_count']) && $params['lowercase_min_count'] !== '') {
-            $lowercaseMinCount = (int) abs($params['lowercase_min_count']);
+        if (isset($params['passwordpolicylowercasemincount']) && $params['passwordpolicylowercasemincount'] !== '') {
+            $lowercaseMinCount = (int) abs($params['passwordpolicylowercasemincount']);
         }
-        if (isset($params['lowercase_max_count']) && $params['lowercase_max_count'] !== '') {
-            $lowercaseMaxCount = (int) abs($params['lowercase_max_count']);
+        if (isset($params['passwordpolicylowercasemaxcount']) && $params['passwordpolicylowercasemaxcount'] !== '') {
+            $lowercaseMaxCount = (int) abs($params['passwordpolicylowercasemaxcount']);
             $maxCountTotal = $maxCountTotal + $lowercaseMaxCount;
         }
-        if (isset($params['numbers_min_count']) && $params['numbers_min_count'] !== '') {
-            $numbersMinCount = (int) abs($params['numbers_min_count']);
+        if (isset($params['passwordpolicynumbersmincount']) && $params['passwordpolicynumbersmincount'] !== '') {
+            $numbersMinCount = (int) abs($params['passwordpolicynumbersmincount']);
         }
-        if (isset($params['numbers_max_count']) && $params['numbers_max_count'] !== '') {
-            $numbersMaxCount = (int) abs($params['numbers_max_count']);
+        if (isset($params['passwordpolicynumbersmaxcount']) && $params['passwordpolicynumbersmaxcount'] !== '') {
+            $numbersMaxCount = (int) abs($params['passwordpolicynumbersmaxcount']);
             $maxCountTotal = $maxCountTotal + $numbersMaxCount;
         }
-        if (isset($params['symbols_min_count']) && $params['symbols_min_count'] !== '') {
-            $symbolsMinCount = (int) abs($params['symbols_min_count']);
+        if (isset($params['passwordpolicysymbolsmincount']) && $params['passwordpolicysymbolsmincount'] !== '') {
+            $symbolsMinCount = (int) abs($params['passwordpolicysymbolsmincount']);
         }
-        if (isset($params['symbols_max_count']) && $params['symbols_max_count'] !== '') {
-            $symbolsMaxCount = (int) abs($params['symbols_max_count']);
+        if (isset($params['passwordpolicysymbolsmaxcount']) && $params['passwordpolicysymbolsmaxcount'] !== '') {
+            $symbolsMaxCount = (int) abs($params['passwordpolicysymbolsmaxcount']);
             $maxCountTotal = $maxCountTotal + $symbolsMaxCount;
         }
 
@@ -231,7 +237,7 @@ class Utils extends BasePackage
         }
 
         if ($maxCountTotal !== 0 &&
-            $maxCountTotal < (int) $params['length_min'] &&
+            $maxCountTotal < (int) $params['passwordpolicylengthmin'] &&
             $uppercaseMaxCount && $lowercaseMaxCount && $numbersMaxCount && $symbolsMaxCount
         ) {
             $this->addResponse('Max value total has to be greater than minimum length.', 1);
@@ -240,7 +246,7 @@ class Utils extends BasePackage
         }
 
         if ($maxCountTotal !== 0 &&
-            $maxCountTotal > (int) $params['length_max'] &&
+            $maxCountTotal > (int) $params['passwordpolicylengthmax'] &&
             $uppercaseMaxCount && $lowercaseMaxCount && $numbersMaxCount && $symbolsMaxCount
         ) {
             $this->addResponse('Max value total has to be smaller than maximum length.', 1);
@@ -251,46 +257,46 @@ class Utils extends BasePackage
         $generator = new RequirementPasswordGenerator();
 
         $generator
-            ->setLength((int) $params['length_min'], 'minimum')
-            ->setLength((int) $params['length_max'], 'maximum')
+            ->setLength((int) $params['passwordpolicylengthmin'], 'minimum')
+            ->setLength((int) $params['passwordpolicylengthmax'], 'maximum')
             ->setOptionValue(RequirementPasswordGenerator::OPTION_UPPER_CASE, $uppercase)
-            ->setOptionValue(RequirementPasswordGenerator::OPTION_LOWER_CASE, $lowercase)
-            ->setOptionValue(RequirementPasswordGenerator::OPTION_NUMBERS, $numbers)
-            ->setOptionValue(RequirementPasswordGenerator::OPTION_SYMBOLS, $symbols)
-            ->setOptionValue(RequirementPasswordGenerator::OPTION_AVOID_SIMILAR, $avoid_similar)
             ->setMinimumCount(RequirementPasswordGenerator::OPTION_UPPER_CASE, $uppercaseMinCount)
             ->setMaximumCount(RequirementPasswordGenerator::OPTION_UPPER_CASE, $uppercaseMaxCount)
+            ->setOptionValue(RequirementPasswordGenerator::OPTION_LOWER_CASE, $lowercase)
             ->setMinimumCount(RequirementPasswordGenerator::OPTION_LOWER_CASE, $lowercaseMinCount)
             ->setMaximumCount(RequirementPasswordGenerator::OPTION_LOWER_CASE, $lowercaseMaxCount)
+            ->setOptionValue(RequirementPasswordGenerator::OPTION_NUMBERS, $numbers)
             ->setMinimumCount(RequirementPasswordGenerator::OPTION_NUMBERS, $numbersMinCount)
             ->setMaximumCount(RequirementPasswordGenerator::OPTION_NUMBERS, $numbersMaxCount)
+            ->setOptionValue(RequirementPasswordGenerator::OPTION_SYMBOLS, $symbols)
             ->setMinimumCount(RequirementPasswordGenerator::OPTION_SYMBOLS, $symbolsMinCount)
             ->setMaximumCount(RequirementPasswordGenerator::OPTION_SYMBOLS, $symbolsMaxCount)
+            ->setOptionValue(RequirementPasswordGenerator::OPTION_AVOID_SIMILAR, $avoid_similar)
         ;
 
-        if ($uppercase === true && isset($params['uppercase_include']) && $params['uppercase_include'] !== '') {
+        if ($uppercase === true && isset($params['passwordpolicyuppercaseinclude']) && $params['passwordpolicyuppercaseinclude'] !== '') {
             $generator
-                ->setParameter(RequirementPasswordGenerator::PARAMETER_UPPER_CASE, $params['uppercase_include'])
+                ->setParameter(RequirementPasswordGenerator::PARAMETER_UPPER_CASE, $params['passwordpolicyuppercaseinclude'])
             ;
         }
-        if ($lowercase === true && isset($params['lowercase_include']) && $params['lowercase_include'] !== '') {
+        if ($lowercase === true && isset($params['passwordpolicylowercaseinclude']) && $params['passwordpolicylowercaseinclude'] !== '') {
             $generator
-                ->setParameter(RequirementPasswordGenerator::PARAMETER_LOWER_CASE, $params['lowercase_include'])
+                ->setParameter(RequirementPasswordGenerator::PARAMETER_LOWER_CASE, $params['passwordpolicylowercaseinclude'])
             ;
         }
-        if ($numbers === true && isset($params['numbers_include']) && $params['numbers_include'] !== '') {
+        if ($numbers === true && isset($params['passwordpolicynumbersinclude']) && $params['passwordpolicynumbersinclude'] !== '') {
             $generator
-                ->setParameter(RequirementPasswordGenerator::PARAMETER_NUMBERS, $params['numbers_include'])
+                ->setParameter(RequirementPasswordGenerator::PARAMETER_NUMBERS, $params['passwordpolicynumbersinclude'])
             ;
         }
-        if ($symbols === true && isset($params['symbols_include']) && $params['symbols_include'] !== '') {
+        if ($symbols === true && isset($params['passwordpolicysymbolsinclude']) && $params['passwordpolicysymbolsinclude'] !== '') {
             $generator
-                ->setParameter(RequirementPasswordGenerator::PARAMETER_SYMBOLS, $params['symbols_include'])
+                ->setParameter(RequirementPasswordGenerator::PARAMETER_SYMBOLS, $params['passwordpolicysymbolsinclude'])
             ;
         }
-        if ($avoid_similar === true && isset($params['avoid_similar_characters']) && $params['avoid_similar_characters'] !== '') {
+        if ($avoid_similar === true && isset($params['passwordpolicyavoidsimilarcharacters']) && $params['passwordpolicyavoidsimilarcharacters'] !== '') {
             $generator
-                ->setParameter(RequirementPasswordGenerator::PARAMETER_SIMILAR, $params['avoid_similar_characters'])
+                ->setParameter(RequirementPasswordGenerator::PARAMETER_SIMILAR, $params['passwordpolicyavoidsimilarcharacters'])
             ;
         }
 

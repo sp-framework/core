@@ -8921,26 +8921,31 @@ var BazContentFields = function() {
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-                    if ($('#' + sectionId + '-password_policy_acceptable_level').length > 0 &&
-                        $('#' + sectionId + '-password_policy_acceptable_level') != '0'
+                    if (($('#' + sectionId + '-password_policy_simple_acceptable_level').length > 0 &&
+                        $('#' + sectionId + '-password_policy_simple_acceptable_level') != '0') ||
+                        $('#' + sectionId + '-password-policy-simple').length > 0
                     ) {
-                        postData['complexity'] = 'simple';
-                        if ($('#' + sectionId + '-password_policy_acceptable_level').val() == '1') {
-                            postData['lengthMin'] = '4';
-                        } else if ($('#' + sectionId + '-password_policy_acceptable_level').val() == '2') {
-                            postData['lengthMin'] = '8';
-                        } else if ($('#' + sectionId + '-password_policy_acceptable_level').val() == '3') {
-                            postData['lengthMin'] = '10';
-                        } else if ($('#' + sectionId + '-password_policy_acceptable_level').val() == '4') {
-                            postData['lengthMin'] = '12';
+                        postData['passwordpolicycomplexity'] = 'simple';
+                        if ($('#' + sectionId + '-password_policy_simple_acceptable_level').val() == '1' ||
+                            $('#' + sectionId + '-password-policy-simple').data('simple_acceptable_level') == '1'
+                        ) {
+                            postData['passwordpolicylengthmin'] = '4';
+                        } else if ($('#' + sectionId + '-password_policy_simple_acceptable_level').val() == '2' ||
+                            $('#' + sectionId + '-password-policy-simple').data('simple_acceptable_level') == '2'
+                        ) {
+                            postData['passwordpolicylengthmin'] = '8';
+                        } else if ($('#' + sectionId + '-password_policy_simple_acceptable_level').val() == '3' ||
+                            $('#' + sectionId + '-password-policy-simple').data('simple_acceptable_level') == '3'
+                        ) {
+                            postData['passwordpolicylengthmin'] = '10';
+                        } else if ($('#' + sectionId + '-password_policy_simple_acceptable_level').val() == '4' ||
+                            $('#' + sectionId + '-password-policy-simple').data('simple_acceptable_level') == '4'
+                        ) {
+                            postData['passwordpolicylengthmin'] = '12';
                         }
-                    }
-
-                    if ($('#' + sectionId + '-pwreset-simple').length > 0) {
-                        postData['complexity'] = 'simple';
                         postData = $.extend(postData, $('#' + sectionId + '-password-policy-simple').data());
-                    } else if ($('#' + sectionId + '-pwreset-complex').length > 0) {
-                        postData['complexity'] = 'complex';
+                    } else if ($('#' + sectionId + '-password-policy-complex').length > 0) {
+                        postData['passwordpolicycomplexity'] = 'complex';
                         postData = $.extend(postData, $('#' + sectionId + '-password-policy-complex').data());
                     }
 

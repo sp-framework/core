@@ -7,6 +7,7 @@ use OTPHP\TOTP;
 use ParagonIE\ConstantTime\Base32;
 use Phalcon\Filter\Validation\Validator\Confirmation;
 use Phalcon\Filter\Validation\Validator\PresenceOf;
+use Phalcon\Filter\Validation\Validator\StringLength;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
@@ -947,7 +948,7 @@ class Auth
             $this->core->core['settings']['security']['twofaSettings']['twofaPwresetNeed2fa'] == true
         ) {
             if (!$this->validateTwoFaCode($this->getAccountSecurityObject(), $data)) {
-                // return false;
+                return false;
             }
         }
 
@@ -957,7 +958,6 @@ class Auth
         ) {
             $passwordPolicy = true;
             $this->passwordPolicyErrors['passwordPolicyBlockPreviousPasswords'] = false;
-            $this->passwordPolicyErrors['passwordPolicySimpleAcceptableLevel'] = false;
 
             if (!$this->checkPwPolicy($data)) {
                 $this->addResponse('New password failed password policy. Please try again...', 1, ['passwordPolicyErrors' => $this->passwordPolicyErrors]);
@@ -1085,22 +1085,309 @@ class Auth
 
         if (isset($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyComplexity'])) {
             if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyComplexity'] === 'simple') {
-                $checkPwStrength = $this->checkPwStrength($data['newpass']);
-
-                if (isset($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel']) &&
-                    (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel'] > 0
-                ) {
-                    if ($checkPwStrength !== false &&
-                        $checkPwStrength < (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel']
-                    ) {
-                        $this->passwordPolicyErrors['passwordPolicySimpleAcceptableLevel'] = true;
-
-                        return false;
-                    }
-                }
+                return $this->checkPwPolicySimple($data);
             } else if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyComplexity'] === 'complex') {
-                //
+                return $this->checkPwPolicyComplex($data);
             }
+        }
+
+        return true;
+    }
+
+    protected function checkPwPolicySimple($data)
+    {
+        $this->passwordPolicyErrors['passwordPolicySimpleAcceptableLevel'] = false;
+
+        $checkPwStrength = $this->checkPwStrength($data['newpass']);
+
+        if (isset($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel']) &&
+            (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel'] > 0
+        ) {
+            if ($checkPwStrength !== false &&
+                $checkPwStrength < (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel']
+            ) {
+                $this->passwordPolicyErrors['passwordPolicySimpleAcceptableLevel'] = true;
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected function checkPwPolicyComplex($data)
+    {
+        //Min & Max Length check
+        $this->passwordPolicyErrors['passwordPolicyLengthMin'] = false;
+        $this->passwordPolicyErrors['passwordPolicyLengthMax'] = false;
+
+        $this->validation->init();
+
+        $passCheckArr = [];
+        $stringLengthArr = [];
+
+        array_push($passCheckArr, 'checkLength');
+        $data['checkLength'] = $data['newpass'];
+        $stringLengthArr['min']['checkLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLengthMin'];
+        $stringLengthArr['max']['checkLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLengthMax'];
+        $stringLengthArr['messageMinimum']['checkLength'] = "passwordPolicyLengthMin|Password minimum length requirement failed.";
+        $stringLengthArr['messageMaximum']['checkLength'] = "passwordPolicyLengthMax|Password maximum length requirement failed.";
+        $stringLengthArr['includedMinimum']['checkLength'] = false;
+        $stringLengthArr['includedMaximum']['checkLength'] = false;
+
+        //Uppercase
+        if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyUppercase'] == true) {
+            $regex = '/[' . $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyUppercaseInclude'] . ']/m';
+            preg_match_all($regex, $data['newpass'], $uppercaseMatches);
+
+            $this->passwordPolicyErrors['passwordPolicyUppercaseMinCount'] = false;
+            $this->passwordPolicyErrors['passwordPolicyUppercaseMaxCount'] = false;
+
+            if (count($uppercaseMatches[0]) > 0) {
+                if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyUppercaseMinCount'] &&
+                    (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyUppercaseMinCount'] > 0
+                ) {
+                    if (!$this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyUppercaseMaxCount']) {
+                        $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyUppercaseMaxCount'] =
+                            $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLengthMax'];
+                    }
+                    array_push($passCheckArr, 'checkUpperLength');
+                    $data['checkUpperLength'] = implode('', $uppercaseMatches[0]);
+                    $stringLengthArr['min']['checkUpperLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyUppercaseMinCount'];
+                    $stringLengthArr['max']['checkUpperLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyUppercaseMaxCount'];
+                    $stringLengthArr['messageMinimum']['checkUpperLength'] = "passwordPolicyUppercaseMinCount|Password minimum length requirement failed.";
+                    $stringLengthArr['messageMaximum']['checkUpperLength'] = "passwordPolicyUppercaseMaxCount|Password maximum length requirement failed.";
+                    $stringLengthArr['includedMinimum']['checkUpperLength'] = false;
+                    $stringLengthArr['includedMaximum']['checkUpperLength'] = false;
+                }
+
+                $this->passwordPolicyErrors['passwordPolicyUppercaseInclude'] = false;
+
+                $password = $data['newpass'];
+
+                foreach ($uppercaseMatches[0] as $match) {
+                    $password = str_replace($match, '', $password);
+                }
+
+                $regex = '/[A-Z]/m';
+                preg_match($regex, $password, $passwordIncludes);
+
+                if (count($passwordIncludes) > 0) {
+                    $this->passwordPolicyErrors['passwordPolicyUppercaseInclude'] = true;
+                    array_push($passCheckArr, 'checkUpperInclude');
+                    $data['checkUpperInclude'] = $passwordIncludes[0];
+
+                    $stringLengthArr['min']['checkUpperInclude'] = 0;
+                    $stringLengthArr['max']['checkUpperInclude'] = 0;
+                    $stringLengthArr['messageMinimum']['checkUpperInclude'] = "passwordPolicyUppercaseInclude|Password has invalid uppercase character.";
+                    $stringLengthArr['messageMaximum']['checkUpperInclude'] = "passwordPolicyUppercaseInclude|Password has invalid uppercase character.";
+                    $stringLengthArr['includedMinimum']['checkUpperInclude'] = false;
+                    $stringLengthArr['includedMaximum']['checkUpperInclude'] = false;
+                }
+            }
+
+            if (count($uppercaseMatches[0]) === 0) {
+                $this->passwordPolicyErrors['passwordPolicyUppercaseMinCount'] = true;
+                $this->passwordPolicyErrors['passwordPolicyUppercaseMaxCount'] = true;
+                $this->passwordPolicyErrors['passwordPolicyUppercaseInclude'] = true;
+            }
+        }
+
+        //Lowercase
+        if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLowercase'] == true) {
+            $regex = '/[' . $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLowercaseInclude'] . ']/m';
+            preg_match_all($regex, $data['newpass'], $lowercaseMatches);
+
+            $this->passwordPolicyErrors['passwordPolicyLowercaseMinCount'] = false;
+            $this->passwordPolicyErrors['passwordPolicyLowercaseMaxCount'] = false;
+
+            if (count($lowercaseMatches[0]) > 0) {
+                if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLowercaseMinCount'] &&
+                    (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLowercaseMinCount'] > 0
+                ) {
+                    if (!$this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLowercaseMaxCount']) {
+                        $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLowercaseMaxCount'] =
+                            $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLengthMax'];
+                    }
+
+                    array_push($passCheckArr, 'checkLowerLength');
+                    $data['checkLowerLength'] = implode('', $lowercaseMatches[0]);
+                    $stringLengthArr['min']['checkLowerLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLowercaseMinCount'];
+                    $stringLengthArr['max']['checkLowerLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLowercaseMaxCount'];
+                    $stringLengthArr['messageMinimum']['checkLowerLength'] = "passwordPolicyLowercaseMinCount|Password minimum length requirement failed.";
+                    $stringLengthArr['messageMaximum']['checkLowerLength'] = "passwordPolicyLowercaseMaxCount|Password maximum length requirement failed.";
+                    $stringLengthArr['includedMinimum']['checkLowerLength'] = false;
+                    $stringLengthArr['includedMaximum']['checkLowerLength'] = false;
+                }
+
+                $this->passwordPolicyErrors['passwordPolicyLowercaseInclude'] = false;
+
+                $password = $data['newpass'];
+
+                foreach ($lowercaseMatches[0] as $match) {
+                    $password = str_replace($match, '', $password);
+                }
+
+                $regex = '/[a-z]/m';
+                preg_match($regex, $password, $passwordIncludes);
+
+                if (count($passwordIncludes) > 0) {
+                    $this->passwordPolicyErrors['passwordPolicyLowercaseInclude'] = true;
+                    array_push($passCheckArr, 'checkLowerInclude');
+                    $data['checkLowerInclude'] = $passwordIncludes[0];
+
+                    $stringLengthArr['min']['checkLowerInclude'] = 0;
+                    $stringLengthArr['max']['checkLowerInclude'] = 0;
+                    $stringLengthArr['messageMinimum']['checkLowerInclude'] = "passwordPolicyLowercaseInclude|Password has invalid lowercase character.";
+                    $stringLengthArr['messageMaximum']['checkLowerInclude'] = "passwordPolicyLowercaseInclude|Password has invalid lowercase character.";
+                    $stringLengthArr['includedMinimum']['checkLowerInclude'] = false;
+                    $stringLengthArr['includedMaximum']['checkLowerInclude'] = false;
+                }
+            }
+
+            if (count($lowercaseMatches[0]) === 0) {
+                $this->passwordPolicyErrors['passwordPolicyLowercaseMinCount'] = true;
+                $this->passwordPolicyErrors['passwordPolicyLowercaseMaxCount'] = true;
+                $this->passwordPolicyErrors['passwordPolicyLowercaseInclude'] = true;
+            }
+        }
+
+        //Numbers
+        if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyNumbers'] == true) {
+            $regex = '/[' . $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyNumbersInclude'] . ']/m';
+            preg_match_all($regex, $data['newpass'], $numbersMatches);
+
+            $this->passwordPolicyErrors['passwordPolicyNumbersMinCount'] = false;
+            $this->passwordPolicyErrors['passwordPolicyNumbersMaxCount'] = false;
+
+            if (count($numbersMatches[0]) > 0) {
+                if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyNumbersMinCount'] &&
+                    (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyNumbersMinCount'] > 0
+                ) {
+                    if (!$this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyNumbersMaxCount']) {
+                        $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyNumbersMaxCount'] =
+                            $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLengthMax'];
+                    }
+
+                    array_push($passCheckArr, 'checkNumbersLength');
+                    $data['checkNumbersLength'] = implode('', $numbersMatches[0]);
+                    $stringLengthArr['min']['checkNumbersLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyNumbersMinCount'];
+                    $stringLengthArr['max']['checkNumbersLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyNumbersMaxCount'];
+                    $stringLengthArr['messageMinimum']['checkNumbersLength'] = "passwordPolicyNumbersMinCount|Password minimum length requirement failed.";
+                    $stringLengthArr['messageMaximum']['checkNumbersLength'] = "passwordPolicyNumbersMaxCount|Password maximum length requirement failed.";
+                    $stringLengthArr['includedMinimum']['checkNumbersLength'] = false;
+                    $stringLengthArr['includedMaximum']['checkNumbersLength'] = false;
+                }
+
+                $this->passwordPolicyErrors['passwordPolicyNumbersInclude'] = false;
+
+                $password = $data['newpass'];
+
+                foreach ($numbersMatches[0] as $match) {
+                    $password = str_replace($match, '', $password);
+                }
+
+                $regex = '/[0-9]/m';
+                preg_match($regex, $password, $passwordIncludes);
+
+                if (count($passwordIncludes) > 0) {
+                    $this->passwordPolicyErrors['passwordPolicyNumbersInclude'] = true;
+                    array_push($passCheckArr, 'checkNumbersInclude');
+                    $data['checkNumbersInclude'] = $passwordIncludes[0];
+
+                    $stringLengthArr['min']['checkNumbersInclude'] = 0;
+                    $stringLengthArr['max']['checkNumbersInclude'] = 0;
+                    $stringLengthArr['messageMinimum']['checkNumbersInclude'] = "passwordPolicyNumbersInclude|Password has invalid numbers.";
+                    $stringLengthArr['messageMaximum']['checkNumbersInclude'] = "passwordPolicyNumbersInclude|Password has invalid numbers.";
+                    $stringLengthArr['includedMinimum']['checkNumbersInclude'] = false;
+                    $stringLengthArr['includedMaximum']['checkNumbersInclude'] = false;
+                }
+            }
+
+            if (count($numbersMatches[0]) === 0) {
+                $this->passwordPolicyErrors['passwordPolicyNumbersMinCount'] = true;
+                $this->passwordPolicyErrors['passwordPolicyNumbersMaxCount'] = true;
+                $this->passwordPolicyErrors['passwordPolicyNumbersInclude'] = true;
+            }
+        }
+
+        //Symbols
+        if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySymbols'] == true) {
+            $regex = '/[' . preg_quote($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySymbolsInclude'], '/') . ']/m';
+            preg_match_all($regex, $data['newpass'], $symbolsMatches);
+
+            $this->passwordPolicyErrors['passwordPolicySymbolsMinCount'] = false;
+            $this->passwordPolicyErrors['passwordPolicySymbolsMaxCount'] = false;
+
+            if (count($symbolsMatches[0]) > 0) {
+                if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySymbolsMinCount'] &&
+                    (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySymbolsMinCount'] > 0
+                ) {
+                    if (!$this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySymbolsMaxCount']) {
+                        $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySymbolsMaxCount'] =
+                            $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLengthMax'];
+                    }
+
+                    array_push($passCheckArr, 'checkSymbolsLength');
+                    $data['checkSymbolsLength'] = implode('', $symbolsMatches[0]);
+                    $stringLengthArr['min']['checkSymbolsLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySymbolsMinCount'];
+                    $stringLengthArr['max']['checkSymbolsLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySymbolsMaxCount'];
+                    $stringLengthArr['messageMinimum']['checkSymbolsLength'] = "passwordPolicySymbolsMinCount|Password minimum length requirement failed.";
+                    $stringLengthArr['messageMaximum']['checkSymbolsLength'] = "passwordPolicySymbolsMaxCount|Password maximum length requirement failed.";
+                    $stringLengthArr['includedMinimum']['checkSymbolsLength'] = false;
+                    $stringLengthArr['includedMaximum']['checkSymbolsLength'] = false;
+                }
+
+                $this->passwordPolicyErrors['passwordPolicySymbolsInclude'] = false;
+
+                $password = $data['newpass'];
+
+                foreach ($symbolsMatches[0] as $match) {
+                    $password = str_replace($match, '', $password);
+                }
+
+                $regex = '/[' . preg_quote("!@$%^&*()<>,.?/[]{}-=_+", '/') . ']/m';
+                preg_match($regex, $password, $passwordIncludes);
+
+                if (count($passwordIncludes) > 0) {
+                    $this->passwordPolicyErrors['passwordPolicySymbolsInclude'] = true;
+                    array_push($passCheckArr, 'checkSymbolsInclude');
+                    $data['checkSymbolsInclude'] = $passwordIncludes[0];
+
+                    $stringLengthArr['min']['checkSymbolsInclude'] = 0;
+                    $stringLengthArr['max']['checkSymbolsInclude'] = 0;
+                    $stringLengthArr['messageMinimum']['checkSymbolsInclude'] = "passwordPolicySymbolsInclude|Password has invalid symbols.";
+                    $stringLengthArr['messageMaximum']['checkSymbolsInclude'] = "passwordPolicySymbolsInclude|Password has invalid symbols.";
+                    $stringLengthArr['includedMinimum']['checkSymbolsInclude'] = false;
+                    $stringLengthArr['includedMaximum']['checkSymbolsInclude'] = false;
+                }
+            }
+
+            if (count($symbolsMatches[0]) === 0) {
+                $this->passwordPolicyErrors['passwordPolicySymbolsMinCount'] = true;
+                $this->passwordPolicyErrors['passwordPolicySymbolsMaxCount'] = true;
+                $this->passwordPolicyErrors['passwordPolicySymbolsInclude'] = true;
+            }
+        }
+
+        $this->validation->add($passCheckArr, StringLength::class, $stringLengthArr);
+
+        $validated = $this->validation->validate($data)->jsonSerialize();
+
+        if (count($validated) > 0) {
+            $messages = 'Error: ';
+
+            foreach ($validated as $key => $value) {
+                $value['message'] = explode('|', $value['message']);
+
+                $this->passwordPolicyErrors[$value['message'][0]] = true;
+
+                $messages .= $value['message'][1] . ' ';
+            }
+
+            $this->addResponse($messages, 1);
+
+            return false;
         }
 
         return true;
