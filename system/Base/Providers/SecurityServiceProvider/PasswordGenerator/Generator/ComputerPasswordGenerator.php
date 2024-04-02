@@ -22,6 +22,8 @@ class ComputerPasswordGenerator extends AbstractPasswordGenerator
     const PARAMETER_SYMBOLS = 'SYMBOLS';
     const PARAMETER_SIMILAR = 'AVOID_SIMILAR';
 
+    private $password = '';
+
     public function __construct()
     {
         $this
@@ -52,26 +54,34 @@ class ComputerPasswordGenerator extends AbstractPasswordGenerator
     {
         $characters = '';
 
+        $enabledOptions = [];
+
         if ($this->getOptionValue(self::OPTION_UPPER_CASE)) {
-            $characters .= $this->getCharactersAsPer(self::OPTION_UPPER_CASE, $this->getParameter(self::PARAMETER_UPPER_CASE, ''), $per);
+            $enabledOptions = array_merge($enabledOptions, [self::OPTION_UPPER_CASE => self::PARAMETER_UPPER_CASE]);
         }
 
         if ($this->getOptionValue(self::OPTION_LOWER_CASE)) {
-            $characters .= $this->getCharactersAsPer(self::OPTION_LOWER_CASE, $this->getParameter(self::PARAMETER_LOWER_CASE, ''), $per);
+            $enabledOptions = array_merge($enabledOptions, [self::OPTION_LOWER_CASE => self::PARAMETER_LOWER_CASE]);
         }
 
         if ($this->getOptionValue(self::OPTION_NUMBERS)) {
-            $characters .= $this->getCharactersAsPer(self::OPTION_NUMBERS, $this->getParameter(self::PARAMETER_NUMBERS, ''), $per);
+            $enabledOptions = array_merge($enabledOptions, [self::OPTION_NUMBERS => self::PARAMETER_NUMBERS]);
         }
 
         if ($this->getOptionValue(self::OPTION_SYMBOLS)) {
-            $characters .= $this->getCharactersAsPer(self::OPTION_SYMBOLS, $this->getParameter(self::PARAMETER_SYMBOLS, ''), $per);
+            $enabledOptions = array_merge($enabledOptions, [self::OPTION_SYMBOLS => self::PARAMETER_SYMBOLS]);
+        }
+
+        if (count($enabledOptions) > 0) {
+            foreach ($enabledOptions as $option => $parameter) {
+                $characters .= $this->getCharactersAsPer($option, $this->getParameter($parameter, ''), $per, count($enabledOptions));
+            }
         }
 
         return $characters;
     }
 
-    protected function getCharactersAsPer($option, $characters, $per)
+    protected function getCharactersAsPer($option, $characters, $per, $enabledOptionsCount)
     {
         if ($this->getOptionValue(self::OPTION_AVOID_SIMILAR)) {
             $removeCharacters = \str_split($this->getParameter(self::PARAMETER_SIMILAR, ''));
@@ -84,10 +94,15 @@ class ComputerPasswordGenerator extends AbstractPasswordGenerator
         if ($per === 'minimum') {
             $count = $this->getMinimumCount($option);
         } else if ($per === 'maximum') {
-            $min = $this->getMinimumCount($option);
             $max = $this->getMaximumCount($option);
+            $passwordLength = \strlen($this->password);
 
-            $count = $max - $min;
+            if (!$max) {
+                $max = $this->getLength('minimum');
+            }
+
+            $numbersOfCharsNeeded = $max - $passwordLength;
+            $count = ceil($numbersOfCharsNeeded/$enabledOptionsCount);
 
             if ($count <= 0) {
                 return $charactersAsPer;
@@ -108,21 +123,20 @@ class ComputerPasswordGenerator extends AbstractPasswordGenerator
      */
     public function generatePassword()
     {
-        $password = $this->getCharacters('minimum');
-        $passwordLength = \strlen($password);
+        $this->password = $this->getCharacters('minimum');
+        $passwordLength = \strlen($this->password);
         $expectedPasswordLength = $this->getLength('minimum');
         if ($passwordLength < $expectedPasswordLength) {
-            $numbersOfCharsNeeded = $expectedPasswordLength - $passwordLength;
-            $password .= $this->getCharacters('maximum');
-            $passwordLength = \strlen($password);
+            $this->password .= $this->getCharacters('maximum');
+            $passwordLength = \strlen($this->password);
         }
 
         if ($passwordLength > $expectedPasswordLength) {
             $substrlength = $expectedPasswordLength - $passwordLength;
-            $password = substr($password, 0, $substrlength);
+            $this->password = substr($this->password, 0, $substrlength);
         }
 
-        return str_shuffle($password);
+        return str_shuffle($this->password);
     }
 
     /**

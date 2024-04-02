@@ -102,7 +102,11 @@
                     }
 
                     if (defaults.smallText.length > 0) {
-                        var strengthText = ' (Enter Password to text strength)';
+                        var strengthText = ' ';
+
+                        if (input.parents('.form-group').siblings().find('input').attr('disabled') !== 'disabled') {
+                            strengthText = 'Enter Password to test strength';
+                        }
 
                         if (value == '1') {
                             strengthText = ' (Weak Strength)';
@@ -113,7 +117,11 @@
                         } else if (value == '2') {
                             strengthText = ' (Best Strength)';
                         }
-                        $(defaults.smallText).html('<span class="text-info text-uppercase">Password strength : ' + value + strengthText + '</span');
+                        if (value > 0) {
+                            $(defaults.smallText).html('<span class="text-info text-uppercase">Password strength : ' + value + strengthText + '</span');
+                        } else {
+                            $(defaults.smallText).html('<span class="text-info text-uppercase">' + strengthText + '</span');
+                        }
                     }
                     var width = Math.floor((value/settings.base)*100);
 

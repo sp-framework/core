@@ -8921,8 +8921,7 @@ var BazContentFields = function() {
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-                    if (($('#' + sectionId + '-password_policy_simple_acceptable_level').length > 0 &&
-                        $('#' + sectionId + '-password_policy_simple_acceptable_level') != '0') ||
+                    if ($('#' + sectionId + '-password_policy_complexity').val() === 'simple' ||
                         $('#' + sectionId + '-password-policy-simple').length > 0
                     ) {
                         postData['passwordpolicycomplexity'] = 'simple';
@@ -8944,24 +8943,66 @@ var BazContentFields = function() {
                             postData['passwordpolicylengthmin'] = '12';
                         }
                         postData = $.extend(postData, $('#' + sectionId + '-password-policy-simple').data());
-                    } else if ($('#' + sectionId + '-password-policy-complex').length > 0) {
+                    } else if ($('#' + sectionId + '-password_policy_complexity').val() === 'complex' ||
+                               $('#' + sectionId + '-password-policy-complex').length > 0
+                    ) {
                         postData['passwordpolicycomplexity'] = 'complex';
-                        postData = $.extend(postData, $('#' + sectionId + '-password-policy-complex').data());
+                        if ($('#' + sectionId + '-password_policy_complexity').val() === 'complex') {
+                            postData['passwordpolicylengthmin'] = $('#' + sectionId + '-password_policy_length_min').val();
+                            if (postData['passwordpolicylengthmin'] === '' || postData['passwordpolicylengthmin'] === '0') {
+                                postData['passwordpolicylengthmin'] = 8;
+                            }
+                            postData['passwordpolicylengthmax'] = $('#' + sectionId + '-password_policy_length_max').val();
+                            if (postData['passwordpolicylengthmax'] === '' || postData['passwordpolicylengthmax'] === '0') {
+                                postData['passwordpolicylengthmax'] = 8;
+                            }
+                            postData['passwordpolicyuppercase'] = $('#' + sectionId + '-password_policy_uppercase')[0].checked;
+                            if ($('#' + sectionId + '-password_policy_uppercase')[0].checked === true) {
+                                postData['passwordpolicyuppercasemincount'] = $('#' + sectionId + '-password_policy_uppercase_min_count').val();
+                                postData['passwordpolicyuppercasemaxcount'] = $('#' + sectionId + '-password_policy_uppercase_max_count').val();
+                                postData['passwordpolicyuppercaseinclude'] = $('#' + sectionId + '-password_policy_uppercase_include').val();
+                            }
+                            postData['passwordpolicylowercase'] = $('#' + sectionId + '-password_policy_lowercase')[0].checked;
+                            if ($('#' + sectionId + '-password_policy_lowercase')[0].checked === true) {
+                                postData['passwordpolicylowercasemincount'] = $('#' + sectionId + '-password_policy_lowercase_min_count').val();
+                                postData['passwordpolicylowercasemaxcount'] = $('#' + sectionId + '-password_policy_lowercase_max_count').val();
+                                postData['passwordpolicylowercaseinclude'] = $('#' + sectionId + '-password_policy_lowercase_include').val();
+                            }
+                            postData['passwordpolicynumbers'] = $('#' + sectionId + '-password_policy_numbers')[0].checked;
+                            if ($('#' + sectionId + '-password_policy_numbers')[0].checked === true) {
+                                postData['passwordpolicynumbersmincount'] = $('#' + sectionId + '-password_policy_numbers_min_count').val();
+                                postData['passwordpolicynumbersmaxcount'] = $('#' + sectionId + '-password_policy_numbers_max_count').val();
+                                postData['passwordpolicynumbersinclude'] = $('#' + sectionId + '-password_policy_numbers_include').val();
+                            }
+                            postData['passwordpolicysymbols'] = $('#' + sectionId + '-password_policy_symbols')[0].checked;
+                            if ($('#' + sectionId + '-password_policy_symbols')[0].checked === true) {
+                                postData['passwordpolicysymbolsmincount'] = $('#' + sectionId + '-password_policy_symbols_min_count').val();
+                                postData['passwordpolicysymbolsmaxcount'] = $('#' + sectionId + '-password_policy_symbols_max_count').val();
+                                postData['passwordpolicysymbolsinclude'] = $('#' + sectionId + '-password_policy_symbols_include').val();
+
+                            }
+                            postData['passwordpolicyavoidsimilar'] = $('#' + sectionId + '-password_policy_avoid_similar')[0].checked;
+                            if ($('#' + sectionId + '-password_policy_avoid_similar')[0].checked === true) {
+                                postData['passwordpolicyavoidsimilarcharacters'] = $('#' + sectionId + '-password_policy_avoid_similar_characters').val();
+                            }
+                        } else if ($('#' + sectionId + '-password-policy-complex').length > 0) {
+                            postData = $.extend(postData, $('#' + sectionId + '-password-policy-complex').data());
+                        }
                     }
 
                     var url = dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/home/generatePw'
                     $.post(url, postData, function(response) {
                         if (response.responseCode == 0) {
-                            if (response.responseData.password) {
-                                $(fieldId).val(response.responseData.password).trigger('change');
-                            }
-
+                            PNotify.success(response.responseMessage);
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+                        if (response.responseData.password) {
+                            $(fieldId).val(response.responseData.password).trigger('change');
                             if ($(fieldId).attr('type') === 'password') {
                                 $(fieldId).attr('type', 'text');
                                 $('#' + fieldId.id + '-visibility').children('i').removeClass('fa-eye-slash').addClass('fa-eye');
                             }
-                        } else {
-                            PNotify.error(response.responseMessage);
                         }
                         if (response.tokenKey && response.token) {
                             $("#security-token").attr("name", response.tokenKey);

@@ -475,26 +475,30 @@
     <hr>
     <div class="row">
         <div class="col">
-            {{adminltetags.useTag('buttons',
-                {
-                    'component'             : component,
-                    'componentName'         : componentName,
-                    'componentId'           : componentId,
-                    'sectionId'             : 'main',
-                    'buttonType'            : 'button',
-                    'buttons'               :
-                        {
-                            'generate-test-password' : {
-                                'title'                   : 'Generate Test Password Using Complex Policy',
-                                'size'                    : 'sm',
-                                'position'                : 'right',
-                                'type'                    : 'primary',
-                                'icon'                    : 'wand-magic-sparkles'
-                            }
-                        }
-                }
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'password_policy_generate_test_password',
+                    'fieldHelp'                             : true,
+                    'fieldLabel'                            : 'Generate Test Password Using Complex Policy',
+                    'fieldHelpTooltipContent'               : 'Hit the magic wand to test your complex password policy. Note: Password may contain extra characters to satisfy the minimum password length requirement.',
+                    'fieldHidden'                           : false,
+                    'fieldType'                             : 'input',
+                    'fieldInputType'                        : 'password',
+                    'fieldInputPasswordToggleVisibility'    : true,
+                    'fieldInputPasswordGenerate'            : true,
+                    'fieldInputPasswordStrengthMeter'       : true,
+                    'fieldInputInfoText'                    : true,
+                    'fieldRequired'                         : false,
+                    'fieldDisabled'                         : true,
+                    'fieldBazScan'                          : true,
+                    'fieldBazPostOnUpdate'                  : false,
+                    'fieldAdditionalClass'                  : 'mb-0'
+                ]
             )}}
         </div>
-        <div class="col p-1" id="generate-password"></div>
     </div>
 </div>
