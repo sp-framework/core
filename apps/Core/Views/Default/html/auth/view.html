@@ -406,42 +406,6 @@ $(document).ready(function(){
             $('#twofa-email').removeClass('d-none');
         }
 
-        if (response.responseData['allowed_methods'].length > 1) {
-            // $('#twofa-methods').removeClass('d-none');
-            // $('#twofa-methods a').off();
-            // $('#twofa-methods a').click(function(e) {
-            //     e.preventDefault();
-
-            //     if ($('#twofa-methods').hasClass('email')) {
-            //         $($('#twofa-methods span')[0]).html('Use Authenticator 2FA');
-            //         $('#twofa-methods').removeClass('email').addClass('authenticator');
-            //         $('#twofa-email').removeClass('d-none');
-            //         $('#{{componentId}}-form-twofa-otp').parents('.form-group').addClass('d-none');
-            //         $('#{{componentId}}-form-twofa-otp').val('');
-            //         $('#{{componentId}}-form-twofa-email').parents('.form-group').removeClass('d-none');
-            //         $('#{{componentId}}-form-twofa-email').val('');
-            //         // if (!response.responseData.otp_status ||
-            //         //     response.responseData.otp_status && response.responseData.otp_status != '1'
-            //         // ) {
-            //         //     $('#twofa-otp-register').addClass('d-none');
-            //         // }
-            //     } else {
-            //         $($('#twofa-methods span')[0]).html('Use Email 2FA');
-            //         $('#twofa-methods').removeClass('authenticator').addClass('email');
-            //         $('#twofa-email').addClass('d-none');
-            //         $('#{{componentId}}-form-twofa-otp').parents('.form-group').removeClass('d-none');
-            //         $('#{{componentId}}-form-twofa-otp').val('');
-            //         $('#{{componentId}}-form-twofa-email').parents('.form-group').addClass('d-none');
-            //         $('#{{componentId}}-form-twofa-email').val('');
-            //         // if (!response.responseData.otp_status ||
-            //         //     response.responseData.otp_status && response.responseData.otp_status != '1'
-            //         // ) {
-            //         //     $('#twofa-otp-register').removeClass('d-none');
-            //         // }
-            //     }
-            // });
-        }
-
         setTimeout(function () {
             $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
 
@@ -662,20 +626,6 @@ $(document).ready(function(){
             }
         }, 1000);
     }
-
-    // function verify() {
-        // $(thisButton).attr('hidden', true);
-        // $('#{{componentId}}-form-agent-verification').parents('.form-group').removeClass('d-none');
-        // $('#{{componentId}}-form-agent-verification').attr('disabled', false);
-        // $('#{{componentId}}-form-verify').attr('hidden', false);
-        // $('#{{componentId}}-form-verify').attr('disabled', false);
-
-        // setTimeout(function () {
-        //     $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
-        //     $('.login-box-msg').text('Enter email verification code and hit verify');
-        //     $('.login-box-msg').addClass('animated fadeIn');
-        // }, 2000);
-    // }
 
     $('#{{componentId}}-form-pass-visibility, #{{componentId}}-form-newpass-visibility, #{{componentId}}-form-confirmnewpass-visibility').click(function(e) {
         e.preventDefault();
