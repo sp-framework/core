@@ -107,7 +107,7 @@ class Utils extends BasePackage
 
             $this->addResponse('Simple complexity password generate successfully', 0, ['password' => $password]);
 
-            return;
+            return ['password' => $password];
         } else if ($params['passwordpolicycomplexity'] === 'complex') {
             if ((!isset($params['passwordpolicyuppercase']) &&
                  !isset($params['passwordpolicylowercase']) &&
@@ -125,7 +125,7 @@ class Utils extends BasePackage
 
                 $this->addResponse('Password generated using default generator as no option was enabled. Select complex complexity options or use simple complexity.', 2, ['password' => $password]);
 
-                return;
+                return ['password' => $password];
             } else {
                 try {
                     $generator = $this->initPasswordGenerator($params);
@@ -137,8 +137,6 @@ class Utils extends BasePackage
                     $password = $generator->generatePassword();
 
                     $this->addResponse('Complex complexity password generate successfully', 0, ['password' => $password]);
-
-                    return;
                 } catch (\Exception $e) {//Generate password using default generator if something fails.
                     $this->logger->log->debug($e->getMessage());
 
@@ -146,6 +144,8 @@ class Utils extends BasePackage
 
                     $this->addResponse('Password generated using default generator due to an error. Contact developer for more help.', 1, ['password' => $password]);
                 }
+
+                return ['password' => $password];
             }
         }
 
