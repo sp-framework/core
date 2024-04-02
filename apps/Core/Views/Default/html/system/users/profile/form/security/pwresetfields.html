@@ -20,7 +20,7 @@
         )}}
     </div>
     {% set strengthMeter = false %}
-    {% if coreSettings['security']['passwordPolicy'] is defined and coreSettings['security']['passwordPolicySettings'] is defined and coreSettings['security']['passwordPolicy'] == 'true' %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] is defined and coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] == 'simple' %}
         {% set strengthMeter = true %}
     {% endif %}
     <div class="col">
@@ -38,6 +38,7 @@
                 'fieldInputPasswordToggleVisibility'    : true,
                 'fieldInputPasswordGenerate'            : true,
                 'fieldInputPasswordStrengthMeter'       : strengthMeter,
+                'fieldInputInfoText'                    : true,
                 'fieldRequired'                         : true,
                 'fieldBazScan'                          : true,
                 'fieldBazPostOnCreate'                  : false,

@@ -91,7 +91,7 @@ class ProfileComponent extends BaseComponent
 
             $user = array_merge($user, $this->postData());
 
-            $pwreset = $this->auth->resetPassword($user, true);
+            $this->auth->resetPassword($user, true);
 
             $this->view->responseMessage = $this->auth->packagesData->responseMessage;
             $this->view->responseCode = $this->auth->packagesData->responseCode;

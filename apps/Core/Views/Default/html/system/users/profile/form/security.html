@@ -24,9 +24,12 @@
     {% set previousPasswordsText = '' %}
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'] > 0 %}
         {% set previousPasswordsText =
-            '<span class="text-info mr-1 policy passwordPolicyBlockPreviousPasswords"><i class="fa fas fa-exclamation-circle"></i></span>
-            <span class="mb-1">Number of previous password you cannot use : <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'] ~ '</strong></span>
-            <br>'
+            '<div class="col">
+                <span class="text-info mr-1 policy passwordPolicyBlockPreviousPasswords">
+                    <i class="fa fas fa-exclamation-circle"></i>
+                </span>
+                <span class="mb-1">Number of previous password you cannot use : <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'] ~ '</strong></span>
+            </div>'
         %}
     {% endif %}
     <div class="row">
@@ -51,7 +54,7 @@
                     'fieldBazPostOnCreate'                  : false,
                     'fieldBazPostOnUpdate'                  : false,
                     'fieldBazJstreeSearch'                  : true,
-                    'fieldHtmlContent'                      : previousPasswordsText
+                    'fieldHtmlContent'                      : '<div class="row">' ~ previousPasswordsText ~ '</div>'
                 ]
             )}}
         </div>
