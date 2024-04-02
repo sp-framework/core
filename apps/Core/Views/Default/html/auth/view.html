@@ -61,24 +61,23 @@ BazCore.header({
                                     'fieldLabel'                            : false,
                                     'fieldType'                             : 'input',
                                     'fieldInputType'                        : 'text',
-                                    'fieldPlaceholder'                      : '2FA Authenticator Code',
-                                    'fieldGroupPostAddonIcon'               : 'lock',
-                                    'fieldHidden'                           : true,
+                                    'fieldInputTypeTextFilter'              : 'positiveInt',
+                                    'fieldPlaceholder'                      : '2FA OTP Code',
+                                    'fieldGroupPreAddonButtonId'            : 'switch_to_email',
+                                    'fieldGroupPreAddonButtonValue'         : '<i class="fas fa-fw fa-repeat"></i>',
+                                    'fieldGroupPreAddonButtonTooltipTitle'  : 'Switch to 2FA (Email)',
                                     'fieldDataInputMinLength'               : 4,
                                     'fieldDataInputMaxLength'               : 8
                                 ]
                             )}}
-                        </div>
-                        <div id="twofa-otp-register" class="col text-center d-none">
-                            <a href="{{links.url('auth/q/setup2fa/true')}}" class="btn btn-info btn-xs">
-                                <span class="text-uppercase">Register TOTP</span>
-                            </a>
                         </div>
                     </div>
                     <div id="twofa-email" class="row d-none">
                         <div class="col">
                             {{adminltetags.useTag('fields',
                                 [
+                                    'component'                             : component,
+                                    'componentName'                         : componentName,
                                     'componentId'                           : componentId,
                                     'sectionId'                             : 'form',
                                     'fieldId'                               : 'twofa-email',
@@ -86,23 +85,20 @@ BazCore.header({
                                     'fieldType'                             : 'input',
                                     'fieldInputType'                        : 'text',
                                     'fieldPlaceholder'                      : '2FA Email Code',
-                                    'fieldGroupPostAddonIcon'               : 'lock',
-                                    'fieldHidden'                           : true,
+                                    'fieldGroupPostAddonButtonId'           : 'email_code',
+                                    'fieldGroupPostAddonButtonValue'        : '<i class="fas fa-fw fa-paper-plane"></i>',
+                                    'fieldGroupPostAddonButtonTooltipTitle' : 'Email new Code',
+                                    'fieldGroupPreAddonButtonId'            : 'switch_to_otp',
+                                    'fieldGroupPreAddonButtonValue'         : '<i class="fas fa-fw fa-repeat"></i>',
+                                    'fieldGroupPreAddonButtonTooltipTitle'  : 'Switch to 2FA (OTP)',
                                     'fieldDataInputMinLength'               : 4,
-                                    'fieldDataInputMaxLength'               : 12
+                                    'fieldDataInputMaxLength'               : 12,
+                                    'fieldInputInfoText'                    : true
                                 ]
                             )}}
                         </div>
-                        <div class="col text-center">
-                            <button id="{{componentId}}-form-send-email" type="button" class="btn btn-info btn-xs">
-                                <i class="fa fa-cog fa-spin email-spinner" hidden></i>
-                                <span class="text-uppercase">Send 2FA Email Code</span>
-                            </button>
-                            <br>
-                            <small class="text-info resend-timer d-none"></small>
-                        </div>
                     </div>
-                    <div class="row">
+                    <div class="row mt-2">
                         <div class="col">
                             {{adminltetags.useTag('fields',
                                 [
@@ -116,11 +112,6 @@ BazCore.header({
                                     'fieldCheckboxAdditionClass'            : 'text-sm text-uppercase'
                                 ]
                             )}}
-                        </div>
-                        <div id="twofa-methods" class="col d-none email">
-                            <a class="text-success float-right" href="#">
-                                <span>Use Email 2FA</span>
-                            </a>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -187,18 +178,19 @@ $(document).ready(function(){
         $('#{{componentId}}-form-auth, ' +
           '#{{componentId}}-form-forgot, ' +
           '#{{componentId}}-form-reset, ' +
-          '#{{componentId}}-form-send-email, ' +
+          '#{{componentId}}-form-twofa-email-email_code, ' +
+          '#{{componentId}}-form-agent-verification-email_code, ' +
           '#{{componentId}}-form-verify').attr('disabled', true);
 
-        if (thisButton.id === '{{componentId}}-form-send-email') {
-            $('.email-spinner').attr('hidden', false);
-        } else {
+        if (thisButton.id !== '{{componentId}}-form-twofa-email-email_code' &&
+            thisButton.id !== '{{componentId}}-form-agent-verification-email_code'
+        ) {
             $('.login-spinner').attr('hidden', false);
         }
 
         if ($('#{{componentId}}-form-auth').length > 0) {
             if ($('#twofa-email').hasClass('d-none') === false) {
-                if (thisButton.id === '{{componentId}}-form-send-email') {
+                if (thisButton.id === '{{componentId}}-form-twofa-email-email_code') {
                     url = '{{links.url("auth/sendtwofaemail")}}';
                     postData = {
                         'user'      : $('#{{componentId}}-form-user').val().trim(),
@@ -241,11 +233,11 @@ $(document).ready(function(){
                 'confirmnewpass'    : $('#{{componentId}}-form-confirmnewpass').val().trim()
             };
         } else if ($('#{{componentId}}-form-verify').length > 0) {
-            if (thisButton.id === '{{componentId}}-form-send-email') {
+            if (thisButton.id === '{{componentId}}-form-agent-verification-email_code') {
                 url = '{{links.url("auth/sendVerification")}}';
             } else if (thisButton.id === '{{componentId}}-form-verify') {
                 postData = {
-                    'code'          : $('#{{componentId}}-form-agent-verification-code').val().trim()
+                    'code'          : $('#{{componentId}}-form-agent-verification').val().trim()
                 };
                 url = '{{links.url("auth/verify")}}';
             }
@@ -262,7 +254,8 @@ $(document).ready(function(){
     $('#{{componentId}}-form-auth, ' +
       '#{{componentId}}-form-forgot, ' +
       '#{{componentId}}-form-reset, ' +
-      '#{{componentId}}-form-send-email, ' +
+      '#{{componentId}}-form-twofa-email-email_code, ' +
+      '#{{componentId}}-form-agent-verification-email_code, ' +
       '#{{componentId}}-form-generate-code, ' +
       '#{{componentId}}-form-verify').click(function(e) {
             e.preventDefault();
@@ -402,11 +395,11 @@ $(document).ready(function(){
             $('#{{componentId}}-form-twofa-otp').parents('.form-group').removeClass('d-none');
             $('#twofa-otp').removeClass('d-none');
             $('#{{componentId}}-form-twofa-otp').focus();
-            if (!response.responseData.otp_status ||
-                response.responseData.otp_status && response.responseData.otp_status != '1'
-            ) {
-                $('#twofa-otp-register').removeClass('d-none');
-            }
+            // if (!response.responseData.otp_status ||
+            //     response.responseData.otp_status && response.responseData.otp_status != '1'
+            // ) {
+            //     $('#twofa-otp-register').removeClass('d-none');
+            // }
         } else if (response.responseData['allowed_methods'].includes('email')) {
             $('#{{componentId}}-form :input').prop('disabled', false);
             $('#{{componentId}}-form-twofa-email').parents('.form-group').removeClass('d-none');
@@ -414,42 +407,41 @@ $(document).ready(function(){
         }
 
         if (response.responseData['allowed_methods'].length > 1) {
-            $('#twofa-methods').removeClass('d-none');
-            $('#twofa-methods a').off();
-            $('#twofa-methods a').click(function(e) {
-                e.preventDefault();
+            // $('#twofa-methods').removeClass('d-none');
+            // $('#twofa-methods a').off();
+            // $('#twofa-methods a').click(function(e) {
+            //     e.preventDefault();
 
-                if ($('#twofa-methods').hasClass('email')) {
-                    $($('#twofa-methods span')[0]).html('Use Authenticator 2FA');
-                    $('#twofa-methods').removeClass('email').addClass('authenticator');
-                    $('#twofa-email').removeClass('d-none');
-                    $('#{{componentId}}-form-twofa-otp').parents('.form-group').addClass('d-none');
-                    $('#{{componentId}}-form-twofa-otp').val('');
-                    $('#{{componentId}}-form-twofa-email').parents('.form-group').removeClass('d-none');
-                    $('#{{componentId}}-form-twofa-email').val('');
-                    if (!response.responseData.otp_status ||
-                        response.responseData.otp_status && response.responseData.otp_status != '1'
-                    ) {
-                        $('#twofa-otp-register').addClass('d-none');
-                    }
-                } else {
-                    $($('#twofa-methods span')[0]).html('Use Email 2FA');
-                    $('#twofa-methods').removeClass('authenticator').addClass('email');
-                    $('#twofa-email').addClass('d-none');
-                    $('#{{componentId}}-form-twofa-otp').parents('.form-group').removeClass('d-none');
-                    $('#{{componentId}}-form-twofa-otp').val('');
-                    $('#{{componentId}}-form-twofa-email').parents('.form-group').addClass('d-none');
-                    $('#{{componentId}}-form-twofa-email').val('');
-                    if (!response.responseData.otp_status ||
-                        response.responseData.otp_status && response.responseData.otp_status != '1'
-                    ) {
-                        $('#twofa-otp-register').removeClass('d-none');
-                    }
-                }
-            });
-
-
+            //     if ($('#twofa-methods').hasClass('email')) {
+            //         $($('#twofa-methods span')[0]).html('Use Authenticator 2FA');
+            //         $('#twofa-methods').removeClass('email').addClass('authenticator');
+            //         $('#twofa-email').removeClass('d-none');
+            //         $('#{{componentId}}-form-twofa-otp').parents('.form-group').addClass('d-none');
+            //         $('#{{componentId}}-form-twofa-otp').val('');
+            //         $('#{{componentId}}-form-twofa-email').parents('.form-group').removeClass('d-none');
+            //         $('#{{componentId}}-form-twofa-email').val('');
+            //         // if (!response.responseData.otp_status ||
+            //         //     response.responseData.otp_status && response.responseData.otp_status != '1'
+            //         // ) {
+            //         //     $('#twofa-otp-register').addClass('d-none');
+            //         // }
+            //     } else {
+            //         $($('#twofa-methods span')[0]).html('Use Email 2FA');
+            //         $('#twofa-methods').removeClass('authenticator').addClass('email');
+            //         $('#twofa-email').addClass('d-none');
+            //         $('#{{componentId}}-form-twofa-otp').parents('.form-group').removeClass('d-none');
+            //         $('#{{componentId}}-form-twofa-otp').val('');
+            //         $('#{{componentId}}-form-twofa-email').parents('.form-group').addClass('d-none');
+            //         $('#{{componentId}}-form-twofa-email').val('');
+            //         // if (!response.responseData.otp_status ||
+            //         //     response.responseData.otp_status && response.responseData.otp_status != '1'
+            //         // ) {
+            //         //     $('#twofa-otp-register').removeClass('d-none');
+            //         // }
+            //     }
+            // });
         }
+
         setTimeout(function () {
             $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
 
@@ -610,9 +602,9 @@ $(document).ready(function(){
                 return;
             }
         } else if ($('#{{componentId}}-form-verify').length > 0) {
-            if (thisButton.id === '{{componentId}}-form-send-email') {
+            if (thisButton.id === '{{componentId}}-form-agent-verification-email_code') {
                 setEmailTimer(null, response.responseData.email_timeout);
-                $('#{{componentId}}-form-agent-verification-code').attr('disabled', false);
+                $('#{{componentId}}-form-agent-verification').attr('disabled', false);
                 $('#{{componentId}}-form-verify').attr('disabled', false);
                 setTimeout(function () {
                     $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
@@ -630,9 +622,13 @@ $(document).ready(function(){
     }
 
     function setEmailTimer(oldsenttime = null, emailtimeout = 60) {
-        $('#{{componentId}}-form-send-email').attr('disabled', true);
-        $('.resend-timer').removeClass('d-none');
-
+        if ($('#{{componentId}}-form-twofa-email-email_code').length > 0) {
+            $('#{{componentId}}-form-twofa-email-email_code').attr('disabled', true);
+            $('#{{componentId}}-form-twofa-email-small-text').html('');
+        } else if ($('#{{componentId}}-form-agent-verification-email_code').length > 0) {
+            $('#{{componentId}}-form-agent-verification-email_code').attr('disabled', true);
+            $('#{{componentId}}-form-agent-verification-small-text').html('');
+        }
         var expiryTimer;
 
         if (oldsenttime) {
@@ -648,20 +644,29 @@ $(document).ready(function(){
             tillExpiry = expiryTimer - now;
             seconds = Math.floor((tillExpiry % (emailtimeout * 1000)) / 1000);
 
-            $('.resend-timer').html('Code sent valid for ' + seconds + 's...');
+            if ($('#{{componentId}}-form-twofa-email-email_code').length > 0) {
+                $('#{{componentId}}-form-twofa-email-small-text').html('Code sent valid for ' + seconds + 's...');
+            } else if ($('#{{componentId}}-form-agent-verification-email_code').length > 0) {
+                $('#{{componentId}}-form-agent-verification-small-text').html('Code sent valid for ' + seconds + 's...');
+            }
 
             if (tillExpiry < 0) {
                 clearInterval(countDownTimer);
-                $('#{{componentId}}-form-send-email').attr('disabled', false);
-                $('.resend-timer').addClass('d-none');
+                if ($('#{{componentId}}-form-twofa-email-email_code').length > 0) {
+                    $('#{{componentId}}-form-twofa-email-email_code').attr('disabled', false);
+                    $('#{{componentId}}-form-twofa-email-small-text').html('');
+                } else if ($('#{{componentId}}-form-agent-verification-email_code').length > 0) {
+                    $('#{{componentId}}-form-agent-verification-email_code').attr('disabled', false);
+                    $('#{{componentId}}-form-agent-verification-small-text').html('');
+                }
             }
         }, 1000);
     }
 
     // function verify() {
         // $(thisButton).attr('hidden', true);
-        // $('#{{componentId}}-form-agent-verification-code').parents('.form-group').removeClass('d-none');
-        // $('#{{componentId}}-form-agent-verification-code').attr('disabled', false);
+        // $('#{{componentId}}-form-agent-verification').parents('.form-group').removeClass('d-none');
+        // $('#{{componentId}}-form-agent-verification').attr('disabled', false);
         // $('#{{componentId}}-form-verify').attr('hidden', false);
         // $('#{{componentId}}-form-verify').attr('disabled', false);
 
@@ -737,6 +742,17 @@ $(document).ready(function(){
                 }
             });
         }, 'json');
+    });
+
+    $('#{{componentId}}-form-twofa-otp-switch_to_email').click(function() {
+        $('#{{componentId}}-form-twofa-otp').val('');
+        $('#twofa-otp').addClass('d-none');
+        $('#twofa-email').removeClass('d-none');
+    });
+    $('#{{componentId}}-form-twofa-email-switch_to_otp').click(function() {
+        $('#{{componentId}}-form-twofa-email').val('');
+        $('#twofa-otp').removeClass('d-none');
+        $('#twofa-email').addClass('d-none');
     });
 });
 </script>

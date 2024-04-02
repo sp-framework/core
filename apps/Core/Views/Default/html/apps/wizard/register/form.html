@@ -44,8 +44,7 @@
     {% if app['settings']['defaultDashboard'] is defined %}
         {% set defaultDashboard = app['settings']['defaultDashboard'] %}
     {% endif %}
-    {% set appAgentEmailTimeout = app['agent_email_timeout'] %}
-    {% else %}
+{% else %}
     {% set appId = '' %}
     {% set appName = '' %}
     {% set appRoute = '' %}

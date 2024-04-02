@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\AccessServiceProvider;
 
+use Carbon\Carbon;
 use OTPHP\HOTP;
 use OTPHP\TOTP;
 use ParagonIE\ConstantTime\Base32;
@@ -314,8 +315,10 @@ class Auth
             (isset($this->account['security']['force_pwreset_after']) &&
              $this->account['security']['force_pwreset_after'] !== null &&
              $this->account['security']['force_pwreset_after'] != '0' &&
-             time() > $this->account['security']['force_pwreset_after']
-            )
+             time() > $this->account['security']['force_pwreset_after'] &&
+             $this->core->core['settings']['security']['passwordPolicy'] == 'true' &&
+             isset($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyForcePwresetAfter']) &&
+            (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyForcePwresetAfter'] > 0)
         ) {
             $this->packagesData->redirectUrl = $this->links->url('auth/q/pwreset/true');
 
@@ -324,8 +327,30 @@ class Auth
 
         if ($this->secTools->passwordNeedsRehash($this->account['security']['password'])) {
             $this->account['security']['password'] = $this->secTools->hashPassword($data['pass'], $this->config->security->passwordWorkFactor);
-            $this->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
         }
+
+        if ($this->core->core['settings']['security']['passwordPolicy'] == 'true') {
+            if (isset($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyForcePwresetAfter']) &&
+                (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyForcePwresetAfter'] > 0
+            ) {
+                $passwordSetOn = Carbon::now();
+
+                if (isset($this->account['security']['password_set_on']) &&
+                    (int) $this->account['security']['password_set_on'] > 0
+                ) {
+                    $passwordSetOn = Carbon::createFromTimestamp((int) $this->account['security']['password_set_on']);
+                }
+
+                $this->account['security']['force_pwreset_after'] =
+                    $passwordSetOn->addDays((int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyForcePwresetAfter'])->getTimestamp();
+            } else {
+                $this->account['security']['force_pwreset_after'] = null;
+            }
+        } else {
+            $this->account['security']['force_pwreset_after'] = null;
+        }
+
+        $this->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
 
         $this->setSessionAndRecaller($data);
 
@@ -439,17 +464,25 @@ class Auth
 
             $this->addResponse('2FA Code Required!', 3);
 
-            if (in_array('email', $this->core->core['settings']['security']['twofaSettings']) && !$this->email->setup()) {
-                unset($this->core->core['settings']['security']['twofaSettings'][array_keys($this->core->core['settings']['security']['twofaSettings'], 'email')[0]]);
+            if (isset($this->core->core['settings']['security']['twofaSettings']['twofaUsing']) &&
+                $this->core->core['settings']['security']['twofaSettings']['twofaUsing'] !== ''
+            ) {
+                if (!is_array($this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
+                    $this->core->core['settings']['security']['twofaSettings']['twofaUsing'] = $this->helper->decode($this->core->core['settings']['security']['twofaSettings']['twofaUsing'], true);
+                }
             }
 
-            if (count($this->core->core['settings']['security']['twofaSettings']) === 0) {//if otp is not set and email service is not configured, we authenticate.
+            if (count($this->core->core['settings']['security']['twofaSettings']['twofaUsing']) === 0) {//if otp is not set and email service is not configured, we authenticate.
                 return true;
             }
 
-            $this->packagesData->responseData = ['allowed_methods' => $this->core->core['settings']['security']['twofaSettings']];
+            if (in_array('email', $this->core->core['settings']['security']['twofaSettings']['twofaUsing']) && !$this->email->setup()) {
+                unset($this->core->core['settings']['security']['twofaSettings']['twofaUsing'][array_keys($this->core->core['settings']['security']['twofaSettings']['twofaUsing'], 'email')[0]]);
+            }
 
-            if (in_array('otp', $this->core->core['settings']['security']['twofaSettings'])) {
+            $this->packagesData->responseData = ['allowed_methods' => $this->core->core['settings']['security']['twofaSettings']['twofaUsing']];
+
+            if (in_array('otp', $this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
                 $this->packagesData->responseData = array_merge($this->packagesData->responseData, ['otp_status' => $security->twofa_otp_status]);
             }
 
@@ -1952,13 +1985,13 @@ class Auth
             }
         }
         if (isset($agent['email_code_sent_on'])) {
-            if (time() < $agent['email_code_sent_on'] + ($this->core->core['settings']['security']['agent_email_timeout'] ?? 60)) {
+            if (time() < $agent['email_code_sent_on'] + ($this->core->core['settings']['security']['agentEmailCodeTimeout'] ?? 60)) {
                 $this->addResponse(
                     'Email already sent, please wait...',
                     1,
                     [
                         'code_sent_on' => $agent['email_code_sent_on'],
-                        'email_timeout' => $this->core->core['settings']['security']['agent_email_timeout'] ?? 60
+                        'email_timeout' => $this->core->core['settings']['security']['agentEmailCodeTimeout'] ?? 60
                     ]
                 );
 
@@ -1970,7 +2003,11 @@ class Auth
             $agent['email_code_sent_on'] = time();
         }
 
-        $code = $this->secTools->random->base62(12);
+        $emailCodeLength = 12;
+        if (isset($this->core->core['settings']['security']['agentEmailCodeLength'])) {
+            $emailCodeLength = $this->core->core['settings']['security']['agentEmailCodeLength'];
+        }
+        $code = $this->secTools->random->base62($emailCodeLength);
 
         $agent['verification_code'] = $this->secTools->hashPassword($code, $this->config->security->passwordWorkFactor);
 
@@ -1987,7 +2024,7 @@ class Auth
                        ' via authentication agent. New code was emailed to the account.'
                 );
 
-            $this->addResponse('Email Sent!', 0, ['email_timeout' => $this->core->core['settings']['security']['agent_email_timeout'] ?? 60]);
+            $this->addResponse('Email Sent!', 0, ['email_timeout' => $this->core->core['settings']['security']['agentEmailCodeTimeout'] ?? 60]);
 
             return;
         }
@@ -2061,7 +2098,7 @@ class Auth
             }
         }
 
-        if (time() > $agent['email_code_sent_on'] + ($this->core->core['settings']['security']['agent_email_timeout'] ?? 60)) {
+        if (time() > $agent['email_code_sent_on'] + ($this->core->core['settings']['security']['agentEmailCodeTimeout'] ?? 60)) {
             $agent['email_code_sent_on'] = null;
             $agent['verification_code'] = null;
 

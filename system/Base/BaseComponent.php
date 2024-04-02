@@ -416,7 +416,7 @@ abstract class BaseComponent extends Controller
 			return $this->sendJson();
 		}
 
-		if ($this->app) {
+		if ($this->app && $this->view->componentName !== 'auth') {
 			if (!$this->app['menu_structure']) {
 				$this->view->menus =
 					$this->basepackages->menus->buildMenusForApp($this->app['id']);
