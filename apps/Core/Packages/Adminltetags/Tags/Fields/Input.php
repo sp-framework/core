@@ -203,6 +203,12 @@ class Input
                 'disabled' :
                 '';
 
+            $this->fieldParams['fieldGroupPreAddonDropdownButtonHidden'] =
+                isset($this->params['fieldGroupPreAddonDropdownButtonHidden']) &&
+                $this->params['fieldGroupPreAddonDropdownButtonHidden'] === true ?
+                'd-none' :
+                '';
+
             $this->fieldParams['fieldGroupPreAddonDropdownButtonTitle'] =
                 isset($this->params['fieldGroupPreAddonDropdownButtonTitle']) ?
                 $this->params['fieldGroupPreAddonDropdownButtonTitle'] :
@@ -215,7 +221,7 @@ class Input
 
             $this->content .=
                 '<div class="input-group-prepend">
-                    <button type="button" ' . $this->fieldParams['fieldId'] . '-prepend-dropdown-button" class="btn btn-' . $this->fieldParams['fieldGroupPreAddonDropdownButtonClass'] . ' dropdown-toggle rounded-0" data-toggle="dropdown" aria-expanded="false" '. $this->fieldParams['fieldGroupPreAddonDropdownButtonDisabled'] . '>
+                    <button type="button" ' . $this->fieldParams['fieldId'] . '-prepend-dropdown-button" class="btn btn-' . $this->fieldParams['fieldGroupPreAddonDropdownButtonClass'] . ' dropdown-toggle rounded-0 ' . $this->fieldParams['fieldGroupPreAddonDropdownButtonHidden'] . '" data-toggle="dropdown" aria-expanded="false" '. $this->fieldParams['fieldGroupPreAddonDropdownButtonDisabled'] . '>
                         <span>' . $this->fieldParams['fieldGroupPreAddonDropdownButtonTitle'] . '</span>
                     </button>
                     <div class="dropdown-menu">';
@@ -260,6 +266,12 @@ class Input
                 'disabled' :
                 '';
 
+            $this->fieldParams['fieldGroupPreAddonButtonHidden'] =
+                isset($this->params['fieldGroupPreAddonButtonHidden']) &&
+                $this->params['fieldGroupPreAddonButtonHidden'] === true ?
+                'd-none' :
+                '';
+
             if (isset($this->params['fieldGroupPreAddonButtonIcon'])) {
                 if ($this->params['fieldGroupPreAddonButtonIcon'] === 'after') {
                     $this->params['fieldGroupPreAddonButtonValue'] =
@@ -274,7 +286,7 @@ class Input
 
             $this->content .=
                 '<div class="input-group-prepend">
-                    <button ' . $this->fieldParams['fieldId'] . '-' . $this->params['fieldGroupPreAddonButtonId'] . '" class="btn btn-'. $this->fieldParams['fieldGroupPreAddonButtonClass'] . ' rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="' . $this->fieldParams['fieldGroupPreAddonButtonTooltipPosition']. '" title="' . $this->fieldParams['fieldGroupPreAddonButtonTooltipTitle'] . '" ' . $this->fieldParams['fieldGroupPreAddonButtonDisabled'] . '>' . $this->params['fieldGroupPreAddonButtonValue'] . '</button>
+                    <button ' . $this->fieldParams['fieldId'] . '-' . $this->params['fieldGroupPreAddonButtonId'] . '" class="btn btn-'. $this->fieldParams['fieldGroupPreAddonButtonClass'] . ' rounded-0 ' . $this->fieldParams['fieldGroupPreAddonButtonHidden'] . '" type="button" data-toggle="tooltip" data-html="true" data-placement="' . $this->fieldParams['fieldGroupPreAddonButtonTooltipPosition']. '" title="' . $this->fieldParams['fieldGroupPreAddonButtonTooltipTitle'] . '" ' . $this->fieldParams['fieldGroupPreAddonButtonDisabled'] . '>' . $this->params['fieldGroupPreAddonButtonValue'] . '</button>
                 </div>' ;
         }
 
@@ -386,6 +398,12 @@ class Input
                 'disabled' :
                 '';
 
+            $this->fieldParams['fieldGroupPostAddonDropdownButtonHidden'] =
+                isset($this->params['fieldGroupPostAddonDropdownButtonHidden']) &&
+                $this->params['fieldGroupPostAddonDropdownButtonHidden'] === true ?
+                'd-none' :
+                '';
+
             $this->fieldParams['fieldGroupPostAddonDropdownButtonTitle'] =
                 isset($this->params['fieldGroupPostAddonDropdownButtonTitle']) ?
                 $this->params['fieldGroupPostAddonDropdownButtonTitle'] :
@@ -398,7 +416,7 @@ class Input
 
             $this->content .=
                 '<div class="input-group-append">
-                    <button type="button" id="' . $this->fieldParams['fieldId'] . '-append-dropdown-button" class="btn btn-' . $this->fieldParams['fieldGroupPostAddonDropdownButtonClass'] . ' dropdown-toggle rounded-0" data-toggle="dropdown" aria-expanded="false" ' . $this->fieldParams['fieldGroupPostAddonDropdownButtonDisabled'] . '>
+                    <button type="button" id="' . $this->fieldParams['fieldId'] . '-append-dropdown-button" class="btn btn-' . $this->fieldParams['fieldGroupPostAddonDropdownButtonClass'] . ' dropdown-toggle rounded-0 ' . $this->fieldParams['fieldGroupPostAddonDropdownButtonHidden'] . '" data-toggle="dropdown" aria-expanded="false" ' . $this->fieldParams['fieldGroupPostAddonDropdownButtonDisabled'] . '>
                         <span>' . $this->fieldParams['fieldGroupPostAddonDropdownButtonTitle'] . '</span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-right">';
@@ -443,6 +461,12 @@ class Input
                 'disabled' :
                 '';
 
+            $this->fieldParams['fieldGroupPostAddonButtonHidden'] =
+                isset($this->params['fieldGroupPostAddonButtonHidden']) &&
+                $this->params['fieldGroupPostAddonButtonHidden'] === true ?
+                'd-none' :
+                '';
+
             if (isset($this->params['fieldGroupPostAddonButtonIcon'])) {
                 $iconHidden =
                     (isset($this->params['fieldGroupPostAddonButtonIconHidden'])) &&
@@ -463,7 +487,7 @@ class Input
 
             $this->content .=
                 '<div class="input-group-append">
-                    <button ' . $this->fieldParams['fieldId'] . '-' . $this->params['fieldGroupPostAddonButtonId'] . '" class="btn btn-'. $this->fieldParams['fieldGroupPostAddonButtonClass'] . ' rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="' . $this->fieldParams['fieldGroupPostAddonButtonTooltipPosition']. '" title="' . $this->fieldParams['fieldGroupPostAddonButtonTooltipTitle'] . '" ' . $this->fieldParams['fieldGroupPostAddonButtonDisabled'] . '>' . $this->params['fieldGroupPostAddonButtonValue'] . '</button>
+                    <button ' . $this->fieldParams['fieldId'] . '-' . $this->params['fieldGroupPostAddonButtonId'] . '" class="btn btn-'. $this->fieldParams['fieldGroupPostAddonButtonClass'] . ' rounded-0 ' . $this->fieldParams['fieldGroupPostAddonButtonHidden'] . '" type="button" data-toggle="tooltip" data-html="true" data-placement="' . $this->fieldParams['fieldGroupPostAddonButtonTooltipPosition']. '" title="' . $this->fieldParams['fieldGroupPostAddonButtonTooltipTitle'] . '" ' . $this->fieldParams['fieldGroupPostAddonButtonDisabled'] . '>' . $this->params['fieldGroupPostAddonButtonValue'] . '</button>
                 </div>' ;
 
         }
