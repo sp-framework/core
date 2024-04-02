@@ -1,7 +1,10 @@
 {% set simpleAcceptableLevel =
-    '<span class="text-info mr-1 policy passwordPolicySimpleAcceptableLevel"><i class="fa fas fa-exclamation-circle"></i></span>
-    <span class="mb-1">Minimum password strength level : <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel'] ~ '</strong></span>
-    <br>'
+    '<div class="col">
+        <span class="text-info mr-1 policy passwordPolicySimpleAcceptableLevel">
+            <i class="fa fas fa-exclamation-circle"></i>
+        </span>
+        <span class="mb-1">Minimum password strength level : <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel'] ~ '</strong></span>
+    </div>'
 %}
 <div class="row">
     <div class="col">
@@ -24,7 +27,7 @@
                 [
                     'simple_acceptable_level'           : coreSettings['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel']
                 ],
-                'fieldHtmlContent'                      : '<div class="row"><div class="col">' ~ simpleAcceptableLevel ~ '</div></div>'
+                'fieldHtmlContent'                      : '<div class="row">' ~ simpleAcceptableLevel ~ '</div>'
             ]
         )}}
     </div>
