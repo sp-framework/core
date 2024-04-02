@@ -215,8 +215,6 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-address_id'                      : { },
         '{{componentId}}-{{sectionId}}-current_password'                : {
             afterInit: function() {
-                var countDownTimer;
-
                 $('#{{componentId}}-{{sectionId}}-twofa_otp-switch_to_email').click(function() {
                     $('#{{componentId}}-{{sectionId}}-twofa_otp').val('');
                     $('#twofa-otp').attr('hidden', true);

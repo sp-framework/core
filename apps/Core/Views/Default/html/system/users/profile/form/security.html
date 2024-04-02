@@ -352,7 +352,7 @@ $('#{{componentId}}-{{sectionId}}-pwreset-button').click(function(e) {
 $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').click(function(e) {
     e.preventDefault();
 
-    // $(this).attr('disabled', true);
+    $(this).attr('disabled', true);
     $(this).children('i').attr('hidden', false);
 
     var postData = { };
