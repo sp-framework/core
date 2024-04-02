@@ -40,6 +40,9 @@ class AuthComponent extends BaseComponent
         }
 
         if (isset($this->getData()['pwreset']) && $this->getData()['pwreset'] === 'true') {
+            $this->view->coreSettings = $this->core->core['settings'];
+
+            $this->view->canUse2fa = $this->auth->canUse2fa();
 
             $this->view->pick('auth/pwreset');
 
@@ -123,12 +126,16 @@ class AuthComponent extends BaseComponent
                 return;
             }
 
-            $pwreset = $this->auth->resetPassword($this->postData());
+            $this->auth->resetPassword($this->postData());
 
-            $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
+            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            $this->view->responseCode = $this->auth->packagesData->responseCode;
 
-            if ($pwreset) {
+            if (isset($this->auth->packagesData->redirectUrl)) {
                 $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
+            }
+            if (isset($this->auth->packagesData->responseData)) {
+                $this->view->responseData = $this->auth->packagesData->responseData;
             }
         } else {
             $this->addResponse('Method Not Allowed', 1);

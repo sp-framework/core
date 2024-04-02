@@ -9,6 +9,7 @@ use ParagonIE\ConstantTime\Base32;
 use Phalcon\Filter\Validation\Validator\Confirmation;
 use Phalcon\Filter\Validation\Validator\PresenceOf;
 use Phalcon\Filter\Validation\Validator\StringLength;
+use Phalcon\Filter\Validation\Validator\StringLength\Min;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
@@ -289,7 +290,11 @@ class Auth
         $validate = $this->validateData($data, 'auth');
 
         if ($validate !== true) {
-            $this->addResponse($validate, 1);
+            if (str_contains($validate, 'Enter valid 2FA code')) {
+                $this->addResponse($validate, 3, ['allowed_methods' => $this->core->core['settings']['security']['twofaSettings']['twofaUsing']]);
+            } else {
+                $this->addResponse($validate, 1);
+            }
 
             return false;
         }
@@ -304,8 +309,10 @@ class Auth
 
         $security = $this->getAccountSecurityObject();
 
-        if (!$this->validateTwoFa($security, $data)) {
-            return false;
+        if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
+            if (!$this->validateTwoFaCode($security, $data)) {
+                return false;
+            }
         }
 
         $this->addResponse('Authenticated. Redirecting...');
@@ -455,42 +462,42 @@ class Auth
         return true;
     }
 
-    protected function validateTwoFa($security, $data)
-    {
-        if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
-            if (isset($data['twofa_using'])) {
-                return $this->validateTwoFaCode($security, $data, true);
-            }
+    // protected function validateTwoFa($security, $data)
+    // {
+    //     if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
+    //         if (isset($data['twofa_using'])) {
+    //             return $this->validateTwoFaCode($security, $data, true);
+    //         }
 
-            $this->addResponse('2FA Code Required!', 3);
+    //         if (isset($this->core->core['settings']['security']['twofaSettings']['twofaUsing']) &&
+    //             $this->core->core['settings']['security']['twofaSettings']['twofaUsing'] !== ''
+    //         ) {
+    //             if (!is_array($this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
+    //                 $this->core->core['settings']['security']['twofaSettings']['twofaUsing'] = $this->helper->decode($this->core->core['settings']['security']['twofaSettings']['twofaUsing'], true);
+    //             }
+    //         }
 
-            if (isset($this->core->core['settings']['security']['twofaSettings']['twofaUsing']) &&
-                $this->core->core['settings']['security']['twofaSettings']['twofaUsing'] !== ''
-            ) {
-                if (!is_array($this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
-                    $this->core->core['settings']['security']['twofaSettings']['twofaUsing'] = $this->helper->decode($this->core->core['settings']['security']['twofaSettings']['twofaUsing'], true);
-                }
-            }
+    //         if (count($this->core->core['settings']['security']['twofaSettings']['twofaUsing']) === 0) {//if otp is not set and email service is not configured, we authenticate.
+    //             return true;
+    //         }
 
-            if (count($this->core->core['settings']['security']['twofaSettings']['twofaUsing']) === 0) {//if otp is not set and email service is not configured, we authenticate.
-                return true;
-            }
+    //         if (in_array('email', $this->core->core['settings']['security']['twofaSettings']['twofaUsing']) && !$this->email->setup()) {
+    //             unset($this->core->core['settings']['security']['twofaSettings']['twofaUsing'][array_keys($this->core->core['settings']['security']['twofaSettings']['twofaUsing'], 'email')[0]]);
+    //         }
 
-            if (in_array('email', $this->core->core['settings']['security']['twofaSettings']['twofaUsing']) && !$this->email->setup()) {
-                unset($this->core->core['settings']['security']['twofaSettings']['twofaUsing'][array_keys($this->core->core['settings']['security']['twofaSettings']['twofaUsing'], 'email')[0]]);
-            }
+    //         $responseData = ['allowed_methods' => $this->core->core['settings']['security']['twofaSettings']['twofaUsing']];
 
-            $this->packagesData->responseData = ['allowed_methods' => $this->core->core['settings']['security']['twofaSettings']['twofaUsing']];
+    //         if (in_array('otp', $this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
+    //             $responseData = array_merge($responseData, ['otp_status' => $security->twofa_otp_status]);
+    //         }
 
-            if (in_array('otp', $this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
-                $this->packagesData->responseData = array_merge($this->packagesData->responseData, ['otp_status' => $security->twofa_otp_status]);
-            }
+    //         $this->addResponse('2FA Code Required!', 3, $responseData);
 
-            return false;
-        }
+    //         return false;
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 
     protected function validateTwoFaCode($security, $data, $viaLogin = false)
     {
@@ -535,14 +542,16 @@ class Auth
 
             return false;
         } else if ($data['twofa_using'] === 'otp' && in_array('otp', $this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
-            if ($security->twofa_otp_status == '1' && !isset($data['code'])) {
-                $this->addResponse('2FA Code Required', 3);
+            // if (($security->twofa_otp_status == '1' && !isset($data['code'])) ||
+            //     ($security->twofa_otp_status == '1' && isset($data['code']) && $data['code'] === '')
+            // ) {
+            //     $this->addResponse('2FA Code Required', 3);
 
-                return false;
-            }
+            //     return false;
+            // }
 
             if ($viaLogin &&
-                ($security->twofa_otp_status == '1' && isset($data['code'])) &&
+                // ($security->twofa_otp_status == '1' && isset($data['code'])) &&
                 (isset($security->twofa_otp_secret) && !$this->verifyOtp($data['code'], $security->twofa_otp_secret))
             ) {
                 $this->addResponse('Error: Username/Password/2FA Code incorrect!', 1);
@@ -885,6 +894,38 @@ class Auth
         if ($task === 'auth') {
             $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid user name."]);
             $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
+            if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
+                $this->validation->add('twofa_using', PresenceOf::class, ["message" => "Error! Please contact administrator."]);
+                $this->validation->add('code', PresenceOf::class, ["message" => "2FA code required."]);
+                if (isset($data['twofa_using'])) {
+                    if ($data['twofa_using'] === 'otp') {
+                        if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'])) {
+                            $this->validation->add('code',
+                                                   Min::class,
+                                                   [
+                                                        "min" => $this->core->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'],
+                                                        "message" => "Enter valid 2FA code.",
+                                                        "included" => false
+                                                    ]
+                                                );
+                        }
+                    } else if ($data['twofa_using'] === 'email') {
+                        if (isset($this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeLength'])) {
+                            $this->validation->add('code',
+                                                   Min::class,
+                                                   [
+                                                        "min" => $this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeLength'],
+                                                        "message" => "Enter valid 2FA code.",
+                                                        "included" => false
+                                                    ]
+                                                );
+                        }
+                    }
+                }
+            }
+        } else if ($task === 'auth2faEmail') {
+            $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid user name."]);
+            $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
         } else if ($task === 'agent') {
             $this->validation->add('code', PresenceOf::class, ["message" => "Enter valid code."]);
         } else if ($task === 'forgot') {
@@ -907,7 +948,32 @@ class Auth
                 $this->core->core['settings']['security']['twofaSettings']['twofaPwresetNeed2fa'] == true
             ) {
                 $this->validation->add('twofa_using', PresenceOf::class, ["message" => "Error! Please contact administrator."]);
-                $this->validation->add('code', PresenceOf::class, ["message" => "Enter valid 2FA code."]);
+                $this->validation->add('code', PresenceOf::class, ["message" => "2FA code required."]);
+                if (isset($data['twofa_using'])) {
+                    if ($data['twofa_using'] === 'otp') {
+                        if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'])) {
+                            $this->validation->add('code',
+                                                   Min::class,
+                                                   [
+                                                        "min" => $this->core->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'],
+                                                        "message" => "Enter valid 2FA code.",
+                                                        "included" => false
+                                                    ]
+                                                );
+                        }
+                    } else if ($data['twofa_using'] === 'email') {
+                        if (isset($this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeLength'])) {
+                            $this->validation->add('code',
+                                                   Min::class,
+                                                   [
+                                                        "min" => $this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeLength'],
+                                                        "message" => "Enter valid 2FA code.",
+                                                        "included" => false
+                                                    ]
+                                                );
+                        }
+                    }
+                }
             }
         }
 
@@ -1034,7 +1100,7 @@ class Auth
                 unset($this->packagesData->redirectUrl);
                 unset($this->packagesData->responseData);
             } else {
-                $this->addResponse('Authenticated. Password changed. Redirecting...');
+                $this->addResponse('Password changed. Redirecting...');
             }
 
             return true;
@@ -1408,18 +1474,14 @@ class Auth
         $validated = $this->validation->validate($data)->jsonSerialize();
 
         if (count($validated) > 0) {
-            $messages = 'Error: ';
-
             foreach ($validated as $key => $value) {
                 $value['message'] = explode('|', $value['message']);
 
                 $this->passwordPolicyErrors[$value['message'][0]] = true;
-
-                $messages .= $value['message'][1] . ' ';
             }
+        }
 
-            $this->addResponse($messages, 1);
-
+        if (in_array(true, $this->passwordPolicyErrors, true)) {
             return false;
         }
 
@@ -2154,7 +2216,7 @@ class Auth
 
     public function sendTwoFaEmail(array $data)
     {
-        $validate = $this->validateData($data, 'auth');
+        $validate = $this->validateData($data, 'auth2faEmail');
 
         if ($validate !== true) {
             $this->addResponse($validate, 1);
@@ -2249,5 +2311,35 @@ class Auth
         if ($responseData !== null) {
             $this->packagesData->responseData = $responseData;
         }
+    }
+
+    public function canUse2fa()
+    {
+        $canUse2fa = [];
+
+        if (isset($this->core->core['settings']['security']['twofa']) &&
+            $this->core->core['settings']['security']['twofa'] == 'true'
+        ) {
+            if (isset($this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
+                if (is_string($this->core->core['settings']['security']['twofaSettings']['twofaUsing']) &&
+                    $this->core->core['settings']['security']['twofaSettings']['twofaUsing'] !== ''
+                ) {
+                    $this->core->core['settings']['security']['twofaSettings']['twofaUsing'] =
+                        $this->helper->decode($this->core->core['settings']['security']['twofaSettings']['twofaUsing']);
+
+                    if (is_array($this->core->core['settings']['security']['twofaSettings']['twofaUsing']) &&
+                        count($this->core->core['settings']['security']['twofaSettings']['twofaUsing']) > 0 &&
+                        in_array('otp', $this->core->core['settings']['security']['twofaSettings']['twofaUsing'])
+                    ) {
+                        array_push($canUse2fa, 'otp');
+                    }
+                }
+            }
+        }
+        if ($this->basepackages->email->setup()) {
+            array_push($canUse2fa, 'email');
+        }
+
+        return $canUse2fa;
     }
 }

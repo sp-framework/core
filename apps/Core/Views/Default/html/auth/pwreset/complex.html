@@ -1,0 +1,206 @@
+
+{% set minLengthText =
+    '<div class="col-md-6">
+        <span class="text-info mr-1 policy passwordPolicyLengthMin">
+            <i class="fa fas fa-exclamation-circle"></i>
+        </span>
+        <span class="mb-1">Minimum password length should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyLengthMin'] ~ '</strong> characters</span>
+    </div>'
+%}
+{% set maxLengthText =
+    '<div class="col-md-6">
+        <span class="text-info mr-1 policy passwordPolicyLengthMax">
+            <i class="fa fas fa-exclamation-circle"></i>
+        </span>
+        <span class="mb-1">Maximum password length should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyLengthMax'] ~ '</strong> characters</span>
+    </div>'
+%}
+{% set uppercaseTextMin = '' %}
+{% set uppercaseTextMax = '' %}
+{% set uppercaseTextInclude = '' %}
+{% if coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercase'] == true %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseMinCount'] !== '' %}
+        {% set uppercaseTextMin =
+            '<div class="col-md-6">
+                <span class="text-info mr-1 policy passwordPolicyUppercaseMinCount">
+                    <i class="fa fas fa-exclamation-circle"></i>
+                </span>
+                <span class="mb-1">Minimum uppercase should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseMinCount'] ~ '</strong> characters</span>
+            </div>'
+        %}
+    {% endif %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseMaxCount'] !== '' %}
+        {% set uppercaseTextMax =
+            '<div class="col-md-6">
+                <span class="text-info mr-1 policy passwordPolicyUppercaseMaxCount">
+                    <i class="fa fas fa-exclamation-circle"></i>
+                </span>
+                <span class="mb-1">Maximum uppercase should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseMaxCount'] ~ '</strong> characters</span>
+            </div>'
+        %}
+    {% endif %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseInclude'] !== '' and coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseInclude'] !== 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'%}
+        {% set uppercaseTextInclude =
+            '<div class="col-md-6">
+                <span class="text-info mr-1 policy passwordPolicyUppercaseInclude">
+                    <i class="fa fas fa-exclamation-circle"></i>
+                </span>
+                <span class="mb-1">Uppercase can include <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseInclude'] ~ '</strong> characters</span>
+            </div>'
+        %}
+    {% endif %}
+{% endif %}
+{% set lowercaseTextMin = '' %}
+{% set lowercaseTextMax = '' %}
+{% set lowercaseTextInclude = '' %}
+{% if coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercase'] == true %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseMinCount'] !== '' %}
+        {% set lowercaseTextMin =
+            '<div class="col-md-6">
+                <span class="text-info mr-1 policy passwordPolicyLowercaseMinCount">
+                    <i class="fa fas fa-exclamation-circle"></i>
+                </span>
+                <span class="mb-1">Minimum lowercase should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseMinCount'] ~ '</strong> characters</span>
+            </div>'
+        %}
+    {% endif %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseMaxCount'] !== '' %}
+        {% set lowercaseTextMax =
+            '<div class="col-md-6">
+                <span class="text-info mr-1 policy passwordPolicyLowercaseMaxCount">
+                    <i class="fa fas fa-exclamation-circle"></i>
+                </span>
+                <span class="mb-1">Maximum lowercase can be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseMaxCount'] ~ '</strong> characters</span>
+            </div>'
+        %}
+    {% endif %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseInclude'] !== '' and coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseInclude'] !== 'abcdefghijklmnopqrstuvwxyz' %}
+        {% set lowercaseTextInclude =
+            '<div class="col-md-6">
+                <span class="text-info mr-1 policy passwordPolicyLowercaseInclude">
+                    <i class="fa fas fa-exclamation-circle"></i>
+                </span>
+                <span class="mb-1">Lowercase can include <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseInclude'] ~ '</strong> characters</span>
+            </div>'
+        %}
+    {% endif %}
+{% endif %}
+{% set numbersTextMin = '' %}
+{% set numbersTextMax = '' %}
+{% set numbersTextInclude = '' %}
+{% if coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbers'] == true %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersMinCount'] !== '' %}
+        {% set numbersTextMin =
+            '<div class="col-md-6">
+                <span class="text-info mr-1 policy passwordPolicyNumbersMinCount">
+                    <i class="fa fas fa-exclamation-circle"></i>
+                </span>
+                <span class="mb-1">Minimum numbers should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersMinCount'] ~ '</strong> characters</span>
+            </div>'
+        %}
+    {% endif %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersMaxCount'] !== '' %}
+        {% set numbersTextMax =
+            '<div class="col-md-6">
+                <span class="text-info mr-1 policy passwordPolicyNumbersMaxCount">
+                    <i class="fa fas fa-exclamation-circle"></i>
+                </span>
+                <span class="mb-1">Maximum numbers can be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersMaxCount'] ~ '</strong> characters</span>
+            </div>'
+        %}
+    {% endif %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersInclude'] !== '' and coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersInclude'] !== '0123456789' %}
+        {% set numbersTextInclude =
+            '<div class="col-md-6">
+                <span class="text-info mr-1 policy passwordPolicyNumbersInclude">
+                    <i class="fa fas fa-exclamation-circle"></i>
+                </span>
+                <span class="mb-1">Numbers can include <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersInclude'] ~ '</strong> characters</span>
+            </div>'
+        %}
+    {% endif %}
+{% endif %}
+{% set symbolsTextMin = '' %}
+{% set symbolsTextMax = '' %}
+{% set symbolsTextInclude = '' %}
+{% if coreSettings['security']['passwordPolicySettings']['passwordPolicySymbols'] == true %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsMinCount'] !== '' %}
+        {% set symbolsTextMin =
+            '<div class="col-md-6">
+                <span class="text-info mr-1 policy passwordPolicySymbolsMinCount">
+                    <i class="fa fas fa-exclamation-circle"></i>
+                </span>
+                <span class="mb-1">Minimum symbols should be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsMinCount'] ~ '</strong> characters</span>
+            </div>'
+        %}
+    {% endif %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsMaxCount'] !== '' %}
+        {% set symbolsTextMax =
+            '<div class="col-md-6">
+                <span class="text-info mr-1 policy passwordPolicySymbolsMaxCount">
+                    <i class="fa fas fa-exclamation-circle"></i>
+                </span>
+                <span class="mb-1">Maximum symbols can be <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsMaxCount'] ~ '</strong> characters</span>
+            </div>'
+        %}
+    {% endif %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsInclude'] !== '' and coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsInclude'] !== '!@$%^&*()<>,.?/[]{}-=_+' %}
+        {% set symbolsTextInclude =
+            '<div class="col-md-6">
+                <span class="text-info mr-1 policy passwordPolicySymbolsInclude">
+                    <i class="fa fas fa-exclamation-circle"></i>
+                </span>
+                <span class="mb-1">Symbols can include <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsInclude'] ~ '</strong> characters</span>
+            </div>'
+        %}
+    {% endif %}
+{% endif %}
+
+{% set htmlContent =
+    '<div class="row">' ~ minLengthText ~ maxLengthText ~ uppercaseTextMin ~ uppercaseTextMax ~ uppercaseTextInclude ~ lowercaseTextMin ~ lowercaseTextMax ~ lowercaseTextInclude ~ numbersTextMax ~ numbersTextMin ~ numbersTextInclude ~ symbolsTextMin ~ symbolsTextMax ~ symbolsTextInclude ~ '</div>'
+%}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : 'form',
+                'fieldId'                               : 'password-policy-complex',
+                'fieldLabel'                            : 'Complex Password Reset Policies',
+                'fieldLabelLegend'                      : false,
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : false,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldDataAttributes'                   :
+                [
+                    'passwordpolicylengthmin'               : coreSettings['security']['passwordPolicySettings']['passwordPolicyLengthMin'],
+                    'passwordpolicylengthmax'               : coreSettings['security']['passwordPolicySettings']['passwordPolicyLengthMax'],
+                    'passwordpolicyuppercase'               : coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercase'],
+                    'passwordpolicyuppercasemincount'       : coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseMinCount'],
+                    'passwordpolicyuppercasemaxcount'       : coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseMaxCount'],
+                    'passwordpolicyuppercaseinclude'        : coreSettings['security']['passwordPolicySettings']['passwordPolicyUppercaseInclude'],
+                    'passwordpolicylowercase'               : coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercase'],
+                    'passwordpolicylowercasemincount'       : coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseMinCount'],
+                    'passwordpolicylowercasemaxcount'       : coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseMaxCount'],
+                    'passwordpolicylowercaseinclude'        : coreSettings['security']['passwordPolicySettings']['passwordPolicyLowercaseInclude'],
+                    'passwordpolicynumbers'                 : coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbers'],
+                    'passwordpolicynumbersmincount'         : coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersMinCount'],
+                    'passwordpolicynumbersmaxcount'         : coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersMaxCount'],
+                    'passwordpolicynumbersinclude'          : coreSettings['security']['passwordPolicySettings']['passwordPolicyNumbersInclude'],
+                    'passwordpolicysymbols'                 : coreSettings['security']['passwordPolicySettings']['passwordPolicySymbols'],
+                    'passwordpolicysymbolsmincount'         : coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsMinCount'],
+                    'passwordpolicysymbolsmaxcount'         : coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsMaxCount'],
+                    'passwordpolicysymbolsinclude'          : coreSettings['security']['passwordPolicySettings']['passwordPolicySymbolsInclude'],
+                    'passwordpolicyavoidsimilar'            : coreSettings['security']['passwordPolicySettings']['passwordPolicyAvoidSimilar'],
+                    'passwordpolicyavoidsimilarcharacters'  : coreSettings['security']['passwordPolicySettings']['passwordPolicyAvoidSimilarCharacters']
+                ],
+                'fieldHtmlContent'                      : htmlContent
+            ]
+        )}}
+    </div>
+</div>

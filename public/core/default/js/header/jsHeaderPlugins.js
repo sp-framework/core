@@ -114,7 +114,7 @@
                             strengthText = ' (Normal Strength)';
                         } else if (value == '3') {
                             strengthText = ' (Good Strength)';
-                        } else if (value == '2') {
+                        } else if (value == '4') {
                             strengthText = ' (Best Strength)';
                         }
                         if (value > 0) {
