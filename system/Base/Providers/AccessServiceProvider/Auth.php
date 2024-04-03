@@ -1090,6 +1090,12 @@ class Auth
             return false;
         }
 
+        if (!$this->account['security']['force_pwreset']) {
+            $this->addResponse('Cannot reset password using this tool. Please login and reset using profile.', 1);
+
+            return false;
+        }
+
         if (isset($this->core->core['settings']['security']['twofa']) &&
             $this->core->core['settings']['security']['twofa'] == true &&
             isset($this->core->core['settings']['security']['twofaSettings']['twofaPwresetNeed2fa']) &&
