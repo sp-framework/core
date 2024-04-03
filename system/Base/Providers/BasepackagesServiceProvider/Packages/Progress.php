@@ -109,6 +109,10 @@ class Progress extends BasePackage
     {
         $progressFile = $this->readProgressFile($session);
 
+        if (!$progressFile) {
+            return false;
+        }
+
         $progress =
             [
                 'total'             => $progressFile['total'],

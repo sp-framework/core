@@ -58,7 +58,7 @@ class PusherTask extends Task
         $pull->bind('tcp://127.0.0.1:5555');
         $pull->on('message', array($this->basepackages->pusher, 'onNewPush'));
 
-        $webSock = new SocketServer('0.0.0.0:4444', $loop);
+        $webSock = new SocketServer('0.0.0.0:4444', [], $loop);
 
         try {
             $webServer = new IoServer(
