@@ -439,6 +439,43 @@ class Auth
             }
 
             if (!$this->secTools->checkPassword($data['pass'], $this->account['security']['password'])) {//Password Fail
+                if ($this->account['security']['forgotten_request'] == true) {
+                    if (time() > $this->account['security']['forgotten_request_sent_on'] + ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyForgottenPasswordTimeout'] ?? 60)
+                    ) {
+                        $this->account['security']['forgotten_request'] = null;
+                        $this->account['security']['forgotten_request_session_id'] = null;
+                        $this->account['security']['forgotten_request_ip'] = null;
+                        $this->account['security']['forgotten_request_agent'] = null;
+                        $this->account['security']['forgotten_request_code'] = null;
+                        $this->account['security']['forgotten_request_sent_on'] = null;
+                        $this->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
+                        $this->addResponse('Code Expired! Request new code...', 1);
+
+                        return false;
+                    }
+
+                    if ($this->account['security']['forgotten_request_session_id'] !== $this->session->getId() ||
+                        $this->account['security']['forgotten_request_ip'] !== $this->request->getClientAddress() ||
+                        $this->account['security']['forgotten_request_agent'] !== $this->request->getUserAgent()
+                    ) {
+                        $this->addResponse('Error: OTP entered on a different browser than requested!', 1);
+
+                        return false;
+                    }
+
+                    if ($this->secTools->checkPassword($data['pass'], $this->account['security']['forgotten_request_code'])) {//forgotten success and we remove forgotten fields
+                        $this->account['security']['forgotten_request'] = null;
+                        $this->account['security']['forgotten_request_session_id'] = null;
+                        $this->account['security']['forgotten_request_ip'] = null;
+                        $this->account['security']['forgotten_request_agent'] = null;
+                        $this->account['security']['forgotten_request_code'] = null;
+                        $this->account['security']['forgotten_request_sent_on'] = null;
+                        $this->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
+
+                        return true;
+                    }
+                }
+
                 if ($viaProfile) {
                     $this->addResponse('Error: Current Password incorrect!', 1);
                 } else {
@@ -448,6 +485,15 @@ class Auth
                 $this->logger->log->debug('Incorrect username/password entered by account ' . $this->account['email'] . ' on app ' . $this->app['name']);
 
                 return false;
+            }
+
+            if ($this->account['security']['forgotten_request'] == true) {//We remove this as the user now remembers their password and logs in with it.
+                $this->account['security']['forgotten_request'] = null;
+                $this->account['security']['forgotten_request_session_id'] = null;
+                $this->account['security']['forgotten_request_ip'] = null;
+                $this->account['security']['forgotten_request_agent'] = null;
+                $this->account['security']['forgotten_request_code'] = null;
+                $this->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
             }
         } else {
             $this->secTools->hashPassword(rand());//Randomize so we take same time to respond as if the account exists.
@@ -501,7 +547,9 @@ class Auth
 
     protected function validateTwoFaCode($security, $data, $viaLogin = false)
     {
-        if (!isset($this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
+        if ((isset($this->core->core['settings']['security']) && $this->core->core['settings']['security'] == 'false') ||
+             !isset($this->core->core['settings']['security']['twofaSettings']['twofaUsing'])
+         ) {
             return true;
         }
 
@@ -510,7 +558,7 @@ class Auth
         }
 
         if ($data['twofa_using'] === 'email' && in_array('email', $this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
-            if (time() > $security->twofa_email_code_sent_on + ($this->core->core['settings']['security']['twofaSettings']['twofa_email_timeout'] ?? 60)) {
+            if (time() > $security->twofa_email_code_sent_on + ($this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeTimeout'] ?? 60)) {
                 $security->twofa_email_code_sent_on = null;
                 $security->twofa_email_code = null;
 
@@ -1001,19 +1049,20 @@ class Auth
             return false;
         }
 
-        $this->account = $this->accounts->checkAccount($data['user'], true);
+        $account = $this->accounts->checkAccount($data['user'], true);
 
-        if ($this->account) {
-            $this->account['force_logout'] = '1';
+        if ($account) {
+            $account['email_new_password'] = '1';
+            $account['forgotten_request'] = '1';
+            $account['forgotten_request_session_id'] = $this->session->getId();
+            $account['forgotten_request_ip'] = $this->request->getClientAddress();
+            $account['forgotten_request_agent'] = $this->request->getUserAgent();
+            $account['forgotten_request_sent_on'] = time();
 
-            $this->account['email_new_password'] = '1';
-
-            $this->account['pwreset_email'] = '1';
-
-            if ($this->accounts->updateAccount($this->account)) {
-                $this->logger->log->info('New password requested for account ' . $this->account['email'] . ' via forgot password. New password was emailed to the account.');
+            if ($this->accounts->updateAccount($account)) {
+                $this->logger->log->info('New password requested for account ' . $account['email'] . ' via forgot password. New password was emailed to the account.');
             } else {
-                $this->logger->log->critical('Trying to send new password for ' . $this->account['email'] . ' via forgot password failed.');
+                $this->logger->log->critical('Trying to send new password for ' . $account['email'] . ' via forgot password failed.');
             }
         }
 
@@ -2238,14 +2287,14 @@ class Auth
         $security = $this->getAccountSecurityObject();
 
         if (isset($security->twofa_email_code_sent_on)) {
-            if (time() < $security->twofa_email_code_sent_on + ($this->core->core['settings']['security']['twofaSettings']['twofa_email_timeout'] ?? 60)
+            if (time() < $security->twofa_email_code_sent_on + ($this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeTimeout'] ?? 60)
             ) {
                 $this->addResponse(
                     'Email already sent, please wait to send another code...',
                     1,
                     [
                         'code_sent_on' => $security->twofa_email_code_sent_on,
-                        'email_timeout' => $this->core->core['settings']['security']['twofaSettings']['twofa_email_timeout'] ?? 60
+                        'email_timeout' => $this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeTimeout'] ?? 60
                     ]
                 );
 
@@ -2277,7 +2326,7 @@ class Auth
             $this->addResponse(
                 'Email Sent!',
                 0,
-                ['email_timeout' => $this->core->core['settings']['security']['twofaSettings']['twofa_email_timeout'] ?? 60]
+                ['email_timeout' => $this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeTimeout'] ?? 60]
             );
 
             return;

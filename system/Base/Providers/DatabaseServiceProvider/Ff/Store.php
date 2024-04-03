@@ -653,7 +653,7 @@ class Store
         }
     }
 
-    protected function deleteRelated($id, $relationsConditions = false)
+    public function deleteRelated($id, $relationsConditions = false)
     {
         $data = $this->findById((int) $id);
 

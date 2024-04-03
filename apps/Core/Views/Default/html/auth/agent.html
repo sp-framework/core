@@ -103,6 +103,7 @@ $(document).ready(function(){
           '#{{componentId}}-form-twofa-email-email_code, ' +
           '#{{componentId}}-form-agent-verification-email_code, ' +
           '#{{componentId}}-form-verify').attr('disabled', true);
+        $('#' + thisButton.id).attr('disabled', true);
 
         if (thisButton.id !== '{{componentId}}-form-twofa-email-email_code' &&
             thisButton.id !== '{{componentId}}-form-agent-verification-email_code'
@@ -322,6 +323,10 @@ $(document).ready(function(){
                 $('#{{componentId}}-form-auth').attr('disabled', false);
                 $('#{{componentId}}-form-twofa-otp').parents('.form-group').addClass('d-none');
             }
+        } else if ($('#{{componentId}}-form-forgot').length > 0) {
+            $('.login-spinner').attr('hidden', true);
+            $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+            $('#{{componentId}}-form :input').prop('disabled', false);
         } else if ($('#{{componentId}}-form-reset').length > 0) {
             $('.login-spinner').attr('hidden', true);
             $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
@@ -447,7 +452,11 @@ $(document).ready(function(){
                 }
             }
         } else if ($('#{{componentId}}-form-forgot').length > 0) {
-            //
+            if (response.responseCode == '1') {
+                $('.login-spinner').attr('hidden', true);
+                $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+                $('#{{componentId}}-form :input').prop('disabled', false);
+            }
         } else if ($('#{{componentId}}-form-generate-code').length > 0) {
             $('#{{componentId}}-form-regenerate-code').attr('disabled', false);
             $('#{{componentId}}-form-verifycode').attr('disabled', false);
@@ -639,7 +648,9 @@ $(document).ready(function(){
         }, 1000);
     }
 
-    $('#{{componentId}}-form-current_password-visibility, #{{componentId}}-form-new_password-visibility, #{{componentId}}-form-confirm_password-visibility').click(function(e) {
+    $('#{{componentId}}-form-current_password-visibility, ' +
+      '#{{componentId}}-form-new_password-visibility, ' +
+      '#{{componentId}}-form-confirm_password-visibility').click(function(e) {
         e.preventDefault();
 
         var id = $(this)[0].id;

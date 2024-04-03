@@ -48,7 +48,7 @@ class EmailQueue extends BasePackage
             }
 
             if (!$this->basepackages->email->setup(null, $this->domains->getDomain()['id'], $this->apps->getAppInfo()['id'])) {
-                $this->basepackages->emailServices->errorEmailService(
+                $this->basepackages->emailservices->errorEmailService(
                     'Email was added to the queue but, there is no email service associated with app: ' . $this->apps->getAppInfo()['name'] . '. Please add a new service ' .
                     'and assign it to the app via domains.'
                 );

@@ -39,6 +39,18 @@ class BasepackagesUsersAccountsSecurity extends BaseModel
 
     public $force_pwreset_after;
 
+    public $forgotten_request;
+
+    public $forgotten_request_session_id;
+
+    public $forgotten_request_ip;
+
+    public $forgotten_request_agent;
+
+    public $forgotten_request_code;
+
+    public $forgotten_request_sent_on;
+
     public function initialize()
     {
         $this->modelRelations['accounts']['relationObj'] = $this->belongsTo(

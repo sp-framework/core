@@ -45,9 +45,9 @@ class Accounts extends BasePackage
                 $account['sessions'] = $this->model->getsessions()->toArray();
             }
 
-            $account['identifiers'] = [];
+            $account['identifier'] = [];
             if ($this->model->getidentifiers()) {
-                $account['identifiers'] = $this->model->getidentifiers()->toArray();
+                $account['identifier'] = $this->model->getidentifiers()->toArray();
             }
 
             $account['agents'] = [];
@@ -181,7 +181,7 @@ class Accounts extends BasePackage
      */
     public function updateAccount(array $data)
     {
-        if (isset($data['pwreset_email']) && $data['pwreset_email'] == '1') {
+        if (isset($data['forgotten_request']) && $data['forgotten_request'] == '1') {
             $validation = $this->validateData($data, true);
         } else {
             $validation = $this->validateData($data);
@@ -197,7 +197,9 @@ class Accounts extends BasePackage
             $data['status'] = '0';
         }
 
-        if ($data['id'] == $this->auth->account()['id']) {
+        if ($this->auth->account() &&
+            $data['id'] == $this->auth->account()['id']
+        ) {
             if ($data['status'] == '0') {
                 $data['status'] = 1;//Cannot disable own account
             }
@@ -233,7 +235,9 @@ class Accounts extends BasePackage
             $data['permissions'] = $this->helper->encode([]);
         } else if (isset($data['override_role']) && $data['override_role'] == 1) {
             //Prevent lockout of logged in user
-            if ($data['id'] == $this->auth->account()['id']) {
+            if ($this->auth->account() &&
+                $data['id'] == $this->auth->account()['id']
+            ) {
                 if (is_string($data['permissions'])) {
                     $data['permissions'] = $this->helper->decode($data['permissions'], true);
                 }
@@ -251,10 +255,12 @@ class Accounts extends BasePackage
 
         $data['domain'] = explode('@', $data['email'])[1];
 
-        if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
-
+        //We keep the old password intact. If user remembers their password and logs in with that, we destroy this code.
+        if (isset($data['forgotten_request']) && $data['forgotten_request'] == '1') {
             $password = $this->basepackages->utils->generateNewPassword()['password'];
-
+            $data['forgotten_request_code'] = $this->secTools->hashPassword($password);
+        } else if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
+            $password = $this->basepackages->utils->generateNewPassword()['password'];
             $data['password'] = $this->secTools->hashPassword($password);
         }
 
@@ -278,7 +284,9 @@ class Accounts extends BasePackage
                 $this->emailNewPassword($data['email'], $password);
             }
 
-            $this->basepackages->profile->updateProfileViaAccount($data);
+            if ($this->auth->account()) {
+                $this->basepackages->profile->updateProfileViaAccount($data);
+            }
 
             $this->addUpdateSecurity($account['id'], $data);
 
@@ -288,7 +296,9 @@ class Accounts extends BasePackage
 
             $this->addResponse('Updated account for ID: ' . $data['email'], 0, null, true);
 
-            if ($data['id'] == $this->auth->account()['id']) {//Cannot logout yourself!
+            if ($this->auth->account() &&
+                $data['id'] == $this->auth->account()['id']
+            ) {//Cannot logout yourself!
                 $data['force_logout'] = '0';
             }
 
@@ -422,38 +432,128 @@ class Accounts extends BasePackage
         $tunnels = true
     ) {
         if ($security) {
-            if ($accountObj->getsecurity()) {
+            if ($this->config->databasetype === 'db' &&
+                $accountObj->getsecurity()
+            ) {
                 $accountObj->getsecurity()->delete();
+            } else {
+                if ($account['security'] &&
+                    is_array($account['security']) &&
+                    count($account['security']) > 0
+                ) {
+                    $securityStore = $this->ff->store((new BasepackagesUsersAccountsSecurity)->getSource());
+                    $securityCheck = $securityStore->findById($account['security']['id']);
+
+                    if ($securityCheck) {
+                        $securityStore->deleteById($account['security']['id'], false);
+                    }
+                }
             }
         }
 
         if ($canlogin) {
-            if ($accountObj->getcanlogin()) {
+            if ($this->config->databasetype === 'db' &&
+                $accountObj->getcanlogin()
+            ) {
                 $accountObj->getcanlogin()->delete();
+            } else {
+                if ($account['canlogin'] &&
+                    is_array($account['canlogin']) &&
+                    count($account['canlogin']) > 0
+                ) {
+                    $canloginStore = $this->ff->store((new BasepackagesUsersAccountsCanlogin)->getSource());
+                    foreach ($account['canlogin'] as $canloginValue) {
+                        $canloginValueCheck = $canloginStore->findById($canloginValue['id']);
+
+                        if ($canloginValueCheck) {
+                            $canloginStore->deleteById($canloginValue['id'], false);
+                        }
+                    }
+                }
             }
         }
 
         if ($identifiers) {
-            if ($accountObj->getidentifiers()) {
+            if ($this->config->databasetype === 'db' &&
+                $accountObj->getidentifiers()
+            ) {
                 $accountObj->getidentifiers()->delete();
+            } else {
+                if ($account['identifier'] &&
+                    is_array($account['identifier']) &&
+                    count($account['identifier']) > 0
+                ) {
+                    $identifierStore = $this->ff->store((new BasepackagesUsersAccountsIdentifiers)->getSource());
+                    $identifierCheck = $identifierStore->findById($account['identifier']['id']);
+
+                    if ($identifierCheck) {
+                        $identifierStore->deleteById($account['identifier']['id'], false);
+                    }
+                }
             }
         }
 
         if ($agents) {
-            if ($accountObj->getagents()) {
+            if ($this->config->databasetype === 'db' &&
+                $accountObj->getagents()
+            ) {
                 $accountObj->getagents()->delete();
+            } else {
+                if ($account['agents'] &&
+                    is_array($account['agents']) &&
+                    count($account['agents']) > 0
+                ) {
+                    $agentsStore = $this->ff->store((new BasepackagesUsersAccountsAgents)->getSource());
+                    foreach ($account['agents'] as $agentsValue) {
+                        $agentsValueCheck = $agentsStore->findById($agentsValue['id']);
+
+                        if ($agentsValueCheck) {
+                            $agentsStore->deleteById($agentsValue['id'], false);
+                        }
+                    }
+                }
             }
         }
 
         if ($sessions) {
-            if ($accountObj->getsessions()) {
+            if ($this->config->databasetype === 'db' &&
+                $accountObj->getsessions()
+            ) {
                 $accountObj->getsessions()->delete();
+            } else {
+                if ($account['sessions'] &&
+                    is_array($account['sessions']) &&
+                    count($account['sessions']) > 0
+                ) {
+                    $sessionsStore = $this->ff->store((new BasepackagesUsersAccountsSessions)->getSource());
+                    foreach ($account['sessions'] as $sessionsValue) {
+                        $sessionsValueCheck = $sessionsStore->findById($sessionsValue['id']);
+
+                        if ($sessionsValueCheck) {
+                            $sessionsStore->deleteById($sessionsValue['id'], false);
+                        }
+                    }
+                }
             }
         }
 
         if ($tunnels) {
-            if ($accountObj->gettunnels()) {
+            if ($this->config->databasetype === 'db' &&
+                $accountObj->gettunnels()
+            ) {
                 $accountObj->gettunnels()->delete();
+            } else {
+                if ($account['tunnels'] &&
+                    is_array($account['tunnels']) &&
+                    count($account['tunnels']) > 0
+                ) {
+                    $tunnelsStore = $this->ff->store((new BasepackagesUsersAccountsTunnels)->getSource());
+                    $tunnelsCheck = $tunnelsStore->findById($account['tunnels']['id']);
+
+                    if ($tunnelsCheck) {
+                        $tunnelsStore->deleteById($account['tunnels']['id'], false);
+                    }
+                }
             }
         }
 
@@ -805,12 +905,13 @@ class Accounts extends BasePackage
         }
     }
 
-    public function validateData(array $data, $pwresetEmail = false)
+    public function validateData(array $data, $forgotRequest = false)
     {
-        $this->validation->init()->add('email', PresenceOf::class, ["message" => "Enter valid username."]);
+        $this->validation->init();
+        $this->validation->add('email', PresenceOf::class, ["message" => "Enter valid username."]);
         $this->validation->add('email', Email::class, ["message" => "Enter valid username."]);
 
-        if (!$pwresetEmail) {
+        if (!$forgotRequest) {
             $this->validation->add('first_name', PresenceOf::class, ["message" => "Enter valid first name."]);
             $this->validation->add('last_name', PresenceOf::class, ["message" => "Enter valid last name."]);
         }

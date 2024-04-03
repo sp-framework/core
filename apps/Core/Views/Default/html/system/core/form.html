@@ -170,7 +170,8 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-password_policy_complexity, ' +
                           '#{{componentId}}-{{sectionId}}-password_policy_force_relogin_after_pwreset, ' +
                           '#{{componentId}}-{{sectionId}}-password_policy_force_pwreset_after, ' +
-                          '#{{componentId}}-{{sectionId}}-password_policy_block_previous_passwords'
+                          '#{{componentId}}-{{sectionId}}-password_policy_block_previous_passwords, ' +
+                          '#{{componentId}}-{{sectionId}}-password_policy_forgotten_password_timeout'
                           ).attr('disabled', false);
                         if ($('#{{componentId}}-{{sectionId}}-password_policy_complexity').val() === 'simple') {
                             $('#simple-div').attr('hidden', false);
@@ -183,7 +184,8 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-password_policy_complexity, ' +
                           '#{{componentId}}-{{sectionId}}-password_policy_force_relogin_after_pwreset, ' +
                           '#{{componentId}}-{{sectionId}}-password_policy_force_pwreset_after, ' +
-                          '#{{componentId}}-{{sectionId}}-password_policy_block_previous_passwords'
+                          '#{{componentId}}-{{sectionId}}-password_policy_block_previous_passwords, ' +
+                          '#{{componentId}}-{{sectionId}}-password_policy_forgotten_password_timeout'
                           ).attr('disabled', true);
                         $('#simple-div').attr('hidden', true);
                         $('#complex-div').attr('hidden', true);
@@ -194,6 +196,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-password_policy_force_relogin_after_pwreset'     : { },
         '{{componentId}}-{{sectionId}}-password_policy_force_pwreset_after'             : { },
         '{{componentId}}-{{sectionId}}-password_policy_block_previous_passwords'        : { },
+        '{{componentId}}-{{sectionId}}-password_policy_forgotten_password_timeout'      : { },
         '{{componentId}}-{{sectionId}}-password_policy_complexity'                      : {
             placeholder : 'SELECT PASSWORD COMPLEXITY',
             afterInit : function() {

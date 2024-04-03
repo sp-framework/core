@@ -120,6 +120,52 @@ class Security
                             'type'          => Column::TYPE_INTEGER,
                             'notNull'       => false
                         ]
+                    ),
+                    new Column(
+                        'forgotten_request',
+                        [
+                            'type'          => Column::TYPE_BOOLEAN,
+                            'notNull'       => false
+                        ]
+                    ),
+                    new Column(
+                        'forgotten_request_session_id',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 50,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'forgotten_request_ip',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 100,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'forgotten_request_agent',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 2048,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'forgotten_request_code',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 2048,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'forgotten_request_sent_on',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => false
+                        ]
                     )
                 ],
                 'options' => [
