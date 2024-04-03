@@ -12,8 +12,13 @@ class AuthComponent extends BaseComponent
 
         $this->view->canRegister = false;
 
+        $this->view->canRecoverPassword = false;
+
         if ($this->app['registration_allowed'] && $this->app['registration_allowed'] == '1') {
             $this->view->canRegister = true;
+        }
+        if ($this->app['recover_password'] && $this->app['recover_password'] == '1') {
+            $this->view->canRecoverPassword = true;
         }
 
         if (isset($this->session->needAgentAuth) && $this->session->needAgentAuth === true) {
@@ -48,6 +53,13 @@ class AuthComponent extends BaseComponent
 
             return;
         } else if (isset($this->getData()['forgot']) && $this->getData()['forgot'] === 'password') {
+            if ($this->app['recover_password'] == '0' || !$this->app['recover_password']) {
+                $this->response->setStatusCode(404);
+
+                return $this->response->send();
+
+                exit;
+            }
 
             $this->view->pick('auth/forgot');
 

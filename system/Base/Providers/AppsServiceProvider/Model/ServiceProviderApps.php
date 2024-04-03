@@ -25,6 +25,8 @@ class ServiceProviderApps extends BaseModel
 
     public $registration_allowed;
 
+    public $recover_password;
+
     public $approve_accounts_manually;
 
     public $enforce_2fa;

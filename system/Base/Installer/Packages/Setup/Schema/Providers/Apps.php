@@ -75,6 +75,13 @@ class Apps
 					]
 				),
 				new Column(
+					'recover_password',
+					[
+						'type'    => Column::TYPE_BOOLEAN,
+						'notNull' => false,
+					]
+				),
+				new Column(
 					'approve_accounts_manually',
 					[
 						'type'    => Column::TYPE_BOOLEAN,

@@ -116,10 +116,12 @@ BazCore.header({
                     </div>
                     <div class="row mt-2">
                         <div class="col mt-2">
-                            <a class="text-info" href="{{links.url('auth/q/forgot/password')}}">
-                                <span>Forgot password?</span>
-                            </a>
-                            <br>
+                            {% if apps.getappinfo()['recover_password'] == '1' %}
+                                <a class="text-info" href="{{links.url('auth/q/forgot/password')}}">
+                                    <span>Forgot password?</span>
+                                </a>
+                                <br>
+                            {% endif %}
                             {% if apps.getappinfo()['registration_allowed'] == '1' %}
                                 <a class="text-info" href="{{links.url('register')}}">
                                     <span>Register new account</span>

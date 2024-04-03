@@ -22,7 +22,7 @@ class RegisterComponent extends BaseComponent
         if (!$this->app || $this->app['registration_allowed'] == '0' || !$this->app['registration_allowed']) {
             $this->response->setStatusCode(404);
 
-            $this->response->send();
+            return $this->response->send();
 
             exit;
         }

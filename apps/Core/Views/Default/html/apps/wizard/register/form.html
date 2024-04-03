@@ -22,6 +22,10 @@
         {% set registrationApproveAccountsManuallyDisabled = true %}
         {% set registrationRoleDisabled = true %}
     {% endif %}
+    {% set recoverPassword = false %}
+    {% if app['recover_password'] == true %}
+        {% set recoverPassword = true %}
+    {% endif %}
     {% set approveAccountsManually = false %}
     {% if app['approve_accounts_manually'] == true %}
         {% set approveAccountsManually = true %}
@@ -275,6 +279,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-route'                               : { },
         '{{componentId}}-{{sectionId}}-description'                         : { },
         '{{componentId}}-{{sectionId}}-registration_allowed'                : { },
+        '{{componentId}}-{{sectionId}}-recover_password'                    : { },
         '{{componentId}}-{{sectionId}}-registration_role_id'                : {
             'placeholder'   : 'SELECT REGISTRATION ROLE',
         },
