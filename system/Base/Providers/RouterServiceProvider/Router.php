@@ -9,6 +9,8 @@ use System\Base\Providers\RouterServiceProvider\Exceptions\DomainNotRegisteredEx
 
 class Router
 {
+	protected $api;
+
 	protected $domains;
 
 	protected $domain;
@@ -55,8 +57,10 @@ class Router
 
 	protected $config;
 
-	public function __construct($domains, $apps, $components, $views, $logger, $request, $response, $helper, $config)
+	public function __construct($api, $domains, $apps, $components, $views, $logger, $request, $response, $helper, $config)
 	{
+		$this->api = $api;
+
 		$this->domains = $domains;
 
 		$this->apps = $apps;
@@ -85,7 +89,6 @@ class Router
 	public function init()
 	{
 		if ($this->validateDomain()) {
-
 			$this->getURI();
 
 			if ($this->appInfo && $this->appDefaults) {
@@ -149,36 +152,40 @@ class Router
 			}
 		}
 
-		$this->router->setDefaultNamespace($this->defaultNamespace);
+		if (!$this->api->isApi($this->request)) {
+			$this->router->setDefaultNamespace($this->defaultNamespace);
+		}
 	}
 
 	protected function registerHome()
 	{
-		$this->setDefaultNamespace(true);
+		if (!$this->api->isApi($this->request)) {
+			$this->setDefaultNamespace(true);
 
-		$this->router->add(
-			'/',
-			[
-				'controller'	=> 'home',
-				'action'		=> 'view'
-			]
-		);
+			$this->router->add(
+				'/',
+				[
+					'controller'	=> 'home',
+					'action'		=> 'view'
+				]
+			);
 
-		$this->router->add(
-			'/' . strtolower($this->appInfo['route']),
-			[
-				'controller'	=> 'home',
-				'action'		=> 'view'
-			]
-		);
+			$this->router->add(
+				'/' . strtolower($this->appInfo['route']),
+				[
+					'controller'	=> 'home',
+					'action'		=> 'view'
+				]
+			);
 
-		$this->router->add(
-			'/' . strtolower($this->appInfo['route']) . '/',
-			[
-				'controller'	=> 'home',
-				'action'		=> 'view'
-			]
-		);
+			$this->router->add(
+				'/' . strtolower($this->appInfo['route']) . '/',
+				[
+					'controller'	=> 'home',
+					'action'		=> 'view'
+				]
+			);
+		}
 	}
 
 	protected function registerRoute($givenRoute)
@@ -238,37 +245,41 @@ class Router
 
 	protected function registerDefaults()
 	{
-		$this->router->setDefaultNamespace(
-			'System\Base\Providers\ErrorServiceProvider'
-		);
+		if (!$this->api->isApi($this->request)) {
+			$this->router->setDefaultNamespace(
+				'System\Base\Providers\ErrorServiceProvider'
+			);
 
-		$this->router->setDefaultController('index');
+			$this->router->setDefaultController('index');
 
-		$this->router->setDefaultAction('view');
+			$this->router->setDefaultAction('view');
+		}
 	}
 
 	protected function regitserNotFound()
 	{
-		if ($this->appDefaults) {
-			if (isset($this->appDefaults['errorComponent'])) {
+		if (!$this->api->isApi($this->request)) {
+			if ($this->appDefaults) {
+				if (isset($this->appDefaults['errorComponent'])) {
 
-				$errorComponent = ucfirst($this->appDefaults['errorComponent']);
+					$errorComponent = ucfirst($this->appDefaults['errorComponent']);
+
+				} else {
+
+					$errorComponent = 'Errors';
+				}
 
 			} else {
-
 				$errorComponent = 'Errors';
 			}
 
-		} else {
-			$errorComponent = 'Errors';
+			$this->router->notFound(
+				[
+					'controller' => $errorComponent,
+					'action'     => 'routeNotFound',
+				]
+			);
 		}
-
-		$this->router->notFound(
-			[
-				'controller' => $errorComponent,
-				'action'     => 'routeNotFound',
-			]
-		);
 	}
 
 	protected function validateDomain()
@@ -325,14 +336,16 @@ class Router
 		$this->appDefaults['id'] = $this->appInfo['id'];
 		$this->appDefaults['app'] = $this->appInfo['route'];
 		$this->appDefaults['app_type'] = $this->appInfo['app_type'];
-		$this->appDefaults['component'] =
-			$this->components->getComponentById($this->appInfo['default_component'])['route'];
-		$this->appDefaults['errorComponent'] =
-			isset($this->appInfo['errors_component']) && $this->appInfo['errors_component'] != 0 ?
-			$this->components->getComponentById($this->appInfo['errors_component'])['route'] :
-			null;
-		$this->appDefaults['view'] =
-			$this->views->getViewById($this->domain['apps'][$this->appInfo['id']]['view'])['name'];
+		if (!$this->api->isApi($this->request)) {
+			$this->appDefaults['component'] =
+				$this->components->getComponentById($this->appInfo['default_component'])['route'];
+			$this->appDefaults['errorComponent'] =
+				isset($this->appInfo['errors_component']) && $this->appInfo['errors_component'] != 0 ?
+				$this->components->getComponentById($this->appInfo['errors_component'])['route'] :
+				null;
+			$this->appDefaults['view'] =
+				$this->views->getViewById($this->domain['apps'][$this->appInfo['id']]['view'])['name'];
+		}
 
 		return true;
 	}
@@ -341,6 +354,16 @@ class Router
 	{
 		if (!$this->uri) {
 			$uri = explode('/q/', trim($this->requestUri, '/'));
+
+			if ($this->api->isApi($this->request)) {
+				$uri[0] = explode('/', $uri[0]);
+
+				if ($uri[0][0] === 'api') {
+					unset($uri[0][0]);
+				}
+
+				$uri[0] = implode('/', $uri[0]);
+			}
 
 			$this->uri = $uri[0];
 

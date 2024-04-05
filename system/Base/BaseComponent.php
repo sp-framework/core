@@ -30,6 +30,8 @@ abstract class BaseComponent extends Controller
 
 	protected $token = null;
 
+	protected $apiResponse = [];
+
 	public $widgets;
 
 	protected function onConstruct()
@@ -41,23 +43,25 @@ abstract class BaseComponent extends Controller
 			return;
 		}
 
-		$this->addResponse('Ok');//Default Response
+		if (!$this->api->isApi($this->request)) {
+			$this->addResponse('Ok');//Default Response
 
-		$this->views = $this->modules->views->getViewInfo();
+			$this->views = $this->modules->views->getViewInfo();
 
-		$this->setComponent();
+			$this->setComponent();
 
-		if (!$this->isJson() || $this->request->isAjax()) {
-			$this->checkLayout();
+			if (!$this->isJson() || $this->request->isAjax()) {
+				$this->checkLayout();
 
-			if (!$this->isJson() && $this->request->isGet()) {
-				$this->setDefaultViewData();
-			}
+				if (!$this->isJson() && $this->request->isGet()) {
+					$this->setDefaultViewData();
+				}
 
-			if ($this->modules->views->getPhalconViewPath() === $this->view->getViewsDir()) {
-				$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
+				if ($this->modules->views->getPhalconViewPath() === $this->view->getViewsDir()) {
+					$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
 
-				$this->viewSimple->setViewsDir($this->view->getViewsDir() . $this->getURI());
+					$this->viewSimple->setViewsDir($this->view->getViewsDir() . $this->getURI());
+				}
 			}
 		}
 	}
@@ -384,13 +388,17 @@ abstract class BaseComponent extends Controller
 
 	protected function sendJson()
 	{
-		$this->view->disable();
-
 		$this->response->setContentType('application/json', 'UTF-8');
 		$this->response->setHeader('Cache-Control', 'no-store');
 
 		if ($this->response->isSent() !== true) {
-			$this->response->setJsonContent($this->view->getParamsToView());
+			if ($this->api->isApi($this->request)) {
+				$this->response->setJsonContent($this->apiResponse);
+			} else {
+				$this->view->disable();
+
+				$this->response->setJsonContent($this->view->getParamsToView());
+			}
 
 			return $this->response->send();
 		}
@@ -781,6 +789,16 @@ abstract class BaseComponent extends Controller
 
 	protected function addResponse($responseMessage, int $responseCode = 0, $responseData = null)
 	{
+		if ($this->api->isApi($this->request)) {
+			$this->apiResponse['responseMessage'] = $responseMessage;
+			$this->apiResponse['responseCode'] = $responseCode;
+			if ($responseData !== null) {
+				$this->apiResponse['responseData'] = $responseData;
+			}
+
+			return $this->sendJson();
+		}
+
 		$this->view->responseMessage = $responseMessage;
 
 		$this->view->responseCode = $responseCode;

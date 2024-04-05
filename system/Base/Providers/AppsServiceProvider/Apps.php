@@ -79,7 +79,14 @@ class Apps extends BasePackage
 			) {
 				return $this->getAppById($domain['default_app_id'])['route'];
 			}
-			return explode('/', $uri[0])[1];
+
+			$uri = explode('/', $uri[0]);
+
+			if ($uri[1] === 'api') {
+				return $uri[2];
+			}
+
+			return $uri[1];
 		}
 	}
 
