@@ -28,6 +28,8 @@ final class Bootstrap
 
     public $config;
 
+    public $response;
+
     public function __construct()
     {
         include(__DIR__ . '/../system/Base/Loader/Service.php');
@@ -60,6 +62,7 @@ final class Bootstrap
 
         $container->register(new HttpServiceProvider());
         $request = $container->getShared('request');
+        $this->response = $container->getShared('response');
         $container->register(new ApiServiceProvider());
         $api = $container->getShared('api');
         $this->isApi = $api->isApi($request);
@@ -161,17 +164,26 @@ final class Bootstrap
 
         try {
             $console->handle($arguments);
+
+            $this->logger->commit();
         } catch (PhalconException $e) {
             fwrite(STDERR, $e->getMessage() . PHP_EOL);
+
+            $this->logger->commit();
+
             exit(1);
         } catch (\Throwable $throwable) {
             fwrite(STDERR, $throwable->getMessage() . PHP_EOL);
+
+            $this->logger->commit();
+
             exit(1);
         } catch (\Exception $exception) {
             fwrite(STDERR, $exception->getMessage() . PHP_EOL);
+
+            $this->logger->commit();
+
             exit(1);
         }
-
-        $this->logger->commit();
     }
 }

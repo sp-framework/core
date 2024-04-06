@@ -236,6 +236,9 @@ class AppsComponent extends BaseComponent
                     return;
                 }
                 $this->view->acceptableUsernames = $this->apps->getAcceptableUsernamesForAppId();
+                $this->view->availableAPIGrantTypes = $this->apps->getAvailableAPIGrantTypes();
+                $this->view->availableOpensslKeyBits = $this->apps->getOpensslKeyBits();
+                $this->view->availableOpensslAlgorithms = $this->apps->getOpensslAlgorithms();
             } else {
                 $this->view->app = null;
                 $domains = $this->domains->domains;
@@ -304,6 +307,11 @@ class AppsComponent extends BaseComponent
         );
 
         $this->view->pick('apps/list');
+    }
+
+    public function apiViewAction()
+    {
+        var_dump('me');
     }
 
     /**
@@ -534,6 +542,24 @@ class AppsComponent extends BaseComponent
                     $this->modules->views->packagesData->responseCode
                 );
             }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function generatePKIKeysAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->apps->generatePKIKeys($this->postData());
+
+            $this->addResponse(
+                $this->apps->packagesData->responseMessage,
+                $this->apps->packagesData->responseCode
+            );
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }

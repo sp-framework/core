@@ -40,10 +40,10 @@ class MicroCollection
 
         if ($this->router->getRoutes()[0]->getPaths()['action'] === 'view') {//Make sure methods are all Caps, else route will not match!
             $methods = ['GET'];
-            $handlerMethod = 'ViewAction';
+            $handlerMethod = 'apiViewAction';
         } else {
             $methods = ['POST'];
-            $handlerMethod = ucfirst($this->router->getRoutes()[0]->getPaths()['action']) . 'Action';
+            $handlerMethod = 'api' . ucfirst($this->router->getRoutes()[0]->getPaths()['action']) . 'Action';
         }
 
         $this->microCollection->setHandler($handler, true);

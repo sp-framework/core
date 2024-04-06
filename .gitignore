@@ -29,3 +29,4 @@ apps/*
 .ff/*
 .sql/*
 system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/*
+.pki

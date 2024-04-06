@@ -4,11 +4,31 @@ namespace System\Base\Providers\ErrorServiceProvider;
 
 class MicroExceptionHandler
 {
-    public function init($exception, $logger)
+    protected $exception;
+
+    protected $logger;
+
+    protected $response;
+
+    protected $apiResponse;
+
+    public function init($exception, $logger, $response)
     {
-        $logger->commit();
+        $this->exception = $exception;
+
+        $this->logger = $logger;
+
+        $this->response = $response;
+
+        if ($this->logger) {
+            $this->logger->commit();
+        }
 
         $class = (new \ReflectionClass($exception))->getShortName();
+
+        if (method_exists($this, $method = "handle{$class}")) {
+            return $this->{$method}();
+        }
 
         $traces = [];
 
@@ -57,5 +77,23 @@ class MicroExceptionHandler
                 </tr>
             </tbody>
             </table>';
+    }
+
+    protected function handleAppNotFoundException()
+    {
+        $this->apiResponse['responseMessage'] = 'Application not found!';
+        $this->apiResponse['responseCode'] = 1;
+
+        return $this->sendJson();
+    }
+
+    protected function sendJson()
+    {
+        $this->response->setContentType('application/json', 'UTF-8');
+        $this->response->setHeader('Cache-Control', 'no-store');
+
+        $this->response->setJsonContent($this->apiResponse);
+
+        return $this->response->send();
     }
 }

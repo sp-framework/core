@@ -80,6 +80,11 @@
                                 'tabTitle'          : 'IP Filters',
                                 'tabInclude'        : 'apps/wizard/filters/form',
                                 'tabHidden'         : ipFilterTabHidden
+                            ],
+                            'api'   :
+                            [
+                                'tabTitle'          : 'API',
+                                'tabInclude'        : 'apps/wizard/api/form'
                             ]
                         ]
                     ]
@@ -89,7 +94,7 @@
     </div>
 </div>
 <script>
-/* globals Sortable */
+/* globals Sortable PNotify Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -160,6 +165,99 @@ dataCollectionSection =
             'placeholder'   : 'SELECT ROLES'
         },
         '{{componentId}}-{{sectionId}}-enforce_2fa'                     : { },
+        '{{componentId}}-{{sectionId}}-api_access'                      : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-api_access').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'apion') {
+                        $('#{{componentId}}-{{sectionId}}-api_grant_type, ' +
+                          '#{{componentId}}-{{sectionId}}-generate-pki, ' +
+                          '#{{componentId}}-{{sectionId}}-regenerate-pki, ' +
+                          '#{{componentId}}-{{sectionId}}-pki_key_size, ' +
+                          '#{{componentId}}-{{sectionId}}-pki_algorithm'
+                          ).attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-api_grant_type, ' +
+                          '#{{componentId}}-{{sectionId}}-generate-pki, ' +
+                          '#{{componentId}}-{{sectionId}}-regenerate-pki, ' +
+                          '#{{componentId}}-{{sectionId}}-pki_key_size, ' +
+                          '#{{componentId}}-{{sectionId}}-pki_algorithm'
+                          ).attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-generate-pki, #{{componentId}}-{{sectionId}}-regenerate-pki').click(function(e) {
+                    e.preventDefault();
+
+                    if (this.id === '{{componentId}}-{{sectionId}}-regenerate-pki') {
+                        Swal.fire({
+                            title                       : '<span class="text-danger">Regenerate PKI Keys?</span>',
+                            icon                        : 'question',
+                            width                       : '100%',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Yes',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-danger text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                                'inputLabel'                : 'text-white',
+                                'input'                     : 'text-white'
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : false,
+                            allowEscapeKey              : false,
+                            didOpen                     : function() {
+                                window.dataCollection.env.sounds.swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed === true &&
+                                result.value !== ''
+                            ) {
+                                regeneratePki(true);
+                            }
+                        });
+                    } else {
+                        regeneratePki();
+                    }
+                });
+
+                function regeneratePki(force = false) {
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['pki_key_size'] = $('#{{componentId}}-{{sectionId}}-pki_key_size').val();
+                    postData['pki_algorithm'] = $('#{{componentId}}-{{sectionId}}-pki_algorithm').val();
+                    if (force) {
+                        postData['force_regenerate'] = true;
+                    }
+
+                    $.post('{{links.url("apps/generatePKIKeys")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+
+                            $('#{{componentId}}-{{sectionId}}-generate-pki').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-regenerate-pki').attr('hidden', false);
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-api_grant_type'                  : {
+            'placeholder'   : 'SELECT API GRANT TYPE'
+        },
+        '{{componentId}}-{{sectionId}}-pki_key_size'                    : {
+            'placeholder'   : 'SELECT PKI KEY SIZE'
+        },
+        '{{componentId}}-{{sectionId}}-pki_algorithm'                   : {
+            'placeholder'   : 'SELECT PKI ALGORITHM'
+        },
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider, :hidden',
             rules: {
@@ -181,6 +279,15 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-default_component'       : 'Please select app default component',
                 '{{componentId}}-{{sectionId}}-errors_component'        : 'Please select app errors component',
                 '{{componentId}}-{{sectionId}}-default_dashboard'       : 'Please select default dashboard'
+            },
+            onSubmit: function() {
+                if (dataCollectionSection['dataToSubmit']['api_access'] === 'apion') {
+                    dataCollectionSection['dataToSubmit']['api_access'] = 1;
+                } else {
+                    dataCollectionSection['dataToSubmit']['api_access'] = 0;
+                }
+
+                return true;
             }
         }
     });

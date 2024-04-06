@@ -47,6 +47,18 @@ class ServiceProviderApps extends BaseModel
 
     public $settings;
 
+    public $api_access;
+
+    public $api_grant_type;
+
+    public $api_private_key;
+
+    public $api_private_key_passphrase;
+
+    public $api_private_key_location;
+
+    public $api_scopes;
+
     public function initialize()
     {
         $clientAddress = $this->getDi()->getRequest()->getClientAddress();

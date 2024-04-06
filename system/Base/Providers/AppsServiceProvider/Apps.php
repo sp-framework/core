@@ -7,6 +7,8 @@ use System\Base\Providers\AppsServiceProvider\Types;
 use System\Base\Providers\AppsServiceProvider\Exceptions\AppNotFoundException;
 use System\Base\Providers\AppsServiceProvider\IpFilter;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderApps;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToWriteFile;
 
 class Apps extends BasePackage
 {
@@ -370,5 +372,132 @@ class Apps extends BasePackage
 						'name'          => 'Username',
 					]
 			];
+	}
+
+	public function getAvailableAPIGrantTypes()
+	{
+		return
+			[
+				'pg'    =>
+					[
+						'id'        	=> 'pg',
+						'name'          => 'Password Grant',
+					],
+				'ccg'   =>
+					[
+						'id'        	=> 'ccg',
+						'name'          => 'Client Credential Grant'
+					],
+				'dcg'   =>
+					[
+						'id'        	=> 'dcg',
+						'name'          => 'Device Code Grant'
+					],
+				'acg'    =>
+					[
+						'id'        	=> 'acg',
+						'name'          => 'Authorization Code Grant',
+					],
+				'rtg'    =>
+					[
+						'id'        	=> 'rtg',
+						'name'          => 'Refresh Token Grant',
+					]
+			];
+	}
+
+	public function getOpensslAlgorithms()
+	{
+		$algos = [];
+
+		foreach (openssl_get_md_methods() as $algo) {
+			$algos[$algo]['id'] = $algo;
+			$algos[$algo]['name'] = strtoupper($algo);
+		}
+
+		return $algos;
+	}
+
+	public function getOpensslKeyBits()
+	{
+		$bits = ['512', '1024', '2048', '4096'];
+
+		$keyBits = [];
+
+		foreach ($bits as $bit) {
+			$keyBits[$bit]['id'] = $bit;
+			$keyBits[$bit]['name'] = $bit;
+		}
+
+		return $keyBits;
+	}
+
+	public function generatePKIKeys($data = [])
+	{
+		if (!$this->checkPkiPath()) {
+			$this->addResponse('Not able to create pki directory, contact administrator.', 1);
+
+			return false;
+		}
+
+		if (!extension_loaded('openssl')) {
+			$this->addResponse('Extension openssl not loaded.', 1);
+
+			return false;
+		}
+
+		if ($this->app['api_private_key'] == true &&
+			!isset($data['force_regenerate'])
+		) {
+			$this->addResponse('Key already exists, set argument regenerate to force regenerate key.', 1);
+
+			return false;
+		}
+
+		try {
+			$key = '';
+			$privateKey = '';
+			$passphrase = $this->random->base58(32);
+
+			$config = [
+				"private_key_bits" => isset($data['pki_key_size']) ? (int) $data['pki_key_size'] : 2048,
+				"digest_alg" => isset($data['pki_algorithm']) ? $data['pki_algorithm'] : 'sha256'
+			];
+
+			$pki = openssl_pkey_new($config);
+			openssl_pkey_export($pki, $privateKey, $passphrase);
+			$publicKey = openssl_pkey_get_details($pki)["key"];
+
+			$key = trim($privateKey . $publicKey);
+
+			try {
+				$this->localContent->write('system/.pki/' . $this->app['id'] . '/.key' , $key, ['visibility' => 'private']);
+				$this->localContent->write('system/.pki/' . $this->app['id'] . '/.private' , $privateKey, ['visibility' => 'private']);
+				$this->localContent->write('system/.pki/' . $this->app['id'] . '/.public' , $publicKey, ['visibility' => 'private']);
+			} catch (FilesystemException | UnableToWriteFile $exception) {
+				throw $exception;
+			}
+
+			$this->app['api_private_key_passphrase'] = $this->secTools->encryptBase64($passphrase);
+			$this->app['api_private_key'] = '1';
+			$this->app['api_private_key_location'] = base_path('system/.pki/' . $this->app['id'] . '/.key');
+
+			$this->updateApp($this->app);
+
+			$this->addResponse('Generated keys!');
+		} catch (\Exception $e) {
+			$this->addResponse($e->getMessage(), 1);
+		}
+	}
+
+	protected function checkPkiPath()
+	{
+		if (!is_dir(base_path('system/.pki/' . $this->app['id'] . '/'))) {
+			if (!mkdir(base_path('system/.pki/' . $this->app['id'] . '/'), 0777, true)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

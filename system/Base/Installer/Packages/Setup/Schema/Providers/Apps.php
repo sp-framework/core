@@ -153,6 +153,51 @@ class Apps
 						'notNull' => false,
 					]
 				),
+				new Column(
+					'api_access',
+					[
+						'type'    => Column::TYPE_BOOLEAN,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'api_grant_type',
+					[
+						'type'    => Column::TYPE_VARCHAR,
+						'size'    => 50,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'api_private_key',
+					[
+						'type'    => Column::TYPE_BOOLEAN,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'api_private_key_passphrase',
+					[
+						'type'    => Column::TYPE_VARCHAR,
+						'size'    => 1024,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'api_private_key_location',
+					[
+						'type'    => Column::TYPE_VARCHAR,
+						'size'    => 1024,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'api_scopes',
+					[
+						'type'    => Column::TYPE_TEXT,
+						'notNull' => false,
+					]
+				),
 			],
 			'indexes' => [
 				new Index(

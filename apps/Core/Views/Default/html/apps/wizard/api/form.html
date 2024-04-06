@@ -1,0 +1,192 @@
+{% set apiAccess = 'apioff' %}
+{% set apiGrantTypesDisabled = true %}
+{% set generateDisabled = true %}
+{% set reGenerateDisabled = true %}
+{% set pkiKeySizeDisabled = true %}
+{% set pkiAlgorithmsDisabled = true %}
+{% if app['api_access'] is defined and app['api_access'] == 'true' %}
+    {% set apiAccess = 'apion' %}
+    {% set apiGrantTypesDisabled = false %}
+    {% set generateDisabled = false %}
+    {% set reGenerateDisabled = false %}
+    {% set pkiKeySizeDisabled = false %}
+    {% set pkiAlgorithmsDisabled = false %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'api_access',
+                'fieldLabel'                     : 'API Access',
+                'fieldType'                      : 'radio',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Switch on to allow API access for this app. Note: You also need to allow API access on the domain for this app.',
+                'fieldRequired'                  : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioPlacementType'        : 'horizontal',
+                'fieldRadioButtons'              :
+                    [
+                        'apioff' :
+                            [
+                                'title'                           : 'OFF',
+                                'type'                            : 'secondary',
+                                'dataValue'                       : 'apioff'
+                            ],
+                        'apion' :
+                            [
+                                'title'                           : 'ON',
+                                'type'                            : 'primary',
+                                'dataValue'                       : 'apion'
+                            ]
+                    ],
+                'fieldRadioChecked'              : apiAccess
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'api_grant_type',
+                'fieldLabel'                            : 'API Grant Type',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select API grant type.',
+                'fieldBazScan'                          : true,
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : apiGrantTypesDisabled,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataSelect2Options'               : availableAPIGrantTypes,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : app['api_grant_type']
+            ]
+        )}}
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'pki',
+                'fieldLabel'                            : 'PKI',
+                'fieldLabelLegend'                      : true,
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : false,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldHtmlContent'                      : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'pki_key_size',
+                'fieldLabel'                            : 'PKI Key Size',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select PKI key size.',
+                'fieldBazScan'                          : true,
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : pkiKeySizeDisabled,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataSelect2Options'               : availableOpensslKeyBits,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : '2048'
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'pki_algorithm',
+                'fieldLabel'                            : 'PKI Algorithm',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select PKI Algorithm.',
+                'fieldBazScan'                          : true,
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : pkiAlgorithmsDisabled,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataSelect2Options'               : availableOpensslAlgorithms,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : 'sha256'
+            ]
+        )}}
+    </div>
+    {% if app['api_private_key'] == '1' %}
+        {% set reGenerateHidden = false %}
+        {% set generateHidden = true %}
+    {% else %}
+        {% set reGenerateHidden = true %}
+        {% set generateHidden = false %}
+    {% endif %}
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                 : component,
+                'componentName'             : componentName,
+                'componentId'               : componentId,
+                'sectionId'                 : sectionId,
+                'buttonType'                : 'button',
+                'buttonLabel'               : 'Public & Private Keys',
+                'buttons'                   :
+                    {
+                        'generate-pki'   : {
+                            'title'                   : 'Generate Public & Private Keys',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'disabled'                : generateDisabled,
+                            'hidden'                  : generateHidden
+                        },
+                        'regenerate-pki'  : {
+                            'title'                   : 'Regenerate Public & Private Keys',
+                            'size'                    : 'sm',
+                            'type'                    : 'danger',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'disabled'                : reGenerateDisabled,
+                            'hidden'                  : reGenerateHidden
+                        }
+                    }
+            ]
+        )}}
+    </div>
+</div>

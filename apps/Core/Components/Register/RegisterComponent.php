@@ -52,4 +52,9 @@ class RegisterComponent extends BaseComponent
             $this->addResponse('Method Not Allowed', 1);
         }
     }
+
+    public function apiClientAction()
+    {
+        //
+    }
 }
