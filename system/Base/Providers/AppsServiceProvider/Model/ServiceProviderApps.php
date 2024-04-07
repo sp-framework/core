@@ -49,6 +49,12 @@ class ServiceProviderApps extends BaseModel
 
     public $api_access;
 
+    public $api_registration_allowed;
+
+    public $api_client_id_length;
+
+    public $api_client_secret_length;
+
     public $api_grant_type;
 
     public $api_private_key;

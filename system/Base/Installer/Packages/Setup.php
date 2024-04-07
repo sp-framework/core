@@ -79,6 +79,12 @@ use System\Base\Installer\Packages\Setup\Schema\Modules\Middlewares;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Packages;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views\Settings;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AccessTokens;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AuthorizationCodes;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Clients;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Jwts;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Api\RefreshTokens;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Scopes;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\IpFilter;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\Types;
@@ -88,6 +94,12 @@ use System\Base\Installer\Packages\Setup\Schema\Providers\Domains;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Logs;
 use System\Base\Installer\Packages\Setup\Write\Configs;
 use System\Base\Installer\Packages\Setup\Write\Pdo;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAccessTokens;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAuthorizationCodes;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiJwts;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiRefreshTokens;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiScopes;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderApps;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsIpFilter;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsTypes;
@@ -442,6 +454,30 @@ class Setup
 			'service_provider_domains' 					=> [
 					'schema'	=> new Domains,
 					'model'		=> new ServiceProviderDomains,
+				],
+			'service_provider_api_access_tokens' 		=> [
+					'schema'	=> new AccessTokens,
+					'model'		=> new ServiceProviderApiAccessTokens,
+				],
+			'service_provider_api_authorization_codes'	=> [
+					'schema'	=> new AuthorizationCodes,
+					'model'		=> new ServiceProviderApiAuthorizationCodes,
+				],
+			'service_provider_api_client'				=> [
+					'schema'	=> new Clients,
+					'model'		=> new ServiceProviderApiClients,
+				],
+			'service_provider_api_jwts'					=> [
+					'schema'	=> new Jwts,
+					'model'		=> new ServiceProviderApiJwts,
+				],
+			'service_provider_api_refresh_tokens'		=> [
+					'schema'	=> new RefreshTokens,
+					'model'		=> new ServiceProviderApiRefreshTokens,
+				],
+			'service_provider_api_scopes'		=> [
+					'schema'	=> new Scopes,
+					'model'		=> new ServiceProviderApiScopes,
 				],
 			'modules_bundles' 							=> [
 					'schema'	=> new Bundles,

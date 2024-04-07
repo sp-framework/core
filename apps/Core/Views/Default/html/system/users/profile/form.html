@@ -46,6 +46,10 @@
             {% set sessionsTabHidden = false %}
         {% endif %}
     {% endfor %}
+    {% set apisTabHidden = true %}
+    {% if apps.getAppInfo()['api_access'] is defined and apps.getAppInfo()['api_access'] == true and apps.getAppInfo()['api_registration_allowed'] is defined and apps.getAppInfo()['api_registration_allowed'] == true %}
+        {% set apisTabHidden = false %}
+    {% endif %}
     <div class="col-md-10">
         <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -89,6 +93,13 @@
                                     'tabInclude'        : 'profile/form/sessions',
                                     'tabIncludeParams'  : ['profile' : profile, 'account' : account],
                                     'tabHidden'         : sessionsTabHidden
+                                ],
+                                'api'   :
+                                [
+                                    'tabTitle'          : 'API',
+                                    'tabInclude'        : 'profile/form/api',
+                                    'tabIncludeParams'  : ['profile' : profile, 'account' : account],
+                                    'tabHidden'         : apisTabHidden
                                 ],
                                 'notifications'   :
                                 [
@@ -232,6 +243,42 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-confirm_password'                : { },
         '{{componentId}}-{{sectionId}}-twofa_otp'                       : { },
         '{{componentId}}-{{sectionId}}-twofa_email'                     : { },
+        '{{componentId}}-{{sectionId}}-api_client_id'                   : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-api-client-keys').click(function(e) {
+                    e.preventDefault();
+
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post('{{links.url("apps/generateclientkeys")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+
+                            if (response.responseData && response.responseData.client_id && response.responseData.client_secret) {
+                                $('#{{componentId}}-{{sectionId}}-api_client_id').val(response.responseData.client_id);
+                                $('#{{componentId}}-{{sectionId}}-api_client_secret').val(response.responseData.client_secret);
+                            }
+                            $('#{{componentId}}-{{sectionId}}-api_client_id, #{{componentId}}-{{sectionId}}-api_client_secret').parents('.form-group').removeClass('d-none');
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-generate-api-client-keys').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-generate-api-client-keys').children('i').attr('hidden', true);
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-api_client_secret'               : { },
         '{{componentId}}-{{sectionId}}-subscriptions'                   :
         $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-subscriptions'], {
             plugins: [

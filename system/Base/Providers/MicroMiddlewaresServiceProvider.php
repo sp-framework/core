@@ -21,15 +21,18 @@ class MicroMiddlewaresServiceProvider extends Injectable
             if ($this->response->isSent() !== true) {
                 $this->response->setJsonContent(['responseMessage' => 'API not available!', 'responseCode' => 1]);
 
-                return $this->response->send();
+                $this->response->send();
             }
+
+            return false;
         }
 
         try {
-            $this->api->setup($this->apps->getAppInfo());
+            $this->api->setup($this->apps);
         } catch (\Exception $e) {
             throw $e;
         }
+
         // dump($this->api->apiNeedsAuth($this->core->core['settings']));die();
     }
 

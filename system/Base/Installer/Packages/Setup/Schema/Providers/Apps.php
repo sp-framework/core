@@ -161,6 +161,27 @@ class Apps
 					]
 				),
 				new Column(
+					'api_registration_allowed',
+					[
+						'type'    => Column::TYPE_BOOLEAN,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'api_client_id_length',
+					[
+						'type'    => Column::TYPE_TINYINTEGER,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'api_client_secret_length',
+					[
+						'type'    => Column::TYPE_TINYINTEGER,
+						'notNull' => false,
+					]
+				),
+				new Column(
 					'api_grant_type',
 					[
 						'type'    => Column::TYPE_VARCHAR,

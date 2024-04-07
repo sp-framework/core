@@ -61,5 +61,6 @@ return
 				'System\Base\Providers\SupportServiceProvider',
 				'System\Base\Providers\SecurityServiceProvider',
 				'System\Base\Providers\LoggerServiceProvider',
+				'System\Base\Providers\AccessServiceProvider',
 			]
 	];

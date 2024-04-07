@@ -2,13 +2,15 @@
 
 namespace System\Base\Providers\AppsServiceProvider;
 
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToWriteFile;
 use System\Base\BasePackage;
-use System\Base\Providers\AppsServiceProvider\Types;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 use System\Base\Providers\AppsServiceProvider\Exceptions\AppNotFoundException;
 use System\Base\Providers\AppsServiceProvider\IpFilter;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderApps;
-use League\Flysystem\FilesystemException;
-use League\Flysystem\UnableToWriteFile;
+use System\Base\Providers\AppsServiceProvider\Types;
 
 class Apps extends BasePackage
 {
@@ -378,29 +380,29 @@ class Apps extends BasePackage
 	{
 		return
 			[
-				'pg'    =>
+				'password'    =>
 					[
-						'id'        	=> 'pg',
+						'id'        	=> 'password',
 						'name'          => 'Password Grant',
 					],
-				'ccg'   =>
+				'client_credentials'   =>
 					[
-						'id'        	=> 'ccg',
+						'id'        	=> 'client_credentials',
 						'name'          => 'Client Credential Grant'
 					],
-				'dcg'   =>
+				// 'dcg'   =>//Implemented in OAuth ver 9.x
+				// 	[
+				// 		'id'        	=> 'dcg',
+				// 		'name'          => 'Device Code Grant'
+				// 	],
+				'code'    =>
 					[
-						'id'        	=> 'dcg',
-						'name'          => 'Device Code Grant'
-					],
-				'acg'    =>
-					[
-						'id'        	=> 'acg',
+						'id'        	=> 'code',
 						'name'          => 'Authorization Code Grant',
 					],
-				'rtg'    =>
+				'refresh_token'    =>
 					[
-						'id'        	=> 'rtg',
+						'id'        	=> 'refresh_token',
 						'name'          => 'Refresh Token Grant',
 					]
 			];
@@ -432,10 +434,25 @@ class Apps extends BasePackage
 		return $keyBits;
 	}
 
+	public function getAPIKeysParams()
+	{
+		$params = '1024|sha256|8';
+
+		try {
+			$params = $this->localContent->read('system/.api/' . $this->app['id'] . '/.params');
+		} catch (FilesystemException | UnableToReadFile $exception) {
+			//Do nothing.
+		}
+
+		$params = explode('|', $params);
+
+		return $params;
+	}
+
 	public function generatePKIKeys($data = [])
 	{
-		if (!$this->checkPkiPath()) {
-			$this->addResponse('Not able to create pki directory, contact administrator.', 1);
+		if (!$this->checkAPIPath()) {
+			$this->addResponse('Not able to create api directory, contact administrator.', 1);
 
 			return false;
 		}
@@ -458,6 +475,8 @@ class Apps extends BasePackage
 			$key = '';
 			$privateKey = '';
 			$passphrase = $this->random->base58(32);
+			$encryptionKeySize = isset($data['encryption_key_size']) ? (int) $data['encryption_key_size'] : 32;
+			$encryptionKey = $this->random->base58();
 
 			$config = [
 				"private_key_bits" => isset($data['pki_key_size']) ? (int) $data['pki_key_size'] : 2048,
@@ -471,16 +490,21 @@ class Apps extends BasePackage
 			$key = trim($privateKey . $publicKey);
 
 			try {
-				$this->localContent->write('system/.pki/' . $this->app['id'] . '/.key' , $key, ['visibility' => 'private']);
-				$this->localContent->write('system/.pki/' . $this->app['id'] . '/.private' , $privateKey, ['visibility' => 'private']);
-				$this->localContent->write('system/.pki/' . $this->app['id'] . '/.public' , $publicKey, ['visibility' => 'private']);
+				$this->localContent->write(
+					'system/.api/' . $this->app['id'] . '/.params',
+					$config['private_key_bits'] . '|' . $config['digest_alg'] . '|' . $encryptionKeySize,
+					['visibility' => 'private']);
+				$this->localContent->write('system/.api/' . $this->app['id'] . '/.pki', $key, ['visibility' => 'private']);
+				$this->localContent->write('system/.api/' . $this->app['id'] . '/.private', $privateKey, ['visibility' => 'private']);
+				$this->localContent->write('system/.api/' . $this->app['id'] . '/.public', $publicKey, ['visibility' => 'private']);
+				$this->localContent->write('system/.api/' . $this->app['id'] . '/.enc', $this->secTools->encryptBase64($encryptionKey), ['visibility' => 'private']);
 			} catch (FilesystemException | UnableToWriteFile $exception) {
 				throw $exception;
 			}
 
 			$this->app['api_private_key_passphrase'] = $this->secTools->encryptBase64($passphrase);
 			$this->app['api_private_key'] = '1';
-			$this->app['api_private_key_location'] = base_path('system/.pki/' . $this->app['id'] . '/.key');
+			$this->app['api_private_key_location'] = base_path('system/.api/' . $this->app['id'] . '/.pki');
 
 			$this->updateApp($this->app);
 
@@ -490,14 +514,91 @@ class Apps extends BasePackage
 		}
 	}
 
-	protected function checkPkiPath()
+	protected function checkAPIPath()
 	{
-		if (!is_dir(base_path('system/.pki/' . $this->app['id'] . '/'))) {
-			if (!mkdir(base_path('system/.pki/' . $this->app['id'] . '/'), 0777, true)) {
+		if (!is_dir(base_path('system/.api/' . $this->app['id'] . '/'))) {
+			if (!mkdir(base_path('system/.api/' . $this->app['id'] . '/'), 0777, true)) {
 				return false;
 			}
 		}
 
 		return true;
+	}
+
+	public function getAPIKeys()
+	{
+		$keys = [];
+
+		try {
+			$keys['enc'] = $this->secTools->decryptBase64($this->localContent->read('system/.api/' . $this->app['id'] . '/.enc'));
+			$keys['public'] = $this->localContent->read('system/.api/' . $this->app['id'] . '/.public');
+			$keys['public_location'] = base_path('system/.api/' . $this->app['id'] . '/.public');
+			$keys['private'] = $this->localContent->read('system/.api/' . $this->app['id'] . '/.private');
+			$keys['private_location'] = base_path('system/.api/' . $this->app['id'] . '/.private');
+			$keys['pki'] = $this->localContent->read('system/.api/' . $this->app['id'] . '/.pki');
+			$keys['pki_location'] = base_path('system/.api/' . $this->app['id'] . '/.pki');
+			$keys['pki_passphrase'] = $this->secTools->decryptBase64($this->app['api_private_key_passphrase']);
+		} catch (FilesystemException | UnableToReadFile $exception) {
+			throw $exception;
+		}
+
+		return $keys;
+	}
+
+	public function generateClientKeys()
+	{
+		$newClient['app_id'] = $this->app['id'];
+		$newClient['domain_id'] = $this->domains->domain['id'];
+		$newClient['account_id'] = $this->auth->account()['id'];
+		$newClient['name'] = $newClient['app_id'] . '_' . $newClient['domain_id'] . '_' . $newClient['account_id'];
+		$newClient['client_id'] = $this->random->base58(isset($this->app['api_client_id_length']) ? $this->app['api_client_id_length'] : 8);
+		$client_secret = $this->random->base58(isset($this->app['api_client_secret_length']) ? $this->app['api_client_secret_length'] : 32);
+		$newClient['client_secret'] = $this->secTools->encryptBase64($client_secret);
+		$newClient['redirect_uri'] = 'https://';
+		$newClient['grant_types'] = '';
+		$newClient['scope'] = '';
+		// $newClient['created_at'] = time();
+		// $newClient['updated_at'] = time();
+
+		try {
+			$clientsObject = new ServiceProviderApiClients;
+			$clientsStore = $this->ff->store($clientsObject->getSource());
+
+			if ($this->config->databasetype === 'db') {
+				$oldClientsObj = $clientsObject->findFirstByName($newClient['name']);
+
+				if ($oldClientsObj) {
+					$oldClient = $oldClientsObj->toArray();
+				}
+			} else {
+				$oldClient = $clientsStore->findOneBy(['name', '=', $newClient['name']]);
+			}
+
+			if (isset($oldClient)) {
+				$newClient = array_merge($oldClient, $newClient);
+
+				if ($this->config->databasetype === 'db') {
+					$oldClientsObj->assign($newClient);
+
+					$oldClientsObj->update();
+				} else {
+					$clientsStore->update($newClient);
+				}
+
+				$this->addResponse('Keys regenerated successfully.', 0, ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret]);
+			} else {
+				if ($this->config->databasetype === 'db') {
+					$clientsObject->assign($newClient);
+
+					$clientsObject->create();
+				} else {
+					$clientsStore->insert($newClient);
+				}
+
+				$this->addResponse('Keys generated successfully.', 0, ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret]);
+			}
+		} catch (\Exception $e) {
+			$this->addResponse('Error generating/updating keys. Please contact administrator.', 1);
+		}
 	}
 }

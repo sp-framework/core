@@ -12,7 +12,7 @@ class ApiServiceProvider implements ServiceProviderInterface
     {
         $container->setShared(
             'api',
-            function () use ($container) {
+            function () {
                 return (new Api())->init();
             }
         );

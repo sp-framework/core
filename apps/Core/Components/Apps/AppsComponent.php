@@ -239,6 +239,7 @@ class AppsComponent extends BaseComponent
                 $this->view->availableAPIGrantTypes = $this->apps->getAvailableAPIGrantTypes();
                 $this->view->availableOpensslKeyBits = $this->apps->getOpensslKeyBits();
                 $this->view->availableOpensslAlgorithms = $this->apps->getOpensslAlgorithms();
+                $this->view->apiKeysParams = $this->apps->getAPIKeysParams();
             } else {
                 $this->view->app = null;
                 $domains = $this->domains->domains;
@@ -564,4 +565,25 @@ class AppsComponent extends BaseComponent
             $this->addResponse('Method Not Allowed', 1);
         }
     }
+
+    public function generateClientKeysAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->apps->generateClientKeys();
+
+            $this->addResponse(
+                $this->apps->packagesData->responseMessage,
+                $this->apps->packagesData->responseCode,
+                $this->apps->packagesData->responseData
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+
 }

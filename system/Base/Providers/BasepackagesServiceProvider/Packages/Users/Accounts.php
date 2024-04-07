@@ -5,6 +5,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Users;
 use Phalcon\Filter\Validation\Validator\Email;
 use Phalcon\Filter\Validation\Validator\PresenceOf;
 use System\Base\BasePackage;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
@@ -70,9 +71,21 @@ class Accounts extends BasePackage
                 $account['role'] = $this->model->getRole()->toArray();
             }
 
+            $account['api'] = [];
+            if ($this->model->getApi()) {
+                $account['api'] = $this->model->getApi()->toArray();
+                if ($account['api']['client_secret'] && $account['api']['client_secret'] !== '') {
+                    $account['api']['client_secret'] = $this->secTools->decryptBase64($account['api']['client_secret']);
+                }
+            }
+
             return $account;
         } else {
             if ($this->ffData) {
+                if ($this->ffData['api']['client_secret'] && $this->ffData['api']['client_secret'] !== '') {
+                    $this->ffData['api']['client_secret'] = $this->secTools->decryptBase64($this->ffData['api']['client_secret']);
+                }
+
                 return $this->ffData;
             }
         }
@@ -429,7 +442,8 @@ class Accounts extends BasePackage
         $sessions = true,
         $identifiers = true,
         $agents = true,
-        $tunnels = true
+        $tunnels = true,
+        $api = true
     ) {
         if ($security) {
             if ($this->config->databasetype === 'db' &&
@@ -552,6 +566,26 @@ class Accounts extends BasePackage
 
                     if ($tunnelsCheck) {
                         $tunnelsStore->deleteById($account['tunnels']['id'], false);
+                    }
+                }
+            }
+        }
+
+        if ($api) {
+            if ($this->config->databasetype === 'db' &&
+                $accountObj->getApi()
+            ) {
+                $accountObj->getApi()->delete();
+            } else {
+                if ($account['api'] &&
+                    is_array($account['api']) &&
+                    count($account['api']) > 0
+                ) {
+                    $apiStore = $this->ff->store((new ServiceProviderApiClients)->getSource());
+                    $apiCheck = $apiStore->findById($account['api']['id']);
+
+                    if ($apiCheck) {
+                        $apiStore->deleteById($account['api']['id'], false);
                     }
                 }
             }

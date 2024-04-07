@@ -170,17 +170,25 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-api_access').click(function() {
                     if ($(this).find('input[type=radio]:checked').data('value') == 'apion') {
                         $('#{{componentId}}-{{sectionId}}-api_grant_type, ' +
+                          '#{{componentId}}-{{sectionId}}-api_registration_allowed, ' +
+                          '#{{componentId}}-{{sectionId}}-api_client_id_length, ' +
+                          '#{{componentId}}-{{sectionId}}-api_client_secret_length, ' +
                           '#{{componentId}}-{{sectionId}}-generate-pki, ' +
                           '#{{componentId}}-{{sectionId}}-regenerate-pki, ' +
                           '#{{componentId}}-{{sectionId}}-pki_key_size, ' +
-                          '#{{componentId}}-{{sectionId}}-pki_algorithm'
+                          '#{{componentId}}-{{sectionId}}-pki_algorithm, ' +
+                          '#{{componentId}}-{{sectionId}}-encryption_key_size'
                           ).attr('disabled', false);
                     } else {
                         $('#{{componentId}}-{{sectionId}}-api_grant_type, ' +
+                          '#{{componentId}}-{{sectionId}}-api_registration_allowed, ' +
+                          '#{{componentId}}-{{sectionId}}-api_client_id_length, ' +
+                          '#{{componentId}}-{{sectionId}}-api_client_secret_length, ' +
                           '#{{componentId}}-{{sectionId}}-generate-pki, ' +
                           '#{{componentId}}-{{sectionId}}-regenerate-pki, ' +
                           '#{{componentId}}-{{sectionId}}-pki_key_size, ' +
-                          '#{{componentId}}-{{sectionId}}-pki_algorithm'
+                          '#{{componentId}}-{{sectionId}}-pki_algorithm, ' +
+                          '#{{componentId}}-{{sectionId}}-encryption_key_size'
                           ).attr('disabled', true);
                     }
                 });
@@ -227,6 +235,7 @@ dataCollectionSection =
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
                     postData['pki_key_size'] = $('#{{componentId}}-{{sectionId}}-pki_key_size').val();
                     postData['pki_algorithm'] = $('#{{componentId}}-{{sectionId}}-pki_algorithm').val();
+                    postData['encryption_key_size'] = $('#{{componentId}}-{{sectionId}}-encryption_key_size').val();
                     if (force) {
                         postData['force_regenerate'] = true;
                     }
@@ -249,6 +258,9 @@ dataCollectionSection =
                 }
             }
         },
+        '{{componentId}}-{{sectionId}}-api_registration_allowed'        : { },
+        '{{componentId}}-{{sectionId}}-api_client_id_length'            : { },
+        '{{componentId}}-{{sectionId}}-api_client_secret_length'        : { },
         '{{componentId}}-{{sectionId}}-api_grant_type'                  : {
             'placeholder'   : 'SELECT API GRANT TYPE'
         },
@@ -258,6 +270,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-pki_algorithm'                   : {
             'placeholder'   : 'SELECT PKI ALGORITHM'
         },
+        '{{componentId}}-{{sectionId}}-encryption_key_size'             : { },
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider, :hidden',
             rules: {
@@ -268,7 +281,8 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-guest_role_id'               : 'required',
                 '{{componentId}}-{{sectionId}}-default_component'           : 'required',
                 '{{componentId}}-{{sectionId}}-errors_component'            : 'required',
-                '{{componentId}}-{{sectionId}}-default_dashboard'           : 'required'
+                '{{componentId}}-{{sectionId}}-default_dashboard'           : 'required',
+                '{{componentId}}-{{sectionId}}-api_grant_type'              : 'required'
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'Please enter app name',
@@ -278,7 +292,8 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-guest_role_id'           : 'Please select guest role',
                 '{{componentId}}-{{sectionId}}-default_component'       : 'Please select app default component',
                 '{{componentId}}-{{sectionId}}-errors_component'        : 'Please select app errors component',
-                '{{componentId}}-{{sectionId}}-default_dashboard'       : 'Please select default dashboard'
+                '{{componentId}}-{{sectionId}}-default_dashboard'       : 'Please select default dashboard',
+                '{{componentId}}-{{sectionId}}-api_grant_type'          : 'Please select Api Grant type'
             },
             onSubmit: function() {
                 if (dataCollectionSection['dataToSubmit']['api_access'] === 'apion') {

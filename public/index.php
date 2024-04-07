@@ -25,7 +25,7 @@ try {
 		if (isset($bootstrap->error)) {
 			$bootstrap->error->handle($exception);
 		} else {
-			if ($bootstrap->config->debug) {
+			if ($bootstrap->config && $bootstrap->config->debug) {
 				$class = (new \ReflectionClass($exception))->getShortName();
 
 				if ($class === 'AppNotFoundException') {
@@ -81,6 +81,8 @@ try {
 						</tr>
 					</tbody>
 					</table>';
+			} else {
+				throw $exception;
 			}
 		}
 	}

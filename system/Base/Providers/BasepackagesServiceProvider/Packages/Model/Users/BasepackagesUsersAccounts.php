@@ -2,7 +2,9 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users;
 
+use League\OAuth2\Server\Entities\UserEntityInterface;
 use System\Base\BaseModel;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
@@ -12,7 +14,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accou
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersProfiles;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersRoles;
 
-class BasepackagesUsersAccounts extends BaseModel
+class BasepackagesUsersAccounts extends BaseModel implements UserEntityInterface
 {
     protected $modelRelations = [];
 
@@ -95,6 +97,25 @@ class BasepackagesUsersAccounts extends BaseModel
             'account_id',
             [
                 'alias'         => 'profile'
+            ]
+        );
+
+        $apiName = '';
+        if ($this->apps && $this->apps->getAppInfo() && $this->domains->domain && $this->auth->account()) {
+            $apiName = $this->apps->getAppInfo()['id'] . '_' . $this->domains->domain['id'] . '_' . $this->auth->account()['id'];
+        }
+        $this->modelRelations['api']['relationObj'] = $this->hasOne(
+            'id',
+            ServiceProviderApiClients::class,
+            'account_id',
+            [
+                'alias'         => 'api',
+                'params'        => [
+                    'conditions'    => 'name = :apiName:',
+                    'bind'          => [
+                        'apiName'  => $apiName
+                    ]
+                ]
             ]
         );
 
