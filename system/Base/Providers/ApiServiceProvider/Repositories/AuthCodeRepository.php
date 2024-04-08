@@ -11,16 +11,13 @@ use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAuthorizati
 
 class AuthCodeRepository extends BasePackage implements AuthCodeRepositoryInterface
 {
-    use OAuthHelper;
+    protected $modelToUse = ServiceProviderApiAuthorizationCodes::class;
 
-    public function modelName()
-    {
-        return ServiceProviderApiAuthorizationCodes::class;
-    }
+    protected $code;
 
     public function getNewAuthCode()
     {
-        return new ServiceProviderApiAuthorizationCodes();
+        return new $this->$modelToUse();
     }
 
     public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity)
@@ -46,12 +43,12 @@ class AuthCodeRepository extends BasePackage implements AuthCodeRepositoryInterf
 
     public function revokeAuthCode($codeId)
     {
-        $this->update(['authorization_code' => $codeId], ['revoked' => 1]);
+        $this->update(['authorization_code' => $codeId, 'revoked' => 1]);
     }
 
     public function isAuthCodeRevoked($codeId)
     {
-        if ($result = $this->findOne(['authorization_code' => $codeId])) {
+        if ($result = $this->getFirst('authorization_code', $codeId)) {
             return (int)$result->revoked === 1;
         }
 

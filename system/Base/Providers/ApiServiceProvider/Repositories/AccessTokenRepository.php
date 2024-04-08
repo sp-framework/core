@@ -14,8 +14,6 @@ use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAccessToken
 
 class AccessTokenRepository extends BasePackage implements AccessTokenRepositoryInterface
 {
-    use OAuthHelper;
-
     protected $modelToUse = ServiceProviderApiAccessTokens::class;
 
     protected $token;

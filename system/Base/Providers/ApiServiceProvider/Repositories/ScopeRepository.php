@@ -27,11 +27,6 @@ class ScopeRepository extends BasePackage implements ScopeRepositoryInterface
         ClientEntityInterface $clientEntity,
         $userIdentifier = null
     ) {
-        //we will ignore $userIdentifier as we do not plan to give user based scopes but client based scopes only
-        // the implementation of this part should totally depend on whoever uses this library
-        // no need to remove invalid scopes (scopes that do not exist in the database)
-        // because they will be validated by the league library
-
         $client = (new ClientRepository())->getFirst('client_id', $clientEntity->getIdentifier());
 
         $clientScopes = empty($clientScope) ? null : $client->scope;

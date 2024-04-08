@@ -6,13 +6,10 @@ use League\OAuth2\Server\Entities\RefreshTokenEntityInterface;
 use League\OAuth2\Server\Exception\UniqueTokenIdentifierConstraintViolationException;
 use League\OAuth2\Server\Repositories\RefreshTokenRepositoryInterface;
 use System\Base\BasePackage;
-use System\Base\Providers\ApiServiceProvider\Library\OAuthHelper;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiRefreshTokens;
 
 class RefreshTokenRepository extends BasePackage implements RefreshTokenRepositoryInterface
 {
-    use OAuthHelper;
-
     protected $modelToUse = ServiceProviderApiRefreshTokens::class;
 
     protected $token;
@@ -82,7 +79,7 @@ class RefreshTokenRepository extends BasePackage implements RefreshTokenReposito
 
     public function isRefreshTokenRevoked($tokenId)
     {
-        if ($result = $this->findOne(['refresh_token' => $tokenId])) {
+        if ($result = $this->getFirst('refresh_token', $tokenId)) {
             return (int)$result->revoked === 1;
         }
 

@@ -395,10 +395,10 @@ class Apps extends BasePackage
 				// 		'id'        	=> 'dcg',
 				// 		'name'          => 'Device Code Grant'
 				// 	],
-				'code'    =>
+				'authorization_code'    =>
 					[
-						'id'        	=> 'code',
-						'name'          => 'Authorization Code Grant',
+						'id'        	=> 'authorization_code',
+						'name'          => 'Authorization Code Grant (With Refresh Token)',
 					]
 			];
 	}

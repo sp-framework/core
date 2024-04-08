@@ -25,7 +25,7 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
 
     public $client_secret;
 
-    public $redirect_uri;
+    // public $redirect_uri;
 
     public $grant_types;
 
@@ -45,20 +45,6 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
         return $this->account_id;
     }
 
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function getRedirectUri()
-    {
-        return $this->redirect_uri;
-    }
-
-    public function setName(string $name)
-    {
-        $this->name = $name;
-    }
 
     public function setRedirectUri(string $uri)
     {

@@ -190,7 +190,7 @@ class Api
     //     );
     // }
 
-    protected function initCode()//Authorization Code Grant
+    protected function initAuthorization_code()//Authorization Code Grant
     {
         $grant = new AuthCodeGrant(
              $this->authCodeRepository,
