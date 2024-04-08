@@ -122,4 +122,17 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
 
         return true;
     }
+
+    public function getUserFromToken($tokenId)
+    {
+        if ($result = $this->getFirst('access_token', $tokenId)) {
+            $result = $result->toArray();
+
+            if ($result['account_id']) {
+                return $this->basepackages->accounts->getAccountById($result['account_id']);
+            }
+        }
+
+        return false;
+    }
 }

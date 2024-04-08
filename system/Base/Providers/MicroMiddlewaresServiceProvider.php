@@ -5,6 +5,7 @@ namespace System\Base\Providers;
 use Phalcon\Di\Injectable;
 use Phalcon\Events\Event;
 use Phalcon\Mvc\DispatcherInterface;
+use System\Base\Providers\AccessServiceProvider\Exceptions\PermissionDeniedException;
 
 class MicroMiddlewaresServiceProvider extends Injectable
 {
@@ -30,8 +31,12 @@ class MicroMiddlewaresServiceProvider extends Injectable
         }
 
         try {
-            if (!$this->checkAllMiddlewares()) {
-                $this->addResponse('Authentication Error!', 1);
+            if (($checkMw = $this->checkAllMiddlewares()) !== true) {
+                if ($checkMw === 'auth') {
+                    $this->addResponse('Authentication Error!', 1);
+                } else if ($checkMw === 'acl') {
+                    $this->addResponse('Permission Denied!', 1);
+                }
 
                 return false;
             }
@@ -78,7 +83,11 @@ class MicroMiddlewaresServiceProvider extends Injectable
                     }
 
                     if (str_contains(strtolower($e->getMessage()), 'denied') || str_contains(strtolower($e->getMessage()), 'expired')) {
-                        return false;
+                        return 'auth';
+                    }
+
+                    if ($e instanceof PermissionDeniedException) {
+                        return 'acl';
                     }
 
                     throw $e;

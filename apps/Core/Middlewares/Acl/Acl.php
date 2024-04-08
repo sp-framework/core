@@ -29,8 +29,12 @@ class Acl extends BaseMiddleware
 
     protected $found = false;
 
+    protected $isApi = false;
+
     public function process($data)
     {
+        $this->isApi = $this->api->isApi($this->request);
+
         $this->actions =
             ['view', 'add', 'update', 'remove', 'msview', 'msupdate'];
 
@@ -49,9 +53,13 @@ class Acl extends BaseMiddleware
             return true;
         }
 
-        if ($this->auth->account()) {
+        if ($this->isApi) {
+            $this->account = $this->api->getAccount();
+        } else {
             $this->account = $this->auth->account();
+        }
 
+        if ($this->account) {
             $this->accountPermissions = $this->helper->decode($this->account['security']['permissions'], true);
 
             //System Admin bypasses the ACL if they don't have any permissions defined.
@@ -156,7 +164,7 @@ class Acl extends BaseMiddleware
 
     protected function setControllerAndAction()
     {
-        if ($this->api->isApi($this->request)) {
+        if ($this->isApi) {
             $controllerName = $this->router->getControllerName();
         } else {
             $controllerName = $this->dispatcher->getControllerName();
@@ -191,7 +199,11 @@ class Acl extends BaseMiddleware
 
         $this->controllerRoute = $component['route'];
 
-        $action = strtolower(str_replace('Action', '', $this->dispatcher->getActiveMethod()));
+        if ($this->isApi) {
+            $action = $this->router->getActionName();
+        } else {
+            $action = strtolower(str_replace('Action', '', $this->dispatcher->getActiveMethod()));
+        }
 
         if (!in_array($action, $this->actions)) {
             return false;

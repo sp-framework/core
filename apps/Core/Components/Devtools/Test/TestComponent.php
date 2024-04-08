@@ -8,9 +8,11 @@ class TestComponent extends BaseComponent
 {
     protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/';
 
+    /**
+     * @acl(name=view)
+     */
     public function viewAction()
     {
-        $this->addResponse('Testing', 1, ['test' => 'test']);
         return false;
     }
 

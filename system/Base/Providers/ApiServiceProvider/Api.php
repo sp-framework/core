@@ -56,6 +56,8 @@ class Api
 
     protected $userRepository;
 
+    protected $headerAttributes;
+
     public function __construct()
     {
         //
@@ -259,11 +261,17 @@ class Api
 
             $validateToken = $this->resource->validateAuthenticatedRequest(ServerRequest::fromGlobals());
 
-            if (!$this->accessTokenRepository->isTokenExpired($validateToken->getAttributes()['oauth_access_token_id'])) {
+            $this->headerAttributes = $validateToken->getAttributes();
+            if (!$this->accessTokenRepository->isTokenExpired($this->headerAttributes['oauth_access_token_id'])) {
                 throw new \Exception('Token Expired!');
             }
         } catch (\Exception $e) {
             throw $e;
         }
+    }
+
+    public function getAccount()
+    {
+        return $this->accessTokenRepository->getUserFromToken($this->headerAttributes['oauth_access_token_id']);
     }
 }

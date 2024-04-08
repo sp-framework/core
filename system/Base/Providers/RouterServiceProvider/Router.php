@@ -245,8 +245,8 @@ class Router
 	{
 		if ($found) {
 			$this->router->setDefaultNamespace($this->defaultNamespace);
-			$this->router->setDefaultController($this->controller);
-			$this->router->setDefaultAction($this->action);
+			$this->router->setDefaultController($this->controller ?? 'home');
+			$this->router->setDefaultAction($this->action ?? 'view');
 		} else {
 			if (!$this->api->isApi($this->request)) {
 				$this->router->setDefaultNamespace(
