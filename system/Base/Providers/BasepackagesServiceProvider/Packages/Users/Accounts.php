@@ -71,19 +71,24 @@ class Accounts extends BasePackage
                 $account['role'] = $this->model->getRole()->toArray();
             }
 
-            $account['api'] = [];
-            if ($this->model->getApi()) {
-                $account['api'] = $this->model->getApi()->toArray();
-                if ($account['api']['client_secret'] && $account['api']['client_secret'] !== '') {
-                    $account['api']['client_secret'] = $this->secTools->decryptBase64($account['api']['client_secret']);
+            $account['api_client'] = [];
+            if ($this->model->getApiClient()) {
+                $account['api_client'] = $this->model->getApiClient()->toArray();
+                if (isset($account['api_client']['client_secret']) && $account['api_client']['client_secret'] !== '') {
+                    $account['api_client']['client_secret'] = $this->random->base58(8);
                 }
+            }
+
+            $account['api_user'] = [];
+            if ($this->model->getApiUser()) {
+                $account['api_user'] = $this->model->getApiUser()->toArray();
             }
 
             return $account;
         } else {
             if ($this->ffData) {
-                if ($this->ffData['api']['client_secret'] && $this->ffData['api']['client_secret'] !== '') {
-                    $this->ffData['api']['client_secret'] = $this->secTools->decryptBase64($this->ffData['api']['client_secret']);
+                if (isset($this->ffData['api_client']['client_secret']) && $this->ffData['api_client']['client_secret'] !== '') {
+                    $this->ffData['api_client']['client_secret'] = $this->random->base58(8);
                 }
 
                 return $this->ffData;

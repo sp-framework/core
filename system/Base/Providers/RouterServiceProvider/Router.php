@@ -152,9 +152,7 @@ class Router
 			}
 		}
 
-		if (!$this->api->isApi($this->request)) {
-			$this->router->setDefaultNamespace($this->defaultNamespace);
-		}
+		$this->registerDefaults(true);
 	}
 
 	protected function registerHome()
@@ -243,16 +241,22 @@ class Router
 		}
 	}
 
-	protected function registerDefaults()
+	protected function registerDefaults($found = false)
 	{
-		if (!$this->api->isApi($this->request)) {
-			$this->router->setDefaultNamespace(
-				'System\Base\Providers\ErrorServiceProvider'
-			);
+		if ($found) {
+			$this->router->setDefaultNamespace($this->defaultNamespace);
+			$this->router->setDefaultController($this->controller);
+			$this->router->setDefaultAction($this->action);
+		} else {
+			if (!$this->api->isApi($this->request)) {
+				$this->router->setDefaultNamespace(
+					'System\Base\Providers\ErrorServiceProvider'
+				);
 
-			$this->router->setDefaultController('index');
+				$this->router->setDefaultController('index');
 
-			$this->router->setDefaultAction('view');
+				$this->router->setDefaultAction('view');
+			}
 		}
 	}
 

@@ -25,7 +25,7 @@ class ServiceProviderApiRefreshTokens extends BaseModel implements RefreshTokenE
 
     public $scope;
 
-    public $user_id;
+    public $account_id;
 
     public $revoked;
 

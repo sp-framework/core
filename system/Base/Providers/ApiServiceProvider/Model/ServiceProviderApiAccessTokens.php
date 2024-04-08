@@ -26,11 +26,16 @@ class ServiceProviderApiAccessTokens extends BaseModel implements AccessTokenEnt
 
     public $client_id;
 
-    public $user_id;
+    public $account_id;
 
     public $revoked;
 
     public $created_at;
 
     public $updated_at;
+
+    public function getUserIdentifier()
+    {
+        return $this->account_id;
+    }
 }

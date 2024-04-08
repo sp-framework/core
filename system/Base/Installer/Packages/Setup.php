@@ -85,6 +85,7 @@ use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Clients;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Jwts;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\RefreshTokens;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Scopes;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Users;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\IpFilter;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\Types;
@@ -100,6 +101,7 @@ use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiJwts;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiRefreshTokens;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiScopes;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiUsers;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderApps;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsIpFilter;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsTypes;
@@ -463,9 +465,13 @@ class Setup
 					'schema'	=> new AuthorizationCodes,
 					'model'		=> new ServiceProviderApiAuthorizationCodes,
 				],
-			'service_provider_api_client'				=> [
+			'service_provider_api_clients'				=> [
 					'schema'	=> new Clients,
 					'model'		=> new ServiceProviderApiClients,
+				],
+			'service_provider_api_users'				=> [
+					'schema'	=> new Users,
+					'model'		=> new ServiceProviderApiUsers,
 				],
 			'service_provider_api_jwts'					=> [
 					'schema'	=> new Jwts,

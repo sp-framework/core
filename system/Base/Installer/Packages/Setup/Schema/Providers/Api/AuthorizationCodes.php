@@ -73,7 +73,7 @@ class AuthorizationCodes
                     ]
                 ),
                 new Column(
-                    'user_id',
+                    'account_id',
                     [
                         'type'          => Column::TYPE_INTEGER,
                         'notNull'       => true

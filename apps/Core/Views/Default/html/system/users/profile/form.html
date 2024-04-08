@@ -261,6 +261,7 @@ dataCollectionSection =
                             if (response.responseData && response.responseData.client_id && response.responseData.client_secret) {
                                 $('#{{componentId}}-{{sectionId}}-api_client_id').val(response.responseData.client_id);
                                 $('#{{componentId}}-{{sectionId}}-api_client_secret').val(response.responseData.client_secret);
+                                $('#{{componentId}}-{{sectionId}}-api_client_secret').attr('type', 'text');
                             }
                             $('#{{componentId}}-{{sectionId}}-api_client_id, #{{componentId}}-{{sectionId}}-api_client_secret').parents('.form-group').removeClass('d-none');
                         } else {

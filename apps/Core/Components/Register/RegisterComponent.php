@@ -55,6 +55,8 @@ class RegisterComponent extends BaseComponent
 
     public function apiClientAction()
     {
-        $this->api->registerClient($this->postData());
+        $token = $this->api->registerClient($this->postData());
+
+        echo $token->getBody();
     }
 }

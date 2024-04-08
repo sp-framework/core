@@ -31,8 +31,6 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
 
     public $scope;
 
-    public $user_id;
-
     public $created_at;
 
     public $updated_at;
@@ -40,6 +38,11 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
     public function getIdentifier()
     {
         return $this->client_id;
+    }
+
+    public function getUserIdentifier()
+    {
+        return $this->account_id;
     }
 
     public function getName()
@@ -52,10 +55,25 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
         return $this->redirect_uri;
     }
 
+    public function setName(string $name)
+    {
+        $this->name = $name;
+    }
+
+    public function setRedirectUri(string $uri)
+    {
+        $this->redirectUri = $uri;
+    }
+
     public function setIdentifier($identifier)
     {
         $this->client_id = $identifier;
 
         return $this;
+    }
+
+    public function setConfidential()
+    {
+        $this->isConfidential = true;
     }
 }

@@ -2,13 +2,15 @@
 {% set clientSecret = '' %}
 {% set clientIdHidden = true %}
 {% set clientSecretHidden = true %}
-{% if account['api'] is defined and account['api']['client_id'] is defined and account['api']['client_id'] !== '' and account['api']['client_secret'] is defined and account['api']['client_secret'] !== '' %}
-    {% set clientId = account['api']['client_id'] %}
-    {% set clientSecret = account['api']['client_secret'] %}
+{% set clientSecretInputFieldType = 'text' %}
+{% if account['api_client'] is defined and account['api_client']['client_id'] is defined and account['api_client']['client_id'] !== '' and account['api_client']['client_secret'] is defined and account['api_client']['client_secret'] !== '' %}
+    {% set clientId = account['api_client']['client_id'] %}
+    {% set clientSecret = account['api_client']['client_secret'] %}
 {% endif %}
 {% if clientId !== '' and clientSecret !== '' %}
     {% set clientIdHidden = false %}
     {% set clientSecretHidden = false %}
+    {% set clientSecretInputFieldType = 'password' %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -66,6 +68,7 @@
                 'fieldHelp'                             : true,
                 'fieldHelpTooltipContent'               : 'Client Secret for API authentication.',
                 'fieldDisabled'                         : true,
+                'fieldInputType'                        : clientSecretInputFieldType,
                 'fieldHidden'                           : clientSecretHidden,
                 'fieldBazScan'                          : true,
                 'fieldBazJstreeSearch'                  : true,
@@ -74,3 +77,4 @@
         )}}
     </div>
 </div>
+<small class="text-danger">Note: Client secret is only shown at the time of key generation. Please copy and save it somewhere safe.</small>

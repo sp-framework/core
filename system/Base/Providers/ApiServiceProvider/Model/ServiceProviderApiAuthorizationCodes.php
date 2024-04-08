@@ -28,7 +28,7 @@ class ServiceProviderApiAuthorizationCodes extends BaseModel implements AuthCode
 
     public $client_id;
 
-    public $user_id;
+    public $account_id;
 
     public $revoked;
 

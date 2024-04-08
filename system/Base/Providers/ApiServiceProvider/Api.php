@@ -6,14 +6,17 @@ use DateInterval;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
 use League\OAuth2\Server\AuthorizationServer;
+use League\OAuth2\Server\AuthorizationValidators\BearerTokenValidator;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\Grant\AuthCodeGrant;
 use League\OAuth2\Server\Grant\ClientCredentialsGrant;
 use League\OAuth2\Server\Grant\PasswordGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
+use League\OAuth2\Server\ResourceServer;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use System\Base\Providers\ApiServiceProvider\Repositories\AccessTokenRepository;
 use System\Base\Providers\ApiServiceProvider\Repositories\AuthCodeRepository;
 use System\Base\Providers\ApiServiceProvider\Repositories\ClientRepository;
@@ -25,6 +28,10 @@ class Api
 {
     protected $apps;
 
+    protected $app;
+
+    protected $keys;
+
     protected $request;
 
     protected $response;
@@ -34,6 +41,8 @@ class Api
     public $apiNeedsAuth;
 
     protected $server;
+
+    protected $resource;
 
     protected $accessTokenRepository;
 
@@ -106,11 +115,11 @@ class Api
     {
         $this->apps = $apps;
 
-        $app = $this->apps->getAppInfo();
+        $this->app = $this->apps->getAppInfo();
 
-        if ($app['api_grant_type']) {
-            if (!isset($this->{$app['api_grant_type']})) {
-                if (method_exists($this, $grant = "init" . ucfirst("{$app['api_grant_type']}"))) {
+        if ($this->app['api_grant_type']) {
+            if (!isset($this->{$this->app['api_grant_type']})) {
+                if (method_exists($this, $grant = "init" . ucfirst("{$this->app['api_grant_type']}"))) {
                     $this->initApiServer();
 
                     $this->{$grant}();
@@ -129,14 +138,14 @@ class Api
         $this->userRepository = new UserRepository();
         // $deviceCodeRepository = new DeviceCodeRepository();
 
-        $keys = $this->apps->getAPIKeys();
+        $this->keys = $this->apps->getAPIKeys();
 
         $this->server = new AuthorizationServer(
             $this->clientRepository,
             $this->accessTokenRepository,
             $this->scopeRepository,
-            new CryptKey($keys['private_location'], $keys['pki_passphrase']),
-            $keys['enc']
+            new CryptKey($this->keys['private_location'], $this->keys['pki_passphrase']),
+            $this->keys['enc']
         );
     }
 
@@ -214,9 +223,7 @@ class Api
 
         try {
             // Try to respond to the access token request
-            $token = $this->server->respondToAccessTokenRequest(ServerRequest::fromGlobals(), $serverResponse);
-
-            var_dump($token);
+            return $this->server->respondToAccessTokenRequest(ServerRequest::fromGlobals(), $serverResponse);
         } catch (OAuthServerException $exception) {
             var_dump($exception);die();
             // All instances of OAuthServerException can be converted to a PSR-7 response
@@ -228,6 +235,35 @@ class Api
             $body->write($exception->getMessage());
 
             return $serverResponse->withStatus(500)->withBody($body);
+        }
+    }
+
+    public function check($apps)
+    {
+        $this->accessTokenRepository = new AccessTokenRepository();
+
+        $this->apps = $apps;
+
+        $this->app = $this->apps->getAppInfo();
+
+        $this->keys = $this->apps->getAPIKeys();
+
+        try {
+            $this->resource = new ResourceServer(
+                $this->accessTokenRepository,
+                new CryptKey($this->keys['public_location'], $this->keys['pki_passphrase']),
+                new BearerTokenValidator(
+                    $this->accessTokenRepository
+                )
+            );
+
+            $validateToken = $this->resource->validateAuthenticatedRequest(ServerRequest::fromGlobals());
+
+            if (!$this->accessTokenRepository->isTokenExpired($validateToken->getAttributes()['oauth_access_token_id'])) {
+                throw new \Exception('Token Expired!');
+            }
+        } catch (\Exception $e) {
+            throw $e;
         }
     }
 }

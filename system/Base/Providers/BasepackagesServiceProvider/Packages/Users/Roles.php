@@ -42,9 +42,9 @@ class Roles extends BasePackage
     public function updateRole(array $data)
     {
         if (!$this->checkForSystemRole($data['id'])) {
-            $role = $this->getById($data['id']);
+            $this->addResponse('Cannot update system role.', 1);
 
-            $data['name'] = $role['name'];
+            return false;
         }
 
         if ($this->update($data)) {

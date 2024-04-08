@@ -7,12 +7,11 @@ use League\OAuth2\Server\Exception\UniqueTokenIdentifierConstraintViolationExcep
 use League\OAuth2\Server\Repositories\AuthCodeRepositoryInterface;
 use System\Base\BasePackage;
 use System\Base\Providers\ApiServiceProvider\Library\OAuthHelper;
-use System\Base\Providers\ApiServiceProvider\Library\Utils;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAuthorizationCodes;
 
 class AuthCodeRepository extends BasePackage implements AuthCodeRepositoryInterface
 {
-    use Utils, OAuthHelper;
+    use OAuthHelper;
 
     public function modelName()
     {
@@ -33,7 +32,7 @@ class AuthCodeRepository extends BasePackage implements AuthCodeRepositoryInterf
 
         $this->create([
             'authorization_code' => $authCode,
-            'expires' => $this->formatDateTime($authCodeEntity->getExpiryDateTime()),
+            'expires' => (\Carbon\Carbon::parse($authCodeEntity->getExpiryDateTime()))->toDateTimeLocalString(),
             'scope' => implode(SCOPE_DELIMITER_STRING, $this->getScopeNamesFromAuthCode($authCodeEntity)),
             'client_id' => $authCodeEntity->getClient()->getIdentifier(),
             // I do not understand why redirect_uri isn't saving to the oauth_codes table.. Must be witchcraft

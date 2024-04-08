@@ -88,6 +88,17 @@ class Store
         }
     }
 
+    public function __get($property)
+    {
+        if ($this->data) {
+            if (isset($this->data[$property])) {
+                return $this->data[$property];
+            }
+        }
+
+        return false;
+    }
+
     protected function checkStore($storeName)
     {
         if (!IoHelper::checkFolder($this->storePath)) {

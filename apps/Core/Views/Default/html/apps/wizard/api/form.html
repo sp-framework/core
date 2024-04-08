@@ -22,6 +22,14 @@
 {% if app['api_registration_allowed'] == true %}
     {% set apiRegistrationAllowed = true %}
 {% endif %}
+{% set apiClientIdLength = 8 %}
+{% set apiClientSecretLength = 32 %}
+{% if app['api_client_id_length'] is defined %}
+    {% set apiClientIdLength = app['api_client_id_length'] %}
+{% endif %}
+{% if app['api_client_secret_length'] is defined %}
+    {% set apiClientSecretLength = app['api_client_secret_length'] %}
+{% endif %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -103,7 +111,7 @@
                 'fieldDataInputMinNumber'               : 8,
                 'fieldDataInputMaxNumber'               : 32,
                 'fieldDataInputMaxLength'               : 2,
-                'fieldValue'                            : app['api_client_id_length']
+                'fieldValue'                            : apiClientIdLength
             ]
         )}}
     </div>
@@ -128,7 +136,7 @@
                 'fieldDataInputMinNumber'               : 8,
                 'fieldDataInputMaxNumber'               : 32,
                 'fieldDataInputMaxLength'               : 2,
-                'fieldValue'                            : app['api_client_secret_length']
+                'fieldValue'                            : apiClientSecretLength
             ]
         )}}
     </div>

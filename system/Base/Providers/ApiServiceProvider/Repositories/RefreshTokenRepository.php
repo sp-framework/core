@@ -7,38 +7,72 @@ use League\OAuth2\Server\Exception\UniqueTokenIdentifierConstraintViolationExcep
 use League\OAuth2\Server\Repositories\RefreshTokenRepositoryInterface;
 use System\Base\BasePackage;
 use System\Base\Providers\ApiServiceProvider\Library\OAuthHelper;
-use System\Base\Providers\ApiServiceProvider\Library\Utils;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiRefreshTokens;
 
 class RefreshTokenRepository extends BasePackage implements RefreshTokenRepositoryInterface
 {
-    use Utils, OAuthHelper;
+    use OAuthHelper;
 
-    public function modelName()
-    {
-        return ServiceProviderApiRefreshTokens::class;
-    }
+    protected $modelToUse = ServiceProviderApiRefreshTokens::class;
+
+    protected $token;
 
     public function getNewRefreshToken()
     {
-        return new RefreshToken();
+        return new ServiceProviderApiRefreshTokens();
     }
 
     public function persistNewRefreshToken(RefreshTokenEntityInterface $refreshTokenEntity)
     {
-        $token = $refreshTokenEntity->getIdentifier();
-        if ($this->findOne(['refresh_token' => $token])) {
+        $refreshToken = $refreshTokenEntity->getIdentifier();
+
+        if ($this->getFirst('refresh_token', $refreshToken)) {
             throw UniqueTokenIdentifierConstraintViolationException::create();
         }
 
         $accessToken = $refreshTokenEntity->getAccessToken();
-        $this->create([
-            'refresh_token' => $token,
-            'expires' => $this->formatDateTime($refreshTokenEntity->getExpiryDateTime()),
+
+        if ($this->config->databasetype === 'db') {
+            $params = [
+                'conditions'    => 'app_id = :appId: AND domain_id = :domainId: AND account_id = :accountId:',
+                'bind'          =>
+                    [
+                        'appId'    => $this->apps->getAppInfo()['id'],
+                        'domainId' => $this->domains->domain['id'],
+                        'accountId'=> $accessToken->getUserIdentifier()
+                    ]
+            ];
+        } else {
+            $params['conditions'] = [
+                ['app_id', '=', $this->apps->getAppInfo()['id']],
+                ['domain_id', '=', $this->domains->domain['id']],
+                ['account_id', '=', $accessToken->getUserIdentifier()]
+            ];
+        }
+
+        $token = $this->getByParams($params, false, false);
+
+        $newToken = [
+            'app_id' => $this->apps->getAppInfo()['id'],
+            'domain_id' => $this->domains->domain['id'],
+            'account_id' => $accessToken->getUserIdentifier(),
+            'refresh_token' => $refreshToken,
+            'expires' => (\Carbon\Carbon::parse($accessToken->getExpiryDateTime()))->toDateTimeLocalString(),
             'client_id' => $accessToken->getClient()->getIdentifier(),
-            'user_id' => $accessToken->getUserIdentifier(),
             'revoked' => 0,
-        ]);
+        ];
+
+        if (!$token) {
+            $this->add($newToken, false);
+        } else {
+            if (count($token) > 0) {
+                $token = $token[0];//We only change the first token found.
+            }
+
+            $newToken = array_merge($token, $newToken);
+
+            $this->update($newToken);
+        }
     }
 
     public function revokeRefreshToken($tokenId)

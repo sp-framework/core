@@ -1,39 +1,29 @@
 <?php
 
-/**
- * Class Util
- * @package App\Library
- */
+// namespace System\Base\Providers\ApiServiceProvider\Library;
 
-namespace System\Base\Providers\ApiServiceProvider\Library;
+// trait Utils
+// {
+//     /**
+//      * @author Adeyemi Olaoye <yemi@cottacush.com>
+//      */
+//     public function getCurrentDateTime()
+//     {
+//         return date('Y-m-d H:i:s');
+//     }
 
-trait Utils
-{
-    /**
-     * @author Adeyemi Olaoye <yemi@cottacush.com>
-     * @return bool|string
-     */
-    public function getCurrentDateTime()
-    {
-        return date('Y-m-d H:i:s');
-    }
+//     public function getCurrentDate()
+//     {
+//         return date('Y-m-d');
+//     }
 
-    /**
-     * @author Adeyemi Olaoye <yemi@cottacush.com>
-     * @return bool|string
-     */
-    public function getCurrentDate()
-    {
-        return date('Y-m-d');
-    }
-
-    /**
-     * @param \DateTime $dateTime
-     * @param string $format
-     * @return string
-     */
-    public function formatDateTime(\DateTime $dateTime, $format = 'Y-m-d H:i:s')
-    {
-        return $dateTime->format($format);
-    }
-}
+//     /**
+//      * @param \DateTime $dateTime
+//      * @param string $format
+//      * @return string
+//      */
+//     public function formatDateTime(\DateTimeImmutable $dateTime, $format = 'Y-m-d H:i:s')
+//     {
+//         return $dateTime->format($format);
+//     }
+// }

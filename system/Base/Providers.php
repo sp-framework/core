@@ -62,5 +62,7 @@ return
 				'System\Base\Providers\SecurityServiceProvider',
 				'System\Base\Providers\LoggerServiceProvider',
 				'System\Base\Providers\AccessServiceProvider',
+				'System\Base\Providers\ModulesServiceProvider',
+				'System\Base\Providers\ValidationServiceProvider',
 			]
 	];

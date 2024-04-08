@@ -399,11 +399,6 @@ class Apps extends BasePackage
 					[
 						'id'        	=> 'code',
 						'name'          => 'Authorization Code Grant',
-					],
-				'refresh_token'    =>
-					[
-						'id'        	=> 'refresh_token',
-						'name'          => 'Refresh Token Grant',
 					]
 			];
 	}
@@ -422,7 +417,7 @@ class Apps extends BasePackage
 
 	public function getOpensslKeyBits()
 	{
-		$bits = ['512', '1024', '2048', '4096'];
+		$bits = ['2048', '4096'];
 
 		$keyBits = [];
 
@@ -553,10 +548,10 @@ class Apps extends BasePackage
 		$newClient['name'] = $newClient['app_id'] . '_' . $newClient['domain_id'] . '_' . $newClient['account_id'];
 		$newClient['client_id'] = $this->random->base58(isset($this->app['api_client_id_length']) ? $this->app['api_client_id_length'] : 8);
 		$client_secret = $this->random->base58(isset($this->app['api_client_secret_length']) ? $this->app['api_client_secret_length'] : 32);
-		$newClient['client_secret'] = $this->secTools->encryptBase64($client_secret);
+		$newClient['client_secret'] = $this->secTools->hashPassword($client_secret);
 		$newClient['redirect_uri'] = 'https://';
 		$newClient['grant_types'] = '';
-		$newClient['scope'] = '';
+		$newClient['scope'] = '*';
 		// $newClient['created_at'] = time();
 		// $newClient['updated_at'] = time();
 

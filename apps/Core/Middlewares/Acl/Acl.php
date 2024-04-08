@@ -156,7 +156,11 @@ class Acl extends BaseMiddleware
 
     protected function setControllerAndAction()
     {
-        $controllerName = $this->dispatcher->getControllerName();
+        if ($this->api->isApi($this->request)) {
+            $controllerName = $this->router->getControllerName();
+        } else {
+            $controllerName = $this->dispatcher->getControllerName();
+        }
 
         $component =
             $this->modules->components->getComponentByNameForAppId(

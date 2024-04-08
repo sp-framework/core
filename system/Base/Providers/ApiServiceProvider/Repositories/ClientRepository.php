@@ -21,9 +21,11 @@ class ClientRepository extends BasePackage implements ClientRepositoryInterface
         if ($clientObj) {
             $this->client = $clientObj->toArray();
 
-            $this->client['client_secret'] = $this->secTools->decryptBase64($this->client['client_secret']);
-
             $clientObj = new $this->modelToUse;
+
+            $clientObj->assign($this->client);
+
+            $clientObj->setConfidential();
 
             return $clientObj;
         }
@@ -36,7 +38,7 @@ class ClientRepository extends BasePackage implements ClientRepositoryInterface
         $this->getClientEntity($clientIdentifier);
 
         if ($this->client) {
-            if ($this->client['client_secret'] === $clientSecret) {
+            if ($this->secTools->checkPassword($clientSecret, $this->client['client_secret'])) {
                 return true;
             }
         }
