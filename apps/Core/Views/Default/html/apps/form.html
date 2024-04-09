@@ -196,6 +196,9 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-generate-pki, #{{componentId}}-{{sectionId}}-regenerate-pki').click(function(e) {
                     e.preventDefault();
 
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+
                     if (this.id === '{{componentId}}-{{sectionId}}-regenerate-pki') {
                         Swal.fire({
                             title                       : '<span class="text-danger">Regenerate PKI Keys?</span>',
@@ -254,6 +257,9 @@ dataCollectionSection =
                             $("#security-token").attr("name", response.tokenKey);
                             $("#security-token").val(response.token);
                         }
+
+                        $('#{{componentId}}-{{sectionId}}-generate-pki, #{{componentId}}-{{sectionId}}-regenerate-pki').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-generate-pki, #{{componentId}}-{{sectionId}}-regenerate-pki').children('i').attr('hidden', false);
                     }, 'json');
                 }
             }

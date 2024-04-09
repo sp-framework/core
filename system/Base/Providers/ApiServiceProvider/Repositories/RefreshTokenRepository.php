@@ -36,14 +36,14 @@ class RefreshTokenRepository extends BasePackage implements RefreshTokenReposito
                     [
                         'appId'    => $this->apps->getAppInfo()['id'],
                         'domainId' => $this->domains->domain['id'],
-                        'accountId'=> $accessToken->getUserIdentifier()
+                        'accountId'=> $accessToken->getClient()->getUserIdentifier()
                     ]
             ];
         } else {
             $params['conditions'] = [
                 ['app_id', '=', $this->apps->getAppInfo()['id']],
                 ['domain_id', '=', $this->domains->domain['id']],
-                ['account_id', '=', $accessToken->getUserIdentifier()]
+                ['account_id', '=', $accessToken->getClient()->getUserIdentifier()]
             ];
         }
 
@@ -74,7 +74,14 @@ class RefreshTokenRepository extends BasePackage implements RefreshTokenReposito
 
     public function revokeRefreshToken($tokenId)
     {
-        $this->update(['refresh_token' => $tokenId], ['revoked' => 1]);
+        if ($result = $this->getFirst('refresh_token', $tokenId)) {
+
+            $result = $result->toArray();
+
+            $result['revoked'] = true;
+
+            $this->update($result);
+        }
     }
 
     public function isRefreshTokenRevoked($tokenId)

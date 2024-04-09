@@ -114,7 +114,7 @@
     </div>
 </div>
 <script>
-/* globals BazContentFieldsValidator PNotify autoComplete fixGrid Inputmask */
+/* globals BazContentFieldsValidator PNotify autoComplete fixGrid Inputmask Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -245,12 +245,47 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-twofa_email'                     : { },
         '{{componentId}}-{{sectionId}}-api_client_id'                   : {
             afterInit: function() {
-                $('#{{componentId}}-{{sectionId}}-generate-api-client-keys').click(function(e) {
+                $('#{{componentId}}-{{sectionId}}-generate-api-client-keys, #{{componentId}}-{{sectionId}}-regenerate-api-client-keys').click(function(e) {
                     e.preventDefault();
 
                     $(this).attr('disabled', true);
                     $(this).children('i').attr('hidden', false);
 
+                    if (this.id === '{{componentId}}-{{sectionId}}-regenerate-api-client-keys') {
+                        Swal.fire({
+                            title                       : '<span class="text-danger">Regenerate API Client Keys?</span>',
+                            icon                        : 'question',
+                            width                       : '100%',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Yes',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-danger text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                                'inputLabel'                : 'text-white',
+                                'input'                     : 'text-white'
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : false,
+                            allowEscapeKey              : false,
+                            didOpen                     : function() {
+                                window.dataCollection.env.sounds.swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed === true &&
+                                result.value !== ''
+                            ) {
+                                regenerateClientKey(true);
+                            }
+                        });
+                    } else {
+                        regenerateClientKey();
+                    }
+                });
+
+                function regenerateClientKey(force = false) {
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
@@ -273,10 +308,10 @@ dataCollectionSection =
                             $("#security-token").val(response.token);
                         }
 
-                        $('#{{componentId}}-{{sectionId}}-generate-api-client-keys').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-generate-api-client-keys').children('i').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-generate-api-client-keys, #{{componentId}}-{{sectionId}}-regenerate-api-client-keys').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-generate-api-client-keys, #{{componentId}}-{{sectionId}}-regenerate-api-client-keys').children('i').attr('hidden', true);
                     }, 'json');
-                });
+                }
             }
         },
         '{{componentId}}-{{sectionId}}-api_client_secret'               : { },

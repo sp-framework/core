@@ -96,7 +96,7 @@ class Api
         return $this->isApi;
     }
 
-    public function setupApi($apps, $logger)
+    public function setupApi($apps, $logger, $refreshTokenSet = false)
     {
         $this->apps = $apps;
 
@@ -108,6 +108,12 @@ class Api
             if (!isset($this->{$this->app['api_grant_type']})) {
                 if (method_exists($this, $grant = "init" . ucfirst("{$this->app['api_grant_type']}"))) {
                     $this->initApiServer();
+
+                    if ($refreshTokenSet) {
+                        $this->initRefresh_token();
+
+                        return;
+                    }
 
                     $this->{$grant}();
                 }

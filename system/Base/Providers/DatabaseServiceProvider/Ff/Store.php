@@ -542,7 +542,7 @@ class Store
             throw new InvalidArgumentException("No documents to update.");
         }
 
-        if (!array_key_exists($this->primaryKey, $data))  {
+        if (!array_key_exists($this->primaryKey, $data)) {
             throw new InvalidArgumentException("Documents have to have the primary key \"$this->primaryKey\".");
         }
 

@@ -42,7 +42,13 @@ class MicroMiddlewaresServiceProvider extends Injectable
                 return false;
             }
 
-            $this->api->setupApi($this->apps, $this->logger);
+            $refreshTokenSet = false;
+
+            if ($this->request->get('refresh_token')) {
+                $refreshTokenSet = true;
+            }
+
+            $this->api->setupApi($this->apps, $this->logger, $refreshTokenSet);
         } catch (\Exception $e) {
             throw $e;
         }

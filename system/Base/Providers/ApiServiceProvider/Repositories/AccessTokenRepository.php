@@ -16,8 +16,6 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
 {
     protected $modelToUse = ServiceProviderApiAccessTokens::class;
 
-    protected $token;
-
     public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null)
     {
         $accessToken = $this->useModel();
@@ -86,13 +84,19 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
 
     public function revokeAccessToken($tokenId)
     {
-        $this->update(['access_token' => $tokenId, 'revoked' => 1]);
+        if ($result = $this->getFirst('access_token', $tokenId)) {
+            $result = $result->toArray();
+
+            $result['revoked'] = true;
+
+            $this->update($result);
+        }
     }
 
     public function isAccessTokenRevoked($tokenId)
     {
         if ($result = $this->getFirst('access_token', $tokenId)) {
-            return (int)$result->revoked === 1;
+            return (int) $result->revoked === 1;
         }
 
         return true;
