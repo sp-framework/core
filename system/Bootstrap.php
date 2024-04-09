@@ -91,8 +91,9 @@ final class Bootstrap
             $application = new Micro($container);
 
             $router = $container->getShared('router');
+            $domains = $container->getShared('domains');
 
-            $microCollection = (new MicroCollection($application, $api, $router))->init();
+            $microCollection = (new MicroCollection($application, $api, $router, $domains))->init();
             $application->mount($microCollection->getMicroCollection());
 
             $events = (new MicroEvents())->init();

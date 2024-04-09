@@ -11,6 +11,8 @@ class Router
 {
 	protected $api;
 
+	protected $isApi;
+
 	protected $domains;
 
 	protected $domain;
@@ -72,6 +74,8 @@ class Router
 		$this->logger = $logger;
 
 		$this->request = $request;
+
+		$this->isApi = $this->api->isApi($this->request);
 
 		$this->response = $response;
 
@@ -157,7 +161,7 @@ class Router
 
 	protected function registerHome()
 	{
-		if (!$this->api->isApi($this->request)) {
+		if (!$this->isApi) {
 			$this->setDefaultNamespace(true);
 
 			$this->router->add(
@@ -248,7 +252,7 @@ class Router
 			$this->router->setDefaultController($this->controller ?? 'home');
 			$this->router->setDefaultAction($this->action ?? 'view');
 		} else {
-			if (!$this->api->isApi($this->request)) {
+			if (!$this->isApi) {
 				$this->router->setDefaultNamespace(
 					'System\Base\Providers\ErrorServiceProvider'
 				);
@@ -262,7 +266,7 @@ class Router
 
 	protected function regitserNotFound()
 	{
-		if (!$this->api->isApi($this->request)) {
+		if (!$this->isApi) {
 			if ($this->appDefaults) {
 				if (isset($this->appDefaults['errorComponent'])) {
 
@@ -303,13 +307,15 @@ class Router
 			exit;
 		}
 
-		if (isset($this->domain['exclusive_to_default_app']) &&
-			$this->domain['exclusive_to_default_app'] == 1
+		if (($this->isApi &&
+			 isset($this->domain['exclusive_for_api']) &&
+			 $this->domain['exclusive_for_api'] == 1) ||
+			(isset($this->domain['exclusive_to_default_app']) &&
+			 $this->domain['exclusive_to_default_app'] == 1)
 		) {
 			$this->appInfo = $this->apps->getAppById($this->domain['default_app_id']);
 
 			$this->domainAppExclusive = true;
-
 		} else  {
 			$this->appInfo = $this->apps->getAppInfo();
 
@@ -340,7 +346,7 @@ class Router
 		$this->appDefaults['id'] = $this->appInfo['id'];
 		$this->appDefaults['app'] = $this->appInfo['route'];
 		$this->appDefaults['app_type'] = $this->appInfo['app_type'];
-		if (!$this->api->isApi($this->request)) {
+		if (!$this->isApi) {
 			$this->appDefaults['component'] =
 				$this->components->getComponentById($this->appInfo['default_component'])['route'];
 			$this->appDefaults['errorComponent'] =
@@ -359,7 +365,7 @@ class Router
 		if (!$this->uri) {
 			$uri = explode('/q/', trim($this->requestUri, '/'));
 
-			if ($this->api->isApi($this->request)) {
+			if ($this->isApi) {
 				$uri[0] = explode('/', $uri[0]);
 
 				if ($uri[0][0] === 'api') {

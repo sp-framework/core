@@ -10,7 +10,7 @@ class Auth extends BaseMiddleware
     {
         //Authenticate API
         if ($this->api->isApi($this->request)) {
-            return $this->api->check($this->apps);
+            return $this->api->authCheck($this->apps);
         }
 
         // Authenticate if in session

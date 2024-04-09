@@ -133,4 +133,24 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
 
         return false;
     }
+
+    protected function getScopeNamesFromAccessToken(AccessTokenEntityInterface $accessTokenEntity)
+    {
+        return $this->scopeToArray($accessTokenEntity->getScopes());
+    }
+
+    protected function getScopeNamesFromAuthCode(AuthCodeEntityInterface $authCodeEntity)
+    {
+        return $this->scopeToArray($authCodeEntity->getScopes());
+    }
+
+    protected function scopeToArray(array $scopes)
+    {
+        $scopeNames = [];
+        foreach ($scopes as $scope) {
+            $scopeNames[] = $scope->getIdentifier();
+        }
+
+        return $scopeNames;
+    }
 }

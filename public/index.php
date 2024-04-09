@@ -25,15 +25,15 @@ try {
 		if (isset($bootstrap->error)) {
 			$bootstrap->error->handle($exception);
 		} else {
+			$class = (new \ReflectionClass($exception))->getShortName();
+
+			if ($class === 'AppNotFoundException') {
+				http_response_code(404);
+
+				return;
+			}
+
 			if ($bootstrap->config && $bootstrap->config->debug) {
-				$class = (new \ReflectionClass($exception))->getShortName();
-
-				if ($class === 'AppNotFoundException') {
-					http_response_code(404);
-
-					return;
-				}
-
 				$traces = [];
 
 				foreach ($exception->getTrace() as $key => $trace) {

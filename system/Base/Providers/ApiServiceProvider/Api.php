@@ -28,6 +28,8 @@ class Api
 {
     protected $apps;
 
+    protected $logger;
+
     protected $app;
 
     protected $keys;
@@ -78,44 +80,27 @@ class Api
 
         $this->isApi = false;
 
-        $url = $this->request->getURI();
 
-        $urlParts = explode("/", $url);
+        if ($this->request->getBestAccept() === 'application/json') {
+            $url = $this->request->getURI();
+            $urlParts = explode("/", $url);
 
-        if (isset($urlParts[1]) &&
-            $urlParts[1] === 'api' &&
-            $this->request->getBestAccept() === 'application/json'
-        ) {
-            $this->isApi = true;
+            if (isset($urlParts[1]) && $urlParts[1] === 'api' ||
+                $this->request->getHeader('Authorization') !== '' ||
+                $this->request->get('client_id')
+            ) {
+                $this->isApi = true;
+            }
         }
 
         return $this->isApi;
     }
 
-    public function apiNeedsAuth($appSettings = [])
-    {
-        if (count($appSettings) === 0) {
-            return false;
-        }
-
-        if (isset($this->apiNeedsAuth)) {
-            return $this->apiNeedsAuth;
-        }
-
-        $this->apiNeedsAuth = false;
-
-        var_Dump($appSettings);
-        if (isset($appSettings['api']['enabled']) && $appSettings['api']['enabled'] == true) {
-
-        }
-
-
-        return $this->apiNeedsAuth;
-    }
-
-    public function setup($apps)
+    public function setupApi($apps, $logger)
     {
         $this->apps = $apps;
+
+        $this->logger = $logger;
 
         $this->app = $this->apps->getAppInfo();
 
@@ -227,10 +212,12 @@ class Api
             // Try to respond to the access token request
             return $this->server->respondToAccessTokenRequest(ServerRequest::fromGlobals(), $serverResponse);
         } catch (OAuthServerException $exception) {
+            $this->logger->logExceptions->critical($exception);
             var_dump($exception);die();
             // All instances of OAuthServerException can be converted to a PSR-7 response
             return $exception->generateHttpResponse($serverResponse);
         } catch (\Exception $exception) {
+            $this->logger->logExceptions->critical($exception);
             var_dump($exception);die();
             // Catch unexpected exceptions
             $body = $serverResponse->getBody();
@@ -240,7 +227,7 @@ class Api
         }
     }
 
-    public function check($apps)
+    public function authCheck($apps)
     {
         $this->accessTokenRepository = new AccessTokenRepository();
 

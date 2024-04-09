@@ -205,12 +205,11 @@ class Apps extends BasePackage
 				}
 
 				$domain['apps'][$data['id']]['allowed'] = true;
+				$domain['apps'][$data['id']]['api'] = false;
 				$domain['apps'][$data['id']]['view'] = $data['view'];
 				$domain['apps'][$data['id']]['email_service'] = $data['email'];
 				$domain['apps'][$data['id']]['publicStorage'] = $data['public'];
 				$domain['apps'][$data['id']]['privateStorage'] = $data['private'];
-
-				$this->domains->updateDomain($domain);
 
 				//add new viewsettings
 				$viewSettingsData = [];
@@ -219,6 +218,7 @@ class Apps extends BasePackage
 				$viewSettingsData['app_id'] = $data['id'];
 				$viewSettingsData['via_app'] = true;
 
+				$this->domains->updateDomain($domain);
 				$this->modules->viewsSettings->addViewsSettings($viewSettingsData);
 			}
 
@@ -331,7 +331,7 @@ class Apps extends BasePackage
 	public function removeApp(array $data)
 	{
 		if ($data['id'] == 1) {
-			$this->addResponse('Cannot remove Admin App. Error removing app.', 1);
+			$this->addResponse('Cannot remove core app!', 1);
 
 			return false;
 		}
@@ -390,9 +390,9 @@ class Apps extends BasePackage
 						'id'        	=> 'client_credentials',
 						'name'          => 'Client Credential Grant'
 					],
-				// 'dcg'   =>//Implemented in OAuth ver 9.x
+				// 'device_code'   =>//Implemented in OAuth ver 9.x
 				// 	[
-				// 		'id'        	=> 'dcg',
+				// 		'id'        	=> 'device_code',
 				// 		'name'          => 'Device Code Grant'
 				// 	],
 				'authorization_code'    =>

@@ -1,13 +1,19 @@
+{% set exclusiveDisabled = false %}
+{% set defaultAppDisabled = false %}
+{% set exclusiveChecked = false %}
+{% set exclusiveApiChecked = false %}
 {% if domain['id'] is defined %}
     {% set domainDefaultAppId = domain['default_app_id'] %}
     {% if domain['exclusive_to_default_app'] is defined and domain['exclusive_to_default_app'] == 1 %}
         {% set exclusiveChecked = true %}
-    {% else %}
-        {% set exclusiveChecked = false %}
+        {% if domain['exclusive_for_api'] is defined and domain['exclusive_for_api'] == 1 %}
+            {% set exclusiveApiChecked = true %}
+            {% set exclusiveDisabled = true %}
+            {% set defaultAppDisabled = true %}
+        {% endif %}
     {% endif %}
 {% else %}
     {% set domainDefaultAppId = '' %}
-    {% set exclusiveChecked = false %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -27,6 +33,7 @@
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldRequired'                  : true,
+                'fieldDisabled'                  : defaultAppDisabled,
                 'fieldDataSelect2Options'        : apps,
                 'fieldDataSelect2OptionsKey'     : 'id',
                 'fieldDataSelect2OptionsValue'   : 'name',
@@ -47,8 +54,31 @@
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'Is this domain exclusive to default app? If yes, then you dont need to add /app_route/ to each link',
                 'fieldType'                      : 'checkbox',
+                'fieldDisabled'                  : exclusiveDisabled,
                 'fieldCheckboxType'              : 'success',
                 'fieldCheckboxChecked'           : exclusiveChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'exclusive_for_api',
+                'fieldLabel'                     : 'Exclusive for API?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Is this domain exclusive for API access to the default app? If yes, then you dont need to add /api/app_route/ to each link',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : exclusiveApiChecked,
                 'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
@@ -134,6 +164,7 @@
                     {% set emailServiceDisabled = true %}
                     {% set publicStorageServiceDisabled = true %}
                     {% set privateStorageServiceDisabled = true %}
+                    {% set apiChecked = false %}
                 {% endif %}
                 {% if app['id'] == domain['default_app_id'] %}
                     {% set appSettingsHidden = '' %}
@@ -155,6 +186,7 @@
                 {% set privateStorageServiceDisabled = true %}
                 {% set appSettingsHidden = 'hidden' %}
                 {% set checkboxDisabled = false %}
+                {% set apiChecked = false %}
             {% endif %}
             <div class="app" data-id="{{app['id']}}" {{appSettingsHidden}}>
                 <div class="row">
@@ -219,6 +251,7 @@
                                 'fieldLabel'                     : false,
                                 'fieldType'                      : 'checkbox',
                                 'fieldCheckboxType'              : 'success',
+                                'fieldDisabled'                  : checkboxDisabled,
                                 'fieldCheckboxChecked'           : apiChecked,
                                 'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
                                 'fieldBazScan'                   : false
@@ -426,7 +459,8 @@ dataCollectionSection =
                     }
                 }
 
-                $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').click(function() {
+                $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').change(function() {
+                    $('#{{componentId}}-{{sectionId}}-default_app_id').attr('disabled', true);
                     defaultApp = $('#{{componentId}}-{{sectionId}}-default_app_id').select2('data')[0]['id'];
 
                     if (defaultApp != 0) {
@@ -443,9 +477,18 @@ dataCollectionSection =
                         for (var checkbox in dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']) {
                             var appId = $('#' + checkbox).parents('.app').data('id');
 
-                            if (checkbox === '{{componentId}}-{{sectionId}}-' + defaultApp + '-allowed') {
-                                $('#' + checkbox)[0].checked = true;
-                                $('#' + checkbox).attr('disabled', true);
+                            if (appId == defaultApp) {
+                                if (checkbox === '{{componentId}}-{{sectionId}}-' + appId + '-allowed') {
+                                    $('#' + checkbox).attr('disabled', true);
+                                } else if (checkbox === '{{componentId}}-{{sectionId}}-' + appId + '-api' &&
+                                    $('#{{componentId}}-{{sectionId}}-exclusive_for_api')[0].checked === true
+                                ) {
+                                    $('#' + checkbox).attr('disabled', true);
+                                    $('#' + checkbox)[0].checked = true;
+                                    dataCollectionSection['data']['apps'][appId]['api'] = true;
+                                } else {
+                                    $('#' + checkbox).attr('disabled', false);
+                                }
                                 dataCollectionSection['data']['apps'][appId]['allowed'] = true;
                                 $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', false);
                                 $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', false);
@@ -455,6 +498,7 @@ dataCollectionSection =
                                 $('#' + checkbox)[0].checked = false;
                                 $('#' + checkbox).attr('disabled', true);
                                 dataCollectionSection['data']['apps'][appId]['allowed'] = false;
+                                dataCollectionSection['data']['apps'][appId]['api'] = false;
                                 $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true);
                                 $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true);
                                 $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true);
@@ -462,6 +506,7 @@ dataCollectionSection =
                             }
                         }
                     } else {
+                        $('#{{componentId}}-{{sectionId}}-default_app_id').attr('disabled', false);
                         for (var disableCheckbox in dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']) {
                             if (disableCheckbox === '{{componentId}}-{{sectionId}}-' + defaultApp + '-allowed') {
                                 $('#' + disableCheckbox).attr('disabled', true);
@@ -470,6 +515,20 @@ dataCollectionSection =
                             }
                         }
                     }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-exclusive_for_api'                   : {
+            afterInit       : function() {
+                $('#{{componentId}}-{{sectionId}}-exclusive_for_api').click(function() {
+                    if ($(this)[0].checked === true) {
+                        $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app')[0].checked = true;
+                        $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').attr('disabled', true);
+
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').attr('disabled', false);
+                    }
+                    $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').trigger('change');
                 });
             }
         },

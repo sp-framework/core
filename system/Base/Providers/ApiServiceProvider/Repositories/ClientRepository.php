@@ -14,7 +14,7 @@ class ClientRepository extends BasePackage implements ClientRepositoryInterface
 
     protected $client;
 
-    public function getClientEntity($clientIdentifier): ?ClientEntityInterface
+    public function getClientEntity($clientIdentifier)
     {
         $clientObj = $this->getFirst('client_id', $clientIdentifier);
 

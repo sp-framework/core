@@ -12,15 +12,19 @@ class MicroCollection
 
     protected $router;
 
+    protected $domains;
+
     protected $microCollection;
 
-    function __construct($application, $api, $router)
+    function __construct($application, $api, $router, $domains)
     {
         $this->application = $application;
 
         $this->api = $api;
 
         $this->router = $router;
+
+        $this->domains = $domains;
 
         $this->microCollection = new Collection;
     }
@@ -31,7 +35,11 @@ class MicroCollection
             $routeToMatch = $this->router->getRoutes()[0]->getPattern();
         }
 
-        $routeToMatch = '/api' . $routeToMatch;
+        if (isset($this->domains->domain['exclusive_for_api']) &&
+            $this->domains->domain['exclusive_for_api'] == false
+        ) {
+            $routeToMatch = '/api' . $routeToMatch;
+        }
 
         $handler =
             $this->router->getRoutes()[0]->getPaths()['namespace'] .
@@ -67,9 +75,9 @@ class MicroCollection
         $this->application->notFound(
             function () use ($application) {
                 $application->response
-                            ->setStatusCode(404, 'Not Found')
+                            ->setStatusCode(404, 'API Route Not Found')
                             ->sendHeaders()
-                            ->setContent('Not Found')
+                            ->setContent('API Route Not Found')
                             ->send();
             }
         );

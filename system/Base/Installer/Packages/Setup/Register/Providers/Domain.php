@@ -44,6 +44,7 @@ class Domain
 				'description' 						=> '',
 				"default_app_id"					=> 1,
 				"exclusive_to_default_app"			=> 0,
+				"exclusive_for_api"					=> 0,
 				"apps"			    				=> $helper->encode($apps),
 				"dns_record"						=> $record,
 				"is_internal"						=> $isInternal,

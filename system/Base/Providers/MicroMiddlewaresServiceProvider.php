@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers;
 
+use GuzzleHttp\Psr7\Response;
 use Phalcon\Di\Injectable;
 use Phalcon\Events\Event;
 use Phalcon\Mvc\DispatcherInterface;
@@ -41,7 +42,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
                 return false;
             }
 
-            $this->api->setup($this->apps);
+            $this->api->setupApi($this->apps, $this->logger);
         } catch (\Exception $e) {
             throw $e;
         }
@@ -49,9 +50,40 @@ class MicroMiddlewaresServiceProvider extends Injectable
 
     public function afterExecuteRoute(
         Event $event,
-        $micro,
+        $micro
     ) {
-        //
+        if ($micro->getReturnedValue() && $micro->getReturnedValue() instanceof Response) {
+            $body = $micro->getReturnedValue()->getBody();
+
+            if ($body) {
+                try {
+                    $body = $this->helper->decode((string) $body, true);
+                } catch (\Exception $e) {
+                    //Returned is not Json. Check Exception Logs
+                    $this->addResponse('Error! Contact Administrator.', 1);
+                }
+            }
+
+            if (isset($body['error'])) {
+                if (isset($body['error_description'])) {
+                    $this->addResponse($body['error_description'], 1);
+                } else if (isset($body['message'])) {
+                    $this->addResponse($body['message'], 1);
+                }
+
+                return false;
+            }
+
+            if (is_array($body)) {
+                if (!isset($body['expires_in'])) {
+                    $this->addResponse('Ok', 0, $body);
+                }
+
+                $this->apiResponse = $body;
+
+                $this->sendJson();
+            }
+        }
     }
 
     protected function checkAllMiddlewares()
@@ -113,7 +145,11 @@ class MicroMiddlewaresServiceProvider extends Injectable
     {
         $this->data['domain'] = $this->domains->getDomain();
 
-        if (isset($this->data['domain']['exclusive_to_default_app']) &&
+        if (isset($this->data['domain']['exclusive_for_api']) &&
+            $this->data['domain']['exclusive_for_api'] == 1
+        ) {
+            $this->data['appRoute'] = '';
+        } else if (isset($this->data['domain']['exclusive_to_default_app']) &&
             $this->data['domain']['exclusive_to_default_app'] == 1
         ) {
             $this->data['appRoute'] = '/api/';
@@ -200,6 +236,10 @@ class MicroMiddlewaresServiceProvider extends Injectable
     {
         $this->apiResponse['responseMessage'] = $responseMessage;
         $this->apiResponse['responseCode'] = $responseCode;
+
+        if ($responseData) {
+            $this->apiResponse['responseData'] = $responseData;
+        }
 
         $this->sendJson();
     }

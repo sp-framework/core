@@ -47,7 +47,14 @@ class Domains
 					new Column(
 						'exclusive_to_default_app',
 						[
-							'type'    => Column::TYPE_TINYINTEGER,
+							'type'    => Column::TYPE_BOOLEAN,
+							'notNull' => true,
+						]
+					),
+					new Column(
+						'exclusive_for_api',
+						[
+							'type'    => Column::TYPE_BOOLEAN,
 							'notNull' => true,
 						]
 					),
