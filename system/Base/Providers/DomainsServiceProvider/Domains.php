@@ -201,6 +201,22 @@ class Domains extends BasePackage
 	{
 		$domain = $this->getById($data['id']);
 
+		$count = 1;
+
+		if ($this->config->databasetype === 'db') {
+			$count = (int) $this->useModel()->count();
+		} else {
+			$count = (int) $this->ffStore->count(true);
+		}
+
+		if ($domain['name'] === $this->request->getHttpHost() ||
+			$count === 1
+		) {
+			$this->addResponse('App is being accessed from this domain. Cannot remove.', 1);
+
+			return false;
+		}
+
 		if ($this->remove($domain['id'])) {
 			$this->addResponse('Removed domain ' . $domain['name']);
 
