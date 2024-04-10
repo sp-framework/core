@@ -149,12 +149,12 @@ class Api
             $this->refreshTokenRepository
         );
 
-        $grant->setRefreshTokenTTL(new DateInterval('P1M'));// refresh tokens will expire after 1 month
+        $grant->setRefreshTokenTTL(new DateInterval($this->app['api_refresh_token_timeout'] ?? 'P1M'));// refresh tokens will expire after 1 month
 
         // Enable the password grant on the server with a token TTL of 1 hour
         $this->server->enableGrantType(
             $grant,
-            new DateInterval('PT1H')// access tokens will expire after 1 hour
+            new DateInterval($this->app['api_access_token_timeout'] ?? 'PT1H')// access tokens will expire after 1 hour
         );
     }
 
@@ -163,7 +163,7 @@ class Api
         // Enable the client credentials grant on the server
         $this->server->enableGrantType(
             new ClientCredentialsGrant(),
-            new DateInterval('PT1H') // access tokens will expire after 1 hour
+            new DateInterval($this->app['api_access_token_timeout'] ?? 'PT1H') // access tokens will expire after 1 hour
         );
     }
 
@@ -177,7 +177,7 @@ class Api
     //             new DateInterval('PT10M'),
     //             'http://foo/bar'
     //         ),
-    //         new DateInterval('PT1H')
+    //         new DateInterval($this->app['api_access_token_timeout'] ?? 'PT1H')
     //     );
     // }
 
@@ -189,24 +189,24 @@ class Api
              new \DateInterval('PT10M') // authorization codes will expire after 10 minutes
          );
 
-        $grant->setRefreshTokenTTL(new \DateInterval('P1M')); // refresh tokens will expire after 1 month
+        $grant->setRefreshTokenTTL(new \DateInterval($this->app['api_refresh_token_timeout'] ?? 'P1M')); // refresh tokens will expire after 1 month
 
         // Enable the authentication code grant on the server
         $this->server->enableGrantType(
             $grant,
-            new \DateInterval('PT1H') // access tokens will expire after 1 hour
+            new \DateInterval($this->app['api_access_token_timeout'] ?? 'PT1H') // access tokens will expire after 1 hour
         );
     }
 
     protected function initRefresh_token()//Refresh Token Grant
     {
         $grant = new RefreshTokenGrant($this->refreshTokenRepository);
-        $grant->setRefreshTokenTTL(new \DateInterval('P1M')); // new refresh tokens will expire after 1 month
+        $grant->setRefreshTokenTTL(new \DateInterval($this->app['api_refresh_token_timeout'] ?? 'P1M')); // new refresh tokens will expire after 1 month
 
         // Enable the refresh token grant on the server
         $this->server->enableGrantType(
             $grant,
-            new \DateInterval('PT1H') // new access tokens will expire after an hour
+            new \DateInterval($this->app['api_access_token_timeout'] ?? 'PT1H') // new access tokens will expire after an hour
         );
     }
 

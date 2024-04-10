@@ -167,7 +167,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-enforce_2fa'                     : { },
         '{{componentId}}-{{sectionId}}-api_access'                      : {
             afterInit : function() {
-                $('#{{componentId}}-{{sectionId}}-api_access').click(function() {
+                $('#{{componentId}}-{{sectionId}}-api_access').change(function() {
                     if ($(this).find('input[type=radio]:checked').data('value') == 'apion') {
                         $('#{{componentId}}-{{sectionId}}-api_grant_type, ' +
                           '#{{componentId}}-{{sectionId}}-api_registration_allowed, ' +
@@ -267,9 +267,6 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-api_registration_allowed'        : { },
         '{{componentId}}-{{sectionId}}-api_client_id_length'            : { },
         '{{componentId}}-{{sectionId}}-api_client_secret_length'        : { },
-        '{{componentId}}-{{sectionId}}-api_grant_type'                  : {
-            'placeholder'   : 'SELECT API GRANT TYPE'
-        },
         '{{componentId}}-{{sectionId}}-pki_key_size'                    : {
             'placeholder'   : 'SELECT PKI KEY SIZE'
         },
@@ -277,6 +274,34 @@ dataCollectionSection =
             'placeholder'   : 'SELECT PKI ALGORITHM'
         },
         '{{componentId}}-{{sectionId}}-encryption_key_size'             : { },
+        '{{componentId}}-{{sectionId}}-api_grant_type'                  : {
+            'placeholder'   : 'SELECT API GRANT TYPE',
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-api_grant_type').on('select2:select', function(e) {
+                    if (e.params.data.id === 'client_credentials') {
+                        $('#{{componentId}}-{{sectionId}}-api_refresh_token_timeout').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-api_refresh_token_timeout').val('');
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-api_refresh_token_timeout').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-api_refresh_token_timeout').val('P1M');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-api_access_token_timeout'        : { },
+        '{{componentId}}-{{sectionId}}-api_refresh_token_timeout'       : { },
+        '{{componentId}}-{{sectionId}}-api_authorization_using'         : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-api_authorization_using').change(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'acl') {
+                        $('#{{componentId}}-{{sectionId}}-api_scopes').attr('disabled', true);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'scopes') {
+                        $('#{{componentId}}-{{sectionId}}-api_scopes').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-api_scopes'                      : { },
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider, :hidden',
             rules: {

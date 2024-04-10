@@ -65,6 +65,10 @@ class ServiceProviderApps extends BaseModel
 
     public $api_scopes;
 
+    public $api_access_token_timeout;
+
+    public $api_refresh_token_timeout;
+
     public function initialize()
     {
         $clientAddress = $this->getDi()->getRequest()->getClientAddress();

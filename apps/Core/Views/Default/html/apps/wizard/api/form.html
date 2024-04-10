@@ -1,4 +1,6 @@
 {% set apiAccess = 'apioff' %}
+{% set apiAuthorizationUsing = 'acl' %}
+{% set scopesDisabled = true %}
 {% set apiRegistrationAllowedDisabled = true %}
 {% set apiClientIdLengthDisabled = true %}
 {% set apiClientSecretLengthDisabled = true %}
@@ -7,6 +9,7 @@
 {% set reGenerateDisabled = true %}
 {% set pkiKeySizeDisabled = true %}
 {% set pkiAlgorithmsDisabled = true %}
+{% set apiRefreshTokenDisabled = false %}
 {% if app['api_access'] is defined and app['api_access'] == 'true' %}
     {% set apiAccess = 'apion' %}
     {% set apiRegistrationAllowedDisabled = false %}
@@ -30,6 +33,49 @@
 {% if app['api_client_secret_length'] is defined %}
     {% set apiClientSecretLength = app['api_client_secret_length'] %}
 {% endif %}
+{% set apiAccessTokenTimeout = 'PT1H' %}
+{% set apiRefreshTokenTimeout = 'P1M' %}
+{% if app['api_access_token_timeout'] is defined %}
+    {% set apiAccessTokenTimeout = app['api_access_token_timeout'] %}
+{% endif %}
+{% if app['api_refresh_token_timeout'] is defined %}
+    {% set apiRefreshTokenTimeout = app['api_refresh_token_timeout'] %}
+{% endif %}
+{% if app['api_grant_type'] === 'client_credentials' %}
+    {% set apiRefreshTokenTimeout = '' %}
+    {% set apiRefreshTokenDisabled = true %}
+{% endif %}
+{% if app['api_authorization_using'] is defined %}
+    {% set apiAuthorizationUsing = app['api_authorization_using'] %}
+    {% if apiAuthorizationUsing === 'scopes' %}
+        {% set scopesDisabled = false %}
+    {% endif %}
+{% endif %}
+{% if app['api_scopes'] === '' or not app['api_scopes'] %}
+    {% set app['api_scopes'] = '*' %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'api',
+                'fieldLabel'                            : 'API',
+                'fieldLabelLegend'                      : true,
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : false,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldHtmlContent'                      : ''
+            ]
+        )}}
+    </div>
+</div>
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -327,6 +373,135 @@
                 'fieldDataSelect2OptionsValue'          : 'name',
                 'fieldDataSelect2OptionsArray'          : true,
                 'fieldDataSelect2OptionsSelected'       : app['api_grant_type']
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'api_access_token_timeout',
+                'fieldLabel'                            : 'API Access Token Timeout',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Enter timeout for access token in php dateinterval duration format. Example: P1M10D means 1 month and 10 days. PT1H30M means 1 Hour and 30 mins. See php DateInterval for documentation on format. Default is PT1H (1 Hour)',
+                'fieldDisabled'                         : false,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMaxLength'               : 30,
+                'fieldValue'                            : apiAccessTokenTimeout
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'api_refresh_token_timeout',
+                'fieldLabel'                            : 'API Refresh Token Timeout',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Enter timeout for access token in php dateinterval duration format. Example: P1M10D means 1 month and 10 days. PT1H30M means 1 Hour and 30 mins. See php DateInterval for documentation on format. Default is P1M (1 Month)',
+                'fieldDisabled'                         : apiRefreshTokenDisabled,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMaxLength'               : 30,
+                'fieldValue'                            : apiRefreshTokenTimeout
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'authorization',
+                'fieldLabel'                            : 'API Authorization',
+                'fieldLabelLegend'                      : true,
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : false,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldHtmlContent'                      : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'api_authorization_using',
+                'fieldLabel'                     : 'API Authorization Using',
+                'fieldType'                      : 'radio',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'API can be authorized using ACL middleware or using scopes.',
+                'fieldRequired'                  : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioPlacementType'        : 'horizontal',
+                'fieldRadioButtons'              :
+                    [
+                        'acl' :
+                            [
+                                'title'                           : 'ACL',
+                                'type'                            : 'primary',
+                                'dataValue'                       : 'acl'
+                            ],
+                        'scopes' :
+                            [
+                                'title'                           : 'SCOPES',
+                                'type'                            : 'primary',
+                                'dataValue'                       : 'scopes'
+                            ]
+                    ],
+                'fieldRadioChecked'              : apiAuthorizationUsing
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'api_scopes',
+                'fieldLabel'                     : 'API Scopes',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 4096,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Scopes of this API. Note: * symbol means allow everything.',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : scopesDisabled,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldTextareaRows'              : 8,
+                'fieldValue'                     : app['api_scopes']
             ]
         )}}
     </div>

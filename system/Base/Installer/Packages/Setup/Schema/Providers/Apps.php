@@ -213,6 +213,30 @@ class Apps
 					]
 				),
 				new Column(
+					'api_access_token_timeout',
+					[
+						'type'    => Column::TYPE_VARCHAR,
+						'size'    => 50,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'api_refresh_token_timeout',
+					[
+						'type'    => Column::TYPE_VARCHAR,
+						'size'    => 50,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'api_authorization_using',
+					[
+						'type'    => Column::TYPE_VARCHAR,
+						'size'    => 50,
+						'notNull' => false,
+					]
+				),
+				new Column(
 					'api_scopes',
 					[
 						'type'    => Column::TYPE_TEXT,
