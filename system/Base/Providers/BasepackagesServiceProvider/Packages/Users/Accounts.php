@@ -1259,7 +1259,7 @@ class Accounts extends BasePackage
                 }
                 $this->packagesData->acls = $this->helper->encode($acls);
 
-                $account['permissions'] = $this->helper->encode($permissions);
+                $account['security']['permissions'] = $this->helper->encode($permissions);
                 $account['profile'] = $this->basepackages->profile->getProfile($account['id']);
 
                 $this->packagesData->account = $account;
