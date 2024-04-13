@@ -79,6 +79,7 @@ use System\Base\Installer\Packages\Setup\Schema\Modules\Middlewares;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Packages;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views\Settings;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Api as SPApi;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AccessTokens;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AuthorizationCodes;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Clients;
@@ -95,6 +96,7 @@ use System\Base\Installer\Packages\Setup\Schema\Providers\Domains;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Logs;
 use System\Base\Installer\Packages\Setup\Write\Configs;
 use System\Base\Installer\Packages\Setup\Write\Pdo;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApi;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAccessTokens;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAuthorizationCodes;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
@@ -457,34 +459,6 @@ class Setup
 					'schema'	=> new Domains,
 					'model'		=> new ServiceProviderDomains,
 				],
-			'service_provider_api_access_tokens' 		=> [
-					'schema'	=> new AccessTokens,
-					'model'		=> new ServiceProviderApiAccessTokens,
-				],
-			'service_provider_api_authorization_codes'	=> [
-					'schema'	=> new AuthorizationCodes,
-					'model'		=> new ServiceProviderApiAuthorizationCodes,
-				],
-			'service_provider_api_clients'				=> [
-					'schema'	=> new Clients,
-					'model'		=> new ServiceProviderApiClients,
-				],
-			'service_provider_api_users'				=> [
-					'schema'	=> new Users,
-					'model'		=> new ServiceProviderApiUsers,
-				],
-			'service_provider_api_jwts'					=> [
-					'schema'	=> new Jwts,
-					'model'		=> new ServiceProviderApiJwts,
-				],
-			'service_provider_api_refresh_tokens'		=> [
-					'schema'	=> new RefreshTokens,
-					'model'		=> new ServiceProviderApiRefreshTokens,
-				],
-			'service_provider_api_scopes'		=> [
-					'schema'	=> new Scopes,
-					'model'		=> new ServiceProviderApiScopes,
-				],
 			'modules_bundles' 							=> [
 					'schema'	=> new Bundles,
 					'model'		=> new ModulesBundles,
@@ -664,7 +638,39 @@ class Setup
 			'basepackages_api_apis_repos' 				=> [
 					'schema'	=> new Repos,
 					'model'		=> null
-			]
+			],
+			'service_provider_api' 						=> [
+					'schema'	=> new SPApi,
+					'model'		=> new ServiceProviderApi,
+				],
+			'service_provider_api_access_tokens' 		=> [
+					'schema'	=> new AccessTokens,
+					'model'		=> new ServiceProviderApiAccessTokens,
+				],
+			'service_provider_api_authorization_codes'	=> [
+					'schema'	=> new AuthorizationCodes,
+					'model'		=> new ServiceProviderApiAuthorizationCodes,
+				],
+			'service_provider_api_clients'				=> [
+					'schema'	=> new Clients,
+					'model'		=> new ServiceProviderApiClients,
+				],
+			'service_provider_api_users'				=> [
+					'schema'	=> new Users,
+					'model'		=> new ServiceProviderApiUsers,
+				],
+			'service_provider_api_jwts'					=> [
+					'schema'	=> new Jwts,
+					'model'		=> new ServiceProviderApiJwts,
+				],
+			'service_provider_api_refresh_tokens'		=> [
+					'schema'	=> new RefreshTokens,
+					'model'		=> new ServiceProviderApiRefreshTokens,
+				],
+			'service_provider_api_scopes'				=> [
+					'schema'	=> new Scopes,
+					'model'		=> new ServiceProviderApiScopes,
+				],
 		];
 
 		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'ff') {

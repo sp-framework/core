@@ -225,40 +225,6 @@
                         )}}
                     </div>
                     <div class="col">
-                        {{adminltetags.useTag('fields',
-                            [
-                                'component'                      : component,
-                                'componentName'                  : componentName,
-                                'componentId'                    : componentId,
-                                'sectionId'                      : sectionId,
-                                'fieldId'                        : 'api-' ~ app['id'],
-                                'fieldLabel'                     : 'API access for App ' ~ app['name'] ~ ' allowed on this domain?',
-                                'fieldHelp'                      : true,
-                                'fieldHelpTooltipContent'        : 'Check if API for this app can be accessed via this domain.',
-                                'fieldRequired'                  : false,
-                                'fieldType'                      : 'html',
-                                'fieldAdditionalClass'           : 'mb-1',
-                                'fieldBazScan'                   : false
-                            ]
-                        )}}
-                        {{adminltetags.useTag('fields',
-                            [
-                                'component'                      : component,
-                                'componentName'                  : componentName,
-                                'componentId'                    : componentId,
-                                'sectionId'                      : sectionId,
-                                'fieldId'                        : app['id'] ~ '-api',
-                                'fieldLabel'                     : false,
-                                'fieldType'                      : 'checkbox',
-                                'fieldCheckboxType'              : 'success',
-                                'fieldDisabled'                  : checkboxDisabled,
-                                'fieldCheckboxChecked'           : apiChecked,
-                                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                                'fieldBazScan'                   : false
-                            ]
-                        )}}
-                    </div>
-                    <div class="col">
                         {% if domain['apps'][app['id']]['view'] is defined %}
                             {% set view = domain['apps'][app['id']]['view'] %}
                         {% else %}
@@ -480,12 +446,6 @@ dataCollectionSection =
                             if (appId == defaultApp) {
                                 if (checkbox === '{{componentId}}-{{sectionId}}-' + appId + '-allowed') {
                                     $('#' + checkbox).attr('disabled', true);
-                                } else if (checkbox === '{{componentId}}-{{sectionId}}-' + appId + '-api' &&
-                                    $('#{{componentId}}-{{sectionId}}-exclusive_for_api')[0].checked === true
-                                ) {
-                                    $('#' + checkbox).attr('disabled', true);
-                                    $('#' + checkbox)[0].checked = true;
-                                    dataCollectionSection['data']['apps'][appId]['api'] = true;
                                 } else {
                                     $('#' + checkbox).attr('disabled', false);
                                 }
@@ -634,28 +594,18 @@ dataCollectionSectionForm['funcs'] = { };
 dataCollectionSectionForm['funcs']['extractData'] =
     function (checkbox = null, select2 = null, select2Type = null, appId) {
         if (checkbox) {
-            if ($('#' + checkbox)[0].id.indexOf('api') != -1) {
-                if ($('#' + checkbox)[0].checked === true) {
-                    dataCollectionSection['data']['apps'][appId]['api'] = true;
-                } else {
-                    dataCollectionSection['data']['apps'][appId]['api'] = false;
-                }
+            if ($('#' + checkbox)[0].checked === true) {
+                dataCollectionSection['data']['apps'][appId]['allowed'] = true;
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', false);
             } else {
-                if ($('#' + checkbox)[0].checked === true) {
-                    dataCollectionSection['data']['apps'][appId]['allowed'] = true;
-                    $('#{{componentId}}-{{sectionId}}-' + appId + '-api-allowed').attr('disabled', false);
-                    $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', false);
-                    $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', false);
-                    $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', false);
-                    $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', false);
-                } else {
-                    dataCollectionSection['data']['apps'][appId]['allowed'] = false;
-                    $('#{{componentId}}-{{sectionId}}-' + appId + '-api-allowed').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true);
-                }
+                dataCollectionSection['data']['apps'][appId]['allowed'] = false;
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-' + appId + '-private-storage').attr('disabled', true);
             }
         } else if (select2 && select2Type) {
             dataCollectionSection['data']['apps'][appId][select2Type] =
@@ -667,8 +617,6 @@ for (var id in dataCollectionSectionForm['vars']['appIds']) {
     dataCollectionSection['data']['apps'][dataCollectionSectionForm['vars']['appIds'][id]] = { };
     dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']['{{componentId}}-{{sectionId}}-' + id + '-allowed'] = { };
     dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-allowed'] = { };
-    dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']['{{componentId}}-{{sectionId}}-' + id + '-api'] = { };
-    dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-api'] = { };
     dataCollectionSectionForm['vars']['dynamicFields']['select2']['{{componentId}}-{{sectionId}}-' + id + '-view'] = { };
     dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-view'] = {"placeholder": "SELECT VIEW (TEMPLATE)"};
     dataCollectionSectionForm['vars']['dynamicFields']['select2']['{{componentId}}-{{sectionId}}-' + id + '-email-service'] = { };

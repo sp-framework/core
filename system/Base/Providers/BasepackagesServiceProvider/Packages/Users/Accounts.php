@@ -1245,18 +1245,21 @@ class Accounts extends BasePackage
 
                             if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                                 foreach ($methods as $annotation) {
-                                    $action = $annotation->getAll('acl')[0]->getArguments();
-                                    $acls[$action['name']] = $action['name'];
-                                    if (isset($permissionsArr[$app['id']][$component['id']])) {
-                                        $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
-                                    } else {
-                                        $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                    if ($annotation->getAll('acl')) {
+                                        $action = $annotation->getAll('acl')[0]->getArguments();
+                                        $acls[$action['name']] = $action['name'];
+                                        if (isset($permissionsArr[$app['id']][$component['id']])) {
+                                            $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
+                                        } else {
+                                            $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+
                 $this->packagesData->acls = $this->helper->encode($acls);
 
                 $account['security']['permissions'] = $this->helper->encode($permissions);
@@ -1287,9 +1290,11 @@ class Accounts extends BasePackage
 
                         if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                             foreach ($methods as $annotation) {
-                                $action = $annotation->getAll('acl')[0]->getArguments();
-                                $acls[$action['name']] = $action['name'];
-                                $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                if ($annotation->getAll('acl')) {
+                                    $action = $annotation->getAll('acl')[0]->getArguments();
+                                    $acls[$action['name']] = $action['name'];
+                                    $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                }
                             }
                         }
                     }

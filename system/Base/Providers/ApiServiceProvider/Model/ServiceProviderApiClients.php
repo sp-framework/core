@@ -13,6 +13,8 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
 
     public $id;
 
+    public $api_id;
+
     public $app_id;
 
     public $domain_id;
@@ -21,19 +23,11 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
 
     public $client_id;
 
-    // public $name;Defined in ClientTrait
-
     public $client_secret;
 
-    // public $redirect_uri;
-
-    public $grant_types;
+    public $grant_type;
 
     public $scope;
-
-    public $created_at;
-
-    public $updated_at;
 
     public function getIdentifier()
     {
@@ -44,7 +38,6 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
     {
         return $this->account_id;
     }
-
 
     public function setRedirectUri(string $uri)
     {

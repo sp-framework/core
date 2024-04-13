@@ -10,6 +10,7 @@ return
 				'System\Base\Providers\AnnotationsServiceProvider',
 				'System\Base\Providers\SecurityServiceProvider',
 				'System\Base\Providers\DatabaseServiceProvider',
+				'System\Base\Providers\HttpServiceProvider',
 				'System\Base\Providers\CacheServiceProvider',
 				'System\Base\Providers\BasepackagesServiceProvider',
 				'System\Base\Providers\CoreServiceProvider',
@@ -52,6 +53,7 @@ return
 			[
 				'System\Base\Providers\ConfigServiceProvider',
 				'System\Base\Providers\DatabaseServiceProvider',
+				'System\Base\Providers\HttpServiceProvider',
 				'System\Base\Providers\ContentServiceProvider',
 				'System\Base\Providers\BasepackagesServiceProvider',
 				'System\Base\Providers\RouterServiceProvider',

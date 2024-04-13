@@ -9,8 +9,8 @@ class Auth extends BaseMiddleware
     public function process($data)
     {
         //Authenticate API
-        if ($this->api->isApi($this->request)) {
-            return $this->api->authCheck($this->apps);
+        if ($this->api->isApi()) {
+            return $this->api->authCheck();
         }
 
         // Authenticate if in session

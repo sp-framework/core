@@ -14,10 +14,16 @@ try {
 	if (isset($bootstrap->isApi) && $bootstrap->isApi === true) {
 		http_response_code(500);
 
-		if ($bootstrap->config->debug) {
+		if ($bootstrap->config->debug && $bootstrap->response) {
 			(new \System\Base\Providers\ErrorServiceProvider\MicroExceptionHandler())->init($exception, $bootstrap->logger, $bootstrap->response);
+		} else if ($bootstrap->config->debug) {
+			throw $exception;
 		} else {
 			echo json_encode(['responseMessage' => 'Error! Please contact Administrator.', 'responseCode' => 1]);
+		}
+
+		if ($bootstrap->logger) {
+			$bootstrap->logger->commit();
 		}
 
 		exit;

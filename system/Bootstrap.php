@@ -59,13 +59,9 @@ final class Bootstrap
         $connection = $container->getShared('connection');
         $session->start();
 
-
-        $container->register(new HttpServiceProvider());
-        $request = $container->getShared('request');
-        $this->response = $container->getShared('response');
         $container->register(new ApiServiceProvider());
         $api = $container->getShared('api');
-        $this->isApi = $api->isApi($request);
+        $this->isApi = $api->isApi();
 
         if ($this->isApi) {
             $providers = $this->providers['api'];

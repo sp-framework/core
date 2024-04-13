@@ -21,6 +21,13 @@ class AuthorizationCodes
                     ]
                 ),
                 new Column(
+                    'api_id',
+                    [
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
                     'app_id',
                     [
                         'type'          => Column::TYPE_TINYINTEGER,
@@ -32,36 +39,6 @@ class AuthorizationCodes
                     [
                         'type'          => Column::TYPE_TINYINTEGER,
                         'notNull'       => true,
-                    ]
-                ),
-                new Column(
-                    'authorization_code',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 1024,
-                        'notNull'       => true,
-                    ]
-                ),
-                new Column(
-                    'expires',
-                    [
-                        'type'          => Column::TYPE_TIMESTAMP,
-                        'notNull'       => true
-                    ]
-                ),
-                new Column(
-                    'redirect_url',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 1024,
-                        'notNull'       => true,
-                    ]
-                ),
-                new Column(
-                    'scope',
-                    [
-                        'type'          => Column::TYPE_TEXT,
-                        'notNull'       => false
                     ]
                 ),
                 new Column(
@@ -80,26 +57,40 @@ class AuthorizationCodes
                     ]
                 ),
                 new Column(
-                    'revoked',
+                    'authorization_code',
                     [
-                        'type'          => Column::TYPE_BOOLEAN,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
+                    'expires',
+                    [
+                        'type'          => Column::TYPE_TIMESTAMP,
+                        'notNull'       => true
+                    ]
+                ),
+                new Column(//As per Oauth2 Naming schema
+                    'redirectUri',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 2048,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
+                    'scope',
+                    [
+                        'type'          => Column::TYPE_TEXT,
                         'notNull'       => false
                     ]
                 ),
                 new Column(
-                    'created_at',
+                    'revoked',
                     [
-                        'type'    => Column::TYPE_TIMESTAMP,
-                        'notNull' => true,
-                        'default' => 'CURRENT_TIMESTAMP'
-                    ]
-                ),
-                new Column(
-                    'updated_at',
-                    [
-                        'type'    => Column::TYPE_TIMESTAMP,
-                        'notNull' => true,
-                        'default' => 'CURRENT_TIMESTAMP'
+                        'type'          => Column::TYPE_BOOLEAN,
+                        'notNull'       => false
                     ]
                 ),
             ],

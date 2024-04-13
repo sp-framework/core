@@ -10,7 +10,7 @@
     {% endif %}
 {% endif %}
 {% if api['repository'] is defined and api['repository'] === true %}
-    {{view.getPartial('../modules/repositories/view')}}
+    {{view.getPartial('../../modules/repositories/view')}}
 {% else %}
-    {{view.getPartial('api/apis/' ~ api['category'] ~ '/' ~ api['provider']|lower ~ '/view')}}
+    {{view.getPartial('clients/apis/' ~ api['category'] ~ '/' ~ api['provider']|lower ~ '/view')}}
 {% endif %}

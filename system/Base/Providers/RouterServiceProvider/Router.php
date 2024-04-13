@@ -75,7 +75,7 @@ class Router
 
 		$this->request = $request;
 
-		$this->isApi = $this->api->isApi($this->request);
+		$this->isApi = $this->api->isApi();
 
 		$this->response = $response;
 

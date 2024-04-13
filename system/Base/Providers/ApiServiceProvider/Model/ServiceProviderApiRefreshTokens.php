@@ -13,30 +13,19 @@ class ServiceProviderApiRefreshTokens extends BaseModel implements RefreshTokenE
 
     public $id;
 
+    public $api_id;
+
     public $app_id;
 
     public $domain_id;
+
+    public $client_id;
+
+    public $account_id;
 
     public $refresh_token;
 
     public $expires;
 
-    public $client_id;
-
-    public $scope;
-
-    public $account_id;
-
     public $revoked;
-
-    public $created_at;
-
-    public $updated_at;
-
-    public function setClientId($clientId)
-    {
-        $this->client_id = $clientId;
-
-        return $this;
-    }
 }

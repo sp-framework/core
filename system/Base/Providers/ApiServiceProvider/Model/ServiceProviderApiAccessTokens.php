@@ -14,9 +14,15 @@ class ServiceProviderApiAccessTokens extends BaseModel implements AccessTokenEnt
 
     public $id;
 
+    public $api_id;
+
     public $app_id;
 
     public $domain_id;
+
+    public $account_id;
+
+    public $client_id;
 
     public $access_token;
 
@@ -24,15 +30,7 @@ class ServiceProviderApiAccessTokens extends BaseModel implements AccessTokenEnt
 
     public $scope;
 
-    public $client_id;
-
-    public $account_id;
-
     public $revoked;
-
-    public $created_at;
-
-    public $updated_at;
 
     public function getUserIdentifier()
     {

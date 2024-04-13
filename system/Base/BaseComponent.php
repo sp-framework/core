@@ -43,7 +43,7 @@ abstract class BaseComponent extends Controller
 			return;
 		}
 
-		if (!$this->api->isApi($this->request)) {
+		if (!$this->api->isApi()) {
 			$this->addResponse('Ok');//Default Response
 
 			$this->views = $this->modules->views->getViewInfo();

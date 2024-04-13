@@ -8,6 +8,8 @@ use System\Base\BaseModel;
 
 class ServiceProviderApiUsers extends BaseModel implements UserEntityInterface
 {
+    public $api_id;
+
     public $app_id;
 
     public $domain_id;

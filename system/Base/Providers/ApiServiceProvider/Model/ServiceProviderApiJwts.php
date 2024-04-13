@@ -8,6 +8,8 @@ class ServiceProviderApiJwts extends BaseModel
 {
     public $id;
 
+    public $api_id;
+
     public $app_id;
 
     public $domain_id;
@@ -17,8 +19,4 @@ class ServiceProviderApiJwts extends BaseModel
     public $subject;
 
     public $public_key;
-
-    public $created_at;
-
-    public $updated_at;
 }

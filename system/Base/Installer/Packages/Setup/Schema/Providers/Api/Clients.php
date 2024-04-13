@@ -21,6 +21,13 @@ class Clients
                     ]
                 ),
                 new Column(
+                    'api_id',
+                    [
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
                     'app_id',
                     [
                         'type'          => Column::TYPE_TINYINTEGER,
@@ -65,16 +72,16 @@ class Clients
                         'notNull'       => true,
                     ]
                 ),
-                new Column(
-                    'redirect_uri',
+                new Column(//As per Oauth2 Naming schema
+                    'redirectUri',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 1024,
+                        'size'          => 2048,
                         'notNull'       => true,
                     ]
                 ),
                 new Column(
-                    'grant_types',
+                    'grant_type',
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 1024,
@@ -84,24 +91,9 @@ class Clients
                 new Column(
                     'scope',
                     [
-                        'type'          => Column::TYPE_TEXT,
-                        'notNull'       => false
-                    ]
-                ),
-                new Column(
-                    'created_at',
-                    [
-                        'type'    => Column::TYPE_TIMESTAMP,
-                        'notNull' => true,
-                        'default' => 'CURRENT_TIMESTAMP'
-                    ]
-                ),
-                new Column(
-                    'updated_at',
-                    [
-                        'type'    => Column::TYPE_TIMESTAMP,
-                        'notNull' => true,
-                        'default' => 'CURRENT_TIMESTAMP'
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => true
                     ]
                 ),
             ],

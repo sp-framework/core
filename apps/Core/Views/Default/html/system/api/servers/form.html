@@ -1,0 +1,693 @@
+{% if api['id'] is defined %}
+    {% set apiId = api['id'] %}
+    {% set apiName = api['name'] %}
+    {% set apiStatus = api['status'] %}
+    {% set apiRegistrationAllowed = api['registration_allowed'] %}
+    {% set apiDescription = api['description'] %}
+    {% set apiClientIdLength = api['client_id_length'] %}
+    {% set apiClientSecretLength = api['client_secret_length'] %}
+    {% set apiGrantType = api['grant_type'] %}
+    {% set apiPrivateKey = api['private_key'] %}
+    {% set apiAccessTokenTimeout = api['access_token_timeout'] %}
+    {% set apiRefreshTokenTimeout = api['refresh_token_timeout'] %}
+    {% set apiScope = api['scope_id'] %}
+    {% set apiAppId = api['app_id'] %}
+    {% set apiDomainId = api['domain_id'] %}
+{% else %}
+    {% set apiId = '' %}
+    {% set apiName = '' %}
+    {% set apiStatus = '' %}
+    {% set apiRegistrationAllowed = '' %}
+    {% set apiDescription = '' %}
+    {% set apiClientIdLength = '8' %}
+    {% set apiClientSecretLength = '32' %}
+    {% set apiGrantType = '' %}
+    {% set apiPrivateKey = '' %}
+    {% set apiAccessTokenTimeout = 'PT1H' %}
+    {% set apiRefreshTokenTimeout = 'P1M' %}
+    {% set apiScope = '' %}
+    {% set apiAppId = '' %}
+    {% set apiDomainId = '' %}
+{% endif %}
+{% set apiStatusChecked = false %}
+{% set apiRegistrationAllowedChecked = false %}
+{% if apiStatus == '1' %}
+    {% set apiStatusChecked = true %}
+{% endif %}
+{% if apiRegistrationAllowed == '1' %}
+    {% set apiRegistrationAllowedChecked = true %}
+{% endif %}
+{% if apiGrantType === 'client_credentials' %}
+    {% set apiRefreshTokenTimeout = '' %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Api ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Api ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : apiId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'Api Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Api Name Example: Core App Api',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : apiName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'status',
+                        'fieldLabel'                     : 'Enabled?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Check to enable api.',
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'success',
+                        'fieldCheckboxChecked'           : apiStatusChecked,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'registration_allowed',
+                        'fieldLabel'                     : 'Allow API Registration?',
+                        'fieldType'                      : 'checkbox',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Allow users to register for API on this App.',
+                        'fieldCheckboxType'              : 'success',
+                        'fieldCheckboxChecked'           : apiRegistrationAllowed,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'description',
+                        'fieldLabel'                     : 'Api Description',
+                        'fieldType'                      : 'textarea',
+                        'fieldDataMaxLength'             : 1024,
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Description of the api',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldTextareaRows'              : 2,
+                        'fieldValue'                     : apiDescription
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'client_id_length',
+                        'fieldLabel'                            : 'Client ID Length',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Enter client ID length to be generated.',
+                        'fieldInputTypeTextFilter'              : 'positiveInt',
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataInputMinNumber'               : 8,
+                        'fieldDataInputMaxNumber'               : 32,
+                        'fieldDataInputMaxLength'               : 2,
+                        'fieldValue'                            : apiClientIdLength
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'client_secret_length',
+                        'fieldLabel'                            : 'Client Secret Length',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Enter client Secret length to be generated.',
+                        'fieldInputTypeTextFilter'              : 'positiveInt',
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataInputMinNumber'               : 8,
+                        'fieldDataInputMaxNumber'               : 32,
+                        'fieldDataInputMaxLength'               : 2,
+                        'fieldValue'                            : apiClientSecretLength
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'access_token_timeout',
+                        'fieldLabel'                            : 'API Access Token Timeout',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Enter timeout for access token in php dateinterval duration format. Example: P1M10D means 1 month and 10 days. PT1H30M means 1 Hour and 30 mins. See php DateInterval for documentation on format. Default is PT1H (1 Hour)',
+                        'fieldDisabled'                         : false,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataInputMaxLength'               : 30,
+                        'fieldValue'                            : apiAccessTokenTimeout
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'refresh_token_timeout',
+                        'fieldLabel'                            : 'API Refresh Token Timeout',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Enter timeout for access token in php dateinterval duration format. Example: P1M10D means 1 month and 10 days. PT1H30M means 1 Hour and 30 mins. See php DateInterval for documentation on format. Default is P1M (1 Month)',
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataInputMaxLength'               : 30,
+                        'fieldValue'                            : apiRefreshTokenTimeout
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'keys',
+                        'fieldLabel'                            : 'Keys',
+                        'fieldLabelLegend'                      : true,
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'html',
+                        'fieldBazScan'                          : false,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldHtmlContent'                      : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'pki_key_size',
+                        'fieldLabel'                            : 'PKI Key Size',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Select PKI key size.',
+                        'fieldBazScan'                          : true,
+                        'fieldRequired'                         : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : availableOpensslKeyBits,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : apiKeysParams[0]
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'pki_algorithm',
+                        'fieldLabel'                            : 'PKI Algorithm',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Select PKI Algorithm.',
+                        'fieldBazScan'                          : true,
+                        'fieldRequired'                         : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : availableOpensslAlgorithms,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : apiKeysParams[1]
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'encryption_key_size',
+                        'fieldLabel'                            : 'Encryption Key Size',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Enter encryption key size.',
+                        'fieldInputTypeTextFilter'              : 'positiveInt',
+                        'fieldRequired'                         : true,
+                        'fieldDisabled'                         : false,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataInputMinNumber'               : 8,
+                        'fieldDataInputMaxNumber'               : 32,
+                        'fieldDataInputMaxLength'               : 2,
+                        'fieldValue'                            : apiKeysParams[2]
+                    ]
+                )}}
+            </div>
+            {% set generateHidden = 'hidden' %}
+            {% if apiPrivateKey == '1' %}
+                {% set generateHidden = '' %}
+            {% endif %}
+            <div class="col" {{generateHidden}}>
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'regenerate_pki_keys',
+                        'fieldLabel'                     : 'Regenerate PKI Keys?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Regenerate PKI Keys? Note: Any clients that have been authorized using previous keys will have to re-authorize.',
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'warning',
+                        'fieldCheckboxChecked'           : false,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'grant',
+                        'fieldLabel'                            : 'Grant',
+                        'fieldLabelLegend'                      : true,
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'html',
+                        'fieldBazScan'                          : false,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldHtmlContent'                      : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'grant_type',
+                        'fieldLabel'                            : 'API Grant Type',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Select API grant type.',
+                        'fieldBazScan'                          : true,
+                        'fieldRequired'                         : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : availableAPIGrantTypes,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : apiGrantType
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'scope_id',
+                        'fieldLabel'                            : 'API Scope',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Select API scope.',
+                        'fieldBazScan'                          : true,
+                        'fieldRequired'                         : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : availableAPIScopes,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : apiScope
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'bind',
+                        'fieldLabel'                            : 'Bind',
+                        'fieldLabelLegend'                      : true,
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'html',
+                        'fieldBazScan'                          : false,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldHtmlContent'                      : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'app_id',
+                        'fieldLabel'                            : 'APP',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Select App.',
+                        'fieldBazScan'                          : true,
+                        'fieldRequired'                         : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : apps,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : apiAppId
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'domain_id',
+                        'fieldLabel'                            : 'Domain',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Select Domain.',
+                        'fieldBazScan'                          : true,
+                        'fieldRequired'                         : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : domains,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : apiDomainId
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals PNotify Swal */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                          : { },
+        '{{componentId}}-{{sectionId}}-name'                        : { },
+        '{{componentId}}-{{sectionId}}-status'                      : { },
+        '{{componentId}}-{{sectionId}}-registration_allowed'        : { },
+        '{{componentId}}-{{sectionId}}-description'                 : { },
+        '{{componentId}}-{{sectionId}}-client_id_length'            : { },
+        '{{componentId}}-{{sectionId}}-client_secret_length'        : { },
+        '{{componentId}}-{{sectionId}}-pki_key_size'                : {
+            'placeholder'   : 'SELECT PKI SIZE'
+        },
+        '{{componentId}}-{{sectionId}}-pki_algorithm'               : { },
+        '{{componentId}}-{{sectionId}}-encryption_key_size'         : { },
+        '{{componentId}}-{{sectionId}}-private_key'                 : {
+            // afterInit: function() {
+            //     $('#{{componentId}}-{{sectionId}}-generate-pki, #{{componentId}}-{{sectionId}}-regenerate-pki').click(function(e) {
+            //         e.preventDefault();
+
+            //         $(this).attr('disabled', true);
+            //         $(this).children('i').attr('hidden', false);
+
+            //         if (this.id === '{{componentId}}-{{sectionId}}-regenerate-pki') {
+            //             Swal.fire({
+            //                 title                       : '<span class="text-danger">Regenerate PKI Keys?</span>',
+            //                 icon                        : 'question',
+            //                 width                       : '100%',
+            //                 background                  : 'rgba(0,0,0,.8)',
+            //                 backdrop                    : 'rgba(0,0,0,.6)',
+            //                 buttonsStyling              : false,
+            //                 confirmButtonText           : 'Yes',
+            //                 customClass                 : {
+            //                     'confirmButton'             : 'btn btn-danger text-uppercase',
+            //                     'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+            //                     'inputLabel'                : 'text-white',
+            //                     'input'                     : 'text-white'
+            //                 },
+            //                 showCancelButton            : true,
+            //                 keydownListenerCapture      : true,
+            //                 allowOutsideClick           : false,
+            //                 allowEscapeKey              : false,
+            //                 didOpen                     : function() {
+            //                     window.dataCollection.env.sounds.swalSound.play();
+            //                 }
+            //             }).then((result) => {
+            //                 if (result.isConfirmed === true &&
+            //                     result.value !== ''
+            //                 ) {
+            //                     regeneratePki(true);
+            //                 }
+            //             });
+            //         } else {
+            //             regeneratePki();
+            //         }
+            //     });
+
+            //     function regeneratePki(force = false) {
+            //         var postData = { };
+            //         postData[$('#security-token').attr('name')] = $('#security-token').val();
+            //         postData['pki_key_size'] = $('#{{componentId}}-{{sectionId}}-pki_key_size').val();
+            //         postData['pki_algorithm'] = $('#{{componentId}}-{{sectionId}}-pki_algorithm').val();
+            //         postData['encryption_key_size'] = $('#{{componentId}}-{{sectionId}}-encryption_key_size').val();
+            //         if (force) {
+            //             postData['force_regenerate'] = true;
+            //         }
+
+            //         $.post('{{links.url("apps/generatePKIKeys")}}', postData, function(response) {
+            //             if (response.responseCode == 0) {
+            //                 PNotify.success(response.responseMessage);
+
+            //                 $('#{{componentId}}-{{sectionId}}-generate-pki').attr('hidden', true);
+            //                 $('#{{componentId}}-{{sectionId}}-regenerate-pki').attr('hidden', false);
+            //                 $('#{{componentId}}-{{sectionId}}-regenerate-pki').val('1');
+            //             } else {
+            //                 PNotify.error(response.responseMessage);
+            //                 $('#{{componentId}}-{{sectionId}}-regenerate-pki').val('0');
+            //             }
+
+            //             if (response.tokenKey && response.token) {
+            //                 $("#security-token").attr("name", response.tokenKey);
+            //                 $("#security-token").val(response.token);
+            //             }
+
+            //             $('#{{componentId}}-{{sectionId}}-generate-pki, #{{componentId}}-{{sectionId}}-regenerate-pki').attr('disabled', false);
+            //             $('#{{componentId}}-{{sectionId}}-generate-pki, #{{componentId}}-{{sectionId}}-regenerate-pki').children('i').attr('hidden', false);
+            //         }, 'json');
+            //     }
+            // }
+        },
+        '{{componentId}}-{{sectionId}}-regenerate_pki_keys'         : { },
+        '{{componentId}}-{{sectionId}}-access_token_timeout'        : { },
+        '{{componentId}}-{{sectionId}}-refresh_token_timeout'       : { },
+        '{{componentId}}-{{sectionId}}-grant_type'                  : {
+            'placeholder'   : 'SELECT GRANT TYPE'
+        },
+        '{{componentId}}-{{sectionId}}-scope_id'                    : {
+            'placeholder'   : 'SELECT SCOPE'
+        },
+        '{{componentId}}-{{sectionId}}-app_id'                      : {
+            'placeholder'   : 'SELECT APP'
+        },
+        '{{componentId}}-{{sectionId}}-domain_id'                   : {
+            'placeholder'   : 'SELECT DOMAIN'
+        },
+        '{{componentId}}-{{sectionId}}-form'                        : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'required',
+                '{{componentId}}-{{sectionId}}-client_id_length'        : 'required',
+                '{{componentId}}-{{sectionId}}-client_secret_length'    : 'required',
+                '{{componentId}}-{{sectionId}}-grant_type'              : 'required',
+                '{{componentId}}-{{sectionId}}-scope'                   : 'required',
+                '{{componentId}}-{{sectionId}}-app_id'                  : 'required',
+                '{{componentId}}-{{sectionId}}-domain_id'               : 'required',
+                '{{componentId}}-{{sectionId}}-pki_key_size'            : 'required',
+                '{{componentId}}-{{sectionId}}-pki_algorithm'           : 'required',
+                '{{componentId}}-{{sectionId}}-encryption_key_size'     : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'Please enter api name',
+                '{{componentId}}-{{sectionId}}-client_id_length'        : 'Enter client ID length',
+                '{{componentId}}-{{sectionId}}-client_secret_length'    : 'Enter client Secret Length',
+                '{{componentId}}-{{sectionId}}-grant_type'              : 'Select Grant Type',
+                '{{componentId}}-{{sectionId}}-scope'                   : 'Select Scope',
+                '{{componentId}}-{{sectionId}}-app_id'                  : 'Please select a app',
+                '{{componentId}}-{{sectionId}}-domain_id'               : 'Please select a domain',
+                '{{componentId}}-{{sectionId}}-pki_key_size'            : 'Select PKI Key Size',
+                '{{componentId}}-{{sectionId}}-pki_algorithm'           : 'Select PKI Key Algorithm',
+                '{{componentId}}-{{sectionId}}-encryption_key_size'     : 'Enter Encryption Key Size',
+            }
+        }
+    });
+</script>

@@ -16,7 +16,9 @@ class MicroMiddlewaresServiceProvider extends Injectable
 
     protected function init()
     {
+        $this->data['api'] = $this->api->getApiInfo();
         $this->data['app'] = $this->apps->getAppInfo();
+        $this->data['domain'] = $this->domains->getDomain();
 
         $this->setHeader();
     }
@@ -48,7 +50,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
                 $refreshTokenSet = true;
             }
 
-            $this->api->setupApi($this->apps, $this->logger, $refreshTokenSet);
+            $this->api->setupApi($refreshTokenSet);
         } catch (\Exception $e) {
             throw $e;
         }
@@ -149,8 +151,6 @@ class MicroMiddlewaresServiceProvider extends Injectable
 
     protected function checkRoute($middleware)
     {
-        $this->data['domain'] = $this->domains->getDomain();
-
         if (isset($this->data['domain']['exclusive_for_api']) &&
             $this->data['domain']['exclusive_for_api'] == 1
         ) {

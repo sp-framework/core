@@ -33,7 +33,7 @@ class Acl extends BaseMiddleware
 
     public function process($data)
     {
-        $this->isApi = $this->api->isApi($this->request);
+        $this->isApi = $this->api->isApi();
 
         $this->actions =
             ['view', 'add', 'update', 'remove', 'msview', 'msupdate'];
@@ -132,7 +132,11 @@ class Acl extends BaseMiddleware
                 new Role($this->roleName, $this->role['description'])
             );
 
-            $this->rolePermissions = $this->helper->decode($this->role['permissions'], true);
+            if (is_string($this->role['permissions'])) {
+                $this->rolePermissions = $this->helper->decode($this->role['permissions'], true);
+            } else {
+                $this->rolePermissions = $this->role['permissions'];
+            }
 
             foreach ($this->rolePermissions as $appKey => $app) {
                 foreach ($app as $componentKey => $permission) {
@@ -154,7 +158,6 @@ class Acl extends BaseMiddleware
                 );
             }
         }
-
         if ($this->found &&
             !$this->acl->isAllowed($this->roleName, $this->controllerRoute, $this->action)
         ) {
@@ -219,6 +222,9 @@ class Acl extends BaseMiddleware
         $componentRoute = $this->components[$componentKey]['route'];
         $componentDescription = $this->components[$componentKey]['description'];
         $componentAcls = $this->components[$componentKey]['acls'];
+        if ($this->isApi && isset($this->components[$componentKey]['api_acls'])) {
+            $componentAcls = $this->components[$componentKey]['api_acls'];
+        }
 
         $this->acl->addComponent(
             new Component($componentRoute, $componentDescription), $componentAcls
@@ -271,14 +277,20 @@ class Acl extends BaseMiddleware
                 $reflector = $this->annotations->get($component['class']);
                 $methods = $reflector->getMethodsAnnotations();
 
-                if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
-                    $this->components[$component['id']]['name'] = strtolower($component['name']);
-                    $this->components[$component['id']]['route'] = strtolower($component['route']);
-                    $this->components[$component['id']]['description'] = $component['description'];
-                    foreach ($methods as $annotation) {
-                        $action = $annotation->getAll('acl')[0]->getArguments();
-                        $acls[$action['name']] = $action['name'];
-                        $this->components[$component['id']]['acls'][$action['name']] = $action['name'];
+                if ($methods && count($methods) > 2) {
+                    if (isset($methods['viewAction'])) {
+                        $this->components[$component['id']]['name'] = strtolower($component['name']);
+                        $this->components[$component['id']]['route'] = strtolower($component['route']);
+                        $this->components[$component['id']]['description'] = $component['description'];
+                        foreach ($methods as $annotation) {
+                            if ($annotation->getAll('acl')) {
+                                $action = $annotation->getAll('acl')[0]->getArguments();
+                                $this->components[$component['id']]['acls'][$action['name']] = $action['name'];
+                            } else if ($annotation->getAll('api_acl')) {
+                                $action = $annotation->getAll('api_acl')[0]->getArguments();
+                                $this->components[$component['id']]['api_acls'][$action['name']] = $action['name'];
+                            }
+                        }
                     }
                 }
             }

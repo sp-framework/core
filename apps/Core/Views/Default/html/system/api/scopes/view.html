@@ -1,0 +1,40 @@
+{% if scope['id'] is defined %}
+    {% set scopeId = scope['id'] %}
+    {% set scopeName = scope['name'] %}
+    {% set scopeDescription = scope['description'] %}
+    {% set title = 'Scope (' ~ scope['name'] ~ ')' %}
+{% else %}
+    {% set scopeId = '' %}
+    {% set scopeName = '' %}
+    {% set scopeDescription = '' %}
+    {% set title = 'New Scope' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'sitemap',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'scopes/form',
+        'formButtons'                   :
+        [
+            'canAdd'                        : canAdd,
+            'canUpdate'                     : canUpdate,
+            'updateButtonId'                : scopeId,
+            'addActionUrl'                  : 'system/api/scopes/add',
+            'addSuccessRedirectUrl'         : 'system/api/scopes',
+            'updateActionUrl'               : 'system/api/scopes/update',
+            'updateSuccessRedirectUrl'      : 'system/api/scopes',
+            'cancelActionUrl'               : 'system/api/scopes',
+            'closeActionUrl'                : 'system/api/scopes'
+        ]
+    ]
+)}}

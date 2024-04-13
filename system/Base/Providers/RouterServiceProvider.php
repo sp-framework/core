@@ -18,7 +18,7 @@ class RouterServiceProvider implements ServiceProviderInterface
 			function () use ($api, $request, $container) {
 				$domains = $container->getShared('domains');
 				$apps = $container->getShared('apps');
-				if (!$api->isApi($request)) {
+				if (!$api->isApi()) {
 					$components = $container->getShared('modules')->components;
 					$views = $container->getShared('modules')->views;
 				} else {

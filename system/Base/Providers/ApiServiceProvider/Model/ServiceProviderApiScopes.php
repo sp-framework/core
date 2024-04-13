@@ -4,32 +4,47 @@ namespace System\Base\Providers\ApiServiceProvider\Model;
 
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use System\Base\BaseModel;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApi;
 
 class ServiceProviderApiScopes extends BaseModel implements ScopeEntityInterface
 {
+    protected $modelRelations = [];
+
     public $id;
 
-    public $app_id;
+    public $name;
 
-    public $domain_id;
+    public $scope_name;
 
-    public $scope;
+    public $description;
 
-    public $is_default;
-
-    public $created_at;
-
-    public $updated_at;
+    public $permissions;
 
     public function getIdentifier()
     {
-        return $this->scope;
+        return $this->scope_name;
     }
 
-    public function setIdentifier($identifier)
+    public function initialize()
     {
-        $this->scope = $identifier;
+        $this->modelRelations['api']['relationObj'] = $this->hasMany(
+            'id',
+            ServiceProviderApi::class,
+            'scope_id',
+            [
+                'alias'         => 'api'
+            ]
+        );
 
-        return $this;
+        parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        if (count($this->modelRelations) === 0) {
+            $this->initialize();
+        }
+
+        return $this->modelRelations;
     }
 }

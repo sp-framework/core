@@ -1,0 +1,62 @@
+{
+    "route": "system/api/clients",
+    "name": "Api Clients",
+    "description": "List Api clients via this component",
+    "module_type": "components",
+    "app_type": "core",
+    "category": "admin",
+    "version": "0.0.0",
+    "repo": "https://.../",
+    "class": "Apps\\Core\\Components\\System\\Api\\Clients\\ClientsComponent",
+    "dependencies":
+    {
+        "core":
+        {
+            "name": "Core",
+            "version": "0.0.0",
+            "repo": "https://.../"
+        },
+        "components":
+        [],
+        "packages":
+        [],
+        "middlewares":
+        [],
+        "views":
+        [],
+        "external":
+        []
+    },
+    "menu":
+    {
+        "seq": 6,
+        "system":
+        {
+            "icon": "cogs",
+            "title": "system",
+            "childs":
+            {
+                "api":
+                {
+                    "title": "api",
+                    "icon": "exchange-alt",
+                    "childs":
+                    {
+                        "clients":
+                        {
+                            "title": "clients",
+                            "link": "system/api/clients"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings":
+    {
+        "mandatory":
+        {
+            "core": true
+        }
+    }
+}

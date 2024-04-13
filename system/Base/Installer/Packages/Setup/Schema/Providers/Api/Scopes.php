@@ -21,49 +21,36 @@ class Scopes
                     ]
                 ),
                 new Column(
-                    'app_id',
+                    'name',
                     [
-                        'type'          => Column::TYPE_TINYINTEGER,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
                         'notNull'       => true,
                     ]
                 ),
                 new Column(
-                    'domain_id',
+                    'scope_name',
                     [
-                        'type'          => Column::TYPE_TINYINTEGER,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
                         'notNull'       => true,
                     ]
                 ),
                 new Column(
-                    'scope',
+                    'description',
                     [
-                        'type'          => Column::TYPE_TEXT,
-                        'notNull'       => false
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 2048,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
-                    'is_default',
+                    'permissions',
                     [
-                        'type'          => Column::TYPE_BOOLEAN,
-                        'notNull'       => false
+                        'type'          => Column::TYPE_JSON,
+                        'notNull'       => true,
                     ]
-                ),
-                new Column(
-                    'created_at',
-                    [
-                        'type'    => Column::TYPE_TIMESTAMP,
-                        'notNull' => true,
-                        'default' => 'CURRENT_TIMESTAMP'
-                    ]
-                ),
-                new Column(
-                    'updated_at',
-                    [
-                        'type'    => Column::TYPE_TIMESTAMP,
-                        'notNull' => true,
-                        'default' => 'CURRENT_TIMESTAMP'
-                    ]
-                ),
+                )
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'

@@ -1,12 +1,12 @@
 <?php
 
-namespace Apps\Core\Components\System\Api;
+namespace Apps\Core\Components\System\Api\Clients;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use System\Base\BaseComponent;
 use System\Base\Exceptions\ControllerNotFoundException;
 
-class ApiComponent extends BaseComponent
+class ClientsComponent extends BaseComponent
 {
     use DynamicTable;
 
@@ -63,7 +63,7 @@ class ApiComponent extends BaseComponent
 
             $this->view->api = $api;
 
-            $this->view->pick('api/view');
+            $this->view->pick('clients/view');
 
             return;
         }
@@ -85,14 +85,14 @@ class ApiComponent extends BaseComponent
             [
                 'actionsToEnable'       =>
                 [
-                    'edit'      => 'system/api',
-                    'remove'    => 'system/api/remove'
+                    'edit'      => 'system/api/clients',
+                    'remove'    => 'system/api/clients/remove'
                 ]
             ];
 
         $this->generateDTContent(
             $this->apiPackage,
-            'system/api/view',
+            'system/api/clients/view',
             null,
             ['name', 'category', 'provider', 'in_use', 'used_by', 'setup'],
             true,
@@ -103,7 +103,7 @@ class ApiComponent extends BaseComponent
             'name'
         );
 
-        $this->view->pick('api/list');
+        $this->view->pick('clients/list');
     }
 
     protected function replaceColumns($dataArr)

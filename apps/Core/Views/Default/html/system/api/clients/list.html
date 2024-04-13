@@ -4,7 +4,7 @@
     {% for apiCategoryKey, apiCategory in apiCategories %}
         {% if apiCategory['childs']|length > 0 %}
             {% for apiCategoryProvider in apiCategory['childs'] %}
-                {% set link = links.url('system/api/q/category/' ~ apiCategoryKey ~ '/provider/' ~ apiCategoryProvider['id'] ~ '/id/0') %}
+                {% set link = links.url('system/api/clients/q/category/' ~ apiCategoryKey ~ '/provider/' ~ apiCategoryProvider['id'] ~ '/id/0') %}
                 {% set apiButtons =
                     apiButtons ~ '"' ~ apiCategoryProvider['id'] ~ '-api" : {"title" : "' ~ apiCategoryProvider['id'] ~ '","type" : "primary","additionalClass" : "contentAjaxLink","url" : "' ~ link ~ '"}'
                 %}

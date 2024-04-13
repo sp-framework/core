@@ -12,6 +12,13 @@ class Users
         [
            'columns' => [
                 new Column(
+                    'api_id',
+                    [
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
                     'app_id',
                     [
                         'type'          => Column::TYPE_TINYINTEGER,
@@ -35,10 +42,11 @@ class Users
                 new Column(
                     'scope',
                     [
-                        'type'          => Column::TYPE_TEXT,
-                        'notNull'       => false
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => true
                     ]
-                )
+                ),
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'

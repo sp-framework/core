@@ -21,6 +21,13 @@ class Jwts
                     ]
                 ),
                 new Column(
+                    'api_id',
+                    [
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
                     'app_id',
                     [
                         'type'          => Column::TYPE_TINYINTEGER,
@@ -55,22 +62,6 @@ class Jwts
                     [
                         'type'          => Column::TYPE_TEXT,
                         'notNull'       => true,
-                    ]
-                ),
-                new Column(
-                    'created_at',
-                    [
-                        'type'    => Column::TYPE_TIMESTAMP,
-                        'notNull' => true,
-                        'default' => 'CURRENT_TIMESTAMP'
-                    ]
-                ),
-                new Column(
-                    'updated_at',
-                    [
-                        'type'    => Column::TYPE_TIMESTAMP,
-                        'notNull' => true,
-                        'default' => 'CURRENT_TIMESTAMP'
                     ]
                 ),
             ],

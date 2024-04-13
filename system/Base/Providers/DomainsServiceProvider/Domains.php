@@ -155,8 +155,7 @@ class Domains extends BasePackage
 					if ($data['default_app_id'] == $appId) {
 						$appSettings['allowed'] = true;
 
-						if (!isset($appSettings['api']) ||
-							!isset($appSettings['view']) ||
+						if (!isset($appSettings['view']) ||
 							!isset($appSettings['publicStorage']) ||
 							!isset($appSettings['privateStorage'])
 						) {
@@ -166,7 +165,6 @@ class Domains extends BasePackage
 						}
 					} else {
 						$appSettings['allowed'] = false;
-						$appSettings['api'] = false;
 						$appSettings['view'] = '';
 						$appSettings['email_service'] = '';
 						$appSettings['publicStorage'] = '';
@@ -174,10 +172,9 @@ class Domains extends BasePackage
 					}
 				} else {
 					if ($appSettings['allowed'] === true &&
-						(!isset($appSettings['api']) ||
-						!isset($appSettings['view']) ||
-						!isset($appSettings['publicStorage']) ||
-						!isset($appSettings['privateStorage']))
+						(!isset($appSettings['view']) ||
+						 !isset($appSettings['publicStorage']) ||
+						 !isset($appSettings['privateStorage']))
 					) {
 						$this->addResponse('Please provide complete app settings for app Id: ' . $appId, 1);
 

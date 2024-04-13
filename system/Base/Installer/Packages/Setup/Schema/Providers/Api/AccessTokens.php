@@ -21,6 +21,13 @@ class AccessTokens
                     ]
                 ),
                 new Column(
+                    'api_id',
+                    [
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
                     'app_id',
                     [
                         'type'          => Column::TYPE_TINYINTEGER,
@@ -32,6 +39,21 @@ class AccessTokens
                     [
                         'type'          => Column::TYPE_TINYINTEGER,
                         'notNull'       => true,
+                    ]
+                ),
+                new Column(
+                    'account_id',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => true
+                    ]
+                ),
+                new Column(
+                    'client_id',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 512,
+                        'notNull'       => true
                     ]
                 ),
                 new Column(
@@ -57,41 +79,10 @@ class AccessTokens
                     ]
                 ),
                 new Column(
-                    'client_id',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 512,
-                        'notNull'       => true
-                    ]
-                ),
-                new Column(
-                    'account_id',
-                    [
-                        'type'          => Column::TYPE_INTEGER,
-                        'notNull'       => true
-                    ]
-                ),
-                new Column(
                     'revoked',
                     [
                         'type'          => Column::TYPE_BOOLEAN,
                         'notNull'       => false
-                    ]
-                ),
-                new Column(
-                    'created_at',
-                    [
-                        'type'    => Column::TYPE_TIMESTAMP,
-                        'notNull' => true,
-                        'default' => 'CURRENT_TIMESTAMP'
-                    ]
-                ),
-                new Column(
-                    'updated_at',
-                    [
-                        'type'    => Column::TYPE_TIMESTAMP,
-                        'notNull' => true,
-                        'default' => 'CURRENT_TIMESTAMP'
                     ]
                 ),
             ],
