@@ -6,14 +6,14 @@
                 'buttonType'            : 'button',
                 'buttons'               :
                     {
-                        'add-role' : {
-                            'title'                   : 'Add New Role',
+                        'add-business' : {
+                            'title'                   : 'Add New Scope',
                             'size'                    : 'sm',
                             'type'                    : 'primary',
                             'icon'                    : 'plus',
                             'buttonAdditionalClass'   : 'contentAjaxLink',
                             'position'                : 'right',
-                            'url'                     : links.url('system/users/roles/q/id/0')
+                            'url'                     : links.url('system/api/server/scopes/q/id/0')
                         }
                     }
             }
@@ -48,6 +48,6 @@
         'dtHideIdColumn'        : true,
         'dtNoOfColumnsToShow'   : 6,
         'dtTableCompact'        : true,
-        'dtZeroRecords'         : 'No roles data available. Add role by clicking the Add new role button.'
+        'dtZeroRecords'         : 'No scopes data available. Add role by clicking the Add new role button.'
     ]
 )}}

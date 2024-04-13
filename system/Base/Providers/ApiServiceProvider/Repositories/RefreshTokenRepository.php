@@ -31,9 +31,10 @@ class RefreshTokenRepository extends BasePackage implements RefreshTokenReposito
 
         if ($this->config->databasetype === 'db') {
             $params = [
-                'conditions'    => 'app_id = :appId: AND domain_id = :domainId: AND account_id = :accountId:',
+                'conditions'    => 'api_id = :apiId: AND app_id = :appId: AND domain_id = :domainId: AND account_id = :accountId:',
                 'bind'          =>
                     [
+                        'apiId'    => $this->api->getApiInfo()['id'],
                         'appId'    => $this->apps->getAppInfo()['id'],
                         'domainId' => $this->domains->domain['id'],
                         'accountId'=> $accessToken->getClient()->getUserIdentifier()
@@ -41,6 +42,7 @@ class RefreshTokenRepository extends BasePackage implements RefreshTokenReposito
             ];
         } else {
             $params['conditions'] = [
+                ['api_id', '=', $this->api->getApiInfo()['id']],
                 ['app_id', '=', $this->apps->getAppInfo()['id']],
                 ['domain_id', '=', $this->domains->domain['id']],
                 ['account_id', '=', $accessToken->getClient()->getUserIdentifier()]
@@ -50,6 +52,7 @@ class RefreshTokenRepository extends BasePackage implements RefreshTokenReposito
         $token = $this->getByParams($params, false, false);
 
         $newToken = [
+            'api_id' => $this->api->getApiInfo()['id'],
             'app_id' => $this->apps->getAppInfo()['id'],
             'domain_id' => $this->domains->domain['id'],
             'account_id' => $accessToken->getClient()->getUserIdentifier(),

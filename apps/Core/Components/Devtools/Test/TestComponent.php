@@ -13,12 +13,15 @@ class TestComponent extends BaseComponent
      */
     public function viewAction()
     {
-        return false;
+        //
     }
 
+    /**
+     * @api_acl(name=view)
+     */
     public function apiViewAction()
     {
-        $this->addResponse('Testing', 1, ['test' => 'test']);
+        $this->addResponse('Test', 0, ['view' => true]);
     }
 
     public function addAction()
@@ -26,13 +29,37 @@ class TestComponent extends BaseComponent
         //
     }
 
+    /**
+     * @api_acl(name=add)
+     */
+    public function apiAddAction()
+    {
+        $this->addResponse('Test', 0, ['add' => true]);
+    }
+
     public function updateAction()
     {
         //
     }
 
+    /**
+     * @api_acl(name=update)
+     */
+    public function apiUpdateAction()
+    {
+        $this->addResponse('Test', 0, ['update' => true]);
+    }
+
     public function removeAction()
     {
         //
+    }
+
+    /**
+     * @api_acl(name=remove)
+     */
+    public function apiRemoveAction()
+    {
+        $this->addResponse('Test', 0, ['remove' => true]);
     }
 }

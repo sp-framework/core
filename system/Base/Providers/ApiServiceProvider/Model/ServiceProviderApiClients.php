@@ -11,6 +11,7 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
 {
     use ClientTrait, EntityTrait;
 
+    //Note: name and redirectUri properties defined in ClientTrait
     public $id;
 
     public $api_id;
@@ -25,9 +26,9 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
 
     public $client_secret;
 
-    public $grant_type;
+    // public $grant_type;
 
-    public $scope;
+    // public $scope;
 
     public function getIdentifier()
     {

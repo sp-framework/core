@@ -64,7 +64,7 @@ class Clients
                         'notNull'       => true,
                     ]
                 ),
-                new Column(
+                new Column(//As per Oauth2 Naming schema
                     'name',
                     [
                         'type'          => Column::TYPE_VARCHAR,
@@ -80,22 +80,22 @@ class Clients
                         'notNull'       => true,
                     ]
                 ),
-                new Column(
-                    'grant_type',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 1024,
-                        'notNull'       => false
-                    ]
-                ),
-                new Column(
-                    'scope',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 1024,
-                        'notNull'       => true
-                    ]
-                ),
+                // new Column(
+                //     'grant_type',
+                //     [
+                //         'type'          => Column::TYPE_VARCHAR,
+                //         'size'          => 1024,
+                //         'notNull'       => false
+                //     ]
+                // ),
+                // new Column(
+                //     'scope',
+                //     [
+                //         'type'          => Column::TYPE_VARCHAR,
+                //         'size'          => 1024,
+                //         'notNull'       => true
+                //     ]
+                // ),
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'

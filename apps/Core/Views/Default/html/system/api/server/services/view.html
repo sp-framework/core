@@ -1,0 +1,42 @@
+{% if api['id'] is defined %}
+    {% set apiId = api['id'] %}
+    {% set title = 'API (' ~ api['name'] ~ ')' %}
+{% else %}
+    {% set apiId = '' %}
+    {% set title = 'New API' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'exchange-alt',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'services/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : apiId,
+            'addActionUrl'                  : 'system/api/server/services/add',
+            'addSuccessRedirectUrl'         : 'system/api/server/services',
+            'updateActionUrl'               : 'system/api/server/services/update',
+            'updateSuccessRedirectUrl'      : 'system/api/server/services',
+            'cancelActionUrl'               : 'system/api/server/services',
+            'closeActionUrl'                : 'system/api/server/services'
+        ],
+        'dataDependencies'              :
+        [
+            [
+                'componentName'      : 'Scopes',
+                'componentVar'       : availableAPIScopes,
+                'componentRoute'     : 'system/api/server/scopes/q/id/0'
+            ]
+        ]
+    ]
+)}}

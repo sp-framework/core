@@ -2,6 +2,8 @@
 {% set clientSecret = '' %}
 {% set clientIdHidden = true %}
 {% set clientSecretHidden = true %}
+{% set reGenerateHidden = true %}
+{% set generateHidden = false %}
 {% set clientSecretInputFieldType = 'text' %}
 {% if account['api_client'] is defined and account['api_client']['client_id'] is defined and account['api_client']['client_id'] !== '' and account['api_client']['client_secret'] is defined and account['api_client']['client_secret'] !== '' %}
     {% set clientId = account['api_client']['client_id'] %}
@@ -90,4 +92,5 @@
         )}}
     </div>
 </div>
-<small class="text-danger">Note: Client secret is only shown at the time of key generation. Please copy and save it somewhere safe.</small>
+<small class="text-danger">Note: Client secret is only shown at the time of key generation. Please copy and save it somewhere safe.</small><br>
+<small class="text-info">Note: This client ID and client secret are only for this domain <strong>({{domains.domain['name']}})</strong> and this app <strong>({{apps.getAppInfo()['name']}})</strong>.</small>

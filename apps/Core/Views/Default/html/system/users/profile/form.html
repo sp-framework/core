@@ -47,8 +47,9 @@
         {% endif %}
     {% endfor %}
     {% set apisTabHidden = true %}
-    {% if apps.getAppInfo()['api_access'] is defined and apps.getAppInfo()['api_access'] == true and apps.getAppInfo()['api_registration_allowed'] is defined and apps.getAppInfo()['api_registration_allowed'] == true %}
+    {% if passwordApi is defined and passwordApi|length > 0 %}
         {% set apisTabHidden = false %}
+        {% set passwordApi = json_encode(passwordApi, 16) %}
     {% endif %}
     <div class="col-md-10">
         <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
@@ -140,6 +141,7 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 }
 
 var subscriptions = JSON.parse('{{subscriptions}}');
+var passwordApi = JSON.parse('{{passwordApi}}');
 var gridColumns = [];
 gridColumns.push(
     {
@@ -248,8 +250,8 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-generate-api-client-keys, #{{componentId}}-{{sectionId}}-regenerate-api-client-keys').click(function(e) {
                     e.preventDefault();
 
-                    $(this).attr('disabled', true);
-                    $(this).children('i').attr('hidden', false);
+                    // $(this).attr('disabled', true);
+                    // $(this).children('i').attr('hidden', false);
 
                     if (this.id === '{{componentId}}-{{sectionId}}-regenerate-api-client-keys') {
                         Swal.fire({
@@ -288,8 +290,9 @@ dataCollectionSection =
                 function regenerateClientKey(force = false) {
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData = $.extend(postData, passwordApi);
 
-                    $.post('{{links.url("apps/generateclientkeys")}}', postData, function(response) {
+                    $.post('{{links.url("system/api/server/services/generateclientkeys")}}', postData, function(response) {
                         if (response.responseCode == 0) {
                             PNotify.success(response.responseMessage);
 

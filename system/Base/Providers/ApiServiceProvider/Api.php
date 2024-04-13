@@ -19,6 +19,7 @@ use League\OAuth2\Server\Grant\PasswordGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\ResourceServer;
 use System\Base\BasePackage;
+use System\Base\Providers\ApiServiceProvider\Clients;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApi;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 use System\Base\Providers\ApiServiceProvider\Repositories\AccessTokenRepository;
@@ -37,6 +38,8 @@ class Api extends BasePackage
 
     public $scopes;
 
+    public $clients;
+
     protected $app;
 
     protected $keys;
@@ -44,6 +47,10 @@ class Api extends BasePackage
     protected $response;
 
     public $isApi;
+
+    protected $clientId;
+
+    protected $isApiCheckVia;
 
     public $apiNeedsAuth;
 
@@ -68,6 +75,8 @@ class Api extends BasePackage
     public function init()
     {
         $this->scopes = new Scopes;
+
+        $this->clients = new Clients;
 
         return $this;
     }
@@ -125,6 +134,10 @@ class Api extends BasePackage
             $data = $this->generatePKIKeys($data);
         }
 
+        if ($data['grant_type'] === 'client_credentials') {
+            $data['refresh_token_timeout'] = 'P1M';
+        }
+
         if ($this->update($data)) {
             $this->addResponse('Updated ' . $data['name'] . ' api');
         } else {
@@ -158,44 +171,91 @@ class Api extends BasePackage
         }
 
         $this->isApi = false;
+        $this->isApiCheckVia = false;
 
         if ($this->request->getBestAccept() === 'application/json') {
             $url = $this->request->getURI();
             $urlParts = explode("/", $url);
 
-            if (isset($urlParts[1]) && $urlParts[1] === 'api' ||
-                $this->request->getHeader('Authorization') !== '' ||
-                $this->request->get('client_id') ||
-                $this->request->get('grant_type')
+            if (isset($urlParts[1]) && $urlParts[1] === 'api') {
+                $this->isApi = true;
+            }
+            if ((isset($urlParts[1]) && $urlParts[1] === 'pub') ||
+                (isset($urlParts[2]) && $urlParts[2] === 'pub')
+            ) {//For public access of api (without authentication). pub is a reserved keyword in apps.
+                $this->isApi = true;
+                $this->isApiCheckVia = 'pub';
+            }
+
+            //Setting client-id with Authorization header is important for our setup as we rely on the client ID to find which API needs to be instantiated
+            if ($this->request->getHeader('Authorization') !== '' &&
+                $this->request->getHeader('client-id')
             ) {
                 $this->isApi = true;
+                $this->isApiCheckVia = 'authorization';
+                $this->clientId = $this->request->getHeader('client-id');
+            } else if ($this->request->get('client_id')) {
+                $this->isApi = true;
+                $this->isApiCheckVia = 'client_id';
+                $this->clientId = $this->request->get('client_id');
             }
         }
 
         return $this->isApi;
     }
 
-    public function getApiInfo()
+    public function getApiInfo($usingIsApiCheckVia = false, $usingDomainApp = false)
     {
-        if ($this->request->get('client_id')) {
-
-        }
-        if ($this->config->databasetype === 'db') {
-            $api =
-                $this->getByParams(
-                    [
-                        'conditions'    => 'domain_id = :did: AND app_id = :aid:',
-                        'bind'          => [
-                            'did'       => $this->domains->domain['id'],
-                            'aid'       => $this->apps->getAppInfo()['id']
-                        ]
-                    ], true
-                );
-        } else {
-            $api = $this->getByParams(['conditions' => [['domain_id', '=', (int) $this->domains->domain['id']], ['app_id', '=', (int) $this->apps->getAppInfo()['id']]]]);
+        if ($this->api) {
+            return $this->api;
         }
 
-        var_dump($api);die();
+        if ($usingIsApiCheckVia) {
+            if ($this->isApiCheckVia === 'pub') {//Public access API
+                //
+            } else if ($this->isApiCheckVia === 'authorization' ||
+                       $this->isApiCheckVia === 'client_id'
+            ) {
+                if ($this->clientId) {
+                    $clientsObject = new ServiceProviderApiClients;
+                    $clientsStore = $this->ff->store($clientsObject->getSource());
+                    $client = null;
+
+                    if ($this->config->databasetype === 'db') {
+                        $clientsObj = $clientsObject->findFirstByClient_Id($this->clientId);
+
+                        if ($clientsObj) {
+                            $client = $clientsObj->toArray();
+                        }
+                    } else {
+                        $client = $clientsStore->findOneBy(['client_id', '=', $this->clientId]);
+                    }
+
+                    if ($client && isset($client['api_id'])) {
+                        $this->api = $this->getById($client['api_id']);
+                    }
+                }
+            }
+        }
+
+        if ($usingDomainApp) {
+            if ($this->config->databasetype === 'db') {
+                $this->api =
+                    $this->getByParams(
+                        [
+                            'conditions'    => 'domain_id = :did: AND app_id = :aid:',
+                            'bind'          => [
+                                'did'       => (int) $this->domains->domain['id'],
+                                'aid'       => (int) $this->apps->getAppInfo()['id']
+                            ]
+                        ], true
+                    );
+            } else {
+                $this->api = $this->getByParams(['conditions' => [['domain_id', '=', (int) $this->domains->domain['id']], ['app_id', '=', (int) $this->apps->getAppInfo()['id']]]]);
+            }
+        }
+
+        return $this->api;
     }
 
     public function setupApi($refreshTokenSet = false)
@@ -227,7 +287,7 @@ class Api extends BasePackage
         $this->userRepository = new UserRepository();
         // $deviceCodeRepository = new DeviceCodeRepository();
 
-        $this->keys = $this->api->getAPIKeys();
+        $this->keys = $this->getAPIKeys();
 
         $this->server = new AuthorizationServer(
             $this->clientRepository,
@@ -306,12 +366,11 @@ class Api extends BasePackage
         );
     }
 
-    public function registerClient($data)
+    public function registerClient()
     {
         $serverResponse = new Response();
 
         try {
-            // Try to respond to the access token request
             return $this->server->respondToAccessTokenRequest(ServerRequest::fromGlobals(), $serverResponse);
         } catch (OAuthServerException $exception) {
             $this->logger->logExceptions->critical($exception);
@@ -333,7 +392,7 @@ class Api extends BasePackage
     {
         $this->accessTokenRepository = new AccessTokenRepository();
 
-        $this->keys = $this->api->getAPIKeys();
+        $this->keys = $this->getAPIKeys();
 
         try {
             $this->resource = new ResourceServer(
@@ -347,9 +406,12 @@ class Api extends BasePackage
             $validateToken = $this->resource->validateAuthenticatedRequest(ServerRequest::fromGlobals());
 
             $this->headerAttributes = $validateToken->getAttributes();
-            if (!$this->accessTokenRepository->isTokenExpired($this->headerAttributes['oauth_access_token_id'])) {
+            var_dump($this->headerAttributes);die();
+            if ($this->accessTokenRepository->isTokenExpired($this->headerAttributes['oauth_access_token_id'])) {
                 throw new \Exception('Token Expired!');
             }
+
+            return $validateToken;
         } catch (\Exception $e) {
             throw $e;
         }
@@ -498,19 +560,19 @@ class Api extends BasePackage
         return true;
     }
 
-    public function getAPIKeys($api)
+    public function getAPIKeys()
     {
         $keys = [];
 
         try {
-            $keys['enc'] = $this->secTools->decryptBase64($this->localContent->read('system/.api/' . $api['id'] . '/.enc'));
-            $keys['public'] = $this->localContent->read('system/.api/' . $api['id'] . '/.public');
-            $keys['public_location'] = base_path('system/.api/' . $api['id'] . '/.public');
-            $keys['private'] = $this->localContent->read('system/.api/' . $api['id'] . '/.private');
-            $keys['private_location'] = base_path('system/.api/' . $api['id'] . '/.private');
-            $keys['pki'] = $this->localContent->read('system/.api/' . $api['id'] . '/.pki');
-            $keys['pki_location'] = base_path('system/.api/' . $api['id'] . '/.pki');
-            $keys['pki_passphrase'] = $this->secTools->decryptBase64($api['private_key_passphrase']);
+            $keys['enc'] = $this->secTools->decryptBase64($this->localContent->read('system/.api/' . $this->api['id'] . '/.enc'));
+            $keys['public'] = $this->localContent->read('system/.api/' . $this->api['id'] . '/.public');
+            $keys['public_location'] = base_path('system/.api/' . $this->api['id'] . '/.public');
+            $keys['private'] = $this->localContent->read('system/.api/' . $this->api['id'] . '/.private');
+            $keys['private_location'] = base_path('system/.api/' . $this->api['id'] . '/.private');
+            $keys['pki'] = $this->localContent->read('system/.api/' . $this->api['id'] . '/.pki');
+            $keys['pki_location'] = base_path('system/.api/' . $this->api['id'] . '/.pki');
+            $keys['pki_passphrase'] = $this->secTools->decryptBase64($this->api['private_key_passphrase']);
         } catch (FilesystemException | UnableToReadFile $exception) {
             throw $exception;
         }
@@ -532,24 +594,25 @@ class Api extends BasePackage
         }
     }
 
-    public function generateClientKeys()
+    public function generateClientKeys($api)
     {
-        $newClient['app_id'] = $this->api['id'];
+        $newClient['api_id'] = $api['id'];
+        $newClient['app_id'] = $this->apps->getAppInfo()['id'];
         $newClient['domain_id'] = $this->domains->domain['id'];
         $newClient['account_id'] = $this->auth->account()['id'];
         $newClient['name'] = $newClient['app_id'] . '_' . $newClient['domain_id'] . '_' . $newClient['account_id'];
-        $newClient['client_id'] = $this->random->base58(isset($this->api['client_id_length']) ? $this->api['client_id_length'] : 8);
-        $client_secret = $this->random->base58(isset($this->api['client_secret_length']) ? $this->api['client_secret_length'] : 32);
+        $newClient['client_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
+        $client_secret = $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
         $newClient['client_secret'] = $this->secTools->hashPassword($client_secret);
-        $newClient['redirect_uri'] = 'https://';
-        $newClient['grant_types'] = '';
-        $newClient['scope'] = '*';
-        // $newClient['created_at'] = time();
-        // $newClient['updated_at'] = time();
+        $newClient['redirectUri'] = 'https://';//Change this to default URI
+        if (isset($api['redirect_uri'])) {
+            $newClient['redirectUri'] = $api['redirect_uri'];
+        }
 
         try {
             $clientsObject = new ServiceProviderApiClients;
             $clientsStore = $this->ff->store($clientsObject->getSource());
+            $oldClient = null;
 
             if ($this->config->databasetype === 'db') {
                 $oldClientsObj = $clientsObject->findFirstByName($newClient['name']);
@@ -561,7 +624,7 @@ class Api extends BasePackage
                 $oldClient = $clientsStore->findOneBy(['name', '=', $newClient['name']]);
             }
 
-            if (isset($oldClient)) {
+            if ($oldClient) {
                 $newClient = array_merge($oldClient, $newClient);
 
                 if ($this->config->databasetype === 'db') {

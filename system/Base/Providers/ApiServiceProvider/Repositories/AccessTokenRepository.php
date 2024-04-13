@@ -40,9 +40,10 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
 
         if ($this->config->databasetype === 'db') {
             $params = [
-                'conditions'    => 'app_id = :appId: AND domain_id = :domainId: AND account_id = :accountId:',
+                'conditions'    => 'api_id = :apiId: AND app_id = :appId: AND domain_id = :domainId: AND account_id = :accountId:',
                 'bind'          =>
                     [
+                        'apiId'    => $this->api->getApiInfo()['id'],
                         'appId'    => $this->apps->getAppInfo()['id'],
                         'domainId' => $this->domains->domain['id'],
                         'accountId'=> $accessTokenEntity->getClient()->getUserIdentifier()
@@ -50,6 +51,7 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
             ];
         } else {
             $params['conditions'] = [
+                ['api_id', '=', $this->api->getApiInfo()['id']],
                 ['app_id', '=', $this->apps->getAppInfo()['id']],
                 ['domain_id', '=', $this->domains->domain['id']],
                 ['account_id', '=', $accessTokenEntity->getClient()->getUserIdentifier()]
@@ -59,6 +61,7 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
         $token = $this->getByParams($params, false, false);
 
         $newToken = [
+            'api_id' => $this->api->getApiInfo()['id'],
             'app_id' => $this->apps->getAppInfo()['id'],
             'domain_id' => $this->domains->domain['id'],
             'account_id' => $accessTokenEntity->getClient()->getUserIdentifier(),
@@ -108,21 +111,21 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
             $result = $result->toArray();
 
             if ($result['expires'] === '') {
-                return false;
+                return true;
             }
 
             try {
                 $expiry = (new Carbon)->parse($result['expires']);
 
                 if ($expiry->isPast()) {
-                    return false;
+                    return true;
                 }
             } catch (\Exception $e) {
                 throw $e;
             }
         }
 
-        return true;
+        return false;
     }
 
     public function getUserFromToken($tokenId)

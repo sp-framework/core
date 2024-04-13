@@ -375,7 +375,7 @@ class Apps extends BasePackage
 	{
 		return
 			[
-				'core', 'dash', 'api', 'pusher', 'messenger'
+				'core', 'dash', 'api', 'pub', 'pusher', 'messenger'
 			];
 	}
 

@@ -16,7 +16,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
 
     protected function init()
     {
-        $this->data['api'] = $this->api->getApiInfo();
+        $this->data['api'] = $this->api->getApiInfo(true);
         $this->data['app'] = $this->apps->getAppInfo();
         $this->data['domain'] = $this->domains->getDomain();
 
@@ -269,18 +269,16 @@ class MicroMiddlewaresServiceProvider extends Injectable
             return false;
         }
 
-        if (!isset($this->data['app']['api_access']) ||
-            (isset($this->data['app']['api_access']) && $this->data['app']['api_access'] == false)
-        ) {
-            $this->addResponse('API not available!', 1);
+        if (!$this->data['api']) {
+            $this->addResponse('API not available or Incorrect client ID or No Authorization Code set.', 1);
 
             return false;
         }
 
-        if (isset($this->data['app']['api_registration_allowed']) &&
-            $this->data['app']['api_registration_allowed'] == false
+        if (isset($this->data['api']['registration_allowed']) &&
+            $this->data['api']['registration_allowed'] == false
         ) {
-            $this->addResponse('API registration not allowed on this app!', 1);
+            $this->addResponse('API registration not allowed on this api!', 1);
 
             return false;
         }
