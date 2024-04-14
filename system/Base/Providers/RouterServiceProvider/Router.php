@@ -13,6 +13,8 @@ class Router
 
 	protected $isApi;
 
+	protected $isApiPublic;
+
 	protected $domains;
 
 	protected $domain;
@@ -76,6 +78,10 @@ class Router
 		$this->request = $request;
 
 		$this->isApi = $this->api->isApi();
+
+		if ($this->api->isApiCheckVia && $this->api->isApiCheckVia === 'pub') {
+			$this->isApiPublic = true;
+		}
 
 		$this->response = $response;
 
@@ -370,6 +376,14 @@ class Router
 
 				if ($uri[0][0] === 'api') {
 					unset($uri[0][0]);
+				}
+
+				if ($this->isApiPublic) {
+					if ($uri[0][0] === 'pub') {
+						unset($uri[0][0]);
+					} else if ($uri[0][1] === 'pub') {
+						unset($uri[0][1]);
+					}
 				}
 
 				$uri[0] = implode('/', $uri[0]);

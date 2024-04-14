@@ -9,6 +9,7 @@ use Apps\Core\Packages\Devtools\Api\Enums\Model\AppsDashDevtoolsApiEnums;
 use Apps\Core\Packages\Devtools\Modules\Install\Schema\DevtoolsModulesBundles;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
+use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToDeleteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Filter\Validation\Validator\Email;
@@ -83,10 +84,8 @@ use System\Base\Installer\Packages\Setup\Schema\Providers\Api as SPApi;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AccessTokens;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AuthorizationCodes;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Clients;
-use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Jwts;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\RefreshTokens;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Scopes;
-use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Users;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\IpFilter;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\Types;
@@ -100,10 +99,8 @@ use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApi;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAccessTokens;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAuthorizationCodes;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
-use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiJwts;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiRefreshTokens;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiScopes;
-use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiUsers;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderApps;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsIpFilter;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsTypes;
@@ -328,13 +325,50 @@ class Setup
 	protected function cleanOldFfs()
 	{
 		$files = $this->basepackages->utils->init($this->container)->scanDir('.ff/');
-		var_dump($files);die();
+
 		foreach ($files['files'] as $key => $file) {
 			try {
-				if (strpos($file, 'ff') === false) {
+				if (strpos($file, '.ff') !== false) {
 					$this->localContent->delete($file);
 				}
 			} catch (FilesystemException | UnableToDeleteFile $exception) {
+				throw $exception;
+			}
+		}
+
+		foreach ($files['dirs'] as $key => $dir) {
+			try {
+				if (strpos($dir, '.ff') !== false) {
+					$this->localContent->deleteDirectory($dir);
+				}
+			} catch (FilesystemException | UnableToDeleteDirectory $exception) {
+				throw $exception;
+			}
+		}
+
+		return true;
+	}
+
+	protected function cleanOldAPIKeys()
+	{
+		$files = $this->basepackages->utils->init($this->container)->scanDir('system/.api/');
+
+		foreach ($files['files'] as $key => $file) {
+			try {
+				if (strpos($file, '.api') !== false) {
+					$this->localContent->delete($file);
+				}
+			} catch (FilesystemException | UnableToDeleteFile $exception) {
+				throw $exception;
+			}
+		}
+
+		foreach ($files['dirs'] as $key => $dir) {
+			try {
+				if (strpos($dir, '.api') !== false) {
+					$this->localContent->deleteDirectory($dir);
+				}
+			} catch (FilesystemException | UnableToDeleteDirectory $exception) {
 				throw $exception;
 			}
 		}
@@ -655,14 +689,10 @@ class Setup
 					'schema'	=> new Clients,
 					'model'		=> new ServiceProviderApiClients,
 				],
-			'service_provider_api_users'				=> [
-					'schema'	=> new Users,
-					'model'		=> new ServiceProviderApiUsers,
-				],
-			'service_provider_api_jwts'					=> [
-					'schema'	=> new Jwts,
-					'model'		=> new ServiceProviderApiJwts,
-				],
+			// 'service_provider_api_users'				=> [
+			// 		'schema'	=> new Users,
+			// 		'model'		=> new ServiceProviderApiUsers,
+			// 	],
 			'service_provider_api_refresh_tokens'		=> [
 					'schema'	=> new RefreshTokens,
 					'model'		=> new ServiceProviderApiRefreshTokens,
@@ -685,6 +715,8 @@ class Setup
 		}
 
 		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'db') {
+			$this->cleanOldFfs();
+
 			foreach ($databases as $tableName => $tableClass) {
 				if ($tableClass['model'] && $tableClass['model']->getSource()) {
 					$tableName = $tableClass['model']->getSource();

@@ -48,9 +48,11 @@ class Api extends BasePackage
 
     public $isApi;
 
+    public $isApiPublic;
+
     protected $clientId;
 
-    protected $isApiCheckVia;
+    public $isApiCheckVia;
 
     public $apiNeedsAuth;
 
@@ -97,18 +99,20 @@ class Api extends BasePackage
         $data['private_key_location'] = '0';
 
         if ($this->add($data)) {
-            $newApi = $this->packagesData->last;
+            if ($data['is_public'] == false) {
+                $newApi = $this->packagesData->last;
 
-            $newApi = $this->generatePKIKeys($newApi);
+                $newApi = $this->generatePKIKeys($newApi);
 
-            if ($newApi) {
-                $this->updateApi($newApi);
+                if ($newApi) {
+                    $this->updateApi($newApi);
 
-                $this->addResponse('Added ' . $data['name'] . ' api');
-            } else {
-                $this->removeApi($newApi);
+                    $this->addResponse('Added ' . $data['name'] . ' api');
+                } else {
+                    $this->removeApi($newApi);
 
-                return false;
+                    return false;
+                }
             }
         } else {
             $this->addResponse('Error adding new api.', 1);
@@ -212,7 +216,11 @@ class Api extends BasePackage
 
         if ($usingIsApiCheckVia) {
             if ($this->isApiCheckVia === 'pub') {//Public access API
-                //
+                $api = $this->getFirst('is_public', (bool) '1');
+
+                if ($api && $api->status == true) {
+                    $this->api = $api->toArray();
+                }
             } else if ($this->isApiCheckVia === 'authorization' ||
                        $this->isApiCheckVia === 'client_id'
             ) {
@@ -232,7 +240,11 @@ class Api extends BasePackage
                     }
 
                     if ($client && isset($client['api_id'])) {
-                        $this->api = $this->getById($client['api_id']);
+                        $api = $this->getById($client['api_id']);
+
+                        if ($api['status'] == true) {
+                            $this->api = $api;
+                        }
                     }
                 }
             }
@@ -243,15 +255,24 @@ class Api extends BasePackage
                 $this->api =
                     $this->getByParams(
                         [
-                            'conditions'    => 'domain_id = :did: AND app_id = :aid:',
+                            'conditions'    => 'domain_id = :did: AND app_id = :aid: AND status = :status:',
                             'bind'          => [
                                 'did'       => (int) $this->domains->domain['id'],
-                                'aid'       => (int) $this->apps->getAppInfo()['id']
+                                'aid'       => (int) $this->apps->getAppInfo()['id'],
+                                'status'    => 1
                             ]
                         ], true
                     );
             } else {
-                $this->api = $this->getByParams(['conditions' => [['domain_id', '=', (int) $this->domains->domain['id']], ['app_id', '=', (int) $this->apps->getAppInfo()['id']]]]);
+                $this->api = $this->getByParams(
+                    [
+                        'conditions' => [
+                            ['domain_id', '=', (int) $this->domains->domain['id']],
+                            ['app_id', '=', (int) $this->apps->getAppInfo()['id']],
+                            ['status', '=', (bool) true],
+                        ]
+                    ]
+                );
             }
         }
 
@@ -406,7 +427,7 @@ class Api extends BasePackage
             $validateToken = $this->resource->validateAuthenticatedRequest(ServerRequest::fromGlobals());
 
             $this->headerAttributes = $validateToken->getAttributes();
-            var_dump($this->headerAttributes);die();
+
             if ($this->accessTokenRepository->isTokenExpired($this->headerAttributes['oauth_access_token_id'])) {
                 throw new \Exception('Token Expired!');
             }
@@ -417,9 +438,13 @@ class Api extends BasePackage
         }
     }
 
-    public function getAccount()
+    public function getScope()
     {
-        return $this->accessTokenRepository->getUserFromToken($this->headerAttributes['oauth_access_token_id']);
+        if ($this->headerAttributes && $this->headerAttributes['oauth_scopes']) {
+            return $this->accessTokenRepository->getUserFromToken($this->headerAttributes['oauth_scopes']);
+        }
+
+        return $this->scopes->getById($this->api['scope_id']);
     }
 
     public function getAvailableAPIGrantTypes()
@@ -483,7 +508,7 @@ class Api extends BasePackage
             if ($id) {
                 $params = $this->localContent->read('system/.api/' . $id . '/.params');
             }
-        } catch (FilesystemException | UnableToReadFile $exception) {
+        } catch (FilesystemException | UnableToReadFile | \throwable $exception) {
             //Do nothing.
         }
 

@@ -31,9 +31,15 @@ class Acl extends BaseMiddleware
 
     protected $isApi = false;
 
+    protected $isApiPublic = false;
+
     public function process($data)
     {
         $this->isApi = $this->api->isApi();
+
+        if ($this->api->isApiCheckVia && $this->api->isApiCheckVia === 'pub') {
+            $this->isApiPublic = true;
+        }
 
         $this->actions =
             ['view', 'add', 'update', 'remove', 'msview', 'msupdate'];
@@ -54,7 +60,7 @@ class Acl extends BaseMiddleware
         }
 
         if ($this->isApi) {
-            $this->account = $this->api->getAccount();
+            $this->role = $this->api->getScope();
         } else {
             $this->account = $this->auth->account();
         }
@@ -110,7 +116,9 @@ class Acl extends BaseMiddleware
                 $this->role = $roles[$this->account['security']['role_id']];
             }
         } else {
-            $this->role = $roles[$this->app['guest_role_id']];
+            if (!$this->role) {
+                $this->role = $roles[$this->app['guest_role_id']];
+            }
         }
 
         $this->roleName = strtolower(str_replace(' ', '', $this->role['name']));
@@ -137,16 +145,17 @@ class Acl extends BaseMiddleware
             } else {
                 $this->rolePermissions = $this->role['permissions'];
             }
-
             foreach ($this->rolePermissions as $appKey => $app) {
                 foreach ($app as $componentKey => $permission) {
                     if ($this->app['id'] == $appKey) {
-                        if ($this->components[$componentKey]['route'] === $this->controllerRoute &&
-                            $this->helper->has($this->components[$componentKey]['acls'], $this->action)
-                        ) {
-                            $this->found = true;
-                            $this->buildAndTestAcl($this->roleName, $componentKey, $permission);
-                            break 2;
+                        if ($this->components[$componentKey]['route'] === $this->controllerRoute) {
+                            if (($this->isApi && $this->helper->has($this->components[$componentKey]['api_acls'], $this->action)) ||
+                                (!$this->isApi && $this->helper->has($this->components[$componentKey]['acls'], $this->action))
+                            ) {
+                                $this->found = true;
+                                $this->buildAndTestAcl($this->roleName, $componentKey, $permission);
+                                break 2;
+                            }
                         }
                     }
                 }
@@ -158,6 +167,7 @@ class Acl extends BaseMiddleware
                 );
             }
         }
+
         if ($this->found &&
             !$this->acl->isAllowed($this->roleName, $this->controllerRoute, $this->action)
         ) {
@@ -198,6 +208,10 @@ class Acl extends BaseMiddleware
                 $this->modules->components->getComponentByRouteForAppId(
                     strtolower($componentRoute), $this->app['id']
                 );
+
+            if (!$component) {
+                return false;
+            }
         }
 
         $this->controllerRoute = $component['route'];

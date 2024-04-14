@@ -6,6 +6,8 @@ use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
 use System\Base\BasePackage;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApi;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiScopes;
 
 class ScopeRepository extends BasePackage implements ScopeRepositoryInterface
@@ -16,9 +18,19 @@ class ScopeRepository extends BasePackage implements ScopeRepositoryInterface
 
     public function getScopeEntityByIdentifier($identifier)
     {
-        $scope = $this->findOne(['scope' => $identifier]);
+        $scopeObj = $this->getFirst('scope_name', $identifier);
 
-        return $scope;
+        if ($scopeObj) {
+            $this->scope = $scopeObj->toArray();
+
+            $scopeObj = new $this->modelToUse;
+
+            $scopeObj->assign($this->scope);
+
+            return $scopeObj;
+        }
+
+        return false;
     }
 
     public function finalizeScopes(
@@ -27,39 +39,29 @@ class ScopeRepository extends BasePackage implements ScopeRepositoryInterface
         ClientEntityInterface $clientEntity,
         $userIdentifier = null
     ) {
-        $client = (new ClientRepository())->getFirst('client_id', $clientEntity->getIdentifier());
-
-        $clientScopes = empty($clientScope) ? null : $client->scope;
-
-        //if scope was not saved for client or * was saved, ignore and return all scopes
-        if (empty($clientScopes) || $clientScopes === '*') {
-            //grant all scopes
-            return $scopes;
-        }
-
-        //scopes of client from database
-        $clientScopes = array_map('trim', explode(SCOPE_DELIMITER_STRING, $clientScopes));
-
-        //remove any scope requested but not associated to client
         $result = [];
-        foreach ($scopes as $scope) {
-            if (!in_array($scope->getIdentifier(), $clientScopes)) {
-                continue;
+
+        $this->modelToUse = ServiceProviderApiClients::class;
+        $this->setFfStoreToUse();
+
+        $clientObj = $this->getFirst('client_id', $clientEntity->getIdentifier());
+
+        if ($clientObj) {
+            $this->modelToUse = ServiceProviderApi::class;
+            $this->setFfStoreToUse();
+
+            $api = $this->getById($clientObj->api_id);
+
+            if ($api) {
+                $this->modelToUse = ServiceProviderApiScopes::class;
+                $this->setFfStoreToUse();
+
+                $scope = $this->getById($api['scope_id']);
+
+                if ($scope) {
+                    $result[] = $this->getScopeEntityByIdentifier($scope['scope_name']);
+                }
             }
-
-            $result[] = $scope;
-        }
-
-        //include scope not requested but associated to client (optional)
-        if ($this->getConfig()->oauth->always_include_client_scopes) {
-            $includedScopes = array_map(function (Scope $scope) {
-                return $scope->getIdentifier();
-            }, $result);
-
-            $excludedScopes = array_diff($clientScopes, $includedScopes);
-            array_walk($excludedScopes, function ($scopeIdentifier) use (&$result) {
-                $result[] = $this->getScopeEntityByIdentifier($scopeIdentifier);
-            });
         }
 
         return $result;

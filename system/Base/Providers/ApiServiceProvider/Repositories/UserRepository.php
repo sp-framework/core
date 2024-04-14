@@ -34,10 +34,10 @@ class UserRepository extends BasePackage implements UserRepositoryInterface
             if ($this->secTools->checkPassword($password, $this->user['security']['password'])) {
                 $userObj = new ServiceProviderApiUsers;
 
-                $userObj->app_id = $this->apps->getAppInfo()['id'];
-                $userObj->domain_id = $this->domains->domain['id'];
+                // $userObj->app_id = $this->apps->getAppInfo()['id'];
+                // $userObj->domain_id = $this->domains->domain['id'];
                 $userObj->account_id = $this->user['id'];
-                $userObj->scope = '';
+                // $userObj->scope = '';
 
                 return $userObj;
             }

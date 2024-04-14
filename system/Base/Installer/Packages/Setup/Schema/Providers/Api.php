@@ -29,6 +29,13 @@ class Api
                     ]
                 ),
                 new Column(
+                    'is_public',
+                    [
+                        'type'          => Column::TYPE_BOOLEAN,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
                     'name',
                     [
                         'type'    => Column::TYPE_VARCHAR,

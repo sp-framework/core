@@ -36,4 +36,9 @@ class ServiceProviderApiAccessTokens extends BaseModel implements AccessTokenEnt
     {
         return $this->account_id;
     }
+
+    public function setUserIdentifier($identifier)
+    {
+        $this->account_id = $identifier;
+    }
 }

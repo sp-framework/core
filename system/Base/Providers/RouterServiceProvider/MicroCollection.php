@@ -40,6 +40,11 @@ class MicroCollection
         ) {
             $routeToMatch = '/api' . $routeToMatch;
         }
+        if (isset($this->api->isApiCheckVia) &&
+            $this->api->isApiCheckVia === 'pub'
+        ) {
+            $routeToMatch = '/pub' . $routeToMatch;
+        }
 
         $handler =
             $this->router->getRoutes()[0]->getPaths()['namespace'] .

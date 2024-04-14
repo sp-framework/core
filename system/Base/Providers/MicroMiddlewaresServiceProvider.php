@@ -115,6 +115,10 @@ class MicroMiddlewaresServiceProvider extends Injectable
             }
 
             if ($middleware['enabled'] == true) {
+                if ($middleware['name'] === 'Auth' && $this->data['api']['is_public'] == true) {
+                    continue;
+                }
+
                 try {
                     $mw = (new $middleware['class']())->process($this->data);
                 } catch (\Exception $e) {
@@ -154,13 +158,25 @@ class MicroMiddlewaresServiceProvider extends Injectable
         if (isset($this->data['domain']['exclusive_for_api']) &&
             $this->data['domain']['exclusive_for_api'] == 1
         ) {
-            $this->data['appRoute'] = '';
+            if ($this->data['api']['is_public'] == true) {
+                $this->data['appRoute'] = '/pub';
+            } else {
+                $this->data['appRoute'] = '';
+            }
         } else if (isset($this->data['domain']['exclusive_to_default_app']) &&
             $this->data['domain']['exclusive_to_default_app'] == 1
         ) {
-            $this->data['appRoute'] = '/api/';
+            if ($this->data['api']['is_public'] == true) {
+                $this->data['appRoute'] = '/api/pub';
+            } else {
+                $this->data['appRoute'] = '/api';
+            }
         } else {
-            $this->data['appRoute'] = '/api/' . strtolower($this->data['app']['route']);
+            if ($this->data['api']['is_public'] == true) {
+                $this->data['appRoute'] = '/api/pub/' . strtolower($this->data['app']['route']);
+            } else {
+                $this->data['appRoute'] = '/api/' . strtolower($this->data['app']['route']);
+            }
         }
 
         $this->data['givenRoute'] = strtolower(rtrim(explode('/q/', $this->request->getUri())[0], '/'));
@@ -170,7 +186,6 @@ class MicroMiddlewaresServiceProvider extends Injectable
         if ($this->data['givenRoute'] === '') {
             $this->data['givenRoute'] = $this->data['appRoute'] . '/home';
         }
-
         $this->data['guestAccess'] =
         [
             $this->data['appRoute'] . '/register/client',
@@ -178,7 +193,10 @@ class MicroMiddlewaresServiceProvider extends Injectable
 
         if (in_array($this->data['givenRoute'], $this->data['guestAccess'])) {
             return true;
-        } else if ($middleware['name'] === 'Auth' && !$this->componentsNeedsAuth()) {
+        } else if ($middleware['name'] === 'Auth' &&
+                   $this->data['api']['is_public'] == false &&
+                   !$this->componentsNeedsAuth()
+        ) {
             return true;
         }
 
@@ -275,8 +293,11 @@ class MicroMiddlewaresServiceProvider extends Injectable
             return false;
         }
 
+        $url = $this->request->getURI();
+
         if (isset($this->data['api']['registration_allowed']) &&
-            $this->data['api']['registration_allowed'] == false
+            $this->data['api']['registration_allowed'] == false &&
+            str_contains($url, 'register/client')
         ) {
             $this->addResponse('API registration not allowed on this api!', 1);
 

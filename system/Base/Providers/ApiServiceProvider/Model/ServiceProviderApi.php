@@ -13,6 +13,8 @@ class ServiceProviderApi extends BaseModel
 
     public $status;
 
+    public $is_public;
+
     public $name;
 
     public $app_id;

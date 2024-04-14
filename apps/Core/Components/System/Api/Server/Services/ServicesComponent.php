@@ -22,7 +22,6 @@ class ServicesComponent extends BaseComponent
             } else {
                 $api = [];
             }
-
             $this->view->api = $api;
             $this->view->apps = $this->apps->apps;
             $this->view->domains = $this->domains->domains;
@@ -62,11 +61,11 @@ class ServicesComponent extends BaseComponent
             $this->api,
             'system/api/server/services/view',
             null,
-            ['name', 'status', 'registration_allowed', 'app_id', 'domain_id', 'grant_type'],
+            ['name', 'status', 'is_public', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id'],
             true,
-            ['name', 'status', 'registration_allowed', 'app_id', 'domain_id', 'grant_type'],
+            ['name', 'status', 'is_public', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id'],
             $controlActions,
-            null,
+            ['app_id' => 'app', 'domain_id' => 'domain', 'scope_id' => 'scope'],
             $replaceColumns,
             'name'
         );
@@ -81,6 +80,29 @@ class ServicesComponent extends BaseComponent
                 $data['registration_allowed'] = '<span class="badge badge-secondary text-uppercase">No</span>';
             } else if ($data['registration_allowed'] == '1') {
                 $data['registration_allowed'] = '<span class="badge badge-success text-uppercase">Yes</span>';
+            }
+            if ($data['status'] == '0') {
+                $data['status'] = '<span class="badge badge-secondary text-uppercase">No</span>';
+            } else if ($data['status'] == '1') {
+                $data['status'] = '<span class="badge badge-success text-uppercase">Yes</span>';
+            }
+            if ($data['is_public'] == '0') {
+                $data['is_public'] = '<span class="badge badge-secondary text-uppercase">No</span>';
+            } else if ($data['is_public'] == '1') {
+                $data['is_public'] = '<span class="badge badge-warning text-uppercase">Yes</span>';
+                $data['grant_type'] = '-';
+            }
+            $app = $this->apps->getById($data['app_id']);
+            if ($app) {
+                $data['app_id'] = $app['name'];
+            }
+            $domain = $this->domains->getById($data['domain_id']);
+            if ($domain) {
+                $data['domain_id'] = $domain['name'];
+            }
+            $scope = $this->api->scopes->getById($data['scope_id']);
+            if ($scope) {
+                $data['scope_id'] = $scope['scope_name'];
             }
         }
 

@@ -50,6 +50,8 @@
     {% if passwordApi is defined and passwordApi|length > 0 %}
         {% set apisTabHidden = false %}
         {% set passwordApi = json_encode(passwordApi, 16) %}
+    {% else %}
+        {% set passwordApi = json_encode([], 16) %}
     {% endif %}
     <div class="col-md-10">
         <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">

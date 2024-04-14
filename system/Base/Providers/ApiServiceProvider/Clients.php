@@ -46,7 +46,7 @@ class Clients extends BasePackage
 
     protected function extractScopeName($data)
     {
-        $data['scope_name'] = str_replace(' ', '', strtoupper($data['name']));
+        $data['scope_name'] = str_replace(' ', '', strtolower($data['name']));
 
         return $data;
     }
