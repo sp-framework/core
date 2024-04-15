@@ -26,9 +26,7 @@ class Accounts extends BasePackage
     {
         $this->setFFRelations(true);
 
-        $apiName = $this->apps->getAppInfo()['id'] . '_' . $this->domains->domain['id'] . '_' . $id;
-
-        $this->setFFRelationsConditions(['api_clients' => [['name', '=', $apiName], ['revoked', '=', false]]]);
+        $this->setFFRelationsConditions(['api_clients' => [['account_id', '=', $id], ['revoked', '=', false]]]);
 
         $this->getFirst('id', $id);
 

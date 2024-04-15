@@ -100,9 +100,9 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        $apiName = '';
-        if ($this->apps && $this->apps->getAppInfo() && $this->domains->domain && $this->auth->account()) {
-            $apiName = $this->apps->getAppInfo()['id'] . '_' . $this->domains->domain['id'] . '_' . $this->auth->account()['id'];
+        $account_id = '0';
+        if (isset($this->auth) && $this->auth->account()) {
+            $account_id = $this->auth->account()['id'];
         }
         $this->modelRelations['api_clients']['relationObj'] = $this->hasMany(
             'id',
@@ -111,10 +111,10 @@ class BasepackagesUsersAccounts extends BaseModel
             [
                 'alias'         => 'api_clients',
                 'params'        => [
-                    'conditions'    => 'name = :apiName: AND revoked = :revoked:',
+                    'conditions'    => 'account_id = :account_id: AND revoked = :revoked:',
                     'bind'          => [
-                        'apiName'  => $apiName,
-                        'revoked'  => '0'
+                        'account_id'    => $account_id,
+                        'revoked'       => '0'
                     ]
                 ]
             ]

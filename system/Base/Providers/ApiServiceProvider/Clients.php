@@ -81,53 +81,68 @@ class Clients extends BasePackage
 
     public function generateClientKeys($api)
     {
-        $newClient['api_id'] = $api['id'];
-        $newClient['app_id'] = $this->apps->getAppInfo()['id'];
-        $newClient['domain_id'] = $this->domains->domain['id'];
-        $newClient['account_id'] = $this->auth->account()['id'];
-        $newClient['name'] = $api['id'] . '_' . $newClient['app_id'] . '_' . $newClient['domain_id'] . '_' . $newClient['account_id'];
-        $newClient['client_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
-        $client_secret = $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
-        $newClient['client_secret'] = $this->secTools->hashPassword($client_secret);
-        $newClient['redirectUri'] = 'https://';//Change this to default URI
-        $newClient['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
-        $newClient['revoked'] = '0';
-        if (isset($api['redirect_uri'])) {
-            $newClient['redirectUri'] = $api['redirect_uri'];
-        }
+        $api = $this->api->getById($api['id']);
 
-        try {
-            if ($this->config->databasetype === 'db') {
-                $oldClient = $this->getByParams(
-                    [
-                        'conditions'    => 'name = :name: AND revoked = :revoked:',
-                        'bind'          =>
-                            [
-                                'name'      => $newClient['name'],
-                                'revoked'   => false
-                            ]
-                    ]
-                );
-            } else {
-                $oldClient = $this->getByParams(['conditions' => [['name', '=', $newClient['name']], ['revoked', '=', false]]]);
-            }
-
-            if ($oldClient && isset($oldClient[0]['id'])) {
-                $oldClient[0]['revoked'] = true;
-
-                if (!$this->updateClient($oldClient[0])) {
-                    return false;
+        if ($api) {
+            $apiName = $api['id'] . '_' . $this->apps->getAppInfo()['id'] . '_' . $this->domains->domain['id'] . '_' . $this->auth->account()['id'];
+            if ($api['client_keys_generation_allowed'] == true) {
+                $newClient['api_id'] = $api['id'];
+                $newClient['app_id'] = $this->apps->getAppInfo()['id'];
+                $newClient['domain_id'] = $this->domains->domain['id'];
+                $newClient['account_id'] = $this->auth->account()['id'];
+                $newClient['name'] = $apiName;
+                $newClient['client_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
+                $client_secret = $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
+                $newClient['client_secret'] = $this->secTools->hashPassword($client_secret);
+                $newClient['redirectUri'] = 'https://';//Change this to default URI
+                $newClient['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
+                $newClient['revoked'] = '0';
+                if (isset($api['redirect_uri'])) {
+                    $newClient['redirectUri'] = $api['redirect_uri'];
                 }
             }
 
-            if (!$this->addClient($newClient)) {
-                return false;
+            try {
+                if ($this->config->databasetype === 'db') {
+                    $oldClient = $this->getByParams(
+                        [
+                            'conditions'    => 'name = :name: AND revoked = :revoked:',
+                            'bind'          =>
+                                [
+                                    'name'      => $apiName,
+                                    'revoked'   => false
+                                ]
+                        ]
+                    );
+                } else {
+                    $oldClient = $this->getByParams(['conditions' => [['name', '=', $apiName], ['revoked', '=', false]]]);
+                }
+
+                if ($oldClient && isset($oldClient[0]['id'])) {
+                    $oldClient[0]['revoked'] = true;
+
+                    if (!$this->updateClient($oldClient[0])) {
+                        return false;
+                    }
+                }
+
+                if (isset($newClient) && $this->addClient($newClient)) {
+                    $this->addResponse('Keys generated successfully.', 0, ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret]);
+
+                    return true;
+                } else {
+                    $this->addResponse('Error API does not allow client keys generation. Please contact administrator.', 1);
+                }
+            } catch (\Exception $e) {
+                $this->addResponse('Error generating/updating keys. Please contact administrator.', 1);
             }
 
-            $this->addResponse('Keys generated successfully.', 0, ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret]);
-        } catch (\Exception $e) {
-            $this->addResponse('Error generating/updating keys. Please contact administrator.', 1);
+            return false;
         }
+
+        $this->addResponse('Error API does not exists. Please contact administrator.', 1);
+
+        return false;
     }
 
     public function generateClientId($data)

@@ -1,6 +1,9 @@
 <small class="text-danger">Note: Client secret is only shown at the time of key generation. Please copy and save it somewhere safe.</small><br><br>
 {% if passwordApis is defined and passwordApis|length > 0 %}
     {% for api in passwordApis %}
+        {% if api['client_keys_generation_allowed'] == false %}
+            {% continue %}
+        {% endif %}
         {% set clientId[api['id']] = '' %}
         {% set clientSecret[api['id']] = '' %}
         {% set clientIdHidden[api['id']] = true %}

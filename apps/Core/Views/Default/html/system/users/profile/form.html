@@ -48,9 +48,17 @@
     {% endfor %}
     {% set apisTabHidden = true %}
     {% if passwordApis is defined and passwordApis|length > 0 %}
-        {% set apisTabHidden = false %}
-        {% set passwordApis = json_encode(passwordApis, 16) %}
+        {% for api in passwordApis %}
+            {% if api['client_keys_generation_allowed'] == true %}
+                {% set apisTabHidden = false %}
+                {% set passwordApis = json_encode(passwordApis, 16) %}
+                {% break %}
+            {% endif %}
+        {% endfor %}
     {% else %}
+        {% set passwordApis = json_encode([], 16) %}
+    {% endif %}
+    {% if apisTabHidden === true %}
         {% set passwordApis = json_encode([], 16) %}
     {% endif %}
     <div class="col-md-10">
