@@ -7,6 +7,8 @@ use Phalcon\Mvc\Controller;
 use Phalcon\Mvc\View;
 use System\Base\Exceptions\ControllerNotFoundException;
 use System\Base\Exceptions\IdNotFoundException;
+use System\Base\Providers\ErrorServiceProvider\Exceptions\IncorrectCSRF;
+use System\Base\Providers\ErrorServiceProvider\Exceptions\IncorrectRequestType;
 
 abstract class BaseComponent extends Controller
 {
@@ -118,6 +120,17 @@ abstract class BaseComponent extends Controller
 			}
 		} catch (\Exception $e) {
 			throw $e;
+		}
+	}
+
+	protected function requestIsPost($checkCSRF = true)
+	{
+		if (!$this->request->isPost()) {
+			throw new IncorrectRequestType('post');
+		}
+
+		if (!$this->checkCSRF()) {
+			throw new IncorrectCSRF;
 		}
 	}
 
