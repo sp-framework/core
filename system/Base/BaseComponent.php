@@ -417,7 +417,7 @@ abstract class BaseComponent extends Controller
 		$this->response->setHeader('Cache-Control', 'no-store');
 
 		if ($this->response->isSent() !== true) {
-			if ($this->api->isApi($this->request)) {
+			if ($this->api->isApi()) {
 				$this->response->setJsonContent($this->apiResponse);
 			} else {
 				$this->view->disable();
@@ -814,7 +814,7 @@ abstract class BaseComponent extends Controller
 
 	protected function addResponse($responseMessage, int $responseCode = 0, $responseData = null)
 	{
-		if ($this->api->isApi($this->request)) {
+		if ($this->api->isApi()) {
 			$this->apiResponse['responseMessage'] = $responseMessage;
 			$this->apiResponse['responseCode'] = $responseCode;
 			if ($responseData !== null) {
