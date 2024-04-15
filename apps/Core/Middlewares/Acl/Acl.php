@@ -69,14 +69,24 @@ class Acl extends BaseMiddleware
             $this->accountPermissions = $this->helper->decode($this->account['security']['permissions'], true);
 
             //System Admin bypasses the ACL if they don't have any permissions defined.
-            if ($this->account['id'] === '1' &&
-                $this->account['security']['role_id'] === '1' &&
+            if ($this->account['id'] == '1' &&
+                $this->account['security']['role_id'] == '1' &&
                 count($this->accountPermissions) === 0
             ) {
                 return;
             }
 
-            if ($this->account['security']['override_role'] === '1') {
+            $this->role = $roles[$this->account['security']['role_id']];
+
+            if (is_string($this->role['permissions'])) {
+                $this->role['permissions'] = $this->helper->decode($this->role['permissions'], true);
+            }
+
+            if ($this->account['security']['override_role'] == '1') {
+                if (count($this->accountPermissions) === 0) {
+                    throw new PermissionDeniedException();
+                }
+
                 $this->accountEmail = str_replace('.', '', str_replace('@', '', $this->account['email']));
 
                 if ($this->localContent->fileExists($aclFileDir . $this->accountEmail . $this->account['id'])) {
@@ -86,8 +96,6 @@ class Acl extends BaseMiddleware
                     $this->acl->addRole(
                         new Role($this->accountEmail, 'User Override Role')
                     );
-
-                    $permissions = $this->helper->decode($this->account['permissions'], true);
 
                     $this->generateComponentsArr();
 
@@ -112,8 +120,8 @@ class Acl extends BaseMiddleware
                 }
 
                 return;
-            } else {
-                $this->role = $roles[$this->account['security']['role_id']];
+            } else if (count($this->role['permissions']) === 0) {
+                throw new PermissionDeniedException();
             }
         } else {
             if (!$this->role) {

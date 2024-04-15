@@ -33,7 +33,7 @@ class Role
             [
                 'name'              => 'Registered Users',
                 'description'       => 'Registered Users Role',
-                'type'              => 0,
+                'type'              => 1,
                 'permissions'       => $helper->encode([])
             ];
 
@@ -41,7 +41,7 @@ class Role
             [
                 'name'              => 'Guests',
                 'description'       => 'Guests Role',
-                'type'              => 0,
+                'type'              => 1,
                 'permissions'       => $helper->encode([])
             ];
 

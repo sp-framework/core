@@ -47,7 +47,7 @@ class Roles
                     new Column(
                         'permissions',
                         [
-                            'type'    => Column::TYPE_TEXT,
+                            'type'    => Column::TYPE_JSON,
                             'notNull' => true,
                         ]
                     )

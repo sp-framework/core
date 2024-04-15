@@ -160,11 +160,14 @@ class Roles extends BasePackage
             $role = $this->getById($rid);
 
             if ($role) {
-                if ($role['permissions'] && $role['permissions'] !== '') {
+                if ($role['permissions'] && is_string($role['permissions']) && $role['permissions'] !== '') {
                     $permissionsArr = $this->helper->decode($role['permissions'], true);
+                } else if ($role['permissions'] && is_array($role['permissions'])) {
+                    $permissionsArr = $role['permissions'];
                 } else {
                     $permissionsArr = [];
                 }
+
                 $permissions = [];
 
                 foreach ($appsArr as $appKey => $app) {
