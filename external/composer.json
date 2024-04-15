@@ -12,7 +12,7 @@
     "extra": {
         "patches": {
             "league\/oauth2-server": {
-                "phpv8.3 support": "\/var\/www\/html\/sp\/system\/Base\/..\/..\/external\/patches\/oauth2_server_bearertokenvalidator.patch"
+                "extract client_id": "\/var\/www\/html\/sp\/system\/Base\/..\/..\/external\/patches\/oauth2_server_bearertokenvalidator.patch"
             }
         }
     }
