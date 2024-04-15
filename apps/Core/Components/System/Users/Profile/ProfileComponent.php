@@ -55,17 +55,15 @@ class ProfileComponent extends BaseComponent
             $this->view->canUse2fa = $this->profile->packagesData->canUse2fa;
 
             $apis = $this->api->getApiInfo(false, true);
-            $passwordApi = [];
+            $passwordApis = [];
             if ($apis && count($apis) > 0) {
-                foreach ($apis as $api) {
+                foreach ($apis as $apiKey => $api) {
                     if (isset($api['grant_type']) && $api['grant_type'] === 'password') {
-                        $passwordApi = $api;
-
-                        break;
+                        $passwordApis[$api['id']] = $api;
                     }
                 }
             }
-            $this->view->passwordApi = $passwordApi;
+            $this->view->passwordApis = $passwordApis;
         } else {
             return;
         }

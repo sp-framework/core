@@ -1,9 +1,13 @@
+{% set autoCodeGrantHidden = 'hidden' %}
+{% set reGenerateHidden = true %}
+{% set generateHidden = false %}
 {% set apiRefreshTokenTimeoutDisabled = false %}
 {% if api['id'] is defined %}
     {% set apiId = api['id'] %}
     {% set apiName = api['name'] %}
     {% set apiStatus = api['status'] %}
     {% set apiIsPublic = api['is_public'] %}
+    {% set apiClientKeysGenerationAllowed = api['client_keys_generation_allowed'] %}
     {% set apiRegistrationAllowed = api['registration_allowed'] %}
     {% set apiDescription = api['description'] %}
     {% set apiClientIdLength = api['client_id_length'] %}
@@ -20,6 +24,7 @@
     {% set apiName = '' %}
     {% set apiStatus = '' %}
     {% set apiIsPublic = '' %}
+    {% set apiClientKeysGenerationAllowed = '' %}
     {% set apiRegistrationAllowed = '' %}
     {% set apiDescription = '' %}
     {% set apiClientIdLength = '8' %}
@@ -35,7 +40,9 @@
 {% set apiStatusChecked = false %}
 {% set apiIsPublicChecked = false %}
 {% set apiRegistrationAllowedChecked = false %}
+{% set apiClientKeysGenerationAllowedChecked = false %}
 {% set apiRegistrationAllowedDisabled = false %}
+{% set apiClientKeysGenerationAllowedDisabled = false %}
 {% set apiGrantDisabled = false %}
 {% set apiClientIdLengthDisabled = false %}
 {% set apiClientSecretLengthDisabled = false %}
@@ -47,11 +54,16 @@
 {% if apiStatus == '1' %}
     {% set apiStatusChecked = true %}
 {% endif %}
+{% if apiClientKeysGenerationAllowed == '1' %}
+    {% set apiClientKeysGenerationAllowedChecked = true %}
+{% endif %}
 {% if apiRegistrationAllowed == '1' %}
     {% set apiRegistrationAllowedChecked = true %}
 {% endif %}
 {% if apiIsPublic == '1' %}
     {% set apiIsPublicChecked = true %}
+    {% set apiClientKeysGenerationAllowedChecked = false %}
+    {% set apiClientKeysGenerationAllowedDisabled = true %}
     {% set apiRegistrationAllowedChecked = false %}
     {% set apiRegistrationAllowedDisabled = true %}
     {% set apiGrantType = '0' %}
@@ -66,6 +78,9 @@
 {% endif %}
 {% if apiGrantType === 'client_credentials' %}
     {% set apiRefreshTokenTimeoutDisabled = true %}
+{% endif %}
+{% if apiGrantType === 'authorization_code' %}
+    {% set autoCodeGrantHidden = '' %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -152,6 +167,29 @@
                         'fieldType'                      : 'checkbox',
                         'fieldCheckboxType'              : 'success',
                         'fieldCheckboxChecked'           : apiIsPublicChecked,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'client_keys_generation_allowed',
+                        'fieldLabel'                     : 'Allow Client Keys Generation?',
+                        'fieldType'                      : 'checkbox',
+                        'fieldHelp'                      : true,
+                        'fieldDisabled'                  : apiClientKeysGenerationAllowedDisabled,
+                        'fieldHelpTooltipContent'        : 'Allow users to register for API on this App.',
+                        'fieldCheckboxType'              : 'success',
+                        'fieldCheckboxChecked'           : apiClientKeysGenerationAllowedChecked,
                         'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
                         'fieldBazScan'                   : true,
                         'fieldBazJstreeSearch'           : true,
@@ -358,6 +396,85 @@
                         'fieldDataSelect2OptionsSelected'       : apiScope
                     ]
                 )}}
+            </div>
+        </div>
+        <div id="autho-code-grant" {{autoCodeGrantHidden}}>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('buttons',
+                        [
+                            'component'                 : component,
+                            'componentName'             : componentName,
+                            'componentId'               : componentId,
+                            'sectionId'                 : sectionId,
+                            'buttonType'                : 'button',
+                            'buttonLabel'               : 'Generate/Regenerate API Client Id',
+                            'buttons'                   :
+                                {
+                                    'generate-api-client-id'      : {
+                                        'title'                   : 'Generate API Client Id',
+                                        'size'                    : 'sm',
+                                        'type'                    : 'primary',
+                                        'icon'                    : 'cog fa-spin',
+                                        'iconHidden'              : true,
+                                        'hidden'                  : generateHidden
+                                    },
+                                    'regenerate-api-client-id'    : {
+                                        'title'                   : 'Revoke & Regenerate API Client Id',
+                                        'size'                    : 'sm',
+                                        'type'                    : 'danger',
+                                        'icon'                    : 'cog fa-spin',
+                                        'iconHidden'              : true,
+                                        'hidden'                  : reGenerateHidden
+                                    }
+                                }
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'api_client_id',
+                            'fieldLabel'                            : 'Client ID',
+                            'fieldType'                             : 'input',
+                            'fieldHelp'                             : true,
+                            'fieldRequired'                         : true,
+                            'fieldHelpTooltipContent'               : 'Client ID for API authentication.',
+                            'fieldBazScan'                          : true,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldBazPostOnCreate'                  : true,
+                            'fieldBazPostOnUpdate'                  : true,
+                            'fieldValue'                            : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'api_redirect_url',
+                            'fieldLabel'                            : 'Redirect Url',
+                            'fieldType'                             : 'input',
+                            'fieldHelp'                             : true,
+                            'fieldHelpTooltipContent'               : 'Redirect Url for API authentication.',
+                            'fieldRequired'                         : true,
+                            'fieldBazScan'                          : true,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldBazPostOnCreate'                  : true,
+                            'fieldBazPostOnUpdate'                  : true,
+                            'fieldValue'                            : ''
+                        ]
+                    )}}
+                </div>
             </div>
         </div>
         <hr>
@@ -617,15 +734,16 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-id'                          : { },
-        '{{componentId}}-{{sectionId}}-name'                        : { },
-        '{{componentId}}-{{sectionId}}-status'                      : { },
-        '{{componentId}}-{{sectionId}}-is_public'                   : {
+        '{{componentId}}-{{sectionId}}-id'                              : { },
+        '{{componentId}}-{{sectionId}}-name'                            : { },
+        '{{componentId}}-{{sectionId}}-status'                          : { },
+        '{{componentId}}-{{sectionId}}-is_public'                       : {
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-is_public').change(function() {
                     if ($(this)[0].checked === true) {
                         $('#{{componentId}}-{{sectionId}}-grant_type').val(0).trigger('change');
                         $('#{{componentId}}-{{sectionId}}-grant_type, ' +
+                          '#{{componentId}}-{{sectionId}}-client_keys_generation_allowed, ' +
                           '#{{componentId}}-{{sectionId}}-registration_allowed, ' +
                           '#{{componentId}}-{{sectionId}}-client_id_length, ' +
                           '#{{componentId}}-{{sectionId}}-client_secret_length, ' +
@@ -638,8 +756,10 @@ dataCollectionSection =
                           '#{{componentId}}-{{sectionId}}-refresh_token_timeout'
                         ).attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-registration_allowed')[0].checked = false;
+                        $('#{{componentId}}-{{sectionId}}-client_keys_generation_allowed')[0].checked = false;
                     } else {
                         $('#{{componentId}}-{{sectionId}}-grant_type, ' +
+                          '#{{componentId}}-{{sectionId}}-client_keys_generation_allowed, ' +
                           '#{{componentId}}-{{sectionId}}-registration_allowed, ' +
                           '#{{componentId}}-{{sectionId}}-client_id_length, ' +
                           '#{{componentId}}-{{sectionId}}-client_secret_length, ' +
@@ -655,94 +775,21 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-registration_allowed'        : { },
-        '{{componentId}}-{{sectionId}}-description'                 : { },
-        '{{componentId}}-{{sectionId}}-client_id_length'            : { },
-        '{{componentId}}-{{sectionId}}-client_secret_length'        : { },
-        '{{componentId}}-{{sectionId}}-pki_key_size'                : {
+        '{{componentId}}-{{sectionId}}-client_keys_generation_allowed'  : { },
+        '{{componentId}}-{{sectionId}}-registration_allowed'            : { },
+        '{{componentId}}-{{sectionId}}-description'                     : { },
+        '{{componentId}}-{{sectionId}}-client_id_length'                : { },
+        '{{componentId}}-{{sectionId}}-client_secret_length'            : { },
+        '{{componentId}}-{{sectionId}}-pki_key_size'                    : {
             'placeholder'   : 'SELECT PKI SIZE'
         },
-        '{{componentId}}-{{sectionId}}-pki_algorithm'               : { },
-        '{{componentId}}-{{sectionId}}-encryption_key_size'         : { },
-        '{{componentId}}-{{sectionId}}-private_key'                 : {
-            // afterInit: function() {
-            //     $('#{{componentId}}-{{sectionId}}-generate-pki, #{{componentId}}-{{sectionId}}-regenerate-pki').click(function(e) {
-            //         e.preventDefault();
-
-            //         $(this).attr('disabled', true);
-            //         $(this).children('i').attr('hidden', false);
-
-            //         if (this.id === '{{componentId}}-{{sectionId}}-regenerate-pki') {
-            //             Swal.fire({
-            //                 title                       : '<span class="text-danger">Regenerate PKI Keys?</span>',
-            //                 icon                        : 'question',
-            //                 width                       : '100%',
-            //                 background                  : 'rgba(0,0,0,.8)',
-            //                 backdrop                    : 'rgba(0,0,0,.6)',
-            //                 buttonsStyling              : false,
-            //                 confirmButtonText           : 'Yes',
-            //                 customClass                 : {
-            //                     'confirmButton'             : 'btn btn-danger text-uppercase',
-            //                     'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-            //                     'inputLabel'                : 'text-white',
-            //                     'input'                     : 'text-white'
-            //                 },
-            //                 showCancelButton            : true,
-            //                 keydownListenerCapture      : true,
-            //                 allowOutsideClick           : false,
-            //                 allowEscapeKey              : false,
-            //                 didOpen                     : function() {
-            //                     window.dataCollection.env.sounds.swalSound.play();
-            //                 }
-            //             }).then((result) => {
-            //                 if (result.isConfirmed === true &&
-            //                     result.value !== ''
-            //                 ) {
-            //                     regeneratePki(true);
-            //                 }
-            //             });
-            //         } else {
-            //             regeneratePki();
-            //         }
-            //     });
-
-            //     function regeneratePki(force = false) {
-            //         var postData = { };
-            //         postData[$('#security-token').attr('name')] = $('#security-token').val();
-            //         postData['pki_key_size'] = $('#{{componentId}}-{{sectionId}}-pki_key_size').val();
-            //         postData['pki_algorithm'] = $('#{{componentId}}-{{sectionId}}-pki_algorithm').val();
-            //         postData['encryption_key_size'] = $('#{{componentId}}-{{sectionId}}-encryption_key_size').val();
-            //         if (force) {
-            //             postData['force_regenerate'] = true;
-            //         }
-
-            //         $.post('{{links.url("apps/generatePKIKeys")}}', postData, function(response) {
-            //             if (response.responseCode == 0) {
-            //                 PNotify.success(response.responseMessage);
-
-            //                 $('#{{componentId}}-{{sectionId}}-generate-pki').attr('hidden', true);
-            //                 $('#{{componentId}}-{{sectionId}}-regenerate-pki').attr('hidden', false);
-            //                 $('#{{componentId}}-{{sectionId}}-regenerate-pki').val('1');
-            //             } else {
-            //                 PNotify.error(response.responseMessage);
-            //                 $('#{{componentId}}-{{sectionId}}-regenerate-pki').val('0');
-            //             }
-
-            //             if (response.tokenKey && response.token) {
-            //                 $("#security-token").attr("name", response.tokenKey);
-            //                 $("#security-token").val(response.token);
-            //             }
-
-            //             $('#{{componentId}}-{{sectionId}}-generate-pki, #{{componentId}}-{{sectionId}}-regenerate-pki').attr('disabled', false);
-            //             $('#{{componentId}}-{{sectionId}}-generate-pki, #{{componentId}}-{{sectionId}}-regenerate-pki').children('i').attr('hidden', false);
-            //         }, 'json');
-            //     }
-            // }
-        },
-        '{{componentId}}-{{sectionId}}-regenerate_pki_keys'         : { },
-        '{{componentId}}-{{sectionId}}-access_token_timeout'        : { },
-        '{{componentId}}-{{sectionId}}-refresh_token_timeout'       : { },
-        '{{componentId}}-{{sectionId}}-grant_type'                  : {
+        '{{componentId}}-{{sectionId}}-pki_algorithm'                   : { },
+        '{{componentId}}-{{sectionId}}-encryption_key_size'             : { },
+        '{{componentId}}-{{sectionId}}-private_key'                     : { },
+        '{{componentId}}-{{sectionId}}-regenerate_pki_keys'             : { },
+        '{{componentId}}-{{sectionId}}-access_token_timeout'            : { },
+        '{{componentId}}-{{sectionId}}-refresh_token_timeout'           : { },
+        '{{componentId}}-{{sectionId}}-grant_type'                      : {
             'placeholder'   : 'SELECT GRANT TYPE',
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-grant_type').on('select2:select', function (e) {
@@ -753,19 +800,112 @@ dataCollectionSection =
                     } else {
                         $('#{{componentId}}-{{sectionId}}-refresh_token_timeout').attr('disabled', false);
                     }
+                    if (data.id === 'authorization_code') {
+                        $('#{{componentId}}-{{sectionId}}-client_keys_generation_allowed, ' +
+                          '#{{componentId}}-{{sectionId}}-is_public, ' +
+                          '#{{componentId}}-{{sectionId}}-registration_allowed').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-api_redirect_url').attr('disabled', false);
+                        $(['#{{componentId}}-{{sectionId}}-client_keys_generation_allowed',
+                           '#{{componentId}}-{{sectionId}}-is_public',
+                           '#{{componentId}}-{{sectionId}}-registration_allowed'])
+                        .each(function(i, checkbox) {
+                            $(checkbox)[0].checked = false;
+                        });
+                        $('#autho-code-grant').attr('hidden', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-client_keys_generation_allowed, ' +
+                          '#{{componentId}}-{{sectionId}}-is_public, ' +
+                          '#{{componentId}}-{{sectionId}}-registration_allowed').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-api_redirect_url').attr('disabled', true);
+                        $('#autho-code-grant').attr('hidden', true);
+                    }
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-scope_id'                    : {
+        '{{componentId}}-{{sectionId}}-api_client_id'                   : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-api-client-id, #{{componentId}}-{{sectionId}}-regenerate-api-client-id').click(function(e) {
+                    e.preventDefault();
+
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+
+                    if (this.id === '{{componentId}}-{{sectionId}}-regenerate-api-client-id') {
+                        Swal.fire({
+                            title                       : '<span class="text-danger">Regenerate API Client Keys?</span>',
+                            icon                        : 'question',
+                            width                       : '100%',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Yes',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-danger text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                                'inputLabel'                : 'text-white',
+                                'input'                     : 'text-white'
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : false,
+                            allowEscapeKey              : false,
+                            didOpen                     : function() {
+                                window.dataCollection.env.sounds.swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed === true &&
+                                result.value !== ''
+                            ) {
+                                generateClientId(true);
+                            }
+                        });
+                    } else {
+                        generateClientId();
+                    }
+                });
+
+                function generateClientId(force = false) {
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['client_id_length'] = $('#{{componentId}}-{{sectionId}}-client_id_length').val();
+
+                    $.post('{{links.url("system/api/server/clients/generateclientid")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+
+                            if (response.responseData && response.responseData.client_id) {
+                                $('#{{componentId}}-{{sectionId}}-api_client_id').val(response.responseData.client_id);
+                            }
+                            $('#{{componentId}}-{{sectionId}}-api_client_id').parents('.form-group').removeClass('d-none');
+                            $('#{{componentId}}-{{sectionId}}-generate-api-client-id').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-regenerate-api-client-id').attr('hidden', false);
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-generate-api-client-id, #{{componentId}}-{{sectionId}}-regenerate-api-client-id').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-generate-api-client-id, #{{componentId}}-{{sectionId}}-regenerate-api-client-id').children('i').attr('hidden', true);
+                    }, 'json');
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-api_redirect_url'                : { },
+        '{{componentId}}-{{sectionId}}-scope_id'                        : {
             'placeholder'   : 'SELECT SCOPE'
         },
-        '{{componentId}}-{{sectionId}}-app_id'                      : {
+        '{{componentId}}-{{sectionId}}-app_id'                          : {
             'placeholder'   : 'SELECT APP'
         },
-        '{{componentId}}-{{sectionId}}-domain_id'                   : {
+        '{{componentId}}-{{sectionId}}-domain_id'                       : {
             'placeholder'   : 'SELECT DOMAIN'
         },
-        '{{componentId}}-{{sectionId}}-form'                        : {
+        '{{componentId}}-{{sectionId}}-form'                            : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, :hidden',
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'required',
                 '{{componentId}}-{{sectionId}}-client_id_length'        : 'required',
@@ -777,6 +917,8 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-pki_key_size'            : 'required',
                 '{{componentId}}-{{sectionId}}-pki_algorithm'           : 'required',
                 '{{componentId}}-{{sectionId}}-encryption_key_size'     : 'required',
+                '{{componentId}}-{{sectionId}}-api_client_id'           : 'required',
+                '{{componentId}}-{{sectionId}}-api_redirect_url'        : 'required',
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'Please enter api name',
@@ -789,6 +931,8 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-pki_key_size'            : 'Select PKI Key Size',
                 '{{componentId}}-{{sectionId}}-pki_algorithm'           : 'Select PKI Key Algorithm',
                 '{{componentId}}-{{sectionId}}-encryption_key_size'     : 'Enter Encryption Key Size',
+                '{{componentId}}-{{sectionId}}-api_client_id'           : 'Generate API Client Id',
+                '{{componentId}}-{{sectionId}}-api_redirect_url'        : 'Enter Redirect URL',
             }
         }
     });

@@ -1,10 +1,10 @@
 {
-    "name"          : "Api Scopes",
-    "display_name"  : "Api Scopes Package",
-    "description"   : "Package for managing system api scopes",
+    "name"          : "ApiServerScopes",
+    "display_name"  : "Api Server Scopes Package",
+    "description"   : "Package for managing system api server scopes",
     "module_type"   : "packages",
     "app_type"      : "core",
-    "category"      : "basepackages",
+    "category"      : "providers",
     "version"       : "0.0.0",
     "repo"          : "https://.../",
     "class"         : "System\\Base\\Providers\\ApiServiceProvider\\Scopes",
@@ -20,5 +20,5 @@
         "views"         : [],
         "external"      : []
     },
-    "settings"      : {"componentRoute":"system/api/scopes"}
+    "settings"      : {"componentRoute":"system/api/server/scopes"}
 }

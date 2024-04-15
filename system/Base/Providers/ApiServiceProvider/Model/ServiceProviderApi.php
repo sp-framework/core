@@ -27,6 +27,8 @@ class ServiceProviderApi extends BaseModel
 
     public $registration_allowed;
 
+    public $client_keys_generation_allowed;
+
     public $client_id_length;
 
     public $client_secret_length;

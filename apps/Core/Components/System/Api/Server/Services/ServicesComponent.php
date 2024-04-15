@@ -179,23 +179,4 @@ class ServicesComponent extends BaseComponent
             $this->view->responseMessage = 'Method Not Allowed';
         }
     }
-
-    public function generateClientKeysAction()
-    {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
-
-            $this->api->generateClientKeys($this->postData());
-
-            $this->addResponse(
-                $this->api->packagesData->responseMessage,
-                $this->api->packagesData->responseCode,
-                $this->api->packagesData->responseData
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
-    }
 }

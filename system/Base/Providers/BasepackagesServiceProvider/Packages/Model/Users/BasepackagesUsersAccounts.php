@@ -111,20 +111,21 @@ class BasepackagesUsersAccounts extends BaseModel
             [
                 'alias'         => 'api_client',
                 'params'        => [
-                    'conditions'    => 'name = :apiName:',
+                    'conditions'    => 'name = :apiName: AND revoked = :revoked:',
                     'bind'          => [
-                        'apiName'  => $apiName
+                        'apiName'  => $apiName,
+                        'revoked'  => '0'
                     ]
                 ]
             ]
         );
 
-        $this->modelRelations['api_user']['relationObj'] = $this->hasOne(
+        $this->modelRelations['api_clients']['relationObj'] = $this->hasMany(
             'id',
-            ServiceProviderApiUsers::class,
+            ServiceProviderApiClients::class,
             'account_id',
             [
-                'alias'         => 'api_user'
+                'alias'         => 'api_clients'
             ]
         );
 

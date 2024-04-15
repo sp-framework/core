@@ -7,13 +7,13 @@
                 'buttons'               :
                     {
                         'add-business' : {
-                            'title'                   : 'Add New Scope',
+                            'title'                   : 'Add New Client',
                             'size'                    : 'sm',
                             'type'                    : 'primary',
                             'icon'                    : 'plus',
                             'buttonAdditionalClass'   : 'contentAjaxLink',
                             'position'                : 'right',
-                            'url'                     : links.url('system/api/scopes/q/id/0')
+                            'url'                     : links.url('system/api/server/clients/q/id/0')
                         }
                     }
             }
@@ -46,8 +46,59 @@
         'dtStateSave'           : false,
         'dtBordered'            : false,
         'dtHideIdColumn'        : true,
-        'dtNoOfColumnsToShow'   : 6,
+        'dtNoOfColumnsToShow'   : 8,
         'dtTableCompact'        : true,
-        'dtZeroRecords'         : 'No scopes data available. Add role by clicking the Add new role button.'
+        'dtZeroRecords'         : 'No clients data available. Add client by clicking the Add new client button.'
     ]
 )}}
+<script>
+/* globals Swal PNotify BazContentLoader BazCore */
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
+    initFuncs();
+}
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterRedraw"] = function() {
+    initFuncs();
+}
+
+function initFuncs() {
+    $('.rowRevoke').each(function(index,row) {
+        $(row).off();
+        $(row).click(function(e) {
+            e.preventDefault();
+
+            var thisButton = this;
+            var url = $(this).attr('href');
+            $(thisButton).children('i').removeClass('fa-times-circle').addClass('fa-spin fa-cog');
+            $(thisButton).addClass('disabled');
+
+            var dataToSend = { };
+            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+            dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
+
+            $.ajax({
+                url         : url,
+                method      : 'post',
+                dataType    : 'json',
+                data        : dataToSend,
+                success     : function(response) {
+                    if (response.responseCode === 0) {
+                        window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+                    } else {
+                        PNotify.error({
+                            title           : response.responseMessage,
+                        });
+                    }
+
+                    $(thisButton).children('i').removeClass('fa-times-circle').addClass('fa-spin fa-cog');
+                    $(thisButton).removeClass('disabled');
+
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                }
+            });
+        });
+    });
+}
+</script>

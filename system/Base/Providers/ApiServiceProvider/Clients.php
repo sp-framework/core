@@ -3,253 +3,135 @@
 namespace System\Base\Providers\ApiServiceProvider;
 
 use System\Base\BasePackage;
-use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiScopes;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 
 class Clients extends BasePackage
 {
-    protected $modelToUse = ServiceProviderApiScopes::class;
+    protected $modelToUse = ServiceProviderApiClients::class;
 
-    protected $packageName = 'scopes';
+    protected $packageName = 'clients';
 
-    public $scopes;
+    public $clients;
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
-
         return $this;
     }
 
     /**
-     * @notification(name=add)
+     * Only via generate new client via profile.
      */
-    public function addScope(array $data)
+    protected function addClient(array $data)
     {
-        if ($this->add($this->extractScopeName($data))) {
-            $this->addResponse('Added ' . $data['name'] . ' scope');
+        if ($this->add($data)) {
+            $this->addResponse('Added ' . $data['name'] . ' client');
+
+            return true;
         } else {
-            $this->addResponse('Error adding new scope.', 1);
+            $this->addResponse('Error updating client.', 1);
         }
     }
 
     /**
      * @notification(name=update)
      */
-    public function updateScope(array $data)
+    public function updateClient(array $data)
     {
-        if ($this->update($this->extractScopeName($data))) {
-            $this->addResponse('Updated ' . $data['name'] . ' scope');
+        if ($this->update($data)) {
+            $this->addResponse('Updated ' . $data['name'] . ' client');
+
+            return true;
         } else {
-            $this->addResponse('Error updating scope.', 1);
+            $this->addResponse('Error updating client.', 1);
         }
     }
 
-    protected function extractScopeName($data)
+    /**
+     *
+     */
+    protected function removeClient(array $data)
     {
-        $data['scope_name'] = str_replace(' ', '', strtolower($data['name']));
-
-        return $data;
+        //
     }
 
-    /**
-     * @notification(name=remove)
-     */
-    public function removeScope(array $data)
+    public function forceRevoke(array $data)
     {
         if (isset($data['id'])) {
-            $hasApi = false;
+            $client = $this->getById($data['id']);
 
-            if ($this->config->databasetype === 'db') {
-                $scopeObj = $this->getFirst('id', $data['id']);
-
-                if ($scopeObj->getApi() && $scopeObj->getApi()->count() > 0) {
-                    $hasApi = true;
-                }
-            } else {
-                $this->setFFRelations(true);
-
-                $scope = $this->getById($data['id']);
-
-                if (isset($scope['api']) && is_array($scope['api']) && count($scope['api']) > 0) {
-                    $hasApi = true;
-                }
-            }
-
-            if ($hasApi) {
-                $this->addResponse('Scope has api assigned to it. Cannot removes scope.', 1);
+            if ($client['revoked'] == '1') {
+                $this->addResponse('Client already revoked!', 1);
 
                 return false;
             }
 
-            if ($this->remove($data['id'], true, false)) {
-                $this->addResponse('Removed scope');
-            } else {
-                $this->addResponse('Error removing scope.', 1);
-            }
-        } else {
-            $this->addResponse('Error removing scope.', 1);
-        }
-    }
+            $client['revoked'] = '1';
 
-    public function generateViewData(int $rid = null)
-    {
-        $acls = [];
+            $this->updateClient($client);
 
-        $appsArr = $this->apps->apps;
-
-        foreach ($appsArr as $appKey => $app) {
-            $componentsArr = msort($this->modules->components->getComponentsForAppId($app['id']), 'name');
-
-            if (count($componentsArr) > 0) {
-                $components[strtolower($app['id'])] =
-                    [
-                        'title' => strtoupper($app['name']),
-                        'id' => strtoupper($app['id'])
-                    ];
-                foreach ($componentsArr as $key => $component) {
-                    $reflector = $this->annotations->get($component['class']);
-                    $methods = $reflector->getMethodsAnnotations();
-
-                    if ($methods && count($methods) > 2 && isset($methods['apiViewAction'])) {
-                        $components[strtolower($app['id'])]['childs'][$key]['id'] = $component['id'];
-                        $components[strtolower($app['id'])]['childs'][$key]['title'] = $component['name'];
-                    }
-                }
-            }
-        }
-
-        $this->packagesData->components = $components;
-
-        $scopesArr = $this->getAll()->scopes;
-        $scopes = [];
-        foreach ($scopesArr as $scopeKey => $scopeValue) {
-            $scopes[$scopeValue['id']] =
-                [
-                    'id'    => $scopeValue['id'],
-                    'name'  => $scopeValue['name']
-                ];
-        }
-
-        if ($rid) {
-            $scope = $this->getById($rid);
-
-            if ($scope) {
-                if ($scope['permissions'] && $scope['permissions'] !== '') {
-                    if (is_string($scope['permissions'])) {
-                        $permissionsArr = $this->helper->decode($scope['permissions'], true);
-                    } else {
-                        $permissionsArr = $scope['permissions'];
-                    }
-                } else {
-                    $permissionsArr = [];
-                }
-                $permissions = [];
-
-                foreach ($appsArr as $appKey => $app) {
-                    $componentsArr = msort($this->modules->components->getComponentsForAppId($app['id']), 'name');
-
-                    foreach ($componentsArr as $key => $component) {
-                        if ($component['class'] && $component['class'] !== '') {
-                            $reflector = $this->annotations->get($component['class']);
-                            $methods = $reflector->getMethodsAnnotations();
-
-                            if ($methods && count($methods) > 2 && isset($methods['apiViewAction'])) {
-                                foreach ($methods as $annotation) {
-                                    if ($annotation->getAll('api_acl')) {
-                                        $action = $annotation->getAll('api_acl')[0]->getArguments();
-                                        $acls[$action['name']] = $action['name'];
-                                        if (isset($permissionsArr[$app['id']][$component['id']])) {
-                                            $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
-                                        } else {
-                                            $permissions[$app['id']][$component['id']][$action['name']] = 0;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                $this->packagesData->acls = $this->helper->encode($acls);
-
-                $scope['permissions'] = $this->helper->encode($permissions);
-
-                $this->packagesData->scope = $scope;
-            } else {
-
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'Scope Not Found!';
-
-                return;
-            }
-        } else {
-            $scope = [];
-            $permissions = [];
-
-            foreach ($appsArr as $appKey => $app) {
-                $componentsArr = msort($this->modules->components->getComponentsForAppId($app['id']), 'name');
-
-                foreach ($componentsArr as $key => $component) {
-                    //Build ACL Columns
-                    if ($component['class'] && $component['class'] !== '') {
-                        $reflector = $this->annotations->get($component['class']);
-                        $methods = $reflector->getMethodsAnnotations();
-
-                        if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
-                            foreach ($methods as $annotation) {
-                                if ($annotation->getAll('api_acl')) {
-                                    $action = $annotation->getAll('api_acl')[0]->getArguments();
-                                    $acls[$action['name']] = $action['name'];
-                                    $permissions[$app['id']][$component['id']][$action['name']] = 0;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            $this->packagesData->acls = $this->helper->encode($acls);
-            $scope['permissions'] = $this->helper->encode($permissions);
-            $this->packagesData->scope = $scope;
-        }
-
-        $this->packagesData->apps = $appsArr;
-
-        $this->packagesData->scopes = $scopes;
-
-        return true;
-    }
-
-    public function searchScope(string $scopeQueryString)
-    {
-        if ($this->config->databasetype === 'db') {
-            $conditions =
-                [
-                    'conditions'    => 'name LIKE :aName:',
-                    'bind'          => [
-                        'aName'     => '%' . $scopeQueryString . '%'
-                    ]
-                ];
-        } else {
-            $conditions = ['name', 'LIKE', '%' . $scopeQueryString . '%'];
-        }
-
-        $searchScopes = $this->getByParams($conditions);
-
-        if (count($searchScopes) > 0) {
-            $scopes = [];
-
-            foreach ($searchScopes as $scopeKey => $scopeValue) {
-                $scopes[$scopeKey]['id'] = $scopeValue['id'];
-                $scopes[$scopeKey]['name'] = $scopeValue['name'];
-            }
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->scopes = $scopes;
+            $this->addResponse('Revoked ' . $client['name'] . ' client');
 
             return true;
         }
+
+        $this->addResponse('Id not set', 1);
+
+        return false;
+    }
+
+    public function generateClientKeys($api)
+    {
+        $newClient['api_id'] = $api['id'];
+        $newClient['app_id'] = $this->apps->getAppInfo()['id'];
+        $newClient['domain_id'] = $this->domains->domain['id'];
+        $newClient['account_id'] = $this->auth->account()['id'];
+        $newClient['name'] = $newClient['app_id'] . '_' . $newClient['domain_id'] . '_' . $newClient['account_id'];
+        $newClient['client_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
+        $client_secret = $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
+        $newClient['client_secret'] = $this->secTools->hashPassword($client_secret);
+        $newClient['redirectUri'] = 'https://';//Change this to default URI
+        $newClient['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
+        $newClient['revoked'] = '0';
+        if (isset($api['redirect_uri'])) {
+            $newClient['redirectUri'] = $api['redirect_uri'];
+        }
+
+        try {
+            if ($this->config->databasetype === 'db') {
+                $oldClient = $this->getByParams(
+                    [
+                        'conditions'    => 'name = :name: AND revoked = :revoked:',
+                        'bind'          =>
+                            [
+                                'name'      => $newClient['name'],
+                                'revoked'   => false
+                            ]
+                    ]
+                );
+            } else {
+                $oldClient = $this->getByParams(['conditions' => [['name', '=', $newClient['name']], ['revoked', '=', false]]]);
+            }
+
+            if ($oldClient && isset($oldClient[0]['id'])) {
+                $oldClient[0]['revoked'] = true;
+
+                if (!$this->updateClient($oldClient[0])) {
+                    return false;
+                }
+            }
+
+            if (!$this->addClient($newClient)) {
+                return false;
+            }
+
+            $this->addResponse('Keys generated successfully.', 0, ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret]);
+        } catch (\Exception $e) {
+            $this->addResponse('Error generating/updating keys. Please contact administrator.', 1);
+        }
+    }
+
+    public function generateClientId($data)
+    {
+        $this->addResponse('Id generated successfully.', 0, ['client_id' => $this->random->base58(isset($data['client_id_length']) ? $data['client_id_length'] : 8)]);
     }
 }

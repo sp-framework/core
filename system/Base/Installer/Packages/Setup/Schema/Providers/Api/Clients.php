@@ -80,22 +80,20 @@ class Clients
                         'notNull'       => true,
                     ]
                 ),
-                // new Column(
-                //     'grant_type',
-                //     [
-                //         'type'          => Column::TYPE_VARCHAR,
-                //         'size'          => 1024,
-                //         'notNull'       => false
-                //     ]
-                // ),
-                // new Column(
-                //     'scope',
-                //     [
-                //         'type'          => Column::TYPE_VARCHAR,
-                //         'size'          => 1024,
-                //         'notNull'       => true
-                //     ]
-                // ),
+                new Column(//For monitoring Activity
+                    'last_used',
+                    [
+                        'type'          => Column::TYPE_TIMESTAMP,
+                        'notNull'       => true
+                    ]
+                ),
+                new Column(
+                    'revoked',
+                    [
+                        'type'          => Column::TYPE_BOOLEAN,
+                        'notNull'       => true
+                    ]
+                ),
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'

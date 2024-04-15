@@ -26,6 +26,10 @@ class Accounts extends BasePackage
     {
         $this->setFFRelations(true);
 
+        $apiName = $this->apps->getAppInfo()['id'] . '_' . $this->domains->domain['id'] . '_' . $id;
+
+        $this->setFFRelationsConditions(['api_client' => [['name', '=', $apiName], ['revoked', '=', false]]]);
+
         $this->getFirst('id', $id);
 
         if ($this->model) {
@@ -79,6 +83,18 @@ class Accounts extends BasePackage
                 }
             }
 
+            $account['api_clients'] = [];
+            if ($this->model->getApiClients()) {
+                $account['api_clients'] = $this->model->getApiClients()->toArray();
+                if ($account['api_clients'] && is_array($account['api_clients']) && count($account['api_clients']) > 0) {
+                    foreach ($account['api_clients'] as &$client) {
+                        if (isset($client['client_secret']) && $client['client_secret'] !== '') {
+                            $client['client_secret'] = $this->random->base58(8);
+                        }
+                    }
+                }
+            }
+
             $account['api_user'] = [];
             if ($this->model->getApiUser()) {
                 $account['api_user'] = $this->model->getApiUser()->toArray();
@@ -89,6 +105,13 @@ class Accounts extends BasePackage
             if ($this->ffData) {
                 if (isset($this->ffData['api_client']['client_secret']) && $this->ffData['api_client']['client_secret'] !== '') {
                     $this->ffData['api_client']['client_secret'] = $this->random->base58(8);
+                }
+                if ($this->ffData['api_clients'] && is_array($this->ffData['api_clients']) && count($this->ffData['api_clients']) > 0) {
+                    foreach ($this->ffData['api_clients'] as &$client) {
+                        if (isset($client['client_secret']) && $client['client_secret'] !== '') {
+                            $client['client_secret'] = $this->random->base58(8);
+                        }
+                    }
                 }
 
                 return $this->ffData;
@@ -338,7 +361,6 @@ class Accounts extends BasePackage
     public function removeAccount(array $data)
     {
         if (isset($data['id']) && $data['id'] != 1) {
-
             if ($this->auth->account()['id'] === $data['id']) {
                 $this->addResponse('Cannot remove own account!', 1);
 
@@ -378,6 +400,8 @@ class Accounts extends BasePackage
                     $this->addToNotification('remove', 'Removed account for ID: ' . $account['email']);
 
                     $this->addResponse('Removed account for ID: ' . $account['email']);
+
+                    $this->api->clients->forceRevoke(['account_id' => $data['id']]);
 
                     return true;
                 } else {
@@ -448,7 +472,7 @@ class Accounts extends BasePackage
         $identifiers = true,
         $agents = true,
         $tunnels = true,
-        $api = true
+        $api_clients = true
     ) {
         if ($security) {
             if ($this->config->databasetype === 'db' &&
@@ -576,21 +600,30 @@ class Accounts extends BasePackage
             }
         }
 
-        if ($api) {
+        if ($api_clients) {
             if ($this->config->databasetype === 'db' &&
-                $accountObj->getApi()
+                $accountObj->getApiClients()
             ) {
-                $accountObj->getApi()->delete();
+                if ($accountObj->getApiClients()->count() > 0) {
+                    foreach ($accountObj->getApiClients() as $client) {
+                        $client->revoked = true;
+
+                        $client->update();
+                    }
+                }
             } else {
-                if ($account['api'] &&
-                    is_array($account['api']) &&
-                    count($account['api']) > 0
+                if ($account['api_clients'] &&
+                    is_array($account['api_clients']) &&
+                    count($account['api_clients']) > 0
                 ) {
                     $apiStore = $this->ff->store((new ServiceProviderApiClients)->getSource());
-                    $apiCheck = $apiStore->findById($account['api']['id']);
+                    foreach ($account['api_clients'] as $client) {
+                        $apiCheck = $apiStore->findById($client['id']);
 
-                    if ($apiCheck) {
-                        $apiStore->deleteById($account['api']['id'], false);
+                        if ($apiCheck) {
+                            $apiCheck['revoked'] = true;
+                            $apiStore->update($apiCheck);
+                        }
                     }
                 }
             }
@@ -850,6 +883,10 @@ class Accounts extends BasePackage
         if (count($canLogin) === 1 &&
             ($canLogin[0]['allowed'] == '1' || $canLogin[0]['allowed'] == '2')
         ) {
+            if ($canLogin[0]['allowed'] == '2') {
+                return false;
+            }
+
             return true;
         } else if (count($canLogin) === 1 && $canLogin[0]['allowed'] == '0') {
             return $canLogin[0];

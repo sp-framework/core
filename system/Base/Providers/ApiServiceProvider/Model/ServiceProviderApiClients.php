@@ -6,6 +6,10 @@ use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\Traits\ClientTrait;
 use League\OAuth2\Server\Entities\Traits\EntityTrait;
 use System\Base\BaseModel;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAccessTokens;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAuthorizationCodes;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiRefreshTokens;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
 
 class ServiceProviderApiClients extends BaseModel implements ClientEntityInterface
 {
@@ -26,9 +30,9 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
 
     public $client_secret;
 
-    // public $grant_type;
+    public $last_used;
 
-    // public $scope;
+    public $revoked;
 
     public function getIdentifier()
     {

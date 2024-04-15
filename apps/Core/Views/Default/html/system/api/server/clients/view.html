@@ -1,13 +1,11 @@
-{% if scope['id'] is defined %}
-    {% set scopeId = scope['id'] %}
-    {% set scopeName = scope['name'] %}
-    {% set scopeDescription = scope['description'] %}
-    {% set title = 'Scope (' ~ scope['name'] ~ ')' %}
+{% if client['id'] is defined %}
+    {% set id = client['id'] %}
+    {% set clientId = client['client_id'] %}
+    {% set title = 'Client (' ~ client['client_id'] ~ ')' %}
 {% else %}
-    {% set scopeId = '' %}
-    {% set scopeName = '' %}
-    {% set scopeDescription = '' %}
-    {% set title = 'New Scope' %}
+    {% set id = '' %}
+    {% set clientId = '' %}
+    {% set title = 'New Client' %}
 {% endif %}
 {{adminltetags.useTag('content',
     [
@@ -23,18 +21,18 @@
         'cardIcon'                      : 'sitemap',
         'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
-        'cardBodyInclude'               : 'scopes/form',
+        'cardBodyInclude'               : 'clients/form',
         'formButtons'                   :
         [
             'canAdd'                        : canAdd,
             'canUpdate'                     : canUpdate,
-            'updateButtonId'                : scopeId,
-            'addActionUrl'                  : 'system/api/scopes/add',
-            'addSuccessRedirectUrl'         : 'system/api/scopes',
-            'updateActionUrl'               : 'system/api/scopes/update',
-            'updateSuccessRedirectUrl'      : 'system/api/scopes',
-            'cancelActionUrl'               : 'system/api/scopes',
-            'closeActionUrl'                : 'system/api/scopes'
+            'updateButtonId'                : id,
+            'addActionUrl'                  : 'system/api/server/clients/add',
+            'addSuccessRedirectUrl'         : 'system/api/server/clients',
+            'updateActionUrl'               : 'system/api/server/clients/update',
+            'updateSuccessRedirectUrl'      : 'system/api/server/clients',
+            'cancelActionUrl'               : 'system/api/server/clients',
+            'closeActionUrl'                : 'system/api/server/clients'
         ]
     ]
 )}}

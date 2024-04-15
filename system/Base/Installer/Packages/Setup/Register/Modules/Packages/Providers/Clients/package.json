@@ -1,13 +1,13 @@
 {
-    "name"          : "ApiClientServices",
-    "display_name"  : "Api Client Services Package",
-    "description"   : "Package for connecting to external resources using API",
+    "name"          : "ApiServerClients",
+    "display_name"  : "Api Server Clients Package",
+    "description"   : "Package for managing system api server clients",
     "module_type"   : "packages",
     "app_type"      : "core",
-    "category"      : "basepackages",
+    "category"      : "providers",
     "version"       : "0.0.0",
     "repo"          : "https://.../",
-    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Api\\Api",
+    "class"         : "System\\Base\\Providers\\ApiServiceProvider\\Clients",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
@@ -20,5 +20,8 @@
         "views"         : [],
         "external"      : []
     },
-    "settings"      : {"componentRoute":"system/api/clients/services"}
+    "settings"      : {
+        "componentRoute":"system/api/server/clients",
+        "revokeClientsAfterXDaysOfInactivity" : 30
+    }
 }

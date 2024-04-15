@@ -619,64 +619,6 @@ class Api extends BasePackage
         }
     }
 
-    public function generateClientKeys($api)
-    {
-        $newClient['api_id'] = $api['id'];
-        $newClient['app_id'] = $this->apps->getAppInfo()['id'];
-        $newClient['domain_id'] = $this->domains->domain['id'];
-        $newClient['account_id'] = $this->auth->account()['id'];
-        $newClient['name'] = $newClient['app_id'] . '_' . $newClient['domain_id'] . '_' . $newClient['account_id'];
-        $newClient['client_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
-        $client_secret = $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
-        $newClient['client_secret'] = $this->secTools->hashPassword($client_secret);
-        $newClient['redirectUri'] = 'https://';//Change this to default URI
-        if (isset($api['redirect_uri'])) {
-            $newClient['redirectUri'] = $api['redirect_uri'];
-        }
-
-        try {
-            $clientsObject = new ServiceProviderApiClients;
-            $clientsStore = $this->ff->store($clientsObject->getSource());
-            $oldClient = null;
-
-            if ($this->config->databasetype === 'db') {
-                $oldClientsObj = $clientsObject->findFirstByName($newClient['name']);
-
-                if ($oldClientsObj) {
-                    $oldClient = $oldClientsObj->toArray();
-                }
-            } else {
-                $oldClient = $clientsStore->findOneBy(['name', '=', $newClient['name']]);
-            }
-
-            if ($oldClient) {
-                $newClient = array_merge($oldClient, $newClient);
-
-                if ($this->config->databasetype === 'db') {
-                    $oldClientsObj->assign($newClient);
-
-                    $oldClientsObj->update();
-                } else {
-                    $clientsStore->update($newClient);
-                }
-
-                $this->addResponse('Keys regenerated successfully.', 0, ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret]);
-            } else {
-                if ($this->config->databasetype === 'db') {
-                    $clientsObject->assign($newClient);
-
-                    $clientsObject->create();
-                } else {
-                    $clientsStore->insert($newClient);
-                }
-
-                $this->addResponse('Keys generated successfully.', 0, ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret]);
-            }
-        } catch (\Exception $e) {
-            $this->addResponse('Error generating/updating keys. Please contact administrator.', 1);
-        }
-    }
-
     public function getAPIAvailableScopes()
     {
         return $this->scopes->init()->scopes;

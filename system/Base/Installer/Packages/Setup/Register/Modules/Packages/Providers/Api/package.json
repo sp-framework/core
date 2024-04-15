@@ -1,10 +1,10 @@
 {
-    "name"          : "Api Servers",
-    "display_name"  : "Api Servers Package",
-    "description"   : "Package for managing system api servers",
+    "name"          : "ApiServerServices",
+    "display_name"  : "Api Server Services Package",
+    "description"   : "Package for managing system api server services",
     "module_type"   : "packages",
     "app_type"      : "core",
-    "category"      : "basepackages",
+    "category"      : "providers",
     "version"       : "0.0.0",
     "repo"          : "https://.../",
     "class"         : "System\\Base\\Providers\\ApiServiceProvider\\Api",
@@ -20,5 +20,5 @@
         "views"         : [],
         "external"      : []
     },
-    "settings"      : {"componentRoute":"system/api/servers"}
+    "settings"      : {"componentRoute":"system/api/server/services"}
 }
