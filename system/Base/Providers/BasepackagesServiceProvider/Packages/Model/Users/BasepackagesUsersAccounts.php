@@ -104,12 +104,12 @@ class BasepackagesUsersAccounts extends BaseModel
         if ($this->apps && $this->apps->getAppInfo() && $this->domains->domain && $this->auth->account()) {
             $apiName = $this->apps->getAppInfo()['id'] . '_' . $this->domains->domain['id'] . '_' . $this->auth->account()['id'];
         }
-        $this->modelRelations['api_client']['relationObj'] = $this->hasOne(
+        $this->modelRelations['api_clients']['relationObj'] = $this->hasMany(
             'id',
             ServiceProviderApiClients::class,
             'account_id',
             [
-                'alias'         => 'api_client',
+                'alias'         => 'api_clients',
                 'params'        => [
                     'conditions'    => 'name = :apiName: AND revoked = :revoked:',
                     'bind'          => [
@@ -117,15 +117,6 @@ class BasepackagesUsersAccounts extends BaseModel
                         'revoked'  => '0'
                     ]
                 ]
-            ]
-        );
-
-        $this->modelRelations['api_clients']['relationObj'] = $this->hasMany(
-            'id',
-            ServiceProviderApiClients::class,
-            'account_id',
-            [
-                'alias'         => 'api_clients'
             ]
         );
 

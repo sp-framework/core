@@ -28,7 +28,7 @@ class Accounts extends BasePackage
 
         $apiName = $this->apps->getAppInfo()['id'] . '_' . $this->domains->domain['id'] . '_' . $id;
 
-        $this->setFFRelationsConditions(['api_client' => [['name', '=', $apiName], ['revoked', '=', false]]]);
+        $this->setFFRelationsConditions(['api_clients' => [['name', '=', $apiName], ['revoked', '=', false]]]);
 
         $this->getFirst('id', $id);
 
@@ -75,14 +75,6 @@ class Accounts extends BasePackage
                 $account['role'] = $this->model->getRole()->toArray();
             }
 
-            $account['api_client'] = [];
-            if ($this->model->getApiClient()) {
-                $account['api_client'] = $this->model->getApiClient()->toArray();
-                if (isset($account['api_client']['client_secret']) && $account['api_client']['client_secret'] !== '') {
-                    $account['api_client']['client_secret'] = $this->random->base58(8);
-                }
-            }
-
             $account['api_clients'] = [];
             if ($this->model->getApiClients()) {
                 $account['api_clients'] = $this->model->getApiClients()->toArray();
@@ -103,9 +95,6 @@ class Accounts extends BasePackage
             return $account;
         } else {
             if ($this->ffData) {
-                if (isset($this->ffData['api_client']['client_secret']) && $this->ffData['api_client']['client_secret'] !== '') {
-                    $this->ffData['api_client']['client_secret'] = $this->random->base58(8);
-                }
                 if ($this->ffData['api_clients'] && is_array($this->ffData['api_clients']) && count($this->ffData['api_clients']) > 0) {
                     foreach ($this->ffData['api_clients'] as &$client) {
                         if (isset($client['client_secret']) && $client['client_secret'] !== '') {

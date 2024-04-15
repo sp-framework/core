@@ -85,7 +85,7 @@ class Clients extends BasePackage
         $newClient['app_id'] = $this->apps->getAppInfo()['id'];
         $newClient['domain_id'] = $this->domains->domain['id'];
         $newClient['account_id'] = $this->auth->account()['id'];
-        $newClient['name'] = $newClient['app_id'] . '_' . $newClient['domain_id'] . '_' . $newClient['account_id'];
+        $newClient['name'] = $api['id'] . '_' . $newClient['app_id'] . '_' . $newClient['domain_id'] . '_' . $newClient['account_id'];
         $newClient['client_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
         $client_secret = $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
         $newClient['client_secret'] = $this->secTools->hashPassword($client_secret);

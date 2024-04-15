@@ -63,7 +63,7 @@ class ProfileComponent extends BaseComponent
                     }
                 }
             }
-            $this->view->passwordApis = $passwordApis;
+            $this->view->passwordApis = msort($passwordApis, 'id');
         } else {
             return;
         }

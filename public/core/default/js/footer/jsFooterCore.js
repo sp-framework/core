@@ -8834,7 +8834,7 @@ var BazContentFields = function() {
 
     function initInput(fieldId, options) {
         if (options.beforeInit) {
-            options.beforeInit(dataCollection);
+            options.beforeInit(dataCollection, options);
         }
         thisFieldId = fieldId;
         fieldId = document.getElementById(fieldId);
@@ -9028,13 +9028,13 @@ var BazContentFields = function() {
 
         maxLength(thisFieldId, options);
         if (options.afterInit) {
-            options.afterInit(dataCollection);
+            options.afterInit(dataCollection, options);
         }
     }
 
     function initSelect2(fieldId, sectionId, options) {
         if (options.beforeInit) {
-            options.beforeInit(dataCollection);
+            options.beforeInit(dataCollection, options);
         }
         thisFieldId = fieldId;
         fieldId = document.getElementById(fieldId);
@@ -9070,24 +9070,24 @@ var BazContentFields = function() {
             });
         }
         if (options.afterInit) {
-            options.afterInit(dataCollection);
+            options.afterInit(dataCollection, options);
         }
     }
 
     function initCheckbox(fieldId, options) {
         if (options.beforeInit) {
-            options.beforeInit(dataCollection);
+            options.beforeInit(dataCollection, options);
         }
         thisFieldId = fieldId;
         fieldId = document.getElementById(fieldId);
         if (options.afterInit) {
-            options.afterInit(dataCollection);
+            options.afterInit(dataCollection, options);
         }
     }
 
     function initRadio(fieldId, options) {
         if (options.beforeInit) {
-            options.beforeInit(dataCollection);
+            options.beforeInit(dataCollection, options);
         }
         thisFieldId = fieldId;
         fieldId = document.getElementById(fieldId);
@@ -9104,7 +9104,7 @@ var BazContentFields = function() {
             });
         }
         if (options.afterInit) {
-            options.afterInit(dataCollection);
+            options.afterInit(dataCollection, options);
         }
     }
 
@@ -9131,7 +9131,7 @@ var BazContentFields = function() {
             });
         }
         if (options.afterInit) {
-            options.afterInit(dataCollection);
+            options.afterInit(dataCollection, options);
         }
     }
 
@@ -9145,37 +9145,37 @@ var BazContentFields = function() {
         dataCollection[componentId][sectionId][fieldId]['colorpicker'] = $('#' + id).colorpicker(options);
 
         if (options.afterInit) {
-            options.afterInit(dataCollection);
+            options.afterInit(dataCollection, options);
         }
     }
 
     function initTextarea(fieldId, options) {
         if (options.beforeInit) {
-            options.beforeInit(dataCollection);
+            options.beforeInit(dataCollection, options);
         }
         thisFieldId = fieldId;
         fieldId = document.getElementById(fieldId);
         maxLength(thisFieldId, options);
         if (options.afterInit) {
-            options.afterInit(dataCollection);
+            options.afterInit(dataCollection, options);
         }
     }
 
     function initJson(fieldId, options) {
         if (options.beforeInit) {
-            options.beforeInit(dataCollection);
+            options.beforeInit(dataCollection, options);
         }
         thisFieldId = fieldId;
         fieldId = document.getElementById(fieldId);
         maxLength(thisFieldId, options);
         if (options.afterInit) {
-            options.afterInit(dataCollection);
+            options.afterInit(dataCollection, options);
         }
     }
 
     function initTrumbowyg(fieldId, options) {
         if (options.beforeInit) {
-            options.beforeInit(dataCollection);
+            options.beforeInit(dataCollection, options);
         }
         thisFieldId = fieldId;
         fieldId = document.getElementById(fieldId);
@@ -9221,18 +9221,18 @@ var BazContentFields = function() {
         dataCollection[componentId][sectionId][thisFieldId]['trumbowyg'] =
             $(fieldId).trumbowyg(options);
         if (options.afterInit) {
-            options.afterInit(dataCollection);
+            options.afterInit(dataCollection, options);
         }
     }
 
     function initCounters(fieldId, options) {
         if (options.beforeInit) {
-            options.beforeInit(dataCollection);
+            options.beforeInit(dataCollection, options);
         }
         thisFieldId = fieldId;
         fieldId = document.getElementById(fieldId);
         if (options.afterInit) {
-            options.afterInit(dataCollection);
+            options.afterInit(dataCollection, options);
         }
     }
 
@@ -9260,7 +9260,7 @@ var BazContentFields = function() {
             );
 
             if (options.afterInit) {
-                options.afterInit(dataCollection);
+                options.afterInit(dataCollection, options);
             }
             return;
         }
@@ -9475,16 +9475,16 @@ var BazContentFields = function() {
         }
 
         if (options.afterInit) {
-            options.afterInit(dataCollection);
+            options.afterInit(dataCollection, options);
         }
     }
 
     function initHTML(fieldId, options) {
         if (options.beforeInit) {
-            options.beforeInit(dataCollection);
+            options.beforeInit(dataCollection, options);
         }
         if (options.afterInit) {
-            options.afterInit(dataCollection);
+            options.afterInit(dataCollection, options);
         }
     }
 
@@ -9496,7 +9496,7 @@ var BazContentFields = function() {
         fieldId = document.getElementById(fieldId);
         dataCollection[componentId][sectionId][thisFieldId]['dropzone'] = $(fieldId).dropzone(options);
         if (options.afterInit) {
-            options.afterInit(dataCollection);
+            options.afterInit(dataCollection, options);
         }
     }
 
@@ -9534,7 +9534,7 @@ var BazContentFields = function() {
             error('Tables not assigned to ' + thisFieldId + '. They need to be assigned in an array, please see documentation');
         }
         if (options.afterInit) {
-            options.afterInit(dataCollection);
+            options.afterInit(dataCollection, options);
         }
     }
 
