@@ -21,18 +21,6 @@ class AccountsComponent extends BaseComponent
         $this->accounts = $this->basepackages->accounts;
 
         $this->roles = $this->basepackages->roles;
-
-        if ($this->checkPackage('Apps\Core\Packages\Business\Directory\Contacts\Contacts')) {
-            $this->contacts = $this->usePackage(Contacts::class);
-        }
-
-        if ($this->checkPackage('Apps\Core\Packages\Hrms\Employees\Employees')) {
-            $this->employees = $this->usePackage(Employees::class);
-        }
-
-        if ($this->checkPackage('Apps\Core\Packages\Crms\Customers\Customers')) {
-            $this->customers = $this->usePackage(Customers::class);
-        }
     }
 
     /**

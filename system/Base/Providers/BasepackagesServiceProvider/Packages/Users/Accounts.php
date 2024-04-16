@@ -635,6 +635,29 @@ class Accounts extends BasePackage
 
         unset($data['id']);
 
+        if ($data['role_id'] != '1' && //Remove msview and msupdate permissions
+            isset($data['override_role']) &&
+            $data['override_role'] == '1'
+        ) {
+            if (isset($data['permissions']) && $data['permissions'] !== '') {
+                $data['permissions'] = $this->helper->decode($data['permissions'], true);
+
+                foreach ($data['permissions'] as $app => &$components) {
+                    if (is_array($components) && count($components) > 0) {
+                        foreach ($components as &$component) {
+                            if (isset($component['msview'])) {
+                                $component['msview'] = 0;
+                            }
+                            if (isset($component['msupdate'])) {
+                                $component['msupdate'] = 0;
+                            }
+                        }
+                    }
+                }
+                $data['permissions'] = $this->helper->encode($data['permissions']);
+            }
+        }
+
         if ($account) {
             if ($this->config->databasetype === 'db') {
                 $account->assign($data);
@@ -1271,6 +1294,11 @@ class Accounts extends BasePackage
                                 foreach ($methods as $annotation) {
                                     if ($annotation->getAll('acl')) {
                                         $action = $annotation->getAll('acl')[0]->getArguments();
+                                        if (isset($account['security']['role_id']) && $account['security']['role_id'] != 1 &&
+                                            ($action['name'] === 'msview' || $action['name'] === 'msupdate')
+                                        ) {
+                                            continue;
+                                        }
                                         $acls[$action['name']] = $action['name'];
                                         if (isset($permissionsArr[$app['id']][$component['id']])) {
                                             $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
@@ -1298,7 +1326,6 @@ class Accounts extends BasePackage
 
                 return false;
             }
-
         } else {
             $account = [];
             $permissions = [];

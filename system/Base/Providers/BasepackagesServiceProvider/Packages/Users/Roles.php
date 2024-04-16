@@ -27,6 +27,8 @@ class Roles extends BasePackage
      */
     public function addRole(array $data)
     {
+        $data = $this->removeMS($data);
+
         if ($this->add($data)) {
             $this->addResponse('Added ' . $data['name'] . ' role');
         } else {
@@ -47,11 +49,40 @@ class Roles extends BasePackage
             return false;
         }
 
+        $data = $this->removeMS($data);
+
         if ($this->update($data)) {
             $this->addResponse('Updated ' . $data['name'] . ' role');
         } else {
             $this->addResponse('Error updating role.', 1);
         }
+    }
+
+    protected function removeMS($data)
+    {
+        if (!isset($data['id']) ||
+            (isset($data['id']) && $data['id'] != '1')
+        ) {
+            if (isset($data['permissions']) && $data['permissions'] !== '') {
+                $data['permissions'] = $this->helper->decode($data['permissions'], true);
+
+                foreach ($data['permissions'] as $app => &$components) {
+                    if (is_array($components) && count($components) > 0) {
+                        foreach ($components as &$component) {
+                            if (isset($component['msview'])) {
+                                $component['msview'] = 0;
+                            }
+                            if (isset($component['msupdate'])) {
+                                $component['msupdate'] = 0;
+                            }
+                        }
+                    }
+                }
+                $data['permissions'] = $this->helper->encode($data['permissions']);
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -182,6 +213,11 @@ class Roles extends BasePackage
                                 foreach ($methods as $annotation) {
                                     if ($annotation->getAll('acl')) {
                                         $action = $annotation->getAll('acl')[0]->getArguments();
+                                        if ($rid && $rid != 1 &&
+                                            ($action['name'] === 'msview' || $action['name'] === 'msupdate')
+                                        ) {
+                                            continue;
+                                        }
                                         $acls[$action['name']] = $action['name'];
                                         if (isset($permissionsArr[$app['id']][$component['id']])) {
                                             $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
