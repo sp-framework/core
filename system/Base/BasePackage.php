@@ -507,6 +507,14 @@ abstract class BasePackage extends Controller
 						'order'	=> $params['order']
 					]
 				);
+		} else {
+			$params =
+				array_merge(
+					$params,
+					[
+						'order'	=> 'id asc'
+					]
+				);
 		}
 
 		if ($pageParams['currentPage'] > 1) {
