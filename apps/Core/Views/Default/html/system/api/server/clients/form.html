@@ -1,9 +1,13 @@
+{% set clientInfoHidden = 'hidden' %}
 {% if client['id'] is defined %}
     {% set id = client['id'] %}
     {% set clientId = client['client_id'] %}
+    {% set clientEmail = client['email'] %}
+    {% set clientInfoHidden = '' %}
 {% else %}
     {% set id = '' %}
     {% set clientId = '' %}
+    {% set clientEmail = '' %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -23,7 +27,6 @@
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : true,
                         'fieldHidden'                    : true,
                         'fieldDisabled'                  : true,
                         'fieldValue'                     : id
@@ -35,19 +38,65 @@
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'api_id',
+                        'fieldLabel'                            : 'API',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Select Api.',
+                        'fieldBazScan'                          : true,
+                        'fieldRequired'                         : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldDataSelect2Options'               : availableAPIServices,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : ''
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'email',
+                        'fieldLabel'                     : 'Email',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Provide email address of account in case of password grant or as a reference in case of client credentials. Upon key generation an email with the client ID and client Secret is sent to this email address.',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : clientEmail
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row" {{clientInfoHidden}}>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
                         'component'                      : component,
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'client_id',
-                        'fieldLabel'                     : 'Client Name',
+                        'fieldLabel'                     : 'Client ID',
                         'fieldType'                      : 'input',
                         'fieldHelp'                      : false,
                         'fieldHelpTooltipContent'        : '',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazPostOnCreate'           : false,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 50,
                         'fieldValue'                     : clientId
@@ -87,12 +136,21 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                          : { },
         '{{componentId}}-{{sectionId}}-client_id'                   : { },
+        '{{componentId}}-{{sectionId}}-email'                       : { },
+        '{{componentId}}-{{sectionId}}-api_id'                      : {
+            "placeholder" : 'SELECT API'
+        },
         '{{componentId}}-{{sectionId}}-form'                        : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, :hidden',
             rules: {
                 '{{componentId}}-{{sectionId}}-client_id'                   : 'required',
+                '{{componentId}}-{{sectionId}}-email'                       : 'required',
+                '{{componentId}}-{{sectionId}}-api_id'                      : 'required',
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-client_id'                   : 'Please enter api client_id',
+                '{{componentId}}-{{sectionId}}-email'                       : 'Please enter email address',
+                '{{componentId}}-{{sectionId}}-api_id'                      : 'Please select api',
             }
         }
     });

@@ -196,7 +196,7 @@ class Api extends BasePackage
             if ($this->request->getHeader('Authorization') !== '') {
                 $this->isApi = true;
                 $this->isApiCheckVia = 'authorization';
-            } else if ($this->request->get('client_id')) {
+            } else if ($this->request->get('client_id') && !$this->request->get('id')) {
                 $this->isApi = true;
                 $this->isApiCheckVia = 'client_id';
                 $this->clientId = $this->request->get('client_id');
@@ -640,5 +640,34 @@ class Api extends BasePackage
     public function getAPIAvailableScopes()
     {
         return $this->scopes->init()->scopes;
+    }
+
+    public function getEnabledAPIByType($type)
+    {
+        $apis = [];
+
+        if ($this->config->databasetype === 'db') {
+            $apis =
+                $this->getByParams(
+                    [
+                        'conditions'    => 'grant_type = :gt: AND status = :status:',
+                        'bind'          => [
+                            'gt'        => $type,
+                            'status'    => 1
+                        ]
+                    ], true
+                );
+        } else {
+            $apis = $this->getByParams(
+                [
+                    'conditions' => [
+                        ['grant_type', '=', $type],
+                        ['status', '=', (bool) true],
+                    ]
+                ]
+            );
+        }
+
+        return $apis;
     }
 }

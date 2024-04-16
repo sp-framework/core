@@ -49,6 +49,14 @@ class Clients
                     ]
                 ),
                 new Column(
+                    'email',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
                     'client_id',
                     [
                         'type'          => Column::TYPE_VARCHAR,

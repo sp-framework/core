@@ -18,17 +18,48 @@ class Clients extends BasePackage
         return $this;
     }
 
-    /**
-     * Only via generate new client via profile.
-     */
-    protected function addClient(array $data)
+    public function addClient(array $data)
     {
+        if (!isset($data['client_id'])) {
+            $validation = $this->basepackages->accounts->validateData($data, true);
+
+            if ($validation !== true) {
+                $this->addResponse($validation, 1);
+
+                return;
+            }
+
+            $api = $this->api->getById($data['api_id']);
+
+            if (!$api) {
+                $this->addResponse('API Id incorrect!', 1);
+
+                return;
+            }
+
+            if ($api['grant_type'] === 'password') {
+                $account = $this->basepackages->accounts->checkAccountBy($data['email']);
+
+                if (!$account) {
+                    $this->addResponse('API grant type password needs an account in the system. No account with that email exists!', 1);
+
+                    return;
+                }
+            } else if ($api['grant_type'] === 'client_credentials') {
+                $account['email'] = $data['email'];
+            }
+
+            $this->generateClientKeys($api, $account);
+
+            return true;
+        }
+
         if ($this->add($data)) {
-            $this->addResponse('Added ' . $data['name'] . ' client');
+            $this->addResponse('Added client');
 
             return true;
         } else {
-            $this->addResponse('Error updating client.', 1);
+            $this->addResponse('Error adding client.', 1);
         }
     }
 
@@ -38,7 +69,7 @@ class Clients extends BasePackage
     public function updateClient(array $data)
     {
         if ($this->update($data)) {
-            $this->addResponse('Updated ' . $data['name'] . ' client');
+            $this->addResponse('Updated client');
 
             return true;
         } else {
@@ -56,7 +87,17 @@ class Clients extends BasePackage
 
     public function forceRevoke(array $data)
     {
-        if (isset($data['id'])) {
+        if (isset($data['regen']) && $data['regen'] == 'true' && isset($data['id'])) {
+            $client = $this->getById($data['id']);
+            $api = $this->api->getById($client['api_id']);
+            $account = $this->basepackages->accounts->getById($client['account_id']);
+
+            $this->generateClientKeys($api, $account);
+
+            $this->addResponse('Revoked & Regenerated client');
+
+            return true;
+        } else if (isset($data['id'])) {
             $client = $this->getById($data['id']);
 
             if ($client['revoked'] == '1') {
@@ -69,7 +110,7 @@ class Clients extends BasePackage
 
             $this->updateClient($client);
 
-            $this->addResponse('Revoked ' . $client['name'] . ' client');
+            $this->addResponse('Revoked client');
 
             return true;
         }
@@ -79,24 +120,25 @@ class Clients extends BasePackage
         return false;
     }
 
-    public function generateClientKeys($api)
+    public function generateClientKeys($api, $account = null, $newClient = null, $emailNewClientDetails = true)
     {
         $api = $this->api->getById($api['id']);
 
         if ($api) {
-            $apiName = $api['id'] . '_' . $this->apps->getAppInfo()['id'] . '_' . $this->domains->domain['id'] . '_' . $this->auth->account()['id'];
-            if ($api['client_keys_generation_allowed'] == true) {
+            $apiName = $api['id'] . '_' . $api['app_id'] . '_' . $api['domain_id'] . '_' . ($account['id'] ?? $this->auth->account()['id']);
+            if ($account || $api['client_keys_generation_allowed'] == true) {
                 $newClient['api_id'] = $api['id'];
-                $newClient['app_id'] = $this->apps->getAppInfo()['id'];
-                $newClient['domain_id'] = $this->domains->domain['id'];
-                $newClient['account_id'] = $this->auth->account()['id'];
+                $newClient['app_id'] = $api['app_id'];
+                $newClient['domain_id'] = $api['domain_id'];
+                $newClient['account_id'] = $account['id'] ?? $this->auth->account()['id'];
+                $newClient['email'] = $account['email'] ?? $this->auth->account()['email'];
                 $newClient['name'] = $apiName;
                 $newClient['client_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
                 $client_secret = $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
                 $newClient['client_secret'] = $this->secTools->hashPassword($client_secret);
-                $newClient['redirectUri'] = 'https://';//Change this to default URI
                 $newClient['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
                 $newClient['revoked'] = '0';
+                $newClient['redirectUri'] = 'https://';//Change this to default URI
                 if (isset($api['redirect_uri'])) {
                     $newClient['redirectUri'] = $api['redirect_uri'];
                 }
@@ -129,6 +171,9 @@ class Clients extends BasePackage
                 if (isset($newClient) && $this->addClient($newClient)) {
                     $this->addResponse('Keys generated successfully.', 0, ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret]);
 
+                    if ($emailNewClientDetails) {
+                        $this->emailNewClientDetails($api, $newClient['email'], $newClient['client_id'], $client_secret);
+                    }
                     return true;
                 } else {
                     $this->addResponse('Error API does not allow client keys generation. Please contact administrator.', 1);
@@ -148,5 +193,21 @@ class Clients extends BasePackage
     public function generateClientId($data)
     {
         $this->addResponse('Id generated successfully.', 0, ['client_id' => $this->random->base58(isset($data['client_id_length']) ? $data['client_id_length'] : 8)]);
+    }
+
+    protected function emailNewClientDetails($api, $email, $clientId, $clientSecret)
+    {
+        $domain = $this->domains->getById($api['domain_id']);
+
+        $emailData['app_id'] = $api['app_id'];
+        $emailData['domain_id'] = $api['domain_id'];
+        $emailData['status'] = 1;
+        $emailData['priority'] = 1;
+        $emailData['confidential'] = 1;
+        $emailData['to_addresses'] = $this->helper->encode([$email]);
+        $emailData['subject'] = 'API client details for ' . $domain['name'];
+        $emailData['body'] = 'Client ID: ' . $clientId . '<br>' . 'Client Secret: ' . $clientSecret;
+
+        return $this->basepackages->emailqueue->addToQueue($emailData);
     }
 }

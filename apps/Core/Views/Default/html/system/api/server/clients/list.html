@@ -1,23 +1,23 @@
 {% set canAddButton = null %}
 {% if canAdd %}
-{% set canAddButton = {
-                'componentId'           : componentId,
-                'sectionId'             : 'listing',
-                'buttonType'            : 'button',
-                'buttons'               :
-                    {
-                        'add-business' : {
-                            'title'                   : 'Add New Client',
-                            'size'                    : 'sm',
-                            'type'                    : 'primary',
-                            'icon'                    : 'plus',
-                            'buttonAdditionalClass'   : 'contentAjaxLink',
-                            'position'                : 'right',
-                            'url'                     : links.url('system/api/server/clients/q/id/0')
+    {% set canAddButton = {
+                    'componentId'           : componentId,
+                    'sectionId'             : 'listing',
+                    'buttonType'            : 'button',
+                    'buttons'               :
+                        {
+                            'add-client' : {
+                                'title'                   : 'Add New Client',
+                                'size'                    : 'sm',
+                                'type'                    : 'primary',
+                                'icon'                    : 'plus',
+                                'buttonAdditionalClass'   : 'contentAjaxLink',
+                                'position'                : 'right',
+                                'url'                     : links.url('system/api/server/clients/q/id/0')
+                            }
                         }
-                    }
-            }
-%}
+                }
+    %}
 {% endif %}
 {{adminltetags.useTag('content',
     [
@@ -55,13 +55,17 @@
 /* globals Swal PNotify BazContentLoader BazCore */
 window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
     initFuncs();
+    $('.tooltip').remove();
+    $('[data-toggle="tooltip"]').tooltip();
 }
 window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterRedraw"] = function() {
     initFuncs();
+    $('.tooltip').remove();
+    $('[data-toggle="tooltip"]').tooltip();
 }
 
 function initFuncs() {
-    $('.rowRevoke').each(function(index,row) {
+    $('.rowRevoke, .rowRevokeRegen').each(function(index,row) {
         $(row).off();
         $(row).click(function(e) {
             e.preventDefault();
@@ -74,6 +78,9 @@ function initFuncs() {
             var dataToSend = { };
             dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
             dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
+            if ($(thisButton).hasClass('rowRevokeRegen')) {
+                dataToSend['regen'] = 'true';
+            }
 
             $.ajax({
                 url         : url,

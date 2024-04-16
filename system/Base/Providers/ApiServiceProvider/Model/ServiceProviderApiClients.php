@@ -26,6 +26,8 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
 
     public $account_id;
 
+    public $email;
+
     public $client_id;
 
     public $client_secret;

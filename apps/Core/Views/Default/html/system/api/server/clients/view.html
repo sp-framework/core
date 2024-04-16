@@ -24,8 +24,6 @@
         'cardBodyInclude'               : 'clients/form',
         'formButtons'                   :
         [
-            'canAdd'                        : canAdd,
-            'canUpdate'                     : canUpdate,
             'updateButtonId'                : id,
             'addActionUrl'                  : 'system/api/server/clients/add',
             'addSuccessRedirectUrl'         : 'system/api/server/clients',
@@ -33,6 +31,14 @@
             'updateSuccessRedirectUrl'      : 'system/api/server/clients',
             'cancelActionUrl'               : 'system/api/server/clients',
             'closeActionUrl'                : 'system/api/server/clients'
+        ],
+        'dataDependencies'              :
+        [
+            [
+                'componentName'      : 'Api Services with grant type password (with client key generation allowed disabled) Or grant type client credentials',
+                'componentVar'       : availableAPIServices,
+                'componentRoute'     : 'system/api/server/services/q/id/0'
+            ]
         ]
     ]
 )}}

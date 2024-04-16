@@ -4196,7 +4196,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                 //          }
                 //      });
                 // }
-                if (dataCollection[componentId][sectionId].data.id === '') {//Create
+                if (dataCollection[componentId][sectionId].data.id === '' || !dataCollection[componentId][sectionId].data.id) {//Create
                     var dataToSubmit;
 
                     $('#' + sectionId).find('[data-bazpostoncreate=true]').each(function() {
