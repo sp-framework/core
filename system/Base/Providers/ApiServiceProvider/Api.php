@@ -5,6 +5,7 @@ namespace System\Base\Providers\ApiServiceProvider;
 use DateInterval;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
+use GuzzleHttp\Psr7\Utils;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToDeleteFile;
@@ -192,12 +193,9 @@ class Api extends BasePackage
             }
 
             //Setting client-id with Authorization header is important for our setup as we rely on the client ID to find which API needs to be instantiated
-            if ($this->request->getHeader('Authorization') !== '' &&
-                $this->request->getHeader('client-id')
-            ) {
+            if ($this->request->getHeader('Authorization') !== '') {
                 $this->isApi = true;
                 $this->isApiCheckVia = 'authorization';
-                $this->clientId = $this->request->getHeader('client-id');
             } else if ($this->request->get('client_id')) {
                 $this->isApi = true;
                 $this->isApiCheckVia = 'client_id';
@@ -224,6 +222,15 @@ class Api extends BasePackage
             } else if ($this->isApiCheckVia === 'authorization' ||
                        $this->isApiCheckVia === 'client_id'
             ) {
+                if ($this->isApiCheckVia === 'authorization') {
+                    $authorization = \trim((string) \preg_replace('/^\s*Bearer\s/', '', $this->request->getHeader('Authorization')));
+                    $authorization = explode('||', $authorization);
+
+                    if (count($authorization) === 2) {
+                        $this->clientId = $this->secTools->decryptBase64($authorization[1]);
+                    }
+                }
+
                 if ($this->clientId) {
                     $clientsObject = new ServiceProviderApiClients;
                     $clientsStore = $this->ff->store($clientsObject->getSource());
@@ -392,7 +399,18 @@ class Api extends BasePackage
         $serverResponse = new Response();
 
         try {
-            return $this->server->respondToAccessTokenRequest(ServerRequest::fromGlobals(), $serverResponse);
+            $tokenResponse = $this->server->respondToAccessTokenRequest(ServerRequest::fromGlobals(), $serverResponse);
+
+            $token = $this->helper->decode((string) $tokenResponse->getBody(), true);
+
+            $encClientId = $this->secTools->encryptBase64($this->request->get('client_id'));
+
+            $token['access_token'] = $token['access_token'] . '||' . $encClientId;
+            $token['refresh_token'] = $token['refresh_token'] . '||' . $encClientId;
+
+            $body = Utils::streamFor($this->helper->encode($token));
+
+            return $tokenResponse->withBody($body);
         } catch (OAuthServerException $exception) {
             $this->logger->logExceptions->critical($exception);
             var_dump($exception);die();
@@ -441,7 +459,7 @@ class Api extends BasePackage
     public function getScope()
     {
         if ($this->headerAttributes && $this->headerAttributes['oauth_scopes']) {
-            return $this->accessTokenRepository->getUserFromToken($this->headerAttributes['oauth_scopes']);
+            return $this->headerAttributes['oauth_scopes'][0];
         }
 
         return $this->scopes->getById($this->api['scope_id']);

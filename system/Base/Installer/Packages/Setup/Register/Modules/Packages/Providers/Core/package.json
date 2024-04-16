@@ -70,6 +70,9 @@
 					},
 					"cboden/ratchet" : {
 						"phpv8.3 support" : "external/patches/cboden_ratchet_ioconnection.patch"
+					},
+					"league/oauth2-server" : {
+						"extract client_id" : "external/patches/oauth2_server_bearertokenvalidator.patch"
 					}
 				}
 			}
