@@ -82,9 +82,26 @@ class Domains extends BasePackage
 
 				return;
 			}
+
+			throw $e;
 		}
 
 		if ($add) {
+			if ($data['apps'] && count($data['apps']) >= 1) {
+				foreach ($data['apps'] as $appId => $appSettings) {
+					if ($appSettings['allowed'] == true) {
+						//add new viewsettings
+						$viewSettingsData = [];
+						$viewSettingsData['view_id'] = (int) $appSettings['view'];
+						$viewSettingsData['domain_id'] = $this->packagesData->last['id'];
+						$viewSettingsData['app_id'] = $appId;
+						$viewSettingsData['via_domain'] = true;
+
+						$this->modules->viewsSettings->addViewsSettings($viewSettingsData);
+					}
+				}
+			}
+
 			$this->addActivityLog($data);
 
 			$this->addResponse('Added ' . $data['name'] . ' domain', 0, null, true);
