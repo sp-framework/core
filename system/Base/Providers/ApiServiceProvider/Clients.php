@@ -47,6 +47,10 @@ class Clients extends BasePackage
                 }
             } else if ($api['grant_type'] === 'client_credentials') {
                 $account['email'] = $data['email'];
+
+                if (isset($data['device']) && $data['device'] = true) {
+                    $account['device'] = $this->secTools->random->uuid();
+                }
             }
 
             $this->generateClientKeys($api, $account);
@@ -91,6 +95,10 @@ class Clients extends BasePackage
             $client = $this->getById($data['id']);
             $api = $this->api->getById($client['api_id']);
             $account = $this->basepackages->accounts->getById($client['account_id']);
+
+            if ($client['device']) {
+                $account['device'] = $client['device'];
+            }
 
             $this->generateClientKeys($api, $account);
 
@@ -139,6 +147,10 @@ class Clients extends BasePackage
                 $newClient['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
                 $newClient['revoked'] = '0';
                 $newClient['redirectUri'] = 'https://';//Change this to default URI
+                $newClient['device'] = null;
+                if (isset($account['device'])) {
+                    $newClient['device'] = $account['device'];
+                }
                 if (isset($api['redirect_uri'])) {
                     $newClient['redirectUri'] = $api['redirect_uri'];
                 }
@@ -148,16 +160,28 @@ class Clients extends BasePackage
                 if ($this->config->databasetype === 'db') {
                     $oldClient = $this->getByParams(
                         [
-                            'conditions'    => 'name = :name: AND revoked = :revoked:',
+                            'conditions'    => 'email = :email: AND revoked = :revoked:',
                             'bind'          =>
                                 [
-                                    'name'      => $apiName,
-                                    'revoked'   => false
+                                    'email'         => ($account['email'] ?? $this->auth->account()['email']),
+                                    'revoked'       => false,
+                                    'device'        => ($account['device'] ?? null),
+                                    'api_id'        => $api['id']
                                 ]
                         ]
                     );
                 } else {
-                    $oldClient = $this->getByParams(['conditions' => [['name', '=', $apiName], ['revoked', '=', false]]]);
+                    $oldClient = $this->getByParams(
+                        [
+                            'conditions' =>
+                                [
+                                    ['email', '=', ($account['email'] ?? $this->auth->account()['email'])],
+                                    ['revoked', '=', false],
+                                    ['device', '=', ($account['device'] ?? null)],
+                                    ['api_id', '=', $api['id']]
+                                ]
+                        ]
+                    );
                 }
 
                 if ($oldClient && isset($oldClient[0]['id'])) {
@@ -172,7 +196,7 @@ class Clients extends BasePackage
                     $this->addResponse('Keys generated successfully.', 0, ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret]);
 
                     if ($emailNewClientDetails) {
-                        $this->emailNewClientDetails($api, $newClient['email'], $newClient['client_id'], $client_secret);
+                        $this->emailNewClientDetails($api, $newClient, $client_secret);
                     }
                     return true;
                 } else {
@@ -195,7 +219,7 @@ class Clients extends BasePackage
         $this->addResponse('Id generated successfully.', 0, ['client_id' => $this->random->base58(isset($data['client_id_length']) ? $data['client_id_length'] : 8)]);
     }
 
-    protected function emailNewClientDetails($api, $email, $clientId, $clientSecret)
+    protected function emailNewClientDetails($api, $newClient, $clientSecret)
     {
         $domain = $this->domains->getById($api['domain_id']);
 
@@ -204,9 +228,13 @@ class Clients extends BasePackage
         $emailData['status'] = 1;
         $emailData['priority'] = 1;
         $emailData['confidential'] = 1;
-        $emailData['to_addresses'] = $this->helper->encode([$email]);
+        $emailData['to_addresses'] = $this->helper->encode([$newClient['email']]);
         $emailData['subject'] = 'API client details for ' . $domain['name'];
-        $emailData['body'] = 'Client ID: ' . $clientId . '<br>' . 'Client Secret: ' . $clientSecret;
+        $emailData['body'] = '';
+        if ($newClient['device']) {
+            $emailData['body'] = 'Device ID: ' . $newClient['device'] . '<br>';
+        }
+        $emailData['body'] = $emailData['body'] . 'Client ID: ' . $newClient['client_id'] . '<br>' . 'Client Secret: ' . $clientSecret;
 
         return $this->basepackages->emailqueue->addToQueue($emailData);
     }

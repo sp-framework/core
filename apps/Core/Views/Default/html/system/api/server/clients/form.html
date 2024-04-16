@@ -1,9 +1,7 @@
-{% set clientInfoHidden = 'hidden' %}
 {% if client['id'] is defined %}
     {% set id = client['id'] %}
     {% set clientId = client['client_id'] %}
     {% set clientEmail = client['email'] %}
-    {% set clientInfoHidden = '' %}
 {% else %}
     {% set id = '' %}
     {% set clientId = '' %}
@@ -80,32 +78,31 @@
                     ]
                 )}}
             </div>
-        </div>
-        <div class="row" {{clientInfoHidden}}>
-            <div class="col">
+            <div id="is-device" class="col d-none">
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'client_id',
-                        'fieldLabel'                     : 'Client ID',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : false,
-                        'fieldHelpTooltipContent'        : '',
-                        'fieldRequired'                  : true,
+                        'fieldId'                        : 'device',
+                        'fieldLabel'                     : 'Client is a device?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Client is a device?',
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'success',
+                        'fieldCheckboxChecked'           : false,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
                         'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 50,
-                        'fieldValue'                     : clientId
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true
                     ]
                 )}}
             </div>
         </div>
     </fieldset>
 </form>
+{% set availableAPIServices = json_encode(availableAPIServices, 16) %}
 <script>
 /* globals PNotify Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
@@ -132,13 +129,33 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
 
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['availableAPIServices'] = JSON.parse('{{availableAPIServices}}');
+
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                          : { },
         '{{componentId}}-{{sectionId}}-client_id'                   : { },
         '{{componentId}}-{{sectionId}}-email'                       : { },
+        '{{componentId}}-{{sectionId}}-device'                      : { },
         '{{componentId}}-{{sectionId}}-api_id'                      : {
-            "placeholder" : 'SELECT API'
+            "placeholder" : 'SELECT API',
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function (e) {
+                    var data = e.params.data;
+
+                    for (var api in dataCollectionSectionForm['vars']['availableAPIServices']) {
+                        if (dataCollectionSectionForm['vars']['availableAPIServices'][api]['id'] == data.id) {
+                            if (dataCollectionSectionForm['vars']['availableAPIServices'][api]['grant_type'] === 'client_credentials') {
+                                $('#is-device').removeClass('d-none');
+                            } else {
+                                $('#is-device').addClass('d-none');
+                                $('#{{componentId}}-{{sectionId}}-device')[0].checked = false;
+                            }
+                        }
+                    }
+                });
+            }
         },
         '{{componentId}}-{{sectionId}}-form'                        : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, :hidden',

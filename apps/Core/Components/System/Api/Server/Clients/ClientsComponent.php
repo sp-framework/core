@@ -78,11 +78,11 @@ class ClientsComponent extends BaseComponent
             $this->api->clients,
             'system/api/server/clients/view',
             $conditions,
-            ['revoked', 'client_id', 'api_id', 'app_id', 'domain_id', 'account_id', 'last_used'],
+            ['revoked', 'client_id', 'api_id', 'email', 'device', 'last_used'],
             true,
-            ['revoked', 'client_id', 'api_id', 'app_id', 'domain_id', 'account_id', 'last_used'],
+            ['revoked', 'client_id', 'api_id', 'email', 'device', 'last_used'],
             null,
-            ['api_id' => 'api', 'app_id' => 'app', 'domain_id' => 'domain', 'account_id' => 'account'],
+            ['api_id' => 'api'],
             $replaceColumns,
             'client_id'
         );
@@ -111,19 +111,8 @@ class ClientsComponent extends BaseComponent
                 $data['api_id'] = $api['name'];
             }
 
-            $app = $this->apps->getById($data['app_id']);
-            if ($app) {
-                $data['app_id'] = $app['name'];
-            }
-
-            $domain = $this->domains->getById($data['domain_id']);
-            if ($domain) {
-                $data['domain_id'] = $domain['name'];
-            }
-
-            $account = $this->basepackages->accounts->getById($data['account_id']);
-            if ($account) {
-                $data['account_id'] = $account['email'];
+            if (!$data['device']) {
+                $data['device'] = '-';
             }
         }
 

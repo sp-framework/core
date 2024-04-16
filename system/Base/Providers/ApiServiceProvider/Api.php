@@ -406,7 +406,9 @@ class Api extends BasePackage
             $encClientId = $this->secTools->encryptBase64($this->request->get('client_id'));
 
             $token['access_token'] = $token['access_token'] . '||' . $encClientId;
-            $token['refresh_token'] = $token['refresh_token'] . '||' . $encClientId;
+            if (isset($token['refresh_token'])) {
+                $token['refresh_token'] = $token['refresh_token'] . '||' . $encClientId;
+            }
 
             $body = Utils::streamFor($this->helper->encode($token));
 
