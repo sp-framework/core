@@ -55,6 +55,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Timezones;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ImportExport;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Menus;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Messenger;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Murls;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notifications;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages;
@@ -112,6 +113,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Basepackage
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesFilters;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesImportExport;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMenus;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMurls;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotifications;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesStorages;
@@ -565,6 +567,10 @@ class Setup
 					'schema'	=> new Menus,
 					'model'		=> new BasepackagesMenus,
 				],
+			'basepackages_murls' 						=> [
+					'schema'	=> new Murls,
+					'model'		=> new BasepackagesMurls,
+				],
 			'basepackages_filters' 						=> [
 					'schema'	=> new Filters,
 					'model'		=> new BasepackagesFilters,
@@ -689,10 +695,6 @@ class Setup
 					'schema'	=> new Clients,
 					'model'		=> new ServiceProviderApiClients,
 				],
-			// 'service_provider_api_users'				=> [
-			// 		'schema'	=> new Users,
-			// 		'model'		=> new ServiceProviderApiUsers,
-			// 	],
 			'service_provider_api_refresh_tokens'		=> [
 					'schema'	=> new RefreshTokens,
 					'model'		=> new ServiceProviderApiRefreshTokens,

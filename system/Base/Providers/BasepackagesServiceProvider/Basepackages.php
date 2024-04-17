@@ -26,6 +26,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Pusher;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Qrcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Templates;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Murls;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profile;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
@@ -96,6 +97,8 @@ class Basepackages
 	protected $backuprestore;
 
 	protected $utils;
+
+	protected $murls;
 
 	public function __construct()
 	{
@@ -320,5 +323,12 @@ class Basepackages
 		$this->utils = (new Utils())->init();
 
 		return $this->utils;
+	}
+
+	protected function initMurls()
+	{
+		$this->murls = (new Murls())->init();
+
+		return $this->murls;
 	}
 }
