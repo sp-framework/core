@@ -12,35 +12,41 @@ BazCore.header({
     <div class="card m-0">
         <div class="card-body login-card-body">
             <div class="login-logo">
-                <img src="{{links.images(assets.get('branding').getCodes()[0].getContent())}}" data-rjs="3" alt="Bazaari Logo">
+                <img src="{{links.images(assets.get('branding').getCodes()[3].getContent())}}" data-rjs="3" alt="Bazaari Logo" style="height:{{assets.get('branding').getCodes()[5].getContent()}}px">
             </div>
             <div id="{{componentId}}-regular" hidden>
-                <p class="login-box-msg text-sm font-weight-bold">Register new account for application {{appName|lower}}</p>
+                {% if api is defined %}
+                    <p class="login-box-msg text-sm font-weight-bold">Register new client for API {{api['name']}}</p>
+                {% else %}
+                    <p class="login-box-msg text-sm font-weight-bold">Register new account for application {{appName|lower}}</p>
+                {% endif %}
                 <div id="{{componentId}}-form">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'componentId'                           : componentId,
-                            'sectionId'                             : 'form',
-                            'fieldId'                               : 'first_name',
-                            'fieldLabel'                            : false,
-                            'fieldType'                             : 'input',
-                            'fieldInputType'                        : 'text',
-                            'fieldPlaceholder'                      : 'First Name',
-                            'fieldGroupPostAddonIcon'               : 'user'
-                        ]
-                    )}}
-                    {{adminltetags.useTag('fields',
-                        [
-                            'componentId'                           : componentId,
-                            'sectionId'                             : 'form',
-                            'fieldId'                               : 'last_name',
-                            'fieldLabel'                            : false,
-                            'fieldType'                             : 'input',
-                            'fieldInputType'                        : 'text',
-                            'fieldPlaceholder'                      : 'Last Name',
-                            'fieldGroupPostAddonIcon'               : 'user'
-                        ]
-                    )}}                    
+                    {% if api is not defined %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'componentId'                           : componentId,
+                                'sectionId'                             : 'form',
+                                'fieldId'                               : 'first_name',
+                                'fieldLabel'                            : false,
+                                'fieldType'                             : 'input',
+                                'fieldInputType'                        : 'text',
+                                'fieldPlaceholder'                      : 'First Name',
+                                'fieldGroupPostAddonIcon'               : 'user'
+                            ]
+                        )}}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'componentId'                           : componentId,
+                                'sectionId'                             : 'form',
+                                'fieldId'                               : 'last_name',
+                                'fieldLabel'                            : false,
+                                'fieldType'                             : 'input',
+                                'fieldInputType'                        : 'text',
+                                'fieldPlaceholder'                      : 'Last Name',
+                                'fieldGroupPostAddonIcon'               : 'user'
+                            ]
+                        )}}
+                    {% endif %}
                     {{adminltetags.useTag('fields',
                         [
                             'componentId'                           : componentId,
@@ -53,12 +59,46 @@ BazCore.header({
                             'fieldGroupPostAddonIcon'               : 'envelope'
                         ]
                     )}}
-                    <div class="row mt-2">
-                        <div class="col mt-2">
-                            <a class="text-info" href="{{links.url('auth')}}">
-                                <span>Back to login</span>
-                            </a>
+                    {% if api is defined %}
+                        <div class="row mt-2">
+                            <div class="col-md-4">
+                                {{adminltetags.useTag('fields',
+                                    [
+                                        'componentId'                           : componentId,
+                                        'sectionId'                             : 'form',
+                                        'fieldId'                               : 'device',
+                                        'fieldLabel'                            : false,
+                                        'fieldType'                             : 'checkbox',
+                                        'fieldCheckboxType'                     : 'success',
+                                        'fieldCheckboxLabel'                    : 'Is Device?',
+                                        'fieldCheckboxAdditionClass'            : 'text-sm text-uppercase'
+                                    ]
+                                )}}
+                            </div>
+                            <div class="col d-none">
+                                {{adminltetags.useTag('fields',
+                                    [
+                                        'componentId'                           : componentId,
+                                        'sectionId'                             : 'form',
+                                        'fieldId'                               : 'forceRegen',
+                                        'fieldLabel'                            : false,
+                                        'fieldType'                             : 'checkbox',
+                                        'fieldCheckboxType'                     : 'success',
+                                        'fieldCheckboxLabel'                    : 'Force Revoke & Regenerate?',
+                                        'fieldCheckboxAdditionClass'            : 'text-sm text-uppercase'
+                                    ]
+                                )}}
+                            </div>
                         </div>
+                    {% endif %}
+                    <div class="row mt-2">
+                        {% if api is not defined %}
+                            <div class="col mt-2">
+                                <a class="text-info" href="{{links.url('auth')}}">
+                                    <span>Back to login</span>
+                                </a>
+                            </div>
+                        {% endif %}
                         <div class="col">
                             <button id="{{componentId}}-form-register" type="button" class="btn btn-info float-right">
                                 <i class="fa fa-cog fa-spin login-spinner" hidden></i>
@@ -72,12 +112,26 @@ BazCore.header({
         </div>
     </div>
 </div>
+{% if api is defined %}
+    {% set api = json_encode(api, 16) %}
+{% else %}
+    {% set api = json_encode([]) %}
+{% endif %}
 <script>
 /*global BazCore */
 $(document).ready(function(){
+    var api = JSON.parse('{{api}}');
+    var isApi = false;
+    if (Object.keys(api).length > 0 && api.id) {
+        isApi = true;
+    }
 
     $('#{{componentId}}-regular').attr('hidden', false).addClass('animated fadeIn');
-    $('#{{componentId}}-form-first_name').focus();
+    if (isApi) {
+        $('#{{componentId}}-form-email').focus();
+    } else {
+        $('#{{componentId}}-form-first_name').focus();
+    }
 
     BazCore.footer({
         loadFooterAt : 'register'
@@ -111,12 +165,24 @@ $(document).ready(function(){
 
         $('.login-spinner').attr('hidden', false);
 
-        url = '{{links.url("register/registerNewAccount")}}';
-        postData = {
-            'first_name'      : $('#{{componentId}}-form-first_name').val().trim(),
-            'last_name'       : $('#{{componentId}}-form-last_name').val().trim(),
-            'email'           : $('#{{componentId}}-form-email').val().trim()
-        };
+        postData = { };
+        postData['email'] = $('#{{componentId}}-form-email').val().trim();
+
+        if (!isApi) {
+            url = '{{links.url("register/registerNewAccount")}}';
+            postData['first_name'] = $('#{{componentId}}-form-first_name').val().trim();
+            postData['last_name'] = $('#{{componentId}}-form-last_name').val().trim();
+        } else if (isApi) {
+            url = '{{links.url("register/apiAddNewClient")}}';
+            postData['api_id'] = api['id'];
+            postData['device'] = '0';
+            if ($('#{{componentId}}-form-device')[0].checked === true) {
+                postData['device'] = '1';
+            }
+            if ($('#{{componentId}}-form-forceRegen')[0].checked === true) {
+                postData['forceRegen'] = '1';
+            }
+        }
 
         postData[$('#security-token').attr('name')] = $('#security-token').val();
     }
@@ -156,6 +222,11 @@ $(document).ready(function(){
                                     }
                                 } else if (response.responseCode == '1') {
                                     $('.login-box-msg').text(response.responseMessage);
+                                    if (isApi) {
+                                        if (response.responseMessage.includes('force')) {
+                                            $('#{{componentId}}-form-forceRegen').parents('.col').removeClass('d-none');
+                                        }
+                                    }
                                     if (response.redirectUrl) {
                                         failed(response.redirectUrl);
                                     } else {
@@ -179,27 +250,55 @@ $(document).ready(function(){
         $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
         $('#{{componentId}}-form :input').prop('disabled', false);
         $('#{{componentId}}-form :input').not('.token').val('');
-        $('#{{componentId}}-form-first_name').focus();
+        if (isApi) {
+            $('#{{componentId}}-form-email').focus();
+            $('#{{componentId}}-form-device')[0].checked = false;
+        } else {
+            $('#{{componentId}}-form-first_name').focus();
+        }
+
         $('#{{componentId}}-form-register').attr('disabled', false);
+
         setTimeout(function () {
             $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
 
-            $('.login-box-msg').text('Register new account for application {{appName|lower}}');
+            if (isApi) {
+                $('.login-box-msg').text('Register new client for API ' + api['name']);
+            } else {
+                $('.login-box-msg').text('Register new account for application {{appName|lower}}');
+            }
 
             $('.login-box-msg').addClass('animated fadeIn');
         }, 5000);
     }
 
     function success(redirectUrl = null) {
-        setTimeout(function() {
-            $('.login-spinner').attr('hidden', true);
+        if (!isApi) {
+            setTimeout(function() {
+                $('.login-spinner').attr('hidden', true);
 
-            if (redirectUrl) {
-                window.location = redirectUrl;
-            } else {
-                window.location = '/{{appRoute}}/';
-            }
-        }, 1500)
+                if (redirectUrl) {
+                    window.location = redirectUrl;
+                } else {
+                    window.location = '/{{appRoute}}/';
+                }
+            }, 1500)
+        } else {
+            $('.login-spinner').attr('hidden', true);
+            $('.login-box-msg').removeClass('fadeIn').addClass('text-success animated fadeIn');
+            $('#{{componentId}}-form :input').prop('disabled', false);
+            $('#{{componentId}}-form :input').not('.token').val('');
+            $('#{{componentId}}-form-email').focus();
+            $('#{{componentId}}-form-device')[0].checked = false;
+            $('#{{componentId}}-form-forceRegen')[0].checked = false;
+            $('#{{componentId}}-form-forceRegen').parents('.col').addClass('d-none');
+
+            setTimeout(function () {
+                $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
+                $('.login-box-msg').text('Register new client for API ' + api['name']);
+                $('.login-box-msg').addClass('animated fadeIn');
+            }, 5000);
+        }
     }
 });
 </script>

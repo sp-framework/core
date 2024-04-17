@@ -38,6 +38,14 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
 
     public $revoked;
 
+    public $concurrent_calls_count;
+
+    public $per_minute_calls_count;
+
+    public $per_hour_calls_count;
+
+    public $per_day_calls_count;
+
     public function getIdentifier()
     {
         return $this->client_id;

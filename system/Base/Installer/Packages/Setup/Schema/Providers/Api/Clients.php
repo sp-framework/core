@@ -110,6 +110,34 @@ class Clients
                         'notNull'       => true
                     ]
                 ),
+                new Column(
+                    'concurrent_calls_count',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'per_minute_calls_count',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'per_hour_calls_count',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'per_day_calls_count',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false
+                    ]
+                ),
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'

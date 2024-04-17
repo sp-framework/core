@@ -114,24 +114,15 @@ class ServicesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->api->addApi($this->postData())) {
-                $this->view->responseData = $this->api->packagesData->last;
-            }
-
-            $this->view->responseCode = $this->api->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->api->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+        if ($this->api->addApi($this->postData())) {
+            $this->view->responseData = $this->api->packagesData->last;
         }
+
+        $this->view->responseCode = $this->api->packagesData->responseCode;
+
+        $this->view->responseMessage = $this->api->packagesData->responseMessage;
     }
 
     /**
@@ -139,22 +130,14 @@ class ServicesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->api->updateApi($this->postData());
+        $this->api->updateApi($this->postData());
 
-            $this->view->responseCode = $this->api->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->api->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
+        $this->addResponse(
+            $this->api->packagesData->responseMessage,
+            $this->api->packagesData->responseCode
+        );
     }
 
     /**
@@ -162,21 +145,13 @@ class ServicesComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->api->removeApi($this->postData());
+        $this->api->removeApi($this->postData());
 
-            $this->view->responseCode = $this->api->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->api->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
+        $this->addResponse(
+            $this->api->packagesData->responseMessage,
+            $this->api->packagesData->responseCode
+        );
     }
 }

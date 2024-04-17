@@ -1,9 +1,11 @@
 {% if scope['id'] is defined %}
     {% set scopeId = scope['id'] %}
-    {% set scopeName = scope['name'] %}
+    {% set name = scope['name'] %}
+    {% set scopeName = scope['scope_name'] %}
     {% set scopeDescription = scope['description'] %}
 {% else %}
     {% set scopeId = '' %}
+    {% set name = '' %}
     {% set scopeName = '' %}
     {% set scopeDescription = '' %}
 {% endif %}
@@ -43,11 +45,43 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Name of the scope. Example: Private Scope',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : name
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'scope_name',
                         'fieldLabel'                     : 'Scope Name',
                         'fieldType'                      : 'input',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Name of the scope. Example: Sales Manager',
+                        'fieldHelpTooltipContent'        : 'Scope name that is used at the time of client registration. Scope name should be with no spaces or special characters.',
                         'fieldRequired'                  : true,
+                        'fieldGroupPostAddonButtons'          :
+                            [
+                                'generate-scope-name'   : [
+                                    'title'                   : false,
+                                    'icon'                    : 'wand-magic-sparkles',
+                                    'noMargin'                : true,
+                                    'buttonAdditionalClass'   : 'rounded-0 text-white',
+                                    'position'                : 'right'
+                                ]
+                            ],
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
@@ -132,6 +166,7 @@
     </fieldset>
 </form>
 <script>
+/* globals PNotify */
 var acls = JSON.parse('{{acls}}');
 var gridColumns = [];
 gridColumns.push(
@@ -211,11 +246,40 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'           : { },
         '{{componentId}}-{{sectionId}}-name'         : { },
-        '{{componentId}}-{{sectionId}}-parent_id'    : {
-            'placeholder'   : 'SELECT PARENT ROLE'
+        '{{componentId}}-{{sectionId}}-scope_name'   : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-scope-name').click(function(e) {
+                    e.preventDefault();
+
+                    var dataToSend = { };
+                    dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+                    dataToSend['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+
+                    $.ajax({
+                        url         : '{{links.url("system/api/server/scopes/generatescopename")}}',
+                        method      : 'post',
+                        dataType    : 'json',
+                        data        : dataToSend,
+                        success     : function(response) {
+                            if (response.responseCode === 0) {
+                                PNotify.success({title : response.responseMessage});
+                                if (response.responseData && response.responseData.scope_name) {
+                                    $('#{{componentId}}-{{sectionId}}-scope_name').val(response.responseData.scope_name);
+                                }
+                            } else {
+                                PNotify.error({title : response.responseMessage});
+                            }
+
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+                        }
+                    });
+                });
+            }
         },
         '{{componentId}}-{{sectionId}}-description'  : { },
-        '{{componentId}}-{{sectionId}}-type'         : { },
         '{{componentId}}-{{sectionId}}-permissions'  :
         $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-permissions'], {
             plugins: [
@@ -564,7 +628,6 @@ dataCollectionSection =
                 }
             }
         }),
-        //Validation
         '{{componentId}}-{{sectionId}}-form' : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'     : 'required'

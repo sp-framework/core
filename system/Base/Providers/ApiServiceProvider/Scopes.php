@@ -25,7 +25,13 @@ class Scopes extends BasePackage
      */
     public function addScope(array $data)
     {
-        if ($this->add($this->extractScopeName($data))) {
+        if (!isset($data['scope_name']) ||
+            (isset($data['scope_name']) && $data['scope_name'] === '')
+        ) {
+            $data = $this->extractScopeName($data);
+        }
+
+        if ($this->add($data)) {
             $this->addResponse('Added ' . $data['name'] . ' scope');
         } else {
             $this->addResponse('Error adding new scope.', 1);
@@ -37,16 +43,28 @@ class Scopes extends BasePackage
      */
     public function updateScope(array $data)
     {
-        if ($this->update($this->extractScopeName($data))) {
+        if (!isset($data['scope_name']) ||
+            (isset($data['scope_name']) && $data['scope_name'] === '')
+        ) {
+            $data = $this->extractScopeName($data);
+        }
+
+        if ($this->update($data)) {
             $this->addResponse('Updated ' . $data['name'] . ' scope');
         } else {
             $this->addResponse('Error updating scope.', 1);
         }
     }
 
-    protected function extractScopeName($data)
+    public function extractScopeName($data)
     {
+        if ($data['name'] === '') {
+            $data['name'] = $this->secTools->random->base58(6);
+        }
+
         $data['scope_name'] = str_replace(' ', '', strtolower($data['name']));
+
+        $this->addResponse('Generated scope name', 0, $data);
 
         return $data;
     }
@@ -221,35 +239,14 @@ class Scopes extends BasePackage
         return true;
     }
 
-    public function searchScope(string $scopeQueryString)
+    public function getScopeByScopeName($scope)
     {
-        if ($this->config->databasetype === 'db') {
-            $conditions =
-                [
-                    'conditions'    => 'name LIKE :aName:',
-                    'bind'          => [
-                        'aName'     => '%' . $scopeQueryString . '%'
-                    ]
-                ];
-        } else {
-            $conditions = ['name', 'LIKE', '%' . $scopeQueryString . '%'];
+        $scope = $this->getFirst('scope_name', $scope, false, true, null, [], true);
+
+        if ($scope) {
+            return $scope;
         }
 
-        $searchScopes = $this->getByParams($conditions);
-
-        if (count($searchScopes) > 0) {
-            $scopes = [];
-
-            foreach ($searchScopes as $scopeKey => $scopeValue) {
-                $scopes[$scopeKey]['id'] = $scopeValue['id'];
-                $scopes[$scopeKey]['name'] = $scopeValue['name'];
-            }
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->scopes = $scopes;
-
-            return true;
-        }
+        return false;
     }
 }

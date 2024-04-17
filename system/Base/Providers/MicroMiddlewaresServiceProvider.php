@@ -288,6 +288,12 @@ class MicroMiddlewaresServiceProvider extends Injectable
         }
 
         if (!$this->data['api']) {
+            if ($this->api->apiCallsLimitReached) {
+                $this->addResponse('API calls limit reached for this client ID.', 1);
+
+                return false;
+            }
+
             $this->addResponse('API not available or Incorrect client ID or No Authorization Code set.', 1);
 
             return false;

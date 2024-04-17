@@ -204,10 +204,13 @@ function getPasswordApiFields() {
                     }
                 });
 
-                function generateClientKey(passwordApi, force = false) {
+                function generateClientKey(passwordApi, forceRegen = false) {
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData = $.extend(postData, passwordApi);
+                    postData['api_id'] = passwordApi['id'];
+                    if (forceRegen) {
+                        postData['forceRegen'] = 'true';
+                    }
 
                     $.post('{{links.url("system/api/server/clients/generateclientkeys")}}', postData, function(response) {
                         if (response.responseCode == 0) {

@@ -75,6 +75,8 @@ class Api extends BasePackage
 
     protected $headerAttributes;
 
+    public $apiCallsLimitReached = false;
+
     public function init()
     {
         $this->scopes = new Scopes;
@@ -196,7 +198,9 @@ class Api extends BasePackage
             if ($this->request->getHeader('Authorization') !== '') {
                 $this->isApi = true;
                 $this->isApiCheckVia = 'authorization';
-            } else if ($this->request->get('client_id') && !$this->request->get('id')) {
+            } else if ($this->request->get('client_id') &&
+                       !$this->request->get('id')
+            ) {
                 $this->isApi = true;
                 $this->isApiCheckVia = 'client_id';
                 $this->clientId = $this->request->get('client_id');
@@ -250,7 +254,9 @@ class Api extends BasePackage
                         $api = $this->getById($client['api_id']);
 
                         if ($api['status'] == true) {
-                            $this->api = $api;
+                            if ($this->checkCallLimits($client, $api)) {
+                                $this->api = $api;
+                            }
                         }
                     }
                 }
@@ -284,6 +290,12 @@ class Api extends BasePackage
         }
 
         return $this->api;
+    }
+
+    public function checkCallLimits($client, $api)
+    {
+        // $this->apiCallsLimitReached = true;
+        return true;
     }
 
     public function setupApi($refreshTokenSet = false)
@@ -646,8 +658,6 @@ class Api extends BasePackage
 
     public function getEnabledAPIByType($type)
     {
-        $apis = [];
-
         if ($this->config->databasetype === 'db') {
             $apis =
                 $this->getByParams(
@@ -668,6 +678,10 @@ class Api extends BasePackage
                     ]
                 ]
             );
+        }
+
+        if (!isset($apis) || !$apis) {
+            $apis = [];
         }
 
         return $apis;

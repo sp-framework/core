@@ -35,6 +35,8 @@ class ServiceProviderApi extends BaseModel
 
     public $grant_type;
 
+    public $cc_max_devices;
+
     public $private_key;
 
     public $encryption_key_size;
@@ -52,6 +54,14 @@ class ServiceProviderApi extends BaseModel
     public $refresh_token_timeout;
 
     public $scope_id;
+
+    public $concurrent_calls_limit;
+
+    public $per_minute_calls_limit;
+
+    public $per_hour_calls_limit;
+
+    public $per_day_calls_limit;
 
     public function initialize()
     {

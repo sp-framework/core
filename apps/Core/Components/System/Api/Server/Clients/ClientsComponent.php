@@ -14,33 +14,14 @@ class ClientsComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $passwordApis = $this->api->getEnabledAPIByType('password');
-
-        if ($passwordApis && is_array($passwordApis) && count($passwordApis) > 0) {
-            foreach ($passwordApis as $passwordApiKey => $passwordApi) {
-                if ($passwordApi['client_keys_generation_allowed'] == true) {
-                    unset($passwordApis[$passwordApiKey]);
-                }
-            }
-        } else {
-            $passwordApis = [];
-        }
-
-        $clientCredentialsApis = $this->api->getEnabledAPIByType('client_credentials');
-
-        if ($clientCredentialsApis && is_array($clientCredentialsApis) && count($clientCredentialsApis) > 0) {
-            foreach ($clientCredentialsApis as $clientCredentialsApiKey => $clientCredentialsApi) {
-                if ($clientCredentialsApi['client_keys_generation_allowed'] == true) {
-                    unset($clientCredentialsApis[$clientCredentialsApiKey]);
-                }
-            }
-        } else {
-            $clientCredentialsApis = [];
-        }
-
-        $this->view->availableAPIServices = array_merge($passwordApis, $clientCredentialsApis);
 
         if (isset($this->getData()['id'])) {
+            $this->view->availableAPIServices =
+                array_merge(
+                    $this->api->getEnabledAPIByType('password'),
+                    $this->api->getEnabledAPIByType('client_credentials')
+                );
+
             if ($this->getData()['id'] != 0) {
                 $client = $this->api->clients->getById($this->getData()['id']);
 

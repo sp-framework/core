@@ -78,6 +78,27 @@
                     ]
                 )}}
             </div>
+            <div id="force-regen" class="col d-none">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'forceRegen',
+                        'fieldLabel'                     : 'Force client keys generation?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Client already exists and cannot be readded unless revoked and regenerated.',
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'warning',
+                        'fieldCheckboxChecked'           : false,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true
+                    ]
+                )}}
+            </div>
             <div id="is-device" class="col d-none">
                 {{adminltetags.useTag('fields',
                     [
@@ -138,6 +159,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-client_id'                   : { },
         '{{componentId}}-{{sectionId}}-email'                       : { },
         '{{componentId}}-{{sectionId}}-device'                      : { },
+        '{{componentId}}-{{sectionId}}-forceRegen'                  : { },
         '{{componentId}}-{{sectionId}}-api_id'                      : {
             "placeholder" : 'SELECT API',
             afterInit: function() {
@@ -168,6 +190,11 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-client_id'                   : 'Please enter api client_id',
                 '{{componentId}}-{{sectionId}}-email'                       : 'Please enter email address',
                 '{{componentId}}-{{sectionId}}-api_id'                      : 'Please select api',
+            },
+            onErrorResponse: function(response) {
+                if (response.responseMessage.includes('force')) {
+                    $('#force-regen').removeClass('d-none');
+                }
             }
         }
     });

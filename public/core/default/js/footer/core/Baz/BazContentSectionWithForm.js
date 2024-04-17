@@ -386,6 +386,9 @@
                                             if ($(thisButtonId).is('.updateData')) {
                                                 $('body').trigger('sectionWithFormDataUpdated');
                                             }
+                                            if (dataCollection[componentId] && dataCollection[componentId][sectionId][sectionId + '-form']['onSuccessResponse']) {
+                                                dataCollection[componentId] && dataCollection[componentId][sectionId][sectionId + '-form']['onSuccessResponse'](response);
+                                            }
                                         } else {
                                             $(thisButtonId).attr('disabled', false);
                                             PNotify.error({
@@ -395,6 +398,10 @@
                                             if (response.tokenKey && response.token) {
                                                 $('#security-token').attr('name', response.tokenKey);
                                                 $('#security-token').val(response.token);
+                                            }
+
+                                            if (dataCollection[componentId] && dataCollection[componentId][sectionId][sectionId + '-form']['onErrorResponse']) {
+                                                dataCollection[componentId] && dataCollection[componentId][sectionId][sectionId + '-form']['onErrorResponse'](response);
                                             }
                                         }
                                         $(thisButtonId).children('i').attr('hidden', true);

@@ -151,6 +151,7 @@ class MiddlewaresServiceProvider extends Injectable
                 $this->data['appRoute'] . '/auth/verify',
                 $this->data['appRoute'] . '/auth/sendtwofaemail',
                 $this->data['appRoute'] . '/register/registernewaccount',
+                $this->data['appRoute'] . '/register/apiaddnewclient',
             ];
         }
 

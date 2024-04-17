@@ -72,14 +72,64 @@ function initFuncs() {
 
             var thisButton = this;
             var url = $(this).attr('href');
-            $(thisButton).children('i').removeClass('fa-times-circle').addClass('fa-spin fa-cog');
-            $(thisButton).addClass('disabled');
+            if ($(thisButton).hasClass('rowRevokeRegen')) {
+                $(thisButton).children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+            } else {
+                $(thisButton).children('i').removeClass('fa-times-circle').addClass('fa-spin fa-cog');
+            }
+            // $(thisButton).addClass('disabled');
 
+            var text;
+            if ($(thisButton).hasClass('rowRevokeRegen')) {
+                text = 'Regenerate API Client Keys for client ID ' + $(thisButton).parents('tr').children('.data-client_id').html() + '?';
+            } else {
+                text = 'Revoke API Client Keys for client ID ' + $(thisButton).parents('tr').children('.data-client_id').html() + '?';
+            }
+            Swal.fire({
+                title                       : '<span class="text-danger">' + text + '</span>',
+                icon                        : 'question',
+                width                       : '100%',
+                background                  : 'rgba(0,0,0,.8)',
+                backdrop                    : 'rgba(0,0,0,.6)',
+                buttonsStyling              : false,
+                confirmButtonText           : 'Yes',
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-danger text-uppercase',
+                    'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                    'inputLabel'                : 'text-white',
+                    'input'                     : 'text-white'
+                },
+                showCancelButton            : true,
+                keydownListenerCapture      : true,
+                allowOutsideClick           : false,
+                allowEscapeKey              : false,
+                didOpen                     : function() {
+                    window.dataCollection.env.sounds.swalSound.play();
+                }
+            }).then((result) => {
+                if (result.isConfirmed === true &&
+                    result.value !== ''
+                ) {
+                    if ($(thisButton).hasClass('rowRevokeRegen')) {
+                        generateClientKey(thisButton, url, false, true);
+                    } else {
+                        generateClientKey(thisButton, url, true);
+                    }
+                } else {
+                    $(thisButton).children('i').removeClass('fa-spin fa-cog').addClass('fa-times-circle');
+                    $(thisButton).removeClass('disabled');
+                }
+            });
+        });
+
+        function generateClientKey(thisButton, url, forceRevoke = false, forceRegen = false) {
             var dataToSend = { };
             dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
             dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
-            if ($(thisButton).hasClass('rowRevokeRegen')) {
-                dataToSend['regen'] = 'true';
+            if ($(thisButton).hasClass('rowRevoke') && forceRevoke) {
+                dataToSend['forceRevoke'] = 'true';
+            } else if ($(thisButton).hasClass('rowRevokeRegen') && forceRegen) {
+                dataToSend['forceRegen'] = 'true';
             }
 
             $.ajax({
@@ -96,7 +146,11 @@ function initFuncs() {
                         });
                     }
 
-                    $(thisButton).children('i').removeClass('fa-times-circle').addClass('fa-spin fa-cog');
+                    if ($(thisButton).hasClass('rowRevoke')) {
+                        $(thisButton).children('i').removeClass('fa-spin fa-cog').addClass('fa-times-circle');
+                    } else {
+                        $(thisButton).children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+                    }
                     $(thisButton).removeClass('disabled');
 
                     if (response.tokenKey && response.token) {
@@ -105,7 +159,7 @@ function initFuncs() {
                     }
                 }
             });
-        });
+        }
     });
 }
 </script>

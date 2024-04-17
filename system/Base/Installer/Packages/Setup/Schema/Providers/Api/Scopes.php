@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Providers\Api;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Scopes
 {
@@ -54,7 +55,16 @@ class Scopes
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'
-            ]
+            ],
+                'indexes' => [
+                    new Index(
+                        'column_UNIQUE',
+                        [
+                            'scope_name'
+                        ],
+                        'UNIQUE'
+                    )
+                ]
         ];
     }
 }

@@ -109,6 +109,13 @@ class Api
                     ]
                 ),
                 new Column(
+                    'cc_max_devices',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
                     'private_key',
                     [
                         'type'          => Column::TYPE_BOOLEAN,
@@ -174,6 +181,34 @@ class Api
                     [
                         'type'          => Column::TYPE_SMALLINTEGER,
                         'notNull'       => true,
+                    ]
+                ),
+                new Column(
+                    'concurrent_calls_limit',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'per_minute_calls_limit',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'per_hour_calls_limit',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'per_day_calls_limit',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false,
                     ]
                 ),
              ],

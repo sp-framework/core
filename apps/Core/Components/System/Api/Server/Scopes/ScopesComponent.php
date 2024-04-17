@@ -93,20 +93,14 @@ class ScopesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->api->scopes->updateScope($this->postData());
+        $this->api->scopes->updateScope($this->postData());
 
-            $this->addResponse(
-                $this->api->scopes->packagesData->responseMessage,
-                $this->api->scopes->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->api->scopes->packagesData->responseMessage,
+            $this->api->scopes->packagesData->responseCode
+        );
     }
 
     /**
@@ -114,16 +108,26 @@ class ScopesComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            $this->api->scopes->removeScope($this->postData());
+        $this->api->scopes->removeScope($this->postData());
 
-            $this->addResponse(
-                $this->api->scopes->packagesData->responseMessage,
-                $this->api->scopes->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->api->scopes->packagesData->responseMessage,
+            $this->api->scopes->packagesData->responseCode
+        );
+    }
+
+    public function generateScopeNameAction()
+    {
+        $this->requestIsPost();
+
+        $this->api->scopes->extractScopeName($this->postData());
+
+        $this->addResponse(
+            $this->api->scopes->packagesData->responseMessage,
+            $this->api->scopes->packagesData->responseCode,
+            $this->api->scopes->packagesData->responseData
+        );
     }
 }
