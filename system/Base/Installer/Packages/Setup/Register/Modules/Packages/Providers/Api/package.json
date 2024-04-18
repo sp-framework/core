@@ -20,5 +20,8 @@
         "views"         : [],
         "external"      : []
     },
-    "settings"      : {"componentRoute":"system/api/server/services"}
+    "settings"      : {
+        "componentRoute":"system/api/server/services",
+        "maxApiPerDeveloper" : 10
+    }
 }

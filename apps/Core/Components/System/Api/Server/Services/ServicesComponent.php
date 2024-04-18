@@ -57,15 +57,29 @@ class ServicesComponent extends BaseComponent
                 ]
             ];
 
+        if ($this->auth->account()['security']['role_id'] != '1') {
+            $conditions =
+                [
+                    'conditions'    =>
+                        '-|account_id|equals|' . $this->auth->account()['id'] . '&',
+                    'order'         => 'id desc'
+                ];
+        } else {
+            $conditions =
+                [
+                    'order'         => 'id desc'
+                ];
+        }
+
         $this->generateDTContent(
             $this->api,
             'system/api/server/services/view',
-            null,
-            ['name', 'status', 'is_public', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id'],
+            $conditions,
+            ['name', 'status', 'is_public', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id', 'account_id'],
             true,
-            ['name', 'status', 'is_public', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id'],
+            ['name', 'status', 'is_public', 'registration_allowed', 'app_id', 'domain_id', 'grant_type', 'scope_id', 'account_id'],
             $controlActions,
-            ['app_id' => 'app', 'domain_id' => 'domain', 'scope_id' => 'scope'],
+            ['app_id' => 'app', 'domain_id' => 'domain', 'scope_id' => 'scope', 'account_id' => 'Account'],
             $replaceColumns,
             'name'
         );
@@ -103,6 +117,16 @@ class ServicesComponent extends BaseComponent
             $scope = $this->api->scopes->getById($data['scope_id']);
             if ($scope) {
                 $data['scope_id'] = $scope['scope_name'];
+            }
+
+            if ($data['account_id'] && $data['account_id'] != 0) {
+                $account = $this->basepackages->accounts->getById($data['account_id']);
+
+                if ($account) {
+                    $data['account_id'] = $account['email'];
+                }
+            } else {
+                $data['account_id'] = '-';
             }
         }
 

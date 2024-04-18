@@ -399,20 +399,6 @@ class Api extends BasePackage
         );
     }
 
-    // protected function initDcg()//Implemented in Oauth version 9.x
-    // {
-    //     // Enable the device code grant on the server with a token TTL of 1 hour
-    //     $this->server->enableGrantType(
-    //         new DeviceCodeGrant(
-    //             $deviceCodeRepository,
-    //             $refreshTokenRepository,
-    //             new DateInterval('PT10M'),
-    //             'http://foo/bar'
-    //         ),
-    //         new DateInterval($this->api['access_token_timeout'] ?? 'PT1H')
-    //     );
-    // }
-
     protected function initAuthorization_code()//Authorization Code Grant
     {
         $grant = new AuthCodeGrant(
@@ -530,29 +516,34 @@ class Api extends BasePackage
 
     public function getAvailableAPIGrantTypes()
     {
-        return
+        $passwordGrant =
             [
                 'password'    =>
                     [
                         'id'            => 'password',
                         'name'          => 'Password Grant (With Refresh Token)',
-                    ],
+                    ]
+            ];
+
+        $otherGrants =
+            [
                 'client_credentials'   =>
                     [
                         'id'            => 'client_credentials',
                         'name'          => 'Client Credential Grant'
                     ],
-                // 'device_code'   =>//Implemented in OAuth ver 9.x
-                //  [
-                //      'id'            => 'device_code',
-                //      'name'          => 'Device Code Grant'
-                //  ],
                 'authorization_code'    =>
                     [
                         'id'            => 'authorization_code',
                         'name'          => 'Authorization Code Grant (With Refresh Token)',
                     ]
             ];
+
+        if ($this->auth->account()['security']['role_id'] == '0') {
+            return array_merge($passwordGrant, $otherGrants);
+        }
+
+        return $otherGrants;
     }
 
     public function getOpensslAlgorithms()
