@@ -66,7 +66,7 @@ BazCore.header({
                                     [
                                         'componentId'                           : componentId,
                                         'sectionId'                             : 'form',
-                                        'fieldId'                               : 'device',
+                                        'fieldId'                               : 'device_id',
                                         'fieldLabel'                            : false,
                                         'fieldType'                             : 'checkbox',
                                         'fieldCheckboxType'                     : 'success',
@@ -175,9 +175,9 @@ $(document).ready(function(){
         } else if (isApi) {
             url = '{{links.url("register/apiAddNewClient")}}';
             postData['api_id'] = api['id'];
-            postData['device'] = '0';
-            if ($('#{{componentId}}-form-device')[0].checked === true) {
-                postData['device'] = '1';
+            postData['device_id'] = '0';
+            if ($('#{{componentId}}-form-device_id')[0].checked === true) {
+                postData['device_id'] = '1';
             }
             if ($('#{{componentId}}-form-forceRegen')[0].checked === true) {
                 postData['forceRegen'] = '1';
@@ -252,7 +252,7 @@ $(document).ready(function(){
         $('#{{componentId}}-form :input').not('.token').val('');
         if (isApi) {
             $('#{{componentId}}-form-email').focus();
-            $('#{{componentId}}-form-device')[0].checked = false;
+            $('#{{componentId}}-form-device_id')[0].checked = false;
         } else {
             $('#{{componentId}}-form-first_name').focus();
         }
@@ -289,7 +289,7 @@ $(document).ready(function(){
             $('#{{componentId}}-form :input').prop('disabled', false);
             $('#{{componentId}}-form :input').not('.token').val('');
             $('#{{componentId}}-form-email').focus();
-            $('#{{componentId}}-form-device')[0].checked = false;
+            $('#{{componentId}}-form-device_id')[0].checked = false;
             $('#{{componentId}}-form-forceRegen')[0].checked = false;
             $('#{{componentId}}-form-forceRegen').parents('.col').addClass('d-none');
 

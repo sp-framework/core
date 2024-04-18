@@ -76,18 +76,24 @@ class Clients extends BasePackage
                     $account['id'] = 0;
                 }
 
-                if (isset($data['device']) && (bool) $data['device'] === true) {
+                if (isset($data['device_id']) && (bool) $data['device_id'] === true) {
                     //Check the amount of client allowed
                     $clientsCount = $this->checkCCAccountDeviceCount($api, $account);
 
-                    if (isset($api['cc_max_devices']) && (int) $api['cc_max_devices'] > 0) {
+                    if (isset($api['cc_max_devices']) && (int) $api['cc_max_devices'] >= 0) {
+                        if ($api['cc_max_devices'] === 0) {
+                            $this->addResponse('Device registration for this API is disabled.', 1);
+
+                            return false;
+                        }
+
                         if ($clientsCount >= $api['cc_max_devices']) {
                             $this->addResponse('Max clients for this account reached. Revoke old clients to add new clients.', 1);
 
                             return false;
                         }
                     }
-                    $account['device'] = $this->secTools->random->uuid();
+                    $account['device_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
                 } else {
                     $oldClient = $this->checkClientExists($api, $account);
 
@@ -167,8 +173,8 @@ class Clients extends BasePackage
             if (isset($data['forceRegen']) && (bool) $data['forceRegen'] === true) {
                 $account = $this->basepackages->accounts->getById($client['account_id']);
 
-                if ($client['device']) {
-                    $account['device'] = $client['device'];
+                if ($client['device_id']) {
+                    $account['device_id'] = $client['device_id'];
                 }
                 $data['api_id'] = $client['api_id'];
 
@@ -239,9 +245,9 @@ class Clients extends BasePackage
                 $newClient['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
                 $newClient['revoked'] = '0';
                 $newClient['redirectUri'] = 'https://';//Change this to default URI
-                $newClient['device'] = null;
-                if (isset($account['device'])) {
-                    $newClient['device'] = $account['device'];
+                $newClient['device_id'] = null;
+                if (isset($account['device_id'])) {
+                    $newClient['device_id'] = $account['device_id'];
                 }
                 if (isset($api['redirect_uri'])) {
                     $newClient['redirectUri'] = $api['redirect_uri'];
@@ -253,7 +259,7 @@ class Clients extends BasePackage
                     $this->addResponse('Keys generated successfully.', 0, ['client_id' => $newClient['client_id'], 'client_secret' => $client_secret]);
 
                     if ($emailNewClientDetails) {
-                        // $this->emailNewClientDetails($api, $newClient, $client_secret);
+                        $this->emailNewClientDetails($api, $newClient, $client_secret);
                     }
                     return true;
                 } else {
@@ -281,7 +287,7 @@ class Clients extends BasePackage
                         [
                             'email'         => ($account['email'] ?? $this->auth->account()['email']),
                             'revoked'       => false,
-                            'device'        => ($account['device'] ?? null),
+                            'device_id'        => ($account['device_id'] ?? null),
                             'api_id'        => $api['id']
                         ]
                 ]
@@ -293,7 +299,7 @@ class Clients extends BasePackage
                         [
                             ['email', '=', ($account['email'] ?? $this->auth->account()['email'])],
                             ['revoked', '=', false],
-                            ['device', '=', ($account['device'] ?? null)],
+                            ['device_id', '=', ($account['device_id'] ?? null)],
                             ['api_id', '=', $api['id']]
                         ]
                 ]
@@ -326,7 +332,7 @@ class Clients extends BasePackage
                         [
                             ['email', '=', $account['email']],
                             ['revoked', '=', false],
-                            ['device', '!=', null],
+                            ['device_id', '!=', null],
                             ['api_id', '=', $api['id']]
                         ]
                 ]
@@ -357,8 +363,8 @@ class Clients extends BasePackage
         $emailData['to_addresses'] = $this->helper->encode([$newClient['email']]);
         $emailData['subject'] = 'API client details for ' . $domain['name'];
         $emailData['body'] = '';
-        if ($newClient['device']) {
-            $emailData['body'] = 'Device ID: ' . $newClient['device'] . '<br>';
+        if ($newClient['device_id']) {
+            $emailData['body'] = 'Device ID: ' . $newClient['device_id'] . '<br>';
         }
         $emailData['body'] = $emailData['body'] . 'Client ID: ' . $newClient['client_id'] . '<br>' . 'Client Secret: ' . $clientSecret;
 

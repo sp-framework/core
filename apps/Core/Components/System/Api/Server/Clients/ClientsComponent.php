@@ -59,9 +59,9 @@ class ClientsComponent extends BaseComponent
             $this->api->clients,
             'system/api/server/clients/view',
             $conditions,
-            ['revoked', 'client_id', 'api_id', 'email', 'device', 'last_used'],
+            ['revoked', 'client_id', 'device_id', 'api_id', 'email', 'last_used'],
             true,
-            ['revoked', 'client_id', 'api_id', 'email', 'device', 'last_used'],
+            ['revoked', 'client_id', 'device_id', 'api_id', 'email', 'last_used'],
             null,
             ['api_id' => 'api'],
             $replaceColumns,
@@ -92,8 +92,8 @@ class ClientsComponent extends BaseComponent
                 $data['api_id'] = $api['name'];
             }
 
-            if (!$data['device']) {
-                $data['device'] = '-';
+            if (!$data['device_id']) {
+                $data['device_id'] = '-';
             }
         }
 
@@ -120,8 +120,7 @@ class ClientsComponent extends BaseComponent
      */
     public function updateAction()
     {
-        $this->requestIsPost();
-        //
+        return false;
     }
 
     public function removeAction()

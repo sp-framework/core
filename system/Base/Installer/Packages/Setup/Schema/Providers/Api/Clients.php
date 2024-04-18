@@ -57,10 +57,10 @@ class Clients
                     ]
                 ),
                 new Column(
-                    'device',
+                    'device_id',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 100,
+                        'size'          => 512,
                         'notNull'       => false,
                     ]
                 ),

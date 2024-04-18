@@ -22,7 +22,6 @@ use League\OAuth2\Server\ResourceServer;
 use System\Base\BasePackage;
 use System\Base\Providers\ApiServiceProvider\Clients;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApi;
-use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 use System\Base\Providers\ApiServiceProvider\Repositories\AccessTokenRepository;
 use System\Base\Providers\ApiServiceProvider\Repositories\AuthCodeRepository;
 use System\Base\Providers\ApiServiceProvider\Repositories\ClientRepository;
@@ -52,6 +51,8 @@ class Api extends BasePackage
     public $isApiPublic;
 
     protected $clientId;
+
+    protected $deviceId;
 
     public $isApiCheckVia;
 
@@ -204,6 +205,9 @@ class Api extends BasePackage
                 $this->isApi = true;
                 $this->isApiCheckVia = 'client_id';
                 $this->clientId = $this->request->get('client_id');
+                if ($this->request->get('device_id')) {
+                    $this->deviceId = $this->request->get('device_id');
+                }
             }
         }
 
@@ -232,29 +236,61 @@ class Api extends BasePackage
 
                     if (count($authorization) === 2) {
                         $this->clientId = $this->secTools->decryptBase64($authorization[1]);
+                    } else if (count($authorization) === 3) {
+                        $this->clientId = $this->secTools->decryptBase64($authorization[1]);
+                        $this->deviceId = $this->secTools->decryptBase64($authorization[2]);
                     }
                 }
 
                 if ($this->clientId) {
-                    $clientsObject = new ServiceProviderApiClients;
-                    $clientsStore = $this->ff->store($clientsObject->getSource());
                     $client = null;
 
                     if ($this->config->databasetype === 'db') {
-                        $clientsObj = $clientsObject->findFirstByClient_Id($this->clientId);
-
-                        if ($clientsObj) {
-                            $client = $clientsObj->toArray();
+                        if ($this->deviceId) {
+                            $params =
+                                [
+                                    'conditions'    => 'client_id = :client_id: AND device_id = :device_id:',
+                                    'bind'          =>
+                                        [
+                                            'client_id'    => $this->clientId,
+                                            'device_id'    => $this->deviceId
+                                        ]
+                                ];
+                        } else {
+                            $params =
+                                [
+                                    'conditions'    => 'client_id = :client_id:',
+                                    'bind'          =>
+                                        [
+                                            'client_id'    => $this->clientId
+                                        ]
+                                ];
                         }
                     } else {
-                        $client = $clientsStore->findOneBy(['client_id', '=', $this->clientId]);
+                        if ($this->deviceId) {
+                            $params = [
+                                'conditions' => [
+                                    ['client_id', '=', $this->clientId],
+                                    ['device_id', '=', $this->deviceId]
+                                ]
+                            ];
+                        } else {
+                            $params = [
+                                'conditions' => [
+                                    ['client_id', '=', $this->clientId]
+                                ]
+                            ];
+
+                        }
                     }
 
-                    if ($client && isset($client['api_id'])) {
-                        $api = $this->getById($client['api_id']);
+                    $client = $this->clients->getByParams($params);
+
+                    if ($client && $client && is_array($client) && isset($client[0]['api_id'])) {
+                        $api = $this->getById($client[0]['api_id']);
 
                         if ($api['status'] == true) {
-                            if ($this->checkCallLimits($client, $api)) {
+                            if ($this->checkCallLimits($client[0], $api)) {
                                 $this->api = $api;
                             }
                         }
@@ -417,9 +453,22 @@ class Api extends BasePackage
 
             $encClientId = $this->secTools->encryptBase64($this->request->get('client_id'));
 
+            if ($this->request->get('device_id')) {
+                $encDeviceId = $this->secTools->encryptBase64($this->request->get('device_id'));
+            }
+
             $token['access_token'] = $token['access_token'] . '||' . $encClientId;
+
+            if (isset($encDeviceId)) {
+                $token['access_token'] = $token['access_token'] . '||' . $encDeviceId;
+            }
+
             if (isset($token['refresh_token'])) {
                 $token['refresh_token'] = $token['refresh_token'] . '||' . $encClientId;
+
+                if (isset($encDeviceId)) {
+                    $token['refresh_token'] = $token['refresh_token'] . '||' . $encDeviceId;
+                }
             }
 
             $body = Utils::streamFor($this->helper->encode($token));
