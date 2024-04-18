@@ -221,30 +221,6 @@ class Apps extends BasePackage
 			return true;
 		}
 
-		if (isset($data['api_access_token_timeout']) && $data['api_access_token_timeout'] !== '') {
-			try {
-				new \DateInterval($data['api_access_token_timeout']);
-			} catch (\Exception $e) {
-				$this->addResponse('Access token timeout error: ' . $e->getMessage(), 1);
-
-				return false;
-			}
-		} else {
-			$data['api_access_token_timeout'] = 'PT1H';
-		}
-
-		if (isset($data['api_refresh_token_timeout']) && $data['api_refresh_token_timeout'] !== '') {
-			try {
-				new \DateInterval($data['api_refresh_token_timeout']);
-			} catch (\Exception $e) {
-				$this->addResponse('Refresh token timeout error: ' . $e->getMessage(), 1);
-
-				return false;
-			}
-		} else {
-			$data['api_refresh_token_timeout'] = 'P1M';
-		}
-
 		$app = $this->getById($data['id']);
 
 		if (isset($data['default_dashboard']) && $data['default_dashboard']) {

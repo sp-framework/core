@@ -102,6 +102,10 @@ class Api extends BasePackage
         $data['private_key'] = '0';
         $data['private_key_location'] = '0';
 
+        if ($data = $this->checkTimeouts($data)) {
+            return false;
+        }
+
         if ($this->add($data)) {
             if ($data['is_public'] == false) {
                 $newApi = $this->packagesData->last;
@@ -136,6 +140,10 @@ class Api extends BasePackage
             return false;
         }
 
+        if ($data = $this->checkTimeouts($data)) {
+            return false;
+        }
+
         $data = array_merge($api, $data);
 
         if (isset($data['regenerate_pki_keys']) && $data['regenerate_pki_keys'] == 1) {
@@ -151,6 +159,35 @@ class Api extends BasePackage
         } else {
             $this->addResponse('Error updating api.', 1);
         }
+    }
+
+    protected function checkTimeouts($data)
+    {
+        if (isset($data['access_token_timeout']) && $data['access_token_timeout'] !== '') {
+            try {
+                new \DateInterval($data['access_token_timeout']);
+            } catch (\Exception $e) {
+                $this->addResponse('Access token timeout error: ' . $e->getMessage(), 1);
+
+                return false;
+            }
+        } else {
+            $data['access_token_timeout'] = 'PT1H';
+        }
+
+        if (isset($data['refresh_token_timeout']) && $data['refresh_token_timeout'] !== '') {
+            try {
+                new \DateInterval($data['refresh_token_timeout']);
+            } catch (\Exception $e) {
+                $this->addResponse('Refresh token timeout error: ' . $e->getMessage(), 1);
+
+                return false;
+            }
+        } else {
+            $data['refresh_token_timeout'] = 'P1M';
+        }
+
+        return $data;
     }
 
     /**
