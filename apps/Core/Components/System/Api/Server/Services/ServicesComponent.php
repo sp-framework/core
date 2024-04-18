@@ -22,6 +22,28 @@ class ServicesComponent extends BaseComponent
             } else {
                 $api = [];
             }
+
+            $api['redirect_url'] = '';
+            $api['request_url'] = '';
+
+            if (isset($api['client_id']) && $api['client_id'] !== '') {
+                $client = $this->api->clients->getFirst('client_id', $api['client_id']);
+
+                if ($client) {
+                    $client = $client->toArray();
+                }
+
+                if ($client['redirectUri'] === '' || $client['redirectUri'] === 'https://') {
+                    $api['type'] = 'redirect';
+                    $api['redirect_url'] = $this->api->generateAPIUrl($api);
+                } else {
+                    $api['redirect_url'] = $client['redirectUri'];
+                }
+
+                $api['type'] = 'request';
+                $api['request_url'] = $this->api->generateAPIUrl($api);
+            }
+
             $this->view->api = $api;
             $this->view->apps = $this->apps->apps;
             $this->view->domains = $this->domains->domains;
@@ -177,5 +199,21 @@ class ServicesComponent extends BaseComponent
             $this->api->packagesData->responseMessage,
             $this->api->packagesData->responseCode
         );
+    }
+
+    public function generateAPIUrlAction()
+    {
+        $this->requestIsPost();
+
+        $this->api->generateAPIUrl($this->postData());
+
+        $this->addResponse(
+            $this->api->packagesData->responseMessage,
+            $this->api->packagesData->responseCode
+        );
+
+        if ($this->api->packagesData->responseData) {
+            $this->view->responseData = $this->api->packagesData->responseData;
+        }
     }
 }

@@ -19,6 +19,7 @@ use League\OAuth2\Server\Grant\ClientCredentialsGrant;
 use League\OAuth2\Server\Grant\PasswordGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\ResourceServer;
+use Phalcon\Filter\Validation\Validator\PresenceOf;
 use System\Base\BasePackage;
 use System\Base\Providers\ApiServiceProvider\Clients;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApi;
@@ -102,14 +103,14 @@ class Api extends BasePackage
         $data['private_key'] = '0';
         $data['private_key_location'] = '0';
 
-        if ($data = $this->checkTimeouts($data)) {
+        if (($data = $this->checkTimeouts($data)) === false) {
             return false;
         }
 
         if ($this->add($data)) {
-            if ($data['is_public'] == false) {
-                $newApi = $this->packagesData->last;
+            $newApi = $this->packagesData->last;
 
+            if ($data['is_public'] == false) {
                 $newApi = $this->generatePKIKeys($newApi);
 
                 if ($newApi) {
@@ -120,6 +121,28 @@ class Api extends BasePackage
                     $this->removeApi($newApi);
 
                     return false;
+                }
+            }
+
+            if ($newApi['grant_type'] === 'authorization_code') {
+                if ((isset($newApi['client_id']) && $newApi['client_id'] === '') ||
+                    !isset($newApi['client_id'])
+                ) {
+                    $client = $this->clients->generateClientKeys(['api_id' => $newApi['id']], $this->auth->account(), null, false);
+
+                    $newApi['client_id'] = $client['client_id'];
+
+                    $this->updateApi($newApi);
+                } else {
+                    $client = $this->clients->getFirst('client_id', $newApi['client_id']);
+
+                    if (!$client && ($api['client_id'] !== $data['client_id'])) {
+                        $client = $this->clients->generateClientKeys(['api_id' => $data['id'], 'forceRegen' => true], $this->auth->account(), null, false, $data['client_id']);
+
+                        $newApi['client_id'] = $client['client_id'];
+
+                        $this->updateApi($newApi);
+                    }
                 }
             }
         } else {
@@ -140,7 +163,7 @@ class Api extends BasePackage
             return false;
         }
 
-        if ($data = $this->checkTimeouts($data)) {
+        if (($data = $this->checkTimeouts($data)) === false) {
             return false;
         }
 
@@ -152,6 +175,24 @@ class Api extends BasePackage
 
         if ($data['grant_type'] === 'client_credentials') {
             $data['refresh_token_timeout'] = 'P1M';
+        }
+
+        if ($data['grant_type'] === 'authorization_code') {
+            if ((isset($data['client_id']) && $data['client_id'] === '') ||
+                !isset($data['client_id'])
+            ) {
+                $client = $this->clients->generateClientKeys(['api_id' => $data['id']], $this->auth->account(), null, false);
+
+                $data['client_id'] = $client['client_id'];
+            } else {
+                $client = $this->clients->getFirst('client_id', $data['client_id']);
+
+                if (!$client && ($api['client_id'] !== $data['client_id'])) {
+                    $client = $this->clients->generateClientKeys(['api_id' => $data['id'], 'forceRegen' => true], $this->auth->account(), null, false, $data['client_id']);
+
+                    $data['client_id'] = $client['client_id'];
+                }
+            }
         }
 
         if ($this->update($data)) {
@@ -762,5 +803,100 @@ class Api extends BasePackage
         }
 
         return $apis;
+    }
+
+    public function generateAPIUrl($data)
+    {
+        $url = false;
+
+        if (!isset($data['type'])) {
+            $this->addResponse('Please set url type.', 1);
+
+            return false;
+        }
+
+        $this->validation->add('app_id', PresenceOf::class, ["message" => "Please provide app id."]);
+        $this->validation->add('domain_id', PresenceOf::class, ["message" => "Please provide domain id."]);
+
+        if (($validatedMessages = $this->validateData($data)) !== true) {
+            $this->addResponse($validatedMessages, 1);
+
+            return false;
+        }
+
+        $app = $this->apps->getById($data['app_id']);
+        if (!$app) {
+            $this->addResponse('App not found', 1);
+
+            return false;
+        }
+        $domain = $this->domains->getById($data['domain_id']);
+        if (!$domain) {
+            $this->addResponse('Domain not found', 1);
+
+            return false;
+        }
+
+        $url = $this->request->getScheme() . '://' . $domain['name'] . '/';
+        if (isset($domain['exclusive_to_default_app']) &&
+            $domain['exclusive_to_default_app'] != 1
+        ) {
+            $url = $url . $app['route'] . '/';
+        }
+
+        if ($data['type'] === 'request') {
+            $this->validation->add('client_id', PresenceOf::class, ["message" => "Please provide client id."]);
+            $this->validation->add('redirect_url', PresenceOf::class, ["message" => "Please provide redirect URL."]);
+            $this->validation->add('scope_id', PresenceOf::class, ["message" => "Please provide scope id."]);
+
+            if (($validatedMessages = $this->validateData($data)) !== true) {
+                $this->addResponse($validatedMessages, 1);
+
+                return false;
+            }
+
+            $scope = $this->scopes->getById($data['scope_id']);
+            if (!$scope) {
+                $this->addResponse('Scope not found', 1);
+
+                return false;
+            }
+
+            $url = $url . 'register/q/response_type/code/client_id/' . $data['client_id'] . '/scope/' . $scope['scope_name'] . '/state/{{your_state_code}}/redirect_uri/__' . $data['redirect_url'] . '__';
+
+            $this->addResponse('Generated Url', 0, ['url' => $url]);
+        } else if ($data['type'] === 'redirect') {
+            if (($validatedMessages = $this->validateData($data)) !== true) {
+                $this->addResponse($validatedMessages, 1);
+
+                return false;
+            }
+            $url = $url . 'register/q/authorized/true';
+
+            $this->addResponse('Generated Url', 0, ['url' => $url]);
+        }
+
+        return $url;
+    }
+
+    protected function validateData($data)
+    {
+        $validated = $this->validation->validate($data)->jsonSerialize();
+
+        if (count($validated) > 0) {
+            $messages = 'Error: ';
+
+            foreach ($validated as $key => $value) {
+                $messages .= $value['message'] . ' ';
+            }
+            return $messages;
+        } else {
+            return true;
+        }
+    }
+
+    public function checkAuthorizationLinkData($data)
+    {
+        var_dump($data);die();
     }
 }

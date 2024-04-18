@@ -209,7 +209,7 @@ class Clients extends BasePackage
         return false;
     }
 
-    public function generateClientKeys($data, $account = null, $newClient = null, $emailNewClientDetails = true)
+    public function generateClientKeys($data, $account = null, $newClient = null, $emailNewClientDetails = true, $clientID = null)
     {
         $api = $this->api->getById($data['api_id']);
 
@@ -239,12 +239,12 @@ class Clients extends BasePackage
                 $newClient['account_id'] = $account['id'] ?? $this->auth->account()['id'];
                 $newClient['email'] = $account['email'] ?? $this->auth->account()['email'];
                 $newClient['name'] = $apiName;
-                $newClient['client_id'] = $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
+                $newClient['client_id'] = $clientID ?? $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
                 $client_secret = $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
                 $newClient['client_secret'] = $this->secTools->hashPassword($client_secret);
                 $newClient['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
                 $newClient['revoked'] = '0';
-                $newClient['redirectUri'] = 'https://';//Change this to default URI
+                $newClient['redirectUri'] = $data['redirect_url'] ?? 'https://';
                 $newClient['device_id'] = null;
                 if (isset($account['device_id'])) {
                     $newClient['device_id'] = $account['device_id'];
@@ -261,7 +261,8 @@ class Clients extends BasePackage
                     if ($emailNewClientDetails) {
                         $this->emailNewClientDetails($api, $newClient, $client_secret);
                     }
-                    return true;
+
+                    return $newClient;
                 } else {
                     $this->addResponse('Error API does not allow client keys generation. Please contact administrator.', 1);
                 }
@@ -287,7 +288,7 @@ class Clients extends BasePackage
                         [
                             'email'         => ($account['email'] ?? $this->auth->account()['email']),
                             'revoked'       => false,
-                            'device_id'        => ($account['device_id'] ?? null),
+                            'device_id'     => ($account['device_id'] ?? null),
                             'api_id'        => $api['id']
                         ]
                 ]
@@ -348,7 +349,11 @@ class Clients extends BasePackage
 
     public function generateClientId($data)
     {
-        $this->addResponse('Id generated successfully.', 0, ['client_id' => $this->random->base58(isset($data['client_id_length']) ? $data['client_id_length'] : 8)]);
+        $clientId = $this->random->base58(isset($data['client_id_length']) ? $data['client_id_length'] : 8);
+
+        $this->addResponse('Id generated successfully.', 0, ['client_id' => $clientId]);
+
+        return $clientId;
     }
 
     protected function emailNewClientDetails($api, $newClient, $clientSecret)

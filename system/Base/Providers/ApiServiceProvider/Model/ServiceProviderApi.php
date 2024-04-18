@@ -37,6 +37,8 @@ class ServiceProviderApi extends BaseModel
 
     public $cc_max_devices;
 
+    public $client_id;
+
     public $private_key;
 
     public $encryption_key_size;

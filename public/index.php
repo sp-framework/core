@@ -10,7 +10,7 @@ try {
 	} else if (PHP_SAPI !== 'cli') {
 		$bootstrap->mvc();
 	}
-} catch (throwable | Exception $exception) {
+} catch (\throwable | \Exception $exception) {
 	if (isset($bootstrap->isApi) && $bootstrap->isApi === true) {
 		http_response_code(500);
 

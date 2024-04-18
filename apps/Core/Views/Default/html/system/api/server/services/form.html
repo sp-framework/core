@@ -188,7 +188,8 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-client_keys_generation_allowed, ' +
                           '#{{componentId}}-{{sectionId}}-is_public, ' +
                           '#{{componentId}}-{{sectionId}}-registration_allowed').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-api_redirect_url').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-redirect_url').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-request_url').attr('disabled', false);
                         $(['#{{componentId}}-{{sectionId}}-client_keys_generation_allowed',
                            '#{{componentId}}-{{sectionId}}-is_public',
                            '#{{componentId}}-{{sectionId}}-registration_allowed'])
@@ -200,22 +201,23 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-client_keys_generation_allowed, ' +
                           '#{{componentId}}-{{sectionId}}-is_public, ' +
                           '#{{componentId}}-{{sectionId}}-registration_allowed').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-api_redirect_url').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-redirect_url').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-request_url').attr('disabled', true);
                         $('#autho-code-grant').attr('hidden', true);
                     }
                 });
             }
         },
         '{{componentId}}-{{sectionId}}-cc_max_devices'                              : { },
-        '{{componentId}}-{{sectionId}}-api_client_id'                               : {
+        '{{componentId}}-{{sectionId}}-client_id'                                   : {
             afterInit: function() {
-                $('#{{componentId}}-{{sectionId}}-generate-api-client-id, #{{componentId}}-{{sectionId}}-regenerate-api-client-id').click(function(e) {
+                $('#{{componentId}}-{{sectionId}}-generate-client-id, #{{componentId}}-{{sectionId}}-regenerate-client-id').click(function(e) {
                     e.preventDefault();
 
                     $(this).attr('disabled', true);
                     $(this).children('i').attr('hidden', false);
 
-                    if (this.id === '{{componentId}}-{{sectionId}}-regenerate-api-client-id') {
+                    if (this.id === '{{componentId}}-{{sectionId}}-regenerate-client-id') {
                         Swal.fire({
                             title                       : '<span class="text-danger">Regenerate API Client Keys?</span>',
                             icon                        : 'question',
@@ -259,11 +261,11 @@ dataCollectionSection =
                             PNotify.success(response.responseMessage);
 
                             if (response.responseData && response.responseData.client_id) {
-                                $('#{{componentId}}-{{sectionId}}-api_client_id').val(response.responseData.client_id);
+                                $('#{{componentId}}-{{sectionId}}-client_id').val(response.responseData.client_id);
                             }
-                            $('#{{componentId}}-{{sectionId}}-api_client_id').parents('.form-group').removeClass('d-none');
-                            $('#{{componentId}}-{{sectionId}}-generate-api-client-id').attr('hidden', true);
-                            $('#{{componentId}}-{{sectionId}}-regenerate-api-client-id').attr('hidden', false);
+                            $('#{{componentId}}-{{sectionId}}-client_id').parents('.form-group').removeClass('d-none');
+                            $('#{{componentId}}-{{sectionId}}-generate-client-id').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-regenerate-client-id').attr('hidden', false);
                         } else {
                             PNotify.error(response.responseMessage);
                         }
@@ -273,13 +275,110 @@ dataCollectionSection =
                             $("#security-token").val(response.token);
                         }
 
-                        $('#{{componentId}}-{{sectionId}}-generate-api-client-id, #{{componentId}}-{{sectionId}}-regenerate-api-client-id').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-generate-api-client-id, #{{componentId}}-{{sectionId}}-regenerate-api-client-id').children('i').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-generate-client-id, #{{componentId}}-{{sectionId}}-regenerate-client-id').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-generate-client-id, #{{componentId}}-{{sectionId}}-regenerate-client-id').children('i').attr('hidden', true);
                     }, 'json');
                 }
             }
         },
-        '{{componentId}}-{{sectionId}}-api_redirect_url'                            : { },
+        '{{componentId}}-{{sectionId}}-redirect_url'                                : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-redirect-url, #{{componentId}}-{{sectionId}}-generate-request-url').click(function(e) {
+                    e.preventDefault();
+
+                    if ($('#{{componentId}}-{{sectionId}}-client_id').val() === '') {
+                        PNotify.error('Url generator needs client ID');
+
+                        $('#{{componentId}}-{{sectionId}}-client_id').focus();
+
+                        return;
+                    } else if ($('#{{componentId}}-{{sectionId}}-app_id').val() === '') {
+                        PNotify.error('Url generator needs App. Please select app');
+
+                        return;
+                    } else if ($('#{{componentId}}-{{sectionId}}-domain_id').val() === '') {
+                        PNotify.error('Url generator needs Domain. Please select domain');
+
+                        return;
+                    } else if ($('#{{componentId}}-{{sectionId}}-scope_id').val() === '') {
+                        PNotify.error('Url generator needs Scope. Please select scope');
+
+                        return;
+                    }
+
+                    var thisButton = this;
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+
+                    Swal.fire({
+                        title                       : '<span class="text-danger">Generate URL?</span>',
+                        icon                        : 'question',
+                        width                       : '100%',
+                        background                  : 'rgba(0,0,0,.8)',
+                        backdrop                    : 'rgba(0,0,0,.6)',
+                        buttonsStyling              : false,
+                        confirmButtonText           : 'Yes',
+                        customClass                 : {
+                            'confirmButton'             : 'btn btn-danger text-uppercase',
+                            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                            'inputLabel'                : 'text-white',
+                            'input'                     : 'text-white'
+                        },
+                        showCancelButton            : true,
+                        keydownListenerCapture      : true,
+                        allowOutsideClick           : false,
+                        allowEscapeKey              : false,
+                        didOpen                     : function() {
+                            window.dataCollection.env.sounds.swalSound.play();
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed === true &&
+                            result.value !== ''
+                        ) {
+                            generateRedirectUrl($(thisButton)[0].id);
+                        }
+                    });
+                });
+
+                function generateRedirectUrl(id) {
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    if (id === '{{componentId}}-{{sectionId}}-generate-redirect-url') {
+                        postData['type'] = 'redirect';
+                    } else if (id === '{{componentId}}-{{sectionId}}-generate-request-url') {
+                        postData['type'] = 'request';
+                    }
+                    postData['client_id'] = $('#{{componentId}}-{{sectionId}}-client_id').val();
+                    postData['redirect_url'] = $('#{{componentId}}-{{sectionId}}-redirect_url').val();
+                    postData['app_id'] = $('#{{componentId}}-{{sectionId}}-app_id').val();
+                    postData['domain_id'] = $('#{{componentId}}-{{sectionId}}-domain_id').val();
+                    postData['scope_id'] = $('#{{componentId}}-{{sectionId}}-scope_id').val();
+
+                    $.post('{{links.url("system/api/server/services/generateapiurl")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+
+                            if (response.responseData && response.responseData.url) {
+                                if (id === '{{componentId}}-{{sectionId}}-generate-redirect-url') {
+                                    $('#{{componentId}}-{{sectionId}}-redirect_url').val(response.responseData.url);
+                                } else if (id === '{{componentId}}-{{sectionId}}-generate-request-url') {
+                                    $('#{{componentId}}-{{sectionId}}-request_url').val(response.responseData.url);
+                                }
+                            }
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-request_url'                                 : { },
         '{{componentId}}-{{sectionId}}-scope_id'                                    : {
             'placeholder'   : 'SELECT SCOPE'
         },
@@ -306,8 +405,8 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-pki_key_size'                    : 'required',
                 '{{componentId}}-{{sectionId}}-pki_algorithm'                   : 'required',
                 '{{componentId}}-{{sectionId}}-encryption_key_size'             : 'required',
-                '{{componentId}}-{{sectionId}}-api_client_id'                   : 'required',
-                '{{componentId}}-{{sectionId}}-api_redirect_url'                : 'required',
+                '{{componentId}}-{{sectionId}}-client_id'                       : 'required',
+                '{{componentId}}-{{sectionId}}-redirect_url'                    : 'required',
             },
             messages    : {
                 '{{componentId}}-{{sectionId}}-name'                            : 'Please enter api name',
@@ -320,8 +419,8 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-pki_key_size'                    : 'Select PKI Key Size',
                 '{{componentId}}-{{sectionId}}-pki_algorithm'                   : 'Select PKI Key Algorithm',
                 '{{componentId}}-{{sectionId}}-encryption_key_size'             : 'Enter Encryption Key Size',
-                '{{componentId}}-{{sectionId}}-api_client_id'                   : 'Generate API Client Id',
-                '{{componentId}}-{{sectionId}}-api_redirect_url'                : 'Enter Redirect URL',
+                '{{componentId}}-{{sectionId}}-client_id'                       : 'Generate API Client Id',
+                '{{componentId}}-{{sectionId}}-redirect_url'                    : 'Enter Redirect URL',
             }
         }
     });

@@ -15,6 +15,9 @@
     {% set apiClientSecretLength = api['client_secret_length'] %}
     {% set apiGrantType = api['grant_type'] %}
     {% set apiCCMaxDevices = api['cc_max_devices'] %}
+    {% set apiClientId = api['client_id'] %}
+    {% set apiRedirectUrl = api['redirect_url'] %}
+    {% set apiRequestUrl = api['request_url'] %}
     {% set apiPrivateKey = api['private_key'] %}
     {% set apiAccessTokenTimeout = api['access_token_timeout'] %}
     {% set apiRefreshTokenTimeout = api['refresh_token_timeout'] %}
@@ -37,6 +40,9 @@
     {% set apiClientSecretLength = '32' %}
     {% set apiGrantType = '' %}
     {% set apiCCMaxDevices = '' %}
+    {% set apiClientId = '' %}
+    {% set apiRedirectUrl = '' %}
+    {% set apiRequestUrl = '' %}
     {% set apiPrivateKey = '' %}
     {% set apiAccessTokenTimeout = 'PT1H' %}
     {% set apiRefreshTokenTimeout = 'P1M' %}
@@ -93,6 +99,8 @@
 {% endif %}
 {% if apiGrantType === 'authorization_code' %}
     {% set authoCodeGrantHidden = '' %}
+    {% set reGenerateHidden = false %}
+    {% set generateHidden = true %}
 {% endif %}
 <div class="row">
     <div class="col">

@@ -12,6 +12,7 @@ class ServiceProviderApiAuthorizationCodes extends BaseModel implements AuthCode
 {
     use AuthCodeTrait, EntityTrait, TokenEntityTrait;
 
+    //Note: name and redirectUri properties defined in AuthCodeTrait
     public $id;
 
     public $api_id;

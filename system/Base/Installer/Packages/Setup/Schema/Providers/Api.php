@@ -116,6 +116,14 @@ class Api
                     ]
                 ),
                 new Column(
+                    'client_id',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 512,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
                     'private_key',
                     [
                         'type'          => Column::TYPE_BOOLEAN,

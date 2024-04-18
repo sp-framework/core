@@ -64,7 +64,7 @@
                     'buttonLabel'               : 'Generate/Regenerate API Client Id',
                     'buttons'                   :
                         {
-                            'generate-api-client-id'      : {
+                            'generate-client-id'      : {
                                 'title'                   : 'Generate API Client Id',
                                 'size'                    : 'sm',
                                 'type'                    : 'primary',
@@ -72,7 +72,7 @@
                                 'iconHidden'              : true,
                                 'hidden'                  : generateHidden
                             },
-                            'regenerate-api-client-id'    : {
+                            'regenerate-client-id'    : {
                                 'title'                   : 'Revoke & Regenerate API Client Id',
                                 'size'                    : 'sm',
                                 'type'                    : 'danger',
@@ -91,17 +91,18 @@
                     'componentName'                         : componentName,
                     'componentId'                           : componentId,
                     'sectionId'                             : sectionId,
-                    'fieldId'                               : 'api_client_id',
+                    'fieldId'                               : 'client_id',
                     'fieldLabel'                            : 'Client ID',
                     'fieldType'                             : 'input',
                     'fieldHelp'                             : true,
                     'fieldRequired'                         : true,
+                    'fieldDisabled'                         : true,
                     'fieldHelpTooltipContent'               : 'Client ID for API authentication.',
                     'fieldBazScan'                          : true,
                     'fieldBazJstreeSearch'                  : true,
                     'fieldBazPostOnCreate'                  : true,
                     'fieldBazPostOnUpdate'                  : true,
-                    'fieldValue'                            : ''
+                    'fieldValue'                            : apiClientId
                 ]
             )}}
         </div>
@@ -114,17 +115,61 @@
                     'componentName'                         : componentName,
                     'componentId'                           : componentId,
                     'sectionId'                             : sectionId,
-                    'fieldId'                               : 'api_redirect_url',
+                    'fieldId'                               : 'redirect_url',
                     'fieldLabel'                            : 'Redirect Url',
                     'fieldType'                             : 'input',
                     'fieldHelp'                             : true,
                     'fieldHelpTooltipContent'               : 'Redirect Url for API authentication.',
+                    'fieldGroupPostAddonButtons'          :
+                        [
+                            'generate-redirect-url'   : [
+                                'title'                   : false,
+                                'icon'                    : 'wand-magic-sparkles',
+                                'noMargin'                : true,
+                                'buttonAdditionalClass'   : 'rounded-0 text-white',
+                                'position'                : 'right'
+                            ]
+                        ],
                     'fieldRequired'                         : true,
                     'fieldBazScan'                          : true,
                     'fieldBazJstreeSearch'                  : true,
                     'fieldBazPostOnCreate'                  : true,
                     'fieldBazPostOnUpdate'                  : true,
-                    'fieldValue'                            : ''
+                    'fieldValue'                            : apiRedirectUrl
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'request_url',
+                    'fieldLabel'                            : 'Request Url',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Request Url for API authentication.',
+                    'fieldGroupPostAddonButtons'          :
+                        [
+                            'generate-request-url'   : [
+                                'title'                   : false,
+                                'icon'                    : 'wand-magic-sparkles',
+                                'noMargin'                : true,
+                                'buttonAdditionalClass'   : 'rounded-0 text-white',
+                                'position'                : 'right'
+                            ]
+                        ],
+                    'fieldRequired'                         : false,
+                    'fieldDisabled'                         : true,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnCreate'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldValue'                            : apiRequestUrl
                 ]
             )}}
         </div>

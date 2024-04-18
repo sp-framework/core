@@ -14,7 +14,7 @@ class Links
 
 	protected $domain;
 
-	protected $url;
+	public $phalconUrl;
 
 	public function __construct($request, $app, $view, $domain)
 	{
@@ -31,15 +31,17 @@ class Links
 
 	public function init()
 	{
-		$this->url = new Url();
+		$this->phalconUrl = new Url();
 
-		$this->url->setBasePath(base_path(''));
+		$this->phalconUrl->setBasePath(base_path(''));
 
-		$this->url->setBaseUri('/');
+		$this->phalconUrl->setBaseUri('/');
 
-		$this->url->setStaticBaseUri(
+		$this->phalconUrl->setStaticBaseUri(
 			$this->request->getScheme() . '://' . $this->request->getHttpHost() . '/'
 		);
+
+		return $this;
 	}
 
 	public function url($link = null, $excludeApp = null)
@@ -55,49 +57,49 @@ class Links
 				$this->domain['exclusive_to_default_app'] == 1) ||
 				$excludeApp
 			) {
-				return $this->url->getStatic('/' . $link);
+				return $this->phalconUrl->getStatic('/' . $link);
 			}
 
-			return $this->url->getStatic(
+			return $this->phalconUrl->getStatic(
 				strtolower($this->app['route']) . '/' . $link
 			);
 
 		} else {
-			return $this->url->getStatic('/');
+			return $this->phalconUrl->getStatic('/');
 		}
 	}
 
 	public function images($link)
 	{
-		return $this->url->getStatic(
+		return $this->phalconUrl->getStatic(
 			$this->app['app_type'] . '/' .
 			strtolower($this->view['name']) . '/images/' . $link);
 	}
 
 	public function css($link)
 	{
-		return $this->url->getStatic(
+		return $this->phalconUrl->getStatic(
 			$this->app['app_type'] . '/' .
 			strtolower($this->view['name']) . '/css/' . $link);
 	}
 
 	public function js($link)
 	{
-		return $this->url->getStatic(
+		return $this->phalconUrl->getStatic(
 			$this->app['app_type'] . '/' .
 			strtolower($this->view['name']) . '/js/' . $link);
 	}
 
 	public function fonts($link)
 	{
-		return $this->url->getStatic(
+		return $this->phalconUrl->getStatic(
 			$this->app['app_type'] . '/' .
 			strtolower($this->view['name']) . '/fonts/' . $link);
 	}
 
 	public function sounds($link)
 	{
-		return $this->url->getStatic(
+		return $this->phalconUrl->getStatic(
 			$this->app['app_type'] . '/' .
 			strtolower($this->view['name']) . '/sounds/' . $link);
 	}
