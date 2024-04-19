@@ -124,6 +124,22 @@ class Api
                     ]
                 ),
                 new Column(
+                    'csrf',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'state',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 512,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
                     'private_key',
                     [
                         'type'          => Column::TYPE_BOOLEAN,

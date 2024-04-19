@@ -250,37 +250,9 @@ dataCollectionSection =
                         generateClientId();
                     }
                 });
-
-                function generateClientId(force = false) {
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['client_id_length'] = $('#{{componentId}}-{{sectionId}}-client_id_length').val();
-
-                    $.post('{{links.url("system/api/server/clients/generateclientid")}}', postData, function(response) {
-                        if (response.responseCode == 0) {
-                            PNotify.success(response.responseMessage);
-
-                            if (response.responseData && response.responseData.client_id) {
-                                $('#{{componentId}}-{{sectionId}}-client_id').val(response.responseData.client_id);
-                            }
-                            $('#{{componentId}}-{{sectionId}}-client_id').parents('.form-group').removeClass('d-none');
-                            $('#{{componentId}}-{{sectionId}}-generate-client-id').attr('hidden', true);
-                            $('#{{componentId}}-{{sectionId}}-regenerate-client-id').attr('hidden', false);
-                        } else {
-                            PNotify.error(response.responseMessage);
-                        }
-
-                        if (response.tokenKey && response.token) {
-                            $("#security-token").attr("name", response.tokenKey);
-                            $("#security-token").val(response.token);
-                        }
-
-                        $('#{{componentId}}-{{sectionId}}-generate-client-id, #{{componentId}}-{{sectionId}}-regenerate-client-id').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-generate-client-id, #{{componentId}}-{{sectionId}}-regenerate-client-id').children('i').attr('hidden', true);
-                    }, 'json');
-                }
             }
         },
+        '{{componentId}}-{{sectionId}}-client_secret'                               : { },
         '{{componentId}}-{{sectionId}}-redirect_url'                                : {
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-generate-redirect-url, #{{componentId}}-{{sectionId}}-generate-request-url').click(function(e) {
@@ -339,43 +311,6 @@ dataCollectionSection =
                         }
                     });
                 });
-
-                function generateRedirectUrl(id) {
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
-                    if (id === '{{componentId}}-{{sectionId}}-generate-redirect-url') {
-                        postData['type'] = 'redirect';
-                    } else if (id === '{{componentId}}-{{sectionId}}-generate-request-url') {
-                        postData['type'] = 'request';
-                    }
-                    postData['client_id'] = $('#{{componentId}}-{{sectionId}}-client_id').val();
-                    postData['redirect_url'] = $('#{{componentId}}-{{sectionId}}-redirect_url').val();
-                    postData['app_id'] = $('#{{componentId}}-{{sectionId}}-app_id').val();
-                    postData['domain_id'] = $('#{{componentId}}-{{sectionId}}-domain_id').val();
-                    postData['scope_id'] = $('#{{componentId}}-{{sectionId}}-scope_id').val();
-
-                    $.post('{{links.url("system/api/server/services/generateapiurl")}}', postData, function(response) {
-                        if (response.responseCode == 0) {
-                            PNotify.success(response.responseMessage);
-
-                            if (response.responseData && response.responseData.url) {
-                                if (id === '{{componentId}}-{{sectionId}}-generate-redirect-url') {
-                                    $('#{{componentId}}-{{sectionId}}-redirect_url').val(response.responseData.url);
-                                } else if (id === '{{componentId}}-{{sectionId}}-generate-request-url') {
-                                    $('#{{componentId}}-{{sectionId}}-request_url').val(response.responseData.url);
-                                }
-                            }
-                        } else {
-                            PNotify.error(response.responseMessage);
-                        }
-
-                        if (response.tokenKey && response.token) {
-                            $("#security-token").attr("name", response.tokenKey);
-                            $("#security-token").val(response.token);
-                        }
-                    }, 'json');
-                }
             }
         },
         '{{componentId}}-{{sectionId}}-request_url'                                 : { },
@@ -406,6 +341,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-pki_algorithm'                   : 'required',
                 '{{componentId}}-{{sectionId}}-encryption_key_size'             : 'required',
                 '{{componentId}}-{{sectionId}}-client_id'                       : 'required',
+                '{{componentId}}-{{sectionId}}-client_secret'                   : 'required',
                 '{{componentId}}-{{sectionId}}-redirect_url'                    : 'required',
             },
             messages    : {
@@ -419,9 +355,84 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-pki_key_size'                    : 'Select PKI Key Size',
                 '{{componentId}}-{{sectionId}}-pki_algorithm'                   : 'Select PKI Key Algorithm',
                 '{{componentId}}-{{sectionId}}-encryption_key_size'             : 'Enter Encryption Key Size',
-                '{{componentId}}-{{sectionId}}-client_id'                       : 'Generate API Client Id',
+                '{{componentId}}-{{sectionId}}-client_id'                       : 'Enter API Client Id',
+                '{{componentId}}-{{sectionId}}-client_secret'                   : 'Enter API Client Secret',
                 '{{componentId}}-{{sectionId}}-redirect_url'                    : 'Enter Redirect URL',
             }
         }
     });
+function generateClientId(force = false) {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['generate_client_id'] = true;
+    postData['client_id_length'] = $('#{{componentId}}-{{sectionId}}-client_id_length').val();
+    postData['generate_client_secret'] = true;
+    postData['client_secret_length'] = $('#{{componentId}}-{{sectionId}}-client_secret_length').val();
+
+    $.post('{{links.url("system/api/server/clients/generateclientidandsecret")}}', postData, function(response) {
+        if (response.responseCode == 0) {
+            PNotify.success(response.responseMessage);
+
+            if (response.responseData && response.responseData.client_id) {
+                $('#{{componentId}}-{{sectionId}}-client_id').val(response.responseData.client_id);
+                generateRedirectUrl('{{componentId}}-{{sectionId}}-generate-request-url');
+            }
+            if (response.responseData && response.responseData.client_secret) {
+                $('#{{componentId}}-{{sectionId}}-client_secret').val(response.responseData.client_secret);
+                $('#{{componentId}}-{{sectionId}}-client_secret').attr('type', 'text');
+            }
+            $('#{{componentId}}-{{sectionId}}-client_id').parents('.form-group').removeClass('d-none');
+            $('#{{componentId}}-{{sectionId}}-generate-client-id').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-regenerate-client-id').attr('hidden', false);
+        } else {
+            PNotify.error(response.responseMessage);
+        }
+
+        if (response.tokenKey && response.token) {
+            $("#security-token").attr("name", response.tokenKey);
+            $("#security-token").val(response.token);
+        }
+
+        $('#{{componentId}}-{{sectionId}}-generate-client-id, #{{componentId}}-{{sectionId}}-regenerate-client-id').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-generate-client-id, #{{componentId}}-{{sectionId}}-regenerate-client-id').children('i').attr('hidden', true);
+    }, 'json');
+}
+
+function generateRedirectUrl(id) {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+    if (id === '{{componentId}}-{{sectionId}}-generate-redirect-url') {
+        postData['type'] = 'redirect';
+    } else if (id === '{{componentId}}-{{sectionId}}-generate-request-url') {
+        postData['type'] = 'request';
+    }
+    postData['client_id'] = $('#{{componentId}}-{{sectionId}}-client_id').val();
+    postData['redirect_url'] = $('#{{componentId}}-{{sectionId}}-redirect_url').val();
+    postData['app_id'] = $('#{{componentId}}-{{sectionId}}-app_id').val();
+    postData['domain_id'] = $('#{{componentId}}-{{sectionId}}-domain_id').val();
+    postData['scope_id'] = $('#{{componentId}}-{{sectionId}}-scope_id').val();
+
+    $.post('{{links.url("system/api/server/services/generateapiurl")}}', postData, function(response) {
+        if (response.responseCode == 0) {
+            PNotify.success(response.responseMessage);
+
+            if (response.responseData && response.responseData.url) {
+                if (id === '{{componentId}}-{{sectionId}}-generate-redirect-url') {
+                    $('#{{componentId}}-{{sectionId}}-redirect_url').val(response.responseData.url);
+                } else if (id === '{{componentId}}-{{sectionId}}-generate-request-url') {
+                    $('#{{componentId}}-{{sectionId}}-request_url').val(response.responseData.url);
+                }
+            }
+        } else {
+            PNotify.error(response.responseMessage);
+        }
+
+        if (response.tokenKey && response.token) {
+            $("#security-token").attr("name", response.tokenKey);
+            $("#security-token").val(response.token);
+        }
+    }, 'json');
+}
+
 </script>

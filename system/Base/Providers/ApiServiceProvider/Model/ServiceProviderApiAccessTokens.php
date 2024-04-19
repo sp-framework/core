@@ -28,8 +28,6 @@ class ServiceProviderApiAccessTokens extends BaseModel implements AccessTokenEnt
 
     public $expires;
 
-    public $scope;
-
     public $revoked;
 
     public function getUserIdentifier()

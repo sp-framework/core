@@ -72,13 +72,6 @@ class AccessTokens
                     ]
                 ),
                 new Column(
-                    'scope',
-                    [
-                        'type'          => Column::TYPE_TEXT,
-                        'notNull'       => false
-                    ]
-                ),
-                new Column(
                     'revoked',
                     [
                         'type'          => Column::TYPE_BOOLEAN,

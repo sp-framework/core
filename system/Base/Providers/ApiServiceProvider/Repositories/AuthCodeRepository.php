@@ -4,6 +4,7 @@ namespace System\Base\Providers\ApiServiceProvider\Repositories;
 
 use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
 use League\OAuth2\Server\Exception\UniqueTokenIdentifierConstraintViolationException;
+use League\OAuth2\Server\Grant\AbstractGrant;
 use League\OAuth2\Server\Repositories\AuthCodeRepositoryInterface;
 use System\Base\BasePackage;
 use System\Base\Providers\ApiServiceProvider\Library\OAuthHelper;
@@ -17,33 +18,75 @@ class AuthCodeRepository extends BasePackage implements AuthCodeRepositoryInterf
 
     public function getNewAuthCode()
     {
-        return new $this->$modelToUse();
+        return $this->useModel();
     }
 
     public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity)
     {
         $authCode = $authCodeEntity->getIdentifier();
-        if ($this->findOne(['authorization_code' => $authCode])) {
+
+        if ($this->getFirst('authorization_code', $authCode)) {
             throw UniqueTokenIdentifierConstraintViolationException::create();
         }
 
-        $this->create([
-            'authorization_code' => $authCode,
-            'expires' => (\Carbon\Carbon::parse($authCodeEntity->getExpiryDateTime()))->toDateTimeLocalString(),
-            'scope' => implode(SCOPE_DELIMITER_STRING, $this->getScopeNamesFromAuthCode($authCodeEntity)),
-            'client_id' => $authCodeEntity->getClient()->getIdentifier(),
-            // I do not understand why redirect_uri isn't saving to the oauth_codes table.. Must be witchcraft
-            // switching to redirect_url
-            //'redirect_uri' => $authCodeEntity->getRedirectUri(),
-            'redirect_url' => $authCodeEntity->getRedirectUri(),
-            'user_id' => $authCodeEntity->getUserIdentifier(),
-            'revoked' => 0,
-        ]);
+        if ($this->config->databasetype === 'db') {
+            $params = [
+                'conditions'    => 'api_id = :apiId: AND app_id = :appId: AND domain_id = :domainId: AND account_id = :accountId:',
+                'bind'          =>
+                    [
+                        'apiId'    => $this->api->getApiInfo()['id'],
+                        'appId'    => $this->apps->getAppInfo()['id'],
+                        'domainId' => $this->domains->domain['id'],
+                        'accountId'=> $authCodeEntity->getClient()->getUserIdentifier()
+                    ]
+            ];
+        } else {
+            $params['conditions'] = [
+                ['api_id', '=', $this->api->getApiInfo()['id']],
+                ['app_id', '=', $this->apps->getAppInfo()['id']],
+                ['domain_id', '=', $this->domains->domain['id']],
+                ['account_id', '=', $authCodeEntity->getClient()->getUserIdentifier()]
+            ];
+        }
+        $code = $this->getByParams($params, false, false);
+
+        $newCode =
+            [
+                'api_id' => $this->api->getApiInfo()['id'],
+                'app_id' => $this->apps->getAppInfo()['id'],
+                'domain_id' => $this->domains->domain['id'],
+                'account_id' => $authCodeEntity->getClient()->getUserIdentifier(),
+                'authorization_code' => $authCode,
+                'expires' => (\Carbon\Carbon::parse($authCodeEntity->getExpiryDateTime()))->toDateTimeLocalString(),
+                'client_id' => $authCodeEntity->getClient()->getIdentifier(),
+                'revoked' => 0,
+                'redirectUri' => $authCodeEntity->getClient()->getRedirectUri()
+            ];
+
+        if (!$code) {
+            $this->add($newCode);
+        } else {
+            if (count($code) > 0) {
+                $code = $code[0];//We only change the first code found.
+            }
+
+            $newCode = array_merge($code, $newCode);
+
+            $this->update($newCode);
+        }
+
+        $authCodeEntity->assign($newCode);
     }
 
     public function revokeAuthCode($codeId)
     {
-        $this->update(['authorization_code' => $codeId, 'revoked' => 1]);
+        if ($result = $this->getFirst('authorization_code', $codeId)) {
+            $result = $result->toArray();
+
+            $result['revoked'] = true;
+
+            $this->update($result);
+        }
     }
 
     public function isAuthCodeRevoked($codeId)
@@ -53,5 +96,20 @@ class AuthCodeRepository extends BasePackage implements AuthCodeRepositoryInterf
         }
 
         return true;
+    }
+
+    protected function getScopeNamesFromAuthCode(AuthCodeEntityInterface $authCodeEntity)
+    {
+        return $this->scopeToArray($authCodeEntity->getScopes());
+    }
+
+    protected function scopeToArray(array $scopes)
+    {
+        $scopeNames = [];
+        foreach ($scopes as $scope) {
+            $scopeNames[] = $scope->getIdentifier();
+        }
+
+        return $scopeNames;
     }
 }

@@ -67,7 +67,6 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
             'account_id' => $accessTokenEntity->getClient()->getUserIdentifier(),
             'access_token' => $accessToken,
             'expires' => (\Carbon\Carbon::parse($accessTokenEntity->getExpiryDateTime()))->toDateTimeLocalString(),
-            'scope' => implode(AbstractGrant::SCOPE_DELIMITER_STRING, $this->getScopeNamesFromAccessToken($accessTokenEntity)),
             'client_id' => $accessTokenEntity->getClient()->getIdentifier(),
             'revoked' => 0
         ];

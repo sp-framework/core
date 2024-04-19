@@ -31,17 +31,28 @@ class ServicesComponent extends BaseComponent
 
                 if ($client) {
                     $client = $client->toArray();
-                }
 
-                if ($client['redirectUri'] === '' || $client['redirectUri'] === 'https://') {
+                    if ($client['redirectUri'] === '' || $client['redirectUri'] === 'https://') {
+                        $api['type'] = 'redirect';
+                        $api['redirect_url'] = $this->api->generateAPIUrl($api);
+                    } else {
+                        $api['redirect_url'] = $client['redirectUri'];
+                    }
+                    if (isset($client['client_secret']) && $client['client_secret'] !== '') {
+                        $client['client_secret'] = $this->random->base58(8);
+                    }
+                    $api['client_secret'] = $client['client_secret'];
+                } else {
+                    $client['redirectUri'] = 'https://';
                     $api['type'] = 'redirect';
                     $api['redirect_url'] = $this->api->generateAPIUrl($api);
-                } else {
-                    $api['redirect_url'] = $client['redirectUri'];
+                    $api['client_secret'] = '';
                 }
 
                 $api['type'] = 'request';
                 $api['request_url'] = $this->api->generateAPIUrl($api);
+            } else {
+                $api['client_secret'] = '';
             }
 
             $this->view->api = $api;

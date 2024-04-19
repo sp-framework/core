@@ -159,11 +159,11 @@ class ClientsComponent extends BaseComponent
         );
     }
 
-    public function generateClientIdAction()
+    public function generateClientIdAndSecretAction()
     {
         $this->requestIsPost();
 
-        $this->api->clients->generateClientId($this->postData());
+        $this->api->clients->generateClientIdAndSecret($this->postData());
 
         $this->addResponse(
             $this->api->clients->packagesData->responseMessage,

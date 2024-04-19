@@ -29,7 +29,15 @@ class ServiceProviderApiAuthorizationCodes extends BaseModel implements AuthCode
 
     public $expires;
 
-    public $scope;
-
     public $revoked;
+
+    public function getUserIdentifier()
+    {
+        return $this->account_id;
+    }
+
+    public function setUserIdentifier($identifier)
+    {
+        $this->account_id = $identifier;
+    }
 }

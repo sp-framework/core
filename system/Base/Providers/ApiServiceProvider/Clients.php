@@ -209,7 +209,7 @@ class Clients extends BasePackage
         return false;
     }
 
-    public function generateClientKeys($data, $account = null, $newClient = null, $emailNewClientDetails = true, $clientID = null)
+    public function generateClientKeys($data, $account = null, $newClient = null, $emailNewClientDetails = true)
     {
         $api = $this->api->getById($data['api_id']);
 
@@ -239,8 +239,8 @@ class Clients extends BasePackage
                 $newClient['account_id'] = $account['id'] ?? $this->auth->account()['id'];
                 $newClient['email'] = $account['email'] ?? $this->auth->account()['email'];
                 $newClient['name'] = $apiName;
-                $newClient['client_id'] = $clientID ?? $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
-                $client_secret = $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
+                $newClient['client_id'] = $data['client_id'] ?? $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
+                $client_secret = $data['client_secret'] ?? $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
                 $newClient['client_secret'] = $this->secTools->hashPassword($client_secret);
                 $newClient['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
                 $newClient['revoked'] = '0';
@@ -347,13 +347,27 @@ class Clients extends BasePackage
         return $clientsCount;
     }
 
-    public function generateClientId($data)
+    public function generateClientIdAndSecret($data)
     {
-        $clientId = $this->random->base58(isset($data['client_id_length']) ? $data['client_id_length'] : 8);
+        if (isset($data['generate_client_id']) && $data['generate_client_id'] == true) {
+            $clientId = $this->random->base58(isset($data['client_id_length']) ? $data['client_id_length'] : 8);
+        }
+        if (isset($data['generate_client_secret']) && $data['generate_client_secret'] == true) {
+            $clientSecret = $this->random->base58(isset($data['client_secret_length']) ? $data['client_secret_length'] : 32);
+        }
 
-        $this->addResponse('Id generated successfully.', 0, ['client_id' => $clientId]);
+        $responseArr = [];
+        if (isset($clientId)) {
+            $responseArr['client_id'] = $clientId;
+        }
 
-        return $clientId;
+        if (isset($clientSecret)) {
+            $responseArr['client_secret'] = $clientSecret;
+        }
+
+        $this->addResponse('Id generated successfully.', 0, $responseArr);
+
+        return $responseArr;
     }
 
     protected function emailNewClientDetails($api, $newClient, $clientSecret)

@@ -8,116 +8,189 @@ BazCore.header({
     <span>Loading... </span>
     <span></span>
 </div>
+{% if api is defined and code is defined %}
+<div id="{{componentId}}" class="login-box" style="width:60%">
+{% else %}
 <div id="{{componentId}}" class="login-box">
+{% endif %}
     <div class="card m-0">
         <div class="card-body login-card-body">
             <div class="login-logo">
                 <img src="{{links.images(assets.get('branding').getCodes()[3].getContent())}}" data-rjs="3" alt="Bazaari Logo" style="height:{{assets.get('branding').getCodes()[5].getContent()}}px">
             </div>
             <div id="{{componentId}}-regular" hidden>
-                {% if api is defined %}
-                    <p class="login-box-msg text-sm font-weight-bold">Register new client for API {{api['name']}}</p>
-                {% else %}
-                    <p class="login-box-msg text-sm font-weight-bold">Register new account for application {{appName|lower}}</p>
-                {% endif %}
                 <div id="{{componentId}}-form">
-                    {% if api is not defined %}
-                        {{adminltetags.useTag('fields',
-                            [
-                                'componentId'                           : componentId,
-                                'sectionId'                             : 'form',
-                                'fieldId'                               : 'first_name',
-                                'fieldLabel'                            : false,
-                                'fieldType'                             : 'input',
-                                'fieldInputType'                        : 'text',
-                                'fieldPlaceholder'                      : 'First Name',
-                                'fieldGroupPostAddonIcon'               : 'user'
-                            ]
-                        )}}
-                        {{adminltetags.useTag('fields',
-                            [
-                                'componentId'                           : componentId,
-                                'sectionId'                             : 'form',
-                                'fieldId'                               : 'last_name',
-                                'fieldLabel'                            : false,
-                                'fieldType'                             : 'input',
-                                'fieldInputType'                        : 'text',
-                                'fieldPlaceholder'                      : 'Last Name',
-                                'fieldGroupPostAddonIcon'               : 'user'
-                            ]
-                        )}}
-                    {% endif %}
-                    {{adminltetags.useTag('fields',
-                        [
-                            'componentId'                           : componentId,
-                            'sectionId'                             : 'form',
-                            'fieldId'                               : 'email',
-                            'fieldLabel'                            : false,
-                            'fieldType'                             : 'input',
-                            'fieldInputType'                        : 'text',
-                            'fieldPlaceholder'                      : 'Email',
-                            'fieldGroupPostAddonIcon'               : 'envelope'
-                        ]
-                    )}}
-                    {% if api is defined %}
-                        <div class="row mt-2">
-                            <div class="col-md-4">
+                    {% if api is defined and code is not defined %}
+                        <p class="login-box-msg text-sm font-weight-bold">Authorize client for {{api['name']}}</p>
+                        <div class="row">
+                            <div class="col text-center">
+                                <button id="{{componentId}}-form-authorize" type="button" class="btn btn-info">
+                                    <i class="fa fa-cog fa-spin login-spinner" hidden></i>
+                                    <span class="text-uppercase">Authorize</span>
+                                </button>
+                            </div>
+                        </div>
+                    {% elseif api is defined and code is defined %}
+                        <p class="login-box-msg text-sm font-weight-bold">Client authorized for {{api['name']}}</p>
+                        <div class="row">
+                            <div class="col">
                                 {{adminltetags.useTag('fields',
                                     [
                                         'componentId'                           : componentId,
                                         'sectionId'                             : 'form',
-                                        'fieldId'                               : 'device_id',
-                                        'fieldLabel'                            : false,
-                                        'fieldType'                             : 'checkbox',
-                                        'fieldCheckboxType'                     : 'success',
-                                        'fieldCheckboxLabel'                    : 'Is Device?',
-                                        'fieldCheckboxAdditionClass'            : 'text-sm text-uppercase'
+                                        'fieldId'                               : 'client_id',
+                                        'fieldLabel'                            : 'Client ID',
+                                        'fieldType'                             : 'input',
+                                        'fieldRequired'                         : true,
+                                        'fieldInputType'                        : 'text',
+                                        'fieldValue'                            : ''
                                     ]
                                 )}}
                             </div>
-                            <div class="col d-none">
+                            <div class="col">
                                 {{adminltetags.useTag('fields',
                                     [
                                         'componentId'                           : componentId,
                                         'sectionId'                             : 'form',
-                                        'fieldId'                               : 'forceRegen',
-                                        'fieldLabel'                            : false,
-                                        'fieldType'                             : 'checkbox',
-                                        'fieldCheckboxType'                     : 'success',
-                                        'fieldCheckboxLabel'                    : 'Force Revoke & Regenerate?',
-                                        'fieldCheckboxAdditionClass'            : 'text-sm text-uppercase'
+                                        'fieldId'                               : 'client_secret',
+                                        'fieldLabel'                            : 'Client Secret',
+                                        'fieldType'                             : 'input',
+                                        'fieldRequired'                         : true,
+                                        'fieldInputType'                        : 'text',
+                                        'fieldValue'                            : ''
                                     ]
                                 )}}
                             </div>
                         </div>
-                    {% endif %}
-                    <div class="row mt-2">
-                        {% if api is not defined %}
-                            <div class="col mt-2">
-                                <a class="text-info" href="{{links.url('auth')}}">
-                                    <span>Back to login</span>
-                                </a>
+                        <div class="row">
+                            <div class="col">
+                                {{adminltetags.useTag('fields',
+                                    [
+                                        'componentId'                           : componentId,
+                                        'sectionId'                             : 'form',
+                                        'fieldId'                               : 'redirect_uri',
+                                        'fieldLabel'                            : 'Redirect URI',
+                                        'fieldType'                             : 'input',
+                                        'fieldDisabled'                         : true,
+                                        'fieldHidden'                           : true,
+                                        'fieldInputType'                        : 'text',
+                                        'fieldValue'                            : client['redirectUri']
+                                    ]
+                                )}}
                             </div>
-                        {% endif %}
-                        <div class="col">
-                            <button id="{{componentId}}-form-register" type="button" class="btn btn-info float-right">
-                                <i class="fa fa-cog fa-spin login-spinner" hidden></i>
-                                <span class="text-uppercase">Register</span>
-                            </button>
                         </div>
-                    </div>
+                        <div id="code">
+                            <div class="row">
+                                <div class="col">
+                                    {{adminltetags.useTag('fields',
+                                        [
+                                            'componentId'                           : componentId,
+                                            'sectionId'                             : 'form',
+                                            'fieldId'                               : 'code',
+                                            'fieldLabel'                            : 'Code',
+                                            'fieldType'                             : 'textarea',
+                                            'fieldDisabled'                         : true,
+                                            'fieldHidden'                           : false,
+                                            'fieldTextareaRows'                     : 8,
+                                            'fieldValue'                            : code
+                                        ]
+                                    )}}
+                                </div>
+                            </div>
+                        </div>
+                        <div id="codes" class="d-none">
+                            <div class="row">
+                                <div class="col">
+                                    {{adminltetags.useTag('fields',
+                                        [
+                                            'componentId'                           : componentId,
+                                            'sectionId'                             : 'form',
+                                            'fieldId'                               : 'expires_in',
+                                            'fieldLabel'                            : 'Expires in minutes',
+                                            'fieldType'                             : 'input',
+                                            'fieldInputType'                        : 'text',
+                                            'fieldValue'                            : ''
+                                        ]
+                                    )}}
+                                </div>
+                                <div class="col">
+                                    {{adminltetags.useTag('fields',
+                                        [
+                                            'componentId'                           : componentId,
+                                            'sectionId'                             : 'form',
+                                            'fieldId'                               : 'token_type',
+                                            'fieldLabel'                            : 'Token type',
+                                            'fieldType'                             : 'input',
+                                            'fieldInputType'                        : 'text',
+                                            'fieldValue'                            : ''
+                                        ]
+                                    )}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    {{adminltetags.useTag('fields',
+                                        [
+                                            'componentId'                           : componentId,
+                                            'sectionId'                             : 'form',
+                                            'fieldId'                               : 'access_token',
+                                            'fieldLabel'                            : 'Access Token',
+                                            'fieldType'                             : 'textarea',
+                                            'fieldDisabled'                         : true,
+                                            'fieldTextareaRows'                     : 8,
+                                            'fieldValue'                            : ''
+                                        ]
+                                    )}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    {{adminltetags.useTag('fields',
+                                        [
+                                            'componentId'                           : componentId,
+                                            'sectionId'                             : 'form',
+                                            'fieldId'                               : 'refresh_token',
+                                            'fieldLabel'                            : 'Refresh Token',
+                                            'fieldType'                             : 'textarea',
+                                            'fieldDisabled'                         : true,
+                                            'fieldTextareaRows'                     : 8,
+                                            'fieldValue'                            : ''
+                                        ]
+                                    )}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col text-center">
+                                <button id="{{componentId}}-form-request" type="button" class="btn btn-info">
+                                    <i class="fa fa-cog fa-spin login-spinner" hidden></i>
+                                    <span class="text-uppercase">Request Access Token</span>
+                                </button>
+                            </div>
+                        </div>
+                    {% elseif error is defined %}
+                        <div class="row mt-4">
+                            <div class="col text-center">
+                                <p class="text-danger font-weight-bold">{{error}}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% include 'auth/footer.html' %}
                 </div>
-                {% include 'auth/footer.html' %}
             </div>
         </div>
     </div>
+{% if api is defined and code is not defined %}
 </div>
+{% else %}
+</div>
+{% endif %}
 {% if api is defined %}
     {% set api = json_encode(api, 16) %}
 {% else %}
     {% set api = json_encode([]) %}
 {% endif %}
-{% if client is defined %}
+{% if api is defined and code is defined %}
     {% set client = json_encode(client, 16) %}
 {% else %}
     {% set client = json_encode([]) %}

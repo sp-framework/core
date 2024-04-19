@@ -52,6 +52,7 @@
     </div>
 </div>
 <div id="autho-code-grant" {{authoCodeGrantHidden}}>
+    <small class="text-danger">Note: Client secret is only shown at the time of key generation. Please copy and save it somewhere safe.</small><br><br>
     <div class="row">
         <div class="col">
             {{adminltetags.useTag('buttons',
@@ -103,6 +104,33 @@
                     'fieldBazPostOnCreate'                  : true,
                     'fieldBazPostOnUpdate'                  : true,
                     'fieldValue'                            : apiClientId
+                ]
+            )}}
+        </div>
+        {% set clientSecretInputFieldType = 'text' %}
+        {% if apiClientSecret !== '' %}
+            {% set clientSecretInputFieldType = 'password' %}
+        {% endif %}
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'client_secret',
+                    'fieldLabel'                            : 'Client Secret',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldRequired'                         : true,
+                    'fieldHelpTooltipContent'               : 'Client Secret for API authentication.',
+                    'fieldDisabled'                         : true,
+                    'fieldInputType'                        : clientSecretInputFieldType,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnCreate'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldValue'                            : apiClientSecret
                 ]
             )}}
         </div>
