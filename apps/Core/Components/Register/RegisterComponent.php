@@ -33,6 +33,12 @@ class RegisterComponent extends BaseComponent
                 return;
             }
 
+            $this->view->authorizationTosPp = null;
+            if (isset($api['authorization_tos_pp']) && $api['authorization_tos_pp'] !== '') {
+                $this->view->authorizationTosPp = $api['authorization_tos_pp'];
+                unset($api['authorization_tos_pp']);
+            }
+
             $this->view->api = $api;
 
             if (isset($this->getData()['state'])) {
@@ -67,6 +73,11 @@ class RegisterComponent extends BaseComponent
                 $this->view->error = $this->api->packagesData->responseMessage;
 
                 return;
+            }
+
+            $this->view->authorizationTosPp = null;
+            if (isset($api['authorization_tos_pp']) && $api['authorization_tos_pp'] !== '') {
+                unset($api['authorization_tos_pp']);
             }
 
             $this->view->api = $api;

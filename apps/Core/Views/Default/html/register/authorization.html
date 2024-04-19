@@ -8,11 +8,16 @@ BazCore.header({
     <span>Loading... </span>
     <span></span>
 </div>
+{% set style = '' %}
+{% set buttonText = 'Authorize' %}
 {% if api is defined and code is defined %}
-<div id="{{componentId}}" class="login-box" style="width:60%">
-{% else %}
-<div id="{{componentId}}" class="login-box">
+    {% set style = 'style="width:60%"' %}
+    {% set buttonText = 'Request Access Token' %}
+{% elseif authorizationTosPp is defined %}
+    {% set style = 'style="width:80%"' %}
+    {% set buttonText = 'Agree & Authorize' %}
 {% endif %}
+<div id="{{componentId}}" class="login-box" {{style}}>
     <div class="card m-0">
         <div class="card-body login-card-body">
             <div class="login-logo">
@@ -23,10 +28,13 @@ BazCore.header({
                     {% if api is defined and code is not defined %}
                         <p class="login-box-msg text-sm font-weight-bold">Authorize client for {{api['name']}}</p>
                         <div class="row">
+                            <div class="col">{{authorizationTosPp}}</div>
+                        </div>
+                        <div class="row">
                             <div class="col text-center">
                                 <button id="{{componentId}}-form-authorize" type="button" class="btn btn-info">
                                     <i class="fa fa-cog fa-spin login-spinner" hidden></i>
-                                    <span class="text-uppercase">Authorize</span>
+                                    <span class="text-uppercase">{{buttonText}}</span>
                                 </button>
                             </div>
                         </div>
@@ -164,7 +172,7 @@ BazCore.header({
                             <div class="col text-center">
                                 <button id="{{componentId}}-form-request" type="button" class="btn btn-info">
                                     <i class="fa fa-cog fa-spin login-spinner" hidden></i>
-                                    <span class="text-uppercase">Request Access Token</span>
+                                    <span class="text-uppercase">{{buttonText}}</span>
                                 </button>
                             </div>
                         </div>
@@ -180,11 +188,7 @@ BazCore.header({
             </div>
         </div>
     </div>
-{% if api is defined and code is not defined %}
 </div>
-{% else %}
-</div>
-{% endif %}
 {% if api is defined %}
     {% set api = json_encode(api, 16) %}
 {% else %}

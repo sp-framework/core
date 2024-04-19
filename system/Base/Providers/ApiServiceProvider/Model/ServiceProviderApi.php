@@ -41,6 +41,8 @@ class ServiceProviderApi extends BaseModel
 
     public $csrf;
 
+    public $authorization_tos_pp;
+
     public $state;
 
     public $private_key;

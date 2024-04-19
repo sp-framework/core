@@ -202,4 +202,27 @@
             )}}
         </div>
     </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'authorization_tos_pp',
+                    'fieldLabel'                     : 'Authorization Terms of Services/Privacy Policy',
+                    'fieldType'                      : 'trumbowyg',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'This html shows up on the authorization page. You can add any terms of service and privacy policy for users to read and accept.',
+                    'fieldRequired'                  : false,
+                    'fieldBazScan'                   : true,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldDataInputMaxLength'        : 65535,
+                    'fieldValue'                     : apiAuthorizationTosPp
+                ]
+            )}}
+        </div>
+    </div>
 </div>

@@ -132,6 +132,13 @@ class Api
                     ]
                 ),
                 new Column(
+                    'authorization_tos_pp',
+                    [
+                        'type'          => Column::TYPE_TEXT,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
                     'state',
                     [
                         'type'          => Column::TYPE_VARCHAR,
