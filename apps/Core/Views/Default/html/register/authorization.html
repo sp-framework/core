@@ -9,12 +9,14 @@ BazCore.header({
     <span></span>
 </div>
 {% set style = '' %}
+{% set rowStyle = '' %}
 {% set buttonText = 'Authorize' %}
 {% if api is defined and code is defined %}
     {% set style = 'style="width:60%"' %}
     {% set buttonText = 'Request Access Token' %}
 {% elseif authorizationTosPp is defined %}
     {% set style = 'style="width:80%"' %}
+    {% set rowStyle = 'style="max-height: 300px;overflow: auto;border: 1px solid #fff;margin-bottom: 10px;padding: 10px; background:#fff;' %}
     {% set buttonText = 'Agree & Authorize' %}
 {% endif %}
 <div id="{{componentId}}" class="login-box" {{style}}>
@@ -27,7 +29,7 @@ BazCore.header({
                 <div id="{{componentId}}-form">
                     {% if api is defined and code is not defined %}
                         <p class="login-box-msg text-sm font-weight-bold">Authorize client for {{api['name']}}</p>
-                        <div class="row">
+                        <div class="row" {{rowStyle}}>
                             <div class="col">{{authorizationTosPp}}</div>
                         </div>
                         <div class="row">
