@@ -351,7 +351,8 @@ class Api extends BasePackage
                 $this->isApiCheckVia = 'authorization';
             } else if ($this->request->get('client_id') &&
                        !$this->request->get('id') &&
-                       !isset($this->request->getPost()['redirect_uri'])
+                       !isset($this->request->getPost()['redirect_uri']) &&
+                       !isset($this->request->getPost()['refresh'])
             ) {
                 $this->isApi = true;
                 $this->isApiCheckVia = 'client_id';
@@ -588,15 +589,19 @@ class Api extends BasePackage
             $token = $this->helper->decode((string) $tokenResponse->getBody(), true);
 
             if ($this->request->get('client_id')) {
-                $encClientId = $this->secTools->encryptBase64($this->request->get('client_id'));
+                $clientId = $this->request->get('client_id');
+                $encClientId = $this->secTools->encryptBase64($clientId);
             } else if ($this->request->getPost()['client_id']) {
-                $encClientId = $this->secTools->encryptBase64($this->request->getPost()['client_id']);
+                $clientId = $this->request->getPost()['client_id'];
+                $encClientId = $this->secTools->encryptBase64($clientId);
             }
 
             if ($this->request->get('device_id')) {
-                $encDeviceId = $this->secTools->encryptBase64($this->request->get('device_id'));
+                $deviceId = $this->request->get('device_id');
+                $encDeviceId = $this->secTools->encryptBase64($deviceId);
             } else if (isset($this->request->getPost()['device_id'])) {
-                $encDeviceId = $this->secTools->encryptBase64($this->request->getPost()['device_id']);
+                $deviceId = $this->request->getPost()['device_id'];
+                $encDeviceId = $this->secTools->encryptBase64($deviceId);
             }
 
             $token['access_token'] = $token['access_token'] . '||' . $encClientId;
@@ -605,16 +610,22 @@ class Api extends BasePackage
                 $token['access_token'] = $token['access_token'] . '||' . $encDeviceId;
             }
 
-            if (isset($token['refresh_token'])) {
-                $token['refresh_token'] = $token['refresh_token'] . '||' . $encClientId;
+            // if (isset($token['refresh_token'])) {
+            //     $token['refresh_token'] = $token['refresh_token'] . '||' . $encClientId;
 
-                if (isset($encDeviceId)) {
-                    $token['refresh_token'] = $token['refresh_token'] . '||' . $encDeviceId;
-                }
-            }
+            //     if (isset($encDeviceId)) {
+            //         $token['refresh_token'] = $token['refresh_token'] . '||' . $encDeviceId;
+            //     }
+            // }
+
+            //Once Client has successfully authenticated using client secret, we replace it so it cannot be used again acting as one time password.
+            //A new set of client keys need to be generated for new token.
+            // $client = $this->clients->getFirst('client_id', $clientId, false, false, false, [], true);
+            // $client['client_secret'] = $this->secTools->hashPassword($this->clients->generateClientIdAndSecret(['generate_client_secret' => true])['client_secret']);
+            // $this->clients->updateClient($client);
 
             if ($this->request->getPost()['grant_type'] === 'authorization_code') {
-                $this->addResponse('Generated authorization code', 0, $token);
+                $this->addResponse('Access token generated!', 0, $token);
 
                 return true;
             }
@@ -624,11 +635,13 @@ class Api extends BasePackage
             return $tokenResponse->withBody($body);
         } catch (OAuthServerException $exception) {
             $this->logger->logExceptions->critical($exception);
+            $this->addResponse($exception->getMessage(), 1, []);
             var_dump($exception);die();
             // All instances of OAuthServerException can be converted to a PSR-7 response
             return $exception->generateHttpResponse($serverResponse);
         } catch (\Exception $exception) {
             $this->logger->logExceptions->critical($exception);
+            $this->addResponse($exception->getMessage(), 1, []);
             var_dump($exception);die();
             // Catch unexpected exceptions
             $body = $serverResponse->getBody();
@@ -697,8 +710,12 @@ class Api extends BasePackage
 
     public function getScope()
     {
-        if ($this->headerAttributes && $this->headerAttributes['oauth_scopes']) {
-            return $this->headerAttributes['oauth_scopes'][0];
+        if ($this->headerAttributes && $this->headerAttributes['oauth_scopes'][0]) {
+            $scope = $this->scopes->getFirst('scope_name', $this->headerAttributes['oauth_scopes'][0], false, false, null, [], true);
+
+            if ($scope) {
+                return $scope;
+            }
         }
 
         return $this->scopes->getById($this->api['scope_id']);
@@ -1045,6 +1062,12 @@ class Api extends BasePackage
                 }
 
                 $api = $this->getById($client->api_id);
+
+                if ($api && isset($this->getData()['refresh']) && $this->getData()['refresh'] == true) {
+                    $this->api = $api;
+
+                    return $api;
+                }
 
                 if (isset($getData['state']) && $getData['state'] !== '') {
                     $api['state'] = $getData['state'];

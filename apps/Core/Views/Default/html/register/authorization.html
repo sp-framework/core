@@ -19,6 +19,10 @@ BazCore.header({
     {% set rowStyle = 'style="max-height: 300px;overflow: auto;border: 1px solid #fff;margin-bottom: 10px;padding: 10px; background:#fff;' %}
     {% set buttonText = 'Agree & Authorize' %}
 {% endif %}
+{% if refresh is defined %}
+    {% set style = 'style="width:60%"' %}
+    {% set buttonText = 'Refresh Token' %}
+{% endif %}
 <div id="{{componentId}}" class="login-box" {{style}}>
     <div class="card m-0">
         <div class="card-body login-card-body">
@@ -27,11 +31,13 @@ BazCore.header({
             </div>
             <div id="{{componentId}}-regular" hidden>
                 <div id="{{componentId}}-form">
-                    {% if api is defined and code is not defined %}
+                    {% if api is defined and code is not defined and refresh is not defined %}
                         <p class="login-box-msg text-sm font-weight-bold">Authorize client for {{api['name']}}</p>
-                        <div class="row" {{rowStyle}}>
-                            <div class="col">{{authorizationTosPp}}</div>
-                        </div>
+                        {% if authorizationTosPp is defined %}
+                            <div class="row" {{rowStyle}}>
+                                <div class="col">{{authorizationTosPp}}</div>
+                            </div>
+                        {% endif %}
                         <div class="row">
                             <div class="col text-center">
                                 <button id="{{componentId}}-form-authorize" type="button" class="btn btn-info">
@@ -40,8 +46,12 @@ BazCore.header({
                                 </button>
                             </div>
                         </div>
-                    {% elseif api is defined and code is defined %}
-                        <p class="login-box-msg text-sm font-weight-bold">Client authorized for {{api['name']}}</p>
+                    {% elseif api is defined and code is defined or refresh is defined %}
+                        {% if refresh is defined %}
+                            <p class="login-box-msg text-sm font-weight-bold text-success">Access Token generator using refresh token for {{api['name']}}</p>
+                        {% else %}
+                            <p class="login-box-msg text-sm font-weight-bold text-success">Client authorized for {{api['name']}}</p>
+                        {% endif %}
                         <div class="row">
                             <div class="col">
                                 {{adminltetags.useTag('fields',
@@ -72,42 +82,63 @@ BazCore.header({
                                 )}}
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col">
-                                {{adminltetags.useTag('fields',
-                                    [
-                                        'componentId'                           : componentId,
-                                        'sectionId'                             : 'form',
-                                        'fieldId'                               : 'redirect_uri',
-                                        'fieldLabel'                            : 'Redirect URI',
-                                        'fieldType'                             : 'input',
-                                        'fieldDisabled'                         : true,
-                                        'fieldHidden'                           : true,
-                                        'fieldInputType'                        : 'text',
-                                        'fieldValue'                            : client['redirectUri']
-                                    ]
-                                )}}
-                            </div>
-                        </div>
-                        <div id="code">
+                        {% if refresh is defined %}
                             <div class="row">
                                 <div class="col">
                                     {{adminltetags.useTag('fields',
                                         [
                                             'componentId'                           : componentId,
                                             'sectionId'                             : 'form',
-                                            'fieldId'                               : 'code',
-                                            'fieldLabel'                            : 'Code',
+                                            'fieldId'                               : 'refresh_token',
+                                            'fieldLabel'                            : 'Refresh Token',
                                             'fieldType'                             : 'textarea',
-                                            'fieldDisabled'                         : true,
+                                            'fieldRequired'                         : true,
                                             'fieldHidden'                           : false,
                                             'fieldTextareaRows'                     : 8,
-                                            'fieldValue'                            : code
+                                            'fieldValue'                            : ''
                                         ]
                                     )}}
                                 </div>
                             </div>
-                        </div>
+                        {% endif %}
+                        {% if code is defined %}
+                            <div class="row">
+                                <div class="col">
+                                    {{adminltetags.useTag('fields',
+                                        [
+                                            'componentId'                           : componentId,
+                                            'sectionId'                             : 'form',
+                                            'fieldId'                               : 'redirect_uri',
+                                            'fieldLabel'                            : 'Redirect URI',
+                                            'fieldType'                             : 'input',
+                                            'fieldDisabled'                         : true,
+                                            'fieldHidden'                           : true,
+                                            'fieldInputType'                        : 'text',
+                                            'fieldValue'                            : client['redirectUri']
+                                        ]
+                                    )}}
+                                </div>
+                            </div>
+                            <div id="code">
+                                <div class="row">
+                                    <div class="col">
+                                        {{adminltetags.useTag('fields',
+                                            [
+                                                'componentId'                           : componentId,
+                                                'sectionId'                             : 'form',
+                                                'fieldId'                               : 'code',
+                                                'fieldLabel'                            : 'Code',
+                                                'fieldType'                             : 'textarea',
+                                                'fieldDisabled'                         : true,
+                                                'fieldHidden'                           : false,
+                                                'fieldTextareaRows'                     : 8,
+                                                'fieldValue'                            : code
+                                            ]
+                                        )}}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                         <div id="codes" class="d-none">
                             <div class="row">
                                 <div class="col">
@@ -201,10 +232,13 @@ BazCore.header({
 {% else %}
     {% set client = json_encode([]) %}
 {% endif %}
+{% if refresh is not defined %}
+    {% set refresh = false %}
+{% endif %}
 <script>
 /*global BazCore */
 $(document).ready(function() {
-    var isRegister, isApi, api, client;
+    var isRegister, isApi, api, client, refresh;
     $('#{{componentId}}-regular').attr('hidden', false).addClass('animated fadeIn');
 
     if ($('#{{componentId}}-form-register').length > 0) {
@@ -230,6 +264,7 @@ $(document).ready(function() {
         isApi = false;
         api = JSON.parse('{{api}}');
         client = JSON.parse('{{client}}');
+        refresh = '{{refresh}}';
 
         BazCore.footer({
             loadFooterAt : 'authorize'
@@ -281,16 +316,22 @@ $(document).ready(function() {
                     postData['forceRegen'] = '1';
                 }
             }
-        } else if (typeof client === 'object' && Object.keys(client).length > 0) {
+        } else if ((typeof client === 'object' && Object.keys(client).length > 0) ||
+                   refresh == true
+        ) {
             url = '{{links.url("register/apiClient")}}';
-            postData['grant_type'] = 'authorization_code';
             postData['client_id'] = $('#{{componentId}}-form-client_id').val().trim();
             postData['client_secret'] = $('#{{componentId}}-form-client_secret').val().trim();
-            postData['redirect_uri'] = $('#{{componentId}}-form-redirect_uri').val().trim();
-            postData['code'] = $('#{{componentId}}-form-code').val().trim();
+            if (refresh != true) {
+                postData['grant_type'] = 'authorization_code';
+                postData['redirect_uri'] = $('#{{componentId}}-form-redirect_uri').val().trim();
+                postData['code'] = $('#{{componentId}}-form-code').val().trim();
+            } else {
+                postData['grant_type'] = 'refresh_token';
+                postData['refresh'] = true;
+                postData['refresh_token'] = $('#{{componentId}}-form-refresh_token').val().trim();
+            }
         } else {
-            //eslint-disable-next-line
-            console.log(api);
             window.location = api['authorization_url'];
         }
 
@@ -385,7 +426,7 @@ $(document).ready(function() {
             $('.login-spinner').attr('hidden', true);
             $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
             $('#{{componentId}}-form :input').prop('disabled', false);
-            $('#{{componentId}}-form :input').not('.token').val('');
+            // $('#{{componentId}}-form :input').not('.token').val('');
             if (isApi) {
                 $('#{{componentId}}-form-email').focus();
                 $('#{{componentId}}-form-device_id')[0].checked = false;
@@ -416,6 +457,8 @@ $(document).ready(function() {
                     $('#codes').removeClass('d-none');
                     $('#code').addClass('d-none');
                     $('.login-spinner').attr('hidden', true);
+                    $('#{{componentId}}-form-request').attr('hidden', true);
+                    $('#{{componentId}}-form-client_id, #{{componentId}}-form-client_secret').attr('disabled', true);
                     $('#{{componentId}}-form-expires_in').val(response.responseData.expires_in);
                     $('#{{componentId}}-form-token_type').val(response.responseData.token_type);
                     $('#{{componentId}}-form-access_token').val(response.responseData.access_token);
@@ -436,7 +479,7 @@ $(document).ready(function() {
             $('.login-spinner').attr('hidden', true);
             $('.login-box-msg').removeClass('fadeIn').addClass('text-success animated fadeIn');
             $('#{{componentId}}-form :input').prop('disabled', false);
-            $('#{{componentId}}-form :input').not('.token').val('');
+            // $('#{{componentId}}-form :input').not('.token').val('');
             $('#{{componentId}}-form-email').focus();
             $('#{{componentId}}-form-device_id')[0].checked = false;
             $('#{{componentId}}-form-forceRegen')[0].checked = false;

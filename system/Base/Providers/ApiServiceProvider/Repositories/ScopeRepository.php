@@ -59,7 +59,9 @@ class ScopeRepository extends BasePackage implements ScopeRepositoryInterface
                 $scope = $this->getById($api['scope_id']);
 
                 if ($scope) {
-                    $result[] = $this->getScopeEntityByIdentifier($scope['scope_name']);
+                    $scopeObj = $this->getScopeEntityByIdentifier($scope['scope_name']);
+
+                    $result[] = $scopeObj->scope_name;
                 }
             }
         }

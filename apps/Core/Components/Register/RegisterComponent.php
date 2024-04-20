@@ -88,6 +88,30 @@ class RegisterComponent extends BaseComponent
             }
 
             return;
+        } else if (isset($this->getData()['client_id']) &&
+                   (isset($this->getData()['refresh']) && $this->getData()['refresh'] == true)
+        ) {
+            $this->view->setLayout('auth');
+
+            $this->view->pick('register/authorization');
+
+            $api = $this->api->checkAuthorizationLinkData($this->getData());
+
+            if (!$api) {
+                $this->view->error = $this->api->packagesData->responseMessage;
+
+                return;
+            }
+
+            if (isset($api['authorization_tos_pp']) && $api['authorization_tos_pp'] !== '') {
+                unset($api['authorization_tos_pp']);
+            }
+
+            $this->view->api = $api;
+
+            $this->view->refresh = true;
+
+            return;
         }
 
         if (isset($this->getData()['api'])) {
@@ -185,7 +209,9 @@ class RegisterComponent extends BaseComponent
             return;
         }
 
-        if ($this->postData()['grant_type'] === 'authorization_code') {
+        if ($this->postData()['grant_type'] === 'authorization_code' ||
+            ($this->postData()['grant_type'] === 'refresh_token' && $this->postData()['refresh'] == 'true')
+        ) {
             $apis = $this->api->getApiInfo(false, true);
 
             foreach ($apis as $api) {
@@ -195,7 +221,11 @@ class RegisterComponent extends BaseComponent
             }
 
             if ($this->api->api) {
-                $this->api->setupApi();
+                if ($this->postData()['grant_type'] === 'refresh_token' && $this->postData()['refresh'] == 'true') {
+                    $this->api->setupApi(true);
+                } else {
+                    $this->api->setupApi();
+                }
             }
 
             $this->api->registerClient();
