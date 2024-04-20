@@ -35,7 +35,7 @@ class RegisterComponent extends BaseComponent
 
             $this->view->authorizationTosPp = null;
             if (isset($api['authorization_tos_pp']) && $api['authorization_tos_pp'] !== '') {
-                $this->view->authorizationTosPp = $api['authorization_tos_pp'];
+                $this->view->authorizationTosPp = html_entity_decode($api['authorization_tos_pp']);
                 unset($api['authorization_tos_pp']);
             }
 

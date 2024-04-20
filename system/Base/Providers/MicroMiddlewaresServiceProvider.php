@@ -163,23 +163,21 @@ class MicroMiddlewaresServiceProvider extends Injectable
             } else {
                 $this->data['appRoute'] = '';
             }
-        } else if (isset($this->data['domain']['exclusive_to_default_app']) &&
-            $this->data['domain']['exclusive_to_default_app'] == 1
-        ) {
+        } else {
             if ($this->data['api']['is_public'] == true) {
                 $this->data['appRoute'] = '/api/pub';
             } else {
                 $this->data['appRoute'] = '/api';
             }
-        } else {
-            if ($this->data['api']['is_public'] == true) {
-                $this->data['appRoute'] = '/api/pub/' . strtolower($this->data['app']['route']);
-            } else {
-                $this->data['appRoute'] = '/api/' . strtolower($this->data['app']['route']);
-            }
         }
-
+        if (isset($this->data['domain']['exclusive_to_default_app']) &&
+            $this->data['domain']['exclusive_to_default_app'] != 1
+        ) {
+            $this->data['appRoute'] = $this->data['appRoute'] . '/' . strtolower($this->data['app']['route']);
+        }
+        $this->data['appRoute'] = $this->helper->reduceSlashes($this->data['appRoute']);
         $this->data['givenRoute'] = strtolower(rtrim(explode('/q/', $this->request->getUri())[0], '/'));
+
         if ($this->data['givenRoute'] === $this->data['appRoute']) {
             $this->data['givenRoute'] = $this->data['appRoute'] . '/home';
         }

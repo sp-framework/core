@@ -1,4 +1,3 @@
-{% set exclusiveDisabled = false %}
 {% set defaultAppDisabled = false %}
 {% set exclusiveChecked = false %}
 {% set exclusiveApiChecked = false %}
@@ -6,11 +5,9 @@
     {% set domainDefaultAppId = domain['default_app_id'] %}
     {% if domain['exclusive_to_default_app'] is defined and domain['exclusive_to_default_app'] == 1 %}
         {% set exclusiveChecked = true %}
-        {% if domain['exclusive_for_api'] is defined and domain['exclusive_for_api'] == 1 %}
-            {% set exclusiveApiChecked = true %}
-            {% set exclusiveDisabled = true %}
-            {% set defaultAppDisabled = true %}
-        {% endif %}
+    {% endif %}
+    {% if domain['exclusive_for_api'] is defined and domain['exclusive_for_api'] == 1 %}
+        {% set exclusiveApiChecked = true %}
     {% endif %}
 {% else %}
     {% set domainDefaultAppId = '' %}
@@ -54,7 +51,6 @@
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'Is this domain exclusive to default app? If yes, then you dont need to add /app_route/ to each link',
                 'fieldType'                      : 'checkbox',
-                'fieldDisabled'                  : exclusiveDisabled,
                 'fieldCheckboxType'              : 'success',
                 'fieldCheckboxChecked'           : exclusiveChecked,
                 'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
@@ -458,7 +454,6 @@ dataCollectionSection =
                                 $('#' + checkbox)[0].checked = false;
                                 $('#' + checkbox).attr('disabled', true);
                                 dataCollectionSection['data']['apps'][appId]['allowed'] = false;
-                                dataCollectionSection['data']['apps'][appId]['api'] = false;
                                 $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', true);
                                 $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', true);
                                 $('#{{componentId}}-{{sectionId}}-' + appId + '-public-storage').attr('disabled', true);
@@ -478,20 +473,7 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-exclusive_for_api'                   : {
-            afterInit       : function() {
-                $('#{{componentId}}-{{sectionId}}-exclusive_for_api').click(function() {
-                    if ($(this)[0].checked === true) {
-                        $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app')[0].checked = true;
-                        $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').attr('disabled', true);
-
-                    } else {
-                        $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').attr('disabled', false);
-                    }
-                    $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').trigger('change');
-                });
-            }
-        },
+        '{{componentId}}-{{sectionId}}-exclusive_for_api'                   : { },
         '{{componentId}}-{{sectionId}}-default_app_id'                      : {
             'placeholder'   : 'SELECT DEFAULT APPLICATION',
             afterInit       : function() {

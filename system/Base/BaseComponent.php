@@ -130,7 +130,7 @@ abstract class BaseComponent extends Controller
 		}
 
 		if (!$this->checkCSRF()) {
-			throw new IncorrectCSRF;
+			return false;
 		}
 	}
 
@@ -349,11 +349,10 @@ abstract class BaseComponent extends Controller
 
 				$this->view->responseMessage = 'CSRF Token Error! Please refresh page.';
 
-				$this->sendJson();
-
-				return false;
+				return $this->sendJson();
 			}
 		}
+
 		return true;
 	}
 

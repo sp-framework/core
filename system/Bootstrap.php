@@ -81,6 +81,7 @@ final class Bootstrap
             error_reporting(E_ALL);
         }
 
+        $this->response = $container->getShared('response');
         $this->logger = $container->getShared('logger');
 
         if ($this->isApi) {

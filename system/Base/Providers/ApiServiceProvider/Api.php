@@ -113,6 +113,10 @@ class Api extends BasePackage
             return false;
         }
 
+        if (isset($data['authorization_tos_pp']) && $data['authorization_tos_pp'] !== '') {
+            $data['authorization_tos_pp'] = $this->escaper->html($data['authorization_tos_pp']);
+        }
+
         if ($this->add($data)) {
             $newApi = $this->packagesData->last;
 
@@ -257,6 +261,10 @@ class Api extends BasePackage
                     $this->clients->updateClient($client);
                 }
             }
+        }
+
+        if (isset($data['authorization_tos_pp']) && $data['authorization_tos_pp'] !== '') {
+            $data['authorization_tos_pp'] = $this->escaper->html($data['authorization_tos_pp']);
         }
 
         if ($this->update($data)) {

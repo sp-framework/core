@@ -15,6 +15,8 @@ class Router
 
 	protected $isApiPublic;
 
+	protected $domainApiExclusive = false;
+
 	protected $domains;
 
 	protected $domain;
@@ -215,7 +217,7 @@ class Router
 		}
 
 		$this->setDefaultNamespace(false);
-
+		// var_dump($this->givenRouteClass, $this->defaultNamespace,$this->controller,$this->action);die();
 		$this->router->add(
 			$routeToMatch,
 			[
@@ -230,6 +232,9 @@ class Router
 	protected function getGivenRouteClass(array $routeArray)
 	{
 		if (!$this->domainAppExclusive) {
+			unset($routeArray[0]); //Remove app name
+		}
+		if ($this->domainApiExclusive) {
 			unset($routeArray[0]); //Remove app name
 		}
 
@@ -313,16 +318,17 @@ class Router
 			exit;
 		}
 
-		if (($this->isApi &&
-			 isset($this->domain['exclusive_for_api']) &&
-			 $this->domain['exclusive_for_api'] == 1) ||
-			(isset($this->domain['exclusive_to_default_app']) &&
-			 $this->domain['exclusive_to_default_app'] == 1)
+		if (isset($this->domain['exclusive_to_default_app']) &&
+			$this->domain['exclusive_to_default_app'] == 1
 		) {
 			$this->appInfo = $this->apps->getAppById($this->domain['default_app_id']);
 
 			$this->domainAppExclusive = true;
 		} else  {
+			if (isset($this->domain['exclusive_for_api']) && $this->domain['exclusive_for_api'] == 1) {
+				$this->domainApiExclusive = true;
+			}
+
 			$this->appInfo = $this->apps->getAppInfo();
 
 			if (!$this->appInfo) {
