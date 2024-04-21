@@ -6,6 +6,39 @@ if (!function_exists('base_path')) {
     }
 }
 
+if (!function_exists('trace')) {
+    function trace($file = true, $line = true, $class = true, $function = true, $args = false, $object = false) {
+        $backtrace = debug_backtrace();
+
+        $traces = [];
+
+        foreach ($backtrace as $key => $trace) {
+            if ($file && isset($trace['file'])) {
+                $traces[$key]['file'] = $trace['file'];
+            }
+            if ($line && isset($trace['line'])) {
+                $traces[$key]['line'] = $trace['line'];
+            }
+            if ($class && isset($trace['class'])) {
+                $traces[$key]['class'] = $trace['class'];
+            }
+            if ($function && isset($trace['function'])) {
+                $traces[$key]['function'] = $trace['function'];
+            }
+            if ($args && isset($trace['args'])) {
+                $traces[$key]['args'] = $trace['args'];
+            }
+            if ($object && isset($trace['object'])) {
+                $traces[$key]['object'] = $trace['object'];
+            }
+        }
+
+        var_dump(array_reverse($traces));
+
+        exit;
+    }
+}
+
 if (!function_exists('toBytes')) {
     function toBytes($from) {
         $type = substr($from, -1);
