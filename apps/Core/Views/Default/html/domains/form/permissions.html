@@ -4,6 +4,7 @@
 {% if domain['id'] is defined %}
     {% set domainDefaultAppId = domain['default_app_id'] %}
     {% if domain['exclusive_to_default_app'] is defined and domain['exclusive_to_default_app'] == 1 %}
+        {% set defaultAppDisabled = true %}
         {% set exclusiveChecked = true %}
     {% endif %}
     {% if domain['exclusive_for_api'] is defined and domain['exclusive_for_api'] == 1 %}

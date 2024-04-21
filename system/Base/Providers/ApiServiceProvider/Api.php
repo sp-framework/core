@@ -333,20 +333,18 @@ class Api extends BasePackage
 
         if ($this->request->getBestAccept() === 'application/json') {
             $url = $this->request->getURI();
-            $urlParts = explode("/", $url);
-
-            if (isset($urlParts[1]) && $urlParts[1] === 'api') {
+            $urlParts = explode("/", trim($url, '/'));
+            if (isset($urlParts[0]) && $urlParts[0] === 'api') {
                 $this->isApi = true;
             }
-            if ((isset($urlParts[1]) && $urlParts[1] === 'pub') ||
-                (isset($urlParts[2]) && $urlParts[2] === 'pub')
-            ) {//For public access of api (without authentication). pub is a reserved keyword in apps.
+            //For public access of api (without authentication). pub is a reserved keyword in apps.
+            //URL: {domain}/api(if not exclusive for api)/pub/app_route(if not exclusive to app)/component/method
+            if ((isset($urlParts[0]) && $urlParts[0] === 'pub') ||
+                (isset($urlParts[1]) && $urlParts[1] === 'pub')
+            ) {
                 $this->isApi = true;
                 $this->isApiCheckVia = 'pub';
-            }
-
-            //Setting client-id with Authorization header is important for our setup as we rely on the client ID to find which API needs to be instantiated
-            if ($this->request->getHeader('Authorization') !== '') {
+            } else if ($this->request->getHeader('Authorization') !== '') {//Setting client-id with Authorization header is important for our setup as we rely on the client ID to find which API needs to be instantiated
                 $this->isApi = true;
                 $this->isApiCheckVia = 'authorization';
             } else if ($this->request->get('client_id') &&

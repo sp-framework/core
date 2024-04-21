@@ -35,15 +35,16 @@ class MicroCollection
             $routeToMatch = $this->router->getRoutes()[0]->getPattern();
         }
 
-        if (isset($this->domains->domain['exclusive_for_api']) &&
-            $this->domains->domain['exclusive_for_api'] == false
-        ) {
-            $routeToMatch = '/api' . $routeToMatch;
-        }
         if (isset($this->api->isApiCheckVia) &&
             $this->api->isApiCheckVia === 'pub'
         ) {
             $routeToMatch = '/pub' . $routeToMatch;
+        }
+
+        if (isset($this->domains->domain['exclusive_for_api']) &&
+            $this->domains->domain['exclusive_for_api'] == false
+        ) {
+            $routeToMatch = '/api' . $routeToMatch;
         }
 
         $handler =
@@ -60,7 +61,6 @@ class MicroCollection
         }
 
         $this->microCollection->setHandler($handler, true);
-
         $this->microCollection->mapVia($routeToMatch, $handlerMethod, $methods, $this->router->getRoutes()[0]->getPaths()['controller']);
 
         $this->regitserNotFound();

@@ -217,7 +217,7 @@ class Router
 		}
 
 		$this->setDefaultNamespace(false);
-		// var_dump($this->givenRouteClass, $this->defaultNamespace,$this->controller,$this->action);die();
+
 		$this->router->add(
 			$routeToMatch,
 			[
@@ -379,13 +379,14 @@ class Router
 
 			if ($this->isApi) {
 				$uri[0] = explode('/', $uri[0]);
-
 				if ($uri[0][0] === 'api') {
 					unset($uri[0][0]);
 				}
 
 				if ($this->isApiPublic) {
-					if ($uri[0][0] === 'pub') {
+					if (isset($uri[0][0]) &&
+						$uri[0][0] === 'pub'
+					) {
 						unset($uri[0][0]);
 					} else if ($uri[0][1] === 'pub') {
 						unset($uri[0][1]);
