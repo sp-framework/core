@@ -7,7 +7,7 @@ if (!function_exists('base_path')) {
 }
 
 if (!function_exists('trace')) {
-    function trace($file = true, $line = true, $class = true, $function = true, $args = false, $object = false) {
+    function trace($args = false, $object = false, $file = true, $line = true, $class = true, $function = true) {
         $backtrace = debug_backtrace();
 
         $traces = [];
@@ -33,7 +33,15 @@ if (!function_exists('trace')) {
             }
         }
 
-        var_dump(array_reverse($traces));
+        if ($object) {
+            if (class_exists(\Symfony\Component\VarDumper\VarDumper::class)) {
+                dump(array_reverse($traces));
+            } else {
+                var_dump(array_reverse($traces));
+            }
+        } else {
+            var_dump(array_reverse($traces));
+        }
 
         exit;
     }
