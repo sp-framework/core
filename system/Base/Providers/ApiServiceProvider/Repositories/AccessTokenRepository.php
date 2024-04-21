@@ -11,6 +11,7 @@ use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use System\Base\BasePackage;
 use System\Base\Providers\ApiServiceProvider\Library\OAuthHelper;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAccessTokens;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiScopes;
 
 class AccessTokenRepository extends BasePackage implements AccessTokenRepositoryInterface
 {
@@ -21,7 +22,11 @@ class AccessTokenRepository extends BasePackage implements AccessTokenRepository
         $accessToken = $this->useModel();
 
         foreach ($scopes as $scope) {
-            $accessToken->addScope($scope);
+            if ($scope instanceof ServiceProviderApiScopes) {
+                $accessToken->addScope($scope->scope_name);
+            } else {
+                $accessToken->addScope($scope);
+            }
         }
 
         $accessToken->setUserIdentifier($userIdentifier);

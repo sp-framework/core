@@ -216,7 +216,7 @@ $(document).ready(function() {
             } else {
                 postData['grant_type'] = 'refresh_token';
                 postData['refresh'] = true;
-                postData['refresh_token'] = $('#{{componentId}}-form-refresh_token').val().trim();
+                postData['refresh_token'] = $('#{{componentId}}-form-refresh_token_input').val().trim();
             }
         } else {
             window.location = api['authorization_url'];
@@ -313,7 +313,7 @@ $(document).ready(function() {
             $('.login-spinner').attr('hidden', true);
             $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
             $('#{{componentId}}-form :input').prop('disabled', false);
-            // $('#{{componentId}}-form :input').not('.token').val('');
+            $('#{{componentId}}-form :input').not('.token').val('');
             if (isApi) {
                 $('#{{componentId}}-form-email').focus();
                 $('#{{componentId}}-form-device_id')[0].checked = false;
@@ -343,6 +343,7 @@ $(document).ready(function() {
                 if (response.responseData) {
                     $('#codes').removeClass('d-none');
                     $('#code').addClass('d-none');
+                    $('#client-info-input').addClass('d-none');
                     $('.login-spinner').attr('hidden', true);
                     $('#{{componentId}}-form-request').attr('hidden', true);
                     $('#{{componentId}}-form-client_id, #{{componentId}}-form-client_secret').attr('disabled', true);
@@ -351,6 +352,18 @@ $(document).ready(function() {
                     $('#{{componentId}}-form-access_token').val(response.responseData.access_token);
                     $('#{{componentId}}-form-refresh_token').val(response.responseData.refresh_token);
                 }
+            } else if (refresh == true) {
+                    $('#codes').removeClass('d-none');
+                    $('#client-info-input').addClass('d-none');
+                    $('#refresh-token-input').addClass('d-none');
+                    $('.login-spinner').attr('hidden', true);
+                    $('#{{componentId}}-form-request').attr('hidden', true);
+                    $('#{{componentId}}-form-client_id, #{{componentId}}-form-client_secret').attr('disabled', true);
+                    $('#{{componentId}}-form-request_token_input').attr('disabled', true);
+                    $('#{{componentId}}-form-expires_in').val(response.responseData.expires_in);
+                    $('#{{componentId}}-form-token_type').val(response.responseData.token_type);
+                    $('#{{componentId}}-form-access_token').val(response.responseData.access_token);
+                    $('#{{componentId}}-form-refresh_token').val(response.responseData.refresh_token);
             } else {
                 setTimeout(function() {
                     $('.login-spinner').attr('hidden', true);
@@ -366,7 +379,7 @@ $(document).ready(function() {
             $('.login-spinner').attr('hidden', true);
             $('.login-box-msg').removeClass('fadeIn').addClass('text-success animated fadeIn');
             $('#{{componentId}}-form :input').prop('disabled', false);
-            // $('#{{componentId}}-form :input').not('.token').val('');
+            $('#{{componentId}}-form :input').not('.token').val('');
             $('#{{componentId}}-form-email').focus();
             $('#{{componentId}}-form-device_id')[0].checked = false;
             $('#{{componentId}}-form-forceRegen')[0].checked = false;

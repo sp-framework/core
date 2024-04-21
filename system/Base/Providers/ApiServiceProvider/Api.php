@@ -352,7 +352,7 @@ class Api extends BasePackage
             } else if ($this->request->get('client_id') &&
                        !$this->request->get('id') &&
                        !isset($this->request->getPost()['redirect_uri']) &&
-                       !isset($this->request->getPost()['refresh'])
+                       !isset($this->request->getPost()['refresh'])//This is important if you are grabbing refresh token using web browser
             ) {
                 $this->isApi = true;
                 $this->isApiCheckVia = 'client_id';
@@ -624,7 +624,7 @@ class Api extends BasePackage
             // $client['client_secret'] = $this->secTools->hashPassword($this->clients->generateClientIdAndSecret(['generate_client_secret' => true])['client_secret']);
             // $this->clients->updateClient($client);
 
-            if ($this->request->getPost()['grant_type'] === 'authorization_code') {
+            if ($this->request->getPost()['grant_type'] === 'authorization_code' || $this->request->get('refresh_token')) {
                 $this->addResponse('Access token generated!', 0, $token);
 
                 return true;

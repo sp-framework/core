@@ -209,19 +209,23 @@ class RegisterComponent extends BaseComponent
             return;
         }
 
-        if ($this->postData()['grant_type'] === 'authorization_code' ||
-            ($this->postData()['grant_type'] === 'refresh_token' && $this->postData()['refresh'] == 'true')
-        ) {
+        if ($this->postData()['grant_type'] === 'authorization_code' || $this->postData()['grant_type'] === 'refresh_token') {
             $apis = $this->api->getApiInfo(false, true);
 
-            foreach ($apis as $api) {
-                if ($this->postData()['client_id'] === $api['client_id']) {
-                    $this->api->api = $api;
+            if (isset($apis['id'])) {
+                if ($this->postData()['client_id'] === $apis['client_id']) {
+                    $this->api->api = $apis;
+                }
+            } else {
+                foreach ($apis as $api) {
+                    if ($this->postData()['client_id'] === $api['client_id']) {
+                        $this->api->api = $api;
+                    }
                 }
             }
 
             if ($this->api->api) {
-                if ($this->postData()['grant_type'] === 'refresh_token' && $this->postData()['refresh'] == 'true') {
+                if ($this->postData()['grant_type'] === 'refresh_token') {
                     $this->api->setupApi(true);
                 } else {
                     $this->api->setupApi();
@@ -242,5 +246,3 @@ class RegisterComponent extends BaseComponent
         return $this->api->registerClient();
     }
 }
-//W6MwCWHe
-//4zuQBHSg9Rqn2XwuFCvLBqzgq2C5DKC4

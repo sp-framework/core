@@ -301,7 +301,9 @@ class MicroMiddlewaresServiceProvider extends Injectable
 
         if (isset($this->data['api']['registration_allowed']) &&
             $this->data['api']['registration_allowed'] == false &&
-            str_contains($url, 'register/client')
+            str_contains($url, 'register/client') &&
+            isset($this->request->getPost()['grant_type']) &&
+            $this->request->getPost()['grant_type'] !== 'refresh_token'
         ) {
             $this->addResponse('API registration not allowed on this api!', 1);
 

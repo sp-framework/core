@@ -90,7 +90,7 @@ class RefreshTokenRepository extends BasePackage implements RefreshTokenReposito
     public function isRefreshTokenRevoked($tokenId)
     {
         if ($result = $this->getFirst('refresh_token', $tokenId)) {
-            return (int)$result->revoked === 1;
+            return (int) $result->revoked == 1;
         }
 
         return true;
