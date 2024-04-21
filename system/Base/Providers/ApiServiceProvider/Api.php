@@ -372,10 +372,81 @@ class Api extends BasePackage
 
         if ($usingIsApiCheckVia) {
             if ($this->isApiCheckVia === 'pub') {//Public access API
-                $api = $this->getFirst('is_public', (bool) '1');
+                if ($this->config->databasetype === 'db') {
+                    $params =
+                        [
+                            'conditions'    => 'is_public = :is_public: AND app_id = :app_id: AND domain_id = :domain_id:',
+                            'bind'          =>
+                                [
+                                    'is_public'     => '1',
+                                    'app_id'        => $this->apps->getAppInfo()['id'],
+                                    'domain_id'     => $this->domains->domain['id']
+                                ]
+                        ];
+                } else {
+                    $params = [
+                        'conditions' => [
+                            ['is_public', '=', (bool) '1'],
+                            ['app_id', '=', $this->apps->getAppInfo()['id']],
+                            ['domain_id', '=', $this->domains->domain['id']]
+                        ]
+                    ];
+                }
 
-                if ($api && $api->status == true) {
-                    $this->api = $api->toArray();
+                $api = $this->getByParams($params);
+
+                if ($api && isset($api[0]) && $api[0]['status'] == true) {
+                    if ($this->config->databasetype === 'db') {
+                        $client = $this->clients->getByParams(
+                            [
+                                'conditions'    => 'client_id = :client_id: AND revoked = :revoked: AND api_id = :api_id:',
+                                'bind'          =>
+                                    [
+                                        'client_id'     => $this->request->getClientAddress(),
+                                        'revoked'       => '0',
+                                        'api_id'        => $api[0]['id']
+                                    ]
+                            ]
+                        );
+                    } else {
+                        $client = $this->clients->getByParams(
+                            [
+                                'conditions' =>
+                                    [
+                                        ['client_id', '=', $this->request->getClientAddress()],
+                                        ['revoked', '=', false],
+                                        ['api_id', '=', $api[0]['id']]
+                                    ]
+                            ]
+                        );
+                    }
+
+                    if ($client) {
+                        if ($this->checkCallLimits($client[0], $api[0])) {
+                            $this->client = $client[0];
+                            $this->apiCallsLimitReached = true;
+                        } else {
+                            $this->api = $api[0];
+                            $this->client = $client[0];
+                        }
+                    } else {
+                        $newClient["api_id"] = $api[0]['id'];
+                        $newClient["app_id"] = $this->apps->getAppInfo()['id'];
+                        $newClient["domain_id"] = $this->domains->domain['id'];
+                        $newClient["account_id"] = 0;
+                        $newClient["email"] = 'pubapi@' . $this->domains->domain['name'];
+                        $newClient["client_id"] = $this->request->getClientAddress();
+                        $newClient["client_secret"] = $this->random->base58(32);
+                        $newClient["name"] = $this->request->getClientAddress();
+                        $newClient["redirectUri"] = 'https://';
+                        $newClient["last_used"] = (\Carbon\Carbon::now())->toDateTimeLocalString();
+                        $newClient["revoked"] = 0;
+
+                        $this->clients->add($newClient, false);
+
+                        $this->api = $api[0];
+                        $this->client = $this->clients->packagesData->last;
+                    }
                 }
             } else if ($this->isApiCheckVia === 'authorization' ||
                        $this->isApiCheckVia === 'client_id'
@@ -441,7 +512,10 @@ class Api extends BasePackage
 
                         if ($api['status'] == true) {
                             if ($this->checkCallLimits($client[0], $api)) {
+                                $this->apiCallsLimitReached = true;
+                            } else {
                                 $this->api = $api;
+                                $this->client = $client[0];
                             }
                         }
                     }
@@ -478,10 +552,78 @@ class Api extends BasePackage
         return $this->api;
     }
 
-    public function checkCallLimits($client, $api)
+    public function checkCallLimits(&$client, $api)
     {
-        // $this->apiCallsLimitReached = true;
-        return true;
+        if ((int) $api['concurrent_calls_limit'] > 0) {
+            if ((int) $client['concurrent_calls_count'] >= (int) $api['concurrent_calls_limit']) {
+                $this->addResponse(
+                    'Rate Limit Reached! ' .
+                    'Configured Concurrent Calls Limit: ' . (int) $api['concurrent_calls_limit'] . '. ' .
+                    'Concurrent Calls Count: ' . (int) $client['concurrent_calls_count'],
+                    1
+                );
+
+                return true;
+            } else {
+                $this->clients->incrementCallCount(['concurrent_calls_count'], $client, $api);
+            }
+        }
+
+        if ((int) $api['per_minute_calls_limit'] > 0) {
+            $this->clients->checkCallCount(['per_minute_calls_count'], $client);
+            if ((int) $client['per_minute_calls_count'] >= (int) $api['per_minute_calls_limit']) {
+                $this->addResponse(
+                    'Rate Limit Reached! ' .
+                    'Configured Per Minute Calls Limit: ' . (int) $api['per_minute_calls_limit'] . '. ' .
+                    'Per Minute Calls Count: ' . (int) $client['per_minute_calls_count'],
+                    1
+                );
+
+                $this->clients->resetCallsCount(['concurrent_calls_count'], $client);
+
+                return true;
+            } else {
+                $this->clients->incrementCallCount(['per_minute_calls_count'], $client, $api);
+            }
+        }
+
+        if ((int) $api['per_hour_calls_limit'] > 0) {
+            $this->clients->checkCallCount(['per_hour_calls_count'], $client);
+            if ((int) $client['per_hour_calls_count'] >= (int) $api['per_hour_calls_limit']) {
+                $this->addResponse(
+                    'Rate Limit Reached! ' .
+                    'Configured Per Hour Calls Limit: ' . (int) $api['per_hour_calls_limit'] . '. ' .
+                    'Per Hour Calls Count: ' . (int) $client['per_hour_calls_count'],
+                    1
+                );
+
+                $this->clients->resetCallsCount(['concurrent_calls_count', 'per_minute_calls_count'], $client);
+
+                return true;
+            } else {
+                $this->clients->incrementCallCount(['per_hour_calls_count'], $client, $api);
+            }
+        }
+
+        if ((int) $api['per_day_calls_limit'] > 0) {
+            $this->clients->checkCallCount(['per_day_calls_count'], $client);
+            if ((int) $client['per_day_calls_count'] >= (int) $api['per_day_calls_limit']) {
+                $this->addResponse(
+                    'Rate Limit Reached! ' .
+                    'Configured Per Day Calls Limit: ' . (int) $api['per_day_calls_limit'] . '. ' .
+                    'Per Day Calls Count: ' . (int) $client['per_day_calls_count'],
+                    1
+                );
+
+                $this->clients->resetCallsCount(['concurrent_calls_count', 'per_minute_calls_count', 'per_hour_calls_count'], $client);
+
+                return true;
+            } else {
+                $this->clients->incrementCallCount(['per_day_calls_count'], $client, $api);
+            }
+        }
+
+        return false;
     }
 
     public function setupApi($refreshTokenSet = false)
@@ -607,20 +749,6 @@ class Api extends BasePackage
             if (isset($encDeviceId)) {
                 $token['access_token'] = $token['access_token'] . '||' . $encDeviceId;
             }
-
-            // if (isset($token['refresh_token'])) {
-            //     $token['refresh_token'] = $token['refresh_token'] . '||' . $encClientId;
-
-            //     if (isset($encDeviceId)) {
-            //         $token['refresh_token'] = $token['refresh_token'] . '||' . $encDeviceId;
-            //     }
-            // }
-
-            //Once Client has successfully authenticated using client secret, we replace it so it cannot be used again acting as one time password.
-            //A new set of client keys need to be generated for new token.
-            // $client = $this->clients->getFirst('client_id', $clientId, false, false, false, [], true);
-            // $client['client_secret'] = $this->secTools->hashPassword($this->clients->generateClientIdAndSecret(['generate_client_secret' => true])['client_secret']);
-            // $this->clients->updateClient($client);
 
             if ($this->request->getPost()['grant_type'] === 'authorization_code' || $this->request->get('refresh_token')) {
                 $this->addResponse('Access token generated!', 0, $token);

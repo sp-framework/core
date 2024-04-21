@@ -60,7 +60,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
         Event $event,
         $micro
     ) {
-        if ($micro->getReturnedValue() && $micro->getReturnedValue() instanceof Response) {
+        if ($micro->getReturnedValue() && $micro->getReturnedValue() instanceof Response) {//Response from token generator
             $body = $micro->getReturnedValue()->getBody();
 
             if ($body) {
@@ -92,6 +92,8 @@ class MicroMiddlewaresServiceProvider extends Injectable
                 $this->sendJson();
             }
         }
+
+        $this->api->clients->setClientsLastUsed($this->api->client);
     }
 
     protected function checkAllMiddlewares()
@@ -287,7 +289,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
 
         if (!$this->data['api']) {
             if ($this->api->apiCallsLimitReached) {
-                $this->addResponse('API calls limit reached for this client ID.', 1);
+                $this->addResponse($this->api->packagesData->responseMessage, $this->api->packagesData->responseCode);
 
                 return false;
             }

@@ -65,23 +65,25 @@ window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFu
 }
 
 function initFuncs() {
-    $('.rowRevoke, .rowRevokeRegen').each(function(index,row) {
+    $('.rowRevoke, .rowRevokeRegen, .rowResetCallsCount').each(function(index,row) {
         $(row).off();
         $(row).click(function(e) {
             e.preventDefault();
 
             var thisButton = this;
             var url = $(this).attr('href');
-            if ($(thisButton).hasClass('rowRevokeRegen')) {
-                $(thisButton).children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
-            } else {
+            if ($(thisButton).hasClass('rowRevoke')) {
                 $(thisButton).children('i').removeClass('fa-times-circle').addClass('fa-spin fa-cog');
+            } else {
+                $(thisButton).children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
             }
             // $(thisButton).addClass('disabled');
 
             var text;
             if ($(thisButton).hasClass('rowRevokeRegen')) {
                 text = 'Regenerate API Client Keys for client ID ' + $(thisButton).parents('tr').children('.data-client_id').html() + '?';
+            } else if ($(thisButton).hasClass('rowResetCallsCount')) {
+                text = 'Reset counters for for client ID ' + $(thisButton).parents('tr').children('.data-client_id').html() + '?';
             } else {
                 text = 'Revoke API Client Keys for client ID ' + $(thisButton).parents('tr').children('.data-client_id').html() + '?';
             }
@@ -111,9 +113,11 @@ function initFuncs() {
                     result.value !== ''
                 ) {
                     if ($(thisButton).hasClass('rowRevokeRegen')) {
-                        generateClientKey(thisButton, url, false, true);
+                        runAjax(thisButton, url, false, true);
+                    } else if ($(thisButton).hasClass('rowResetCallsCount')) {
+                        runAjax(thisButton, url);
                     } else {
-                        generateClientKey(thisButton, url, true);
+                        runAjax(thisButton, url, true);
                     }
                 } else {
                     $(thisButton).children('i').removeClass('fa-spin fa-cog').addClass('fa-times-circle');
@@ -122,7 +126,7 @@ function initFuncs() {
             });
         });
 
-        function generateClientKey(thisButton, url, forceRevoke = false, forceRegen = false) {
+        function runAjax(thisButton, url, forceRevoke = false, forceRegen = false) {
             var dataToSend = { };
             dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
             dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();

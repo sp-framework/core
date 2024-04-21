@@ -21,6 +21,7 @@ class TestComponent extends BaseComponent
      */
     public function apiViewAction()
     {
+        sleep(5);
         $this->addResponse('Test', 0, ['view' => true]);
     }
 

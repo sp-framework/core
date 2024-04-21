@@ -170,6 +170,14 @@ class Clients extends BasePackage
         }
 
         if ($client) {
+            $api = $this->api->getById($client['api_id']);
+
+            if ($api['is_public'] == true) {
+                $this->addResponse('Cannot revoke or generate key for public client.', 1);
+
+                return false;
+            }
+
             if (isset($data['forceRegen']) && (bool) $data['forceRegen'] === true) {
                 $account = $this->basepackages->accounts->getById($client['account_id']);
 
@@ -287,7 +295,7 @@ class Clients extends BasePackage
                     'bind'          =>
                         [
                             'email'         => ($account['email'] ?? $this->auth->account()['email']),
-                            'revoked'       => false,
+                            'revoked'       => '0',
                             'device_id'     => ($account['device_id'] ?? null),
                             'api_id'        => $api['id']
                         ]
@@ -390,13 +398,110 @@ class Clients extends BasePackage
         return $this->basepackages->emailqueue->addToQueue($emailData);
     }
 
-    public function incrementCallCount($data, $type)
+    public function checkCallCount($types = [], &$client)
     {
-        //To increment call counts of the client
+        if (in_array('per_minute_calls_count', $types)) {
+            $lastUsed = (\Carbon\Carbon::parse($client['last_used']))->startOfMinute();
+            $now = \Carbon\Carbon::now();
+
+            if ($lastUsed->diffInMinutes($now) > 1) {
+                $client['per_minute_calls_count'] = 0;
+            }
+        }
+
+        if (in_array('per_hour_calls_count', $types)) {
+            $lastUsed = (\Carbon\Carbon::parse($client['last_used']))->startOfHour();
+            $now = \Carbon\Carbon::now();
+
+            if ($lastUsed->diffInMinutes($now) > 60) {
+                $client['per_hour_calls_count'] = 0;
+            }
+        }
+
+        if (in_array('per_day_calls_count', $types)) {
+            $lastUsed = (\Carbon\Carbon::parse($client['last_used']))->startOfDay();
+            $now = \Carbon\Carbon::now();
+
+            if ($lastUsed->diffInHours($now) > 24) {
+                $client['per_day_calls_count'] = 0;
+            }
+        }
+
+        $this->update($client);
     }
 
-    public function resetCallCount($clientId, $type)
+    public function incrementCallCount($types = [], &$client, $api)
     {
-        //To reset call counts of the client
+        if (in_array('per_minute_calls_count', $types)) {
+            if ((int) $client['per_minute_calls_count'] < (int) $api['per_minute_calls_limit']) {
+                $client['per_minute_calls_count'] = (int) $client['per_minute_calls_count'] + 1;
+            }
+        }
+
+        if (in_array('per_hour_calls_count', $types)) {
+            if ((int) $client['per_hour_calls_count'] < (int) $api['per_hour_calls_limit']) {
+                $client['per_hour_calls_count'] = (int) $client['per_hour_calls_count'] + 1;
+            }
+        }
+
+        if (in_array('per_day_calls_count', $types)) {
+            if ((int) $client['per_day_calls_count'] < (int) $api['per_day_calls_limit']) {
+                $client['per_day_calls_count'] = (int) $client['per_day_calls_count'] + 1;
+            }
+        }
+
+        if (in_array('concurrent_calls_count', $types)) {
+            if ((int) $client['concurrent_calls_count'] < (int) $api['concurrent_calls_limit']) {
+                $client['concurrent_calls_count'] = (int) $client['concurrent_calls_count'] + 1;
+            }
+        }
+
+        $this->update($client);
+    }
+
+    public function resetCallsCount($types = [], &$client = null, $clientId = null)
+    {
+        if (!$client && $clientId) {
+            $client = $this->getById($clientId);
+
+            if (!$client) {
+                $this->addResponse('Client ID incorrect', 1);
+
+                return;
+            }
+        }
+
+        if (in_array('concurrent_calls_count', $types)) {
+            $client['concurrent_calls_count'] = 0;
+        }
+        if (in_array('per_minute_calls_count', $types)) {
+            $client['per_minute_calls_count'] = 0;
+        }
+        if (in_array('per_hour_calls_count', $types)) {
+            $client['per_hour_calls_count'] = 0;
+        }
+        if (in_array('per_day_calls_count', $types)) {
+            $client['per_day_calls_count'] = 0;
+        }
+
+        if (count($types) === 0) {
+            $client['concurrent_calls_count'] = 0;
+            $client['per_minute_calls_count'] = 0;
+            $client['per_hour_calls_count'] = 0;
+            $client['per_day_calls_count'] = 0;
+        }
+
+        $this->update($client);
+    }
+
+    public function setClientsLastUsed($client, $decrementConcurrentCallsCounter = true)
+    {
+        $client['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
+
+        if ($decrementConcurrentCallsCounter && (int) $client['concurrent_calls_count'] > 0) {
+            $client['concurrent_calls_count'] = (int) $client['concurrent_calls_count'] - 1;
+        }
+
+        $this->update($client);
     }
 }
