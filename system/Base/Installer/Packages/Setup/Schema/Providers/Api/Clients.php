@@ -125,6 +125,14 @@ class Clients
                     ]
                 ),
                 new Column(
+                    'per_minute_calls_start',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          =>50,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
                     'per_hour_calls_count',
                     [
                         'type'          => Column::TYPE_INTEGER,
@@ -132,9 +140,25 @@ class Clients
                     ]
                 ),
                 new Column(
+                    'per_hour_calls_start',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          =>50,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
                     'per_day_calls_count',
                     [
                         'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'per_day_calls_start',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          =>50,
                         'notNull'       => false
                     ]
                 ),

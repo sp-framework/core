@@ -250,10 +250,14 @@ class MicroMiddlewaresServiceProvider extends Injectable
         return false;
     }
 
-    protected function setHeader()
+    protected function setHeader($responseCode = 0)
     {
         $this->response->setContentType('application/json', 'UTF-8');
         $this->response->setHeader('Cache-Control', 'no-store');
+
+        if ($responseCode !== 0) {
+            $this->response->setStatusCode($responseCode);
+        }
     }
 
     protected function addResponse($responseMessage, int $responseCode = 0, $responseData = null)
@@ -265,12 +269,12 @@ class MicroMiddlewaresServiceProvider extends Injectable
             $this->apiResponse['responseData'] = $responseData;
         }
 
-        $this->sendJson();
+        $this->sendJson($responseCode);
     }
 
-    protected function sendJson()
+    protected function sendJson($responseCode = 0)
     {
-        $this->setHeader();
+        $this->setHeader($responseCode);
 
         if ($this->response->isSent() !== true) {
             $this->response->setJsonContent($this->apiResponse);
@@ -289,7 +293,9 @@ class MicroMiddlewaresServiceProvider extends Injectable
 
         if (!$this->data['api']) {
             if ($this->api->apiCallsLimitReached) {
-                $this->addResponse($this->api->packagesData->responseMessage, $this->api->packagesData->responseCode);
+                $this->api->clients->setClientsLastUsed($this->api->client, false);
+
+                $this->addResponse($this->api->packagesData->responseMessage, 429);
 
                 return false;
             }

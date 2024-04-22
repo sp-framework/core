@@ -126,6 +126,8 @@ class Clients extends BasePackage
             return true;
         }
 
+        $this->resetCallsCount([], $data);
+
         if ($this->add($data)) {
             $this->addResponse('Added client');
 
@@ -401,33 +403,31 @@ class Clients extends BasePackage
     public function checkCallCount($types = [], &$client)
     {
         if (in_array('per_minute_calls_count', $types)) {
-            $lastUsed = (\Carbon\Carbon::parse($client['last_used']))->startOfMinute();
+            $perMinuteCallsStart = (\Carbon\Carbon::parse($client['per_minute_calls_start']));
             $now = \Carbon\Carbon::now();
 
-            if ($lastUsed->diffInMinutes($now) > 1) {
-                $client['per_minute_calls_count'] = 0;
+            if ($perMinuteCallsStart->diffInMinutes($now) > 1) {
+                $this->resetCallsCount(['per_minute_calls_count'], $client);
             }
         }
 
         if (in_array('per_hour_calls_count', $types)) {
-            $lastUsed = (\Carbon\Carbon::parse($client['last_used']))->startOfHour();
+            $perHourCallsStart = (\Carbon\Carbon::parse($client['per_hour_calls_start']));
             $now = \Carbon\Carbon::now();
 
-            if ($lastUsed->diffInMinutes($now) > 60) {
-                $client['per_hour_calls_count'] = 0;
+            if ($perHourCallsStart->diffInMinutes($now) > 60) {
+                $this->resetCallsCount(['per_hour_calls_count'], $client);
             }
         }
 
         if (in_array('per_day_calls_count', $types)) {
-            $lastUsed = (\Carbon\Carbon::parse($client['last_used']))->startOfDay();
+            $perDayCallsStart = (\Carbon\Carbon::parse($client['per_day_calls_start']));
             $now = \Carbon\Carbon::now();
 
-            if ($lastUsed->diffInHours($now) > 24) {
-                $client['per_day_calls_count'] = 0;
+            if ($perDayCallsStart->diffInHours($now) > 24) {
+                $this->resetCallsCount(['per_day_calls_count'], $client);
             }
         }
-
-        $this->update($client);
     }
 
     public function incrementCallCount($types = [], &$client, $api)
@@ -456,6 +456,9 @@ class Clients extends BasePackage
             }
         }
 
+        if ($this->opCache) {
+            $this->opCache->setCache($client['client_id'], $client, 'api-clients');
+        }
         $this->update($client);
     }
 
@@ -476,12 +479,15 @@ class Clients extends BasePackage
         }
         if (in_array('per_minute_calls_count', $types)) {
             $client['per_minute_calls_count'] = 0;
+            $client['per_minute_calls_start'] = (\Carbon\Carbon::now()->startOfMinute()->toDateTimeLocalString());
         }
         if (in_array('per_hour_calls_count', $types)) {
             $client['per_hour_calls_count'] = 0;
+            $client['per_hour_calls_start'] = (\Carbon\Carbon::now()->startOfHour()->toDateTimeLocalString());
         }
         if (in_array('per_day_calls_count', $types)) {
             $client['per_day_calls_count'] = 0;
+            $client['per_day_calls_start'] = (\Carbon\Carbon::now()->startOfDay()->toDateTimeLocalString());
         }
 
         if (count($types) === 0) {
@@ -489,19 +495,36 @@ class Clients extends BasePackage
             $client['per_minute_calls_count'] = 0;
             $client['per_hour_calls_count'] = 0;
             $client['per_day_calls_count'] = 0;
+            $client['per_minute_calls_start'] = (\Carbon\Carbon::now()->startOfMinute()->toDateTimeLocalString());
+            $client['per_hour_calls_start'] = (\Carbon\Carbon::now()->startOfHour()->toDateTimeLocalString());
+            $client['per_day_calls_start'] = (\Carbon\Carbon::now()->startOfDay()->toDateTimeLocalString());
         }
 
-        $this->update($client);
+        if (isset($client['id'])) {
+            $client['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
+
+            if ($this->opCache) {
+                $this->opCache->setCache($client['client_id'], $client, 'api-clients');
+            }
+            $this->update($client);
+        }
     }
 
-    public function setClientsLastUsed($client, $decrementConcurrentCallsCounter = true)
+    public function setClientsLastUsed($client, $setLastUsed = true, $decrementConcurrentCallsCounter = true)
     {
-        $client['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
+        $client = $this->getById($client['id']);//Important as we need the client from the DB.
+
+        if ($setLastUsed) {
+            $client['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
+        }
 
         if ($decrementConcurrentCallsCounter && (int) $client['concurrent_calls_count'] > 0) {
             $client['concurrent_calls_count'] = (int) $client['concurrent_calls_count'] - 1;
         }
 
+        if ($this->opCache) {
+            $this->opCache->setCache($client['client_id'], $client, 'api-clients');
+        }
         $this->update($client);
     }
 }

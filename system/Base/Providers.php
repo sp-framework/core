@@ -60,6 +60,7 @@ return
 				'System\Base\Providers\DomainsServiceProvider',
 				'System\Base\Providers\AppsServiceProvider',
 				'System\Base\Providers\CoreServiceProvider',
+				'System\Base\Providers\CacheServiceProvider',
 				'System\Base\Providers\SupportServiceProvider',
 				'System\Base\Providers\SecurityServiceProvider',
 				'System\Base\Providers\LoggerServiceProvider',

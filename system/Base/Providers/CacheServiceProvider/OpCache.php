@@ -44,7 +44,7 @@ class OpCache
 
         file_put_contents(base_path($this->storagePath . $this->directory . '/' . $key), '<?php $value = ' . $value . ';', LOCK_EX);
 
-        $this->getCache($key);
+        return $this->getCache($key, $directory);
     }
 
     public function removeCache($key = null, $directory = null)

@@ -396,32 +396,43 @@ class Api extends BasePackage
                 $api = $this->getByParams($params);
 
                 if ($api && isset($api[0]) && $api[0]['status'] == true) {
-                    if ($this->config->databasetype === 'db') {
-                        $client = $this->clients->getByParams(
-                            [
-                                'conditions'    => 'client_id = :client_id: AND revoked = :revoked: AND api_id = :api_id:',
-                                'bind'          =>
-                                    [
-                                        'client_id'     => $this->request->getClientAddress(),
-                                        'revoked'       => '0',
-                                        'api_id'        => $api[0]['id']
-                                    ]
-                            ]
-                        );
+                    if ($this->opCache) {
+                        $opCacheClient = $this->opCache->getCache($this->request->getClientAddress(), 'api-clients');
+                        if ($opCacheClient) {
+                            $client[0] = $opCacheClient;
+                        }
                     } else {
-                        $client = $this->clients->getByParams(
-                            [
-                                'conditions' =>
-                                    [
-                                        ['client_id', '=', $this->request->getClientAddress()],
-                                        ['revoked', '=', false],
-                                        ['api_id', '=', $api[0]['id']]
-                                    ]
-                            ]
-                        );
+                        if ($this->config->databasetype === 'db') {
+                            $client = $this->clients->getByParams(
+                                [
+                                    'conditions'    => 'client_id = :client_id: AND revoked = :revoked: AND api_id = :api_id:',
+                                    'bind'          =>
+                                        [
+                                            'client_id'     => $this->request->getClientAddress(),
+                                            'revoked'       => '0',
+                                            'api_id'        => $api[0]['id']
+                                        ]
+                                ]
+                            );
+                        } else {
+                            $client = $this->clients->getByParams(
+                                [
+                                    'conditions' =>
+                                        [
+                                            ['client_id', '=', $this->request->getClientAddress()],
+                                            ['revoked', '=', false],
+                                            ['api_id', '=', $api[0]['id']]
+                                        ]
+                                ]
+                            );
+                        }
                     }
 
                     if ($client) {
+                        if ($this->opCache) {
+                            $client[0] = $this->opCache->setCache($this->request->getClientAddress(), $client[0], 'api-clients');
+                        }
+
                         if ($this->checkCallLimits($client[0], $api[0])) {
                             $this->client = $client[0];
                             $this->apiCallsLimitReached = true;
@@ -442,7 +453,7 @@ class Api extends BasePackage
                         $newClient["last_used"] = (\Carbon\Carbon::now())->toDateTimeLocalString();
                         $newClient["revoked"] = 0;
 
-                        $this->clients->add($newClient, false);
+                        $this->clients->addClient($newClient, false);
 
                         $this->api = $api[0];
                         $this->client = $this->clients->packagesData->last;
@@ -559,7 +570,7 @@ class Api extends BasePackage
                 $this->addResponse(
                     'Rate Limit Reached! ' .
                     'Configured Concurrent Calls Limit: ' . (int) $api['concurrent_calls_limit'] . '. ' .
-                    'Concurrent Calls Count: ' . (int) $client['concurrent_calls_count'],
+                    'Concurrent Calls Count: ' . (int) $client['concurrent_calls_count'] . '.',
                     1
                 );
 
@@ -575,11 +586,10 @@ class Api extends BasePackage
                 $this->addResponse(
                     'Rate Limit Reached! ' .
                     'Configured Per Minute Calls Limit: ' . (int) $api['per_minute_calls_limit'] . '. ' .
-                    'Per Minute Calls Count: ' . (int) $client['per_minute_calls_count'],
+                    'Per Minute Calls Count: ' . (int) $client['per_minute_calls_count'] . '. ' .
+                    'Please make API calls after: '. \Carbon\Carbon::now()->startOfMinute()->addMinute()->toCookieString(),
                     1
                 );
-
-                $this->clients->resetCallsCount(['concurrent_calls_count'], $client);
 
                 return true;
             } else {
@@ -593,11 +603,12 @@ class Api extends BasePackage
                 $this->addResponse(
                     'Rate Limit Reached! ' .
                     'Configured Per Hour Calls Limit: ' . (int) $api['per_hour_calls_limit'] . '. ' .
-                    'Per Hour Calls Count: ' . (int) $client['per_hour_calls_count'],
+                    'Per Hour Calls Count: ' . (int) $client['per_hour_calls_count'] . '. ' .
+                    'Please make API calls after: '. \Carbon\Carbon::now()->startOfHour()->addHour()->toCookieString(),
                     1
                 );
 
-                $this->clients->resetCallsCount(['concurrent_calls_count', 'per_minute_calls_count'], $client);
+                $this->clients->resetCallsCount(['per_minute_calls_count'], $client);
 
                 return true;
             } else {
@@ -611,11 +622,12 @@ class Api extends BasePackage
                 $this->addResponse(
                     'Rate Limit Reached! ' .
                     'Configured Per Day Calls Limit: ' . (int) $api['per_day_calls_limit'] . '. ' .
-                    'Per Day Calls Count: ' . (int) $client['per_day_calls_count'],
+                    'Per Day Calls Count: ' . (int) $client['per_day_calls_count'] . '. ' .
+                    'Please make API calls after: '. \Carbon\Carbon::now()->startOfDay()->addDay()->toCookieString(),
                     1
                 );
 
-                $this->clients->resetCallsCount(['concurrent_calls_count', 'per_minute_calls_count', 'per_hour_calls_count'], $client);
+                $this->clients->resetCallsCount(['per_minute_calls_count', 'per_hour_calls_count'], $client);
 
                 return true;
             } else {
