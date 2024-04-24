@@ -396,12 +396,7 @@ class Api extends BasePackage
                 $api = $this->getByParams($params);
 
                 if ($api && isset($api[0]) && $api[0]['status'] == true) {
-                    if ($this->opCache) {
-                        $opCacheClient = $this->opCache->getCache($this->request->getClientAddress(), 'api-clients');
-                        if ($opCacheClient) {
-                            $client[0] = $opCacheClient;
-                        }
-                    } else {
+                    if (!isset($client)) {
                         if ($this->config->databasetype === 'db') {
                             $client = $this->clients->getByParams(
                                 [
@@ -428,11 +423,7 @@ class Api extends BasePackage
                         }
                     }
 
-                    if ($client) {
-                        if ($this->opCache) {
-                            $client[0] = $this->opCache->setCache($this->request->getClientAddress(), $client[0], 'api-clients');
-                        }
-
+                    if (isset($client)) {
                         if ($this->checkCallLimits($client[0], $api[0])) {
                             $this->client = $client[0];
                             $this->apiCallsLimitReached = true;
@@ -566,6 +557,7 @@ class Api extends BasePackage
     public function checkCallLimits(&$client, $api)
     {
         if ((int) $api['concurrent_calls_limit'] > 0) {
+            var_dump($client['concurrent_calls_count']);
             if ((int) $client['concurrent_calls_count'] >= (int) $api['concurrent_calls_limit']) {
                 $this->addResponse(
                     'Rate Limit Reached! ' .
@@ -580,8 +572,21 @@ class Api extends BasePackage
             }
         }
 
+        $toCheckCallCount = [];
+
         if ((int) $api['per_minute_calls_limit'] > 0) {
-            $this->clients->checkCallCount(['per_minute_calls_count'], $client);
+            array_push($toCheckCallCount, 'per_minute_calls_count');
+        }
+        if ((int) $api['per_hour_calls_limit'] > 0) {
+            array_push($toCheckCallCount, 'per_hour_calls_count');
+        }
+        if ((int) $api['per_day_calls_limit'] > 0) {
+            array_push($toCheckCallCount, 'per_day_calls_count');
+        }
+
+        $this->clients->checkCallCount($toCheckCallCount, $client);
+
+        if (in_array('per_minute_calls_count', $toCheckCallCount)) {
             if ((int) $client['per_minute_calls_count'] >= (int) $api['per_minute_calls_limit']) {
                 $this->addResponse(
                     'Rate Limit Reached! ' .
@@ -597,8 +602,7 @@ class Api extends BasePackage
             }
         }
 
-        if ((int) $api['per_hour_calls_limit'] > 0) {
-            $this->clients->checkCallCount(['per_hour_calls_count'], $client);
+        if (in_array('per_hour_calls_count', $toCheckCallCount)) {
             if ((int) $client['per_hour_calls_count'] >= (int) $api['per_hour_calls_limit']) {
                 $this->addResponse(
                     'Rate Limit Reached! ' .
@@ -616,8 +620,7 @@ class Api extends BasePackage
             }
         }
 
-        if ((int) $api['per_day_calls_limit'] > 0) {
-            $this->clients->checkCallCount(['per_day_calls_count'], $client);
+        if (in_array('per_day_calls_count', $toCheckCallCount)) {
             if ((int) $client['per_day_calls_count'] >= (int) $api['per_day_calls_limit']) {
                 $this->addResponse(
                     'Rate Limit Reached! ' .

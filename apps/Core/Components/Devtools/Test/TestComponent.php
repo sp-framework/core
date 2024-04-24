@@ -21,8 +21,10 @@ class TestComponent extends BaseComponent
      */
     public function apiViewAction()
     {
-        // sleep(1);
-        $this->addResponse('Test', 0, ['connection' => $this->connection->getId()]);
+        // usleep(50000);
+        sleep(10);
+        // var_dump($_SESSION);
+        $this->addResponse('Test', 0, ['connection' => $this->connection->getId(), 'session' => $this->session->getId()]);
     }
 
     public function addAction()

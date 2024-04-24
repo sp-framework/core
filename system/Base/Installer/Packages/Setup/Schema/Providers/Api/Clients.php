@@ -117,6 +117,14 @@ class Clients
                         'notNull'       => false
                     ]
                 ),
+                // new Column(
+                //     'concurrent_calls_connections',
+                //     [
+                //         'type'          => Column::TYPE_VARCHAR,
+                //         'size'          => 2048,
+                //         'notNull'       => false
+                //     ]
+                // ),
                 new Column(
                     'per_minute_calls_count',
                     [
@@ -128,10 +136,18 @@ class Clients
                     'per_minute_calls_start',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          =>50,
+                        'size'          => 50,
                         'notNull'       => false
                     ]
                 ),
+                // new Column(
+                //     'per_minute_calls_connections',
+                //     [
+                //         'type'          => Column::TYPE_VARCHAR,
+                //         'size'          => 2048,
+                //         'notNull'       => false
+                //     ]
+                // ),
                 new Column(
                     'per_hour_calls_count',
                     [
@@ -143,10 +159,18 @@ class Clients
                     'per_hour_calls_start',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          =>50,
+                        'size'          => 50,
                         'notNull'       => false
                     ]
                 ),
+                // new Column(
+                //     'per_hour_calls_connections',
+                //     [
+                //         'type'          => Column::TYPE_VARCHAR,
+                //         'size'          => 2048,
+                //         'notNull'       => false
+                //     ]
+                // ),
                 new Column(
                     'per_day_calls_count',
                     [
@@ -158,10 +182,18 @@ class Clients
                     'per_day_calls_start',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          =>50,
+                        'size'          => 50,
                         'notNull'       => false
                     ]
                 ),
+                // new Column(
+                //     'per_day_calls_connections',
+                //     [
+                //         'type'          => Column::TYPE_VARCHAR,
+                //         'size'          => 2048,
+                //         'notNull'       => false
+                //     ]
+                // ),
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'

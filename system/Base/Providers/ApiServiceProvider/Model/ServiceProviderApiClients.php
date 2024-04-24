@@ -40,17 +40,25 @@ class ServiceProviderApiClients extends BaseModel implements ClientEntityInterfa
 
     public $concurrent_calls_count;
 
+    // public $concurrent_calls_connections;
+
     public $per_minute_calls_count;
 
     public $per_minute_calls_start;
+
+    // public $per_minute_calls_connections;
 
     public $per_hour_calls_count;
 
     public $per_hour_calls_start;
 
+    // public $per_hour_calls_connections;
+
     public $per_day_calls_count;
 
     public $per_day_calls_start;
+
+    // public $per_day_calls_connections;
 
     public function getIdentifier()
     {
