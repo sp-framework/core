@@ -7,7 +7,7 @@ if (!function_exists('base_path')) {
 }
 
 if (!function_exists('trace')) {
-    function trace(array $varsToDump = [], $args = false, $object = false, $file = true, $line = true, $class = true, $function = true) {
+    function trace(array $varsToDump = [], $exit = true, $args = false, $object = false, $file = true, $line = true, $class = true, $function = true) {
         $backtrace = debug_backtrace();
 
         $traces = [];
@@ -58,7 +58,9 @@ if (!function_exists('trace')) {
             var_dump(array_reverse($traces));
         }
 
-        exit;
+        if ($exit) {
+            exit;
+        }
     }
 }
 
