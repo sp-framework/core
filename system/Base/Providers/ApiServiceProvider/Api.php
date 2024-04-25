@@ -482,6 +482,16 @@ class Api extends BasePackage
                 if ($this->clientId) {
                     $client = null;
 
+                    $this->caching->init('apcuCache', 7200);
+
+                    if ($this->caching->enabled) {
+                        $apcuClient = $this->caching->getCache('api-clients-' . $this->request->getClientAddress());
+
+                        if ($apcuClient) {
+                            $client[0] = $apcuClient;
+                        }
+                    }
+
                     if ($this->config->databasetype === 'db') {
                         if ($this->deviceId) {
                             $params =
@@ -524,11 +534,16 @@ class Api extends BasePackage
                     $client = $this->clients->getByParams($params);
 
                     if ($client && $client && is_array($client) && isset($client[0]['api_id'])) {
+                        if ($this->caching->enabled) {
+                            $client[0] = $this->caching->setCache('api-clients-' . $this->request->getClientAddress(), $client[0]);
+                        }
+
                         $api = $this->getById($client[0]['api_id']);
 
                         if ($api['status'] == true) {
                             if ($this->checkCallLimits($client[0], $api)) {
                                 $this->apiCallsLimitReached = true;
+                                $this->client = $client[0];
                             } else {
                                 $this->api = $api;
                                 $this->client = $client[0];
