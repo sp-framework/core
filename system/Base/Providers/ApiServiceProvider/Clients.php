@@ -439,66 +439,31 @@ class Clients extends BasePackage
     public function incrementCallCount($types = [], &$client, $api)
     {
         if (in_array('per_minute_calls_count', $types)) {
-            if (is_string($client['per_minute_calls_connections'])) {
-                $client['per_minute_calls_connections'] = $this->helper->decode($client['per_minute_calls_connections'], true);
-            }
-
-            // $per_minute_calls_connections_count = count($client['per_minute_calls_connections']);
-
             if ($client['per_minute_calls_count'] < (int) $api['per_minute_calls_limit']) {
-                // array_push($client['per_minute_calls_connections'], $this->connection->getId());
-
                 $client['per_minute_calls_count'] = $client['per_minute_calls_count'] + 1;
-                // if (count($client['per_minute_calls_connections']) >= 100) {
-                    // $client['per_minute_calls_connections'] = [];
-                // }
             }
         }
 
         if (in_array('per_hour_calls_count', $types)) {
-            if (is_string($client['per_hour_calls_connections'])) {
-                $client['per_hour_calls_connections'] = $this->helper->decode($client['per_hour_calls_connections'], true);
-            }
-
-            // $per_hour_calls_connections_count = count($client['per_hour_calls_connections']);
-
             if ($client['per_hour_calls_count'] < (int) $api['per_hour_calls_limit']) {
-                // array_push($client['per_hour_calls_connections'], $this->connection->getId());
-
                 $client['per_hour_calls_count'] = $client['per_hour_calls_count'] + 1;
-                // if (count($client['per_hour_calls_connections']) >= 100) {
-                    // $client['per_hour_calls_connections'] = [];
-                // }
             }
         }
 
         if (in_array('per_day_calls_count', $types)) {
-            if (is_string($client['per_day_calls_connections'])) {
-                $client['per_day_calls_connections'] = $this->helper->decode($client['per_day_calls_connections'], true);
-            }
-
-            // $per_day_calls_connections_count = count($client['per_day_calls_connections']);
-
             if ($client['per_day_calls_count'] < (int) $api['per_day_calls_limit']) {
-                // array_push($client['per_day_calls_connections'], $this->connection->getId());
-
                 $client['per_day_calls_count'] = $client['per_day_calls_count'] + 1;
-                // if (count($client['per_day_calls_connections']) >= 100) {
-                    // $client['per_day_calls_connections'] = [];
-                // }
             }
         }
 
         if (in_array('concurrent_calls_count', $types)) {
             if ((int) $client['concurrent_calls_count'] < (int) $api['concurrent_calls_limit']) {
-                // if (is_string($client['concurrent_calls_connections'])) {
-                //     $client['concurrent_calls_connections'] = $this->helper->decode($client['concurrent_calls_connections'], true);
-                // }
-                // array_push($client['concurrent_calls_connections'], $this->connection->getId());
-
-                // $client['concurrent_calls_count'] = count($client['concurrent_calls_connections']);
                 $client['concurrent_calls_count'] = $client['concurrent_calls_count'] + 1;
             }
+        }
+
+        if ($this->caching->enabled) {
+            $this->caching->setCache('api-clients-' . $this->request->getClientAddress(), $client);
         }
 
         $this->update($client);
@@ -518,21 +483,17 @@ class Clients extends BasePackage
 
         if (in_array('concurrent_calls_count', $types)) {
             $client['concurrent_calls_count'] = 0;
-            // $client['concurrent_calls_connections'] = [];
         }
         if (in_array('per_minute_calls_count', $types)) {
             $client['per_minute_calls_count'] = 0;
-            // $client['per_minute_calls_connections'] = [];
             $client['per_minute_calls_start'] = (\Carbon\Carbon::now()->startOfMinute()->toDateTimeLocalString());
         }
         if (in_array('per_hour_calls_count', $types)) {
             $client['per_hour_calls_count'] = 0;
-            // $client['per_hour_calls_connections'] = [];
             $client['per_hour_calls_start'] = (\Carbon\Carbon::now()->startOfHour()->toDateTimeLocalString());
         }
         if (in_array('per_day_calls_count', $types)) {
             $client['per_day_calls_count'] = 0;
-            // $client['per_day_calls_connections'] = [];
             $client['per_day_calls_start'] = (\Carbon\Carbon::now()->startOfDay()->toDateTimeLocalString());
         }
 
@@ -541,10 +502,6 @@ class Clients extends BasePackage
             $client['per_minute_calls_count'] = 0;
             $client['per_hour_calls_count'] = 0;
             $client['per_day_calls_count'] = 0;
-            // $client['concurrent_calls_connections'] = [];
-            // $client['per_minute_calls_connections'] = [];
-            // $client['per_hour_calls_connections'] = [];
-            // $client['per_day_calls_connections'] = [];
             $client['per_minute_calls_start'] = (\Carbon\Carbon::now()->startOfMinute()->toDateTimeLocalString());
             $client['per_hour_calls_start'] = (\Carbon\Carbon::now()->startOfHour()->toDateTimeLocalString());
             $client['per_day_calls_start'] = (\Carbon\Carbon::now()->startOfDay()->toDateTimeLocalString());
@@ -552,6 +509,12 @@ class Clients extends BasePackage
 
         if (isset($client['id'])) {
             $client['last_used'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
+
+            $this->caching->init('apcuCache', 7200);
+
+            if ($this->caching->enabled) {
+                $this->caching->setCache('api-clients-' . $this->request->getClientAddress(), $client);
+            }
 
             $this->update($client);
         }
@@ -566,15 +529,11 @@ class Clients extends BasePackage
         }
 
         if ($decrementConcurrentCallsCounter && (int) $client['concurrent_calls_count'] > 0) {
-            // if (is_string($client['concurrent_calls_connections'])) {
-                // $client['concurrent_calls_connections'] = $this->helper->decode($client['concurrent_calls_connections'], true);
-            // }
-            // if (($key = array_search($this->connection->getId(), $client['concurrent_calls_connections'])) !== false) {
-            //     unset($client['concurrent_calls_connections'][$key]);
-            // }
-
-            // $client['concurrent_calls_count'] = count($client['concurrent_calls_connections']);
             $client['concurrent_calls_count'] = $client['concurrent_calls_count'] - 1;
+        }
+
+        if ($this->caching->enabled) {
+            $this->caching->setCache('api-clients-' . $this->request->getClientAddress(), $client);
         }
 
         $this->update($client);

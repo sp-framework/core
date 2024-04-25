@@ -396,6 +396,16 @@ class Api extends BasePackage
                 $api = $this->getByParams($params);
 
                 if ($api && isset($api[0]) && $api[0]['status'] == true) {
+                    $this->caching->init('apcuCache', 7200);
+
+                    if ($this->caching->enabled) {
+                        $apcuClient = $this->caching->getCache('api-clients-' . $this->request->getClientAddress());
+
+                        if ($apcuClient) {
+                            $client[0] = $apcuClient;
+                        }
+                    }
+
                     if (!isset($client)) {
                         if ($this->config->databasetype === 'db') {
                             $client = $this->clients->getByParams(
@@ -420,6 +430,10 @@ class Api extends BasePackage
                                         ]
                                 ]
                             );
+                        }
+
+                        if ($this->caching->enabled) {
+                            $client[0] = $this->caching->setCache('api-clients-' . $this->request->getClientAddress(), $client[0]);
                         }
                     }
 
@@ -557,7 +571,6 @@ class Api extends BasePackage
     public function checkCallLimits(&$client, $api)
     {
         if ((int) $api['concurrent_calls_limit'] > 0) {
-            var_dump($client['concurrent_calls_count']);
             if ((int) $client['concurrent_calls_count'] >= (int) $api['concurrent_calls_limit']) {
                 $this->addResponse(
                     'Rate Limit Reached! ' .
