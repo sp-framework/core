@@ -2,6 +2,7 @@
 
 namespace Apps\Core\Components\Devtools\Test;
 
+use Apps\Core\Packages\Devtools\DicExtractData\DevtoolsDicExtractData;
 use System\Base\BaseComponent;
 
 class TestComponent extends BaseComponent
@@ -13,7 +14,9 @@ class TestComponent extends BaseComponent
      */
     public function viewAction()
     {
-        //
+        $dicData = new DevtoolsDicExtractData;
+
+        $dicData->processDicData();
     }
 
     /**
@@ -22,7 +25,7 @@ class TestComponent extends BaseComponent
     public function apiViewAction()
     {
         // usleep(50000);
-        sleep(10);
+        // sleep(10);
         // var_dump($_SESSION);
         $this->addResponse('Test', 0, ['connection' => $this->connection->getId(), 'session' => $this->session->getId()]);
     }
