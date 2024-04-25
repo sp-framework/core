@@ -1,0 +1,23 @@
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'arrow-down-wide-short',
+        'cardTitle'                     : 'Mini URLs (mURLs)',
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'murls/form',
+        'formButtons'                   :
+        [
+            'updateActionUrl'               : 'system/tools/murls/update',
+            'updateSuccessRedirectUrl'      : 'system/tools/murls',
+            'closeActionUrl'                : 'system/tools/murls'
+        ]
+    ]
+)}}
