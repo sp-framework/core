@@ -14,9 +14,9 @@ class TestComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $dicData = new DevtoolsDicExtractData;
+        // $dicData = new DevtoolsDicExtractData;
 
-        $dicData->processDicData();
+        // $dicData->processDicData();
     }
 
     /**

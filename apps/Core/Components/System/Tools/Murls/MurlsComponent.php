@@ -107,6 +107,10 @@ class MurlsComponent extends BaseComponent
 
         $this->murls->generateMurl($this->postData());
 
-        $this->addResponse($this->murls->packagesData->responseMessage, $this->murls->packagesData->responseCode);
+        if ($this->murls->packagesData->responseData) {
+            $this->addResponse($this->murls->packagesData->responseMessage, $this->murls->packagesData->responseCode, $this->murls->packagesData->responseData);
+        } else {
+            $this->addResponse($this->murls->packagesData->responseMessage, $this->murls->packagesData->responseCode);
+        }
     }
 }

@@ -127,30 +127,217 @@
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Enter mini URL or generate random characters or human readable version of it.',
                         'fieldRequired'                  : true,
-                        'fieldGroupPostAddonButtons'          :
-                            [
-                                'generate-random'   : [
-                                    'title'                   : false,
-                                    'icon'                    : 'robot',
-                                    'type'                    : 'secondary',
-                                    'noMargin'                : true,
-                                    'buttonAdditionalClass'   : 'rounded-0 text-white',
-                                    'position'                : 'right'
-                                ],
-                                'generate-human'   : [
-                                    'title'                   : false,
-                                    'icon'                    : 'user',
-                                    'noMargin'                : true,
-                                    'buttonAdditionalClass'   : 'rounded-0 text-white',
-                                    'position'                : 'right'
-                                ]
-                            ],
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 50,
                         'fieldValue'                     : murlMrul
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'generator',
+                        'fieldLabel'                            : 'Murl Generator',
+                        'fieldLabelLegend'                      : true,
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'html',
+                        'fieldBazScan'                          : false,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldHtmlContent'                      : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'generator_type',
+                        'fieldLabel'                     : 'Generator Type',
+                        'fieldType'                      : 'radio',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select either random generator or dictionary genrator.',
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true,
+                        'fieldRadioButtons'              :
+                            [
+                                'random' :
+                                    [
+                                        'title'                           : 'RANDOM',
+                                        'type'                            : 'primary',
+                                        'dataValue'                       : 'random'
+                                    ],
+                                'dictionary' :
+                                    [
+                                        'title'                           : 'DICTIONARY',
+                                        'type'                            : 'primary',
+                                        'dataValue'                       : 'dictionary'
+                                    ]
+                            ],
+                        'fieldRadioChecked'              : 'random'
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'random_characters_length',
+                                'fieldLabel'                            : 'Random Characters Length',
+                                'fieldType'                             : 'input',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Length of Murl using random characters.',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldBazScan'                          : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataInputMinNumber'               : 4,
+                                'fieldDataInputMaxNumber'               : 50,
+                                'fieldDataInputMaxLength'               : 2,
+                                'fieldValue'                            : '4'
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'dictionary_word_separator',
+                                'fieldLabel'                     : 'Word Separator',
+                                'fieldType'                      : 'radio',
+                                'fieldDisabled'                  : true,
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Select either dash or underscore.',
+                                'fieldRequired'                  : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldBazScan'                   : true,
+                                'fieldRadioButtons'              :
+                                    [
+                                        'dash' :
+                                            [
+                                                'title'                           : 'DASH ( - )',
+                                                'type'                            : 'primary',
+                                                'dataValue'                       : 'dash'
+                                            ],
+                                        'underscore' :
+                                            [
+                                                'title'                           : 'UNDERSCORE ( _ )',
+                                                'type'                            : 'primary',
+                                                'dataValue'                       : 'underscore'
+                                            ]
+                                    ],
+                                'fieldRadioChecked'              : 'dash'
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col">
+                                {{adminltetags.useTag('fields',
+                                    [
+                                        'component'                             : component,
+                                        'componentName'                         : componentName,
+                                        'componentId'                           : componentId,
+                                        'sectionId'                             : sectionId,
+                                        'fieldId'                               : 'dictionary_words_amount',
+                                        'fieldLabel'                            : 'Number of dictionary words to use',
+                                        'fieldType'                             : 'input',
+                                        'fieldHelp'                             : true,
+                                        'fieldDisabled'                         : true,
+                                        'fieldHelpTooltipContent'               : 'Number of dictionary words to use to generate murl.',
+                                        'fieldInputTypeTextFilter'              : 'positiveInt',
+                                        'fieldBazScan'                          : true,
+                                        'fieldBazJstreeSearch'                  : true,
+                                        'fieldBazPostOnCreate'                  : true,
+                                        'fieldBazPostOnUpdate'                  : true,
+                                        'fieldDataInputMinNumber'               : 1,
+                                        'fieldDataInputMaxNumber'               : 5,
+                                        'fieldDataInputMaxLength'               : 1,
+                                        'fieldValue'                            : '1'
+                                    ]
+                                )}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                {{adminltetags.useTag('fields',
+                                    [
+                                        'component'                             : component,
+                                        'componentName'                         : componentName,
+                                        'componentId'                           : componentId,
+                                        'sectionId'                             : sectionId,
+                                        'fieldId'                               : 'dictionary_word_length',
+                                        'fieldLabel'                            : 'Length of each word',
+                                        'fieldType'                             : 'input',
+                                        'fieldHelp'                             : true,
+                                        'fieldDisabled'                         : true,
+                                        'fieldHelpTooltipContent'               : 'Length of dictionary word to use to generate murl.',
+                                        'fieldInputTypeTextFilter'              : 'positiveInt',
+                                        'fieldBazScan'                          : true,
+                                        'fieldBazJstreeSearch'                  : true,
+                                        'fieldBazPostOnCreate'                  : true,
+                                        'fieldBazPostOnUpdate'                  : true,
+                                        'fieldDataInputMinNumber'               : 1,
+                                        'fieldDataInputMaxNumber'               : 15,
+                                        'fieldDataInputMaxLength'               : 2,
+                                        'fieldValue'                            : '3'
+                                    ]
+                                )}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'component'                 : component,
+                        'componentName'             : componentName,
+                        'componentId'               : componentId,
+                        'sectionId'                 : sectionId,
+                        'buttonType'                : 'button',
+                        'buttons'                   :
+                            {
+                                'generate-murl'   : {
+                                    'title'                   : 'Generate Murl',
+                                    'size'                    : 'sm',
+                                    'type'                    : 'primary',
+                                    'icon'                    : 'cog fa-spin',
+                                    'iconHidden'              : true
+                                }
+                            }
                     ]
                 )}}
             </div>
@@ -193,26 +380,53 @@ dataCollectionSection =
             'placeholder'   : 'SELECT DOMAIN'
         },
         '{{componentId}}-{{sectionId}}-url'                                         : { },
+        '{{componentId}}-{{sectionId}}-generator_type'                              : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generator_type').change(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') === 'random') {
+                        $('#{{componentId}}-{{sectionId}}-random_characters_length').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-dictionary_word_separator').find('input[type=radio]').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-dictionary_words_amount, #{{componentId}}-{{sectionId}}-dictionary_word_length').attr('disabled', true);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') === 'dictionary') {
+                        $('#{{componentId}}-{{sectionId}}-random_characters_length').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-dictionary_words_amount, #{{componentId}}-{{sectionId}}-dictionary_word_length').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-dictionary_word_separator').find('input[type=radio]').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-random_characters_length'                    : { },
+        '{{componentId}}-{{sectionId}}-dictionary_word_separator'                   : { },
+        '{{componentId}}-{{sectionId}}-dictionary_words_amount'                     : { },
+        '{{componentId}}-{{sectionId}}-dictionary_word_length'                      : { },
         '{{componentId}}-{{sectionId}}-murl'                                        : {
             afterInit: function() {
-                $('#{{componentId}}-{{sectionId}}-generate-random, #{{componentId}}-{{sectionId}}-generate-human').click(function(e) {
+                $('#{{componentId}}-{{sectionId}}-generate-murl').click(function(e) {
                     e.preventDefault();
 
                     var dataToSend = { };
                     dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
-                    dataToSend['app_id'] = $('#{{componentId}}-{{sectionId}}-app_id').val();
-                    dataToSend['domain_id'] = $('#{{componentId}}-{{sectionId}}-domain_id').val();
-                    dataToSend['url'] = $('#{{componentId}}-{{sectionId}}-url').val();
-
-                    if (dataToSend['url'] === '') {
-                        PNotify.error({title : 'Enter valid URL'});
-
-                        return false;
+                    dataToSend['generator_type'] = $('#{{componentId}}-{{sectionId}}-generator_type').find('input[type=radio]:checked').data('value');
+                    if (dataToSend['generator_type'] === 'random') {
+                        dataToSend['random_characters_length'] = $('#{{componentId}}-{{sectionId}}-random_characters_length').val();
+                    } else if (dataToSend['generator_type'] === 'dictionary') {
+                        dataToSend['dictionary_word_separator'] = $('#{{componentId}}-{{sectionId}}-dictionary_word_separator').find('input[type=radio]:checked').data('value');
+                        dataToSend['dictionary_words_amount'] = $('#{{componentId}}-{{sectionId}}-dictionary_words_amount').val();
+                        dataToSend['dictionary_word_length'] = $('#{{componentId}}-{{sectionId}}-dictionary_word_length').val();
                     }
+                    // dataToSend['app_id'] = $('#{{componentId}}-{{sectionId}}-app_id').val();
+                    // dataToSend['domain_id'] = $('#{{componentId}}-{{sectionId}}-domain_id').val();
+                    // dataToSend['url'] = $('#{{componentId}}-{{sectionId}}-url').val();
 
-                    if ($(this)[0].id === '{{componentId}}-{{sectionId}}-generate-human') {
-                        dataToSend['human_readable'] = true;
-                    }
+                    // if (dataToSend['url'] === '') {
+                    //     PNotify.error({title : 'Enter valid URL'});
+
+                    //     return false;
+                    // }
+
+                    // if ($(this)[0].id === '{{componentId}}-{{sectionId}}-generate-human') {
+                    //     dataToSend['human_readable'] = true;
+                    // }
 
                     $.ajax({
                         url         : '{{links.url("system/tools/murls/generateMurl")}}',

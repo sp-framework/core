@@ -1,3 +1,10 @@
+{% if murl['id'] is defined %}
+    {% set murlId = murl['id'] %}
+    {% set title = 'Mini URL (mURL) (' ~ murl['murl'] ~ ')' %}
+{% else %}
+    {% set murlId = '' %}
+    {% set title = 'New Mini URL (mURL)' %}
+{% endif %}
 {{adminltetags.useTag('content',
     [
         'component'                     : component,
@@ -10,14 +17,18 @@
         'cardFooter'                    : true,
         'cardType'                      : 'primary',
         'cardIcon'                      : 'arrow-down-wide-short',
-        'cardTitle'                     : 'Mini URLs (mURLs)',
+        'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
         'cardBodyInclude'               : 'murls/form',
         'formButtons'                   :
         [
-            'updateActionUrl'               : 'system/tools/murls/update',
-            'updateSuccessRedirectUrl'      : 'system/tools/murls',
-            'closeActionUrl'                : 'system/tools/murls'
+            'updateButtonId'                : murlId,
+            'addActionUrl'                  : 'system/email/services/add',
+            'addSuccessRedirectUrl'         : 'system/email/services',
+            'updateActionUrl'               : 'system/email/services/update',
+            'updateSuccessRedirectUrl'      : 'system/email/services',
+            'cancelActionUrl'               : 'system/email/services',
+            'closeActionUrl'                : 'system/email/services'
         ]
     ]
 )}}
