@@ -16,14 +16,52 @@ class Murls extends BasePackage
 
     public $murls;
 
+    public function init()
+    {
+        return $this;
+    }
+
     public function addMurl($data)
     {
-        //
+        $this->validation->init()->add('app_id', PresenceOf::class, ["message" => "Please provide app information."]);
+        $this->validation->add('domain_id', PresenceOf::class, ["message" => "Please provide domain information."]);
+        $this->validation->add('url', PresenceOf::class, ["message" => "Please provide URL."]);
+        $this->validation->add('murl', PresenceOf::class, ["message" => "Please provide mURL."]);
+
+        if (!$this->doValidation($data)) {
+            return false;
+        }
+
+        $data['account_id'] = $this->auth->account()['id'];
+
+        if ($this->add($data)) {
+            $this->addResponse('Murl added');
+
+            return true;
+        }
+
+        $this->addResponse('Error Adding Murl', 1);
     }
 
     public function updateMurl($data)
     {
-        //
+        $this->validation->init()->add('id', PresenceOf::class, ["message" => "Please provide murl Id."]);
+        $this->validation->add('app_id', PresenceOf::class, ["message" => "Please provide app information."]);
+        $this->validation->add('domain_id', PresenceOf::class, ["message" => "Please provide domain information."]);
+        $this->validation->add('url', PresenceOf::class, ["message" => "Please provide URL."]);
+        $this->validation->add('murl', PresenceOf::class, ["message" => "Please provide mURL."]);
+
+        if (!$this->doValidation($data)) {
+            return false;
+        }
+
+        if ($this->update($data)) {
+            $this->addResponse('Murl updated');
+
+            return true;
+        }
+
+        $this->addResponse('Error Updating Murl', 1);
     }
 
     public function removeMurl($data)
@@ -96,23 +134,7 @@ class Murls extends BasePackage
 
     protected function doValidation($data)
     {
-        // $this->validation->init()->add('app_id', PresenceOf::class, ["message" => "Please provide app information."]);
-        // $this->validation->add('domain_id', PresenceOf::class, ["message" => "Please provide domain information."]);
-        // $this->validation->add('url', PresenceOf::class, ["message" => "Please provide URL."]);
-
-        // if (!$this->doValidation($data)) {
-        //     return false;
-        // }
-
-        // $this->validation->init()->add('url', Url::class, ["message" => "VALID."]);//We dont want valid URL
-
-        // if ($this->doValidation($data)) {//URL is valid which is incorrect as we dont want URL with domain or http
-        //     $this->addResponse('Please provide URL without http scheme or domain.', 1);
-
-        //     return false;
-        // }
-
-        $validated = $this->validation->validate($data)->jsonSerialize();
+         $validated = $this->validation->validate($data)->jsonSerialize();
 
         if (count($validated) > 0) {
             $messages = 'Error: ';

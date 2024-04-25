@@ -63,7 +63,9 @@ class Router
 
 	protected $config;
 
-	public function __construct($api, $domains, $apps, $components, $views, $logger, $request, $response, $helper, $config)
+	protected $basepackages;
+
+	public function __construct($api, $domains, $apps, $components, $views, $logger, $request, $response, $helper, $config, $basepackages)
 	{
 		$this->api = $api;
 
@@ -90,6 +92,8 @@ class Router
 		$this->helper = $helper;
 
 		$this->config = $config;
+
+		$this->basepackages = $basepackages;
 
 		$this->requestUri = $this->request->getURI();
 
@@ -200,10 +204,13 @@ class Router
 
 	protected function registerRoute($givenRoute)
 	{
-		//SEO
-		if (isset($this->appInfo['seo_urls']) && $this->appInfo['seo_urls'] == 1) {
-			//Using $this->uri, we can extract the route from seo url from SEO db
-			//$givenRoute = $this->usePackage()
+		//Murl/SEO
+		if ($this->apps->isMurl) {
+			$givenRoute = $this->apps->isMurl->url;
+
+			if (!$this->domainApiExclusive) {
+				$givenRoute = $this->appInfo['route'] . '/' . $givenRoute;
+			}
 		}
 
 		$routeArray = explode('/', $givenRoute);
@@ -214,6 +221,10 @@ class Router
 			$routeToMatch = '/' . $givenRoute . '/q/' . ':params';
 		} else {
 			$routeToMatch = '/' . $givenRoute;
+		}
+
+		if ($this->apps->isMurl) {
+			$routeToMatch = '/' . $this->apps->isMurl->murl;
 		}
 
 		$this->setDefaultNamespace(false);

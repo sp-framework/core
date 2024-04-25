@@ -26,6 +26,8 @@ class Apps extends BasePackage
 
 	protected $appInfo = null;
 
+	public $isMurl = false;
+
 	public function init(bool $resetCache = false)
 	{
 		$this->types = (new Types)->init($resetCache);
@@ -81,6 +83,14 @@ class Apps extends BasePackage
 			}
 
 			$uri = explode("/", trim($uri[0], '/'));
+
+			if (count($uri) === 1) {//Check for Murl
+				$this->isMurl = $this->basepackages->murls->getFirst('murl', trim($uri[0], '/'));
+
+				if ($this->isMurl) {
+					return $this->getAppById($this->isMurl->app_id)['route'];
+				}
+			}
 
 			if ($uri[0] === 'api' && $uri[1] === 'pub') {
 				return $uri[2];

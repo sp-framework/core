@@ -31,6 +31,7 @@
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
                         'fieldHidden'                    : true,
                         'fieldDisabled'                  : true,
                         'fieldValue'                     : murlId
@@ -106,6 +107,7 @@
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMaxLength'        : 2048,
                         'fieldTextareaRows'              : 2,
                         'fieldValue'                     : murlUrl
@@ -174,8 +176,8 @@
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Select either random generator or dictionary genrator.',
                         'fieldRequired'                  : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
                         'fieldBazScan'                   : true,
                         'fieldRadioButtons'              :
                             [
@@ -213,8 +215,8 @@
                                 'fieldInputTypeTextFilter'              : 'positiveInt',
                                 'fieldBazScan'                          : true,
                                 'fieldBazJstreeSearch'                  : true,
-                                'fieldBazPostOnCreate'                  : true,
-                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : false,
                                 'fieldDataInputMinNumber'               : 4,
                                 'fieldDataInputMaxNumber'               : 50,
                                 'fieldDataInputMaxLength'               : 2,
@@ -238,8 +240,8 @@
                                 'fieldHelp'                      : true,
                                 'fieldHelpTooltipContent'        : 'Select either dash or underscore.',
                                 'fieldRequired'                  : true,
-                                'fieldBazPostOnCreate'           : true,
-                                'fieldBazPostOnUpdate'           : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : false,
                                 'fieldBazScan'                   : true,
                                 'fieldRadioButtons'              :
                                     [
@@ -278,8 +280,8 @@
                                         'fieldInputTypeTextFilter'              : 'positiveInt',
                                         'fieldBazScan'                          : true,
                                         'fieldBazJstreeSearch'                  : true,
-                                        'fieldBazPostOnCreate'                  : true,
-                                        'fieldBazPostOnUpdate'                  : true,
+                                        'fieldBazPostOnCreate'                  : false,
+                                        'fieldBazPostOnUpdate'                  : false,
                                         'fieldDataInputMinNumber'               : 1,
                                         'fieldDataInputMaxNumber'               : 5,
                                         'fieldDataInputMaxLength'               : 1,
@@ -305,8 +307,8 @@
                                         'fieldInputTypeTextFilter'              : 'positiveInt',
                                         'fieldBazScan'                          : true,
                                         'fieldBazJstreeSearch'                  : true,
-                                        'fieldBazPostOnCreate'                  : true,
-                                        'fieldBazPostOnUpdate'                  : true,
+                                        'fieldBazPostOnCreate'                  : false,
+                                        'fieldBazPostOnUpdate'                  : false,
                                         'fieldDataInputMinNumber'               : 1,
                                         'fieldDataInputMaxNumber'               : 15,
                                         'fieldDataInputMaxLength'               : 2,
@@ -414,19 +416,6 @@ dataCollectionSection =
                         dataToSend['dictionary_words_amount'] = $('#{{componentId}}-{{sectionId}}-dictionary_words_amount').val();
                         dataToSend['dictionary_word_length'] = $('#{{componentId}}-{{sectionId}}-dictionary_word_length').val();
                     }
-                    // dataToSend['app_id'] = $('#{{componentId}}-{{sectionId}}-app_id').val();
-                    // dataToSend['domain_id'] = $('#{{componentId}}-{{sectionId}}-domain_id').val();
-                    // dataToSend['url'] = $('#{{componentId}}-{{sectionId}}-url').val();
-
-                    // if (dataToSend['url'] === '') {
-                    //     PNotify.error({title : 'Enter valid URL'});
-
-                    //     return false;
-                    // }
-
-                    // if ($(this)[0].id === '{{componentId}}-{{sectionId}}-generate-human') {
-                    //     dataToSend['human_readable'] = true;
-                    // }
 
                     $.ajax({
                         url         : '{{links.url("system/tools/murls/generateMurl")}}',

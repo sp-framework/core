@@ -80,7 +80,12 @@ abstract class BaseComponent extends Controller
 				$this->componentName, $this->app['id']
 			);
 
-		$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
+		//Murl
+		if ($this->apps->isMurl) {
+			$url = explode('/', explode('/q/', trim($this->apps->isMurl->url, '/'))[0]);
+		} else {
+			$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
+		}
 
 		if ($this->request->isPost()) {
 			unset($url[$this->helper->lastKey($url)]);
@@ -499,7 +504,14 @@ abstract class BaseComponent extends Controller
 
 	protected function getURI()
 	{
-		$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
+		if ($this->apps->isMurl) {
+			$url = explode('/', explode('/q/', trim($this->apps->isMurl->url, '/'))[0]);
+			if ($url[0] !== $this->app['route']) {
+				array_unshift($url, $this->app['route']);
+			}
+		} else {
+			$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
+		}
 
 		$firstKey = $this->helper->firstKey($url);
 		$lastKey = $this->helper->lastKey($url);

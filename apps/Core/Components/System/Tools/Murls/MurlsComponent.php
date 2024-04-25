@@ -23,7 +23,7 @@ class MurlsComponent extends BaseComponent
     {
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $murl = $this->murl->getById($this->getData()['id']);
+                $murl = $this->murls->getById($this->getData()['id']);
 
                 if (!$murl) {
                     return $this->throwIdNotFound();
