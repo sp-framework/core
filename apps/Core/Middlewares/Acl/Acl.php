@@ -36,7 +36,6 @@ class Acl extends BaseMiddleware
     public function process($data)
     {
         $this->isApi = $this->api->isApi();
-
         if ($this->api->isApiCheckVia && $this->api->isApiCheckVia === 'pub') {
             $this->isApiPublic = true;
         }
@@ -196,22 +195,25 @@ class Acl extends BaseMiddleware
                 $controllerName,
                 $this->app['id']
             );
-
         if (!$component) {
-            $url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
+            if ($this->apps->isMurl) {
+                $url = explode('/', trim(explode('/q/', $this->apps->isMurl['url'])[0], '/'));
+            } else {
+                $url = explode('/', trim(explode('/q/', $this->request->getUri())[0], '/'));
+            }
 
             if ($this->request->isPost()) {
                 unset($url[$this->helper->lastKey($url)]);
             }
 
             if (isset($this->domains->domain['exclusive_to_default_app']) &&
-                $this->domains->domain['exclusive_to_default_app'] == 0
+                $this->domains->domain['exclusive_to_default_app'] == 0 &&
+                $url[0] === $this->apps->getAppInfo()['route']
             ) {
                 unset($url[0]);
             }
 
             $componentRoute = implode('/', $url);
-
             $component =
                 $this->modules->components->getComponentByRouteForAppId(
                     strtolower($componentRoute), $this->app['id']
