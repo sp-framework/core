@@ -83,9 +83,31 @@ class MurlsComponent extends BaseComponent
                 }
             }
             $this->addResponse('Ok', 0, ['data' => $murl]);
+
+            return;
         }
 
-        $this->addResponse('Incorrect ID', 1);
+        if ($this->request->isPost()) {
+            $rows =
+                $this->generateDTContent(
+                    $this->murls,
+                    'system/tools/murls/view',
+                    null,
+                    ['murl', 'hits', 'valid_till'],
+                    false,
+                    ['murl', 'hits', 'valid_till'],
+                    null,
+                    null,
+                    null,
+                    'murl'
+                );
+
+            if ($rows) {
+                $this->addResponse('Ok', 0, ['data' => $rows]);
+            }
+
+            return;
+        }
     }
 
     /**

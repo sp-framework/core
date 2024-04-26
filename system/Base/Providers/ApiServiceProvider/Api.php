@@ -59,8 +59,6 @@ class Api extends BasePackage
 
     public $isApi;
 
-    public $isApiPublic;
-
     protected $clientId;
 
     protected $deviceId;

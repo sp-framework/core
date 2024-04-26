@@ -214,6 +214,11 @@ trait DynamicTable {
                     $row["__control"] = $actions;
                 }
             }
+
+            if ($this->api->isApi()) {
+                return $rows;
+            }
+
             $adminltetags = new Adminltetags();
 
             $this->view->rows =

@@ -97,12 +97,32 @@ abstract class BaseComponent extends Controller
 			$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
 		}
 
+		if ($this->api->isApi()) {
+			if ($url[0] === 'api') {
+				unset($url[0]);
+			}
+
+			$url = array_values($url);
+
+			if ($this->api->isApiCheckVia === 'pub') {
+				if (isset($url[0]) &&
+					$url[0] === 'pub'
+				) {
+					unset($url[0]);
+				}
+			}
+			$url = array_values($url);
+		}
+
 		if ($this->request->isPost()) {
 			unset($url[$this->helper->lastKey($url)]);
 		}
+		$url = array_values($url);
+
 		if (isset($url[0]) && $url[0] === $this->app['route']) {
 			unset($url[0]);
 		}
+		$url = array_values($url);
 
 		$this->componentRoute = implode('/', $url);
 		if (!$this->component) {
