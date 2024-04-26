@@ -87,6 +87,14 @@ class MicroExceptionHandler
         return $this->sendJson();
     }
 
+    protected function handleControllerNotFoundException()
+    {
+        $this->apiResponse['responseMessage'] = 'Component not found!';
+        $this->apiResponse['responseCode'] = 1;
+
+        return $this->sendJson();
+    }
+
     protected function sendJson()
     {
         $this->response->setContentType('application/json', 'UTF-8');

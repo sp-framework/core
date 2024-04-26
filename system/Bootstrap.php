@@ -87,10 +87,11 @@ final class Bootstrap
         if ($this->isApi) {
             $application = new Micro($container);
 
+            $request = $container->getShared('request');
             $router = $container->getShared('router');
             $domains = $container->getShared('domains');
 
-            $microCollection = (new MicroCollection($application, $api, $router, $domains))->init();
+            $microCollection = (new MicroCollection($request, $application, $api, $router, $domains))->init();
             $application->mount($microCollection->getMicroCollection());
 
             $events = (new MicroEvents())->init();

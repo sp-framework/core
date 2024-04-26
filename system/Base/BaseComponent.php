@@ -69,6 +69,12 @@ abstract class BaseComponent extends Controller
 			if (count($this->dispatcher->getParams()) > 0) {
 				$this->buildGetQueryParamsArr();
 			}
+
+			$this->setComponent();
+
+			if (!$this->component && $this->app) {
+				throw new ControllerNotFoundException('Component Not Found!');
+			}
 		}
 	}
 
@@ -99,7 +105,6 @@ abstract class BaseComponent extends Controller
 		}
 
 		$this->componentRoute = implode('/', $url);
-
 		if (!$this->component) {
 			$this->component =
 				$this->modules->components->getComponentByRouteForAppId(

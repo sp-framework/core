@@ -286,7 +286,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
     protected function preCheck()
     {
         if (!$this->data['app']) {
-            $this->addResponse('APP not available!', 1);
+            $this->addResponse('APP not available!', 404);
 
             return false;
         }
@@ -300,7 +300,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
                 return false;
             }
 
-            $this->addResponse('API not available or Incorrect client ID or No Authorization Code set.', 1);
+            $this->addResponse('API not available or Incorrect client ID or No Authorization Code set.', 404);
 
             return false;
         }
@@ -313,7 +313,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
             isset($this->request->getPost()['grant_type']) &&
             $this->request->getPost()['grant_type'] !== 'refresh_token'
         ) {
-            $this->addResponse('API registration not allowed on this api!', 1);
+            $this->addResponse('API registration not allowed on this api!', 403);
 
             return false;
         }

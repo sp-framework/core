@@ -254,6 +254,7 @@ class Murls extends BasePackage
                 if (!isset($package['settings']['componentRoute'])) {
                     return false;
                 }
+
                 $murl['url'] = $package['settings']['componentRoute'] . '/q/id/' . $vMurl[2];
             } else if (count($vMurl) === 2) {//Fixed for approute-packagename
                 $murl['url'] = $package['settings']['componentRoute'];

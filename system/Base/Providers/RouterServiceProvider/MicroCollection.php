@@ -6,6 +6,8 @@ use Phalcon\Mvc\Micro\Collection;
 
 class MicroCollection
 {
+    protected $request;
+
     protected $application;
 
     protected $api;
@@ -16,8 +18,10 @@ class MicroCollection
 
     protected $microCollection;
 
-    function __construct($application, $api, $router, $domains)
+    function __construct($request, $application, $api, $router, $domains)
     {
+        $this->request = $request;
+
         $this->application = $application;
 
         $this->api = $api;
@@ -52,8 +56,11 @@ class MicroCollection
             '\\' .
             ucfirst($this->router->getRoutes()[0]->getPaths()['controller']) . 'Component';
 
-        if ($this->router->getRoutes()[0]->getPaths()['action'] === 'view') {//Make sure methods are all Caps, else route will not match!
+        if ($this->router->getRoutes()[0]->getPaths()['action'] === 'view' && !$this->request->isPost()) {//Make sure methods are all Caps, else route will not match!
             $methods = ['GET'];
+            $handlerMethod = 'apiViewAction';
+        } else if ($this->router->getRoutes()[0]->getPaths()['action'] === 'view' && $this->request->isPost()) {
+            $methods = ['POST'];
             $handlerMethod = 'apiViewAction';
         } else {
             $methods = ['POST'];
