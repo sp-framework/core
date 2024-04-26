@@ -23,16 +23,33 @@ class Murls extends BasePackage
 
     public function addMurl($data)
     {
-        $this->validation->init()->add('app_id', PresenceOf::class, ["message" => "Please provide app information."]);
-        $this->validation->add('domain_id', PresenceOf::class, ["message" => "Please provide domain information."]);
-        $this->validation->add('url', PresenceOf::class, ["message" => "Please provide URL."]);
+        $this->validation->init()->add('url', PresenceOf::class, ["message" => "Please provide URL."]);
         $this->validation->add('murl', PresenceOf::class, ["message" => "Please provide mURL."]);
+        if (!isset($data['api_id']) ||
+            (isset($data['api_id']) && $data['api_id'] === '')
+        ) {
+            $this->validation->add('app_id', PresenceOf::class, ["message" => "Please provide app information."]);
+            $this->validation->add('domain_id', PresenceOf::class, ["message" => "Please provide domain information."]);
+        }
 
         if (!$this->doValidation($data)) {
             return false;
         }
 
         $data['account_id'] = $this->auth->account()['id'];
+
+        if (isset($data['api_id'])) {
+            $api = $this->api->getById($data['api_id']);
+
+            if (!$api) {
+                $this->addResponse('API ID Incorrect', 1);
+
+                return false;
+            }
+
+            $data['app_id'] = $api['app_id'];
+            $data['domain_id'] = $api['domain_id'];
+        }
 
         if ($this->add($data)) {
             $this->addResponse('Murl added');
@@ -46,13 +63,30 @@ class Murls extends BasePackage
     public function updateMurl($data)
     {
         $this->validation->init()->add('id', PresenceOf::class, ["message" => "Please provide murl Id."]);
-        $this->validation->add('app_id', PresenceOf::class, ["message" => "Please provide app information."]);
-        $this->validation->add('domain_id', PresenceOf::class, ["message" => "Please provide domain information."]);
         $this->validation->add('url', PresenceOf::class, ["message" => "Please provide URL."]);
         $this->validation->add('murl', PresenceOf::class, ["message" => "Please provide mURL."]);
+        if (!isset($data['api_id']) ||
+            (isset($data['api_id']) && $data['api_id'] === '')
+        ) {
+            $this->validation->add('app_id', PresenceOf::class, ["message" => "Please provide app information."]);
+            $this->validation->add('domain_id', PresenceOf::class, ["message" => "Please provide domain information."]);
+        }
 
         if (!$this->doValidation($data)) {
             return false;
+        }
+
+        if (isset($data['api_id'])) {
+            $api = $this->api->getById($data['api_id']);
+
+            if (!$api) {
+                $this->addResponse('API ID Incorrect', 1);
+
+                return false;
+            }
+
+            $data['app_id'] = $api['app_id'];
+            $data['domain_id'] = $api['domain_id'];
         }
 
         if ($this->update($data)) {
@@ -66,7 +100,11 @@ class Murls extends BasePackage
 
     public function removeMurl($data)
     {
-        //
+        if ($this->remove($data['id'])) {
+            $this->addResponse('Murl removed');
+        } else {
+            $this->addResponse('Error removing murl', 1);
+        }
     }
 
     public function generateMurl($data)
@@ -149,5 +187,35 @@ class Murls extends BasePackage
         }
 
         return true;
+    }
+
+    public function getMurlByDomainId($murl, $domainId)
+    {
+        if ($this->config->databasetype === 'db') {
+            $params =
+                [
+                    'conditions'    => 'murl = :murl: AND domain_id = :domain_id:',
+                    'bind'          =>
+                        [
+                            'murl'          => $murl,
+                            'domain_id'     => $domainId
+                        ]
+                ];
+        } else {
+            $params = [
+                'conditions' => [
+                    ['murl', '=', $murl],
+                    ['domain_id', '=', $domainId]
+                ]
+            ];
+        }
+
+        $murl = $this->getByParams($params);
+
+        if ($murl && count($murl) > 0) {
+            $murl = $murl[0];
+        }
+
+        return $murl;
     }
 }

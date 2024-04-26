@@ -37,6 +37,10 @@ class Api extends BasePackage
 {
     protected $modelToUse = ServiceProviderApi::class;
 
+    protected $packageName = 'apiServices';
+
+    public $apiServices;
+
     public $api;
 
     public $client;
@@ -85,11 +89,15 @@ class Api extends BasePackage
 
     public $apiCallsLimitReached = false;
 
-    public function init()
+    public function init(bool $resetCache = false)
     {
         $this->scopes = new Scopes;
 
         $this->clients = new Clients;
+
+        if ($this->container) {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }
@@ -395,13 +403,16 @@ class Api extends BasePackage
 
                 $api = $this->getByParams($params);
 
+
                 if ($api && isset($api[0]) && $api[0]['status'] == true) {
+
                     $this->caching->init('apcuCache', 7200);
 
                     if ($this->caching->enabled) {
                         $apcuClient = $this->caching->getCache('api-clients-' . $this->request->getClientAddress());
 
                         if ($apcuClient) {
+                            $client = [];
                             $client[0] = $apcuClient;
                         }
                     }
@@ -437,7 +448,7 @@ class Api extends BasePackage
                         }
                     }
 
-                    if (isset($client)) {
+                    if (isset($client) && $client) {
                         if ($this->checkCallLimits($client[0], $api[0])) {
                             $this->client = $client[0];
                             $this->apiCallsLimitReached = true;

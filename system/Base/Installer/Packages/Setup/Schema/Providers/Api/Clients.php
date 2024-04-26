@@ -14,7 +14,7 @@ class Clients
                 new Column(
                     'id',
                     [
-                        'type'          => Column::TYPE_TINYINTEGER,
+                        'type'          => Column::TYPE_INTEGER,
                         'notNull'       => true,
                         'autoIncrement' => true,
                         'primary'       => true,
@@ -23,21 +23,21 @@ class Clients
                 new Column(
                     'api_id',
                     [
-                        'type'          => Column::TYPE_TINYINTEGER,
+                        'type'          => Column::TYPE_INTEGER,
                         'notNull'       => true,
                     ]
                 ),
                 new Column(
                     'app_id',
                     [
-                        'type'          => Column::TYPE_TINYINTEGER,
+                        'type'          => Column::TYPE_INTEGER,
                         'notNull'       => true,
                     ]
                 ),
                 new Column(
                     'domain_id',
                     [
-                        'type'          => Column::TYPE_TINYINTEGER,
+                        'type'          => Column::TYPE_INTEGER,
                         'notNull'       => true,
                     ]
                 ),

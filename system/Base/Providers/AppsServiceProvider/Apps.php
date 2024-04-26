@@ -84,11 +84,36 @@ class Apps extends BasePackage
 
 			$uri = explode("/", trim($uri[0], '/'));
 
-			if (count($uri) === 1) {//Check for Murl
-				$this->isMurl = $this->basepackages->murls->getFirst('murl', trim($uri[0], '/'));
+			if ($this->api->isApi()) {
+				$apiUri = $uri;
+				if ($apiUri[0] === 'api') {
+					unset($apiUri[0]);
+				}
+
+				$apiUri = array_values($apiUri);
+
+				if ($this->api->isApiCheckVia === 'pub') {
+					if (isset($apiUri[0]) &&
+						$apiUri[0] === 'pub'
+					) {
+						unset($apiUri[0]);
+					}
+				}
+
+				$apiUri = array_values($apiUri);
+			}
+
+			if ((isset($apiUri) && count($apiUri) === 1) ||
+				count($uri) === 1
+			) {//Check for Murl
+				if (isset($apiUri)) {
+					$this->isMurl = $this->basepackages->murls->getMurlByDomainId(trim($apiUri[0], '/'), $domain['id']);
+				} else {
+					$this->isMurl = $this->basepackages->murls->getMurlByDomainId(trim($uri[0], '/'), $domain['id']);
+				}
 
 				if ($this->isMurl) {
-					return $this->getAppById($this->isMurl->app_id)['route'];
+					return $this->getAppById($this->isMurl['app_id'])['route'];
 				}
 			}
 

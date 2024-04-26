@@ -1,5 +1,6 @@
 {% if murl['id'] is defined %}
     {% set murlId = murl['id'] %}
+    {% set murlApiId = murl['api_id'] %}
     {% set murlAppId = murl['app_id'] %}
     {% set murlDomainId = murl['domain_id'] %}
     {% set murlUrl = murl['url'] %}
@@ -7,11 +8,18 @@
     {% set murlValidTill = murl['valid_till'] %}
 {% else %}
     {% set murlId = '' %}
+    {% set murlApiId = '' %}
     {% set murlAppId = '' %}
     {% set murlDomainId = '' %}
     {% set murlUrl = '' %}
     {% set murlMrul = '' %}
     {% set murlValidTill = '' %}
+{% endif %}
+{% set appDisabled = false %}
+{% set domainDisabled = false %}
+{% if murlApiId !== '' and murlApiId !== null %}
+    {% set appDisabled = true %}
+    {% set domainDisabled = true %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -47,6 +55,30 @@
                         'componentName'                         : componentName,
                         'componentId'                           : componentId,
                         'sectionId'                             : sectionId,
+                        'fieldId'                               : 'api_id',
+                        'fieldLabel'                            : 'API',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Select API.',
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : apiServices,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : murlApiId
+                    ]
+                )}}
+            </div>
+            <div class="col border-left">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
                         'fieldId'                               : 'app_id',
                         'fieldLabel'                            : 'APP',
                         'fieldType'                             : 'select2',
@@ -54,6 +86,7 @@
                         'fieldHelpTooltipContent'               : 'Select App.',
                         'fieldBazScan'                          : true,
                         'fieldRequired'                         : true,
+                        'fieldDisabled'                         : appDisabled,
                         'fieldBazJstreeSearch'                  : true,
                         'fieldBazPostOnCreate'                  : true,
                         'fieldBazPostOnUpdate'                  : true,
@@ -79,6 +112,7 @@
                         'fieldHelpTooltipContent'               : 'Select Domain.',
                         'fieldBazScan'                          : true,
                         'fieldRequired'                         : true,
+                        'fieldDisabled'                         : domainDisabled,
                         'fieldBazJstreeSearch'                  : true,
                         'fieldBazPostOnCreate'                  : true,
                         'fieldBazPostOnUpdate'                  : true,
@@ -214,6 +248,7 @@
                                 'fieldHelpTooltipContent'               : 'Length of Murl using random characters.',
                                 'fieldInputTypeTextFilter'              : 'positiveInt',
                                 'fieldBazScan'                          : true,
+                                'fieldRequired'                         : true,
                                 'fieldBazJstreeSearch'                  : true,
                                 'fieldBazPostOnCreate'                  : false,
                                 'fieldBazPostOnUpdate'                  : false,
@@ -279,6 +314,7 @@
                                         'fieldHelpTooltipContent'               : 'Number of dictionary words to use to generate murl.',
                                         'fieldInputTypeTextFilter'              : 'positiveInt',
                                         'fieldBazScan'                          : true,
+                                        'fieldRequired'                         : true,
                                         'fieldBazJstreeSearch'                  : true,
                                         'fieldBazPostOnCreate'                  : false,
                                         'fieldBazPostOnUpdate'                  : false,
@@ -306,6 +342,7 @@
                                         'fieldHelpTooltipContent'               : 'Length of dictionary word to use to generate murl.',
                                         'fieldInputTypeTextFilter'              : 'positiveInt',
                                         'fieldBazScan'                          : true,
+                                        'fieldRequired'                         : true,
                                         'fieldBazJstreeSearch'                  : true,
                                         'fieldBazPostOnCreate'                  : false,
                                         'fieldBazPostOnUpdate'                  : false,
@@ -322,7 +359,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col">
+            <div class="col text-center">
                 {{adminltetags.useTag('buttons',
                     [
                         'component'                 : component,
@@ -375,6 +412,19 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                                          : { },
+        '{{componentId}}-{{sectionId}}-api_id'                                      : {
+            'placeholder'   : 'SELECT API',
+            'allowClear'    : true,
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function (e) {
+                    $('#{{componentId}}-{{sectionId}}-app_id, #{{componentId}}-{{sectionId}}-domain_id').val(0).trigger('change');
+                    $('#{{componentId}}-{{sectionId}}-app_id, #{{componentId}}-{{sectionId}}-domain_id').attr('disabled', true);
+                });
+                $('#{{componentId}}-{{sectionId}}-api_id').on('select2:clear', function (e) {
+                    $('#{{componentId}}-{{sectionId}}-app_id, #{{componentId}}-{{sectionId}}-domain_id').attr('disabled', false);
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-app_id'                                      : {
             'placeholder'   : 'SELECT APP'
         },

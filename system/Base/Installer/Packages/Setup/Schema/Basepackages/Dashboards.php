@@ -31,7 +31,7 @@ class Dashboards
                 new Column(
                     'app_id',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
+                        'type'    => Column::TYPE_INTEGER,
                         'notNull' => true
                     ]
                 ),

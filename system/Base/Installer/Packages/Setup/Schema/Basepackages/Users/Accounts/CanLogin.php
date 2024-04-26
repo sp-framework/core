@@ -30,7 +30,7 @@ class CanLogin
                     new Column(
                         'app_id',
                         [
-                            'type'          => Column::TYPE_SMALLINTEGER,
+                            'type'          => Column::TYPE_INTEGER,
                             'notNull'       => true,
                         ]
                     ),

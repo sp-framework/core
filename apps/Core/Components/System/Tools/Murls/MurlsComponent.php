@@ -36,6 +36,8 @@ class MurlsComponent extends BaseComponent
 
             $this->view->apps = $this->apps->apps;
 
+            $this->view->apiServices = $this->api->init()->apiServices;
+
             return;
         }
 
@@ -63,6 +65,27 @@ class MurlsComponent extends BaseComponent
         );
 
         $this->view->pick('murls/list');
+    }
+
+    /**
+     * @api_acl(name=view)
+     */
+    public function apiViewAction()
+    {
+        $this->initialize();
+
+        if (isset($this->getQueryArr['id'])) {
+            if ($this->getQueryArr['id'] != 0) {
+                $murl = $this->murls->getById($this->getQueryArr['id']);
+
+                if (!$murl) {
+                    return $this->throwIdNotFound();
+                }
+            }
+            $this->addResponse('Ok', 0, ['data' => $murl]);
+        }
+
+        $this->addResponse('Incorrect ID', 1);
     }
 
     /**

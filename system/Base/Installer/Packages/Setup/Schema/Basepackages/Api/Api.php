@@ -14,7 +14,7 @@ class Api
                 new Column(
                     'id',
                     [
-                        'type'          => Column::TYPE_SMALLINTEGER,
+                        'type'          => Column::TYPE_INTEGER,
                         'notNull'       => true,
                         'autoIncrement' => true,
                         'primary'       => true,

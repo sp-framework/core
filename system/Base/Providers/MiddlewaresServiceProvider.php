@@ -113,15 +113,28 @@ class MiddlewaresServiceProvider extends Injectable
     {
         $this->data['domain'] = $this->domains->getDomain();
 
+        if ($this->apps->isMurl) {
+            $this->data['givenRoute'] = strtolower(rtrim(explode('/q/', $this->apps->isMurl['url'])[0], '/'));
+        } else {
+            $this->data['givenRoute'] = strtolower(rtrim(explode('/q/', $this->request->getUri())[0], '/'));
+        }
+
         if (isset($this->data['domain']['exclusive_to_default_app']) &&
             $this->data['domain']['exclusive_to_default_app'] == 1
         ) {
             $this->data['appRoute'] = '';
         } else {
+            if ($this->apps->isMurl) {
+                $givenRoute = explode('/', trim($this->data['givenRoute'], '/'));
+
+                if ($givenRoute[0] !== strtolower($this->data['app']['route'])) {
+                    array_unshift($givenRoute, strtolower($this->data['app']['route']));
+                }
+                $this->data['givenRoute'] = '/' . implode('/', $givenRoute);
+            }
+
             $this->data['appRoute'] = '/' . strtolower($this->data['app']['route']);
         }
-
-        $this->data['givenRoute'] = strtolower(rtrim(explode('/q/', $this->request->getUri())[0], '/'));
 
         if ($this->data['givenRoute'] === $this->data['appRoute']) {
             $this->data['givenRoute'] = $this->data['appRoute'] . '/home';
@@ -129,6 +142,7 @@ class MiddlewaresServiceProvider extends Injectable
         if ($this->data['givenRoute'] === '') {
             $this->data['givenRoute'] = $this->data['appRoute'] . '/home';
         }
+
 
         if ($this->request->isGet()) {
             $this->data['guestAccess'] =

@@ -15,7 +15,7 @@ class Domains
 					new Column(
 						'id',
 						[
-							'type'          => Column::TYPE_TINYINTEGER,
+							'type'          => Column::TYPE_INTEGER,
 							'notNull'       => true,
 							'autoIncrement' => true,
 							'primary'       => true,
@@ -40,7 +40,7 @@ class Domains
 					new Column(
 						'default_app_id',
 						[
-							'type'    => Column::TYPE_TINYINTEGER,
+							'type'    => Column::TYPE_INTEGER,
 							'notNull' => true,
 						]
 					),

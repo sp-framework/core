@@ -22,16 +22,23 @@ class Murls
                         ]
                     ),
                     new Column(
+                        'api_id',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => true,
+                        ]
+                    ),
+                    new Column(
                         'app_id',
                         [
-                            'type'          => Column::TYPE_TINYINTEGER,
+                            'type'          => Column::TYPE_INTEGER,
                             'notNull'       => true,
                         ]
                     ),
                     new Column(
                         'domain_id',
                         [
-                            'type'          => Column::TYPE_TINYINTEGER,
+                            'type'          => Column::TYPE_INTEGER,
                             'notNull'       => true,
                         ]
                     ),
@@ -77,7 +84,6 @@ class Murls
                     new Index(
                         'column_UNIQUE',
                         [
-                            'app_id',
                             'domain_id',
                             'murl'
                         ],

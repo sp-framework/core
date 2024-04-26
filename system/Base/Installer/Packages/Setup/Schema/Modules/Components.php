@@ -161,7 +161,7 @@ class Components
 					new Column(
 						'api_id',
 						[
-							'type'    => Column::TYPE_TINYINTEGER,
+							'type'    => Column::TYPE_INTEGER,
 							'notNull' => true,
 						]
 					),
