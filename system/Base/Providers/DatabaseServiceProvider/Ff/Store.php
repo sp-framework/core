@@ -1312,9 +1312,19 @@ class Store
         if (!isset($data['id']) && count($this->uniqueFields) > 0) {
             $criteria = [];
 
+            $storeSchemaProperties = $this->getStoreSchema()['properties'];
+
             foreach ($this->uniqueFields as $uniqueField) {
                 if (isset($data[$uniqueField])) {
-                    array_push($criteria, [$uniqueField, '=', $data[$uniqueField]]);
+                    if (isset($storeSchemaProperties[$uniqueField]['type'])) {
+                        if ($storeSchemaProperties[$uniqueField]['type'] === 'integer') {
+                            array_push($criteria, [$uniqueField, '=', (int) $data[$uniqueField]]);
+                        } else if ($storeSchemaProperties[$uniqueField]['type'] === 'boolean') {
+                            array_push($criteria, [$uniqueField, '=', (bool) $data[$uniqueField]]);
+                        } else {
+                            array_push($criteria, [$uniqueField, '=', $data[$uniqueField]]);
+                        }
+                    }
                 }
             }
 
