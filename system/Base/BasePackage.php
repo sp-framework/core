@@ -542,9 +542,7 @@ abstract class BasePackage extends Controller
 				]
 			);
 
-		if (!$arrayData &&
-			isset($pageParams['conditions']) && $pageParams['conditions'] !== ''
-		) {
+		if (!$arrayData && isset($pageParams)) {
 			if ($this->config->databasetype === 'db') {
 				$data = $this->getDbDataWithConditions($params, $pageParams['conditions'], $resetCache, $enableCache);
 			} else {
