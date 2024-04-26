@@ -93,13 +93,7 @@ class MurlsComponent extends BaseComponent
                     $this->murls,
                     'system/tools/murls/view',
                     null,
-                    ['murl', 'hits', 'valid_till'],
-                    false,
-                    ['murl', 'hits', 'valid_till'],
-                    null,
-                    null,
-                    null,
-                    'murl'
+                    ['murl', 'hits', 'valid_till']
                 );
 
             if ($rows) {

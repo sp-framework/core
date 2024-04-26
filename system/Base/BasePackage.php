@@ -384,7 +384,6 @@ abstract class BasePackage extends Controller
 			if (isset($params['offset'])) {
 				$offset = $params['offset'];
 			}
-
 			if (isset($params['conditions']) && is_array($params['conditions']) && count($params['conditions']) > 0) {
 				$this->ffData = $this->ffStore->findBy($params['conditions'], $order, $limit, $offset);
 			} else if (isset($params['conditions']) &&
@@ -404,6 +403,16 @@ abstract class BasePackage extends Controller
 			$this->setFfStoreToUse();
 
 			if (is_array($this->ffData) && count($this->ffData) > 0) {
+				if (isset($params['columns']) && count($params['columns']) > 0) {//Filter Data as per requested columns
+					foreach ($this->ffData as $ffDataKey => $ffData) {
+						foreach ($ffData as $ffDataColumnKey => $ffDataColumnValue) {
+							if (!in_array($ffDataColumnKey, $params['columns'])) {
+								unset($this->ffData[$ffDataKey][$ffDataColumnKey]);
+							}
+						}
+					}
+				}
+
 				return $this->ffData;
 			}
 
@@ -532,6 +541,7 @@ abstract class BasePackage extends Controller
 						0,
 				]
 			);
+
 		if (!$arrayData &&
 			isset($pageParams['conditions']) && $pageParams['conditions'] !== ''
 		) {
