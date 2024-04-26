@@ -17,7 +17,7 @@
 {% endif %}
 {% set appDisabled = false %}
 {% set domainDisabled = false %}
-{% if murlApiId !== '' and murlApiId !== null %}
+{% if murlApiId !== '' and murlApiId !== null and murlApiId != 0 %}
     {% set appDisabled = true %}
     {% set domainDisabled = true %}
 {% endif %}
@@ -169,6 +169,27 @@
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 50,
                         'fieldValue'                     : murlMrul
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'valid_till',
+                        'fieldLabel'                            : 'Valid Till',
+                        'fieldType'                             : 'flatpickr',
+                        'fieldFlatpickrClearButton'             : true,
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Valid Till',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldValue'                            : murlValidTill
                     ]
                 )}}
             </div>
@@ -491,7 +512,13 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-valid_till'                                  : { },
+        '{{componentId}}-{{sectionId}}-valid_till'                                  : {
+            enableTime          : true,
+            time_24hr           : true,
+            dateFormat          : "Y-m-d H:i:s",
+            altFormat           : "Y-m-d H:i:s",
+            minuteIncrement     : 1
+        },
         '{{componentId}}-{{sectionId}}-form'                                        : {
             ignore      : ':submit, :reset, :image, :disabled, .ignore, :hidden',
             rules       : {

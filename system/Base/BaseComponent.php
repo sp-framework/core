@@ -472,13 +472,15 @@ abstract class BaseComponent extends Controller
 
 		//Murl - update Hits
 		if ($this->apps->isMurl) {
-			if ($this->apps->isMurl['hits'] === null) {
-				$this->apps->isMurl['hits'] = 1;
-			} else {
-				$this->apps->isMurl['hits'] = (int) ($this->apps->isMurl['hits'] + 1);
-			}
+			if (!isset($this->apps->isMurl['vMurl'])) {
+				if ($this->apps->isMurl['hits'] === null) {
+					$this->apps->isMurl['hits'] = 1;
+				} else {
+					$this->apps->isMurl['hits'] = (int) ($this->apps->isMurl['hits'] + 1);
+				}
 
-			$this->basepackages->murls->updateMurl($this->apps->isMurl);
+				$this->basepackages->murls->updateMurl($this->apps->isMurl);
+			}
 		}
 	}
 

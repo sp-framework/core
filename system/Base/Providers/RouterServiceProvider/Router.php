@@ -248,7 +248,7 @@ class Router
 			$routeToMatch = '/' . ':params';
 		}
 
-		if ($this->isApi) {//Assign params to dispatcher manually so that BaseComponent can pic them up
+		if ($this->isApi && isset($givenRouteArr[1])) {//Assign params to dispatcher manually so that BaseComponent can pic them up
 			$params = explode('/', trim($givenRouteArr[1], '/'));
 
 			$this->dispatcher->setParameters($params);

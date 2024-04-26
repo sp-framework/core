@@ -74,9 +74,9 @@ class MurlsComponent extends BaseComponent
     {
         $this->initialize();
 
-        if (isset($this->getQueryArr['id'])) {
-            if ($this->getQueryArr['id'] != 0) {
-                $murl = $this->murls->getById($this->getQueryArr['id']);
+        if (isset($this->getData()['id'])) {
+            if ($this->getData()['id'] != 0) {
+                $murl = $this->murls->getById($this->getData()['id']);
 
                 if (!$murl) {
                     return $this->throwIdNotFound();

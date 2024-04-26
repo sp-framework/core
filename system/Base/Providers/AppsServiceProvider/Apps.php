@@ -107,9 +107,9 @@ class Apps extends BasePackage
 				count($uri) === 1
 			) {//Check for Murl
 				if (isset($apiUri)) {
-					$this->isMurl = $this->basepackages->murls->getMurlByDomainId(trim($apiUri[0], '/'), $domain['id']);
+					$this->isMurl = $this->basepackages->murls->getMurlByDomainId($this, trim($apiUri[0], '/'), $domain['id']);
 				} else {
-					$this->isMurl = $this->basepackages->murls->getMurlByDomainId(trim($uri[0], '/'), $domain['id']);
+					$this->isMurl = $this->basepackages->murls->getMurlByDomainId($this, trim($uri[0], '/'), $domain['id']);
 				}
 
 				if ($this->isMurl) {

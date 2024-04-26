@@ -38,7 +38,7 @@ class Murls extends BasePackage
 
         $data['account_id'] = $this->auth->account()['id'];
 
-        if (isset($data['api_id'])) {
+        if (isset($data['api_id']) && $data['api_id'] != 0) {
             $api = $this->api->getById($data['api_id']);
 
             if (!$api) {
@@ -76,7 +76,7 @@ class Murls extends BasePackage
             return false;
         }
 
-        if (isset($data['api_id'])) {
+        if (isset($data['api_id']) && $data['api_id'] != 0) {
             $api = $this->api->getById($data['api_id']);
 
             if (!$api) {
@@ -189,7 +189,7 @@ class Murls extends BasePackage
         return true;
     }
 
-    public function getMurlByDomainId($murl, $domainId)
+    public function getMurlByDomainId($apps, $murlUrl, $domainId)
     {
         if ($this->config->databasetype === 'db') {
             $params =
@@ -197,25 +197,76 @@ class Murls extends BasePackage
                     'conditions'    => 'murl = :murl: AND domain_id = :domain_id:',
                     'bind'          =>
                         [
-                            'murl'          => $murl,
+                            'murl'          => $murlUrl,
                             'domain_id'     => $domainId
                         ]
                 ];
         } else {
             $params = [
                 'conditions' => [
-                    ['murl', '=', $murl],
+                    ['murl', '=', $murlUrl],
                     ['domain_id', '=', $domainId]
                 ]
             ];
         }
 
         $murl = $this->getByParams($params);
-
         if ($murl && count($murl) > 0) {
             $murl = $murl[0];
+
+            if ($murl['valid_till'] !== null && $murl['valid_till'] !== '') {
+                $validity = \Carbon\Carbon::parse($murl['valid_till']);
+
+                if ($validity->isPast()) {
+                    return false;
+                }
+            }
+
+            return $murl;
         }
 
-        return $murl;
+        //vMurl
+        $vMurl = explode('-', $murlUrl);
+
+        if (!$murl && is_array($vMurl) && count($vMurl) >= 2) {
+            $murl = [];
+
+            $app = $apps->getFirst('route', $vMurl[0]);
+
+            if (!$app) {
+                return false;
+            }
+
+            $app = $app->toArray();
+
+            $package = $this->modules->packages->getPackageByName($vMurl[1]);
+
+            if (!$package) {
+                return false;
+            }
+            if (count($vMurl) === 3) {//Fixed for approute-packagename-packagedataID
+                $id = (int) $vMurl[2];
+
+                if ($id === 0) {
+                    return false;
+                }
+
+                if (!isset($package['settings']['componentRoute'])) {
+                    return false;
+                }
+                $murl['url'] = $package['settings']['componentRoute'] . '/q/id/' . $vMurl[2];
+            } else if (count($vMurl) === 2) {//Fixed for approute-packagename
+                $murl['url'] = $package['settings']['componentRoute'];
+            }
+
+            $murl['app_id'] = $app['id'];
+            $murl['domain_id'] = $domainId;
+            $murl['murl'] = $murlUrl;
+            $murl['vMurl'] = true;
+
+            return $murl;
+        }
+
+        return false;
     }
 }
