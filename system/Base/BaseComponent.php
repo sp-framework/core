@@ -86,7 +86,7 @@ abstract class BaseComponent extends Controller
 
 		//Murl
 		if ($this->apps->isMurl) {
-			$url = explode('/', explode('/q/', trim($this->apps->isMurl->url, '/'))[0]);
+			$url = explode('/', explode('/q/', trim($this->apps->isMurl['url'], '/'))[0]);
 		} else {
 			$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
 		}
@@ -94,7 +94,6 @@ abstract class BaseComponent extends Controller
 		if ($this->request->isPost()) {
 			unset($url[$this->helper->lastKey($url)]);
 		}
-
 		if (isset($url[0]) && $url[0] === $this->app['route']) {
 			unset($url[0]);
 		}
@@ -470,6 +469,17 @@ abstract class BaseComponent extends Controller
 				}
 			}
 		}
+
+		//Murl - update Hits
+		if ($this->apps->isMurl) {
+			if ($this->apps->isMurl['hits'] === null) {
+				$this->apps->isMurl['hits'] = 1;
+			} else {
+				$this->apps->isMurl['hits'] = (int) ($this->apps->isMurl['hits'] + 1);
+			}
+
+			$this->basepackages->murls->updateMurl($this->apps->isMurl);
+		}
 	}
 
 	protected function buildHeaderBreadcrumb()
@@ -509,7 +519,7 @@ abstract class BaseComponent extends Controller
 	protected function getURI()
 	{
 		if ($this->apps->isMurl) {
-			$url = explode('/', explode('/q/', trim($this->apps->isMurl->url, '/'))[0]);
+			$url = explode('/', explode('/q/', trim($this->apps->isMurl['url'], '/'))[0]);
 			if ($url[0] !== $this->app['route']) {
 				array_unshift($url, $this->app['route']);
 			}
@@ -633,7 +643,15 @@ abstract class BaseComponent extends Controller
 	protected function buildGetQueryParamsArr()
 	{
 		if ($this->request->isGet()) {
-			$arr = $this->helper->chunk($this->dispatcher->getParams(), 2);
+			//Murl
+			if ($this->apps->isMurl) {
+				$arr = $this->helper->chunk(
+					explode('/', explode('/q/', trim($this->apps->isMurl['url'], '/'))[1]),
+					2
+				);
+			} else {
+				$arr = $this->helper->chunk($this->dispatcher->getParams(), 2);
+			}
 
 			foreach ($arr as $value) {
 				if (isset($value[1])) {
