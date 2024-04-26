@@ -36,9 +36,9 @@ class MicroMiddlewaresServiceProvider extends Injectable
         try {
             if (($checkMw = $this->checkAllMiddlewares()) !== true) {
                 if ($checkMw === 'auth') {
-                    $this->addResponse('Authentication Error!', 1);
+                    $this->addResponse('Authentication Error!', 401);
                 } else if ($checkMw === 'acl') {
-                    $this->addResponse('Permission Denied!', 1);
+                    $this->addResponse('Permission Denied!', 403);
                 }
 
                 return false;
@@ -250,12 +250,12 @@ class MicroMiddlewaresServiceProvider extends Injectable
         return false;
     }
 
-    protected function setHeader($responseCode = 0)
+    protected function setHeader($responseCode = 200)
     {
         $this->response->setContentType('application/json', 'UTF-8');
         $this->response->setHeader('Cache-Control', 'no-store');
 
-        if ($responseCode !== 0) {
+        if ($responseCode !== 0 || $responseCode !== 1) {
             $this->response->setStatusCode($responseCode);
         }
     }

@@ -65,8 +65,22 @@ class Router
 
 	protected $basepackages;
 
-	public function __construct($api, $domains, $apps, $components, $views, $logger, $request, $response, $helper, $config, $basepackages)
-	{
+	protected $dispatcher;
+
+	public function __construct(
+		$api,
+		$domains,
+		$apps,
+		$components,
+		$views,
+		$logger,
+		$request,
+		$response,
+		$helper,
+		$config,
+		$basepackages,
+		$dispatcher
+	) {
 		$this->api = $api;
 
 		$this->domains = $domains;
@@ -94,6 +108,8 @@ class Router
 		$this->config = $config;
 
 		$this->basepackages = $basepackages;
+
+		$this->dispatcher = $dispatcher;
 
 		$this->requestUri = $this->request->getURI();
 
@@ -206,25 +222,36 @@ class Router
 	{
 		//Murl/SEO
 		if ($this->apps->isMurl) {
-			$givenRoute = $this->apps->isMurl->url;
+			$givenRoute = $this->apps->isMurl['url'];
 
-			if (!$this->domainApiExclusive) {
-				$givenRoute = $this->appInfo['route'] . '/' . $givenRoute;
+			$givenRouteArr = explode('/q/', trim($givenRoute, '/'));
+			$this->getQuery = $givenRouteArr[1] ?? null;
+
+			if (!$this->domainApiExclusive && !str_starts_with($givenRouteArr[0], $this->appInfo['route'])) {
+				$givenRouteArr[0] = $this->appInfo['route'] . '/' . $givenRouteArr[0];
 			}
+		} else {
+			$givenRouteArr[0] = $givenRoute;
 		}
 
-		$routeArray = explode('/', $givenRoute);
+		$routeArray = explode('/', $givenRouteArr[0]);
 
 		$this->getGivenRouteClass($routeArray);
 
 		if ($this->getQuery) {
-			$routeToMatch = '/' . $givenRoute . '/q/' . ':params';
+			$routeToMatch = '/' . $givenRouteArr[0] . '/q/' . ':params';
 		} else {
-			$routeToMatch = '/' . $givenRoute;
+			$routeToMatch = '/' . $givenRouteArr[0];
 		}
 
 		if ($this->apps->isMurl) {
-			$routeToMatch = '/' . $this->apps->isMurl->murl;
+			$routeToMatch = '/' . ':params';
+		}
+
+		if ($this->isApi) {//Assign params to dispatcher manually so that BaseComponent can pic them up
+			$params = explode('/', trim($givenRouteArr[1], '/'));
+
+			$this->dispatcher->setParameters($params);
 		}
 
 		$this->setDefaultNamespace(false);
@@ -394,15 +421,16 @@ class Router
 					unset($uri[0][0]);
 				}
 
+				$uri[0] = array_values($uri[0]);
+
 				if ($this->isApiPublic) {
 					if (isset($uri[0][0]) &&
 						$uri[0][0] === 'pub'
 					) {
 						unset($uri[0][0]);
-					} else if ($uri[0][1] === 'pub') {
-						unset($uri[0][1]);
 					}
 				}
+				$uri[0] = array_values($uri[0]);
 
 				$uri[0] = implode('/', $uri[0]);
 			}

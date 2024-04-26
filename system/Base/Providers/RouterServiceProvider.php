@@ -21,16 +21,22 @@ class RouterServiceProvider implements ServiceProviderInterface
 				if (!$api->isApi()) {
 					$components = $container->getShared('modules')->components;
 					$views = $container->getShared('modules')->views;
+					$dispatcher = null;
 				} else {
 					$components = null;
 					$views = null;
+					$dispatcher = $container->getShared('dispatcher');//We need dispatcher to assign get Query params.
 				}
 				$logger = $container->getShared('logger');
 				$response = $container->getShared('response');
 				$helper = $container->getShared('helper');
 				$config = $container->getShared('config');
 				$basepackages = $container->getShared('basepackages');
-				return (new Router($api, $domains, $apps, $components, $views, $logger, $request, $response, $helper, $config, $basepackages))->init();
+				return (
+					new Router(
+						$api, $domains, $apps, $components, $views, $logger, $request, $response, $helper, $config, $basepackages, $dispatcher
+					)
+				)->init();
 			}
 		);
 	}

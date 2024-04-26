@@ -65,6 +65,10 @@ abstract class BaseComponent extends Controller
 					$this->viewSimple->setViewsDir($this->view->getViewsDir() . $this->getURI());
 				}
 			}
+		} else if ($this->api->isApi()) {
+			if (count($this->dispatcher->getParams()) > 0) {
+				$this->buildGetQueryParamsArr();
+			}
 		}
 	}
 
