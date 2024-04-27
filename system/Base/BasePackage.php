@@ -599,13 +599,15 @@ abstract class BasePackage extends Controller
 
 			$paginationCounters['limit'] = (int) $pageParams['limit'];
 			$paginationCounters['first'] = 1;
+			$paginationCounters['last'] =
+				(int) ceil($paginationCounters['filtered_items'] / ($paginationCounters['limit']));
 			$paginationCounters['previous'] =
 				(int) $pageParams['currentPage'] > 1 ? $pageParams['currentPage'] - 1 : 1;
 			$paginationCounters['current'] =
 				(int) $pageParams['currentPage'];
-			$paginationCounters['next'] = $pageParams['currentPage'] + 1;
-			$paginationCounters['last'] =
-				(int) ceil($paginationCounters['filtered_items'] / ($paginationCounters['limit']));
+			if ($paginationCounters['last'] != $pageParams['currentPage']) {
+				$paginationCounters['next'] = $pageParams['currentPage'] + 1;
+			}
 
 			$this->packagesData->paginationCounters = $paginationCounters;
 
