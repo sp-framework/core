@@ -1,0 +1,47 @@
+{
+    "enable":
+    {
+        "availableAt": "disable",
+        "command": "enable",
+        "hasChilds": false,
+        "description": "Enter enable mode",
+        "class": "\\System\\Base\\Providers\\TerminalServiceProvider\\Commands\\Enable",
+        "function": "run",
+        "args":
+        []
+    },
+    "en":
+    {
+        "availableAt": "disable",
+        "command": "en",
+        "alias": true,
+        "hasChilds": false,
+        "description": "Alias of enable command",
+        "class": "\\System\\Base\\Providers\\TerminalServiceProvider\\Commands\\Enable",
+        "function": "run",
+        "args":
+        []
+    },
+    "show":
+    {
+        "availableAt": "enable",
+        "command": "show",
+        "hasChilds": true,
+        "description": "Show configuration options",
+        "class": "",
+        "function": "",
+        "args":
+        []
+    },
+    "show_version":
+    {
+        "availableAt": "enable",
+        "command": "version",
+        "hasChilds": false,
+        "description": "Show configuration options (version)",
+        "class": "\\System\\Base\\Providers\\TerminalServiceProvider\\Commands\\Show\\Version",
+        "function": "run",
+        "args":
+        []
+    }
+}

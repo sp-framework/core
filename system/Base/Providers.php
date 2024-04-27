@@ -48,6 +48,8 @@ return
 				'System\Base\Providers\ContentServiceProvider',
 				'System\Base\Providers\WebSocketServiceProvider',
 				'System\Base\Providers\ValidationServiceProvider',
+				'System\Base\Providers\AccessServiceProvider',
+				'System\Base\Providers\TerminalServiceProvider',
 			],
 		'api'	=>
 			[

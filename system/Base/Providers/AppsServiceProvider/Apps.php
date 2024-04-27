@@ -46,12 +46,18 @@ class Apps extends BasePackage
 	public function getAppInfo($route = null)
 	{
 		if (PHP_SAPI === 'cli') {
+			if (isset($this->appInfo) && $this->appInfo) {
+				return $this->appInfo;
+			}
+
 			$this->appInfo = $this->getAppByRoute($route);
 
 			$this->ipFilter = (new IpFilter())->init($this, $this->appInfo);
+
+			return;
 		}
 
-		if (isset($this->appInfo)) {
+		if (isset($this->appInfo) && $this->appInfo) {
 			return $this->appInfo;
 		} else {
 			if ($this->checkAppRegistration($this->getAppRoute())) {

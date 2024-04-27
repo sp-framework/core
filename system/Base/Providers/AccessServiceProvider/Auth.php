@@ -299,6 +299,14 @@ class Auth
             return false;
         }
 
+        if (PHP_SAPI === 'cli') {
+            if (!$this->checkAccount($data)) {
+                return false;
+            }
+
+            return true;
+        }
+
         if (!$this->checkAccount($data)) {
             $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
 
