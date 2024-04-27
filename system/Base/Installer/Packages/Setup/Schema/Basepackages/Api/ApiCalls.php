@@ -39,7 +39,7 @@ class ApiCalls
                     'call_method',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 50,
+                        'size'    => 100,
                         'notNull' => true,
                     ]
                 ),
@@ -47,7 +47,7 @@ class ApiCalls
                     'call_response_code',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 5,
+                        'size'    => 10,
                         'notNull' => true,
                     ]
                 ),
@@ -68,8 +68,7 @@ class ApiCalls
                 new Column(
                     'call_error',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 4096,
+                        'type'    => Column::TYPE_TEXT,
                         'notNull' => false,
                     ]
                 ),

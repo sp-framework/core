@@ -24,7 +24,7 @@ class Repos
                         'api_url',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 1024,
+                            'size'    => 2048,
                             'notNull' => true,
                         ]
                     ),
@@ -40,7 +40,7 @@ class Repos
                         'repo_url',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 1024,
+                            'size'    => 2048,
                             'notNull' => true,
                         ]
                     ),
@@ -48,7 +48,7 @@ class Repos
                         'branch',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 100,
+                            'size'    => 512,
                             'notNull' => true,
                         ]
                     ),
@@ -64,7 +64,7 @@ class Repos
                         'username',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 50,
+                            'size'    => 100,
                             'notNull' => false,
                         ]
                     ),
@@ -72,7 +72,7 @@ class Repos
                         'password',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 50,
+                            'size'    => 100,
                             'notNull' => false,
                         ]
                     ),

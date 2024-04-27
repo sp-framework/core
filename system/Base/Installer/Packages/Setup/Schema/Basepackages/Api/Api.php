@@ -31,7 +31,7 @@ class Api
                     'name',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 50,
+                        'size'    => 100,
                         'notNull' => true,
                     ]
                 ),
@@ -39,7 +39,7 @@ class Api
                     'category',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 50,
+                        'size'    => 100,
                         'notNull' => true,
                     ]
                 ),
@@ -47,7 +47,7 @@ class Api
                     'provider',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 50,
+                        'size'    => 100,
                         'notNull' => true,
                     ]
                 ),
@@ -77,7 +77,7 @@ class Api
                     'location',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 50,
+                        'size'    => 100,
                         'notNull' => true
                     ]
                 ),
