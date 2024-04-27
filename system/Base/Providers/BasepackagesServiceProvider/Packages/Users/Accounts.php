@@ -5,6 +5,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Users;
 use Phalcon\Filter\Validation\Validator\Email;
 use Phalcon\Filter\Validation\Validator\PresenceOf;
 use System\Base\BasePackage;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
@@ -24,6 +25,8 @@ class Accounts extends BasePackage
     public function getAccountById(int $id)
     {
         $this->setFFRelations(true);
+
+        $this->setFFRelationsConditions(['api_clients' => [['account_id', '=', $id], ['revoked', '=', false]]]);
 
         $this->getFirst('id', $id);
 
@@ -70,9 +73,34 @@ class Accounts extends BasePackage
                 $account['role'] = $this->model->getRole()->toArray();
             }
 
+            $account['api_clients'] = [];
+            if ($this->model->getApiClients()) {
+                $account['api_clients'] = $this->model->getApiClients()->toArray();
+                if ($account['api_clients'] && is_array($account['api_clients']) && count($account['api_clients']) > 0) {
+                    foreach ($account['api_clients'] as &$client) {
+                        if (isset($client['client_secret']) && $client['client_secret'] !== '') {
+                            $client['client_secret'] = $this->random->base58(8);
+                        }
+                    }
+                }
+            }
+
+            $account['api_user'] = [];
+            if ($this->model->getApiUser()) {
+                $account['api_user'] = $this->model->getApiUser()->toArray();
+            }
+
             return $account;
         } else {
             if ($this->ffData) {
+                if ($this->ffData['api_clients'] && is_array($this->ffData['api_clients']) && count($this->ffData['api_clients']) > 0) {
+                    foreach ($this->ffData['api_clients'] as &$client) {
+                        if (isset($client['client_secret']) && $client['client_secret'] !== '') {
+                            $client['client_secret'] = $this->random->base58(8);
+                        }
+                    }
+                }
+
                 return $this->ffData;
             }
         }
@@ -320,7 +348,6 @@ class Accounts extends BasePackage
     public function removeAccount(array $data)
     {
         if (isset($data['id']) && $data['id'] != 1) {
-
             if ($this->auth->account()['id'] === $data['id']) {
                 $this->addResponse('Cannot remove own account!', 1);
 
@@ -360,6 +387,8 @@ class Accounts extends BasePackage
                     $this->addToNotification('remove', 'Removed account for ID: ' . $account['email']);
 
                     $this->addResponse('Removed account for ID: ' . $account['email']);
+
+                    $this->api->clients->forceRevoke(['account_id' => $data['id']]);
 
                     return true;
                 } else {
@@ -429,7 +458,8 @@ class Accounts extends BasePackage
         $sessions = true,
         $identifiers = true,
         $agents = true,
-        $tunnels = true
+        $tunnels = true,
+        $api_clients = true
     ) {
         if ($security) {
             if ($this->config->databasetype === 'db' &&
@@ -557,6 +587,35 @@ class Accounts extends BasePackage
             }
         }
 
+        if ($api_clients) {
+            if ($this->config->databasetype === 'db' &&
+                $accountObj->getApiClients()
+            ) {
+                if ($accountObj->getApiClients()->count() > 0) {
+                    foreach ($accountObj->getApiClients() as $client) {
+                        $client->revoked = true;
+
+                        $client->update();
+                    }
+                }
+            } else {
+                if ($account['api_clients'] &&
+                    is_array($account['api_clients']) &&
+                    count($account['api_clients']) > 0
+                ) {
+                    $apiStore = $this->ff->store((new ServiceProviderApiClients)->getSource());
+                    foreach ($account['api_clients'] as $client) {
+                        $apiCheck = $apiStore->findById($client['id']);
+
+                        if ($apiCheck) {
+                            $apiCheck['revoked'] = true;
+                            $apiStore->update($apiCheck);
+                        }
+                    }
+                }
+            }
+        }
+
         return true;
     }
 
@@ -575,6 +634,29 @@ class Accounts extends BasePackage
         $data['account_id'] = $id;
 
         unset($data['id']);
+
+        if ($data['role_id'] != '1' && //Remove msview and msupdate permissions
+            isset($data['override_role']) &&
+            $data['override_role'] == '1'
+        ) {
+            if (isset($data['permissions']) && $data['permissions'] !== '') {
+                $data['permissions'] = $this->helper->decode($data['permissions'], true);
+
+                foreach ($data['permissions'] as $app => &$components) {
+                    if (is_array($components) && count($components) > 0) {
+                        foreach ($components as &$component) {
+                            if (isset($component['msview'])) {
+                                $component['msview'] = 0;
+                            }
+                            if (isset($component['msupdate'])) {
+                                $component['msupdate'] = 0;
+                            }
+                        }
+                    }
+                }
+                $data['permissions'] = $this->helper->encode($data['permissions']);
+            }
+        }
 
         if ($account) {
             if ($this->config->databasetype === 'db') {
@@ -811,6 +893,10 @@ class Accounts extends BasePackage
         if (count($canLogin) === 1 &&
             ($canLogin[0]['allowed'] == '1' || $canLogin[0]['allowed'] == '2')
         ) {
+            if ($canLogin[0]['allowed'] == '2') {
+                return false;
+            }
+
             return true;
         } else if (count($canLogin) === 1 && $canLogin[0]['allowed'] == '0') {
             return $canLogin[0];
@@ -908,8 +994,8 @@ class Accounts extends BasePackage
     public function validateData(array $data, $forgotRequest = false)
     {
         $this->validation->init();
-        $this->validation->add('email', PresenceOf::class, ["message" => "Enter valid username."]);
-        $this->validation->add('email', Email::class, ["message" => "Enter valid username."]);
+        $this->validation->add('email', PresenceOf::class, ["message" => "Enter valid email."]);
+        $this->validation->add('email', Email::class, ["message" => "Enter valid email."]);
 
         if (!$forgotRequest) {
             $this->validation->add('first_name', PresenceOf::class, ["message" => "Enter valid first name."]);
@@ -1206,21 +1292,29 @@ class Accounts extends BasePackage
 
                             if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                                 foreach ($methods as $annotation) {
-                                    $action = $annotation->getAll('acl')[0]->getArguments();
-                                    $acls[$action['name']] = $action['name'];
-                                    if (isset($permissionsArr[$app['id']][$component['id']])) {
-                                        $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
-                                    } else {
-                                        $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                    if ($annotation->getAll('acl')) {
+                                        $action = $annotation->getAll('acl')[0]->getArguments();
+                                        if (isset($account['security']['role_id']) && $account['security']['role_id'] != 1 &&
+                                            ($action['name'] === 'msview' || $action['name'] === 'msupdate')
+                                        ) {
+                                            continue;
+                                        }
+                                        $acls[$action['name']] = $action['name'];
+                                        if (isset($permissionsArr[$app['id']][$component['id']])) {
+                                            $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
+                                        } else {
+                                            $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+
                 $this->packagesData->acls = $this->helper->encode($acls);
 
-                $account['permissions'] = $this->helper->encode($permissions);
+                $account['security']['permissions'] = $this->helper->encode($permissions);
                 $account['profile'] = $this->basepackages->profile->getProfile($account['id']);
 
                 $this->packagesData->account = $account;
@@ -1232,7 +1326,6 @@ class Accounts extends BasePackage
 
                 return false;
             }
-
         } else {
             $account = [];
             $permissions = [];
@@ -1248,9 +1341,11 @@ class Accounts extends BasePackage
 
                         if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                             foreach ($methods as $annotation) {
-                                $action = $annotation->getAll('acl')[0]->getArguments();
-                                $acls[$action['name']] = $action['name'];
-                                $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                if ($annotation->getAll('acl')) {
+                                    $action = $annotation->getAll('acl')[0]->getArguments();
+                                    $acls[$action['name']] = $action['name'];
+                                    $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                }
                             }
                         }
                     }

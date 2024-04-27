@@ -88,6 +88,17 @@ class Store
         }
     }
 
+    public function __get($property)
+    {
+        if ($this->data) {
+            if (isset($this->data[$property])) {
+                return $this->data[$property];
+            }
+        }
+
+        return false;
+    }
+
     protected function checkStore($storeName)
     {
         if (!IoHelper::checkFolder($this->storePath)) {
@@ -531,7 +542,7 @@ class Store
             throw new InvalidArgumentException("No documents to update.");
         }
 
-        if (!array_key_exists($this->primaryKey, $data))  {
+        if (!array_key_exists($this->primaryKey, $data)) {
             throw new InvalidArgumentException("Documents have to have the primary key \"$this->primaryKey\".");
         }
 
@@ -1301,9 +1312,19 @@ class Store
         if (!isset($data['id']) && count($this->uniqueFields) > 0) {
             $criteria = [];
 
+            $storeSchemaProperties = $this->getStoreSchema()['properties'];
+
             foreach ($this->uniqueFields as $uniqueField) {
                 if (isset($data[$uniqueField])) {
-                    array_push($criteria, [$uniqueField, '=', $data[$uniqueField]]);
+                    if (isset($storeSchemaProperties[$uniqueField]['type'])) {
+                        if ($storeSchemaProperties[$uniqueField]['type'] === 'integer') {
+                            array_push($criteria, [$uniqueField, '=', (int) $data[$uniqueField]]);
+                        } else if ($storeSchemaProperties[$uniqueField]['type'] === 'boolean') {
+                            array_push($criteria, [$uniqueField, '=', (bool) $data[$uniqueField]]);
+                        } else {
+                            array_push($criteria, [$uniqueField, '=', $data[$uniqueField]]);
+                        }
+                    }
                 }
             }
 

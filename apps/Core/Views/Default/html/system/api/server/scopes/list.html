@@ -1,0 +1,53 @@
+{% set canAddButton = null %}
+{% if canAdd %}
+{% set canAddButton = {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'add-business' : {
+                            'title'                   : 'Add New Scope',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'plus',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/api/server/scopes/q/id/0')
+                        }
+                    }
+            }
+%}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'             : table['component'],
+        'componentName'         : componentName,
+        'componentId'           : componentId,
+        'parentComponentId'     : parent,
+        'sectionId'             : 'listing',
+        'contentType'           : 'sectionWithListing',
+        'cardHeader'            : true,
+        'cardType'              : 'primary',
+        'cardIcon'              : 'sitemap',
+        'cardTitle'             : componentName,
+        'cardAdditionalClass'   : 'rounded-0',
+        'cardShowTools'         : ['maximize'],
+        'dtFilter'              : true,
+        'dtFilters'             : table['filters'],
+        'dtFilterColumns'       : table['filterColumns'],
+        'dtFixedHeader'         : true,
+        'dtPrimaryButtons'      : canAddButton,
+        'dtTable'               : table,
+        'dtColumns'             : table['columns'],
+        'dtPostUrl'             : table['postUrl'],
+        'dtPostUrlParams'       : table['postUrlParams'],
+        'dtStriped'             : true,
+        'dtStateSave'           : false,
+        'dtBordered'            : false,
+        'dtHideIdColumn'        : true,
+        'dtNoOfColumnsToShow'   : 6,
+        'dtTableCompact'        : true,
+        'dtZeroRecords'         : 'No scopes data available. Add scope by clicking the Add new scope button.'
+    ]
+)}}

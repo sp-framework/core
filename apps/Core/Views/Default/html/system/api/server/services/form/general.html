@@ -1,0 +1,100 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'client_id_length',
+                'fieldLabel'                            : 'Client ID Length',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Enter client ID length to be generated.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : apiClientIdLengthDisabled,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : 8,
+                'fieldDataInputMaxNumber'               : 32,
+                'fieldDataInputMaxLength'               : 2,
+                'fieldValue'                            : apiClientIdLength
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'client_secret_length',
+                'fieldLabel'                            : 'Client Secret Length',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Enter client Secret length to be generated.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : apiClientSecretLengthDisabled,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : 8,
+                'fieldDataInputMaxNumber'               : 32,
+                'fieldDataInputMaxLength'               : 2,
+                'fieldValue'                            : apiClientSecretLength
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'access_token_timeout',
+                'fieldLabel'                            : 'API Access Token Timeout',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Enter timeout for access token in php dateinterval duration format. Example: P1M10D means 1 month and 10 days. PT1H30M means 1 Hour and 30 mins. See php DateInterval for documentation on format. Default is PT1H (1 Hour)',
+                'fieldDisabled'                         : apiAccessTokenTimeoutDisabled,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMaxLength'               : 30,
+                'fieldValue'                            : apiAccessTokenTimeout
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'refresh_token_timeout',
+                'fieldLabel'                            : 'API Refresh Token Timeout',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Enter timeout for access token in php dateinterval duration format. Example: P1M10D means 1 month and 10 days. PT1H30M means 1 Hour and 30 mins. See php DateInterval for documentation on format. Default is P1M (1 Month)',
+                'fieldBazScan'                          : true,
+                'fieldDisabled'                         : apiRefreshTokenTimeoutDisabled,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMaxLength'               : 30,
+                'fieldValue'                            : apiRefreshTokenTimeout
+            ]
+        )}}
+    </div>
+</div>

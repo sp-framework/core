@@ -3,10 +3,10 @@
 namespace System\Base\Providers\AppsServiceProvider;
 
 use System\Base\BasePackage;
-use System\Base\Providers\AppsServiceProvider\Types;
 use System\Base\Providers\AppsServiceProvider\Exceptions\AppNotFoundException;
 use System\Base\Providers\AppsServiceProvider\IpFilter;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderApps;
+use System\Base\Providers\AppsServiceProvider\Types;
 
 class Apps extends BasePackage
 {
@@ -25,6 +25,8 @@ class Apps extends BasePackage
 	protected $reservedRoutes;
 
 	protected $appInfo = null;
+
+	public $isMurl = false;
 
 	public function init(bool $resetCache = false)
 	{
@@ -79,7 +81,51 @@ class Apps extends BasePackage
 			) {
 				return $this->getAppById($domain['default_app_id'])['route'];
 			}
-			return explode('/', $uri[0])[1];
+
+			$uri = explode("/", trim($uri[0], '/'));
+
+			if ($this->api->isApi()) {
+				$apiUri = $uri;
+				if ($apiUri[0] === 'api') {
+					unset($apiUri[0]);
+				}
+
+				$apiUri = array_values($apiUri);
+
+				if ($this->api->isApiCheckVia === 'pub') {
+					if (isset($apiUri[0]) &&
+						$apiUri[0] === 'pub'
+					) {
+						unset($apiUri[0]);
+					}
+				}
+
+				$apiUri = array_values($apiUri);
+			}
+
+			if ((isset($apiUri) && count($apiUri) === 1) ||
+				count($uri) === 1
+			) {//Check for Murl
+				if (isset($apiUri)) {
+					$this->isMurl = $this->basepackages->murls->getMurlByDomainId($this, trim($apiUri[0], '/'), $domain['id']);
+				} else {
+					$this->isMurl = $this->basepackages->murls->getMurlByDomainId($this, trim($uri[0], '/'), $domain['id']);
+				}
+
+				if ($this->isMurl) {
+					return $this->getAppById($this->isMurl['app_id'])['route'];
+				}
+			}
+
+			if ($uri[0] === 'api' && $uri[1] === 'pub') {
+				return $uri[2];
+			} else if ($uri[0] === 'api') {
+				return $uri[1];
+			} else if ($uri[0] === 'pub') {
+				return $uri[1];
+			}
+
+			return $uri[0];
 		}
 	}
 
@@ -194,12 +240,11 @@ class Apps extends BasePackage
 				}
 
 				$domain['apps'][$data['id']]['allowed'] = true;
+				$domain['apps'][$data['id']]['api'] = false;
 				$domain['apps'][$data['id']]['view'] = $data['view'];
 				$domain['apps'][$data['id']]['email_service'] = $data['email'];
 				$domain['apps'][$data['id']]['publicStorage'] = $data['public'];
 				$domain['apps'][$data['id']]['privateStorage'] = $data['private'];
-
-				$this->domains->updateDomain($domain);
 
 				//add new viewsettings
 				$viewSettingsData = [];
@@ -208,6 +253,7 @@ class Apps extends BasePackage
 				$viewSettingsData['app_id'] = $data['id'];
 				$viewSettingsData['via_app'] = true;
 
+				$this->domains->updateDomain($domain);
 				$this->modules->viewsSettings->addViewsSettings($viewSettingsData);
 			}
 
@@ -320,7 +366,7 @@ class Apps extends BasePackage
 	public function removeApp(array $data)
 	{
 		if ($data['id'] == 1) {
-			$this->addResponse('Cannot remove Admin App. Error removing app.', 1);
+			$this->addResponse('Cannot remove core app!', 1);
 
 			return false;
 		}
@@ -344,7 +390,7 @@ class Apps extends BasePackage
 	{
 		return
 			[
-				'core', 'dash', 'api', 'pusher', 'messenger'
+				'core', 'dash', 'api', 'pub', 'pusher', 'messenger'
 			];
 	}
 

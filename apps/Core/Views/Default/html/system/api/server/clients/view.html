@@ -1,0 +1,44 @@
+{% if client['id'] is defined %}
+    {% set id = client['id'] %}
+    {% set clientId = client['client_id'] %}
+    {% set title = 'Client (' ~ client['client_id'] ~ ')' %}
+{% else %}
+    {% set id = '' %}
+    {% set clientId = '' %}
+    {% set title = 'New Client' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'sitemap',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'clients/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : id,
+            'addActionUrl'                  : 'system/api/server/clients/add',
+            'addSuccessRedirectUrl'         : 'system/api/server/clients',
+            'updateActionUrl'               : 'system/api/server/clients/update',
+            'updateSuccessRedirectUrl'      : 'system/api/server/clients',
+            'cancelActionUrl'               : 'system/api/server/clients',
+            'closeActionUrl'                : 'system/api/server/clients'
+        ],
+        'dataDependencies'              :
+        [
+            [
+                'componentName'      : 'Api Services with grant type password (with client key generation allowed disabled) Or grant type client credentials',
+                'componentVar'       : availableAPIServices,
+                'componentRoute'     : 'system/api/server/services/q/id/0'
+            ]
+        ]
+    ]
+)}}

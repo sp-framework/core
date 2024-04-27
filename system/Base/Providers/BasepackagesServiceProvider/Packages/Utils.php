@@ -10,6 +10,10 @@ use ZxcvbnPhp\Zxcvbn;
 
 class Utils extends BasePackage
 {
+    protected $microtime = 0;
+
+    protected $microTimers = [];
+
     public function init($container = null)
     {
         if ($container) {
@@ -459,5 +463,26 @@ class Utils extends BasePackage
         $this->addResponse('Success', 0, ['json' => $data['json']]);
 
         return $data['json'];
+    }
+
+    public function setMicroTimer($reference)
+    {
+        $microtime['reference'] = $reference;
+
+        if ($this->microtime === 0) {
+            $microtime['difference'] = '-';
+            $this->microtime = microtime(true);
+        } else {
+            $now = microtime(true);
+            $microtime['difference'] = $now - $this->microtime;
+            $this->microtime = $now;
+        }
+
+        array_push($this->microTimers, $microtime);
+    }
+
+    public function getMicroTimer()
+    {
+        return $this->microTimers;
     }
 }

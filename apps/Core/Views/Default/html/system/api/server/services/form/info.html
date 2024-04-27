@@ -1,0 +1,274 @@
+{% set authoCodeGrantHidden = 'hidden' %}
+{% set clientCredentialsGrantHidden = 'hidden' %}
+{% set reGenerateHidden = true %}
+{% set generateHidden = false %}
+{% set apiRefreshTokenTimeoutDisabled = false %}
+{% if api['id'] is defined %}
+    {% set apiId = api['id'] %}
+    {% set apiName = api['name'] %}
+    {% set apiStatus = api['status'] %}
+    {% set apiIsPublic = api['is_public'] %}
+    {% set apiClientKeysGenerationAllowed = api['client_keys_generation_allowed'] %}
+    {% set apiRegistrationAllowed = api['registration_allowed'] %}
+    {% set apiDescription = api['description'] %}
+    {% set apiClientIdLength = api['client_id_length'] %}
+    {% set apiClientSecretLength = api['client_secret_length'] %}
+    {% set apiGrantType = api['grant_type'] %}
+    {% set apiCCMaxDevices = api['cc_max_devices'] %}
+    {% set apiAuthorizationTosPp = api['authorization_tos_pp'] %}
+    {% set apiClientId = api['client_id'] %}
+    {% set apiClientSecret = api['client_secret'] %}
+    {% set apiRedirectUrl = api['redirect_url'] %}
+    {% set apiRequestUrl = api['request_url'] %}
+    {% set apiPrivateKey = api['private_key'] %}
+    {% set apiAccessTokenTimeout = api['access_token_timeout'] %}
+    {% set apiRefreshTokenTimeout = api['refresh_token_timeout'] %}
+    {% set apiScope = api['scope_id'] %}
+    {% set apiAppId = api['app_id'] %}
+    {% set apiDomainId = api['domain_id'] %}
+    {% set apiConcurrentCallsLimit = api['concurrent_calls_limit'] %}
+    {% set apiPerMinuteCallsLimit = api['per_minute_calls_limit'] %}
+    {% set apiPerHourCallsLimit = api['per_hour_calls_limit'] %}
+    {% set apiPerDayCallsLimit = api['per_day_calls_limit'] %}
+{% else %}
+    {% set apiId = '' %}
+    {% set apiName = '' %}
+    {% set apiStatus = '' %}
+    {% set apiIsPublic = '' %}
+    {% set apiClientKeysGenerationAllowed = '' %}
+    {% set apiRegistrationAllowed = '' %}
+    {% set apiDescription = '' %}
+    {% set apiClientIdLength = '8' %}
+    {% set apiClientSecretLength = '32' %}
+    {% set apiGrantType = '' %}
+    {% set apiCCMaxDevices = '' %}
+    {% set apiAuthorizationTosPp = '' %}
+    {% set apiClientId = '' %}
+    {% set apiClientSecret = '' %}
+    {% set apiRedirectUrl = '' %}
+    {% set apiRequestUrl = '' %}
+    {% set apiPrivateKey = '' %}
+    {% set apiAccessTokenTimeout = 'PT1H' %}
+    {% set apiRefreshTokenTimeout = 'P1M' %}
+    {% set apiScope = '' %}
+    {% set apiAppId = '' %}
+    {% set apiDomainId = '' %}
+    {% set apiConcurrentCallsLimit = '' %}
+    {% set apiPerMinuteCallsLimit = '' %}
+    {% set apiPerHourCallsLimit = '' %}
+    {% set apiPerDayCallsLimit = '' %}
+{% endif %}
+{% set apiStatusChecked = false %}
+{% set apiIsPublicChecked = false %}
+{% set apiRegistrationAllowedChecked = false %}
+{% set apiClientKeysGenerationAllowedChecked = false %}
+{% set apiRegistrationAllowedDisabled = false %}
+{% set apiClientKeysGenerationAllowedDisabled = false %}
+{% set apiGrantDisabled = false %}
+{% set apiClientIdLengthDisabled = false %}
+{% set apiClientSecretLengthDisabled = false %}
+{% set apiAccessTokenTimeoutDisabled = false %}
+{% set apiRefreshTokenTimeoutDisabled = false %}
+{% set apiPkiKeySizeDisabled = false %}
+{% set apiPkiAlgorithmDisabled = false %}
+{% set apiEncryptionKeySizeDisabled = false %}
+{% if apiStatus == '1' %}
+    {% set apiStatusChecked = true %}
+{% endif %}
+{% if apiClientKeysGenerationAllowed == '1' %}
+    {% set apiClientKeysGenerationAllowedChecked = true %}
+{% endif %}
+{% if apiRegistrationAllowed == '1' %}
+    {% set apiRegistrationAllowedChecked = true %}
+{% endif %}
+{% if apiIsPublic == '1' %}
+    {% set apiIsPublicChecked = true %}
+    {% set apiClientKeysGenerationAllowedChecked = false %}
+    {% set apiClientKeysGenerationAllowedDisabled = true %}
+    {% set apiRegistrationAllowedChecked = false %}
+    {% set apiRegistrationAllowedDisabled = true %}
+    {% set apiGrantType = '0' %}
+    {% set apiGrantDisabled = true %}
+    {% set apiClientIdLengthDisabled = true %}
+    {% set apiClientSecretLengthDisabled = true %}
+    {% set apiAccessTokenTimeoutDisabled = true %}
+    {% set apiRefreshTokenTimeoutDisabled = true %}
+    {% set apiPkiKeySizeDisabled = true %}
+    {% set apiPkiAlgorithmDisabled = true %}
+    {% set apiEncryptionKeySizeDisabled = true %}
+{% endif %}
+{% if apiGrantType === 'client_credentials' %}
+    {% set apiRefreshTokenTimeoutDisabled = true %}
+    {% set clientCredentialsGrantHidden = '' %}
+{% endif %}
+{% if apiGrantType === 'authorization_code' %}
+    {% set authoCodeGrantHidden = '' %}
+    {% set reGenerateHidden = false %}
+    {% set generateHidden = true %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'id',
+                'fieldLabel'                     : 'Api ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Api ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : apiId
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'status',
+                'fieldLabel'                     : 'Enabled?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Check to enable api.',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : apiStatusChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'is_public',
+                'fieldLabel'                     : 'Is Public API?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Check if api is public api.',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : apiIsPublicChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'client_keys_generation_allowed',
+                'fieldLabel'                     : 'Allow Client Keys Generation?',
+                'fieldType'                      : 'checkbox',
+                'fieldHelp'                      : true,
+                'fieldDisabled'                  : apiClientKeysGenerationAllowedDisabled,
+                'fieldHelpTooltipContent'        : 'Allow users to register for API on this App.',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : apiClientKeysGenerationAllowedChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'registration_allowed',
+                'fieldLabel'                     : 'Allow API Registration?',
+                'fieldType'                      : 'checkbox',
+                'fieldHelp'                      : true,
+                'fieldDisabled'                  : apiRegistrationAllowedDisabled,
+                'fieldHelpTooltipContent'        : 'Allow users to register for API on this App.',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : apiRegistrationAllowed,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'name',
+                'fieldLabel'                     : 'Api Name',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Api Name Example: Core App Api',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : apiName
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'description',
+                'fieldLabel'                     : 'Api Description',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 1024,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Description of the api',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 1024,
+                'fieldTextareaRows'              : 2,
+                'fieldValue'                     : apiDescription
+            ]
+        )}}
+    </div>
+</div>

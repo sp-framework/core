@@ -34,6 +34,12 @@ class ViewsSettings extends BasePackage
             return false;
         }
 
+        if ($this->getViewsSettingsByViewIdDomainIdAndAppId($data['view_id'], $data['domain_id'], $data['app_id'])) {
+            $this->addResponse('Settings already exits!', 1);
+
+            return false;
+        }
+
         $data['settings'] = $this->mergeViewsSettings($data, $view);
 
         if (!$this->basepackages->utils->validateJson(['json' => $data['settings']])) {
@@ -102,7 +108,9 @@ class ViewsSettings extends BasePackage
             $view['settings'] = $this->helper->decode($view['settings'], true);
         }
 
-        if (isset($data['via_app']) && $data['via_app'] === true) {
+        if ((isset($data['via_app']) && $data['via_app'] === true) ||
+            isset($data['via_domain']) && $data['via_domain'] === true
+        ) {
             $data['settings'] = $view['settings'];
 
             $data['settings'] = $this->helper->encode($data['settings']);

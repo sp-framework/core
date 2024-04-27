@@ -1,0 +1,27 @@
+{
+    "name"          : "ApiServerClients",
+    "display_name"  : "Api Server Clients Package",
+    "description"   : "Package for managing system api server clients",
+    "module_type"   : "packages",
+    "app_type"      : "core",
+    "category"      : "providers",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\ApiServiceProvider\\Clients",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "settings"      : {
+        "componentRoute":"system/api/server/clients",
+        "revokeClientsAfterXDaysOfInactivity" : 30
+    }
+}

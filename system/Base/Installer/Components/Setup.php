@@ -434,6 +434,8 @@ Class Setup
 
 				// $this->setupPackage->removeInstaller();
 
+				$this->setupPackage->cleanOldAPIKeys();
+
 				$this->setupPackage->cleanVar();
 
 				$this->setupPackage->cleanOldBackups();

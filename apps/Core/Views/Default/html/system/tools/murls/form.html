@@ -1,0 +1,538 @@
+{% if murl['id'] is defined %}
+    {% set murlId = murl['id'] %}
+    {% set murlApiId = murl['api_id'] %}
+    {% set murlAppId = murl['app_id'] %}
+    {% set murlDomainId = murl['domain_id'] %}
+    {% set murlUrl = murl['url'] %}
+    {% set murlMrul = murl['murl'] %}
+    {% set murlValidTill = murl['valid_till'] %}
+{% else %}
+    {% set murlId = '' %}
+    {% set murlApiId = '' %}
+    {% set murlAppId = '' %}
+    {% set murlDomainId = '' %}
+    {% set murlUrl = '' %}
+    {% set murlMrul = '' %}
+    {% set murlValidTill = '' %}
+{% endif %}
+{% set appDisabled = false %}
+{% set domainDisabled = false %}
+{% if murlApiId !== '' and murlApiId !== null and murlApiId != 0 %}
+    {% set appDisabled = true %}
+    {% set domainDisabled = true %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Murl ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Murl ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : murlId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'api_id',
+                        'fieldLabel'                            : 'API',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Select API.',
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : apiServices,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : murlApiId
+                    ]
+                )}}
+            </div>
+            <div class="col border-left">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'app_id',
+                        'fieldLabel'                            : 'APP',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Select App.',
+                        'fieldBazScan'                          : true,
+                        'fieldRequired'                         : true,
+                        'fieldDisabled'                         : appDisabled,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : apps,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : murlAppId
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'domain_id',
+                        'fieldLabel'                            : 'Domain',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Select Domain.',
+                        'fieldBazScan'                          : true,
+                        'fieldRequired'                         : true,
+                        'fieldDisabled'                         : domainDisabled,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : domains,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : murlDomainId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'url',
+                        'fieldLabel'                     : 'URL (Route)',
+                        'fieldType'                      : 'textarea',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Provide original URL (without domain and app route) that you want to conver to mURL.',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMaxLength'        : 2048,
+                        'fieldTextareaRows'              : 2,
+                        'fieldValue'                     : murlUrl
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'murl',
+                        'fieldLabel'                     : 'Mini URL',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Enter mini URL or generate random characters or human readable version of it.',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : murlMrul
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'valid_till',
+                        'fieldLabel'                            : 'Valid Till',
+                        'fieldType'                             : 'flatpickr',
+                        'fieldFlatpickrClearButton'             : true,
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Valid Till',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldValue'                            : murlValidTill
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'generator',
+                        'fieldLabel'                            : 'Murl Generator',
+                        'fieldLabelLegend'                      : true,
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'html',
+                        'fieldBazScan'                          : false,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldHtmlContent'                      : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'generator_type',
+                        'fieldLabel'                     : 'Generator Type',
+                        'fieldType'                      : 'radio',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select either random generator or dictionary genrator.',
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldBazScan'                   : true,
+                        'fieldRadioButtons'              :
+                            [
+                                'random' :
+                                    [
+                                        'title'                           : 'RANDOM',
+                                        'type'                            : 'primary',
+                                        'dataValue'                       : 'random'
+                                    ],
+                                'dictionary' :
+                                    [
+                                        'title'                           : 'DICTIONARY',
+                                        'type'                            : 'primary',
+                                        'dataValue'                       : 'dictionary'
+                                    ]
+                            ],
+                        'fieldRadioChecked'              : 'random'
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'random_characters_length',
+                                'fieldLabel'                            : 'Random Characters Length',
+                                'fieldType'                             : 'input',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Length of Murl using random characters.',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldBazScan'                          : true,
+                                'fieldRequired'                         : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : false,
+                                'fieldDataInputMinNumber'               : 4,
+                                'fieldDataInputMaxNumber'               : 50,
+                                'fieldDataInputMaxLength'               : 2,
+                                'fieldValue'                            : '4'
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'dictionary_word_separator',
+                                'fieldLabel'                     : 'Word Separator',
+                                'fieldType'                      : 'radio',
+                                'fieldDisabled'                  : true,
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Select either dash or underscore.',
+                                'fieldRequired'                  : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : false,
+                                'fieldBazScan'                   : true,
+                                'fieldRadioButtons'              :
+                                    [
+                                        'dash' :
+                                            [
+                                                'title'                           : 'DASH ( - )',
+                                                'type'                            : 'primary',
+                                                'dataValue'                       : 'dash'
+                                            ],
+                                        'underscore' :
+                                            [
+                                                'title'                           : 'UNDERSCORE ( _ )',
+                                                'type'                            : 'primary',
+                                                'dataValue'                       : 'underscore'
+                                            ]
+                                    ],
+                                'fieldRadioChecked'              : 'dash'
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col">
+                                {{adminltetags.useTag('fields',
+                                    [
+                                        'component'                             : component,
+                                        'componentName'                         : componentName,
+                                        'componentId'                           : componentId,
+                                        'sectionId'                             : sectionId,
+                                        'fieldId'                               : 'dictionary_words_amount',
+                                        'fieldLabel'                            : 'Number of dictionary words to use',
+                                        'fieldType'                             : 'input',
+                                        'fieldHelp'                             : true,
+                                        'fieldDisabled'                         : true,
+                                        'fieldHelpTooltipContent'               : 'Number of dictionary words to use to generate murl.',
+                                        'fieldInputTypeTextFilter'              : 'positiveInt',
+                                        'fieldBazScan'                          : true,
+                                        'fieldRequired'                         : true,
+                                        'fieldBazJstreeSearch'                  : true,
+                                        'fieldBazPostOnCreate'                  : false,
+                                        'fieldBazPostOnUpdate'                  : false,
+                                        'fieldDataInputMinNumber'               : 1,
+                                        'fieldDataInputMaxNumber'               : 5,
+                                        'fieldDataInputMaxLength'               : 1,
+                                        'fieldValue'                            : '1'
+                                    ]
+                                )}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                {{adminltetags.useTag('fields',
+                                    [
+                                        'component'                             : component,
+                                        'componentName'                         : componentName,
+                                        'componentId'                           : componentId,
+                                        'sectionId'                             : sectionId,
+                                        'fieldId'                               : 'dictionary_word_length',
+                                        'fieldLabel'                            : 'Length of each word',
+                                        'fieldType'                             : 'input',
+                                        'fieldHelp'                             : true,
+                                        'fieldDisabled'                         : true,
+                                        'fieldHelpTooltipContent'               : 'Length of dictionary word to use to generate murl.',
+                                        'fieldInputTypeTextFilter'              : 'positiveInt',
+                                        'fieldBazScan'                          : true,
+                                        'fieldRequired'                         : true,
+                                        'fieldBazJstreeSearch'                  : true,
+                                        'fieldBazPostOnCreate'                  : false,
+                                        'fieldBazPostOnUpdate'                  : false,
+                                        'fieldDataInputMinNumber'               : 1,
+                                        'fieldDataInputMaxNumber'               : 15,
+                                        'fieldDataInputMaxLength'               : 2,
+                                        'fieldValue'                            : '3'
+                                    ]
+                                )}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-center">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'component'                 : component,
+                        'componentName'             : componentName,
+                        'componentId'               : componentId,
+                        'sectionId'                 : sectionId,
+                        'buttonType'                : 'button',
+                        'buttons'                   :
+                            {
+                                'generate-murl'   : {
+                                    'title'                   : 'Generate Murl',
+                                    'size'                    : 'sm',
+                                    'type'                    : 'primary',
+                                    'icon'                    : 'cog fa-spin',
+                                    'iconHidden'              : true
+                                }
+                            }
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals PNotify Swal */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                          : { },
+        '{{componentId}}-{{sectionId}}-api_id'                                      : {
+            'placeholder'   : 'SELECT API',
+            'allowClear'    : true,
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function (e) {
+                    $('#{{componentId}}-{{sectionId}}-app_id, #{{componentId}}-{{sectionId}}-domain_id').val(0).trigger('change');
+                    $('#{{componentId}}-{{sectionId}}-app_id, #{{componentId}}-{{sectionId}}-domain_id').attr('disabled', true);
+                });
+                $('#{{componentId}}-{{sectionId}}-api_id').on('select2:clear', function (e) {
+                    $('#{{componentId}}-{{sectionId}}-app_id, #{{componentId}}-{{sectionId}}-domain_id').attr('disabled', false);
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-app_id'                                      : {
+            'placeholder'   : 'SELECT APP'
+        },
+        '{{componentId}}-{{sectionId}}-domain_id'                                   : {
+            'placeholder'   : 'SELECT DOMAIN'
+        },
+        '{{componentId}}-{{sectionId}}-url'                                         : { },
+        '{{componentId}}-{{sectionId}}-generator_type'                              : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generator_type').change(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') === 'random') {
+                        $('#{{componentId}}-{{sectionId}}-random_characters_length').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-dictionary_word_separator').find('input[type=radio]').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-dictionary_words_amount, #{{componentId}}-{{sectionId}}-dictionary_word_length').attr('disabled', true);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') === 'dictionary') {
+                        $('#{{componentId}}-{{sectionId}}-random_characters_length').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-dictionary_words_amount, #{{componentId}}-{{sectionId}}-dictionary_word_length').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-dictionary_word_separator').find('input[type=radio]').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-random_characters_length'                    : { },
+        '{{componentId}}-{{sectionId}}-dictionary_word_separator'                   : { },
+        '{{componentId}}-{{sectionId}}-dictionary_words_amount'                     : { },
+        '{{componentId}}-{{sectionId}}-dictionary_word_length'                      : { },
+        '{{componentId}}-{{sectionId}}-murl'                                        : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-murl').click(function(e) {
+                    e.preventDefault();
+
+                    var dataToSend = { };
+                    dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+                    dataToSend['generator_type'] = $('#{{componentId}}-{{sectionId}}-generator_type').find('input[type=radio]:checked').data('value');
+                    if (dataToSend['generator_type'] === 'random') {
+                        dataToSend['random_characters_length'] = $('#{{componentId}}-{{sectionId}}-random_characters_length').val();
+                    } else if (dataToSend['generator_type'] === 'dictionary') {
+                        dataToSend['dictionary_word_separator'] = $('#{{componentId}}-{{sectionId}}-dictionary_word_separator').find('input[type=radio]:checked').data('value');
+                        dataToSend['dictionary_words_amount'] = $('#{{componentId}}-{{sectionId}}-dictionary_words_amount').val();
+                        dataToSend['dictionary_word_length'] = $('#{{componentId}}-{{sectionId}}-dictionary_word_length').val();
+                    }
+
+                    $.ajax({
+                        url         : '{{links.url("system/tools/murls/generateMurl")}}',
+                        method      : 'post',
+                        dataType    : 'json',
+                        data        : dataToSend,
+                        success     : function(response) {
+                            if (response.responseCode === 0) {
+                                PNotify.success({title : response.responseMessage});
+                                if (response.responseData && response.responseData.murl) {
+                                    $('#{{componentId}}-{{sectionId}}-murl').val(response.responseData.murl);
+                                }
+                            } else {
+                                PNotify.error({title : response.responseMessage});
+                            }
+
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+                        }
+                    });
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-valid_till'                                  : {
+            enableTime          : true,
+            time_24hr           : true,
+            dateFormat          : "Y-m-d H:i:s",
+            altFormat           : "Y-m-d H:i:s",
+            minuteIncrement     : 1
+        },
+        '{{componentId}}-{{sectionId}}-form'                                        : {
+            ignore      : ':submit, :reset, :image, :disabled, .ignore, :hidden',
+            rules       : {
+                '{{componentId}}-{{sectionId}}-app_id'                          : 'required',
+                '{{componentId}}-{{sectionId}}-domain_id'                       : 'required',
+                '{{componentId}}-{{sectionId}}-url'                             : 'required',
+                '{{componentId}}-{{sectionId}}-murl'                            : 'required'
+            },
+            messages    : {
+                '{{componentId}}-{{sectionId}}-app_id'                          : 'Please select App',
+                '{{componentId}}-{{sectionId}}-domain_id'                       : 'Please select Domain',
+                '{{componentId}}-{{sectionId}}-url'                             : 'Please enter original URL',
+                '{{componentId}}-{{sectionId}}-murl'                            : 'Please enter mini URL'
+            }
+        }
+    });
+</script>

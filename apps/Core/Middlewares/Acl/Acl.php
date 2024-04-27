@@ -29,8 +29,17 @@ class Acl extends BaseMiddleware
 
     protected $found = false;
 
+    protected $isApi = false;
+
+    protected $isApiPublic = false;
+
     public function process($data)
     {
+        $this->isApi = $this->api->isApi();
+        if ($this->api->isApiCheckVia && $this->api->isApiCheckVia === 'pub') {
+            $this->isApiPublic = true;
+        }
+
         $this->actions =
             ['view', 'add', 'update', 'remove', 'msview', 'msupdate'];
 
@@ -49,20 +58,34 @@ class Acl extends BaseMiddleware
             return true;
         }
 
-        if ($this->auth->account()) {
+        if ($this->isApi) {
+            $this->role = $this->api->getScope();
+        } else {
             $this->account = $this->auth->account();
+        }
 
+        if ($this->account) {
             $this->accountPermissions = $this->helper->decode($this->account['security']['permissions'], true);
 
             //System Admin bypasses the ACL if they don't have any permissions defined.
-            if ($this->account['id'] === '1' &&
-                $this->account['security']['role_id'] === '1' &&
+            if ($this->account['id'] == '1' &&
+                $this->account['security']['role_id'] == '1' &&
                 count($this->accountPermissions) === 0
             ) {
                 return;
             }
 
-            if ($this->account['security']['override_role'] === '1') {
+            $this->role = $roles[$this->account['security']['role_id']];
+
+            if (is_string($this->role['permissions'])) {
+                $this->role['permissions'] = $this->helper->decode($this->role['permissions'], true);
+            }
+
+            if ($this->account['security']['override_role'] == '1') {
+                if (count($this->accountPermissions) === 0) {
+                    throw new PermissionDeniedException();
+                }
+
                 $this->accountEmail = str_replace('.', '', str_replace('@', '', $this->account['email']));
 
                 if ($this->localContent->fileExists($aclFileDir . $this->accountEmail . $this->account['id'])) {
@@ -72,8 +95,6 @@ class Acl extends BaseMiddleware
                     $this->acl->addRole(
                         new Role($this->accountEmail, 'User Override Role')
                     );
-
-                    $permissions = $this->helper->decode($this->account['permissions'], true);
 
                     $this->generateComponentsArr();
 
@@ -98,11 +119,13 @@ class Acl extends BaseMiddleware
                 }
 
                 return;
-            } else {
-                $this->role = $roles[$this->account['security']['role_id']];
+            } else if (count($this->role['permissions']) === 0) {
+                throw new PermissionDeniedException();
             }
         } else {
-            $this->role = $roles[$this->app['guest_role_id']];
+            if (!$this->role) {
+                $this->role = $roles[$this->app['guest_role_id']];
+            }
         }
 
         $this->roleName = strtolower(str_replace(' ', '', $this->role['name']));
@@ -124,17 +147,22 @@ class Acl extends BaseMiddleware
                 new Role($this->roleName, $this->role['description'])
             );
 
-            $this->rolePermissions = $this->helper->decode($this->role['permissions'], true);
-
+            if (is_string($this->role['permissions'])) {
+                $this->rolePermissions = $this->helper->decode($this->role['permissions'], true);
+            } else {
+                $this->rolePermissions = $this->role['permissions'];
+            }
             foreach ($this->rolePermissions as $appKey => $app) {
                 foreach ($app as $componentKey => $permission) {
                     if ($this->app['id'] == $appKey) {
-                        if ($this->components[$componentKey]['route'] === $this->controllerRoute &&
-                            $this->helper->has($this->components[$componentKey]['acls'], $this->action)
-                        ) {
-                            $this->found = true;
-                            $this->buildAndTestAcl($this->roleName, $componentKey, $permission);
-                            break 2;
+                        if ($this->components[$componentKey]['route'] === $this->controllerRoute) {
+                            if (($this->isApi && $this->helper->has($this->components[$componentKey]['api_acls'], $this->action)) ||
+                                (!$this->isApi && $this->helper->has($this->components[$componentKey]['acls'], $this->action))
+                            ) {
+                                $this->found = true;
+                                $this->buildAndTestAcl($this->roleName, $componentKey, $permission);
+                                break 2;
+                            }
                         }
                     }
                 }
@@ -156,38 +184,53 @@ class Acl extends BaseMiddleware
 
     protected function setControllerAndAction()
     {
-        $controllerName = $this->dispatcher->getControllerName();
+        if ($this->isApi) {
+            $controllerName = $this->router->getControllerName();
+        } else {
+            $controllerName = $this->dispatcher->getControllerName();
+        }
 
         $component =
             $this->modules->components->getComponentByNameForAppId(
                 $controllerName,
                 $this->app['id']
             );
-
         if (!$component) {
-            $url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
+            if ($this->apps->isMurl) {
+                $url = explode('/', trim(explode('/q/', $this->apps->isMurl['url'])[0], '/'));
+            } else {
+                $url = explode('/', trim(explode('/q/', $this->request->getUri())[0], '/'));
+            }
 
             if ($this->request->isPost()) {
                 unset($url[$this->helper->lastKey($url)]);
             }
 
             if (isset($this->domains->domain['exclusive_to_default_app']) &&
-                $this->domains->domain['exclusive_to_default_app'] == 0
+                $this->domains->domain['exclusive_to_default_app'] == 0 &&
+                $url[0] === $this->apps->getAppInfo()['route']
             ) {
                 unset($url[0]);
             }
 
             $componentRoute = implode('/', $url);
-
             $component =
                 $this->modules->components->getComponentByRouteForAppId(
                     strtolower($componentRoute), $this->app['id']
                 );
+
+            if (!$component) {
+                return false;
+            }
         }
 
         $this->controllerRoute = $component['route'];
 
-        $action = strtolower(str_replace('Action', '', $this->dispatcher->getActiveMethod()));
+        if ($this->isApi) {
+            $action = $this->router->getActionName();
+        } else {
+            $action = strtolower(str_replace('Action', '', $this->dispatcher->getActiveMethod()));
+        }
 
         if (!in_array($action, $this->actions)) {
             return false;
@@ -203,6 +246,9 @@ class Acl extends BaseMiddleware
         $componentRoute = $this->components[$componentKey]['route'];
         $componentDescription = $this->components[$componentKey]['description'];
         $componentAcls = $this->components[$componentKey]['acls'];
+        if ($this->isApi && isset($this->components[$componentKey]['api_acls'])) {
+            $componentAcls = $this->components[$componentKey]['api_acls'];
+        }
 
         $this->acl->addComponent(
             new Component($componentRoute, $componentDescription), $componentAcls
@@ -255,14 +301,20 @@ class Acl extends BaseMiddleware
                 $reflector = $this->annotations->get($component['class']);
                 $methods = $reflector->getMethodsAnnotations();
 
-                if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
-                    $this->components[$component['id']]['name'] = strtolower($component['name']);
-                    $this->components[$component['id']]['route'] = strtolower($component['route']);
-                    $this->components[$component['id']]['description'] = $component['description'];
-                    foreach ($methods as $annotation) {
-                        $action = $annotation->getAll('acl')[0]->getArguments();
-                        $acls[$action['name']] = $action['name'];
-                        $this->components[$component['id']]['acls'][$action['name']] = $action['name'];
+                if ($methods && count($methods) > 2) {
+                    if (isset($methods['viewAction'])) {
+                        $this->components[$component['id']]['name'] = strtolower($component['name']);
+                        $this->components[$component['id']]['route'] = strtolower($component['route']);
+                        $this->components[$component['id']]['description'] = $component['description'];
+                        foreach ($methods as $annotation) {
+                            if ($annotation->getAll('acl')) {
+                                $action = $annotation->getAll('acl')[0]->getArguments();
+                                $this->components[$component['id']]['acls'][$action['name']] = $action['name'];
+                            } else if ($annotation->getAll('api_acl')) {
+                                $action = $annotation->getAll('api_acl')[0]->getArguments();
+                                $this->components[$component['id']]['api_acls'][$action['name']] = $action['name'];
+                            }
+                        }
                     }
                 }
             }

@@ -260,6 +260,8 @@ class Views extends BasePackage
                 if (!$this->viewSettings) {
                     if (is_string($this->view['settings'])) {
                         $this->viewSettings = $this->helper->decode($this->view['settings'], true);
+                    } else {
+                        $this->viewSettings = $this->view['settings'];
                     }
                 }
 

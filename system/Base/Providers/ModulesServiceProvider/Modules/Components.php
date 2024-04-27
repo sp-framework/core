@@ -258,8 +258,17 @@ class Components extends BasePackage
 		$components = $this->helper->decode($data['components'], true);
 		$needAuths = $this->helper->decode($data['need_auths'], true);
 
+		$homeNeedsAuth = false;
+		if (in_array(true, $needAuths)) {//If any of them is true, we have to make home true.
+			$homeNeedsAuth = true;
+		}
+
 		foreach ($components as $componentId => $status) {
 			$component = $this->getById($componentId);
+
+			if ($component['route'] === 'home' && $homeNeedsAuth) {
+				$needAuths[$componentId] = true;
+			}
 
 			if (is_string($component['apps'])) {
 				$component['apps'] = $this->helper->decode($component['apps'], true);

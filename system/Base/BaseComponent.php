@@ -7,6 +7,8 @@ use Phalcon\Mvc\Controller;
 use Phalcon\Mvc\View;
 use System\Base\Exceptions\ControllerNotFoundException;
 use System\Base\Exceptions\IdNotFoundException;
+use System\Base\Providers\ErrorServiceProvider\Exceptions\IncorrectCSRF;
+use System\Base\Providers\ErrorServiceProvider\Exceptions\IncorrectRequestType;
 
 abstract class BaseComponent extends Controller
 {
@@ -30,6 +32,8 @@ abstract class BaseComponent extends Controller
 
 	protected $token = null;
 
+	protected $apiResponse = [];
+
 	public $widgets;
 
 	protected function onConstruct()
@@ -41,23 +45,35 @@ abstract class BaseComponent extends Controller
 			return;
 		}
 
-		$this->addResponse('Ok');//Default Response
+		if (!$this->api->isApi()) {
+			$this->addResponse('Ok');//Default Response
 
-		$this->views = $this->modules->views->getViewInfo();
+			$this->views = $this->modules->views->getViewInfo();
 
-		$this->setComponent();
+			$this->setComponent();
 
-		if (!$this->isJson() || $this->request->isAjax()) {
-			$this->checkLayout();
+			if (!$this->isJson() || $this->request->isAjax()) {
+				$this->checkLayout();
 
-			if (!$this->isJson() && $this->request->isGet()) {
-				$this->setDefaultViewData();
+				if (!$this->isJson() && $this->request->isGet()) {
+					$this->setDefaultViewData();
+				}
+
+				if ($this->modules->views->getPhalconViewPath() === $this->view->getViewsDir()) {
+					$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
+
+					$this->viewSimple->setViewsDir($this->view->getViewsDir() . $this->getURI());
+				}
+			}
+		} else if ($this->api->isApi()) {
+			if (count($this->dispatcher->getParams()) > 0) {
+				$this->buildGetQueryParamsArr();
 			}
 
-			if ($this->modules->views->getPhalconViewPath() === $this->view->getViewsDir()) {
-				$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
+			$this->setComponent();
 
-				$this->viewSimple->setViewsDir($this->view->getViewsDir() . $this->getURI());
+			if (!$this->component && $this->app) {
+				throw new ControllerNotFoundException('Component Not Found!');
 			}
 		}
 	}
@@ -74,18 +90,41 @@ abstract class BaseComponent extends Controller
 				$this->componentName, $this->app['id']
 			);
 
-		$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
+		//Murl
+		if ($this->apps->isMurl) {
+			$url = explode('/', explode('/q/', trim($this->apps->isMurl['url'], '/'))[0]);
+		} else {
+			$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
+		}
+
+		if ($this->api->isApi()) {
+			if ($url[0] === 'api') {
+				unset($url[0]);
+			}
+
+			$url = array_values($url);
+
+			if ($this->api->isApiCheckVia === 'pub') {
+				if (isset($url[0]) &&
+					$url[0] === 'pub'
+				) {
+					unset($url[0]);
+				}
+			}
+			$url = array_values($url);
+		}
 
 		if ($this->request->isPost()) {
 			unset($url[$this->helper->lastKey($url)]);
 		}
+		$url = array_values($url);
 
 		if (isset($url[0]) && $url[0] === $this->app['route']) {
 			unset($url[0]);
 		}
+		$url = array_values($url);
 
 		$this->componentRoute = implode('/', $url);
-
 		if (!$this->component) {
 			$this->component =
 				$this->modules->components->getComponentByRouteForAppId(
@@ -114,6 +153,17 @@ abstract class BaseComponent extends Controller
 			}
 		} catch (\Exception $e) {
 			throw $e;
+		}
+	}
+
+	protected function requestIsPost($checkCSRF = true)
+	{
+		if (!$this->request->isPost()) {
+			throw new IncorrectRequestType('post');
+		}
+
+		if (!$this->checkCSRF()) {
+			return false;
 		}
 	}
 
@@ -288,17 +338,29 @@ abstract class BaseComponent extends Controller
 	protected function checkPermissions()
 	{
 		if ($this->auth->account()) {
-			if ($this->auth->account()['security']['permissions'] !== '') {
-				$permissions = $this->helper->decode($this->auth->account()['security']['permissions'], true);
+			if ($this->auth->account()['security']['override_role'] == '1') {
+				if (is_string($this->auth->account()['security']['permissions']) &&
+					$this->auth->account()['security']['permissions'] !== ''
+				) {
+					$permissions = $this->helper->decode($this->auth->account()['security']['permissions'], true);
+				} else {
+					$permissions = $this->auth->account()['security']['permissions'];
+				}
 			}
 
-			if (is_array($permissions) && count($permissions) === 0) {
+			if (!isset($permissions) ||
+				isset($permissions) && count($permissions) === 0
+			) {
 				if ($this->auth->account()['role']['id'] == '1') {
 					return 'sysAdmin';
 				}
 
-				if ($this->auth->account()['role']['permissions'] !== '') {
+				if (is_string($this->auth->account()['role']['permissions']) &&
+					$this->auth->account()['role']['permissions'] !== ''
+				) {
 					$permissions = $this->helper->decode($this->auth->account()['role']['permissions'], true);
+				} else {
+					$permissions = $this->auth->account()['role']['permissions'];
 				}
 			}
 
@@ -320,11 +382,10 @@ abstract class BaseComponent extends Controller
 
 				$this->view->responseMessage = 'CSRF Token Error! Please refresh page.';
 
-				$this->sendJson();
-
-				return false;
+				return $this->sendJson();
 			}
 		}
+
 		return true;
 	}
 
@@ -384,13 +445,17 @@ abstract class BaseComponent extends Controller
 
 	protected function sendJson()
 	{
-		$this->view->disable();
-
 		$this->response->setContentType('application/json', 'UTF-8');
 		$this->response->setHeader('Cache-Control', 'no-store');
 
 		if ($this->response->isSent() !== true) {
-			$this->response->setJsonContent($this->view->getParamsToView());
+			if ($this->api->isApi()) {
+				$this->response->setJsonContent($this->apiResponse);
+			} else {
+				$this->view->disable();
+
+				$this->response->setJsonContent($this->view->getParamsToView());
+			}
 
 			return $this->response->send();
 		}
@@ -427,6 +492,19 @@ abstract class BaseComponent extends Controller
 				} else {
 					$this->view->menus = $this->app['menu_structure'];
 				}
+			}
+		}
+
+		//Murl - update Hits
+		if ($this->apps->isMurl) {
+			if (!isset($this->apps->isMurl['vMurl'])) {
+				if ($this->apps->isMurl['hits'] === null) {
+					$this->apps->isMurl['hits'] = 1;
+				} else {
+					$this->apps->isMurl['hits'] = (int) ($this->apps->isMurl['hits'] + 1);
+				}
+
+				$this->basepackages->murls->updateMurl($this->apps->isMurl);
 			}
 		}
 	}
@@ -467,7 +545,14 @@ abstract class BaseComponent extends Controller
 
 	protected function getURI()
 	{
-		$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
+		if ($this->apps->isMurl) {
+			$url = explode('/', explode('/q/', trim($this->apps->isMurl['url'], '/'))[0]);
+			if ($url[0] !== $this->app['route']) {
+				array_unshift($url, $this->app['route']);
+			}
+		} else {
+			$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
+		}
 
 		$firstKey = $this->helper->firstKey($url);
 		$lastKey = $this->helper->lastKey($url);
@@ -585,7 +670,15 @@ abstract class BaseComponent extends Controller
 	protected function buildGetQueryParamsArr()
 	{
 		if ($this->request->isGet()) {
-			$arr = $this->helper->chunk($this->dispatcher->getParams(), 2);
+			//Murl
+			if ($this->apps->isMurl) {
+				$arr = $this->helper->chunk(
+					explode('/', explode('/q/', trim($this->apps->isMurl['url'], '/'))[1]),
+					2
+				);
+			} else {
+				$arr = $this->helper->chunk($this->dispatcher->getParams(), 2);
+			}
 
 			foreach ($arr as $value) {
 				if (isset($value[1])) {
@@ -781,6 +874,16 @@ abstract class BaseComponent extends Controller
 
 	protected function addResponse($responseMessage, int $responseCode = 0, $responseData = null)
 	{
+		if ($this->api->isApi()) {
+			$this->apiResponse['responseMessage'] = $responseMessage;
+			$this->apiResponse['responseCode'] = $responseCode;
+			if ($responseData !== null) {
+				$this->apiResponse['responseData'] = $responseData;
+			}
+
+			return $this->sendJson();
+		}
+
 		$this->view->responseMessage = $responseMessage;
 
 		$this->view->responseCode = $responseCode;

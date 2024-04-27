@@ -44,7 +44,7 @@ class HttpServiceProvider implements ServiceProviderInterface
                 $app = $container->getShared('apps')->getAppInfo();
                 $view = $container->getShared('modules')->views->getViewInfo();
                 $domain = $container->getShared('domains')->getDomain();
-                return new Links($request, $app, $view, $domain);
+                return (new Links($request, $app, $view, $domain))->init();
             }
         );
     }

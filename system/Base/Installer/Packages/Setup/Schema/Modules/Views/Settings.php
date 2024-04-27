@@ -30,14 +30,14 @@ class Settings
                     new Column(
                         'domain_id',
                         [
-                            'type'    => Column::TYPE_SMALLINTEGER,
+                            'type'    => Column::TYPE_INTEGER,
                             'notNull' => true,
                         ]
                     ),
                     new Column(
                         'app_id',
                         [
-                            'type'    => Column::TYPE_SMALLINTEGER,
+                            'type'    => Column::TYPE_INTEGER,
                             'notNull' => true,
                         ]
                     ),

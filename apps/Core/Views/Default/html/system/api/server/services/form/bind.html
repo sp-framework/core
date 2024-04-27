@@ -1,0 +1,77 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'app_id',
+                'fieldLabel'                            : 'APP',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select App.',
+                'fieldBazScan'                          : true,
+                'fieldRequired'                         : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataSelect2Options'               : apps,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : apiAppId
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'domain_id',
+                'fieldLabel'                            : 'Domain',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select Domain.',
+                'fieldBazScan'                          : true,
+                'fieldRequired'                         : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataSelect2Options'               : domains,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : apiDomainId
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'scope_id',
+                'fieldLabel'                            : 'API Scope',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select API scope.',
+                'fieldBazScan'                          : true,
+                'fieldRequired'                         : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataSelect2Options'               : availableAPIScopes,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : apiScope
+            ]
+        )}}
+    </div>
+</div>

@@ -1,0 +1,228 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'grant_type',
+                'fieldLabel'                            : 'API Grant Type',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select API grant type.',
+                'fieldBazScan'                          : true,
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : apiGrantDisabled,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataSelect2Options'               : availableAPIGrantTypes,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : apiGrantType
+            ]
+        )}}
+    </div>
+</div>
+<div id="client-credentials-grant" {{clientCredentialsGrantHidden}}>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'cc_max_devices',
+                    'fieldLabel'                            : 'Max # devices per user',
+                    'fieldType'                             : 'input',
+                    'fieldInputTypeTextFilter'              : 'positiveInt',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Max number of devices that an user can register. Example: If you are running an application that you allow external vendors to connect and sell your API services, you can limit the number of devices they can connect through their account. The number of device is additional to their own personal account they can register.',
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnCreate'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldValue'                            : apiCCMaxDevices
+                ]
+            )}}
+        </div>
+    </div>
+</div>
+<div id="autho-code-grant" {{authoCodeGrantHidden}}>
+    <small class="text-danger">Note: Client secret is only shown at the time of key generation. Please copy and save it somewhere safe.</small><br><br>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('buttons',
+                [
+                    'component'                 : component,
+                    'componentName'             : componentName,
+                    'componentId'               : componentId,
+                    'sectionId'                 : sectionId,
+                    'buttonType'                : 'button',
+                    'buttonLabel'               : 'Generate/Regenerate API Client Id',
+                    'buttons'                   :
+                        {
+                            'generate-client-id'      : {
+                                'title'                   : 'Generate API Client Id',
+                                'size'                    : 'sm',
+                                'type'                    : 'primary',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true,
+                                'hidden'                  : generateHidden
+                            },
+                            'regenerate-client-id'    : {
+                                'title'                   : 'Revoke & Regenerate API Client Id',
+                                'size'                    : 'sm',
+                                'type'                    : 'danger',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true,
+                                'hidden'                  : reGenerateHidden
+                            }
+                        }
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'client_id',
+                    'fieldLabel'                            : 'Client ID',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldRequired'                         : true,
+                    'fieldDisabled'                         : true,
+                    'fieldHelpTooltipContent'               : 'Client ID for API authentication.',
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnCreate'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldValue'                            : apiClientId
+                ]
+            )}}
+        </div>
+        {% set clientSecretInputFieldType = 'text' %}
+        {% if apiClientSecret !== '' %}
+            {% set clientSecretInputFieldType = 'password' %}
+        {% endif %}
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'client_secret',
+                    'fieldLabel'                            : 'Client Secret',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldRequired'                         : true,
+                    'fieldHelpTooltipContent'               : 'Client Secret for API authentication.',
+                    'fieldDisabled'                         : true,
+                    'fieldInputType'                        : clientSecretInputFieldType,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnCreate'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldValue'                            : apiClientSecret
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'redirect_url',
+                    'fieldLabel'                            : 'Redirect Url',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Redirect Url for API authentication.',
+                    'fieldGroupPostAddonButtons'          :
+                        [
+                            'generate-redirect-url'   : [
+                                'title'                   : false,
+                                'icon'                    : 'wand-magic-sparkles',
+                                'noMargin'                : true,
+                                'buttonAdditionalClass'   : 'rounded-0 text-white',
+                                'position'                : 'right'
+                            ]
+                        ],
+                    'fieldRequired'                         : true,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnCreate'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldValue'                            : apiRedirectUrl
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'request_url',
+                    'fieldLabel'                            : 'Request Url',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Request Url for API authentication. This will be overwritten when the user makes a connection with their state parameter set.',
+                    'fieldGroupPostAddonButtons'          :
+                        [
+                            'generate-request-url'   : [
+                                'title'                   : false,
+                                'icon'                    : 'wand-magic-sparkles',
+                                'noMargin'                : true,
+                                'buttonAdditionalClass'   : 'rounded-0 text-white',
+                                'position'                : 'right'
+                            ]
+                        ],
+                    'fieldRequired'                         : false,
+                    'fieldDisabled'                         : true,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnCreate'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldValue'                            : apiRequestUrl
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'authorization_tos_pp',
+                    'fieldLabel'                     : 'Authorization Terms of Services/Privacy Policy',
+                    'fieldType'                      : 'trumbowyg',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'This html shows up on the authorization page. You can add any terms of service and privacy policy for users to read and accept.',
+                    'fieldRequired'                  : false,
+                    'fieldBazScan'                   : true,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldDataInputMaxLength'        : 65535,
+                    'fieldValue'                     : apiAuthorizationTosPp
+                ]
+            )}}
+        </div>
+    </div>
+</div>

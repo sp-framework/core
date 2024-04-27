@@ -1,0 +1,107 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'pki_key_size',
+                'fieldLabel'                            : 'PKI Key Size',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select PKI key size.',
+                'fieldBazScan'                          : true,
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : apiPkiKeySizeDisabled,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataSelect2Options'               : availableOpensslKeyBits,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : apiKeysParams[0]
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'pki_algorithm',
+                'fieldLabel'                            : 'PKI Algorithm',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select PKI Algorithm.',
+                'fieldBazScan'                          : true,
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : apiPkiAlgorithmDisabled,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataSelect2Options'               : availableOpensslAlgorithms,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : apiKeysParams[1]
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'encryption_key_size',
+                'fieldLabel'                            : 'Encryption Key Size',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Enter encryption key size.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : apiEncryptionKeySizeDisabled,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : 8,
+                'fieldDataInputMaxNumber'               : 32,
+                'fieldDataInputMaxLength'               : 2,
+                'fieldValue'                            : apiKeysParams[2]
+            ]
+        )}}
+    </div>
+    {% set generateHidden = 'hidden' %}
+    {% if apiPrivateKey == '1' %}
+        {% set generateHidden = '' %}
+    {% endif %}
+    <div class="col" {{generateHidden}}>
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'regenerate_pki_keys',
+                'fieldLabel'                     : 'Regenerate PKI Keys?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Regenerate PKI Keys? Note: Any clients that have been authorized using previous keys will have to re-authorize.',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'warning',
+                'fieldCheckboxChecked'           : false,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+    </div>
+</div>

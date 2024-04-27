@@ -82,9 +82,9 @@ class DomainsComponent extends BaseComponent
             $this->domains,
             'domains/view',
             null,
-            ['name', 'default_app_id', 'exclusive_to_default_app', 'is_internal'],
+            ['name', 'default_app_id', 'exclusive_to_default_app', 'exclusive_for_api', 'is_internal'],
             true,
-            ['name', 'default_app_id', 'exclusive_to_default_app', 'is_internal'],
+            ['name', 'default_app_id', 'exclusive_to_default_app', 'exclusive_for_api', 'is_internal'],
             $controlActions,
             ['default_app_id' => 'default app'],
             $replaceColumns,
@@ -99,6 +99,7 @@ class DomainsComponent extends BaseComponent
         foreach ($dataArr as $dataKey => &$data) {
             $data = $this->formatDefaultAppId($dataKey, $data);
             $data = $this->formatExclusiveToDefaultApp($dataKey, $data);
+            $data = $this->formatExclusiveForApi($dataKey, $data);
             $data = $this->formatIsInternal($dataKey, $data);
         }
 
@@ -127,7 +128,18 @@ class DomainsComponent extends BaseComponent
         if ($data['exclusive_to_default_app'] == '0') {
             $data['exclusive_to_default_app'] = '<span class="badge badge-secondary text-uppercase">No</span>';
         } else if ($data['exclusive_to_default_app'] == '1') {
-            $data['exclusive_to_default_app'] = '<span class="badge badge-primary text-uppercase">Yes</span>';
+            $data['exclusive_to_default_app'] = '<span class="badge badge-info text-uppercase">Yes</span>';
+        }
+
+        return $data;
+    }
+
+    protected function formatExclusiveForApi($rowId, $data)
+    {
+        if ($data['exclusive_for_api'] == '0') {
+            $data['exclusive_for_api'] = '<span class="badge badge-secondary text-uppercase">No</span>';
+        } else if ($data['exclusive_for_api'] == '1') {
+            $data['exclusive_for_api'] = '<span class="badge badge-info text-uppercase">Yes</span>';
         }
 
         return $data;
@@ -136,9 +148,9 @@ class DomainsComponent extends BaseComponent
     protected function formatIsInternal($rowId, $data)
     {
         if ($data['is_internal'] == '0') {
-            $data['is_internal'] = '<span class="badge badge-primary text-uppercase">No</span>';
+            $data['is_internal'] = '<span class="badge badge-info text-uppercase">No</span>';
         } else if ($data['is_internal'] == '1') {
-            $data['is_internal'] = '<span class="badge badge-secondary text-uppercase">Yes</span>';
+            $data['is_internal'] = '<span class="badge badge-warning text-uppercase">Yes</span>';
         }
 
         return $data;

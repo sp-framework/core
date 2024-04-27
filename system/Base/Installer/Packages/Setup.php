@@ -9,6 +9,7 @@ use Apps\Core\Packages\Devtools\Api\Enums\Model\AppsDashDevtoolsApiEnums;
 use Apps\Core\Packages\Devtools\Modules\Install\Schema\DevtoolsModulesBundles;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
+use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToDeleteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Filter\Validation\Validator\Email;
@@ -54,6 +55,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Timezones;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ImportExport;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Menus;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Messenger;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Murls;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notifications;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages;
@@ -79,6 +81,12 @@ use System\Base\Installer\Packages\Setup\Schema\Modules\Middlewares;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Packages;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views\Settings;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Api as SPApi;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AccessTokens;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AuthorizationCodes;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Clients;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Api\RefreshTokens;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Scopes;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\IpFilter;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\Types;
@@ -88,6 +96,12 @@ use System\Base\Installer\Packages\Setup\Schema\Providers\Domains;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Logs;
 use System\Base\Installer\Packages\Setup\Write\Configs;
 use System\Base\Installer\Packages\Setup\Write\Pdo;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApi;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAccessTokens;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAuthorizationCodes;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiRefreshTokens;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiScopes;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderApps;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsIpFilter;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsTypes;
@@ -99,6 +113,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Basepackage
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesFilters;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesImportExport;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMenus;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMurls;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotifications;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesStorages;
@@ -312,13 +327,50 @@ class Setup
 	protected function cleanOldFfs()
 	{
 		$files = $this->basepackages->utils->init($this->container)->scanDir('.ff/');
-		var_dump($files);die();
+
 		foreach ($files['files'] as $key => $file) {
 			try {
-				if (strpos($file, 'ff') === false) {
+				if (strpos($file, '.ff') !== false) {
 					$this->localContent->delete($file);
 				}
 			} catch (FilesystemException | UnableToDeleteFile $exception) {
+				throw $exception;
+			}
+		}
+
+		foreach ($files['dirs'] as $key => $dir) {
+			try {
+				if (strpos($dir, '.ff') !== false) {
+					$this->localContent->deleteDirectory($dir);
+				}
+			} catch (FilesystemException | UnableToDeleteDirectory $exception) {
+				throw $exception;
+			}
+		}
+
+		return true;
+	}
+
+	protected function cleanOldAPIKeys()
+	{
+		$files = $this->basepackages->utils->init($this->container)->scanDir('system/.api/');
+
+		foreach ($files['files'] as $key => $file) {
+			try {
+				if (strpos($file, '.api') !== false) {
+					$this->localContent->delete($file);
+				}
+			} catch (FilesystemException | UnableToDeleteFile $exception) {
+				throw $exception;
+			}
+		}
+
+		foreach ($files['dirs'] as $key => $dir) {
+			try {
+				if (strpos($dir, '.api') !== false) {
+					$this->localContent->deleteDirectory($dir);
+				}
+			} catch (FilesystemException | UnableToDeleteDirectory $exception) {
 				throw $exception;
 			}
 		}
@@ -515,6 +567,10 @@ class Setup
 					'schema'	=> new Menus,
 					'model'		=> new BasepackagesMenus,
 				],
+			'basepackages_murls' 						=> [
+					'schema'	=> new Murls,
+					'model'		=> new BasepackagesMurls,
+				],
 			'basepackages_filters' 						=> [
 					'schema'	=> new Filters,
 					'model'		=> new BasepackagesFilters,
@@ -622,7 +678,31 @@ class Setup
 			'basepackages_api_apis_repos' 				=> [
 					'schema'	=> new Repos,
 					'model'		=> null
-			]
+			],
+			'service_provider_api' 						=> [
+					'schema'	=> new SPApi,
+					'model'		=> new ServiceProviderApi,
+				],
+			'service_provider_api_access_tokens' 		=> [
+					'schema'	=> new AccessTokens,
+					'model'		=> new ServiceProviderApiAccessTokens,
+				],
+			'service_provider_api_authorization_codes'	=> [
+					'schema'	=> new AuthorizationCodes,
+					'model'		=> new ServiceProviderApiAuthorizationCodes,
+				],
+			'service_provider_api_clients'				=> [
+					'schema'	=> new Clients,
+					'model'		=> new ServiceProviderApiClients,
+				],
+			'service_provider_api_refresh_tokens'		=> [
+					'schema'	=> new RefreshTokens,
+					'model'		=> new ServiceProviderApiRefreshTokens,
+				],
+			'service_provider_api_scopes'				=> [
+					'schema'	=> new Scopes,
+					'model'		=> new ServiceProviderApiScopes,
+				],
 		];
 
 		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'ff') {
@@ -637,6 +717,8 @@ class Setup
 		}
 
 		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'db') {
+			$this->cleanOldFfs();
+
 			foreach ($databases as $tableName => $tableClass) {
 				if ($tableClass['model'] && $tableClass['model']->getSource()) {
 					$tableName = $tableClass['model']->getSource();

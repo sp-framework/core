@@ -6,6 +6,64 @@ if (!function_exists('base_path')) {
     }
 }
 
+if (!function_exists('trace')) {
+    function trace(array $varsToDump = [], $exit = true, $args = false, $object = false, $file = true, $line = true, $class = true, $function = true) {
+        $backtrace = debug_backtrace();
+
+        $traces = [];
+
+        foreach ($backtrace as $key => $trace) {
+            if ($file && isset($trace['file'])) {
+                $traces[$key]['file'] = $trace['file'];
+            }
+            if ($line && isset($trace['line'])) {
+                $traces[$key]['line'] = $trace['line'];
+            }
+            if ($class && isset($trace['class'])) {
+                $traces[$key]['class'] = $trace['class'];
+            }
+            if ($function && isset($trace['function'])) {
+                $traces[$key]['function'] = $trace['function'];
+            }
+            if ($args && isset($trace['args'])) {
+                $traces[$key]['args'] = $trace['args'];
+            }
+            if ($object && isset($trace['object'])) {
+                $traces[$key]['object'] = $trace['object'];
+            }
+        }
+
+        if ($object) {
+            if (class_exists(\Symfony\Component\VarDumper\VarDumper::class)) {
+                if (count($varsToDump) > 0) {
+                    foreach ($varsToDump as $var) {
+                        dump($var);
+                    }
+                }
+                dump(array_reverse($traces));
+            } else {
+                if (count($varsToDump) > 0) {
+                    foreach ($varsToDump as $var) {
+                        var_dump($var);
+                    }
+                }
+                var_dump(array_reverse($traces));
+            }
+        } else {
+            if (count($varsToDump) > 0) {
+                foreach ($varsToDump as $var) {
+                    var_dump($var);
+                }
+            }
+            var_dump(array_reverse($traces));
+        }
+
+        if ($exit) {
+            exit;
+        }
+    }
+}
+
 if (!function_exists('toBytes')) {
     function toBytes($from) {
         $type = substr($from, -1);

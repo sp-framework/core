@@ -7,7 +7,7 @@ use Apps\Core\Packages\Adminltetags\Adminltetags;
 trait DynamicTable {
     public function generateDTContent(
         $package,
-        string $postUrl,
+        string $postUrl = null,
         $postUrlParams,
         array $columnsForTable = [],
         $withFilter = true,
@@ -51,6 +51,10 @@ trait DynamicTable {
                 foreach ($dtReplaceColumnsTitle as $dtReplaceColumnsTitleKey => $dtReplaceColumnsTitleValue) {
                     $table['columns'][$dtReplaceColumnsTitleKey]['name'] = $dtReplaceColumnsTitleValue;
                 }
+            }
+
+            if ($postUrl === null) {
+                throw new \Exception('Datatables postUrl Missing.');
             }
 
             $table['postUrl'] = $this->links->url($postUrl);
@@ -214,6 +218,11 @@ trait DynamicTable {
                     $row["__control"] = $actions;
                 }
             }
+
+            if ($this->api->isApi()) {
+                return ['rows' => $rows, 'counters' => $package->packagesData->paginationCounters];
+            }
+
             $adminltetags = new Adminltetags();
 
             $this->view->rows =

@@ -306,6 +306,11 @@ class AppsComponent extends BaseComponent
         $this->view->pick('apps/list');
     }
 
+    public function apiViewAction()
+    {
+        var_dump('me');
+    }
+
     /**
      * @acl(name=add)
      */

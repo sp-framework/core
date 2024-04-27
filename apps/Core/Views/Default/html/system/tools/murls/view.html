@@ -1,0 +1,34 @@
+{% if murl['id'] is defined %}
+    {% set murlId = murl['id'] %}
+    {% set title = 'Mini URL (mURL) (' ~ murl['murl'] ~ ')' %}
+{% else %}
+    {% set murlId = '' %}
+    {% set title = 'New Mini URL (mURL)' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'arrow-down-wide-short',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'murls/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : murlId,
+            'addActionUrl'                  : 'system/tools/murls/add',
+            'addSuccessRedirectUrl'         : 'system/tools/murls',
+            'updateActionUrl'               : 'system/tools/murls/update',
+            'updateSuccessRedirectUrl'      : 'system/tools/murls',
+            'cancelActionUrl'               : 'system/tools/murls',
+            'closeActionUrl'                : 'system/tools/murls'
+        ]
+    ]
+)}}

@@ -82,9 +82,26 @@ class Domains extends BasePackage
 
 				return;
 			}
+
+			throw $e;
 		}
 
 		if ($add) {
+			if ($data['apps'] && count($data['apps']) >= 1) {
+				foreach ($data['apps'] as $appId => $appSettings) {
+					if ($appSettings['allowed'] == true) {
+						//add new viewsettings
+						$viewSettingsData = [];
+						$viewSettingsData['view_id'] = (int) $appSettings['view'];
+						$viewSettingsData['domain_id'] = $this->packagesData->last['id'];
+						$viewSettingsData['app_id'] = $appId;
+						$viewSettingsData['via_domain'] = true;
+
+						$this->modules->viewsSettings->addViewsSettings($viewSettingsData);
+					}
+				}
+			}
+
 			$this->addActivityLog($data);
 
 			$this->addResponse('Added ' . $data['name'] . ' domain', 0, null, true);
@@ -173,8 +190,8 @@ class Domains extends BasePackage
 				} else {
 					if ($appSettings['allowed'] === true &&
 						(!isset($appSettings['view']) ||
-						!isset($appSettings['publicStorage']) ||
-						!isset($appSettings['privateStorage']))
+						 !isset($appSettings['publicStorage']) ||
+						 !isset($appSettings['privateStorage']))
 					) {
 						$this->addResponse('Please provide complete app settings for app Id: ' . $appId, 1);
 
@@ -197,6 +214,22 @@ class Domains extends BasePackage
 	public function removeDomain(array $data)
 	{
 		$domain = $this->getById($data['id']);
+
+		$count = 1;
+
+		if ($this->config->databasetype === 'db') {
+			$count = (int) $this->useModel()->count();
+		} else {
+			$count = (int) $this->ffStore->count(true);
+		}
+
+		if ($domain['name'] === $this->request->getHttpHost() ||
+			$count === 1
+		) {
+			$this->addResponse('App is being accessed from this domain. Cannot remove.', 1);
+
+			return false;
+		}
 
 		if ($this->remove($domain['id'])) {
 			$this->addResponse('Removed domain ' . $domain['name']);

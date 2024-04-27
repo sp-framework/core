@@ -1,6 +1,6 @@
 {
-    "name"          : "Api",
-    "display_name"  : "Api Package",
+    "name"          : "ApiClientServices",
+    "display_name"  : "Api Client Services Package",
     "description"   : "Package for connecting to external resources using API",
     "module_type"   : "packages",
     "app_type"      : "core",
@@ -20,5 +20,5 @@
         "views"         : [],
         "external"      : []
     },
-    "settings"      : {"componentRoute":"system/api"}
+    "settings"      : {"componentRoute":"system/api/clients/services"}
 }

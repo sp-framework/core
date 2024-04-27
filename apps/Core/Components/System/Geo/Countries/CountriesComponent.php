@@ -104,6 +104,43 @@ class CountriesComponent extends BaseComponent
     }
 
     /**
+     * @api_acl(name=view)
+     */
+    public function apiViewAction()
+    {
+        $this->initialize();
+
+        if (isset($this->getData()['id'])) {
+            if ($this->getData()['id'] != 0) {
+                $geoCountry = $this->geoCountries->getById($this->getData()['id']);
+
+                if (!$geoCountry) {
+                    return $this->throwIdNotFound();
+                }
+            }
+            $this->addResponse('Ok', 0, ['data' => $geoCountry]);
+
+            return;
+        }
+
+        if ($this->request->isPost()) {
+            $data =
+                $this->generateDTContent(
+                    $this->geoCountries,
+                    null,
+                    null,
+                    ['name', 'capital', 'currency', 'installed', 'enabled']
+                );
+
+            if ($data) {
+                $this->addResponse('Ok', 0, ['data' => $data]);
+            }
+
+            return;
+        }
+    }
+
+    /**
      * @acl(name=add)
      */
     public function addAction()

@@ -89,7 +89,7 @@
     </div>
 </div>
 <script>
-/* globals Sortable */
+/* globals Sortable PNotify Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -170,7 +170,8 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-guest_role_id'               : 'required',
                 '{{componentId}}-{{sectionId}}-default_component'           : 'required',
                 '{{componentId}}-{{sectionId}}-errors_component'            : 'required',
-                '{{componentId}}-{{sectionId}}-default_dashboard'           : 'required'
+                '{{componentId}}-{{sectionId}}-default_dashboard'           : 'required',
+                '{{componentId}}-{{sectionId}}-api_grant_type'              : 'required'
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'Please enter app name',
@@ -180,7 +181,17 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-guest_role_id'           : 'Please select guest role',
                 '{{componentId}}-{{sectionId}}-default_component'       : 'Please select app default component',
                 '{{componentId}}-{{sectionId}}-errors_component'        : 'Please select app errors component',
-                '{{componentId}}-{{sectionId}}-default_dashboard'       : 'Please select default dashboard'
+                '{{componentId}}-{{sectionId}}-default_dashboard'       : 'Please select default dashboard',
+                '{{componentId}}-{{sectionId}}-api_grant_type'          : 'Please select Api Grant type'
+            },
+            onSubmit: function() {
+                if (dataCollectionSection['dataToSubmit']['api_access'] === 'apion') {
+                    dataCollectionSection['dataToSubmit']['api_access'] = 1;
+                } else {
+                    dataCollectionSection['dataToSubmit']['api_access'] = 0;
+                }
+
+                return true;
             }
         }
     });

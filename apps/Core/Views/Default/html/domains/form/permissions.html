@@ -1,13 +1,17 @@
+{% set defaultAppDisabled = false %}
+{% set exclusiveChecked = false %}
+{% set exclusiveApiChecked = false %}
 {% if domain['id'] is defined %}
     {% set domainDefaultAppId = domain['default_app_id'] %}
     {% if domain['exclusive_to_default_app'] is defined and domain['exclusive_to_default_app'] == 1 %}
+        {% set defaultAppDisabled = true %}
         {% set exclusiveChecked = true %}
-    {% else %}
-        {% set exclusiveChecked = false %}
+    {% endif %}
+    {% if domain['exclusive_for_api'] is defined and domain['exclusive_for_api'] == 1 %}
+        {% set exclusiveApiChecked = true %}
     {% endif %}
 {% else %}
     {% set domainDefaultAppId = '' %}
-    {% set exclusiveChecked = false %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -27,6 +31,7 @@
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldRequired'                  : true,
+                'fieldDisabled'                  : defaultAppDisabled,
                 'fieldDataSelect2Options'        : apps,
                 'fieldDataSelect2OptionsKey'     : 'id',
                 'fieldDataSelect2OptionsValue'   : 'name',
@@ -57,7 +62,32 @@
             ]
         )}}
     </div>
-    {% if apps|length > 1 %}
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'exclusive_for_api',
+                'fieldLabel'                     : 'Exclusive for API?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Is this domain exclusive for API access to the default app? If yes, then you dont need to add /api/app_route/ to each link',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : exclusiveApiChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<hr>
+{% if apps|length > 1 %}
+    <div class="row">
         <div class="col">
             {{adminltetags.useTag('fields',
                 [
@@ -83,9 +113,8 @@
                 ]
             )}}
         </div>
-    {% endif %}
-</div>
-<hr>
+    </div>
+{% endif %}
 <div class="row">
     <div class="col">
         {# For apps settings #}
@@ -115,8 +144,13 @@
         {% for app in apps %}
             {% set appIds[app['id']] = app['id'] %}
             {% if domain['apps'][app['id']] is defined %}
-                {% if domain['apps'][app['id']]['allowed'] == true %}
+                {% if domain['apps'][app['id']]['allowed'] is defined and domain['apps'][app['id']]['allowed'] == true %}
                     {% set checked = true %}
+                    {% if domain['apps'][app['id']]['api'] is defined and domain['apps'][app['id']]['api'] == true %}
+                        {% set apiChecked = true %}
+                    {% else %}
+                        {% set apiChecked = false %}
+                    {% endif %}
                     {% set viewDisabled = false %}
                     {% set emailServiceDisabled = false %}
                     {% set publicStorageServiceDisabled = false %}
@@ -127,6 +161,7 @@
                     {% set emailServiceDisabled = true %}
                     {% set publicStorageServiceDisabled = true %}
                     {% set privateStorageServiceDisabled = true %}
+                    {% set apiChecked = false %}
                 {% endif %}
                 {% if app['id'] == domain['default_app_id'] %}
                     {% set appSettingsHidden = '' %}
@@ -148,6 +183,7 @@
                 {% set privateStorageServiceDisabled = true %}
                 {% set appSettingsHidden = 'hidden' %}
                 {% set checkboxDisabled = false %}
+                {% set apiChecked = false %}
             {% endif %}
             <div class="app" data-id="{{app['id']}}" {{appSettingsHidden}}>
                 <div class="row">
@@ -161,7 +197,7 @@
                                 'fieldId'                        : 'allowed-' ~ app['id'],
                                 'fieldLabel'                     : 'App ' ~ app['name'] ~ ' Allowed on this domain?',
                                 'fieldHelp'                      : true,
-                                'fieldHelpTooltipContent'        : 'Select apps that can be accessed via this domain.',
+                                'fieldHelpTooltipContent'        : 'Check if app can be accessed via this domain.',
                                 'fieldRequired'                  : false,
                                 'fieldType'                      : 'html',
                                 'fieldAdditionalClass'           : 'mb-1',
@@ -386,7 +422,8 @@ dataCollectionSection =
                     }
                 }
 
-                $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').click(function() {
+                $('#{{componentId}}-{{sectionId}}-exclusive_to_default_app').change(function() {
+                    $('#{{componentId}}-{{sectionId}}-default_app_id').attr('disabled', true);
                     defaultApp = $('#{{componentId}}-{{sectionId}}-default_app_id').select2('data')[0]['id'];
 
                     if (defaultApp != 0) {
@@ -403,9 +440,12 @@ dataCollectionSection =
                         for (var checkbox in dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']) {
                             var appId = $('#' + checkbox).parents('.app').data('id');
 
-                            if (checkbox === '{{componentId}}-{{sectionId}}-' + defaultApp + '-allowed') {
-                                $('#' + checkbox)[0].checked = true;
-                                $('#' + checkbox).attr('disabled', true);
+                            if (appId == defaultApp) {
+                                if (checkbox === '{{componentId}}-{{sectionId}}-' + appId + '-allowed') {
+                                    $('#' + checkbox).attr('disabled', true);
+                                } else {
+                                    $('#' + checkbox).attr('disabled', false);
+                                }
                                 dataCollectionSection['data']['apps'][appId]['allowed'] = true;
                                 $('#{{componentId}}-{{sectionId}}-' + appId + '-view').attr('disabled', false);
                                 $('#{{componentId}}-{{sectionId}}-' + appId + '-email-service').attr('disabled', false);
@@ -422,6 +462,7 @@ dataCollectionSection =
                             }
                         }
                     } else {
+                        $('#{{componentId}}-{{sectionId}}-default_app_id').attr('disabled', false);
                         for (var disableCheckbox in dataCollectionSectionForm['vars']['dynamicFields']['checkboxes']) {
                             if (disableCheckbox === '{{componentId}}-{{sectionId}}-' + defaultApp + '-allowed') {
                                 $('#' + disableCheckbox).attr('disabled', true);
@@ -433,6 +474,7 @@ dataCollectionSection =
                 });
             }
         },
+        '{{componentId}}-{{sectionId}}-exclusive_for_api'                   : { },
         '{{componentId}}-{{sectionId}}-default_app_id'                      : {
             'placeholder'   : 'SELECT DEFAULT APPLICATION',
             afterInit       : function() {

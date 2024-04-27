@@ -17,12 +17,12 @@ class ApcuCache
         $this->cacheConfig = $cacheConfig;
     }
 
-    public function init()
+    public function init($force = false, $timeout = null)
     {
-        if ($this->cacheConfig->enabled) {
+        if ($this->cacheConfig->enabled || $force) {
             $options = [
-                'defaultSerializer' => 'Json',
-                'lifetime'          => $this->cacheConfig->timeout
+                'defaultSerializer' => 'json',
+                'lifetime'          => $timeout ?? $this->cacheConfig->timeout
             ];
 
             $serializerFactory = new SerializerFactory();
@@ -36,7 +36,9 @@ class ApcuCache
             $cacheOptions = [
                 'adapter' => 'apcu',
                 'options' => [
-                    'prefix' => 'sp-',
+                    'prefix'            => 'sp-',
+                    'defaultSerializer' => 'json',
+                    'lifetime'          => $timeout ?? $this->cacheConfig->timeout
                 ],
             ];
 
@@ -44,7 +46,7 @@ class ApcuCache
 
             return $this->cache;
         } else {
-            return false;
+            return $this;
         }
     }
 }

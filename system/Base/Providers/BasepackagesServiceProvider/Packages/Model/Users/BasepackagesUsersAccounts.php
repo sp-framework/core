@@ -3,6 +3,8 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users;
 
 use System\Base\BaseModel;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiUsers;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
@@ -95,6 +97,26 @@ class BasepackagesUsersAccounts extends BaseModel
             'account_id',
             [
                 'alias'         => 'profile'
+            ]
+        );
+
+        $account_id = '0';
+        if (isset($this->auth) && $this->auth->account()) {
+            $account_id = $this->auth->account()['id'];
+        }
+        $this->modelRelations['api_clients']['relationObj'] = $this->hasMany(
+            'id',
+            ServiceProviderApiClients::class,
+            'account_id',
+            [
+                'alias'         => 'api_clients',
+                'params'        => [
+                    'conditions'    => 'account_id = :account_id: AND revoked = :revoked:',
+                    'bind'          => [
+                        'account_id'    => $account_id,
+                        'revoked'       => '0'
+                    ]
+                ]
             ]
         );
 

@@ -9,6 +9,14 @@ use System\Base\Providers\RouterServiceProvider\Exceptions\DomainNotRegisteredEx
 
 class Router
 {
+	protected $api;
+
+	protected $isApi;
+
+	protected $isApiPublic;
+
+	protected $domainApiExclusive = false;
+
 	protected $domains;
 
 	protected $domain;
@@ -55,8 +63,26 @@ class Router
 
 	protected $config;
 
-	public function __construct($domains, $apps, $components, $views, $logger, $request, $response, $helper, $config)
-	{
+	protected $basepackages;
+
+	protected $dispatcher;
+
+	public function __construct(
+		$api,
+		$domains,
+		$apps,
+		$components,
+		$views,
+		$logger,
+		$request,
+		$response,
+		$helper,
+		$config,
+		$basepackages,
+		$dispatcher
+	) {
+		$this->api = $api;
+
 		$this->domains = $domains;
 
 		$this->apps = $apps;
@@ -69,11 +95,21 @@ class Router
 
 		$this->request = $request;
 
+		$this->isApi = $this->api->isApi();
+
+		if ($this->api->isApiCheckVia && $this->api->isApiCheckVia === 'pub') {
+			$this->isApiPublic = true;
+		}
+
 		$this->response = $response;
 
 		$this->helper = $helper;
 
 		$this->config = $config;
+
+		$this->basepackages = $basepackages;
+
+		$this->dispatcher = $dispatcher;
 
 		$this->requestUri = $this->request->getURI();
 
@@ -85,7 +121,6 @@ class Router
 	public function init()
 	{
 		if ($this->validateDomain()) {
-
 			$this->getURI();
 
 			if ($this->appInfo && $this->appDefaults) {
@@ -149,54 +184,74 @@ class Router
 			}
 		}
 
-		$this->router->setDefaultNamespace($this->defaultNamespace);
+		$this->registerDefaults(true);
 	}
 
 	protected function registerHome()
 	{
-		$this->setDefaultNamespace(true);
+		if (!$this->isApi) {
+			$this->setDefaultNamespace(true);
 
-		$this->router->add(
-			'/',
-			[
-				'controller'	=> 'home',
-				'action'		=> 'view'
-			]
-		);
+			$this->router->add(
+				'/',
+				[
+					'controller'	=> 'home',
+					'action'		=> 'view'
+				]
+			);
 
-		$this->router->add(
-			'/' . strtolower($this->appInfo['route']),
-			[
-				'controller'	=> 'home',
-				'action'		=> 'view'
-			]
-		);
+			$this->router->add(
+				'/' . strtolower($this->appInfo['route']),
+				[
+					'controller'	=> 'home',
+					'action'		=> 'view'
+				]
+			);
 
-		$this->router->add(
-			'/' . strtolower($this->appInfo['route']) . '/',
-			[
-				'controller'	=> 'home',
-				'action'		=> 'view'
-			]
-		);
+			$this->router->add(
+				'/' . strtolower($this->appInfo['route']) . '/',
+				[
+					'controller'	=> 'home',
+					'action'		=> 'view'
+				]
+			);
+		}
 	}
 
 	protected function registerRoute($givenRoute)
 	{
-		//SEO
-		if (isset($this->appInfo['seo_urls']) && $this->appInfo['seo_urls'] == 1) {
-			//Using $this->uri, we can extract the route from seo url from SEO db
-			//$givenRoute = $this->usePackage()
+		//Murl/SEO
+		if ($this->apps->isMurl) {
+			$givenRoute = $this->apps->isMurl['url'];
+
+			$givenRouteArr = explode('/q/', trim($givenRoute, '/'));
+			$this->getQuery = $givenRouteArr[1] ?? null;
+
+			if (!$this->domainApiExclusive && !str_starts_with($givenRouteArr[0], $this->appInfo['route'])) {
+				$givenRouteArr[0] = $this->appInfo['route'] . '/' . $givenRouteArr[0];
+			}
+		} else {
+			$givenRouteArr[0] = $givenRoute;
 		}
 
-		$routeArray = explode('/', $givenRoute);
+		$routeArray = explode('/', $givenRouteArr[0]);
 
 		$this->getGivenRouteClass($routeArray);
 
 		if ($this->getQuery) {
-			$routeToMatch = '/' . $givenRoute . '/q/' . ':params';
+			$routeToMatch = '/' . $givenRouteArr[0] . '/q/' . ':params';
 		} else {
-			$routeToMatch = '/' . $givenRoute;
+			$routeToMatch = '/' . $givenRouteArr[0];
+		}
+
+		if ($this->apps->isMurl) {
+			$routeToMatch = '/' . ':params';
+		}
+
+		if ($this->isApi && isset($givenRouteArr[1])) {//Assign params to dispatcher manually so that BaseComponent can pic them up
+			$params = explode('/', trim($givenRouteArr[1], '/'));
+
+			$this->dispatcher->setParameters($params);
 		}
 
 		$this->setDefaultNamespace(false);
@@ -215,6 +270,9 @@ class Router
 	protected function getGivenRouteClass(array $routeArray)
 	{
 		if (!$this->domainAppExclusive) {
+			unset($routeArray[0]); //Remove app name
+		}
+		if ($this->domainApiExclusive) {
 			unset($routeArray[0]); //Remove app name
 		}
 
@@ -236,39 +294,49 @@ class Router
 		}
 	}
 
-	protected function registerDefaults()
+	protected function registerDefaults($found = false)
 	{
-		$this->router->setDefaultNamespace(
-			'System\Base\Providers\ErrorServiceProvider'
-		);
+		if ($found) {
+			$this->router->setDefaultNamespace($this->defaultNamespace);
+			$this->router->setDefaultController($this->controller ?? 'home');
+			$this->router->setDefaultAction($this->action ?? 'view');
+		} else {
+			if (!$this->isApi) {
+				$this->router->setDefaultNamespace(
+					'System\Base\Providers\ErrorServiceProvider'
+				);
 
-		$this->router->setDefaultController('index');
+				$this->router->setDefaultController('index');
 
-		$this->router->setDefaultAction('view');
+				$this->router->setDefaultAction('view');
+			}
+		}
 	}
 
 	protected function regitserNotFound()
 	{
-		if ($this->appDefaults) {
-			if (isset($this->appDefaults['errorComponent'])) {
+		if (!$this->isApi) {
+			if ($this->appDefaults) {
+				if (isset($this->appDefaults['errorComponent'])) {
 
-				$errorComponent = ucfirst($this->appDefaults['errorComponent']);
+					$errorComponent = ucfirst($this->appDefaults['errorComponent']);
+
+				} else {
+
+					$errorComponent = 'Errors';
+				}
 
 			} else {
-
 				$errorComponent = 'Errors';
 			}
 
-		} else {
-			$errorComponent = 'Errors';
+			$this->router->notFound(
+				[
+					'controller' => $errorComponent,
+					'action'     => 'routeNotFound',
+				]
+			);
 		}
-
-		$this->router->notFound(
-			[
-				'controller' => $errorComponent,
-				'action'     => 'routeNotFound',
-			]
-		);
 	}
 
 	protected function validateDomain()
@@ -294,8 +362,11 @@ class Router
 			$this->appInfo = $this->apps->getAppById($this->domain['default_app_id']);
 
 			$this->domainAppExclusive = true;
-
 		} else  {
+			if (isset($this->domain['exclusive_for_api']) && $this->domain['exclusive_for_api'] == 1) {
+				$this->domainApiExclusive = true;
+			}
+
 			$this->appInfo = $this->apps->getAppInfo();
 
 			if (!$this->appInfo) {
@@ -325,14 +396,16 @@ class Router
 		$this->appDefaults['id'] = $this->appInfo['id'];
 		$this->appDefaults['app'] = $this->appInfo['route'];
 		$this->appDefaults['app_type'] = $this->appInfo['app_type'];
-		$this->appDefaults['component'] =
-			$this->components->getComponentById($this->appInfo['default_component'])['route'];
-		$this->appDefaults['errorComponent'] =
-			isset($this->appInfo['errors_component']) && $this->appInfo['errors_component'] != 0 ?
-			$this->components->getComponentById($this->appInfo['errors_component'])['route'] :
-			null;
-		$this->appDefaults['view'] =
-			$this->views->getViewById($this->domain['apps'][$this->appInfo['id']]['view'])['name'];
+		if (!$this->isApi) {
+			$this->appDefaults['component'] =
+				$this->components->getComponentById($this->appInfo['default_component'])['route'];
+			$this->appDefaults['errorComponent'] =
+				isset($this->appInfo['errors_component']) && $this->appInfo['errors_component'] != 0 ?
+				$this->components->getComponentById($this->appInfo['errors_component'])['route'] :
+				null;
+			$this->appDefaults['view'] =
+				$this->views->getViewById($this->domain['apps'][$this->appInfo['id']]['view'])['name'];
+		}
 
 		return true;
 	}
@@ -341,6 +414,26 @@ class Router
 	{
 		if (!$this->uri) {
 			$uri = explode('/q/', trim($this->requestUri, '/'));
+
+			if ($this->isApi) {
+				$uri[0] = explode('/', $uri[0]);
+				if ($uri[0][0] === 'api') {
+					unset($uri[0][0]);
+				}
+
+				$uri[0] = array_values($uri[0]);
+
+				if ($this->isApiPublic) {
+					if (isset($uri[0][0]) &&
+						$uri[0][0] === 'pub'
+					) {
+						unset($uri[0][0]);
+					}
+				}
+				$uri[0] = array_values($uri[0]);
+
+				$uri[0] = implode('/', $uri[0]);
+			}
 
 			$this->uri = $uri[0];
 

@@ -17,15 +17,15 @@ class StreamCache
         $this->cacheConfig = $cacheConfig;
     }
 
-    public function init()
+    public function init($force = false, $timeout = null)
     {
-        if ($this->cacheConfig->enabled) {
-            $serializerFactory = new SerializerFactory();
-
+        if ($this->cacheConfig->enabled || $force) {
             $options = [
-                'defaultSerializer' => 'Json',
-                'lifetime'          => $this->cacheConfig->timeout
+                'defaultSerializer' => 'json',
+                'lifetime'          => $timeout ?? $this->cacheConfig->timeout
             ];
+
+            $serializerFactory = new SerializerFactory();
 
             $adapter = new AdapterFactory($serializerFactory, $options);
 
@@ -41,7 +41,9 @@ class StreamCache
                 'adapter'   => 'stream',
                 'options'   => [
                     'prefix'            => 'stream',
-                    'storageDir'        => $savePath
+                    'storageDir'        => $savePath,
+                    'defaultSerializer' => 'json',
+                    'lifetime'          => $timeout ?? $this->cacheConfig->timeout
                 ],
             ];
 
@@ -49,7 +51,7 @@ class StreamCache
 
             return $this->cache;
         } else {
-            return false;
+            return $this;
         }
     }
 
