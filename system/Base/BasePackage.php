@@ -587,14 +587,12 @@ abstract class BasePackage extends Controller
 				}
 			}
 
-			if ($this->filterConditions) {
-				if ($this->config->databasetype === 'db') {
-					$paginationCounters['filtered_items'] = $this->modelToUse::count($this->filterConditions);
-				} else {
-					$paginationCounters['filtered_items'] = $this->ffStore->count($this->filterConditions);
-				}
+			$paginationCounters['filtered_items'] = $paginationCounters['total_items'];
+
+			if ($this->filterConditions && $this->config->databasetype === 'db') {
+				$paginationCounters['filtered_items'] = $this->modelToUse::count($this->filterConditions);
 			} else {
-				$paginationCounters['filtered_items'] = $paginationCounters['total_items'];
+				$paginationCounters['filtered_items'] = count($data);
 			}
 
 			$paginationCounters['limit'] = (int) $pageParams['limit'];
@@ -1141,7 +1139,7 @@ abstract class BasePackage extends Controller
 				}
 
 				$params['conditions'] = $ffConditions;
-				// and|name|like|aus&or|name|like|pak|&
+				// -|name|like|%aus%&or|name|like|%ind%|&
 				// dump($params);die();
 				$data = $this->getByParams($params, true, false);
 			}

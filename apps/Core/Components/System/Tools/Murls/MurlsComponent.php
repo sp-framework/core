@@ -88,16 +88,16 @@ class MurlsComponent extends BaseComponent
         }
 
         if ($this->request->isPost()) {
-            $rows =
+            $data =
                 $this->generateDTContent(
                     $this->murls,
-                    'system/tools/murls/view',
                     null,
-                    ['murl', 'hits', 'valid_till']
+                    null,
+                    ['murl', 'hits']
                 );
 
-            if ($rows) {
-                $this->addResponse('Ok', 0, ['data' => $rows]);
+            if ($data) {
+                $this->addResponse('Ok', 0, ['data' => $data]);
             }
 
             return;
