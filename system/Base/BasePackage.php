@@ -1579,6 +1579,13 @@ abstract class BasePackage extends Controller
 		return $this->modelToUse;
 	}
 
+	public function setModelToUse($model)
+	{
+		$this->modelToUse = $model;
+
+		$this->setFfStoreToUse();
+	}
+
 	protected function getModelsMetaData()
 	{
 		if ($this->config->databasetype === 'db' && $this->modelToUse) {
