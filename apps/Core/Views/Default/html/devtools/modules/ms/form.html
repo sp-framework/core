@@ -1,0 +1,227 @@
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'module_type',
+                        'fieldLabel'                     : false,
+                        'fieldType'                      : 'html',
+                        'fieldAdditionalClass'           : 'mb-0',
+                        'fieldHelp'                      : false,
+                        'fieldRequired'                  : false,
+                        'fieldHidden'                    : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'module_id',
+                        'fieldLabel'                     : false,
+                        'fieldType'                      : 'html',
+                        'fieldAdditionalClass'           : 'mb-0',
+                        'fieldHelp'                      : false,
+                        'fieldRequired'                  : false,
+                        'fieldHidden'                    : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'usedModules',
+                        'fieldLabel'                     : 'Select Module',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select module to view/change settings.',
+                        'fieldBazScan'                   : true,
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldDataSelect2Options'        : usedModules,
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsSelected': ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div id="{{componentId}}-{{sectionId}}-components-form" hidden>
+        </div>
+        <div id="{{componentId}}-{{sectionId}}-packages-form" hidden>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'allowedFileMimeTypes',
+                            'fieldLabel'                     : 'Allowed File Mime Types',
+                            'fieldType'                      : 'json',
+                            'fieldDataMaxLength'             : 4096,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Allowed File Mime Types. Format: JSON',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazJstreeSearch'           : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 4096,
+                            'fieldTextareaRows'              : 4,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'allowedImageMimeTypes',
+                            'fieldLabel'                     : 'Allowed Image Mime Types',
+                            'fieldType'                      : 'json',
+                            'fieldDataMaxLength'             : 4096,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Allowed Image Mime Types. Format: JSON',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazJstreeSearch'           : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 4096,
+                            'fieldTextareaRows'              : 4,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'allowedImageSizes',
+                            'fieldLabel'                     : 'Allowed Image Sizes',
+                            'fieldType'                      : 'json',
+                            'fieldDataMaxLength'             : 4096,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Allowed Image Sizes. Format: JSON',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazJstreeSearch'           : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 4096,
+                            'fieldTextareaRows'              : 4,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</form>
+{% set usedModules = json_encode(usedModules, 16) %}
+<script>
+/* globals PNotify Swal dataCollection */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-module_type'                                 : { },
+        '{{componentId}}-{{sectionId}}-module_id'                                   : { },
+        '{{componentId}}-{{sectionId}}-usedModules'                                 : {
+            placeholder : 'SELECT MODULE TO VIEW/UPDATE',
+            afterInit: function() {
+                var usedModules = { };
+                usedModules = JSON.parse('{{usedModules}}');
+
+                $('#{{componentId}}-{{sectionId}}-updateData').attr('disabled', true);
+
+                $('#{{componentId}}-{{sectionId}}-usedModules').on('select2:select', function(e) {
+                    $('#{{componentId}}-{{sectionId}}-updateData').attr('disabled', false);
+                    var id = e.params.data.id;
+
+                    var label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
+
+                    if (usedModules[label]['childs'][id]['settings']) {
+                        $('#{{componentId}}-{{sectionId}}-allowedFileMimeTypes')
+                            .val(JSON.stringify(usedModules[label]['childs'][id]['settings']['allowedFileMimeTypes']));
+                        $('#{{componentId}}-{{sectionId}}-allowedImageMimeTypes')
+                            .val(JSON.stringify(usedModules[label]['childs'][id]['settings']['allowedImageMimeTypes']));
+                        $('#{{componentId}}-{{sectionId}}-allowedImageSizes')
+                            .val(JSON.stringify(usedModules[label]['childs'][id]['settings']['allowedImageSizes']));
+                    }
+
+                    dataCollectionSection['data']['module_id'] = id;
+                    dataCollectionSection['data']['module_type'] = label;
+
+                    $('#{{componentId}}-{{sectionId}}-packages-form').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-components-form').attr('hidden', true);
+
+                    if (label === 'packages') {
+                        $('#{{componentId}}-{{sectionId}}-packages-form').attr('hidden', false);
+                    } else if (label === 'components') {
+                        $('#{{componentId}}-{{sectionId}}-components-form').attr('hidden', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-allowedFileMimeTypes'                        : { },
+        '{{componentId}}-{{sectionId}}-allowedImageMimeTypes'                       : { },
+        '{{componentId}}-{{sectionId}}-allowedImageSizes'                           : { },
+        '{{componentId}}-{{sectionId}}-form'                                        : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
+            rules: {
+                '{{componentId}}-{{sectionId}}-allowedFileMimeTypes'            : {'required' : true, 'json' : true},
+                '{{componentId}}-{{sectionId}}-allowedImageMimeTypes'           : {'required' : true, 'json' : true},
+                '{{componentId}}-{{sectionId}}-allowedImageSizes'               : {'required' : true, 'json' : true}
+            },
+            messages: {
+            }
+        }
+    });
+</script>

@@ -14,7 +14,7 @@ class ServicesComponent extends BaseComponent
 
     public function initialize()
     {
-        $this->apiPackage = $this->basepackages->api;
+        $this->apiPackage = $this->usePackage('apiClientServices');
     }
 
     /**
@@ -144,24 +144,19 @@ class ServicesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->apiPackage->addApi($this->postData())) {
-                $this->view->responseData = $this->apiPackage->packagesData->last;
-            }
+        $responseData = [];
 
-            $this->view->responseCode = $this->apiPackage->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->apiPackage->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+        if ($this->apiPackage->addApi($this->postData())) {
+            $responseData = $this->apiPackage->packagesData->last;
         }
+
+        $this->addResponse(
+            $this->apiPackage->packagesData->responseMessage,
+            $this->apiPackage->packagesData->responseCode,
+            $responseData
+        );
     }
 
     /**
@@ -169,22 +164,14 @@ class ServicesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->apiPackage->updateApi($this->postData());
+        $this->apiPackage->updateApi($this->postData());
 
-            $this->view->responseCode = $this->apiPackage->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->apiPackage->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
+        $this->addResponse(
+            $this->apiPackage->packagesData->responseMessage,
+            $this->apiPackage->packagesData->responseCode
+        );
     }
 
     /**
@@ -192,21 +179,13 @@ class ServicesComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->apiPackage->removeApi($this->postData());
+        $this->apiPackage->removeApi($this->postData());
 
-            $this->view->responseCode = $this->apiPackage->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->apiPackage->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
+        $this->addResponse(
+            $this->apiPackage->packagesData->responseMessage,
+            $this->apiPackage->packagesData->responseCode
+        );
     }
 }

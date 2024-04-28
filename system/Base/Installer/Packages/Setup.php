@@ -14,7 +14,7 @@ use League\Flysystem\UnableToDeleteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Filter\Validation\Validator\Email;
 use Phalcon\Filter\Validation\Validator\PresenceOf;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Api\Apis\Repos as RegisterRepos;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\ApiClientServices\Apis\Repos as RegisterRepos;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Dashboard as RegisterCoreDashboard;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Filter as RegisterFilter;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Geo\Countries as RegisterCountries;
@@ -38,9 +38,9 @@ use System\Base\Installer\Packages\Setup\Register\Providers\Core as RegisterCore
 use System\Base\Installer\Packages\Setup\Register\Providers\Domain as RegisterDomain;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ActivityLogs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\AddressBook;
-use System\Base\Installer\Packages\Setup\Schema\Basepackages\Api\Api;
-use System\Base\Installer\Packages\Setup\Schema\Basepackages\Api\ApiCalls;
-use System\Base\Installer\Packages\Setup\Schema\Basepackages\Api\Apis\Repos;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\ApiClientServices;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\ApiClientServicesCalls;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\Apis\Repos;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards\Widgets as DashboardsWidgets;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailQueue;
@@ -105,8 +105,8 @@ use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiScopes;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderApps;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsIpFilter;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsTypes;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Api\BasepackagesApi;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Api\BasepackagesApiCalls;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\ApiClientServices\BasepackagesApiClientServices;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\ApiClientServices\BasepackagesApiClientServicesCalls;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesActivityLogs;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesDashboards;
@@ -667,15 +667,15 @@ class Setup
 					'schema'	=> new Messenger,
 					'model'		=> new BasepackagesMessenger,
 			],
-			'basepackages_api' 							=> [
-					'schema'	=> new Api,
-					'model'		=> new BasepackagesApi,
+			'basepackages_api_client_services'			=> [
+					'schema'	=> new ApiClientServices,
+					'model'		=> new BasepackagesApiClientServices,
 			],
-			'basepackages_api_calls' 					=> [
-					'schema'	=> new ApiCalls,
-					'model'		=> new BasepackagesApiCalls,
+			'basepackages_api_client_services_calls' 	=> [
+					'schema'	=> new ApiClientServicesCalls,
+					'model'		=> new BasepackagesApiClientServicesCalls,
 			],
-			'basepackages_api_apis_repos' 				=> [
+			'basepackages_api_client_services_apis_repos'=> [
 					'schema'	=> new Repos,
 					'model'		=> null
 			],

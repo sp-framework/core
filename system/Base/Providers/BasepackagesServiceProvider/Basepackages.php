@@ -4,7 +4,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider;
 
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ActivityLogs;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\AddressBook;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Api\Api;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\ApiClientServices;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\BackupRestore;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Barcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Dashboards;
@@ -19,6 +19,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ImportExport;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Messenger;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Murls;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Progress;
@@ -26,7 +27,6 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Pusher;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Qrcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Templates;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Murls;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profile;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
@@ -86,7 +86,7 @@ class Basepackages
 
 	protected $progress;
 
-	protected $api;
+	protected $apiClientServices;
 
 	protected $messenger;
 
@@ -283,11 +283,11 @@ class Basepackages
 		return $this->progress;
 	}
 
-	protected function initApi()
+	protected function initApiClientServices()
 	{
-		$this->api = (new Api())->init();
+		$this->apiClientServices = (new ApiClientServices())->init();
 
-		return $this->api;
+		return $this->apiClientServices;
 	}
 
 	protected function initMessenger()
