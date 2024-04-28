@@ -125,11 +125,18 @@ abstract class BaseComponent extends Controller
 		$url = array_values($url);
 
 		$this->componentRoute = implode('/', $url);
+
+		$componentByRoute =
+			$this->modules->components->getComponentByRouteForAppId(
+				strtolower($this->componentRoute), $this->app['id']
+			);
+
 		if (!$this->component) {
-			$this->component =
-				$this->modules->components->getComponentByRouteForAppId(
-					strtolower($this->componentRoute), $this->app['id']
-				);
+			$this->component = $componentByRoute;
+		} else {
+			if ($this->component['route'] !== $componentByRoute['route']) {//Incorrect component captured due to same shortname grabbed via reflection
+				$this->component = $componentByRoute;
+			}
 		}
 
 		if ($checkWidgets) {
@@ -763,7 +770,6 @@ abstract class BaseComponent extends Controller
 		if ($getSettings) {
 			$this->view->usedModules = $usedModules;
 		}
-
 		return $package;
 	}
 
