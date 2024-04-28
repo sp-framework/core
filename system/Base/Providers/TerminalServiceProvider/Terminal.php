@@ -40,9 +40,11 @@ class Terminal extends BasePackage
             exit;
         }
 
+        system('clear');
+
         $this->setBanner();
 
-        echo $this->banner;
+        \cli\line($this->banner);
 
         return $this;
     }
@@ -51,15 +53,9 @@ class Terminal extends BasePackage
     {
         echo $this->hostname . $this->prompt;
 
-        if ($this->hasChilds) {
-            $command = $this->hasChilds;
+        $cliHandle = fopen('php://stdin','r');
 
-            $this->hasChilds = false;
-        } else {
-            $cliHandle = fopen('php://stdin','r');
-
-            $command = rtrim(fgets($cliHandle), "\r\n");
-        }
+        $command = rtrim(fgets($cliHandle), "\r\n");
 
         while (true) {
             if ($command === 'exit') {
@@ -72,20 +68,53 @@ class Terminal extends BasePackage
                 }
             } else if (str_contains($command, '?') || $command === '?' || $command === 'help') {
                 if ($command === '?') {
-                    var_dump('me');
-                    $this->showHelp();
+                    $this->showHelp($this->commands);
                 } else if (str_contains($command, '?')) {
-                    $this->showHelp(true);
+                    $command = trim(str_replace('?', '', $command));
+                    $command = explode(' ', $command);
 
-                    $command = str_replace('?', '', $command);
+                    $commands = $this->commands;
 
-                    $this->hasChilds = $command;
+                    if (count($command) > 1) {
+                        $cmdPath = [];
+                        foreach ($command as $commandKey) {
+                            if (isset($commands[$commandKey]['childs']) &&
+                                is_array($commands[$commandKey]['childs']) &&
+                                count($commands[$commandKey]['childs']) > 0
+                            ) {
+                                array_push($cmdPath, $commandKey);
+
+                                $commands = $commands[$commandKey]['childs'];
+                            }
+                        }
+
+                        if (isset($commands[$this->helper->last($command)])) {
+                            $this->showHelp([$commands[$this->helper->last($command)]], $cmdPath);
+                        } else {
+                            $this->showHelp($commands, $cmdPath);
+                        }
+                    } else {
+                        if (isset($this->commands[$command[0]]) &&
+                            isset($this->commands[$command[0]]['childs']) &&
+                            is_array($this->commands[$command[0]]['childs']) &&
+                            count($this->commands[$command[0]]['childs']) > 0
+                        ) {
+                            $this->showHelp($this->commands[$command[0]]['childs'], [$command[0]]);
+                        } else if (isset($this->commands[$command[0]])) {
+                            $this->showHelp($this->commands, [$command[0]]);
+                        } else {
+                            if (!$this->searchCommand(trim(strtolower($command[0])))) {
+                                echo "Command " . $command[0] . "not found!\n";
+                            }
+                        }
+                    }
                 }
-
             } else if (checkCtype($command)) {
                 if (!$this->searchCommand(trim(strtolower($command)))) {
                     echo "Command " . $command . " not found!\n";
                 }
+            } else if ($command !== '') {
+                echo "Command " . $command . " not found!\n";
             }
 
             $this->run();
@@ -102,18 +131,19 @@ class Terminal extends BasePackage
         exit;
     }
 
-    protected function showHelp($hasChilds = false)
+    protected function showHelp($commands, $cmdPath = null)
     {
+        if ($cmdPath) {
+            $cmdPath = implode(' ', $cmdPath) . ' ';
+        } else {
+            $cmdPath = '';
+        }
+
         $availableCommands = [];
 
-        foreach ($this->commands as $command) {
+        foreach ($commands as $command) {
             if ($this->whereAt === $command['availableAt']) {
-                if (!$hasChilds && $command['hasChilds'] === false) {
-                    array_push($availableCommands, [$command['command'], $command['description']]);
-                } else if ($hasChilds && $command['hasChilds'] === true) {
-                    var_dump($command);
-                    array_push($availableCommands, [$command['command'], $command['description']]);
-                }
+                array_push($availableCommands, [$cmdPath . $command['command'], $command['description']]);
             }
         }
 
@@ -128,13 +158,46 @@ class Terminal extends BasePackage
 
     protected function searchCommand($command)
     {
-        if (isset($this->commands[$command])) {
-            if (isset($this->commands[$command]['hasChilds']) && $this->commands[$command]['hasChilds'] === true) {
-                var_dump($command);
+        $commandArr = explode(' ', $command);
+
+        if (count($commandArr) === 1 &&
+            isset($this->commands[$commandArr[0]])
+        ) {
+            if (isset($this->commands[$commandArr[0]]['childs']) &&
+                is_array($this->commands[$commandArr[0]]['childs']) &&
+                count($this->commands[$commandArr[0]]['childs']) > 0
+            ) {
                 return true;
             }
 
-            return $this->execCommand($this->commands[$command]);
+            if ($this->commands[$commandArr[0]]['availableAt'] === $this->whereAt) {
+                return $this->execCommand($this->commands[$commandArr[0]]);
+            }
+        } else if (count($commandArr) > 1) {
+            $commands = $this->commands;
+
+            foreach ($commandArr as $commandKey) {
+                if (isset($commands[$commandKey]['childs']) &&
+                    is_array($commands[$commandKey]['childs']) &&
+                    count($commands[$commandKey]['childs']) > 0
+                ) {
+                    if (isset($commands[$commandKey]) &&
+                        $commandKey === $this->helper->last($commandArr)
+                    ) {
+                        if ($commands[$commandKey]['availableAt'] === $this->whereAt) {
+                            return $this->execCommand($commands[$commandKey]);
+                        }
+                    }
+
+                    $commands = $commands[$commandKey]['childs'];
+                }
+            }
+
+            if (isset($commands[$this->helper->last($commandArr)])) {
+                if ($commands[$this->helper->last($commandArr)]['availableAt'] === $this->whereAt) {
+                    return $this->execCommand($commands[$this->helper->last($commandArr)]);
+                }
+            }
         }
 
         return false;
@@ -148,7 +211,7 @@ class Terminal extends BasePackage
 
         $class = new $commandArr['class'];
 
-        $response = $class->init($this)->run($commandArr['args']);
+        $response = $class->init($this)->{$commandArr['function']}($commandArr['args']);
 
         if ($response !== null) {
             if ($class->packagesData->responseCode == 0) {
@@ -157,19 +220,34 @@ class Terminal extends BasePackage
                 $color = "%R";
             }
 
+            \cli\line("");
             \cli\line($color . $class->packagesData->responseMessage);
             \cli\out("%W");
+            if ($class->packagesData->responseData && count($class->packagesData->responseData) > 0) {
+
+                $responseData = true_flatten($class->packagesData->responseData);
+
+                foreach ($responseData as $key => $value) {
+                    if ($value === null || $value === '') {
+                        $value = 'null';
+                    }
+                    \cli\line("%b$key : %W$value");
+                }
+            }
+            \cli\line("");
 
             return true;
         }
-    }
 
+        return false;
+    }
 
     protected function setBanner($banner = null)
     {
         $this->banner =
-            "Welcome to SP!\n" .
-            "Type help or ? (question mark) for help at any time\n";
+            "%RWelcome to SP!\n\n" .
+            "Type help or ? (question mark) for help at any time\n\n" .
+            "Enter command and ? (question mark) for specific command help/options\n%W";
     }
 
     public function setWhereAt($at)

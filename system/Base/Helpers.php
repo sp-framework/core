@@ -134,6 +134,23 @@ if (!function_exists('flatten_array')) {
     }
 }
 
+if (!function_exists('true_flatten')) {
+    function true_flatten(array $array, array $parents = [])
+    {
+        $return = [];
+        foreach ($array as $k => $value) {
+            $p = empty($parents) ? [$k] : [...$parents, $k];
+            if (is_array($value)) {
+                $return = [...$return, ...true_flatten($value, $p)];
+            } else {
+                $return[implode('_', $p)] = $value;
+            }
+        }
+
+        return $return;
+    }
+}
+
 if (!function_exists('convertObjToArr')) {
     function convertObjToArr($object)
     {
