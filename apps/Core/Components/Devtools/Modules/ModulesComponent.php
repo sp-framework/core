@@ -12,7 +12,7 @@ class ModulesComponent extends BaseComponent
 
 	public function initialize()
 	{
-		$this->modulesPackage = $this->usePackage(DevtoolsModules::class);
+		$this->modulesPackage = $this->usePackage(DevtoolsModules::class, 'packages');
 	}
 
 	/**
@@ -20,6 +20,8 @@ class ModulesComponent extends BaseComponent
 	 */
 	public function viewAction()
 	{
+		$this->checkSettingsRoute();
+
 		if (isset($this->getData()['bundles'])) {
 			$this->view->bundles = true;
 
@@ -122,7 +124,7 @@ class ModulesComponent extends BaseComponent
 
 		$this->view->modulesJson = $this->helper->encode($modulesJson);
 
-		$apisArr = $this->basepackages->api->init()->getAll()->api;
+		$apisArr = $this->basepackages->apiClientServices->init()->getAll()->apiClientServices;
 		if (count($apisArr) > 0) {
 			$apis[0]['id'] = 0;
 			$apis[0]['name'] = 'Local Modules';
@@ -130,7 +132,7 @@ class ModulesComponent extends BaseComponent
 
 			foreach ($apisArr as $api) {
 				if ($api['category'] === 'repos') {
-					$useApi = $this->basepackages->api->useApi($api['id'], true);
+					$useApi = $this->basepackages->apiClientServices->useApi($api['id'], true);
 					$apiConfig = $useApi->getApiConfig();
 
 					$apis[$api['id']]['id'] = $apiConfig['id'];

@@ -189,25 +189,6 @@
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                             : component,
-                        'componentName'                         : componentName,
-                        'componentId'                           : componentId,
-                        'sectionId'                             : sectionId,
-                        'fieldId'                               : 'release-version',
-                        'fieldLabel'                            : 'Release Version',
-                        'fieldHidden'                           : false,
-                        'fieldType'                             : 'html',
-                        'fieldBazScan'                          : true,
-                        'fieldBazPostOnCreate'                  : false,
-                        'fieldBazPostOnUpdate'                  : false,
-                        'fieldBazJstreeSearch'                  : true,
-                        'fieldHtmlContent'                      : '<h4 class="mt-1">SELECT RELEASE TYPE</h4>'
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
                         'component'                      : component,
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
@@ -224,6 +205,25 @@
                         'fieldBazPostOnUpdate'           : true,
                         'fieldBazJstreeSearch'           : true,
                         'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'release-version',
+                        'fieldLabel'                            : 'Release Version',
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'html',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldHtmlContent'                      : '<h4 class="mt-1">SELECT RELEASE TYPE</h4>'
                     ]
                 )}}
             </div>

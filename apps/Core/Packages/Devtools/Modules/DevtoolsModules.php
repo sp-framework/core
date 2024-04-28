@@ -21,9 +21,9 @@ class DevtoolsModules extends BasePackage
 
     public $bundles;
 
-    protected $api;
+    protected $apiClient;
 
-    protected $apiConfig;
+    protected $apiClientConfig;
 
     protected $newFiles = [];
 
@@ -987,16 +987,16 @@ $file .= '
             return false;
         }
 
-        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'IssueApi';
             $method = 'issueListLabels';
-            $args = [$this->apiConfig['org_user'], strtolower($data['name'])];
-        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+            $args = [$this->apiClientConfig['org_user'], strtolower($data['name'])];
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             //For github
         }
 
         try {
-            $labels = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+            $labels = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
         } catch (\throwable $e) {
             $this->addResponse($e->getmessage(), 1);
 
@@ -1027,15 +1027,15 @@ $file .= '
 
         $since = $latestRelease['created_at'];
 
-        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'IssueApi';
             $method = 'issueListIssues';
-            $args = [$this->apiConfig['org_user'], strtolower($data['name']), 'closed', implode(',', $data['labels']), null, null, null, $since];
-        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+            $args = [$this->apiClientConfig['org_user'], strtolower($data['name']), 'closed', implode(',', $data['labels']), null, null, null, $since];
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             //For github
         }
 
-        $issues = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+        $issues = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
 
         if ($issues) {
             $this->addResponse('Issues Synced', 0, ['issues' => $issues]);
@@ -1048,16 +1048,16 @@ $file .= '
 
     protected function getLatestRelease($data)
     {
-        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';
             $method = 'repoGetLatestRelease';
-            $args = [$this->apiConfig['org_user'], strtolower($data['name'])];
-        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+            $args = [$this->apiClientConfig['org_user'], strtolower($data['name'])];
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             //For github
         }
 
         try {
-            $latestRelease = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+            $latestRelease = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
         } catch (\throwable $e) {
             $this->addResponse($e->getMessage(), 1);
         }
@@ -1083,25 +1083,24 @@ $file .= '
             return false;
         }
 
-        $this->api = $this->basepackages->api->useApi($data['api_id'], true);
+        $this->apiClient = $this->basepackages->apiClientServices->useApi($data['api_id'], true);
+        $this->apiClientConfig = $this->apiClient->getApiConfig();
 
-        $this->apiConfig = $this->api->getApiConfig();
-
-        if ($this->apiConfig['auth_type'] === 'auth' &&
-            ((!$this->apiConfig['username'] || $this->apiConfig['username'] === '') &&
-             (!$this->apiConfig['password'] || $this->apiConfig['password'] === ''))
+        if ($this->apiClientConfig['auth_type'] === 'auth' &&
+            ((!$this->apiClientConfig['username'] || $this->apiClientConfig['username'] === '') &&
+             (!$this->apiClientConfig['password'] || $this->apiClientConfig['password'] === ''))
         ) {
             $this->addResponse('Username/Password missing, cannot sync', 1);
 
             return false;
-        } else if ($this->apiConfig['auth_type'] === 'access_token' &&
-                   (!$this->apiConfig['access_token'] || $this->apiConfig['access_token'] === '')
+        } else if ($this->apiClientConfig['auth_type'] === 'access_token' &&
+                   (!$this->apiClientConfig['access_token'] || $this->apiClientConfig['access_token'] === '')
         ) {
             $this->addResponse('Access token missing, cannot sync', 1);
 
             return false;
-        } else if ($this->apiConfig['auth_type'] === 'autho' &&
-                   (!$this->apiConfig['authorization'] || $this->apiConfig['authorization'] === '')
+        } else if ($this->apiClientConfig['auth_type'] === 'autho' &&
+                   (!$this->apiClientConfig['authorization'] || $this->apiClientConfig['authorization'] === '')
         ) {
             $this->addResponse('Authorization token missing, cannot sync', 1);
 
@@ -1113,7 +1112,7 @@ $file .= '
 
     public function bumpVersion($data)
     {
-        if (!$this->initApi($data['api_id'])) {
+        if (!$this->initApi($data)) {
             return false;
         }
 
@@ -1168,16 +1167,16 @@ $file .= '
             return false;
         }
 
-        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';
             $method = 'repoListBranches';
-            $args = [$this->apiConfig['org_user'], strtolower($data['name'])];
-        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+            $args = [$this->apiClientConfig['org_user'], strtolower($data['name'])];
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             //For github
         }
 
         try {
-            $branches = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+            $branches = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
         } catch (\throwable $e) {
             $this->addResponse($e->getMessage(), 1);
 
@@ -1199,7 +1198,7 @@ $file .= '
             return false;
         }
 
-        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';
             $method = 'repoCreateRelease';
 
@@ -1219,7 +1218,7 @@ $file .= '
 
             $args =
                 [
-                    $this->apiConfig['org_user'],
+                    $this->apiClientConfig['org_user'],
                     strtolower($data['name']),
                     [
                         'body'              => $data['release_notes'],
@@ -1230,12 +1229,12 @@ $file .= '
                         'target_commitish'  => $data['branch']
                     ]
                 ];
-        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             //For github
         }
 
         try {
-            $newRelease = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+            $newRelease = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
 
             if ($newRelease) {
                 $this->addResponse('Generated New Release!', 0, ['newRelease' => $newRelease]);
@@ -1267,15 +1266,15 @@ $file .= '
         $data['repo'] = $this->helper->last(explode('/', $data['repo']));
 
         //Check for bundle.json file
-        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';
             $method = 'repoGetContents';
-        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             //For github
         }
 
         try {
-            $file = $this->api->useMethod($collection, $method, [$this->apiConfig['org_user'], strtolower($data['repo']), 'bundle.json'])->getResponse(true);
+            $file = $this->apiClient->useMethod($collection, $method, [$this->apiClientConfig['org_user'], strtolower($data['repo']), 'bundle.json'])->getResponse(true);
         } catch (\throwable $e) {
             if ($e->getCode() !== 404) {
                 $this->addResponse($e->getMessage(), 1);
@@ -1304,7 +1303,7 @@ $file .= '
             $method = 'repoCreateFile';
             $args =
                 [
-                    $this->apiConfig['org_user'],
+                    $this->apiClientConfig['org_user'],
                     strtolower($data['repo']),
                     'bundle.json',
                     [
@@ -1316,7 +1315,7 @@ $file .= '
             $method = 'repoUpdateFile';
             $args =
                 [
-                    $this->apiConfig['org_user'],
+                    $this->apiClientConfig['org_user'],
                     strtolower($data['repo']),
                     'bundle.json',
                     [
@@ -1327,14 +1326,14 @@ $file .= '
                 ];
         }
 
-        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';
-        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             //For github
         }
 
         try {
-            $file = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+            $file = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
         } catch (\throwable $e) {
             $this->addResponse($e->getMessage(), 1);
 
@@ -1346,22 +1345,22 @@ $file .= '
 
     protected function checkRepo($data)
     {
-        if (!$this->apiConfig && !$this->initApi($data)) {
+        if (!$this->apiClientConfig && !$this->initApi($data)) {
             return false;
         }
 
         $data['repo'] = $this->helper->last(explode('/', $data['repo']));
 
         //Check Repo if exists
-        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';
             $method = 'repoGet';
-        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             //For github
         }
 
         try {
-            $repo = $this->api->useMethod($collection, $method, [$this->apiConfig['org_user'], strtolower($data['repo'])])->getResponse(true);
+            $repo = $this->apiClient->useMethod($collection, $method, [$this->apiClientConfig['org_user'], strtolower($data['repo'])])->getResponse(true);
         } catch (\throwable $e) {
             if ($e->getCode() === 404 && $data['createrepo'] == false) {
                 $this->addResponse('Repository does not exist. Please check create repo and publish again.' . $e->getMessage(), 1);
@@ -1379,19 +1378,19 @@ $file .= '
 
     protected function createRepo($data)
     {
-        if (!$this->apiConfig && !$this->initApi($data)) {
+        if (!$this->apiClientConfig && !$this->initApi($data)) {
             return false;
         }
 
         $data['repo'] = $this->helper->last(explode('/', $data['repo']));
 
-        if (strtolower($this->apiConfig['provider']) === 'gitea') {
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'OrganizationApi';
             $method = 'createOrgRepo';
 
             $args =
                 [
-                    $this->apiConfig['org_user'],
+                    $this->apiClientConfig['org_user'],
                     [
                         "auto_init"         => true,
                         "default_branch"    => "main",
@@ -1400,12 +1399,12 @@ $file .= '
                         "private"           => false,
                     ]
                 ];
-        } else if (strtolower($this->apiConfig['provider']) === 'github') {
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             //For github
         }
 
         try {
-            $newRepo = $this->api->useMethod($collection, $method, $args)->getResponse(true);
+            $newRepo = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
         } catch (\throwable $e) {
             $this->addResponse($e->getMessage(), 1);
 
