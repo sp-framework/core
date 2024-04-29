@@ -20,8 +20,6 @@ class ModulesComponent extends BaseComponent
 	 */
 	public function viewAction()
 	{
-		$this->checkSettingsRoute();
-
 		if (isset($this->getData()['bundles'])) {
 			$this->view->bundles = true;
 
