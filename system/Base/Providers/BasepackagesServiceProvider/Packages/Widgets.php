@@ -44,7 +44,7 @@ class Widgets extends BasePackage
     }
 
     public function getWidget(int $id, $task = null, $dashboardWidget = [])
-    {
+    {//Do investigation on BaseComponent method useComponentWithView for this.
         $widget = $this->getById($id);
 
         if (!$task) {
