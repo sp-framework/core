@@ -1,24 +1,28 @@
+
 {
-    "name"          : "DevtoolsModules",
-    "display_name"  : "Modules",
-    "description"   : "Package for Modules component",
-    "module_type"   : "packages",
-    "version"       : "0.0.0",
-    "app_type"      : "core",
-    "category"      : "devtools",
-    "repo"          : "https://.../",
-    "class"         : "Apps\\Core\\Packages\\Devtools\\Modules\\DevtoolsModules",
-    "dependencies"  : {
-        "core"          : {
-            "name"      : "Core",
-            "version"   : "0.0.0",
-            "repo"      : "https://.../"
-        },
-        "components"    : [],
-        "packages"      : [],
-        "middlewares"   : [],
-        "views"         : [],
-        "external"      : []
-    },
-    "settings"      : { }
+	"name" : "DevtoolsModules",
+	"display_name" : "Devtools Modules",
+	"description" : "Package for Modules component",
+	"module_type" : "packages",
+	"app_type" : "core",
+	"category" : "devtools",
+	"version" : "0.0.0",
+	"repo" : "https://.../",
+	"class" : "Apps\\Core\\Packages\\Devtools\\Modules\\DevtoolsModules",
+	"dependencies" : 
+	{
+		"core" : 
+		{
+			"name" : "Core",
+			"version" : "0.0.0",
+			"repo" : "https://.../"
+		},
+		"components" : [],
+		"packages" : [],
+		"middlewares" : [],
+		"views" : [],
+		"external" : []
+	},
+	"settings" : {
+	}
 }
