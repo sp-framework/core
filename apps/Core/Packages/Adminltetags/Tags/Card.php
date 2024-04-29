@@ -122,9 +122,8 @@ class Card extends Adminltetags
             $cardIsWidget = ' style="box-shadow: 0 0 0 0;margin: 0;background-color: #f4f6f9;"';
         }
 
+        $tools = '';
         if (isset($this->params['cardShowTools']) && count($this->params['cardShowTools']) > 0) {
-            $tools = '';
-
             foreach ($this->params['cardShowTools'] as $key => $tool) {
                 if ($tool === "refresh") {
                     $tools .=
@@ -167,40 +166,40 @@ class Card extends Adminltetags
                         </button>';
                 }
             }
-
-            if ($this->view->canMsv && $this->view->usedModules) {
-                $url = $this->links->url($this->params['component']['route'] . '/q/settings/true');
-                $tools .=
-                    '<a href="' . $url . '" class="btn btn-tool btn-tool-package-settings-link disabled" role="button" hidden="">Package Settings Link</a>' .
-                    '<script>
-                        $(document).ready(function() {
-                            $("#' . $this->params['componentId'] . '-listing .btn-tool-package-settings").click(function() {
-                                BazContentLoader.loadAjax($("#' . $this->params['componentId'] . '-listing .btn-tool-package-settings-link"), {
-                                    ajaxBefore                      : function () {
-                                                                        Pace.restart();
-                                                                        $("#baz-content").empty();
-                                                                        $("#loader").attr("hidden", false);
-                                                                    },
-                                    ajaxFinished                    : function () {
-                                                                        BazCore.updateBreadcrumb();
-                                                                        $("#loader").attr("hidden", true);
-                                                                        $(".tooltip").remove();
-                                                                    },
-                                    ajaxError                       : function () {
-                                                                        $("#loader").attr("hidden", true);
-                                                                        BazCore.updateBreadcrumb();
-                                                                    }
-                                });
-                                BazContentLoader.init();
-                            });
-                        });
-                    </script>
-                    <button type="button" class="btn btn-tool btn-tool-package-settings" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Package Settings" data-card-widget="package-settings">
-                        <i class="fas fa-fw fa-gears"></i>
-                    </button>';
-            }
         } else {
             $tools = '';
+        }
+
+        if ($this->view->canMsv && $this->view->usedModules) {
+            $url = $this->links->url($this->params['component']['route'] . '/q/settings/true');
+            $tools .=
+                '<a href="' . $url . '" class="btn btn-tool btn-tool-package-settings-link disabled" role="button" hidden="">Package Settings Link</a>' .
+                '<script>
+                    $(document).ready(function() {
+                        $("#' . $this->params['componentId'] . '-listing .btn-tool-package-settings").click(function() {
+                            BazContentLoader.loadAjax($("#' . $this->params['componentId'] . '-listing .btn-tool-package-settings-link"), {
+                                ajaxBefore                      : function () {
+                                                                    Pace.restart();
+                                                                    $("#baz-content").empty();
+                                                                    $("#loader").attr("hidden", false);
+                                                                },
+                                ajaxFinished                    : function () {
+                                                                    BazCore.updateBreadcrumb();
+                                                                    $("#loader").attr("hidden", true);
+                                                                    $(".tooltip").remove();
+                                                                },
+                                ajaxError                       : function () {
+                                                                    $("#loader").attr("hidden", true);
+                                                                    BazCore.updateBreadcrumb();
+                                                                }
+                            });
+                            BazContentLoader.init();
+                        });
+                    });
+                </script>
+                <button type="button" class="btn btn-tool btn-tool-package-settings" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Package Settings" data-card-widget="package-settings">
+                    <i class="fas fa-fw fa-gears"></i>
+                </button>';
         }
 
         if ($this->config->cache->enabled) {
