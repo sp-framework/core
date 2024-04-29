@@ -13,7 +13,7 @@ class StoragesComponent extends BaseComponent
 
     public function initialize()
     {
-        $this->storages = $this->usePackage('storages', 'packages');
+        $this->storages = $this->usePackage('storages', true);
     }
 
     /**
@@ -26,8 +26,6 @@ class StoragesComponent extends BaseComponent
         }
 
         if ($this->app['id'] == 1) {
-            $this->checkSettingsRoute();
-
             if (isset($this->getData()['id'])) {
                 if ($this->getData()['id'] != 0) {
                     $storage = $this->storages->getById($this->getData()['id']);

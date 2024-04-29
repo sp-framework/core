@@ -176,6 +176,8 @@ abstract class BaseComponent extends Controller
 
 	public function beforeExecuteRoute()
 	{
+		$this->checkSettingsRoute();
+
 		if (!$this->component && $this->app) {
 			$this->setErrorDispatcher('controllerNotFound');
 
@@ -251,7 +253,13 @@ abstract class BaseComponent extends Controller
 
 	protected function checkSettingsRoute()
 	{
-		if (isset($this->getData()['settings']) && $this->getData()['settings'] == 'true') {
+		if ($this->dispatcher->wasForwarded()) {
+			return;
+		}
+
+		if (isset($this->getData()['settings']) &&
+			$this->getData()['settings'] == 'true'
+		) {
 			$this->dispatcher->forward(['action' => 'msview']);
 		}
 	}

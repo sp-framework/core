@@ -12,7 +12,7 @@ class ModulesComponent extends BaseComponent
 
 	public function initialize()
 	{
-		$this->modulesPackage = $this->usePackage(DevtoolsModules::class, 'packages');
+		$this->modulesPackage = $this->usePackage(DevtoolsModules::class, true);
 	}
 
 	/**
