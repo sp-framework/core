@@ -592,7 +592,11 @@ abstract class BasePackage extends Controller
 			if ($this->filterConditions && $this->config->databasetype === 'db') {
 				$paginationCounters['filtered_items'] = $this->modelToUse::count($this->filterConditions);
 			} else {
-				$paginationCounters['filtered_items'] = count($data);
+				if ($data) {
+					$paginationCounters['filtered_items'] = count($data);
+				} else {
+					$paginationCounters['filtered_items'] = 0;
+				}
 			}
 
 			$paginationCounters['limit'] = (int) $pageParams['limit'];
