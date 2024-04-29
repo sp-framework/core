@@ -84,6 +84,17 @@ class ExceptionHandlers extends BaseComponent
 		return $this->sendJson();
 	}
 
+	public function handleIOException($exception)
+	{
+		$this->addResponse($exception->getMessage(), 1);
+
+		if (str_contains($exception->getMessage(), "Duplicate entry")) {
+			$this->addResponse("Entry with same data already exists.", 1);
+		}
+
+		return $this->sendJson();
+	}
+
 	private function setViewsDir($partial)
 	{
 		$this->view->setViewsDir(base_path($this->baseErrorDir));
