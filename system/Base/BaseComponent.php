@@ -851,10 +851,14 @@ abstract class BaseComponent extends Controller
 			);
 	}
 
-	protected function useComponentWithView($componentClass, $action = 'view')
+	protected function useComponentWithView($componentClass, $action = 'view', $args = null)
 	{
 		//To Use from Component - $this->useComponentWithView(HomeComponent::class);
 		//This will generate 2 view variables 1) {{home}} & {{homeTemplate}}
+		//This can be used for dashboard component
+		//From dashboard you can make a call to a component widgetAction and grab the template content from it.
+		//The template data can be then passed to view for widget rendering.
+		//Need further investigation.
 		$this->app = $this->apps->getAppInfo();
 
 		$component = $this->checkComponent($componentClass);
@@ -864,10 +868,10 @@ abstract class BaseComponent extends Controller
 			$componentAction = $action . 'Action';
 			$componentViewName = strtolower($component['name']) . 'Template';
 
-			var_dump($componentName,$componentAction,$componentViewName);
+			// var_dump($componentName,$componentAction,$componentViewName);
 
 			$this->view->{$componentName} =
-				$this->useComponent($componentClass)->{$componentAction}();
+				$this->useComponent($componentClass)->{$componentAction}($args);
 
 			$this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
 
