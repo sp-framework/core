@@ -742,36 +742,7 @@ abstract class BaseComponent extends Controller
 			}
 		}
 
-		if ($getSettings === 'components' || $getSettings === true) {
-			$thisComponent['id'] = $this->component['id'];
-			$thisComponent['name'] = $this->component['name'];
-			$thisComponent['settings'] = $this->component['settings'];
-			if (is_string($thisComponent['settings'])) {
-				$thisComponent['settings'] = $this->helper->decode($thisComponent['settings'], true);
-			}
-
-			if (isset($thisComponent['settings']['mandatory'])) {//Remove all crucial only dev settings
-				unset($thisComponent['settings']['mandatory']);
-			}
-			if (isset($thisComponent['settings']['needAuth'])) {//Remove all crucial only dev settings
-				unset($thisComponent['settings']['needAuth']);
-			}
-
-			if ($this->view->usedModules &&
-				isset($this->view->usedModules['components']['childs']) &&
-				is_array($this->view->usedModules['components']['childs']) &&
-				count($this->view->usedModules['components']['childs']) > 0
-			) {
-				$usedModules['components']['childs'] = $this->view->usedModules['components']['childs'];
-				$usedModules['components']['childs'][$thisComponent['id']] = $thisComponent;
-			} else {
-				$usedModules['components'] = [];
-				$usedModules['components']['value'] = 'components';
-				$usedModules['components']['childs'][$thisComponent['id']] = $thisComponent;
-			}
-		}
-
-		if ($getSettings === 'packages' || $getSettings === true) {
+		if ($getSettings) {
 			$packageInfo = $this->modules->packages->getPackageByName($packageClass);
 			$thisPackage['id'] = $packageInfo['id'];
 			$thisPackage['name'] = $packageInfo['name'];
@@ -796,10 +767,12 @@ abstract class BaseComponent extends Controller
 				$usedModules['packages']['value'] = 'packages';
 				$usedModules['packages']['childs'][$thisPackage['id']] = $thisPackage;
 			}
-		}
 
-		if ($getSettings) {
-			$this->view->usedModules = $usedModules;
+			if ($this->view->usedModules) {
+				array_merge($this->view->usedModules, $usedModules);
+			} else {
+				$this->view->usedModules = $usedModules;
+			}
 		}
 
 		return $package;
@@ -860,18 +833,53 @@ abstract class BaseComponent extends Controller
 			);
 	}
 
-	protected function useComponent($componentClass)
+	protected function useComponent($componentClass = null, $getSettings = false)
 	{
-		$this->app = $this->apps->getAppInfo();
-
-		if ($this->checkComponent($componentClass)) {
-			return new $componentClass();
+		if ($componentClass && $this->checkComponent($componentClass)) {
+			$component = new $componentClass();
 		} else {
 			throw new \Exception(
 				'Component class : ' . $componentClass .
 				' not available for app ' . $this->app['name']
 			);
 		}
+
+		if ($getSettings) {
+			$thisComponent['id'] = $this->component['id'];
+			$thisComponent['name'] = $this->component['name'];
+			$thisComponent['settings'] = $this->component['settings'];
+			if (is_string($thisComponent['settings'])) {
+				$thisComponent['settings'] = $this->helper->decode($thisComponent['settings'], true);
+			}
+
+			if (isset($thisComponent['settings']['mandatory'])) {//Remove all crucial only dev settings
+				unset($thisComponent['settings']['mandatory']);
+			}
+			if (isset($thisComponent['settings']['needAuth'])) {//Remove all crucial only dev settings
+				unset($thisComponent['settings']['needAuth']);
+			}
+
+			if ($this->view->usedModules &&
+				isset($this->view->usedModules['components']['childs']) &&
+				is_array($this->view->usedModules['components']['childs']) &&
+				count($this->view->usedModules['components']['childs']) > 0
+			) {
+				$usedModules['components']['childs'] = $this->view->usedModules['components']['childs'];
+				$usedModules['components']['childs'][$thisComponent['id']] = $thisComponent;
+			} else {
+				$usedModules['components'] = [];
+				$usedModules['components']['value'] = 'components';
+				$usedModules['components']['childs'][$thisComponent['id']] = $thisComponent;
+			}
+
+			if ($this->view->usedModules) {
+				array_merge($this->view->usedModules, $usedModules);
+			} else {
+				$this->view->usedModules = $usedModules;
+			}
+		}
+
+		return $component;
 	}
 
 	protected function checkComponent($componentClass)
