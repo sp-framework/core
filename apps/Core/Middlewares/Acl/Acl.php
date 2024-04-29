@@ -191,7 +191,7 @@ class Acl extends BaseMiddleware
         }
 
         $component =
-            $this->modules->components->getComponentByNameForAppId(
+            $this->modules->components->getComponentByClassForAppId(
                 $controllerName,
                 $this->app['id']
             );

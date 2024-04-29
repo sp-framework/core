@@ -95,7 +95,7 @@ if (localStorage.getItem('bazDevMode') === null) {
         <div class="wrapper">
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/header/view') %}
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/content/view') %}
-            {% if modules.components.getComponentByNameForAppId('Messenger', apps.getAppInfo()['id']) %}
+            {% if modules.components.getComponentByClassForAppId('Messenger', apps.getAppInfo()['id']) %}
                 {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/messenger/view') %}
             {% endif %}
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/footer/view') %}

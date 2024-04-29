@@ -89,7 +89,7 @@ class Components
 						'class',
 						[
 							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 2048,
+							'size'    => 512,
 							'notNull' => true,
 						]
 					),
@@ -222,9 +222,7 @@ class Components
 					new Index(
 						'column_UNIQUE',
 						[
-							'name',
-							'app_type',
-							'route'
+							'class'
 						],
 						'UNIQUE'
 					)

@@ -72,6 +72,35 @@ class Middlewares extends BasePackage
 		return false;
 	}
 
+	public function getMiddlewareByClassForAppId($class, $appId = null)
+	{
+		if (!$appId) {
+			$appId = isset($this->apps->getAppInfo()['id']) ? $this->apps->getAppInfo()['id'] : false;
+
+			if (!$appId) {
+				return false;
+			}
+		}
+
+		foreach($this->middlewares as $middleware) {
+			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
+
+			if ($middleware['class'] !== $class) {
+				continue;
+			}
+
+			if (isset($middleware['apps'][$appId])) {
+				if (isset($middleware['apps'][$appId]['enabled']) &&
+					$middleware['apps'][$appId]['enabled'] === true
+				) {
+					return $middleware;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	public function getMiddlewareByAppTypeAndRepoAndClass($appType, $repo, $class)
 	{
 		foreach($this->middlewares as $middleware) {

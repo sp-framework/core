@@ -13,7 +13,9 @@ class StoragesComponent extends BaseComponent
 
     public function initialize()
     {
-        $this->storages = $this->usePackage('storages', true);
+        $this->setModuleSettings(true);
+
+        $this->storages = $this->usePackage('storages');
     }
 
     /**

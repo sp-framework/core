@@ -34,6 +34,10 @@ abstract class BaseComponent extends Controller
 
 	protected $apiResponse = [];
 
+	protected $showModuleSettings = false;
+
+	protected $usedModules = [];
+
 	public $widgets;
 
 	protected function onConstruct()
@@ -86,8 +90,8 @@ abstract class BaseComponent extends Controller
 			str_replace('Component', '', $this->reflection->getShortName());
 
 		$this->component =
-			$this->modules->components->getComponentByNameForAppId(
-				$this->componentName, $this->app['id']
+			$this->modules->components->getComponentByClassForAppId(
+				$this->reflection->getName(), $this->app['id']
 			);
 
 		//Murl
@@ -269,11 +273,8 @@ abstract class BaseComponent extends Controller
 	 */
 	public function msviewAction()
 	{
-		if ($this->view->usedModules) {
-			if (isset($this->getData()['settings']) && $this->getData()['settings'] == 'true') {
-
-				$this->view->pick($this->helper->last(explode('/', $this->component['route'])) . '/msview');
-			}
+		if (isset($this->getData()['settings']) && $this->getData()['settings'] == 'true') {
+			$this->view->pick($this->helper->last(explode('/', $this->component['route'])) . '/msview');
 		}
 	}
 
@@ -516,6 +517,85 @@ abstract class BaseComponent extends Controller
 				$this->basepackages->murls->updateMurl($this->apps->isMurl);
 			}
 		}
+
+		if ($this->showModuleSettings) {
+			$usedModules = [];
+			$usedModules['components'] = [];
+			$usedModules['packages'] = [];
+			$usedModules['components']['value'] = 'components';
+			$usedModules['packages']['value'] = 'packages';
+			//Components
+			$thisComponent['id'] = $this->component['id'];
+			$thisComponent['name'] = $this->component['name'];
+			$thisComponent['settings'] = $this->component['settings'];
+			if (is_string($thisComponent['settings'])) {
+				$thisComponent['settings'] = $this->helper->decode($thisComponent['settings'], true);
+			}
+
+			if (isset($thisComponent['settings']['mandatory'])) {//Remove all crucial only dev settings
+				unset($thisComponent['settings']['mandatory']);
+			}
+			if (isset($thisComponent['settings']['needAuth'])) {//Remove all crucial only dev settings
+				unset($thisComponent['settings']['needAuth']);
+			}
+
+			if (count($thisComponent['settings']) > 0) {
+				$usedModules['components']['childs'][$thisComponent['id']] = $thisComponent;
+			}
+
+			if (isset($this->usedModules['components']) &&
+				is_array($this->usedModules['components']) &&
+				count($this->usedModules['components']) > 0
+			) {
+				foreach ($this->usedModules['components'] as $usedModulesComponent) {
+					$componentInfo = $this->modules->components->getComponentByClassForAppId($usedModulesComponent);
+					if (!$componentInfo) {
+						continue;
+					}
+					$thisComponent['id'] = $componentInfo['id'];
+					$thisComponent['name'] = $componentInfo['name'];
+					$thisComponent['settings'] = $componentInfo['settings'];
+					if (is_string($thisComponent['settings'])) {
+						$thisComponent['settings'] = $this->helper->decode($thisComponent['settings'], true);
+					}
+					if (isset($thisComponent['settings']['mandatory'])) {//Remove all crucial only dev settings
+						unset($thisComponent['settings']['mandatory']);
+					}
+					if (isset($thisComponent['settings']['needAuth'])) {//Remove all crucial only dev settings
+						unset($thisComponent['settings']['needAuth']);
+					}
+					if (count($thisComponent['settings']) > 0) {
+						$usedModules['components']['childs'][$thisComponent['id']] = $thisComponent;
+					}
+				}
+			}
+			//packages
+			if (isset($this->usedModules['packages']) &&
+				is_array($this->usedModules['packages']) &&
+				count($this->usedModules['packages']) > 0
+			) {
+				foreach ($this->usedModules['packages'] as $usedModulesPackage) {
+					$packageInfo = $this->modules->packages->getPackageByNameForAppId($usedModulesPackage);
+					if (!$packageInfo) {
+						continue;
+					}
+					$thisPackage['id'] = $packageInfo['id'];
+					$thisPackage['name'] = $packageInfo['name'];
+					$thisPackage['settings'] = $packageInfo['settings'];
+					if (is_string($thisPackage['settings'])) {
+						$thisPackage['settings'] = $this->helper->decode($thisPackage['settings'], true);
+					}
+					if (isset($thisPackage['settings']['componentRoute'])) {//Remove all crucial only dev settings
+						unset($thisPackage['settings']['componentRoute']);
+					}
+					if (count($thisPackage['settings']) > 0) {
+						$usedModules['packages']['childs'][$thisPackage['id']] = $thisPackage;
+					}
+				}
+			}
+
+			$this->view->usedModules = $usedModules;
+		}
 	}
 
 	protected function buildHeaderBreadcrumb()
@@ -722,7 +802,7 @@ abstract class BaseComponent extends Controller
 		return $this->request->getPut();
 	}
 
-	protected function usePackage($packageClass, $getSettings = false)
+	protected function usePackage($packageClass)
 	{
 		if (strpos($packageClass, '\\') === false) {
 			$package = $this->basepackages->$packageClass;
@@ -734,14 +814,14 @@ abstract class BaseComponent extends Controller
 			$packageClass = explode('\\', $packageClass);
 
 			if (count($packageClass) === 1) {
-				$packageClass = $packageClass[0];
+				$packageName = $packageClass[0];
 			} else {
-				$packageClass = implode('', $packageClass);
+				$packageName = implode('', $packageClass);
 			}
 		} else {
 			if ($this->checkPackage($packageClass)) {
 				$package = (new $packageClass())->init();
-				$packageClass = $this->helper->last(explode('\\', $packageClass));
+				$packageName = $this->helper->last(explode('\\', $packageClass));
 			} else {
 				throw new \Exception(
 					'Package class : ' . $packageClass .
@@ -750,38 +830,11 @@ abstract class BaseComponent extends Controller
 			}
 		}
 
-		if ($getSettings) {
-			$packageInfo = $this->modules->packages->getPackageByName($packageClass);
-			$thisPackage['id'] = $packageInfo['id'];
-			$thisPackage['name'] = $packageInfo['name'];
-			$thisPackage['settings'] = $packageInfo['settings'];
-			if (is_string($thisPackage['settings'])) {
-				$thisPackage['settings'] = $this->helper->decode($thisPackage['settings'], true);
-			}
-
-			if (isset($thisPackage['settings']['componentRoute'])) {//Remove all crucial only dev settings
-				unset($thisPackage['settings']['componentRoute']);
-			}
-
-			if ($this->view->usedModules &&
-				isset($this->view->usedModules['packages']['childs']) &&
-				is_array($this->view->usedModules['packages']['childs']) &&
-				count($this->view->usedModules['packages']['childs']) > 0
-			) {
-				$usedModules['packages']['childs'] = $this->view->usedModules['packages']['childs'];
-				$usedModules['packages']['childs'][$thisPackage['id']] = $thisPackage;
-			} else {
-				$usedModules['packages'] = [];
-				$usedModules['packages']['value'] = 'packages';
-				$usedModules['packages']['childs'][$thisPackage['id']] = $thisPackage;
-			}
-
-			if ($this->view->usedModules) {
-				array_merge($this->view->usedModules, $usedModules);
-			} else {
-				$this->view->usedModules = $usedModules;
-			}
+		if (!isset($this->usedModules['packages'])) {
+			$this->usedModules['packages'] = [];
 		}
+
+		array_push($this->usedModules['packages'], $packageName);
 
 		return $package;
 	}
@@ -841,10 +894,12 @@ abstract class BaseComponent extends Controller
 			);
 	}
 
-	protected function useComponent($componentClass = null, $getSettings = false)
+	protected function useComponent($componentClass)
 	{
-		if ($componentClass && $this->checkComponent($componentClass)) {
+		if ($this->checkComponent($componentClass)) {
 			$component = new $componentClass();
+
+			$componentName = $this->helper->last(explode('\\', $componentClass));
 		} else {
 			throw new \Exception(
 				'Component class : ' . $componentClass .
@@ -852,40 +907,11 @@ abstract class BaseComponent extends Controller
 			);
 		}
 
-		if ($getSettings) {
-			$thisComponent['id'] = $this->component['id'];
-			$thisComponent['name'] = $this->component['name'];
-			$thisComponent['settings'] = $this->component['settings'];
-			if (is_string($thisComponent['settings'])) {
-				$thisComponent['settings'] = $this->helper->decode($thisComponent['settings'], true);
-			}
-
-			if (isset($thisComponent['settings']['mandatory'])) {//Remove all crucial only dev settings
-				unset($thisComponent['settings']['mandatory']);
-			}
-			if (isset($thisComponent['settings']['needAuth'])) {//Remove all crucial only dev settings
-				unset($thisComponent['settings']['needAuth']);
-			}
-
-			if ($this->view->usedModules &&
-				isset($this->view->usedModules['components']['childs']) &&
-				is_array($this->view->usedModules['components']['childs']) &&
-				count($this->view->usedModules['components']['childs']) > 0
-			) {
-				$usedModules['components']['childs'] = $this->view->usedModules['components']['childs'];
-				$usedModules['components']['childs'][$thisComponent['id']] = $thisComponent;
-			} else {
-				$usedModules['components'] = [];
-				$usedModules['components']['value'] = 'components';
-				$usedModules['components']['childs'][$thisComponent['id']] = $thisComponent;
-			}
-
-			if ($this->view->usedModules) {
-				array_merge($this->view->usedModules, $usedModules);
-			} else {
-				$this->view->usedModules = $usedModules;
-			}
+		if (!isset($this->usedModules['components'])) {
+			$this->usedModules['components'] = [];
 		}
+
+		array_push($this->usedModules['components'], $componentName);
 
 		return $component;
 	}
@@ -893,8 +919,8 @@ abstract class BaseComponent extends Controller
 	protected function checkComponent($componentClass)
 	{
 		return
-			$this->modules->components->getComponentByNameForAppId(
-				str_replace('Component', '', $this->helper->last(explode('\\', $componentClass))),
+			$this->modules->components->getComponentByClassForAppId(
+				$componentClass,
 				$this->app['id']
 			);
 	}
@@ -1026,5 +1052,10 @@ abstract class BaseComponent extends Controller
 	protected function extractNumbers($string)
 	{
 		return preg_replace('/[^0-9]/', '', $string);
+	}
+
+	public function setModuleSettings(bool $setting)
+	{
+		$this->showModuleSettings = $setting;
 	}
 }

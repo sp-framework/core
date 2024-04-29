@@ -18,8 +18,16 @@ class Packages extends BasePackage
 		return $this;
 	}
 
-	public function getPackageByNameForAppId($name, $appId)
+	public function getPackageByNameForAppId($name, $appId = null)
 	{
+		if (!$appId) {
+			$appId = isset($this->apps->getAppInfo()['id']) ? $this->apps->getAppInfo()['id'] : false;
+
+			if (!$appId) {
+				return false;
+			}
+		}
+
 		foreach($this->packages as $package) {
 			$package['apps'] = $this->helper->decode($package['apps'], true);
 
@@ -34,6 +42,36 @@ class Packages extends BasePackage
 
 		return false;
 	}
+
+	public function getPackageByClassForAppId($class, $appId = null)
+	{
+		if (!$appId) {
+			$appId = isset($this->apps->getAppInfo()['id']) ? $this->apps->getAppInfo()['id'] : false;
+
+			if (!$appId) {
+				return false;
+			}
+		}
+
+		foreach($this->packages as $package) {
+			$package['apps'] = $this->helper->decode($package['apps'], true);
+
+			if ($package['class'] !== $class) {
+				continue;
+			}
+
+			if (isset($package['apps'][$appId])) {
+				if (isset($package['apps'][$appId]['enabled']) &&
+					$package['apps'][$appId]['enabled'] === true
+				) {
+					return $package;
+				}
+			}
+		}
+
+		return false;
+	}
+
 
 	public function getPackagesByApiId($apiId)
 	{

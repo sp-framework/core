@@ -91,8 +91,20 @@ class Components extends BasePackage
 		return false;
 	}
 
-	public function getComponentByRouteForAppId($route, $appId)
+	public function getComponentByRouteForAppId($route, $appId = null)
 	{
+		if (!$appId) {
+			$appId = isset($this->apps->getAppInfo()['id']) ? $this->apps->getAppInfo()['id'] : false;
+
+			if (!$appId) {
+				return false;
+			}
+		}
+
+		if ($route === '') {
+			$route = 'home';
+		}
+
 		foreach($this->components as $component) {
 			$component['apps'] = $this->helper->decode($component['apps'], true);
 
@@ -118,6 +130,49 @@ class Components extends BasePackage
 				if (isset($component['apps'][$appId]['enabled']) &&
 					$component['apps'][$appId]['enabled'] === true &&
 					strtolower($component['name']) === strtolower($name)
+				) {
+					return $component;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public function getComponentByClassForAppId($class, $appId = null)
+	{
+		if (!$appId) {
+			$appId = isset($this->apps->getAppInfo()['id']) ? $this->apps->getAppInfo()['id'] : false;
+
+			if (!$appId) {
+				return false;
+			}
+		}
+
+		if (!str_contains($class, 'Component')) {
+			$class = ucfirst($class) . 'Component';
+		}
+
+		$classArr = explode('\\', $class);
+
+		foreach($this->components as $component) {
+			$component['apps'] = $this->helper->decode($component['apps'], true);
+
+			if (count($classArr) === 1) {//Only Class Name Given
+				if (!str_contains($component['class'], $classArr[0])) {
+					continue;
+				}
+			} else {
+				$class = implode('\\', $classArr);
+
+				if ($component['class'] !== $class) {
+					continue;
+				}
+			}
+
+			if (isset($component['apps'][$appId])) {
+				if (isset($component['apps'][$appId]['enabled']) &&
+					$component['apps'][$appId]['enabled'] === true
 				) {
 					return $component;
 				}
