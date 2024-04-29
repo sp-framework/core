@@ -759,7 +759,17 @@ class Setup
 
 	protected function registerCoreAppType()
 	{
-		return (new RegisterCoreAppType())->register($this->db, $this->ff);
+		try {
+			$jsonFile =
+				$this->helper->decode(
+					$this->localContent->read('apps/Core/Install/type.json'),
+					true
+				);
+		} catch (\throwable $e) {
+			throw new \Exception($e->getMessage() . '. Problem reading type.json');
+		}
+
+		return (new RegisterCoreAppType())->register($this->db, $this->ff, $jsonFile);
 	}
 
 	protected function registerCoreApp()
@@ -806,8 +816,14 @@ class Setup
 						$this->registerCoreDashboard($jsonFile);
 					}
 
-					if (isset($jsonFile['widgets']) && count($jsonFile['widgets']) > 0) {
-						$this->registerCoreWidgets($jsonFile, $registeredComponentId, $adminComponent);
+					if (isset($jsonFile['widgets'])) {
+						if (is_string($jsonFile['widgets'])) {
+							$jsonFile['widgets'] = $this->helper->decode($jsonFile['widgets'], true);
+						}
+
+						if (count($jsonFile['widgets']) > 0) {
+							$this->registerCoreWidgets($jsonFile, $registeredComponentId, $adminComponent);
+						}
 					}
 				}
 			}

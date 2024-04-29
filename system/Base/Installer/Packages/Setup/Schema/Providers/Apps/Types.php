@@ -22,19 +22,19 @@ class Types
                     ]
                 ),
                 new Column(
-                    'app_type',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 50,
-                        'notNull' => true
-                    ]
-                ),
-                new Column(
                     'name',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 100,
                         'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'app_type',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => true
                     ]
                 ),
                 new Column(
