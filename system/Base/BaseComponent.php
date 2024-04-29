@@ -274,32 +274,26 @@ abstract class BaseComponent extends Controller
 	 */
 	public function msupdateAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			if (isset($this->postData()['module_id']) &&
-				$this->postData()['module_type'] === 'components'
-			) {
-				$this->modules->components->msupdate($this->postData());
+		if (isset($this->postData()['id']) &&
+			$this->postData()['module_type'] === 'components'
+		) {
+			$this->modules->components->msupdate($this->postData());
 
-				$this->addResponse(
-					$this->modules->components->packagesData->responseMessage,
-					$this->modules->components->packagesData->responseCode
-				);
-			} else if (isset($this->postData()['module_id']) &&
-					   $this->postData()['module_type'] === 'packages'
-			) {
-				$this->modules->packages->msupdate($this->postData());
+			$this->addResponse(
+				$this->modules->components->packagesData->responseMessage,
+				$this->modules->components->packagesData->responseCode
+			);
+		} else if (isset($this->postData()['id']) &&
+				   $this->postData()['module_type'] === 'packages'
+		) {
+			$this->modules->packages->msupdate($this->postData());
 
-				$this->addResponse(
-					$this->modules->packages->packagesData->responseMessage,
-					$this->modules->packages->packagesData->responseCode
-				);
-			}
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
+			$this->addResponse(
+				$this->modules->packages->packagesData->responseMessage,
+				$this->modules->packages->packagesData->responseCode
+			);
 		}
 	}
 
@@ -724,6 +718,18 @@ abstract class BaseComponent extends Controller
 	{
 		if (strpos($packageClass, '\\') === false) {
 			$package = $this->basepackages->$packageClass;
+
+			$reflection = new \ReflectionClass($package);
+
+			$packageClass = $reflection->getName();
+			$packageClass = str_replace('System\Base\Providers\BasepackagesServiceProvider\Packages\\', '', $packageClass);
+			$packageClass = explode('\\', $packageClass);
+
+			if (count($packageClass) === 1) {
+				$packageClass = $packageClass[0];
+			} else {
+				$packageClass = implode('', $packageClass);
+			}
 		} else {
 			if ($this->checkPackage($packageClass)) {
 				$package = (new $packageClass())->init();
@@ -739,13 +745,28 @@ abstract class BaseComponent extends Controller
 		if ($getSettings === 'components' || $getSettings === true) {
 			$thisComponent['id'] = $this->component['id'];
 			$thisComponent['name'] = $this->component['name'];
-			$thisComponent['settings'] = $this->helper->decode($this->component['settings'], true);
+			$thisComponent['settings'] = $this->component['settings'];
+			if (is_string($thisComponent['settings'])) {
+				$thisComponent['settings'] = $this->helper->decode($thisComponent['settings'], true);
+			}
 
-			if (!isset($usedModules['components'])) {
-				$usedModules['components'] = [];
-				$usedModules['components']['value'] = 'components';
+			if (isset($thisComponent['settings']['mandatory'])) {//Remove all crucial only dev settings
+				unset($thisComponent['settings']['mandatory']);
+			}
+			if (isset($thisComponent['settings']['needAuth'])) {//Remove all crucial only dev settings
+				unset($thisComponent['settings']['needAuth']);
+			}
+
+			if ($this->view->usedModules &&
+				isset($this->view->usedModules['components']['childs']) &&
+				is_array($this->view->usedModules['components']['childs']) &&
+				count($this->view->usedModules['components']['childs']) > 0
+			) {
+				$usedModules['components']['childs'] = $this->view->usedModules['components']['childs'];
 				$usedModules['components']['childs'][$thisComponent['id']] = $thisComponent;
 			} else {
+				$usedModules['components'] = [];
+				$usedModules['components']['value'] = 'components';
 				$usedModules['components']['childs'][$thisComponent['id']] = $thisComponent;
 			}
 		}
@@ -754,15 +775,25 @@ abstract class BaseComponent extends Controller
 			$packageInfo = $this->modules->packages->getPackageByName($packageClass);
 			$thisPackage['id'] = $packageInfo['id'];
 			$thisPackage['name'] = $packageInfo['name'];
-			if (is_string($packageInfo['settings'])) {
-				$thisPackage['settings'] = $this->helper->decode($packageInfo['settings'], true);
+			$thisPackage['settings'] = $packageInfo['settings'];
+			if (is_string($thisPackage['settings'])) {
+				$thisPackage['settings'] = $this->helper->decode($thisPackage['settings'], true);
 			}
 
-			if (!isset($usedModules['packages'])) {
-				$usedModules['packages'] = [];
-				$usedModules['packages']['value'] = 'packages';
+			if (isset($thisPackage['settings']['componentRoute'])) {//Remove all crucial only dev settings
+				unset($thisPackage['settings']['componentRoute']);
+			}
+
+			if ($this->view->usedModules &&
+				isset($this->view->usedModules['packages']['childs']) &&
+				is_array($this->view->usedModules['packages']['childs']) &&
+				count($this->view->usedModules['packages']['childs']) > 0
+			) {
+				$usedModules['packages']['childs'] = $this->view->usedModules['packages']['childs'];
 				$usedModules['packages']['childs'][$thisPackage['id']] = $thisPackage;
 			} else {
+				$usedModules['packages'] = [];
+				$usedModules['packages']['value'] = 'packages';
 				$usedModules['packages']['childs'][$thisPackage['id']] = $thisPackage;
 			}
 		}
@@ -770,6 +801,7 @@ abstract class BaseComponent extends Controller
 		if ($getSettings) {
 			$this->view->usedModules = $usedModules;
 		}
+
 		return $package;
 	}
 

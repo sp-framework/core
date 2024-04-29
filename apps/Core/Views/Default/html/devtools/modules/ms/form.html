@@ -1,63 +1,6 @@
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'module_type',
-                        'fieldLabel'                     : false,
-                        'fieldType'                      : 'html',
-                        'fieldAdditionalClass'           : 'mb-0',
-                        'fieldHelp'                      : false,
-                        'fieldRequired'                  : false,
-                        'fieldHidden'                    : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnUpdate'           : true
-                    ]
-                )}}
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'module_id',
-                        'fieldLabel'                     : false,
-                        'fieldType'                      : 'html',
-                        'fieldAdditionalClass'           : 'mb-0',
-                        'fieldHelp'                      : false,
-                        'fieldRequired'                  : false,
-                        'fieldHidden'                    : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnUpdate'           : true
-                    ]
-                )}}
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'usedModules',
-                        'fieldLabel'                     : 'Select Module',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select module to view/change settings.',
-                        'fieldBazScan'                   : true,
-                        'fieldRequired'                  : true,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldDataSelect2Options'        : usedModules,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsSelected': ''
-                    ]
-                )}}
-            </div>
-        </div>
+        {% include '../common/ms/form.html' %}
         <div id="{{componentId}}-{{sectionId}}-components-form" hidden>
         </div>
         <div id="{{componentId}}-{{sectionId}}-packages-form" hidden>
@@ -196,7 +139,7 @@ dataCollectionSection =
                             .val(JSON.stringify(usedModules[label]['childs'][id]['settings']['allowedImageSizes']));
                     }
 
-                    dataCollectionSection['data']['module_id'] = id;
+                    dataCollectionSection['data']['id'] = id;
                     dataCollectionSection['data']['module_type'] = label;
 
                     $('#{{componentId}}-{{sectionId}}-packages-form').attr('hidden', true);

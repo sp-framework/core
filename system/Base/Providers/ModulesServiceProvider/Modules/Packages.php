@@ -320,12 +320,14 @@ class Packages extends BasePackage
 
 	public function msupdate(array $data)//module settings update
 	{
-		$package = $this->getById($data['module_id']);
+		$package = $this->getById($data['id']);
 
-		$package['settings'] = $this->helper->decode($package['settings'], true);
+		if (is_string($package['settings'])) {
+			$package['settings'] = $this->helper->decode($package['settings'], true);
+		}
 
 		foreach ($data as $key => $settingsData) {
-			if ($key !== 'module_id' &&
+			if ($key !== 'id' &&
 				$key !== 'module_type' &&
 				$settingsData !== $this->security->getRequestToken()
 			) {

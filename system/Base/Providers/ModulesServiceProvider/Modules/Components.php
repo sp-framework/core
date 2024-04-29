@@ -333,12 +333,14 @@ class Components extends BasePackage
 
 	public function msupdate(array $data)//module settings update
 	{
-		$component = $this->getById($data['module_id']);
+		$component = $this->getById($data['id']);
 
-		$component['settings'] = $this->helper->decode($component['settings'], true);
+		if (is_string($component['settings'])) {
+			$component['settings'] = $this->helper->decode($component['settings'], true);
+		}
 
 		foreach ($data as $key => $settingsData) {
-			if ($key !== 'module_id' &&
+			if ($key !== 'id' &&
 				$key !== 'module_type' &&
 				$settingsData !== $this->security->getRequestToken()
 			) {

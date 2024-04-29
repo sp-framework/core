@@ -1,0 +1,126 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'id',
+                'fieldLabel'                     : false,
+                'fieldType'                      : 'html',
+                'fieldAdditionalClass'           : 'mb-0',
+                'fieldHelp'                      : false,
+                'fieldRequired'                  : false,
+                'fieldHidden'                    : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'module_type',
+                'fieldLabel'                     : false,
+                'fieldType'                      : 'html',
+                'fieldAdditionalClass'           : 'mb-0',
+                'fieldHelp'                      : false,
+                'fieldRequired'                  : false,
+                'fieldHidden'                    : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'usedModules',
+                'fieldLabel'                     : 'Select Module',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select module to view/change settings.',
+                'fieldBazScan'                   : true,
+                'fieldRequired'                  : true,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataSelect2Options'        : usedModules,
+                'fieldDataSelect2OptionsKey'     : 'id',
+                'fieldDataSelect2OptionsValue'   : 'name',
+                'fieldDataSelect2OptionsSelected': ''
+            ]
+        )}}
+    </div>
+</div>
+{% set usedModules = json_encode(usedModules, 16) %}
+<script>
+/* globals PNotify Swal dataCollection */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['usedModules'] = JSON.parse('{{usedModules}}');
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                          : { },
+        '{{componentId}}-{{sectionId}}-module_type'                                 : { },
+        '{{componentId}}-{{sectionId}}-usedModules'                                 : {
+            placeholder : 'SELECT MODULE TO VIEW/UPDATE',
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-updateData').attr('disabled', true);
+
+                $('#{{componentId}}-{{sectionId}}-usedModules').on('select2:select', function(e) {
+                    $('#{{componentId}}-{{sectionId}}-updateData').attr('disabled', false);
+                    var id = e.params.data.id;
+
+                    var label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
+
+                    dataCollectionSection['data']['id'] = id;
+                    dataCollectionSection['data']['module_type'] = label;
+
+                    $('#{{componentId}}-{{sectionId}}-packages-form').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-components-form').attr('hidden', true);
+
+                    if (label === 'packages') {
+                        $('#{{componentId}}-{{sectionId}}-packages-form').attr('hidden', false);
+                    } else if (label === 'components') {
+                        $('#{{componentId}}-{{sectionId}}-components-form').attr('hidden', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form'                                        : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
+            rules: {
+            },
+            messages: {
+            }
+        }
+    });
+</script>
