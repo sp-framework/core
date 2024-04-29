@@ -186,7 +186,7 @@ class Manager extends BasePackage
         $localModules = [];
         $sortedModules = [];
 
-        $apis = $this->basepackages->api->init()->getAll()->api;
+        $apis = $this->basepackages->apiClientServices->init()->getAll()->apiClientServices;
 
         if (count($apis) === 0) {
             $this->addResponse('No API configured', 1);
@@ -196,7 +196,7 @@ class Manager extends BasePackage
 
         foreach ($apis as $api) {
             if ($api['category'] === 'repos') {
-                $this->api = $this->basepackages->api->useApi($api['id'], true);
+                $this->api = $this->basepackages->apiClientServices->useApi($api['id'], true);
                 $this->apiConfig = $this->api->getApiConfig();
 
                 $sortedModules[$api['id']] = [];
@@ -282,7 +282,7 @@ class Manager extends BasePackage
 
     protected function initApi($id)
     {
-        $this->api = $this->basepackages->api->useApi($id, true);
+        $this->api = $this->basepackages->apiClientServices->useApi($id, true);
 
         $this->apiConfig = $this->api->getApiConfig();
 
