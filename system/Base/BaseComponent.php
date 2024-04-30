@@ -191,12 +191,7 @@ abstract class BaseComponent extends Controller
 		}
 
 		if (!$this->isJson()) {
-			$this->view->canView = false;
-			$this->view->canAdd = false;
-			$this->view->canUpdate = false;
-			$this->view->canRemove = false;
-			$this->view->canMsv = false;
-			$this->view->canMsu = false;
+			$this->setViewPermissions(false, false, false, false, false, false);
 
 			$middlewares =
 				msort(
@@ -213,12 +208,8 @@ abstract class BaseComponent extends Controller
 				}
 
 				if ($middleware['name'] === 'Acl' && $middleware['enabled'] === false) {
-					$this->view->canView = true;
-					$this->view->canAdd = true;
-					$this->view->canUpdate = true;
-					$this->view->canRemove = true;
-					$this->view->canMsv = true;
-					$this->view->canMsu = true;
+					$this->setViewPermissions();
+
 					return;
 				}
 			}
@@ -245,14 +236,25 @@ abstract class BaseComponent extends Controller
 					$this->view->canMsu = true;
 				}
 			} else if ($permissions === 'sysAdmin') {
-				$this->view->canView = true;
-				$this->view->canAdd = true;
-				$this->view->canUpdate = true;
-				$this->view->canRemove = true;
-				$this->view->canMsv = true;
-				$this->view->canMsu = true;
+				$this->setViewPermissions();
 			}
 		}
+	}
+
+	protected function setViewPermissions(
+		$canView = true,
+		$canAdd = true,
+		$canUpdate = true,
+		$canRemove = true,
+		$canMsv = true,
+		$canMsu = true
+	) {
+		$this->view->canView = $canView;
+		$this->view->canAdd = $canAdd;
+		$this->view->canUpdate = $canUpdate;
+		$this->view->canRemove = $canRemove;
+		$this->view->canMsv = $canMsv;
+		$this->view->canMsu = $canMsu;
 	}
 
 	protected function checkSettingsRoute()
