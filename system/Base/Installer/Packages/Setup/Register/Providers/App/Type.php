@@ -10,7 +10,10 @@ class Type
             [
                 'name'                      => $typeFile['name'],
                 'app_type'                  => $typeFile['app_type'],
-                'description'               => $typeFile['description']
+                'description'               => $typeFile['description'],
+                'api_id'                    => 1,
+                'repo'                      => $typeFile['repo'],
+                'version'                   => $typeFile['version']
             ];
 
         if ($db) {

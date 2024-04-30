@@ -45,6 +45,29 @@ class Types
                         'notNull' => false,
                     ]
                 ),
+                new Column(
+                    'version',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 15,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'repo',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 2048,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'api_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => true,
+                    ]
+                ),
             ],
             'indexes' => [
                 new Index(

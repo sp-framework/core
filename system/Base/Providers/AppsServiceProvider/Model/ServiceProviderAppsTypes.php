@@ -13,4 +13,10 @@ class ServiceProviderAppsTypes extends BaseModel
     public $name;
 
     public $description;
+
+    public $api_id;
+
+    public $repo;
+
+    public $version;
 }
