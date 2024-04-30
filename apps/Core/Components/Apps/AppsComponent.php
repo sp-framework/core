@@ -71,11 +71,9 @@ class AppsComponent extends BaseComponent
                 }
 
                 $components = [];
-                $packages = [];
                 $middlewares = [];
                 $views = [];
                 $mandatoryComponents = [];
-                $mandatoryPackages = [];
                 $mandatoryMiddlewares = [];
                 $mandatoryViews = [];
 
@@ -150,31 +148,6 @@ class AppsComponent extends BaseComponent
                     }
 
                     $components[$key] = $componentValue;
-                }
-
-                //Packages
-                $packagesArr = $this->modules->packages->getpackagesForAppType($app['app_type']);
-                foreach ($packagesArr as $key => &$packageValue) {
-                    if ($packageValue['apps']) {
-                        if (is_string($packageValue['apps'])) {
-                            $packageValue['apps'] = $this->helper->decode($packageValue['apps'], true);
-                        }
-                    }
-                    if ($packageValue['settings']) {
-                        if (is_string($packageValue['settings'])) {
-                            $packageValue['settings'] = $this->helper->decode($packageValue['settings'], true);
-                        }
-                        if (isset($packageValue['settings']['mandatory']) &&
-                             $packageValue['settings']['mandatory'] === true
-                        ) {
-                            array_push($mandatoryPackages, $packageValue['name']);
-                        } else if (isset($packageValue['settings']['mandatory'][$app['route']]) &&
-                                   $packageValue['settings']['mandatory'][$app['route']] === true
-                        ) {
-                            array_push($mandatoryPackages, $packageValue['name']);
-                        }
-                    }
-                    $packages[$key] = $packageValue;
                 }
 
                 //Middlewares
@@ -256,11 +229,9 @@ class AppsComponent extends BaseComponent
                 }
 
                 $this->view->components = msort($components, 'name');
-                $this->view->packages = msort($packages, 'name');
                 $this->view->middlewares = msort($middlewares, 'sequence');
                 $this->view->views = msort($views, 'name');
                 $this->view->mandatoryComponents = $mandatoryComponents;
-                $this->view->mandatoryPackages = $mandatoryPackages;
                 $this->view->mandatoryMiddlewares = $mandatoryMiddlewares;
                 $this->view->mandatoryViews = $mandatoryViews;
 
