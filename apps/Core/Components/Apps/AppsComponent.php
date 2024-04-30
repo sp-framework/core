@@ -71,9 +71,11 @@ class AppsComponent extends BaseComponent
                 }
 
                 $components = [];
+                $packages = [];
                 $middlewares = [];
                 $views = [];
                 $mandatoryComponents = [];
+                $mandatoryPackages = [];
                 $mandatoryMiddlewares = [];
                 $mandatoryViews = [];
 
@@ -102,11 +104,13 @@ class AppsComponent extends BaseComponent
 
                 $this->view->modulesMenus = $this->basepackages->menus->getMenusForApp($app['id']);
 
+                //Components
                 $componentsArr = $this->modules->components->getComponentsForAppType($app['app_type']);
-
                 foreach ($componentsArr as $key => &$componentValue) {
                     if ($componentValue['apps']) {
-                        $componentValue['apps'] = $this->helper->decode($componentValue['apps'], true);
+                        if (is_string($componentValue['apps'])) {
+                            $componentValue['apps'] = $this->helper->decode($componentValue['apps'], true);
+                        }
 
                         if (!isset($componentValue['apps'][$app['id']]['needAuth'])) {
                             $componentValue['apps'][$app['id']]['needAuth'] = false;
@@ -129,7 +133,7 @@ class AppsComponent extends BaseComponent
                         ) {
                             array_push($mandatoryComponents, $componentValue['name']);
                         } else if (isset($componentValue['settings']['mandatory'][$app['route']]) &&
-                             $componentValue['settings']['mandatory'][$app['route']] === true
+                                   $componentValue['settings']['mandatory'][$app['route']] === true
                         ) {
                             array_push($mandatoryComponents, $componentValue['name']);
                         }
@@ -148,24 +152,50 @@ class AppsComponent extends BaseComponent
                     $components[$key] = $componentValue;
                 }
 
-                $middlewaresArr =
-                        $this->modules->middlewares->getMiddlewaresForAppType(
-                            $app['app_type'],
-                            $app['id']
-                        );
+                //Packages
+                $packagesArr = $this->modules->packages->getpackagesForAppType($app['app_type']);
+                foreach ($packagesArr as $key => &$packageValue) {
+                    if ($packageValue['apps']) {
+                        if (is_string($packageValue['apps'])) {
+                            $packageValue['apps'] = $this->helper->decode($packageValue['apps'], true);
+                        }
+                    }
+                    if ($packageValue['settings']) {
+                        if (is_string($packageValue['settings'])) {
+                            $packageValue['settings'] = $this->helper->decode($packageValue['settings'], true);
+                        }
+                        if (isset($packageValue['settings']['mandatory']) &&
+                             $packageValue['settings']['mandatory'] === true
+                        ) {
+                            array_push($mandatoryPackages, $packageValue['name']);
+                        } else if (isset($packageValue['settings']['mandatory'][$app['route']]) &&
+                                   $packageValue['settings']['mandatory'][$app['route']] === true
+                        ) {
+                            array_push($mandatoryPackages, $packageValue['name']);
+                        }
+                    }
+                    $packages[$key] = $packageValue;
+                }
 
+                //Middlewares
+                $middlewaresArr = $this->modules->middlewares->getMiddlewaresForAppType($app['app_type'], $app['id']);
                 foreach ($middlewaresArr as $key => &$middlewareValue) {
+                    if ($middlewareValue['apps']) {
+                        if (is_string($middlewareValue['apps'])) {
+                            $middlewareValue['apps'] = $this->helper->decode($middlewareValue['apps'], true);
+                        }
+                    }
                     if ($middlewareValue['settings']) {
                         if (is_string($middlewareValue['settings'])) {
                             $middlewareValue['settings'] = $this->helper->decode($middlewareValue['settings'], true);
                         }
 
                         if (isset($middlewareValue['settings']['mandatory']) &&
-                             $middlewareValue['settings']['mandatory'] === true
+                            $middlewareValue['settings']['mandatory'] === true
                         ) {
                             array_push($mandatoryMiddlewares, $middlewareValue['name']);
                         } else if (isset($middlewareValue['settings']['mandatory'][$app['route']]) &&
-                             $middlewareValue['settings']['mandatory'][$app['route']] === true
+                                   $middlewareValue['settings']['mandatory'][$app['route']] === true
                         ) {
                             array_push($mandatoryMiddlewares, $middlewareValue['name']);
                         }
@@ -173,8 +203,8 @@ class AppsComponent extends BaseComponent
                     $middlewares[$key] = $middlewareValue;
                 }
 
+                //Views
                 $viewsArr = $this->modules->views->getViewsForAppType($app['app_type']);
-
                 if (count($viewsArr) === 1) {
                     array_push($mandatoryViews, $this->helper->first($viewsArr)['name']);
 
@@ -182,13 +212,15 @@ class AppsComponent extends BaseComponent
 
                     if ($views[$this->helper->first($viewsArr)['id']]['apps']) {
                         if (is_string($views[$this->helper->first($viewsArr)['id']]['apps'])) {
-                            $views[$this->helper->first($viewsArr)['id']]['apps'] = $this->helper->decode($views[$this->helper->first($viewsArr)['id']]['apps'], true);
+                            $views[$this->helper->first($viewsArr)['id']]['apps'] =
+                                $this->helper->decode($views[$this->helper->first($viewsArr)['id']]['apps'], true);
                         }
                     }
 
                     if ($views[$this->helper->first($viewsArr)['id']]['settings']) {
                         if (is_string($views[$this->helper->first($viewsArr)['id']]['settings'])) {
-                            $views[$this->helper->first($viewsArr)['id']]['settings'] = $this->helper->decode($views[$this->helper->first($viewsArr)['id']]['settings'], true);
+                            $views[$this->helper->first($viewsArr)['id']]['settings'] =
+                                $this->helper->decode($views[$this->helper->first($viewsArr)['id']]['settings'], true);
                         }
                     }
                 } else {
@@ -208,7 +240,13 @@ class AppsComponent extends BaseComponent
                                 $viewValue['settings'] = $this->helper->decode($viewValue['settings'], true);
                             }
 
-                            if (isset($viewValue['settings']['mandatory']) && $viewValue['settings']['mandatory'] == true) {
+                            if (isset($viewValue['settings']['mandatory']) &&
+                                $viewValue['settings']['mandatory'] == true
+                            ) {
+                                array_push($mandatoryViews, $viewValue['name']);
+                            } else if (isset($viewValue['settings']['mandatory'][$app['route']]) &&
+                                       $viewValue['settings']['mandatory'][$app['route']] === true
+                            ) {
                                 array_push($mandatoryViews, $viewValue['name']);
                             }
                         }
@@ -218,9 +256,11 @@ class AppsComponent extends BaseComponent
                 }
 
                 $this->view->components = msort($components, 'name');
+                $this->view->packages = msort($packages, 'name');
                 $this->view->middlewares = msort($middlewares, 'sequence');
                 $this->view->views = msort($views, 'name');
                 $this->view->mandatoryComponents = $mandatoryComponents;
+                $this->view->mandatoryPackages = $mandatoryPackages;
                 $this->view->mandatoryMiddlewares = $mandatoryMiddlewares;
                 $this->view->mandatoryViews = $mandatoryViews;
 
@@ -308,7 +348,7 @@ class AppsComponent extends BaseComponent
 
     public function apiViewAction()
     {
-        var_dump('me');
+        // var_dump('me');
     }
 
     /**

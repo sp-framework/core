@@ -22,23 +22,25 @@
     </div>
 </div>
 {% if views is defined and views|length > 0 %}
-    <div class="row mb-2">
-        {% set viewIds = [] %}
-        {% include 'apps/tables/modules' with
-            [
-                'component'             : component,
-                'componentId'           : componentId,
-                'parent'                : parent,
-                'sectionId'             : sectionId,
-                'moduleType'            : 'view',
-                'mandatoryModules'      : mandatoryViews,
-                'modules'               : views
-            ]
-        %}
-        {% for view in views %}
-            {% set viewIds[componentId ~ '-' ~ sectionId ~ '-view-' ~ view['id']] = view['id'] %}
-        {% endfor %}
-        {% set viewIds = json_encode(viewIds, 16) %}
+    <div class="row">
+        <div class="col">
+            {% set viewIds = [] %}
+            {% include 'apps/tables/modules' with
+                [
+                    'component'             : component,
+                    'componentId'           : componentId,
+                    'parent'                : parent,
+                    'sectionId'             : sectionId,
+                    'moduleType'            : 'view',
+                    'mandatoryModules'      : mandatoryViews,
+                    'modules'               : views
+                ]
+            %}
+            {% for view in views %}
+                {% set viewIds[componentId ~ '-' ~ sectionId ~ '-view-' ~ view['id']] = view['id'] %}
+            {% endfor %}
+            {% set viewIds = json_encode(viewIds, 16) %}
+        </div>
     </div>
 {% else %}
     <label>No views available for this app type. Go to <a href="{{links.url('modules')}}" class="contentAjaxLink">modules</a> and download views.</label>
@@ -97,13 +99,13 @@ dataCollectionSection =
                     for (var viewCheckbox in viewIds) {
                         $('#' + viewCheckbox).click(function() {
                             var id = $(this)[0].id;
-                            extractViewCheckboxData(id, viewIds[viewCheckbox]);
+                            extractViewCheckboxData(id);
                         });
-                        extractViewCheckboxData(viewCheckbox, viewIds[viewCheckbox]);
+                        extractViewCheckboxData(viewCheckbox);
                     }
                 }
 
-                function extractViewCheckboxData(viewCheckbox, view) {
+                function extractViewCheckboxData(viewCheckbox) {
                     var viewId = $('#' + viewCheckbox).data('id');
 
                     if ($('#' + viewCheckbox)[0].checked === true) {

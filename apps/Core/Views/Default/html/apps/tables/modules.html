@@ -80,7 +80,7 @@
                             'menu'                      : module['menu_id']
                         ]
                     %}
-                {% elseif moduleType === 'view' %}
+                {% elseif moduleType === 'view' or moduleType === 'package' %}
                     {# {% set viewIds[componentId ~ '-' ~ sectionId ~ '-view-' ~ module['id']] = module['id'] %} #}
                     {% if module['apps'][app['id']] is defined and module['apps'][app['id']]['enabled'] === true %}
                         {% set checked = true %}
@@ -207,7 +207,7 @@
                     </td>
                 {% endif %}
                 <td>
-                    {% if moduleType === 'view' %}
+                    {% if moduleType === 'view' or moduleType === 'package' %}
                         {{module['display_name']}}
                     {% else %}
                         {{module['name']}}
