@@ -1,3 +1,4 @@
+{% set apptypesURL = links.url('devtools/modules/q/module/true/type/apptypes/id/0') %}
 {% set componentsURL = links.url('devtools/modules/q/module/true/type/components/id/0') %}
 {% set packagesURL = links.url('devtools/modules/q/module/true/type/packages/id/0') %}
 {% set middlewaresURL = links.url('devtools/modules/q/module/true/type/middlewares/id/0') %}
@@ -26,6 +27,12 @@
                 'buttonPosition'                    : 'right',
                 'buttons'                           :
                     {
+                        'apptypes' : {
+                            'title'                   : 'App Type',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : apptypesURL
+                        },
                         'components' : {
                             'title'                   : 'Component',
                             'type'                    : 'primary',
