@@ -73,11 +73,20 @@ class ModulesComponent extends BaseComponent
 		$modules['core']['value'] = 'Core';
 		$modules['core']['childs'][1] = $module;
 
-		$modulesTypeArr = ['components', 'packages', 'middlewares', 'views', 'bundles'];
+		$modulesTypeArr = ['apptypes', 'components', 'packages', 'middlewares', 'views', 'bundles'];
 
 		foreach ($modulesTypeArr as $modulesType) {
 			if ($modulesType === 'bundles') {
 				$modulesArr['modules'] = msort($this->modules->{$modulesType}->{$modulesType}, 'name');
+			} else if ($modulesType === 'apptypes') {
+				$modulesArr['modules'] = msort($this->apps->types->types, 'name');
+				if (!isset($this->getData()['includecoremodules'])) {
+					foreach ($modulesArr['modules'] as $typesModuleKey => $typesModule) {
+						if ($typesModule['app_type'] === 'core') {
+							unset($modulesArr['modules'][$typesModuleKey]);
+						}
+					}
+				}
 			} else {
 				$modulesArr = $this->processModulesArr(msort($this->modules->{$modulesType}->{$modulesType}, 'name'));
 				${$modulesType . 'CategoryArr'} = $modulesArr['categoryArr'];
@@ -92,6 +101,7 @@ class ModulesComponent extends BaseComponent
 		}
 
 		$this->view->modules = $modules;
+		$this->view->releases = $modules;
 
 		$modulesJson = [];
 
@@ -105,8 +115,8 @@ class ModulesComponent extends BaseComponent
 					[
 						'id' 		=> $child['id'],
 						'name' 		=> $child['name'],
-						'version' 	=> $child['version'],
-						'repo' 		=> $child['repo'],
+						'version' 	=> $child['version'] ?? null,
+						'repo' 		=> $child['repo'] ?? null,
 					];
 
 				if ($moduleKey === 'views') {
@@ -146,19 +156,22 @@ class ModulesComponent extends BaseComponent
 		) {
 			$type = strtolower($this->getData()['type']);
 
-			if ($type !== 'core') {
-				$this->view->categoryArr = ${$type . 'CategoryArr'};
+			if ($type !== 'apptypes') {
+				if ($type !== 'core') {
+					$this->view->categoryArr = ${$type . 'CategoryArr'};
 
-				if ($type === 'components') {
-					$this->view->menuBaseStructure = $this->basepackages->menus->getMenusForAppType($module['app_type']);
+					if ($type === 'components') {
+						$this->view->menuBaseStructure = $this->basepackages->menus->getMenusForAppType($module['app_type']);
+					}
+				} else {
+					$this->view->categoryArr = ['core' => ['id' => 'providers', 'name' => 'Providers']];
 				}
-			} else {
-				$this->view->categoryArr = ['core' => ['id' => 'providers', 'name' => 'Providers']];
+			} else if ($type === 'apptypes') {
+				unset($apis[1]);//Remove core
 			}
 
 			$this->view->type = $type;
 			$this->view->module = null;
-
 			$this->view->apis = $apis;
 			$this->view->moduleTypes = $this->modulesPackage->getModuleTypes();
 			$this->view->moduleSettings = $this->modulesPackage->getDefaultSettings();
@@ -167,91 +180,125 @@ class ModulesComponent extends BaseComponent
 			$this->view->moduleWidgets = $this->helper->encode([]);
 
 			if ($this->getData()['id'] != 0) {
-				if ($type !== 'core') {
-					$module = [];
+				if ($type !== 'apptypes') {
+					if ($type !== 'core') {
+						$module = [];
 
-					$module['module_details'] = $this->modules->{$type}->getById($this->getData()['id']);
+						$module['module_details'] = $this->modules->{$type}->getById($this->getData()['id']);
 
-					if ($module['module_details']['module_type'] === 'components') {
-						$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Components/';
-						if ($module['module_details']['menu']) {
-							$this->view->moduleMenu = $this->helper->encode($this->helper->decode($module['module_details']['menu'], true));
-							$this->view->menuBaseStructure = $this->basepackages->menus->getMenusForAppType($module['module_details']['app_type']);
-						} else {
-							$this->view->moduleMenu = false;
-							$this->view->menuBaseStructure = [];
+						if ($module['module_details']['module_type'] === 'components') {
+							$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Components/';
+							if ($module['module_details']['menu']) {
+								$this->view->moduleMenu = $this->helper->encode($this->helper->decode($module['module_details']['menu'], true));
+								$this->view->menuBaseStructure = $this->basepackages->menus->getMenusForAppType($module['module_details']['app_type']);
+							} else {
+								$this->view->moduleMenu = false;
+								$this->view->menuBaseStructure = [];
+							}
+						} else if ($module['module_details']['module_type'] === 'packages') {
+							if ($module['module_details']['app_type'] === 'core' &&
+								($module['module_details']['category'] === 'basepackages' ||
+								 $module['module_details']['category'] === 'providers')
+							) {
+								if ($module['module_details']['category'] === 'basepackages') {
+									$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/';
+								} else if ($module['module_details']['category'] === 'providers') {
+									$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/';
+								}
+							} else {
+								$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Packages/';
+							}
+						} else if ($module['module_details']['module_type'] === 'middlewares') {
+							$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Middlewares/';
+						} else if ($module['module_details']['module_type'] === 'views') {
+							$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Views/';
 						}
-					} else if ($module['module_details']['module_type'] === 'packages') {
-						if ($module['module_details']['app_type'] === 'core' &&
+
+						if ($module['module_details']['module_type'] === 'packages' &&
 							($module['module_details']['category'] === 'basepackages' ||
 							 $module['module_details']['category'] === 'providers')
 						) {
-							if ($module['module_details']['category'] === 'basepackages') {
-								$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/';
-							} else if ($module['module_details']['category'] === 'providers') {
-								$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/';
-							}
+							$jsonFile =
+								$moduleLocation .
+								ucfirst($module['module_details']['name']) . '/' .
+								substr($module['module_details']['module_type'], 0, -1) . '.json';
 						} else {
-							$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Packages/';
-						}
-					} else if ($module['module_details']['module_type'] === 'middlewares') {
-						$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Middlewares/';
-					} else if ($module['module_details']['module_type'] === 'views') {
-						$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Views/';
-					}
+							if ($module['module_details']['module_type'] === 'components') {
+								$routeArr = explode('/', $module['module_details']['route']);
 
-					if ($module['module_details']['module_type'] === 'packages' &&
-						($module['module_details']['category'] === 'basepackages' ||
-						 $module['module_details']['category'] === 'providers')
-					) {
-						$jsonFile =
-							$moduleLocation .
-							ucfirst($module['module_details']['name']) . '/' .
-							substr($module['module_details']['module_type'], 0, -1) . '.json';
-					} else {
-						if ($module['module_details']['module_type'] === 'components') {
-							$routeArr = explode('/', $module['module_details']['route']);
-
-							foreach ($routeArr as &$path) {
-								$path = ucfirst($path);
-							}
-
-							$routePath = implode('/', $routeArr) . '/Install/';
-						} else if ($module['module_details']['module_type'] === 'middlewares') {
-							$routePath = $module['module_details']['name'] . '/Install/';
-						} else if ($module['module_details']['module_type'] === 'packages') {
-							$pathArr = preg_split('/(?=[A-Z])/', $module['module_details']['name'], -1, PREG_SPLIT_NO_EMPTY);
-
-							$routePath = implode('/', $pathArr) . '/Install/';
-						} else if ($module['module_details']['module_type'] === 'views') {
-							if (!$module['module_details']['view_modules_version'] ||
-								($module['module_details']['base_view_module_id'] && $module['module_details']['base_view_module_id'] != '0')
-							) {
-								$baseView = $this->modules->views->getViewById($module['module_details']['base_view_module_id']);
-
-								$pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['module_details']['name']), -1, PREG_SPLIT_NO_EMPTY);
-
-								if (count($pathArr) > 1) {
-									foreach ($pathArr as &$path) {
-										$path = strtolower($path);
-									}
-								} else {
-									$pathArr[0] = strtolower($pathArr[0]);
+								foreach ($routeArr as &$path) {
+									$path = ucfirst($path);
 								}
 
-								$module['route'] = implode('/', $pathArr);
+								$routePath = implode('/', $routeArr) . '/Install/';
+							} else if ($module['module_details']['module_type'] === 'middlewares') {
+								$routePath = $module['module_details']['name'] . '/Install/';
+							} else if ($module['module_details']['module_type'] === 'packages') {
+								$pathArr = preg_split('/(?=[A-Z])/', $module['module_details']['name'], -1, PREG_SPLIT_NO_EMPTY);
 
-								$routePath = $baseView['name'] . '/html/' . $module['route'] . '/';
-							} else {
-								$routePath = $module['module_details']['name'] . '/';
+								$routePath = implode('/', $pathArr) . '/Install/';
+							} else if ($module['module_details']['module_type'] === 'views') {
+								if (!$module['module_details']['view_modules_version'] ||
+									($module['module_details']['base_view_module_id'] && $module['module_details']['base_view_module_id'] != '0')
+								) {
+									$baseView = $this->modules->views->getViewById($module['module_details']['base_view_module_id']);
+
+									$pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['module_details']['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+									if (count($pathArr) > 1) {
+										foreach ($pathArr as &$path) {
+											$path = strtolower($path);
+										}
+									} else {
+										$pathArr[0] = strtolower($pathArr[0]);
+									}
+
+									$module['route'] = implode('/', $pathArr);
+
+									$routePath = $baseView['name'] . '/html/' . $module['route'] . '/';
+								} else {
+									$routePath = $module['module_details']['name'] . '/';
+								}
 							}
+
+							$jsonFile =
+								$moduleLocation .
+								$routePath .
+								substr($module['module_details']['module_type'], 0, -1) . '.json';
 						}
 
-						$jsonFile =
-							$moduleLocation .
-							$routePath .
-							substr($module['module_details']['module_type'], 0, -1) . '.json';
+						try {
+							$module = array_merge($module, $this->basepackages->utils->validateJson(
+								[
+									'json' 			=> $this->localContent->read($jsonFile),
+									'returnJson' 	=> 'array'
+								]
+							));
+
+							$module['id'] = $module['module_details']['id'];
+						} catch (\throwable $e) {
+							throw new \Exception($e->getMessage());
+						}
 					}
+
+					if (isset($module['widgets']) && is_array($module['widgets'])) {
+						$this->view->moduleWidgets = $module['widgets'] = $this->helper->encode($module['widgets']);
+					} else {
+						$this->view->moduleWidgets = $module['widgets'] = $this->helper->encode([]);
+					}
+					if (is_array($module['settings'])) {
+						$this->view->moduleSettings = $module['settings'] = $this->helper->encode($module['settings']);
+					}
+					if (is_array($module['dependencies'])) {
+						$this->view->moduleDependencies = $module['dependencies'] = $this->helper->encode($module['dependencies']);
+					}
+				} else {
+					$module = [];
+
+					$module['module_details'] = $this->apps->types->getAppTypeById($this->getData()['id']);
+
+					$jsonFile =
+						'apps/' . ucfirst($module['module_details']['app_type']) . '/Install/type.json';
 
 					try {
 						$module = array_merge($module, $this->basepackages->utils->validateJson(
@@ -265,18 +312,6 @@ class ModulesComponent extends BaseComponent
 					} catch (\throwable $e) {
 						throw new \Exception($e->getMessage());
 					}
-				}
-
-				if (isset($module['widgets']) && is_array($module['widgets'])) {
-					$this->view->moduleWidgets = $module['widgets'] = $this->helper->encode($module['widgets']);
-				} else {
-					$this->view->moduleWidgets = $module['widgets'] = $this->helper->encode([]);
-				}
-				if (is_array($module['settings'])) {
-					$this->view->moduleSettings = $module['settings'] = $this->helper->encode($module['settings']);
-				}
-				if (is_array($module['dependencies'])) {
-					$this->view->moduleDependencies = $module['dependencies'] = $this->helper->encode($module['dependencies']);
 				}
 
 				$this->view->module = $module;
@@ -317,39 +352,27 @@ class ModulesComponent extends BaseComponent
 
 	public function addAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			$this->modulesPackage->addModule($this->postData());
+		$this->modulesPackage->addModule($this->postData());
 
-			$this->addResponse(
-				$this->modulesPackage->packagesData->responseMessage,
-				$this->modulesPackage->packagesData->responseCode,
-				$this->modulesPackage->packagesData->responseData
-			);
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
-		}
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode,
+			$this->modulesPackage->packagesData->responseData
+		);
 	}
 
 	public function updateAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			$this->modulesPackage->updateModule($this->postData());
+		$this->modulesPackage->updateModule($this->postData());
 
-			$this->addResponse(
-				$this->modulesPackage->packagesData->responseMessage,
-				$this->modulesPackage->packagesData->responseCode
-			);
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
-		}
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
 	}
 
 	// public function removeAction()
@@ -386,21 +409,15 @@ class ModulesComponent extends BaseComponent
 
 	public function formatJsonAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			$this->basepackages->utils->formatJson($this->postData());
+		$this->basepackages->utils->formatJson($this->postData());
 
-			$this->addResponse(
-				$this->basepackages->utils->packagesData->responseMessage,
-				$this->basepackages->utils->packagesData->responseCode,
-				$this->basepackages->utils->packagesData->responseData
-			);
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
-		}
+		$this->addResponse(
+			$this->basepackages->utils->packagesData->responseMessage,
+			$this->basepackages->utils->packagesData->responseCode,
+			$this->basepackages->utils->packagesData->responseData
+		);
 	}
 
 	protected function processModulesArr($modulesArr)
@@ -426,29 +443,23 @@ class ModulesComponent extends BaseComponent
 
 	public function getAppTypeMenusAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			if (isset($this->postData()['app_type'])) {
-				$this->addResponse(
-					'Menu structure for app_type generated', 0,
-					$this->modules->manager->packagesData->responseData =
-						[
-							'menus_html' =>
-								$this->generateTree(
-									$this->basepackages->menus->getMenusForAppType(
-										$this->postData()['app_type']
-									)
+		if (isset($this->postData()['app_type'])) {
+			$this->addResponse(
+				'Menu structure for app_type generated', 0,
+				$this->modules->manager->packagesData->responseData =
+					[
+						'menus_html' =>
+							$this->generateTree(
+								$this->basepackages->menus->getMenusForAppType(
+									$this->postData()['app_type']
 								)
-						]
-				);
-			} else {
-				$this->addResponse('Please provide module type and module id', 1);
-			}
+							)
+					]
+			);
 		} else {
-			$this->addResponse('Method Not Allowed', 1);
+			$this->addResponse('Please provide module type and module id', 1);
 		}
 	}
 
@@ -467,157 +478,165 @@ class ModulesComponent extends BaseComponent
 
 	public function syncLabelsAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			if ($this->modulesPackage->syncLabels($this->postData())) {
-				$this->addResponse(
-					$this->modulesPackage->packagesData->responseMessage,
-					$this->modulesPackage->packagesData->responseCode,
-					$this->modulesPackage->packagesData->responseData
-				);
-
-				return;
-			}
-
+		if ($this->modulesPackage->syncLabels($this->postData())) {
 			$this->addResponse(
 				$this->modulesPackage->packagesData->responseMessage,
-				$this->modulesPackage->packagesData->responseCode
+				$this->modulesPackage->packagesData->responseCode,
+				$this->modulesPackage->packagesData->responseData
 			);
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
+
+			return;
 		}
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
 	}
 
 	public function getLabelIssuesAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			if ($this->modulesPackage->getLabelIssues($this->postData())) {
-				$this->addResponse(
-					$this->modulesPackage->packagesData->responseMessage,
-					$this->modulesPackage->packagesData->responseCode,
-					$this->modulesPackage->packagesData->responseData
-				);
-
-				return;
-			}
-
+		if ($this->modulesPackage->getLabelIssues($this->postData())) {
 			$this->addResponse(
 				$this->modulesPackage->packagesData->responseMessage,
-				$this->modulesPackage->packagesData->responseCode
+				$this->modulesPackage->packagesData->responseCode,
+				$this->modulesPackage->packagesData->responseData
 			);
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
+
+			return;
 		}
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
 	}
 
 	public function bumpVersionAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			if ($this->modulesPackage->bumpVersion($this->postData())) {
-				$this->addResponse(
-					$this->modulesPackage->packagesData->responseMessage,
-					$this->modulesPackage->packagesData->responseCode,
-					$this->modulesPackage->packagesData->responseData
-				);
-
-				return;
-			}
-
+		if ($this->modulesPackage->bumpVersion($this->postData())) {
 			$this->addResponse(
 				$this->modulesPackage->packagesData->responseMessage,
-				$this->modulesPackage->packagesData->responseCode
+				$this->modulesPackage->packagesData->responseCode,
+				$this->modulesPackage->packagesData->responseData
 			);
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
+
+			return;
 		}
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
 	}
 
 	public function syncBranchesAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			if ($this->modulesPackage->syncBranches($this->postData())) {
-				$this->addResponse(
-					$this->modulesPackage->packagesData->responseMessage,
-					$this->modulesPackage->packagesData->responseCode,
-					$this->modulesPackage->packagesData->responseData
-				);
-
-				return;
-			}
-
+		if ($this->modulesPackage->syncBranches($this->postData())) {
 			$this->addResponse(
 				$this->modulesPackage->packagesData->responseMessage,
-				$this->modulesPackage->packagesData->responseCode
+				$this->modulesPackage->packagesData->responseCode,
+				$this->modulesPackage->packagesData->responseData
 			);
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
+
+			return;
 		}
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
 	}
 
 	public function generateReleaseAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			if ($this->modulesPackage->generateRelease($this->postData())) {
-				$this->addResponse(
-					$this->modulesPackage->packagesData->responseMessage,
-					$this->modulesPackage->packagesData->responseCode,
-					$this->modulesPackage->packagesData->responseData
-				);
-
-				return;
-			}
-
+		if ($this->modulesPackage->generateRelease($this->postData())) {
 			$this->addResponse(
 				$this->modulesPackage->packagesData->responseMessage,
-				$this->modulesPackage->packagesData->responseCode
+				$this->modulesPackage->packagesData->responseCode,
+				$this->modulesPackage->packagesData->responseData
 			);
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
+
+			return;
 		}
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
 	}
 
 	public function publishBundleJsonAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			if ($this->modulesPackage->publishBundleJson($this->postData())) {
-				$this->addResponse(
-					$this->modulesPackage->packagesData->responseMessage,
-					$this->modulesPackage->packagesData->responseCode,
-					$this->modulesPackage->packagesData->responseData
-				);
-
-				return;
-			}
-
+		if ($this->modulesPackage->publishBundleJson($this->postData())) {
 			$this->addResponse(
 				$this->modulesPackage->packagesData->responseMessage,
-				$this->modulesPackage->packagesData->responseCode
+				$this->modulesPackage->packagesData->responseCode,
+				$this->modulesPackage->packagesData->responseData
 			);
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
+
+			return;
 		}
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
+	}
+
+	public function generateModuleClassAction()
+	{
+		$this->requestIsPost();
+
+		$this->modulesPackage->generateModuleClass($this->postData());
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
+
+		if ($this->modulesPackage->packagesData->responseData) {
+			$this->view->responseData = $this->modulesPackage->packagesData->responseData;
+		}
+	}
+
+	public function generateModuleRepoUrlAction()
+	{
+		$this->requestIsPost();
+
+		$this->modulesPackage->generateModuleRepoUrl($this->postData());
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
+
+		if ($this->modulesPackage->packagesData->responseData) {
+			$this->view->responseData = $this->modulesPackage->packagesData->responseData;
+		}
+	}
+
+	public function checkVersionAction()
+	{
+		$this->requestIsPost();
+
+		$this->modulesPackage->checkVersion($this->postData());
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
 	}
 }

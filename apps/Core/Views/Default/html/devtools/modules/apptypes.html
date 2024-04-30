@@ -1,25 +1,44 @@
-{% if bundle['id'] is defined %}
-    {% set bundleId = bundle['id'] %}
-    {% set bundleName = bundle['name'] %}
-    {% set bundleDescription = bundle['description'] %}
-    {% set bundleApp_type = bundle['app_type'] %}
-    {% set bundleModule_type = 'bundles' %}
-    {% set bundleApiId = bundle['api_id'] %}
-    {% set bundleVersion = bundle['version'] %}
-    {% set bundleRepo = bundle['repo'] %}
+{% if module['id'] is defined %}
+    {% set moduleId = module['id'] %}
+    {% set moduleName = module['name'] %}
+    {% set moduleApp_type = module['app_type'] %}
+    {% set moduleDescription = module['description'] %}
+    {% set moduleApiId = module['module_details']['api_id'] %}
+    {% set moduleVersion = module['version'] %}
+    {% set moduleRepo = module['repo'] %}
 {% else %}
-    {% set bundleId = '' %}
-    {% set bundleName = '' %}
-    {% set bundleDescription = '' %}
-    {% set bundleApp_type = '' %}
-    {% set bundleModule_type = 'bundles' %}
-    {% set bundleApiId = '' %}
-    {% set bundleVersion = '0.0.0' %}
-    {% set bundleRepo = '' %}
+    {% set moduleId = '' %}
+    {% set moduleName = '' %}
+    {% set moduleApp_type = '' %}
+    {% set moduleDescription = '' %}
+    {% set moduleApiId = '0' %}
+    {% set moduleVersion = '0.0.0' %}
+    {% set moduleRepo = 'https://.../' %}
 {% endif %}
-{% set moduleTypeDisabled = true %}
 <div class="row">
     <div class="col">
+        {% if clone is defined and clone === true %}
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'is_clone',
+                    'fieldLabel'                     : 'Is Clone',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Is Clone',
+                    'fieldRequired'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldHidden'                    : true,
+                    'fieldDisabled'                  : true,
+                    'fieldValue'                     : 'true'
+                ]
+            )}}
+        {% endif %}
         {{adminltetags.useTag('fields',
             [
                 'component'                      : component,
@@ -27,37 +46,17 @@
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
                 'fieldId'                        : 'id',
-                'fieldLabel'                     : 'Bundle ID',
+                'fieldLabel'                     : 'Module ID',
                 'fieldType'                      : 'input',
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Bundle ID',
+                'fieldHelpTooltipContent'        : 'Module ID',
                 'fieldRequired'                  : true,
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnCreate'           : false,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldHidden'                    : true,
                 'fieldDisabled'                  : true,
-                'fieldValue'                     : bundleId
-            ]
-        )}}
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'type',
-                'fieldLabel'                     : 'Bundle Type',
-                'fieldType'                      : 'input',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Bundle Type',
-                'fieldRequired'                  : true,
-                'fieldBazScan'                   : true,
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldHidden'                    : true,
-                'fieldDisabled'                  : true,
-                'fieldValue'                     : type
+                'fieldValue'                     : moduleId
             ]
         )}}
     </div>
@@ -72,40 +71,39 @@
                 'sectionId'                            : sectionId,
                 'fieldId'                              : 'app_type',
                 'fieldLabel'                           : 'App Type',
-                'fieldType'                            : 'select2',
+                'fieldType'                            : 'input',
                 'fieldHelp'                            : true,
-                'fieldHelpTooltipContent'              : 'Select app type or enter a new one to create a new type.',
+                'fieldHelpTooltipContent'              : 'App Type : core, blog, ecom, finance, etc',
                 'fieldRequired'                        : true,
                 'fieldBazPostOnCreate'                 : true,
                 'fieldBazPostOnUpdate'                 : true,
                 'fieldBazScan'                         : true,
-                'fieldDataSelect2Create'               : true,
-                'fieldDataSelect2OptionsArray'         : true,
-                'fieldDataSelect2Options'              : appTypes,
-                'fieldDataSelect2OptionsKey'           : 'id',
-                'fieldDataSelect2OptionsValue'         : 'name',
-                'fieldDataSelect2OptionsSelected'      : bundleApp_type
+                'fieldDataInputMinLength'              : 1,
+                'fieldDataInputMaxLength'              : 50,
+                'fieldValue'                           : moduleApp_type
             ]
         )}}
     </div>
     <div class="col">
         {{adminltetags.useTag('fields',
             [
-                'component'                            : component,
-                'componentName'                        : componentName,
-                'componentId'                          : componentId,
-                'sectionId'                            : sectionId,
-                'fieldId'                              : 'module_type',
-                'fieldLabel'                           : 'Module Type',
-                'fieldType'                            : 'input',
-                'fieldHelp'                            : true,
-                'fieldHelpTooltipContent'              : 'Module Type',
-                'fieldRequired'                        : true,
-                'fieldDisabled'                        : true,
-                'fieldBazPostOnCreate'                 : true,
-                'fieldBazPostOnUpdate'                 : true,
-                'fieldBazScan'                         : true,
-                'fieldValue'                           : bundleModule_type
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'name',
+                'fieldLabel'                     : 'App Type Name',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'App Type name : Core, Blogging, ECommerce, Finance, etc',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : moduleName
             ]
         )}}
     </div>
@@ -118,19 +116,20 @@
                 'componentName'                  : componentName,
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
-                'fieldId'                        : 'name',
-                'fieldLabel'                     : 'Bundle Name',
-                'fieldType'                      : 'input',
+                'fieldId'                        : 'description',
+                'fieldLabel'                     : 'Description',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 1024,
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Bundle Name Example: Dashboard Base.',
-                'fieldRequired'                  : true,
+                'fieldHelpTooltipContent'        : 'Description',
+                'fieldRequired'                  : false,
                 'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldDataInputMinLength'        : 1,
-                'fieldDataInputMaxLength'        : 50,
-                'fieldValue'                     : bundleName
+                'fieldDataInputMaxLength'        : 1024,
+                'fieldTextareaRows'              : 2,
+                'fieldValue'                     : moduleDescription
             ]
         )}}
     </div>
@@ -144,10 +143,10 @@
                 'componentId'                          : componentId,
                 'sectionId'                            : sectionId,
                 'fieldId'                              : 'api_id',
-                'fieldLabel'                           : 'Remote Repo?',
+                'fieldLabel'                           : 'Local/Remote Repo?',
                 'fieldType'                            : 'select2',
                 'fieldHelp'                            : true,
-                'fieldHelpTooltipContent'              : 'Select repo if the bundle will be available on a repo. Note: Bundles are only available via Repo.',
+                'fieldHelpTooltipContent'              : 'Select repo if the module will be available on a repo. If not, choose local and you can pass zip file to the end user.',
                 'fieldRequired'                        : true,
                 'fieldBazScan'                         : true,
                 'fieldBazPostOnCreate'                 : true,
@@ -156,7 +155,7 @@
                 'fieldDataSelect2Options'              : apis,
                 'fieldDataSelect2OptionsKey'           : 'id',
                 'fieldDataSelect2OptionsValue'         : 'name',
-                'fieldDataSelect2OptionsSelected'      : bundleApiId
+                'fieldDataSelect2OptionsSelected'      : moduleApiId
             ]
         )}}
     </div>
@@ -168,11 +167,12 @@
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
                 'fieldId'                        : 'version',
-                'fieldLabel'                     : 'Bundle version',
+                'fieldLabel'                     : 'Module version',
                 'fieldType'                      : 'input',
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Bundle version. New modules start with 0.0.0(Major.Minor.Patch). We use semantic version system.',
+                'fieldHelpTooltipContent'        : 'Module version. New modules start with 0.0.0(Major.Minor.Patch). We use semantic version system.',
                 'fieldRequired'                  : true,
+                'fieldInputToggleEdit'           : true,
                 'fieldGroupPreAddonButtons'      :
                     [
                         'check-version'   : [
@@ -183,14 +183,13 @@
                             'position'                : 'right'
                         ]
                     ],
-                'fieldInputToggleEdit'           : true,
                 'fieldDisabled'                  : true,
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 50,
-                'fieldValue'                     : bundleVersion
+                'fieldValue'                     : moduleVersion
             ]
         )}}
     </div>
@@ -204,11 +203,14 @@
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
                 'fieldId'                        : 'repo',
-                'fieldLabel'                     : 'Bundle repo',
+                'fieldLabel'                     : 'Module repo',
                 'fieldType'                      : 'input',
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Bundle repo.',
+                'fieldHelpTooltipContent'        : 'Module repo.',
                 'fieldRequired'                  : true,
+                'fieldInputToggleEdit'           : true,
+                'fieldDisabled'                  : true,
+                'fieldBazScan'                   : true,
                 'fieldGroupPreAddonButtons'          :
                     [
                         'generate-repo-url'   : [
@@ -219,14 +221,11 @@
                             'position'                : 'right'
                         ]
                     ],
-                'fieldInputToggleEdit'           : true,
-                'fieldDisabled'                  : true,
-                'fieldBazScan'                   : true,
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 1024,
-                'fieldValue'                     : bundleRepo
+                'fieldValue'                     : moduleRepo
             ]
         )}}
     </div>
@@ -240,6 +239,7 @@
                 'fieldId'                        : 'createrepo',
                 'fieldLabel'                     : 'Create New Repo?',
                 'fieldHelp'                      : true,
+                'fieldDisabled'                  : true,
                 'fieldHelpTooltipContent'        : 'Create new repository if it does not exist on remote?',
                 'fieldType'                      : 'checkbox',
                 'fieldCheckboxType'              : 'primary',

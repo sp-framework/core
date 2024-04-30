@@ -288,7 +288,7 @@
     {% endif %}
 </div>
 <div class="row">
-    <div class="col-md-3">
+    <div class="col">
         {{adminltetags.useTag('fields',
             [
                 'component'                            : component,
@@ -312,7 +312,7 @@
             ]
         )}}
     </div>
-    <div class="col-md-2">
+    <div class="col">
         {{adminltetags.useTag('fields',
             [
                 'component'                      : component,
@@ -326,6 +326,16 @@
                 'fieldHelpTooltipContent'        : 'Module version. New modules start with 0.0.0(Major.Minor.Patch). We use semantic version system.',
                 'fieldRequired'                  : true,
                 'fieldInputToggleEdit'           : true,
+                'fieldGroupPreAddonButtons'      :
+                    [
+                        'check-version'   : [
+                            'title'                   : false,
+                            'icon'                    : 'check',
+                            'noMargin'                : true,
+                            'buttonAdditionalClass'   : 'rounded-0 text-white',
+                            'position'                : 'right'
+                        ]
+                    ],
                 'fieldDisabled'                  : true,
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnCreate'           : true,
@@ -336,6 +346,8 @@
             ]
         )}}
     </div>
+</div>
+<div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
             [
@@ -352,6 +364,16 @@
                 'fieldInputToggleEdit'           : true,
                 'fieldDisabled'                  : true,
                 'fieldBazScan'                   : true,
+                'fieldGroupPreAddonButtons'          :
+                    [
+                        'generate-repo-url'   : [
+                            'title'                   : false,
+                            'icon'                    : 'wand-magic-sparkles',
+                            'noMargin'                : true,
+                            'buttonAdditionalClass'   : 'rounded-0 text-white',
+                            'position'                : 'right'
+                        ]
+                    ],
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
@@ -370,6 +392,7 @@
                 'fieldId'                        : 'createrepo',
                 'fieldLabel'                     : 'Create New Repo?',
                 'fieldHelp'                      : true,
+                'fieldDisabled'                  : true,
                 'fieldHelpTooltipContent'        : 'Create new repository if it does not exist on remote?',
                 'fieldType'                      : 'checkbox',
                 'fieldCheckboxType'              : 'primary',
@@ -399,6 +422,16 @@
                 'fieldDisabled'                  : true,
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'Module class.',
+                'fieldGroupPreAddonButtons'          :
+                    [
+                        'generate-module-class'   : [
+                            'title'                   : false,
+                            'icon'                    : 'wand-magic-sparkles',
+                            'noMargin'                : true,
+                            'buttonAdditionalClass'   : 'rounded-0 text-white',
+                            'position'                : 'right'
+                        ]
+                    ],
                 'fieldRequired'                  : true,
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnCreate'           : true,

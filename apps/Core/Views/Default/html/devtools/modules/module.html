@@ -536,33 +536,111 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-api_id'                                  : {
             'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY',
             afterInit: function() {
-                var repourl = '';
+                var repourl = $('#{{componentId}}-{{sectionId}}-repo').val();
+
                 $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function(e) {
-                    var id;
-
-                    id = e.params.data.id;
+                    var id = e.params.data.id;
                     repourl = $(e.params.data.element).data('url');
-                    extractName(repourl);
+
+                    if (repourl !== 'https://.../') {
+                        $('#{{componentId}}-{{sectionId}}-createrepo').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-createrepo')[0].checked = false;
+                        $('#{{componentId}}-{{sectionId}}-createrepo').attr('disabled', true);
+                    }
                 });
-
-                $('#{{componentId}}-{{sectionId}}-name').off();
-                $('#{{componentId}}-{{sectionId}}-name').on('keyup', function() {
-                    extractName(repourl);
-                });
-
-                function extractName(repourl = '') {
-                    repourl =
-                        repourl + '/' +
-                        $('#{{componentId}}-{{sectionId}}-app_type').val().toLowerCase() + '-' +
-                        $('#{{componentId}}-{{sectionId}}-module_type').val().toLowerCase() + '-' +
-                        $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
-
-                    $('#{{componentId}}-{{sectionId}}-repo').val(repourl);
-                }
             }
         },
-        '{{componentId}}-{{sectionId}}-version'                                 : { },
-        '{{componentId}}-{{sectionId}}-repo'                                    : { },
+        '{{componentId}}-{{sectionId}}-version'                                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-check-version').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['version'] = $('#{{componentId}}-{{sectionId}}-version').val();
+
+                    if (postData['version'] === '') {
+                        PNotify.error('Please enter version.');
+
+                        return;
+                    }
+
+                    $.post('{{links.url("devtools/modules/checkVersion")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-repo'                                    : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-repo-url').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
+                    postData['app_type'] = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                    postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+
+                    if (postData['api_id'] === '') {
+                        PNotify.error('Please select api.');
+                        return;
+                    }
+
+                    if (postData['app_type'] === '') {
+                        PNotify.error('Please select app type.');
+                        return;
+                    }
+                    if (postData['module_type'] === '') {
+                        PNotify.error('Please select module type.');
+                        return;
+                    }
+                    if (postData['module_type'] === 'components') {
+                        if (postData['route'] === '') {
+                            PNotify.error('Please enter route.');
+                            return;
+                        }
+                    } else {
+                        if (postData['name'] === '') {
+                            PNotify.error('Please enter name.');
+                            return;
+                        }
+                        if (postData['category'] === '') {
+                            PNotify.error('Please select category.');
+                            return;
+                        }
+                    }
+
+                    $.post('{{links.url("devtools/modules/generateModuleRepoUrl")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+
+                            if (response.responseData.repo) {
+                                $('#{{componentId}}-{{sectionId}}-repo').val(response.responseData.repo);
+                            }
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-createrepo'                              : { },
         '{{componentId}}-{{sectionId}}-modules'                                 : {
             'placeholder'   : 'SELECT MODULE',
@@ -742,6 +820,151 @@ dataCollectionSection =
     });
 </script>
         {% endif %}
+    {% elseif type === 'apptypes' %}
+        <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {% include 'modules/apptypes.html' %}
+            </fieldset>
+        </form>
+        <script>
+/* globals PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-is_clone'                                : { },
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
+        '{{componentId}}-{{sectionId}}-app_type'                                : { },
+        '{{componentId}}-{{sectionId}}-name'                                    : { },
+        '{{componentId}}-{{sectionId}}-description'                             : { },
+        '{{componentId}}-{{sectionId}}-api_id'                                  : {
+            'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY',
+            afterInit: function() {
+                var repourl = $('#{{componentId}}-{{sectionId}}-repo').val();
+
+                $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function(e) {
+                    var id = e.params.data.id;
+                    repourl = $(e.params.data.element).data('url');
+
+                    if (repourl !== 'https://.../') {
+                        $('#{{componentId}}-{{sectionId}}-createrepo').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-createrepo')[0].checked = false;
+                        $('#{{componentId}}-{{sectionId}}-createrepo').attr('disabled', true);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-version'                                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-check-version').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['version'] = $('#{{componentId}}-{{sectionId}}-version').val();
+
+                    if (postData['version'] === '') {
+                        PNotify.error('Please enter version.');
+
+                        return;
+                    }
+
+                    $.post('{{links.url("devtools/modules/checkVersion")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-repo'                                    : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-repo-url').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
+                    postData['app_type'] = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                    postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                    postData['module_type'] = 'apps_types';
+
+                    if (postData['api_id'] === '') {
+                        PNotify.error('Please select api.');
+                        return;
+                    }
+
+                    if (postData['app_type'] === '') {
+                        PNotify.error('Please select app type.');
+                        return;
+                    }
+                    if (postData['module_type'] === '') {
+                        PNotify.error('Please select module type.');
+                        return;
+                    }
+
+                    $.post('{{links.url("devtools/modules/generateModuleRepoUrl")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+
+                            if (response.responseData.repo) {
+                                $('#{{componentId}}-{{sectionId}}-repo').val(response.responseData.repo);
+                            }
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-createrepo'                              : { },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                            : 'required',
+                '{{componentId}}-{{sectionId}}-app_type'                        : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-app_type'                        : 'Please enter app type',
+                '{{componentId}}-{{sectionId}}-name'                            : 'Please enter app type name',
+            }
+        }
+    });
+</script>
     {% else %}
         {% set tabsData =
             [
@@ -935,198 +1158,173 @@ dataCollectionSection =
                     repourl = $(e.params.data.element).data('url');
 
                     if (repourl !== 'https://.../') {
-                        extractRepoName(repourl);
+                        $('#{{componentId}}-{{sectionId}}-createrepo').attr('disabled', false);
                     } else {
                         $('#{{componentId}}-{{sectionId}}-createrepo')[0].checked = false;
                         $('#{{componentId}}-{{sectionId}}-createrepo').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-repo').val(repourl);
                     }
                 });
-
-                $('#{{componentId}}-{{sectionId}}-name').on('keyup', function() {
-                    if (repourl !== 'https://.../') {
-                        extractRepoName(repourl);
-                    }
-                });
-
-                $('#{{componentId}}-{{sectionId}}-app_type').on('change.select2', function() {
-                    if (repourl !== 'https://.../') {
-                        extractRepoName(repourl);
-                    }
-                });
-
-                $('#{{componentId}}-{{sectionId}}-category').on('change.select2', function() {
-                    if (repourl !== 'https://.../') {
-                        extractRepoName(repourl);
-                    }
-                });
-
-                function extractRepoName(repourl = '') {
-                    repourl =
-                        repourl + '/' +
-                        $('#{{componentId}}-{{sectionId}}-app_type').val().toLowerCase() + '-' +
-                        $('#{{componentId}}-{{sectionId}}-module_type').val().toLowerCase() + '-' +
-                        $('#{{componentId}}-{{sectionId}}-category').val().toLowerCase() + '-' +
-                        $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
-
-                    $('#{{componentId}}-{{sectionId}}-repo').val(repourl);
-                }
             }
         },
-        '{{componentId}}-{{sectionId}}-version'                                 : { },
-        '{{componentId}}-{{sectionId}}-repo'                                    : { },
+        '{{componentId}}-{{sectionId}}-version'                                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-check-version').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['version'] = $('#{{componentId}}-{{sectionId}}-version').val();
+
+                    if (postData['version'] === '') {
+                        PNotify.error('Please enter version.');
+
+                        return;
+                    }
+
+                    $.post('{{links.url("devtools/modules/checkVersion")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-repo'                                    : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-repo-url').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
+                    postData['app_type'] = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                    postData['category'] = $('#{{componentId}}-{{sectionId}}-category').val();
+                    if (postData['module_type'] === 'components') {
+                        postData['route'] = $('#{{componentId}}-{{sectionId}}-route').val();
+                    } else {
+                        postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                    }
+
+                    if (postData['api_id'] === '') {
+                        PNotify.error('Please select api.');
+                        return;
+                    }
+
+                    if (postData['app_type'] === '') {
+                        PNotify.error('Please select app type.');
+                        return;
+                    }
+                    if (postData['module_type'] === '') {
+                        PNotify.error('Please select module type.');
+                        return;
+                    }
+                    if (postData['module_type'] === 'components') {
+                        if (postData['route'] === '') {
+                            PNotify.error('Please enter route.');
+                            return;
+                        }
+                    } else {
+                        if (postData['name'] === '') {
+                            PNotify.error('Please enter name.');
+                            return;
+                        }
+                        if (postData['category'] === '') {
+                            PNotify.error('Please select category.');
+                            return;
+                        }
+                    }
+
+                    $.post('{{links.url("devtools/modules/generateModuleRepoUrl")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+
+                            if (response.responseData.repo) {
+                                $('#{{componentId}}-{{sectionId}}-repo').val(response.responseData.repo);
+                            }
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-createrepo'                              : { },
         '{{componentId}}-{{sectionId}}-class'                                   : {
             afterInit: function() {
-                function capitalizeFirstLetter(string) {
-                    return string.charAt(0).toUpperCase() + string.slice(1);
-                }
+                $('#{{componentId}}-{{sectionId}}-generate-module-class').click(function(e) {
+                    e.preventDefault();
 
-                var currentClass = $('#{{componentId}}-{{sectionId}}-class').val();
-                var currentClassArr = [];
-                var routeArr = [];
-                var nameArr = [];
-
-                if (currentClass !== '') {
-                    currentClassArr = currentClass.split('\\');
-                } else {
-                    currentClassArr[0] = 'Apps';
-                    currentClassArr[1] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
-                    currentClassArr[2] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-module_type').val());
-                }
-
-                $('#{{componentId}}-{{sectionId}}-app_type').on('change.select2', function() {
-                    var data = $('#{{componentId}}-{{sectionId}}-app_type').select2('data')[0];
-
-                    currentClassArr[1] = data.text
-
-                    $('#{{componentId}}-{{sectionId}}-class').val(currentClassArr.join('\\'));
-                });
-
-                $('#{{componentId}}-{{sectionId}}-name').on('keyup', function() {
-                    extractClass();
-                });
-
-                function extractClass() {
-                    if ((dataCollectionSectionForm['vars']['module_type'] === 'packages' &&
-                        $('#{{componentId}}-{{sectionId}}-category').select2('data')[0].id !== 'basepackages') ||
-                        dataCollectionSectionForm['vars']['module_type'] === 'middlewares'
-                    ) {
-                        if ($('#{{componentId}}-{{sectionId}}-category').val() === 'providers') {
-                            currentClassArr = [];
-                            currentClassArr[0] = 'System';
-                            currentClassArr[1] = 'Base';
-                            currentClassArr[2] = 'Providers';
-                            currentClassArr[3] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-name').val()) + 'ServiceProvider';
-                        } else {
-                            currentClassArr = [];
-                            currentClassArr[0] = 'Apps';
-                            currentClassArr[1] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
-                            currentClassArr[2] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-module_type').val());
-                            currentClassArr[3] = '';
-                            currentClassArr[4] = '';
-                        }
-
-                        if ($('#{{componentId}}-{{sectionId}}-name').val() !== '') {
-                            if (dataCollectionSectionForm['vars']['module_type'] === 'middlewares') {
-                                name = $('#{{componentId}}-{{sectionId}}-name').val();
-                                currentClassArr[3] = capitalizeFirstLetter(name);
-                                currentClassArr[4] = currentClassArr[3];
-                            } else {
-                                if ($('#{{componentId}}-{{sectionId}}-category').val() === 'providers') {
-                                    currentClassArr[4] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-name').val());
-                                } else {
-                                    nameArr = $('#{{componentId}}-{{sectionId}}-name').val().split(/(?=[A-Z])/);
-
-                                    if (nameArr.length === 1) {
-                                        currentClassArr[3] = capitalizeFirstLetter(nameArr[0]);
-                                        currentClassArr[4] = currentClassArr[3];
-                                    } else {
-                                        if (nameArr[nameArr.length -1] !== '') {
-                                            $(nameArr).each(function(i, name) {
-                                                if (i !== nameArr.length) {
-                                                    i = 3 + i;
-                                                    if (dataCollectionSectionForm['vars']['module_type'] === 'packages') {
-                                                        currentClassArr[i] = capitalizeFirstLetter(name);
-                                                        currentClassArr[i + 1] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-name').val());
-                                                        // currentClassArr[i + 1] = currentClassArr[i - 1] + capitalizeFirstLetter(name);
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            currentClassArr = [];
-                            currentClassArr[0] = 'Apps';
-                            currentClassArr[1] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
-                            currentClassArr[2] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-module_type').val());
-                        }
-                    } else if (dataCollectionSectionForm['vars']['module_type'] === 'packages' &&
-                               $('#{{componentId}}-{{sectionId}}-category').select2('data')[0].id === 'basepackages'
-                    ) {
-                        currentClassArr[5] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-name').val());
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['app_type'] = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                    if (postData['module_type'] === 'components') {
+                        postData['route'] = $('#{{componentId}}-{{sectionId}}-route').val();
+                    } else if (postData['module_type'] === 'packages') {
+                        postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                        postData['category'] = $('#{{componentId}}-{{sectionId}}-category').val();
+                    } else if (postData['module_type'] === 'middlewares') {
+                        postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
                     }
 
-                    $('#{{componentId}}-{{sectionId}}-class').val(currentClassArr.join('\\'));
-                }
-
-                $('#{{componentId}}-{{sectionId}}-route').off();
-                $('#{{componentId}}-{{sectionId}}-route').on('keyup', function() {
-                    currentClassArr[3] = '';
-                    currentClassArr[4] = '';
-
-                    if ($('#{{componentId}}-{{sectionId}}-route').val() !== '') {
-                        routeArr = $('#{{componentId}}-{{sectionId}}-route').val().split('/');
-                        if (routeArr.length === 1) {
-                            currentClassArr[3] = capitalizeFirstLetter(routeArr[0]);
-                            currentClassArr[4] = capitalizeFirstLetter(routeArr[0]) + 'Component';
-                        } else {
-                            if (routeArr[routeArr.length -1] !== '') {
-                                $(routeArr).each(function(i, route) {
-                                    if (i !== routeArr.length) {
-                                        i = 3 + i;
-                                        currentClassArr[i] = capitalizeFirstLetter(route);
-                                        currentClassArr[i + 1] = capitalizeFirstLetter(route) + 'Component';
-                                    }
-                                });
-                            }
+                    if (postData['app_type'] === '') {
+                        PNotify.error('Please select app type.');
+                        return;
+                    }
+                    if (postData['module_type'] === '') {
+                        PNotify.error('Please select module type.');
+                        return;
+                    }
+                    if (postData['module_type'] === 'components') {
+                        if (postData['route'] === '') {
+                            PNotify.error('Please enter route.');
+                            return;
                         }
-                    } else {
-                        currentClassArr = [];
-                        currentClassArr[0] = 'Apps';
-                        currentClassArr[1] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
-                        currentClassArr[2] = capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-module_type').val());
+                    } else if (postData['module_type'] === 'packages') {
+                        if (postData['name'] === '') {
+                            PNotify.error('Please enter name.');
+                            return;
+                        }
+                        if (postData['category'] === '') {
+                            PNotify.error('Please select category.');
+                            return;
+                        }
+                    } else if (postData['module_type'] === 'middlewares') {
+                        if (postData['name'] === '') {
+                            PNotify.error('Please enter name.');
+                            return;
+                        }
                     }
 
-                    $('#{{componentId}}-{{sectionId}}-class').val(currentClassArr.join('\\'));
-                });
+                    $.post('{{links.url("devtools/modules/generateModuleClass")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
 
-                $('#{{componentId}}-{{sectionId}}-category').on('change.select2', function() {
-                    var data = $('#{{componentId}}-{{sectionId}}-category').select2('data')[0];
-
-                    if (data.id === 'basepackages') {
-                        currentClassArr = [];
-                        currentClassArr[0] = 'System';
-                        currentClassArr[1] = 'Base';
-                        currentClassArr[2] = 'Providers';
-                        currentClassArr[3] = 'BasepackagesServiceProvider';
-                        currentClassArr[4] = 'Packages';
-                        var nameArr = $('#{{componentId}}-{{sectionId}}-name').val().split(/(?=[A-Z])/);
-
-                        if (nameArr.length > 1) {
-                            for (var i = nameArr.length - 1; i >= 0; i--) {
-                                currentClassArr[5 + i] = capitalizeFirstLetter(nameArr[i]);
+                            if (response.responseData.class) {
+                                $('#{{componentId}}-{{sectionId}}-class').val(response.responseData.class);
                             }
                         } else {
-                            currentClassArr[5] = capitalizeFirstLetter(nameArr[0]);
+                            PNotify.error(response.responseMessage);
                         }
 
-                        $('#{{componentId}}-{{sectionId}}-class').val(currentClassArr.join('\\'));
-                    } else {
-                        extractClass();
-                    }
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
                 });
             }
         },
