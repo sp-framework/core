@@ -36,6 +36,8 @@ abstract class BaseComponent extends Controller
 
 	protected $showModuleSettings = false;
 
+	protected $showModuleSettingsData = [];
+
 	protected $usedModules = [];
 
 	public $widgets;
@@ -597,6 +599,12 @@ abstract class BaseComponent extends Controller
 			}
 
 			$this->view->usedModules = $usedModules;
+
+			if (count($this->showModuleSettingsData) > 0) {
+				foreach ($this->showModuleSettingsData as $dataKey => $dataValue) {
+					$this->view->{$dataKey} = $dataValue;
+				}
+			}
 		}
 	}
 
@@ -1059,5 +1067,14 @@ abstract class BaseComponent extends Controller
 	public function setModuleSettings(bool $setting)
 	{
 		$this->showModuleSettings = $setting;
+	}
+
+	public function setModuleSettingsData(array $data = [])
+	{
+		if (isset($this->getData()['settings']) &&
+			$this->getData()['settings'] == 'true'
+		) {
+			$this->showModuleSettingsData = $data;
+	}
 	}
 }
