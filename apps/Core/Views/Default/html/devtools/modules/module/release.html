@@ -101,29 +101,6 @@
             ]
         )}}
     </div>
-    <div class="col-md-2">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'version',
-                'fieldLabel'                     : 'Module version',
-                'fieldType'                      : 'input',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Module version. New modules start with 0.0.0(Major.Minor.Patch). We use semantic version system.',
-                'fieldRequired'                  : true,
-                'fieldDisabled'                  : true,
-                'fieldBazScan'                   : true,
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldDataInputMinLength'        : 1,
-                'fieldDataInputMaxLength'        : 50,
-                'fieldValue'                     : moduleVersion
-            ]
-        )}}
-    </div>
     <div class="col">
         {{adminltetags.useTag('fields',
             [
@@ -175,6 +152,14 @@
                     'patch' : {
                         'id'    : 'patch',
                         'name'  : 'PATCH'
+                    },
+                    'preRelease' : {
+                        'id'    : 'preRelease',
+                        'name'  : 'PRE RELEASE'
+                    },
+                    'buildMeta' : {
+                        'id'    : 'buildMeta',
+                        'name'  : 'BUILD META'
                     }
                 },
                 'fieldDataSelect2OptionsArray'           : true,
@@ -185,6 +170,31 @@
         )}}
     </div>
     <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'version',
+                'fieldLabel'                     : 'Current module version',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Current module version. We use semantic version system.',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : moduleVersion
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
         <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
@@ -193,43 +203,68 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'prerelease',
-                        'fieldLabel'                     : 'Pre-Release?',
+                        'fieldId'                        : 'pre-release-prefix',
+                        'fieldLabel'                     : 'Pre Release Prefix',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Check if release is a pre-release (not production ready)?',
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'warning',
-                        'fieldCheckboxChecked'           : false,
-                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldHelpTooltipContent'        : 'Enter your pre release prefix',
+                        'fieldType'                      : 'input',
+                        'fieldRequired'                  : true,
+                        'fieldDisabled'                  : true,
+                        'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazScan'                   : true
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 5,
+                        'fieldValue'                     : ''
                     ]
                 )}}
             </div>
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                             : component,
-                        'componentName'                         : componentName,
-                        'componentId'                           : componentId,
-                        'sectionId'                             : sectionId,
-                        'fieldId'                               : 'release-version',
-                        'fieldLabel'                            : 'Release Version',
-                        'fieldHidden'                           : false,
-                        'fieldType'                             : 'html',
-                        'fieldBazScan'                          : true,
-                        'fieldBazPostOnCreate'                  : false,
-                        'fieldBazPostOnUpdate'                  : false,
-                        'fieldBazJstreeSearch'                  : true,
-                        'fieldHtmlContent'                      : '<h4 class="mt-1">SELECT RELEASE TYPE</h4>'
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'build-meta',
+                        'fieldLabel'                     : 'Build Meta',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Enter your build Meta',
+                        'fieldType'                      : 'input',
+                        'fieldRequired'                  : true,
+                        'fieldDisabled'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : ''
                     ]
                 )}}
             </div>
         </div>
     </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'release-version',
+                'fieldLabel'                            : 'Release Version',
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldHtmlContent'                      : '<h4 class="mt-1">SELECT RELEASE TYPE</h4>'
+            ]
+        )}}
+    </div>
 </div>
+<hr>
 <div class="row">
     <div class="col">
         <div class="row">

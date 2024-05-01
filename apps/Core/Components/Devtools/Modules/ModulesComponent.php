@@ -537,8 +537,10 @@ class ModulesComponent extends BaseComponent
 
 		$this->addResponse(
 			$this->modulesPackage->packagesData->responseMessage,
-			$this->modulesPackage->packagesData->responseCode
+			$this->modulesPackage->packagesData->responseCode,
+			$this->modulesPackage->packagesData->responseData ?? []
 		);
+
 	}
 
 	public function syncBranchesAction()

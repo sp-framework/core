@@ -1169,7 +1169,7 @@ $file .= '
         }
 
         //Get Latest Release (Last One, we need to sync issues since that release)
-        $latestRelease = $this->getLatestRelease($data);
+        $latestRelease = $this->getReleases($data);
 
         if (!$latestRelease) {
             $since = null;
@@ -1196,24 +1196,36 @@ $file .= '
         $this->addResponse('Error syncing issues', 1);
     }
 
-    protected function getLatestRelease($data)
+    protected function getReleases($module, $getLatestRelease = false)
     {
         if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';
-            $method = 'repoGetLatestRelease';
-            $args = [$this->apiClientConfig['org_user'], strtolower($data['name'])];
+            $method = 'repoListReleases';
+            $args =
+                [
+                    $this->apiClientConfig['org_user'],
+                    strtolower($module['repo'])
+                ];
         } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             //For github
         }
 
         try {
-            $latestRelease = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+            $releases = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
         } catch (\throwable $e) {
+            if ($e->getCode() === 404) {
+                return false;
+            }
+
             $this->addResponse($e->getMessage(), 1);
         }
 
-        if (isset($latestRelease)) {
-            return $latestRelease;
+        if (isset($releases) && is_array($releases)) {
+            if (count($releases) === 1 || $getLatestRelease) {
+                return $releases[0];
+            }
+
+            return $releases;
         }
 
         return false;
@@ -1266,25 +1278,39 @@ $file .= '
 
     public function bumpVersion($data)
     {
-        if (!$this->initApi($data)) {
-            $this->addResponse('Could not initialize the API assigned to this module.', 1);
+        if (!isset($data['repo'])) {
+            $module = $this->modules->{$data['module_type']}->getById($data['id']);
 
-            return false;
+            if (!$module) {
+                $this->addResponse('Bundle not found.', 1);
+
+                return false;
+            }
+
+            if (!$this->initApi($module)) {
+                $this->addResponse('Could not initialize the API assigned to this module.', 1);
+
+                return false;
+            }
+
+            $module['repo'] = $this->helper->last(explode('/', $module['repo']));
+        } else {
+            $module = $data;
         }
 
-        $latestRelease = $this->getLatestRelease($data);
+        $latestRelease = $this->getReleases($module, true);
 
         if ($latestRelease) {
             $latestReleaseVersion = $latestRelease['name'];
         } else {
+            $this->addResponse('No version found on remote repository.', 1, ['release' => $module['version']]);
+
             return false;
         }
 
-        if ($data['module_type'] === 'core') {
+        if ($module['module_type'] === 'core') {
             $currentVersion = $this->core->getVersion();
         } else {
-            $module = $this->modules->{$data['module_type']}->getById($data['id']);
-
             $currentVersion = $module['version'];
         }
 
@@ -1363,11 +1389,21 @@ $file .= '
 
     public function generateRelease($data)
     {
-        if (!$this->initApi($data)) {
+        $module = $this->modules->{$data['module_type']}->getById($data['id']);
+
+        if (!$module) {
+            $this->addResponse('Bundle not found.', 1);
+
+            return false;
+        }
+
+        if (!$this->initApi($module)) {
             $this->addResponse('Could not initialize the API assigned to this module.', 1);
 
             return false;
         }
+
+        $module['repo'] = $this->helper->last(explode('/', $module['repo']));
 
         if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';
@@ -1381,16 +1417,25 @@ $file .= '
             // }
 
             $prerelease = false;
-            if (isset($data['prerelease']) && $data['prerelease'] == 'true') {
+            if ($data['bump'] == 'preRelease') {
                 $prerelease = true;
             }
 
-            $name = $this->bumpVersion($data);
+            if ($data['bump'] === 'buildMeta') {
+                $name = $data['buildMetaRelease'];
+                $prerelease = true;
+            } else {
+                $name = $this->bumpVersion($data);
+            }
+
+            if (!$name) {
+                $name = $module['version'];
+            }
 
             $args =
                 [
                     $this->apiClientConfig['org_user'],
-                    strtolower($data['name']),
+                    strtolower($module['repo']),
                     [
                         'body'              => $data['release_notes'],
                         'draft'             => false,
@@ -1408,6 +1453,10 @@ $file .= '
             $newRelease = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
 
             if ($newRelease) {
+                $module['version'] = $name;
+
+                $this->modules->{$data['module_type']}->update($module);
+
                 $this->addResponse('Generated New Release!', 0, ['newRelease' => $newRelease]);
 
                 return true;
