@@ -1483,7 +1483,7 @@ abstract class BasePackage extends Controller
 
 	protected function getClassName()
 	{
-		$reflection = new \ReflectionClass($this);
+		$reflection = $this->getReflection();
 
 		return explode('\\', $reflection->getName());
 	}
@@ -1494,9 +1494,33 @@ abstract class BasePackage extends Controller
 			$cacheClass = $this->cacheClass;
 		}
 
-		$reflection = new \ReflectionClass($cacheClass);
+		$reflection = $this->getReflection($cacheClass);
 
 		return explode('\\', $reflection->getName());
+	}
+
+	protected function getReflection($class = null)
+	{
+		if (!$class) {
+			$class = $this;
+		}
+
+		return new \ReflectionClass($class);
+	}
+
+	protected function getPackage()
+	{
+		$reflection = $this->getReflection();
+
+		$class = $reflection->getName();
+
+		$package = $this->modules->packages->getPackageByClassForAppId($class);
+
+		if ($package) {
+			return $package;
+		}
+
+		return false;
 	}
 
 	protected function extractCacheName($cacheClass = null)
