@@ -79,7 +79,7 @@ class Repos extends BasePackage
     {
         $this->config = new Configuration;
 
-        $this->config->setHost($this->helper->reduceSlashes($this->apiConfig['api_url'] . '/api/v1'));
+        $this->config->setHost($this->helper->reduceSlashes($this->apiConfig['api_url']));
 
         if (isset($this->apiConfig['debug']) && $this->apiConfig['debug'] === true) {
             $this->config->setDebug(true);
@@ -87,6 +87,9 @@ class Repos extends BasePackage
             $this->httpOptions['debug'] = true;
         }
 
+        $this->config->setUsername(null);
+        $this->config->setPassword(null);
+        $this->config->setApiKey('access_token', null);
         if ($this->apiConfig['auth_type'] === 'auth') {
             $this->config->setUsername($this->apiConfig['username']);
             $this->config->setPassword($this->apiConfig['password']);
