@@ -24,5 +24,6 @@
 		"external" : []
 	},
 	"settings" : {
+		"api_clients" : []
 	}
 }

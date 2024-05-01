@@ -13,6 +13,14 @@ class ModulesComponent extends BaseComponent
 	public function initialize()
 	{
 		$this->modulesPackage = $this->usePackage(DevtoolsModules::class);
+
+		$this->setModuleSettings(true);
+
+		$this->setModuleSettingsData([
+				'apis' => $this->modulesPackage->getAvailableApis(true, false),
+				'apiClients' => $this->modulesPackage->getAvailableApis(false, false)
+			]
+		);
 	}
 
 	/**
@@ -132,23 +140,7 @@ class ModulesComponent extends BaseComponent
 
 		$this->view->modulesJson = $this->helper->encode($modulesJson);
 
-		$apisArr = $this->basepackages->apiClientServices->init()->getAll()->apiClientServices;
-		if (count($apisArr) > 0) {
-			$apis[0]['id'] = 0;
-			$apis[0]['name'] = 'Local Modules';
-			$apis[0]['data']['url'] = 'https://.../';
-
-			foreach ($apisArr as $api) {
-				if ($api['category'] === 'repos') {
-					$useApi = $this->basepackages->apiClientServices->useApi($api['id'], true);
-					$apiConfig = $useApi->getApiConfig();
-
-					$apis[$api['id']]['id'] = $apiConfig['id'];
-					$apis[$api['id']]['name'] = $apiConfig['name'];
-					$apis[$api['id']]['data']['url'] = $apiConfig['repo_url'];
-				}
-			}
-		}
+		$apis = $this->modulesPackage->getAvailableApis(false, true);
 
 		if (isset($this->getData()['id']) &&
 			isset($this->getData()['module']) &&
@@ -334,6 +326,9 @@ class ModulesComponent extends BaseComponent
 					return $this->throwIdNotFound();
 				}
 
+				if (is_array($bundle['bundle_modules'])) {
+					$bundle['bundle_modules'] = $this->helper->encode($bundle['bundle_modules']);
+				}
 				$this->view->bundle = $bundle;
 				$this->view->bundleModules = $bundle['bundle_modules'];
 			}

@@ -1726,4 +1726,51 @@ $file .= '
 
         return true;
     }
+
+    public function getAvailableApis($getAll = false, $returnApis = true)
+    {
+        $apis = [];
+        $apis[0]['id'] = 0;
+        $apis[0]['name'] = 'Local Modules';
+        $apis[0]['data']['url'] = 'https://.../';
+
+        $apisArr = [];
+
+        if (!$getAll) {
+            $package = $this->getPackage();
+            if (isset($package['settings']) &&
+                isset($package['settings']['api_clients']) &&
+                is_array($package['settings']['api_clients']) &&
+                count($package['settings']['api_clients']) > 0
+            ) {
+                foreach ($package['settings']['api_clients'] as $key => $clientId) {
+                    $client = $this->basepackages->apiClientServices->getApiById($clientId);
+
+                    if ($client) {
+                        array_push($apisArr, $client);
+                    }
+                }
+            }
+        } else {
+            $apisArr = $this->basepackages->apiClientServices->getAll()->apiClientServices;
+        }
+
+        if (count($apisArr) > 0) {
+            foreach ($apisArr as $api) {
+                if ($api['category'] === 'repos') {
+                    $useApi = $this->basepackages->apiClientServices->useApi($api['id'], true);
+                    $apiConfig = $useApi->getApiConfig();
+
+                    $apis[$api['id']]['id'] = $apiConfig['id'];
+                    $apis[$api['id']]['name'] = $apiConfig['name'];
+                    $apis[$api['id']]['data']['url'] = $apiConfig['repo_url'];
+                }
+            }
+        }
+
+        if ($returnApis) {
+            return $apis;
+        }
+        return $apisArr;
+    }
 }
