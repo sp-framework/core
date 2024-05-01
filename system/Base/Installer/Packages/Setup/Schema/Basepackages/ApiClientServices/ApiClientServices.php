@@ -62,7 +62,7 @@ class ApiClientServices
                     'used_by',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 100,
+                        'size'    => 1024,
                         'notNull' => false,
                     ]
                 ),

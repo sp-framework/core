@@ -377,6 +377,16 @@ class Packages extends BasePackage
 			}
 		}
 
+		try {
+			$packageReflection = new \ReflectionClass($package['class']);
+			$packageSettingsProperty = $packageReflection->getProperty('settings');
+			$settingsClass = $packageSettingsProperty->getValue(new $package['class']);
+
+			(new $settingsClass)->onUpdate($data);
+		} catch (\Exception $e) {
+			throw $e;
+		}
+
 		$package['settings'] = $this->helper->encode($package['settings']);
 
 		$this->update($package);

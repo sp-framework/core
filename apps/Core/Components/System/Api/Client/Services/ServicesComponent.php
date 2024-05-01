@@ -118,7 +118,8 @@ class ServicesComponent extends BaseComponent
             $data['category'] = ucfirst($data['category']);
 
             if ($data['used_by'] !== '') {
-                $data['used_by'] = ucfirst($data['used_by']);
+                $data['used_by'] = $this->helper->decode($data['used_by'], true);
+                $data['used_by'] = implode(', ', $data['used_by']);
             } else if ($data['used_by'] === '') {
                 $data['used_by'] = '-';
             }

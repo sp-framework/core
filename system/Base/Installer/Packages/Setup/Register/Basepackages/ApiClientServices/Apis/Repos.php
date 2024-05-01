@@ -8,7 +8,7 @@ class Repos
     {
         $coreRepo =
             [
-                'api_url'               => 'https://dev.bazaari.com.au/',
+                'api_url'               => 'https://dev.bazaari.com.au/api/v1',
                 'org_user'              => 'sp-core',
                 'repo_url'              => 'https://dev.bazaari.com.au/sp-core',
                 'branch'                => 'main',
@@ -23,14 +23,14 @@ class Repos
                 'category'          => 'repos',
                 'provider'          => 'Gitea',
                 'in_use'            => 1,
-                'used_by'           => 'modules',
+                'used_by'           => json_encode(['modules']),
                 'setup'             => 4,
                 'location'          => 'system'
             ];
 
         $modulesRepo =
             [
-                'api_url'               => 'https://dev.bazaari.com.au/',
+                'api_url'               => 'https://dev.bazaari.com.au/api/v1',
                 'org_user'              => 'sp-modules',
                 'repo_url'              => 'https://dev.bazaari.com.au/sp-modules',
                 'branch'                => 'main',
@@ -45,7 +45,7 @@ class Repos
                 'category'              => 'repos',
                 'provider'              => 'Gitea',
                 'in_use'                => 1,
-                'used_by'               => 'modules',
+                'used_by'               => json_encode(['modules']),
                 'setup'                 => 4,
                 'location'              => 'system'
             ];

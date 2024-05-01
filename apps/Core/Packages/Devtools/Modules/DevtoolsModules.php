@@ -3,6 +3,7 @@
 namespace Apps\Core\Packages\Devtools\Modules;
 
 use Apps\Core\Packages\Devtools\Modules\Model\AppsCoreDevtoolsModulesBundles;
+use Apps\Core\Packages\Devtools\Modules\Settings;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToReadFile;
@@ -29,6 +30,8 @@ class DevtoolsModules extends BasePackage
     protected $newFiles = [];
 
     protected $newDirs = [];
+
+    protected $settings = Settings::class;
 
     public function addModule($data)
     {
