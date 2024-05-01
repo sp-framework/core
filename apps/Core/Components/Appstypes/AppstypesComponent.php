@@ -4,10 +4,16 @@ namespace Apps\Core\Components\Appstypes;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use System\Base\BaseComponent;
+use System\Base\Providers\AppsServiceProvider\Types;
 
 class AppstypesComponent extends BaseComponent
 {
     use DynamicTable;
+
+    public function initialize()
+    {
+        $this->appsTypes = $this->usePackage(Types::class);
+    }
 
     /**
      * @acl(name=view)
@@ -16,7 +22,7 @@ class AppstypesComponent extends BaseComponent
     {
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $appsType = $this->apps->types->getAppTypeById($this->getData()['id']);
+                $appsType = $this->appsTypes->getAppTypeById($this->getData()['id']);
 
                 if (!$appsType) {
                     return $this->throwIdNotFound();
@@ -39,7 +45,7 @@ class AppstypesComponent extends BaseComponent
             ];
 
         $this->generateDTContent(
-            $this->apps->types,
+            $this->appsTypes,
             'appstypes/view',
             null,
             ['name', 'app_type'],
@@ -66,7 +72,7 @@ class AppstypesComponent extends BaseComponent
                 return;
             }
 
-            $this->apps->types->updateAppsType($this->postData());
+            $this->appsTypes->updateAppsType($this->postData());
 
             $this->addResponse(
                 $this->apps->packagesData->responseMessage,
