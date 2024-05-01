@@ -176,8 +176,8 @@ class Card extends Adminltetags
                 '<a href="' . $url . '" class="btn btn-tool btn-tool-package-settings-link disabled" role="button" hidden="">Package Settings Link</a>' .
                 '<script>
                     $(document).ready(function() {
-                        $("#' . $this->params['componentId'] . '-listing .btn-tool-package-settings").click(function() {
-                            BazContentLoader.loadAjax($("#' . $this->params['componentId'] . '-listing .btn-tool-package-settings-link"), {
+                        $(".btn-tool-package-settings").click(function() {
+                            BazContentLoader.loadAjax($(".btn-tool-package-settings-link"), {
                                 ajaxBefore                      : function () {
                                                                     Pace.restart();
                                                                     $("#baz-content").empty();
