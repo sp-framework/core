@@ -149,7 +149,7 @@ class ModulesComponent extends BaseComponent
 			$type = strtolower($this->getData()['type']);
 
 			if ($type !== 'apptypes') {
-				if ($type !== 'core') {
+				if ($type !== 'core' && $type !== 'bundles') {
 					$this->view->categoryArr = ${$type . 'CategoryArr'};
 
 					if ($type === 'components') {
@@ -161,7 +161,6 @@ class ModulesComponent extends BaseComponent
 			} else if ($type === 'apptypes') {
 				unset($apis[1]);//Remove core
 			}
-
 			$this->view->type = $type;
 			$this->view->module = null;
 			$this->view->apis = $apis;
@@ -178,98 +177,100 @@ class ModulesComponent extends BaseComponent
 
 						$module['module_details'] = $this->modules->{$type}->getById($this->getData()['id']);
 
-						if ($module['module_details']['module_type'] === 'components') {
-							$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Components/';
-							if ($module['module_details']['menu']) {
-								$this->view->moduleMenu = $this->helper->encode($this->helper->decode($module['module_details']['menu'], true));
-								$this->view->menuBaseStructure = $this->basepackages->menus->getMenusForAppType($module['module_details']['app_type']);
-							} else {
-								$this->view->moduleMenu = false;
-								$this->view->menuBaseStructure = [];
+						if ($module['module_details']['module_type'] !== 'bundles') {
+							if ($module['module_details']['module_type'] === 'components') {
+								$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Components/';
+								if ($module['module_details']['menu']) {
+									$this->view->moduleMenu = $this->helper->encode($this->helper->decode($module['module_details']['menu'], true));
+									$this->view->menuBaseStructure = $this->basepackages->menus->getMenusForAppType($module['module_details']['app_type']);
+								} else {
+									$this->view->moduleMenu = false;
+									$this->view->menuBaseStructure = [];
+								}
+							} else if ($module['module_details']['module_type'] === 'packages') {
+								if ($module['module_details']['app_type'] === 'core' &&
+									($module['module_details']['category'] === 'basepackages' ||
+									 $module['module_details']['category'] === 'providers')
+								) {
+									if ($module['module_details']['category'] === 'basepackages') {
+										$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/';
+									} else if ($module['module_details']['category'] === 'providers') {
+										$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/';
+									}
+								} else {
+									$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Packages/';
+								}
+							} else if ($module['module_details']['module_type'] === 'middlewares') {
+								$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Middlewares/';
+							} else if ($module['module_details']['module_type'] === 'views') {
+								$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Views/';
 							}
-						} else if ($module['module_details']['module_type'] === 'packages') {
-							if ($module['module_details']['app_type'] === 'core' &&
+
+							if ($module['module_details']['module_type'] === 'packages' &&
 								($module['module_details']['category'] === 'basepackages' ||
 								 $module['module_details']['category'] === 'providers')
 							) {
-								if ($module['module_details']['category'] === 'basepackages') {
-									$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/';
-								} else if ($module['module_details']['category'] === 'providers') {
-									$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/';
-								}
+								$jsonFile =
+									$moduleLocation .
+									ucfirst($module['module_details']['name']) . '/' .
+									substr($module['module_details']['module_type'], 0, -1) . '.json';
 							} else {
-								$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Packages/';
-							}
-						} else if ($module['module_details']['module_type'] === 'middlewares') {
-							$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Middlewares/';
-						} else if ($module['module_details']['module_type'] === 'views') {
-							$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Views/';
-						}
+								if ($module['module_details']['module_type'] === 'components') {
+									$routeArr = explode('/', $module['module_details']['route']);
 
-						if ($module['module_details']['module_type'] === 'packages' &&
-							($module['module_details']['category'] === 'basepackages' ||
-							 $module['module_details']['category'] === 'providers')
-						) {
-							$jsonFile =
-								$moduleLocation .
-								ucfirst($module['module_details']['name']) . '/' .
-								substr($module['module_details']['module_type'], 0, -1) . '.json';
-						} else {
-							if ($module['module_details']['module_type'] === 'components') {
-								$routeArr = explode('/', $module['module_details']['route']);
-
-								foreach ($routeArr as &$path) {
-									$path = ucfirst($path);
-								}
-
-								$routePath = implode('/', $routeArr) . '/Install/';
-							} else if ($module['module_details']['module_type'] === 'middlewares') {
-								$routePath = $module['module_details']['name'] . '/Install/';
-							} else if ($module['module_details']['module_type'] === 'packages') {
-								$pathArr = preg_split('/(?=[A-Z])/', $module['module_details']['name'], -1, PREG_SPLIT_NO_EMPTY);
-
-								$routePath = implode('/', $pathArr) . '/Install/';
-							} else if ($module['module_details']['module_type'] === 'views') {
-								if (!$module['module_details']['view_modules_version'] ||
-									($module['module_details']['base_view_module_id'] && $module['module_details']['base_view_module_id'] != '0')
-								) {
-									$baseView = $this->modules->views->getViewById($module['module_details']['base_view_module_id']);
-
-									$pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['module_details']['name']), -1, PREG_SPLIT_NO_EMPTY);
-
-									if (count($pathArr) > 1) {
-										foreach ($pathArr as &$path) {
-											$path = strtolower($path);
-										}
-									} else {
-										$pathArr[0] = strtolower($pathArr[0]);
+									foreach ($routeArr as &$path) {
+										$path = ucfirst($path);
 									}
 
-									$module['route'] = implode('/', $pathArr);
+									$routePath = implode('/', $routeArr) . '/Install/';
+								} else if ($module['module_details']['module_type'] === 'middlewares') {
+									$routePath = $module['module_details']['name'] . '/Install/';
+								} else if ($module['module_details']['module_type'] === 'packages') {
+									$pathArr = preg_split('/(?=[A-Z])/', $module['module_details']['name'], -1, PREG_SPLIT_NO_EMPTY);
 
-									$routePath = $baseView['name'] . '/html/' . $module['route'] . '/';
-								} else {
-									$routePath = $module['module_details']['name'] . '/';
+									$routePath = implode('/', $pathArr) . '/Install/';
+								} else if ($module['module_details']['module_type'] === 'views') {
+									if (!$module['module_details']['view_modules_version'] ||
+										($module['module_details']['base_view_module_id'] && $module['module_details']['base_view_module_id'] != '0')
+									) {
+										$baseView = $this->modules->views->getViewById($module['module_details']['base_view_module_id']);
+
+										$pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['module_details']['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+										if (count($pathArr) > 1) {
+											foreach ($pathArr as &$path) {
+												$path = strtolower($path);
+											}
+										} else {
+											$pathArr[0] = strtolower($pathArr[0]);
+										}
+
+										$module['route'] = implode('/', $pathArr);
+
+										$routePath = $baseView['name'] . '/html/' . $module['route'] . '/';
+									} else {
+										$routePath = $module['module_details']['name'] . '/';
+									}
 								}
+
+								$jsonFile =
+									$moduleLocation .
+									$routePath .
+									substr($module['module_details']['module_type'], 0, -1) . '.json';
 							}
 
-							$jsonFile =
-								$moduleLocation .
-								$routePath .
-								substr($module['module_details']['module_type'], 0, -1) . '.json';
-						}
+							try {
+								$module = array_merge($module, $this->basepackages->utils->validateJson(
+									[
+										'json' 			=> $this->localContent->read($jsonFile),
+										'returnJson' 	=> 'array'
+									]
+								));
 
-						try {
-							$module = array_merge($module, $this->basepackages->utils->validateJson(
-								[
-									'json' 			=> $this->localContent->read($jsonFile),
-									'returnJson' 	=> 'array'
-								]
-							));
-
-							$module['id'] = $module['module_details']['id'];
-						} catch (\throwable $e) {
-							throw new \Exception($e->getMessage());
+								$module['id'] = $module['module_details']['id'];
+							} catch (\throwable $e) {
+								throw new \Exception($e->getMessage());
+							}
 						}
 					}
 
@@ -278,10 +279,10 @@ class ModulesComponent extends BaseComponent
 					} else {
 						$this->view->moduleWidgets = $module['widgets'] = $this->helper->encode([]);
 					}
-					if (is_array($module['settings'])) {
+					if (isset($module['settings']) && is_array($module['settings'])) {
 						$this->view->moduleSettings = $module['settings'] = $this->helper->encode($module['settings']);
 					}
-					if (is_array($module['dependencies'])) {
+					if (isset($module['settings']) && is_array($module['dependencies'])) {
 						$this->view->moduleDependencies = $module['dependencies'] = $this->helper->encode($module['dependencies']);
 					}
 				} else {
@@ -306,7 +307,16 @@ class ModulesComponent extends BaseComponent
 					}
 				}
 
-				$this->view->module = $module;
+				if ($module['module_details']['module_type'] === 'bundles') {
+					$moduleArr = [];
+
+					$moduleArr = $module['module_details'];
+					$moduleArr['module_details'] = $module['module_details'];
+
+					$this->view->module = $moduleArr;
+				} else {
+					$this->view->module = $module;
+				}
 			}
 		} else if (isset($this->getData()['id']) &&
 				   isset($this->getData()['bundles'])
@@ -571,11 +581,11 @@ class ModulesComponent extends BaseComponent
 		);
 	}
 
-	public function publishBundleJsonAction()
+	public function commitBundleJsonAction()
 	{
 		$this->requestIsPost();
 
-		if ($this->modulesPackage->publishBundleJson($this->postData())) {
+		if ($this->modulesPackage->commitBundleJson($this->postData())) {
 			$this->addResponse(
 				$this->modulesPackage->packagesData->responseMessage,
 				$this->modulesPackage->packagesData->responseCode,

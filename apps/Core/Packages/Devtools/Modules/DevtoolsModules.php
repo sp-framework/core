@@ -404,6 +404,11 @@ class DevtoolsModules extends BasePackage
     {
         return
             [
+                'bundles'    =>
+                    [
+                        'id'    => 'bundles',
+                        'name'  => 'Bundles'
+                    ],
                 'components'    =>
                     [
                         'id'    => 'components',
@@ -439,6 +444,7 @@ class DevtoolsModules extends BasePackage
         $defaultDependencies =
             [
                 'core'              => [],
+                'apptype'           => [],
                 'components'        => [],
                 'packages'          => [],
                 'middlewares'       => [],
@@ -1113,14 +1119,26 @@ $file .= '
 
     public function syncLabels($data)
     {
-        if (!$this->initApi($data)) {
+        $module = $this->modules->{$data['module_type']}->getById($data['id']);
+
+        if (!$module) {
+            $this->addResponse('Bundle not found.', 1);
+
             return false;
         }
+
+        if (!$this->initApi($module)) {
+            $this->addResponse('Could not initialize the API assigned to this module.', 1);
+
+            return false;
+        }
+
+        $module['repo'] = $this->helper->last(explode('/', $module['repo']));
 
         if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'IssueApi';
             $method = 'issueListLabels';
-            $args = [$this->apiClientConfig['org_user'], strtolower($data['name'])];
+            $args = [$this->apiClientConfig['org_user'], $module['repo']];
         } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             //For github
         }
@@ -1139,12 +1157,14 @@ $file .= '
             return true;
         }
 
-        $this->addResponse('Error syncing labels', 1);
+        $this->addResponse('Error syncing labels or no labels configured.', 1);
     }
 
     public function getLabelIssues($data)
     {
         if (!$this->initApi($data)) {
+            $this->addResponse('Could not initialize the API assigned to this module.', 1);
+
             return false;
         }
 
@@ -1201,6 +1221,10 @@ $file .= '
 
     protected function initApi($data)
     {
+        if ($this->apiClient && $this->apiClientConfig) {
+            return true;
+        }
+
         if (!isset($data['api_id']) || !isset($data['name'])) {
             $this->addResponse('API information not provided', 1, []);
 
@@ -1218,19 +1242,19 @@ $file .= '
 
         if ($this->apiClientConfig['auth_type'] === 'auth' &&
             ((!$this->apiClientConfig['username'] || $this->apiClientConfig['username'] === '') &&
-             (!$this->apiClientConfig['password'] || $this->apiClientConfig['password'] === ''))
+            (!$this->apiClientConfig['password'] || $this->apiClientConfig['password'] === ''))
         ) {
             $this->addResponse('Username/Password missing, cannot sync', 1);
 
             return false;
         } else if ($this->apiClientConfig['auth_type'] === 'access_token' &&
-                   (!$this->apiClientConfig['access_token'] || $this->apiClientConfig['access_token'] === '')
+                  (!$this->apiClientConfig['access_token'] || $this->apiClientConfig['access_token'] === '')
         ) {
             $this->addResponse('Access token missing, cannot sync', 1);
 
             return false;
         } else if ($this->apiClientConfig['auth_type'] === 'autho' &&
-                   (!$this->apiClientConfig['authorization'] || $this->apiClientConfig['authorization'] === '')
+                  (!$this->apiClientConfig['authorization'] || $this->apiClientConfig['authorization'] === '')
         ) {
             $this->addResponse('Authorization token missing, cannot sync', 1);
 
@@ -1243,6 +1267,8 @@ $file .= '
     public function bumpVersion($data)
     {
         if (!$this->initApi($data)) {
+            $this->addResponse('Could not initialize the API assigned to this module.', 1);
+
             return false;
         }
 
@@ -1293,14 +1319,26 @@ $file .= '
 
     public function syncBranches($data)
     {
-        if (!$this->initApi($data)) {
+        $module = $this->modules->{$data['module_type']}->getById($data['id']);
+
+        if (!$module) {
+            $this->addResponse('Bundle not found.', 1);
+
             return false;
         }
+
+        if (!$this->initApi($module)) {
+            $this->addResponse('Could not initialize the API assigned to this module.', 1);
+
+            return false;
+        }
+
+        $module['repo'] = $this->helper->last(explode('/', $module['repo']));
 
         if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';
             $method = 'repoListBranches';
-            $args = [$this->apiClientConfig['org_user'], strtolower($data['name'])];
+            $args = [$this->apiClientConfig['org_user'], $module['repo']];
         } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             //For github
         }
@@ -1308,6 +1346,7 @@ $file .= '
         try {
             $branches = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
         } catch (\throwable $e) {
+            dump($e);die();
             $this->addResponse($e->getMessage(), 1);
 
             return false;
@@ -1325,6 +1364,8 @@ $file .= '
     public function generateRelease($data)
     {
         if (!$this->initApi($data)) {
+            $this->addResponse('Could not initialize the API assigned to this module.', 1);
+
             return false;
         }
 
@@ -1380,20 +1421,39 @@ $file .= '
         $this->addResponse('Error generating new release', 1);
     }
 
-    public function publishBundleJson($data)
+    public function commitBundleJson($data)
     {
-        if (!$this->initApi($data)) {
+        $bundle = $this->modules->bundles->getById($data['id']);
+
+        if (!$bundle) {
+            $this->addResponse('Bundle not found.', 1);
+
             return false;
         }
 
-        $repo = $this->checkRepo($data);
+        $bundle['createrepo'] = $data['createrepo'];
+        $bundle['commit_message'] = $data['commit_message'];
 
-        //Create new repo if doesnt exist.
-        if (!$repo) {
-            $newRepo = $this->createRepo($data);
+        if (!$this->initApi($bundle)) {
+            $this->addResponse('Could not initialize the API assigned to this module.', 1);
+
+            return false;
         }
 
-        $data['repo'] = $this->helper->last(explode('/', $data['repo']));
+        $repo = $this->checkRepo($bundle);
+
+        //Create new repo if doesnt exist.
+        if (!$repo && $bundle['createrepo'] == 'false') {
+            return false;
+        } else if (!$repo) {
+            $newRepo = $this->createRepo($bundle);
+
+            if (!$newRepo) {
+                return false;
+            }
+        }
+
+        $bundle['repo'] = $this->helper->last(explode('/', $bundle['repo']));
 
         //Check for bundle.json file
         if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
@@ -1404,7 +1464,14 @@ $file .= '
         }
 
         try {
-            $file = $this->apiClient->useMethod($collection, $method, [$this->apiClientConfig['org_user'], strtolower($data['repo']), 'bundle.json'])->getResponse(true);
+            $file = $this->apiClient->useMethod(
+                $collection,
+                $method,
+                [
+                    $this->apiClientConfig['org_user'],
+                    strtolower($bundle['repo']), 'bundle.json'
+                ]
+            )->getResponse(true);
         } catch (\throwable $e) {
             if ($e->getCode() !== 404) {
                 $this->addResponse($e->getMessage(), 1);
@@ -1414,12 +1481,15 @@ $file .= '
         }
 
         $jsonContent = [];
-        $jsonContent["name"] = $data["name"];
-        $jsonContent["description"] = $data["description"];
-        $jsonContent["module_type"] = $data["module_type"];
-        $jsonContent["app_type"] = $data["app_type"];
-        $jsonContent["repo"] = $data["repo"];
-        $jsonContent["bundle_modules"] = $this->helper->decode($data["bundle_modules"], true);
+        $jsonContent["name"] = $bundle["name"];
+        $jsonContent["description"] = $bundle["description"];
+        $jsonContent["module_type"] = $bundle["module_type"];
+        $jsonContent["app_type"] = $bundle["app_type"];
+        $jsonContent["repo"] = $bundle["repo"];
+        if (is_string($bundle["bundle_modules"])) {
+            $bundle["bundle_modules"] = $this->helper->decode($bundle["bundle_modules"], true);
+        }
+        $jsonContent["bundle_modules"] = $bundle["bundle_modules"];
 
         $jsonContent = $this->helper->encode($jsonContent, JSON_UNESCAPED_SLASHES);
 
@@ -1427,6 +1497,7 @@ $file .= '
         $jsonContent = str_replace('"{', '{', $jsonContent);
         $jsonContent = str_replace('}"', '}', $jsonContent);
         $jsonContent = $this->basepackages->utils->formatJson(['json' => $jsonContent]);
+        $base64EncodedJsonContent = base64_encode($jsonContent);
 
         //Create File if not found
         if (!isset($file)) {
@@ -1434,23 +1505,29 @@ $file .= '
             $args =
                 [
                     $this->apiClientConfig['org_user'],
-                    strtolower($data['repo']),
+                    strtolower($bundle['repo']),
                     'bundle.json',
                     [
-                        'message' => $data['comment'],
-                        'content' => base64_encode($jsonContent)
+                        'message' => $bundle['commit_message'],
+                        'content' => $base64EncodedJsonContent
                     ]
                 ];
         } else {
+            if ($file['content'] === $base64EncodedJsonContent) {
+                $this->addResponse('Local and remote files are same. Nothing to commit!');
+
+                return true;
+            }
+
             $method = 'repoUpdateFile';
             $args =
                 [
                     $this->apiClientConfig['org_user'],
-                    strtolower($data['repo']),
+                    strtolower($bundle['repo']),
                     'bundle.json',
                     [
-                        'message' => $data['comment'],
-                        'content' => base64_encode($jsonContent),
+                        'message' => $bundle['commit_message'],
+                        'content' => $base64EncodedJsonContent,
                         'sha' => $file['sha']
                     ]
                 ];
@@ -1475,8 +1552,10 @@ $file .= '
 
     protected function checkRepo($data)
     {
-        if (!$this->apiClientConfig && !$this->initApi($data)) {
-            return false;
+        if (!$this->initApi($data)) {
+            $this->addResponse('Could not initialize the API assigned to this module.', 1);
+
+            return true;
         }
 
         $data['repo'] = $this->helper->last(explode('/', $data['repo']));
@@ -1490,10 +1569,18 @@ $file .= '
         }
 
         try {
-            $repo = $this->apiClient->useMethod($collection, $method, [$this->apiClientConfig['org_user'], strtolower($data['repo'])])->getResponse(true);
+            $repo =
+                $this->apiClient->useMethod(
+                    $collection,
+                    $method,
+                    [
+                        $this->apiClientConfig['org_user'],
+                        strtolower($data['repo'])
+                    ]
+                )->getResponse(true);
         } catch (\throwable $e) {
-            if ($e->getCode() === 404 && $data['createrepo'] == false) {
-                $this->addResponse('Repository does not exist. Please check create repo and publish again.' . $e->getMessage(), 1);
+            if ($e->getCode() === 404 && $data['createrepo'] == 'false') {
+                $this->addResponse('Repository does not exist. Please check create repo and try again.' . $e->getMessage(), 1);
 
                 return false;
             }
@@ -1508,7 +1595,9 @@ $file .= '
 
     protected function createRepo($data)
     {
-        if (!$this->apiClientConfig && !$this->initApi($data)) {
+        if (!$this->initApi($data)) {
+            $this->addResponse('Could not initialize the API assigned to this module.', 1);
+
             return false;
         }
 
@@ -1523,7 +1612,7 @@ $file .= '
                     $this->apiClientConfig['org_user'],
                     [
                         "auto_init"         => true,
-                        "default_branch"    => "main",
+                        "default_branch"    => "dev",
                         "description"       => $data['repo'],
                         "name"              => $data['repo'],
                         "private"           => false,
@@ -1542,10 +1631,39 @@ $file .= '
         }
 
         if (isset($newRepo)) {
+            $this->createRepoMainBranch($data);
+
             return $newRepo;
         }
 
         return false;
+    }
+
+    protected function createRepoMainBranch($data)
+    {
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+            $collection = 'RepositoryApi';
+            $method = 'repoCreateBranch';
+
+            $args =
+                [
+                    $this->apiClientConfig['org_user'],
+                    $data['repo'],
+                    [
+                        "new_branch_name"   => 'main'
+                    ]
+                ];
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+            //For github
+        }
+
+        try {
+            $newRepo = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+        } catch (\throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
     }
 
     public function generateModuleClass($data)
@@ -1611,7 +1729,6 @@ $file .= '
         $this->addResponse('Generated Class', 0, ['class' => $class]);
 
         return true;
-
     }
 
     public function generateModuleRepoUrl($data)

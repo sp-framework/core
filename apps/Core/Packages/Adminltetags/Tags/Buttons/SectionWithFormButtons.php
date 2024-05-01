@@ -83,7 +83,8 @@ class SectionWithFormButtons
 
         if (isset($this->params['formButtons']['addActionUrl']) ||
             isset($this->params['formButtons']['updateActionUrl']) ||
-            isset($this->params['formButtons']['closeActionUrl'])
+            isset($this->params['formButtons']['closeActionUrl']) ||
+            isset($this->params['formButtons']['cancelActionUrl'])
         ) {
             if (isset($this->params['formButtons']['addActionUrl'])) {
                 $this->buttonParams['addActionUrl'] =
@@ -98,7 +99,6 @@ class SectionWithFormButtons
             }
 
             if (isset($this->params['formButtons']['updateActionUrl'])) {
-
                 $this->buttonParams['updateActionUrl'] =
                     $this->links->url($this->params['formButtons']['updateActionUrl']);
 
@@ -117,7 +117,6 @@ class SectionWithFormButtons
                     $this->buttonParams['cancelActionUrl'] =
                         $this->links->url($this->params['formButtons']['cancelActionUrl']);
                 }
-
                 if (isset($this->params['formButtons']['closeActionUrl'])) {
                     $this->buttonParams['closeActionUrl'] =
                         $this->links->url($this->params['formButtons']['closeActionUrl']);
@@ -238,6 +237,9 @@ class SectionWithFormButtons
 
         if (count($buttonsArr) === 1 && isset($buttonsArr['closeForm'])) {
             $buttonsArr['closeForm']['hidden'] = false;
+        }
+        if (count($buttonsArr) === 1 && isset($buttonsArr['cancelForm'])) {
+            $buttonsArr['cancelForm']['hidden'] = false;
         }
 
         $this->content .= $this->adminLTETags->useTag('buttons',

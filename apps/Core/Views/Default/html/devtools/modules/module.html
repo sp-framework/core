@@ -67,8 +67,8 @@ dataCollectionSection =
 
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
-                    postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
                     postData['labels'] = labelsArr;
 
                     $.post('{{links.url("devtools/modules/getLabelIssues")}}', postData, function(response) {
@@ -117,9 +117,7 @@ dataCollectionSection =
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
                     postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
-                    postData['type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
-                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
-                    postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
                     postData['bump'] = bump;
 
                     $.post('{{links.url("devtools/modules/bumpVersion")}}', postData, function(response) {
@@ -212,8 +210,8 @@ dataCollectionSection =
 
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
-                    postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
 
                     $.post('{{links.url("devtools/modules/syncBranches")}}', postData, function(response) {
                         if (response.tokenKey && response.token) {
@@ -256,8 +254,8 @@ dataCollectionSection =
 
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
-                    postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
 
                     $.post('{{links.url("devtools/modules/syncLabels")}}', postData, function(response) {
                         if (response.tokenKey && response.token) {
@@ -319,7 +317,7 @@ dataCollectionSection =
             </form>
             {% set moduleId = bundle['id'] %}
             <script>
-/* globals PNotify */
+/* globals PNotify BazContentLoader Pace BazCore */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -351,20 +349,12 @@ dataCollectionSectionForm['vars']['bundleId'] = '{{bundleId}}';
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                                      : { },
-        '{{componentId}}-{{sectionId}}-type'                                    : { },
-        '{{componentId}}-{{sectionId}}-app_type'                                : {
-            'placeholder'   : 'SELECT APP TYPE OR CREATE NEW'
-        },
-        '{{componentId}}-{{sectionId}}-module_type'                             : {
-            'placeholder'   : 'SELECT MODULE TYPE'
-        },
-        '{{componentId}}-{{sectionId}}-name'                                    : { },
         '{{componentId}}-{{sectionId}}-api_id'                                  : {
             'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY'
         },
         '{{componentId}}-{{sectionId}}-repo'                                    : { },
         '{{componentId}}-{{sectionId}}-createrepo'                              : { },
-        '{{componentId}}-{{sectionId}}-comment'                                 : { },
+        '{{componentId}}-{{sectionId}}-commit_message'                          : { },
         '{{componentId}}-{{sectionId}}-bundle_modules'                          : {
             'afterInit'     : function() {
                 function prettyfyJson() {
@@ -374,31 +364,23 @@ dataCollectionSection =
 
                 prettyfyJson();
 
-                $('#publish').off();
-                $('#publish').click(function(e) {
+                $('#commit').off();
+                $('#commit').click(function(e) {
                     e.preventDefault();
 
                     $('#{{componentId}}-{{sectionId}}').BazContentSectionWithForm({'task':'validateForm'});
 
                     if ($('#{{componentId}}-{{sectionId}}-alert').length === 0) {
-                        $('#publish').attr('disabled', true);
-                        $('#publish').children('i').removeClass('fa-code').addClass('fa-spin fa-cog');
+                        $('#commit').attr('disabled', true);
+                        $('#commit').children('i').removeClass('fa-code').addClass('fa-spin fa-cog');
 
                         var postData = { };
                         postData[$('#security-token').attr('name')] = $('#security-token').val();
                         postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
-                        postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
-                        postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
-                        postData['app_type'] = $('#{{componentId}}-{{sectionId}}-app_type').val();
-                        postData['description'] = $('#{{componentId}}-{{sectionId}}-description').val();
-                        postData['type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
-                        postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
-                        postData['repo'] = $('#{{componentId}}-{{sectionId}}-repo').val();
                         postData['createrepo'] = $('#{{componentId}}-{{sectionId}}-createrepo')[0].checked;
-                        postData['comment'] = $('#{{componentId}}-{{sectionId}}-comment').val();
-                        postData['bundle_modules'] = $('#{{componentId}}-{{sectionId}}-bundle_modules').val();
+                        postData['commit_message'] = $('#{{componentId}}-{{sectionId}}-commit_message').val();
 
-                        $.post('{{links.url("devtools/modules/publishBundleJson")}}', postData, function(response) {
+                        $.post('{{links.url("devtools/modules/commitBundleJson")}}', postData, function(response) {
                             if (response.tokenKey && response.token) {
                                 $('#security-token').attr('name', response.tokenKey);
                                 $('#security-token').val(response.token);
@@ -406,13 +388,28 @@ dataCollectionSection =
 
                             if (response.responseCode == 0) {
                                 PNotify.success({'text': response.responseMessage});
+
+                                BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-cancelForm'), {
+                                    ajaxBefore                      : function () {
+                                                                        Pace.restart();
+                                                                        $("#baz-content").empty();
+                                                                        $("#loader").attr('hidden', false);
+                                                                    },
+                                    ajaxFinished                    : function () {
+                                                                        BazCore.updateBreadcrumb();
+                                                                        $("#loader").attr('hidden', true);
+                                                                    },
+                                    ajaxError                       : function () {
+                                                                        $("#loader").attr('hidden', true);
+                                                                        BazCore.updateBreadcrumb();
+                                                                    }
+                                });
                             } else {
                                 PNotify.error({'text': response.responseMessage});
 
-                                $('#publish').attr('disabled', false);
+                                $('#commit').attr('disabled', false);
                             }
 
-                            $('#publish').children('i').removeClass('fa-spin fa-cog').addClass('fa-code');
                         }, 'json');
                     }
                 });
@@ -420,28 +417,20 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-form'                                    : {
             rules: {
-                '{{componentId}}-{{sectionId}}-app_type'                        : 'required',
-                '{{componentId}}-{{sectionId}}-module_type'                     : 'required',
-                '{{componentId}}-{{sectionId}}-name'                            : 'required',
                 '{{componentId}}-{{sectionId}}-api_id'                          : 'required',
                 '{{componentId}}-{{sectionId}}-repo'                            : 'required',
-                '{{componentId}}-{{sectionId}}-comment'                         : 'required',
+                '{{componentId}}-{{sectionId}}-commit_message'                  : 'required',
                 '{{componentId}}-{{sectionId}}-bundle_modules'                  : 'required',
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-app_type'                        : 'Please select app type',
-                '{{componentId}}-{{sectionId}}-module_type'                     : 'Please select module type',
-                '{{componentId}}-{{sectionId}}-name'                            : 'Please enter module name',
                 '{{componentId}}-{{sectionId}}-api_id'                          : 'Please select Remote Repo',
                 '{{componentId}}-{{sectionId}}-repo'                            : 'Please enter repo',
-                '{{componentId}}-{{sectionId}}-comment'                         : 'Please enter commit comment',
+                '{{componentId}}-{{sectionId}}-commit_message'                  : 'Please enter commit message',
                 '{{componentId}}-{{sectionId}}-bundle_modules'                  : 'Please enter bundle modules',
-            },
-            onSubmitResponse: function(response) {
-                return true;
             }
         }
     });
+    //For some reason when you save this file, you have to save module.js as well else sp-linter does not update this file.
 </script>
         {% else %}
             {% set tabsData =
@@ -719,11 +708,15 @@ dataCollectionSection =
 
                     var found = false;
 
-                    if (label === 'core') {
+                    if (label === 'core' || label === 'apptypes') {
+                        if (label === 'apptypes') {
+                            label = 'apptype';
+                        }
                         dataCollectionSectionForm['vars']['bundleModules'][label] = { };
                         dataCollectionSectionForm['vars']['bundleModules'][label]['name'] = moduleData['name'];
                         dataCollectionSectionForm['vars']['bundleModules'][label]['version'] = moduleData['version'];
                         dataCollectionSectionForm['vars']['bundleModules'][label]['repo'] = moduleData['repo'];
+
                     } else if (label === 'external') {
                         if (dataCollectionSectionForm['vars']['bundleModules']['external'].length === 0) {
                             dataCollectionSectionForm['vars']['bundleModules']['external'] = { };
@@ -766,7 +759,10 @@ dataCollectionSection =
                     var found = false;
                     var foundIndex;
 
-                    if (label === 'core') {
+                    if (label === 'core' || label === 'apptypes') {
+                        if (label === 'apptypes') {
+                            label = 'apptype';
+                        }
                         dataCollectionSectionForm['vars']['bundleModules'][label] = { };
                     } else if (label === 'external') {
                         delete dataCollectionSectionForm['vars']['bundleModules'][label][$('#{{componentId}}-{{sectionId}}-modules-external').val()];
