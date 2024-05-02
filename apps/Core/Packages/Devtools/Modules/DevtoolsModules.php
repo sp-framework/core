@@ -1219,7 +1219,6 @@ $file .= '
 
             $this->addResponse($e->getMessage(), 1);
         }
-
         if (isset($releases) && is_array($releases)) {
             if (count($releases) === 1 || $getLatestRelease) {
                 return $releases[0];
@@ -1278,6 +1277,10 @@ $file .= '
 
     public function bumpVersion($data)
     {
+        if (isset($data['bump']) && $data['bump'] === 'custom') {
+            return false;
+        }
+
         if (!isset($data['repo'])) {
             $module = $this->modules->{$data['module_type']}->getById($data['id']);
 
@@ -1294,8 +1297,26 @@ $file .= '
             }
 
             $module['repo'] = $this->helper->last(explode('/', $module['repo']));
+            $module['bump'] = $data['bump'];
         } else {
             $module = $data;
+        }
+
+        if (isset($data['preReleasePrefix']) || isset($data['buildMetaPrefix'])) {
+            if (isset($data['preReleasePrefix'])) {
+                if (!checkCtype($data['preReleasePrefix'], 'alpha', ['.'])) {
+                    $this->addResponse('Pre release prefix cannot have special chars or numbers (except .(dot)).', 1);
+                    return false;
+                }
+                $module['preReleasePrefix'] = $data['preReleasePrefix'];
+            }
+            if (isset($data['buildMetaPrefix'])) {
+                if (!checkCtype($data['buildMetaPrefix'], 'alpha', ['.'])) {
+                    $this->addResponse('Build meta prefix cannot have special chars or numbers (except .(dot)).', 1);
+                    return false;
+                }
+                $module['buildMetaPrefix'] = $data['buildMetaPrefix'];
+            }
         }
 
         $latestRelease = $this->getReleases($module, true);
@@ -1303,9 +1324,42 @@ $file .= '
         if ($latestRelease) {
             $latestReleaseVersion = $latestRelease['name'];
         } else {
-            $this->addResponse('No version found on remote repository.', 1, ['release' => $module['version']]);
+            $moduleVersion = $module['version'];
 
-            return false;
+            if (isset($module['preReleasePrefix']) || isset($module['buildMetaPrefix'])) {
+                if (isset($module['preReleasePrefix'])) {
+                    $moduleVersion = $moduleVersion . '-' . $module['preReleasePrefix'];
+                }
+
+                if (isset($module['buildMetaPrefix'])) {
+                    $module['buildMetaPrefix'] = explode('.', $module['buildMetaPrefix']);
+
+                    array_walk($module['buildMetaPrefix'], function(&$prefix) {
+                        if ($prefix === 'now') {
+                            $prefix = time();
+                        }
+                    });
+                    $moduleVersion = $moduleVersion . '+' . implode('.', $module['buildMetaPrefix']);
+                }
+            }
+
+            $parsedVersion = Version::parse($moduleVersion);
+
+            $parsedVersionString = null;
+
+            if (isset($module['preReleasePrefix']) || isset($module['buildMetaPrefix'])) {
+                $parsedVersion = $parsedVersion->getNextPreReleaseVersion();
+
+                $parsedVersionString = $parsedVersion->__toString();
+
+                if (isset($module['buildMetaPrefix'])) {
+                    $parsedVersionString = $parsedVersionString . '+' . implode('.', $module['buildMetaPrefix']);
+                }
+            }
+
+            $this->addResponse('No version found on remote repository.', 1, ['release' => $parsedVersionString ?? $moduleVersion]);
+
+            return $parsedVersionString ?? $moduleVersion;
         }
 
         if ($module['module_type'] === 'core') {
@@ -1331,7 +1385,9 @@ $file .= '
         }
 
         $version = Version::parse($currentVersion);
-        $bump = 'getNext' . ucfirst($data['bump']) . 'Version';
+        trace([$version]);
+        $bump = 'getNext' . ucfirst($module['bump']) . 'Version';
+
         $newVersion = $version->$bump();
 
         if ($newVersion) {
@@ -1417,16 +1473,10 @@ $file .= '
             // }
 
             $prerelease = false;
-            if ($data['bump'] == 'preRelease') {
+            if ($data['bump'] == 'preRelease' || $data['bump'] == 'buildMeta' || $data['bump'] == 'preReleaseBuildMeta') {
                 $prerelease = true;
             }
-
-            if ($data['bump'] === 'buildMeta') {
-                $name = $data['buildMetaRelease'];
-                $prerelease = true;
-            } else {
-                $name = $this->bumpVersion($data);
-            }
+            $name = $this->bumpVersion($data);
 
             if (!$name) {
                 $name = $module['version'];

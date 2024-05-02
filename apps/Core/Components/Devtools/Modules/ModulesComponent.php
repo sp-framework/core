@@ -3,8 +3,8 @@
 namespace Apps\Core\Components\Devtools\Modules;
 
 use Apps\Core\Packages\Devtools\Modules\DevtoolsModules;
-
 use System\Base\BaseComponent;
+use z4kn4fein\SemVer\Version;
 
 class ModulesComponent extends BaseComponent
 {
@@ -313,10 +313,59 @@ class ModulesComponent extends BaseComponent
 					$moduleArr = $module['module_details'];
 					$moduleArr['module_details'] = $module['module_details'];
 
-					$this->view->module = $moduleArr;
-				} else {
-					$this->view->module = $module;
+					$module = $moduleArr;
 				}
+
+				if ($this->view->newrelease) {
+					$module['isPreRelease'] = false;
+					$module['preRelease'] = false;
+					$module['buildMeta'] = false;
+					$module['isCustom'] = false;
+
+					$module['version'] = 'v1.0';
+					if ($module['version'] !== '0.0.0') {
+						try {
+							$parsedVersion = Version::parse($module['version']);
+
+							$module['isPreRelease'] = $parsedVersion->isPreRelease();
+
+							if ($module['isPreRelease']) {
+								$preRelease = $parsedVersion->getPreRelease();
+
+								if ($preRelease) {
+									$preRelease = explode('.', $preRelease);
+									if (count($preRelease) > 1) {
+										unset($preRelease[$this->helper->lastKey($preRelease)]);
+									}
+									$module['preRelease'] = implode('.', $preRelease);
+								}
+
+								$buildMeta = $parsedVersion->getBuildMeta();
+								if ($buildMeta) {
+									$buildMeta = explode('.', $buildMeta);
+									array_walk($buildMeta, function(&$meta) {
+										if ((int) $meta !== 0) {
+											try {
+												$metaIsUnixTime = \Carbon\Carbon::parse((int) $meta);
+
+												if ($metaIsUnixTime) {
+													$meta = 'now';
+												}
+											} catch (\Exception $e) {
+												// Do nothing
+											}
+										}
+									});
+									$module['buildMeta'] = implode('.', $buildMeta);
+								}
+							}
+						} catch (\Exception $e) {
+							$module['isCustom'] = true;
+						}
+					}
+				}
+
+				$this->view->module = $module;
 			}
 		} else if (isset($this->getData()['id']) &&
 				   isset($this->getData()['bundles'])

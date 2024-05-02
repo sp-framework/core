@@ -105,31 +105,83 @@ dataCollectionSection =
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-release-type').on('select2:select', function(e) {
                     var bump = e.params.data.id;
-                    if (bump === 'buildMeta') {
-                        $('#{{componentId}}-{{sectionId}}-build-meta').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-build-meta').val($('#{{componentId}}-{{sectionId}}-version').val());
-                        $('#{{componentId}}-{{sectionId}}-release-version').html(
-                            '<h4 class="mt-1" id="build-meta-release">' +
-                            $('#{{componentId}}-{{sectionId}}-build-meta').val() +
-                            '</h4>'
-                        );
-                        $('#{{componentId}}-{{sectionId}}-build-meta').off();
-                        $('#{{componentId}}-{{sectionId}}-build-meta').keyup(function() {
-                            $('#{{componentId}}-{{sectionId}}-release-version').html(
-                                '<h4 class="mt-1" id="build-meta-release">' +
-                                $('#{{componentId}}-{{sectionId}}-build-meta').val() +
-                                '</h4>'
-                            );
-                        });
 
-                        return;
+                    if (bump === 'custom') {
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-custom-version').attr('disabled', false);
+                            $('#semver').attr('hidden', true);
+                            $('#custom').attr('hidden', false);
+                            $('#{{componentId}}-{{sectionId}}-get-next-release').attr('disabled', true);
                     } else {
-                        $('#{{componentId}}-{{sectionId}}-build-meta').val('');
-                        $('#{{componentId}}-{{sectionId}}-build-meta').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-release-version').html('<h4 class="mt-1">SELECT RELEASE TYPE</h4>');
+                        $('#semver').attr('hidden', false);
+                        $('#custom').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-custom-version').val('');
+
+                        if (bump === 'buildMeta') {
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
+                        } else if (bump === 'preRelease') {
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
+                        } else if (bump === 'preReleaseBuildMeta') {
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', false);
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-get-next-release').attr('disabled', false);
+                    }
+                    $('#release-version-text').html('');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-get-next-release').off();
+                $('#{{componentId}}-{{sectionId}}-get-next-release').click(function(e) {
+                    e.preventDefault();
+                    var bump = $('#{{componentId}}-{{sectionId}}-release-type').val();
+
+                    if (bump === 'custom') {
+                        return;
                     }
 
-                    $('#{{componentId}}-{{sectionId}}-release-version').html(
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                    postData['bump'] = bump;
+
+                    if (bump === 'preRelease') {
+                        postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
+                        if (postData['preReleasePrefix'] === '') {
+                            PNotify.error({'text': 'Provide pre-release prefix.'});
+                            return;
+                        }
+                    } else if (bump === 'buildMeta') {
+                        postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
+                        if (postData['buildMetaPrefix'] === '') {
+                            PNotify.error({'text': 'Provide build meta prefix.'});
+                            return;
+                        }
+                    } else if (bump === 'preReleaseBuildMeta') {
+                        postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
+                        postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
+                        if (postData['preReleasePrefix'] === '') {
+                            PNotify.error({'text': 'Provide pre-release prefix.'});
+                            return;
+                        }
+                        if (postData['buildMetaPrefix'] === '') {
+                            PNotify.error({'text': 'Provide build meta prefix.'});
+                            return;
+                        }
+                    }
+                    $('#release-version-text').html(
                         '<div class="row">' +
                         '    <div class="col text-lg">' +
                         '        <i class="fa fa-cog fa-spin"></i> Loading...' +
@@ -137,12 +189,6 @@ dataCollectionSection =
                         '</div>'
                     );
 
-
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
-                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
-                    postData['bump'] = bump;
 
                     $.post('{{links.url("devtools/modules/bumpVersion")}}', postData, function(response) {
                         if (response.tokenKey && response.token) {
@@ -161,7 +207,7 @@ dataCollectionSection =
                             }
 
                             if (response.responseData && response.responseData.currentVersion && response.responseData.newVersion) {
-                                $('#{{componentId}}-{{sectionId}}-release-version').html(
+                                $('#release-version-text').html(
                                     '<h4><span class="text-' + color + '">' + response.responseData.currentVersion + '</span> ' +
                                     '<i class="fa-solid fa-arrow-right"></i> ' +
                                     '<span class="text-primary">' + response.responseData.newVersion + '</span></h4>'
@@ -169,11 +215,11 @@ dataCollectionSection =
                             }
                         } else {
                             if (response.responseData && response.responseData.release) {
-                                $('#{{componentId}}-{{sectionId}}-release-version').html(
+                                $('#release-version-text').html(
                                     '<h4><span class="text-primary">' + response.responseData.release + '</span></h4>'
                                 );
                             } else {
-                                $('#{{componentId}}-{{sectionId}}-release-version').html(
+                                $('#release-version-text').html(
                                     '<span class="text-danger">ERROR LOADING RELEASE INFORMATION!</span>'
                                 );
                             }
@@ -198,8 +244,29 @@ dataCollectionSection =
 
                         var postData = { };
                         postData['bump'] = $('#{{componentId}}-{{sectionId}}-release-type').val();
-                        if (postData['bump'] === 'buildMeta') {
-                            postData['buildMetaRelease'] = $('#build-meta-release').html();
+                        if (postData['bump'] === 'preRelease') {
+                            postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
+                            if (postData['preReleasePrefix'] === '') {
+                                PNotify.error({'text': 'Provide pre-release prefix.'});
+                                return;
+                            }
+                        } else if (postData['bump'] === 'buildMeta') {
+                            postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
+                            if (postData['buildMetaPrefix'] === '') {
+                                PNotify.error({'text': 'Provide build meta prefix.'});
+                                return;
+                            }
+                        } else if (postData['bump'] === 'preReleaseBuildMeta') {
+                            postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
+                            postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
+                            if (postData['preReleasePrefix'] === '') {
+                                PNotify.error({'text': 'Provide pre-release prefix.'});
+                                return;
+                            }
+                            if (postData['buildMetaPrefix'] === '') {
+                                PNotify.error({'text': 'Provide build meta prefix.'});
+                                return;
+                            }
                         }
                         postData[$('#security-token').attr('name')] = $('#security-token').val();
                         postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
@@ -244,8 +311,9 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-build-meta'                              : { },
         '{{componentId}}-{{sectionId}}-pre-release-prefix'                      : { },
+        '{{componentId}}-{{sectionId}}-build-meta-prefix'                       : { },
+        '{{componentId}}-{{sectionId}}-custom-version'                          : { },
         '{{componentId}}-{{sectionId}}-branch'                                  : {
             placeholder : "SELECT BRANCH",
             afterInit : function() {

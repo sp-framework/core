@@ -73,7 +73,7 @@ class Packages
 						'version',
 						[
 							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 15,
+							'size'    => 100,
 							'notNull' => true,
 						]
 					),

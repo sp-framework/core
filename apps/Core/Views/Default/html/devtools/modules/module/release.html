@@ -125,6 +125,35 @@
         )}}
     </div>
 </div>
+{% set releastTypeSelect = '' %}
+{% set preReleaseDisabled = true %}
+{% set buildMetaDisabled = true %}
+{% set preRelease = '' %}
+{% set buildMeta = '' %}
+{% set semverHidden = '' %}
+{% set customHidden = 'hidden' %}
+{% set customDisabled = true %}
+{% if module['isCustom'] is defined and module['isCustom'] === true %}
+    {% set semverHidden = 'hidden' %}
+    {% set customHidden = '' %}
+    {% set customDisabled = false %}
+    {% set releastTypeSelect = 'custom' %}
+{% endif %}
+{% if module['isPreRelease'] is defined and module['isPreRelease'] == true %}
+    {% if module['preRelease'] is defined and module['preRelease'] != '' %}
+        {% set preRelease = module['preRelease'] %}
+        {% set preReleaseDisabled = false %}
+        {% set releastTypeSelect = 'preRelease' %}
+    {% endif %}
+    {% if module['buildMeta'] is defined and module['buildMeta'] != '' %}
+        {% set buildMeta = module['buildMeta'] %}
+        {% set buildMetaDisabled = false %}
+        {% set releastTypeSelect = 'buildMeta' %}
+    {% endif %}
+    {% if preReleaseDisabled === false and buildMetaDisabled === false %}
+        {% set releastTypeSelect = 'preReleaseBuildMeta' %}
+    {% endif %}
+{% endif %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -160,12 +189,20 @@
                     'buildMeta' : {
                         'id'    : 'buildMeta',
                         'name'  : 'BUILD META'
+                    },
+                    'preReleaseBuildMeta' : {
+                        'id'    : 'preReleaseBuildMeta',
+                        'name'  : 'PRE RELEASE + BUILD META'
+                    },
+                    'custom' : {
+                        'id'    : 'custom',
+                        'name'  : 'CUSTOM (NON SEMANTIC VERSION)'
                     }
                 },
                 'fieldDataSelect2OptionsArray'           : true,
                 'fieldDataSelect2OptionsKey'             : 'id',
                 'fieldDataSelect2OptionsValue'           : 'name',
-                'fieldDataSelect2OptionsSelected'        : ''
+                'fieldDataSelect2OptionsSelected'        : releastTypeSelect
             ]
         )}}
     </div>
@@ -193,7 +230,7 @@
         )}}
     </div>
 </div>
-<div class="row">
+<div class="row" id="semver" {{semverHidden}}>
     <div class="col">
         <div class="row">
             <div class="col">
@@ -209,13 +246,13 @@
                         'fieldHelpTooltipContent'        : 'Enter your pre release prefix',
                         'fieldType'                      : 'input',
                         'fieldRequired'                  : true,
-                        'fieldDisabled'                  : true,
+                        'fieldDisabled'                  : preReleaseDisabled,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 5,
-                        'fieldValue'                     : ''
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : preRelease
                     ]
                 )}}
             </div>
@@ -226,25 +263,43 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'build-meta',
-                        'fieldLabel'                     : 'Build Meta',
+                        'fieldId'                        : 'build-meta-prefix',
+                        'fieldLabel'                     : 'Build Meta Prefix',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Enter your build Meta',
+                        'fieldHelpTooltipContent'        : 'Enter your build Meta Prefix. You can use keyword "now" for current unix time. Example: beta.now will produce beta.1714635771',
                         'fieldType'                      : 'input',
                         'fieldRequired'                  : true,
-                        'fieldDisabled'                  : true,
+                        'fieldDisabled'                  : buildMetaDisabled,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 50,
-                        'fieldValue'                     : ''
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : buildMeta
                     ]
                 )}}
             </div>
         </div>
     </div>
     <div class="col">
+        {% set getReleaseButton = adminltetags.useTag('buttons',
+            [
+                'componentId'           : componentId,
+                'sectionId'             : sectionId,
+                'buttonType'            : 'button',
+                'buttons'               :
+                    [
+                        'get-next-release' : [
+                            'label'                   : '',
+                            'title'                   : 'Get Next Release',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'disabled'                : true,
+                            'position'                : 'left'
+                        ]
+                    ]
+            ]
+        ) %}
         {{adminltetags.useTag('fields',
             [
                 'component'                             : component,
@@ -259,7 +314,32 @@
                 'fieldBazPostOnCreate'                  : false,
                 'fieldBazPostOnUpdate'                  : false,
                 'fieldBazJstreeSearch'                  : true,
-                'fieldHtmlContent'                      : '<h4 class="mt-1">SELECT RELEASE TYPE</h4>'
+                'fieldHtmlContent'                      : getReleaseButton ~ '<h4 class="m-0" id="release-version-text"></h4>'
+            ]
+        )}}
+    </div>
+</div>
+<div class="row" id="custom" {{customHidden}}>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'custom-version',
+                'fieldLabel'                     : 'Custom version',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Custom version. In case you dont want to use semantic version system.',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : customDisabled,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : ''
             ]
         )}}
     </div>
