@@ -33,6 +33,11 @@ if (!function_exists('trace')) {
             }
         }
 
+        $reversedTraces = array_reverse($traces);
+        $lastTrace = $reversedTraces[array_key_last($reversedTraces)];
+
+        echo 'Trace called at line: <strong>' . $lastTrace['line'] . '</strong> on file: <strong>' . $lastTrace['file'] . '</strong>';
+
         if ($object) {
             if (class_exists(\Symfony\Component\VarDumper\VarDumper::class)) {
                 if (count($varsToDump) > 0) {
@@ -40,14 +45,14 @@ if (!function_exists('trace')) {
                         dump($var);
                     }
                 }
-                dump(array_reverse($traces));
+                dump($reversedTraces);
             } else {
                 if (count($varsToDump) > 0) {
                     foreach ($varsToDump as $var) {
                         var_dump($var);
                     }
                 }
-                var_dump(array_reverse($traces));
+                var_dump($reversedTraces);
             }
         } else {
             if (count($varsToDump) > 0) {
@@ -55,7 +60,7 @@ if (!function_exists('trace')) {
                     var_dump($var);
                 }
             }
-            var_dump(array_reverse($traces));
+            var_dump($reversedTraces);
         }
 
         if ($exit) {
