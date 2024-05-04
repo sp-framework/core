@@ -367,7 +367,9 @@ class Utils extends BasePackage
                         $prefix .= str_repeat($indent, $arrayLevel);
                     }
                     if ($data['json'][$i + 1] === '"') {
-                        $prefix = $return;
+                        if ($i !== 0) {
+                            $prefix = $return;
+                        }
                         $prefix .= str_repeat($indent, $arrayLevel);
                     }
                     $arrayLevel++;

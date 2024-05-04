@@ -13,7 +13,7 @@ class Repos
                 'repo_url'              => 'https://dev.bazaari.com.au/sp-core',
                 'branch'                => 'main',
                 'auth_type'             => 'autho',
-                'authorization'         => ''//5b7987057a61adfe7be9994b5a5e8d569d385138 - bcust Token
+                'authorization'         => ''//bcust Token
             ];
 
         $coreApi =
@@ -35,7 +35,7 @@ class Repos
                 'repo_url'              => 'https://dev.bazaari.com.au/sp-modules',
                 'branch'                => 'main',
                 'auth_type'             => 'autho',
-                'authorization'         => ''//5b7987057a61adfe7be9994b5a5e8d569d385138 - bcust Token
+                'authorization'         => ''//bcust Token
             ];
 
         $modulesApi =
@@ -44,6 +44,28 @@ class Repos
                 'description'           => 'Bazaari Modules Repository',
                 'category'              => 'repos',
                 'provider'              => 'Gitea',
+                'in_use'                => 1,
+                'used_by'               => json_encode(['modules']),
+                'setup'                 => 4,
+                'location'              => 'system'
+            ];
+
+        $githubModulesRepo =
+            [
+                'api_url'               => 'https://api.github.com',
+                'org_user'              => 'sp-modules',
+                'repo_url'              => 'https://www.github.com/sp-modules',
+                'branch'                => 'main',
+                'auth_type'             => 'autho',
+                'authorization'         => ''//github Token
+            ];
+
+        $githubModulesApi =
+            [
+                'name'                  => 'Github Modules (SP)',
+                'description'           => 'Github Modules Repository',
+                'category'              => 'repos',
+                'provider'              => 'Github',
                 'in_use'                => 1,
                 'used_by'               => json_encode(['modules']),
                 'setup'                 => 4,
@@ -66,6 +88,14 @@ class Repos
 
                 $db->insertAsDict('basepackages_api_client_services', $modulesApi);
             }
+
+            $newRepo = $db->insertAsDict('basepackages_api_client_services_apis_repos', $githubModulesRepo);
+
+            if ($newRepo) {
+                $githubModulesApi['api_category_id'] = $db->lastInsertId();
+
+                $db->insertAsDict('basepackages_api_client_services', $githubModulesApi);
+            }
         }
 
         if ($ff) {
@@ -86,6 +116,14 @@ class Repos
                 $modulesApi['api_category_id'] = $apisReposStore->getLastInsertedId();
 
                 $apiStore->updateOrInsert($modulesApi);
+            }
+
+            $newRepo = $apisReposStore->updateOrInsert($githubModulesRepo);
+
+            if ($newRepo) {
+                $githubModulesApi['api_category_id'] = $apisReposStore->getLastInsertedId();
+
+                $apiStore->updateOrInsert($githubModulesApi);
             }
         }
     }

@@ -331,7 +331,9 @@ class DevtoolsModules extends BasePackage
 
             if ($data['createrepo'] == true) {
                 if (!$this->checkRepo($data)) {
-                    $this->createRepo($data);
+                    $newRepo = $this->createRepo($data);
+
+                    $this->addResponse('Added new app type', 0, ['newRepo' => $newRepo]);
                 }
             }
 
@@ -363,18 +365,26 @@ class DevtoolsModules extends BasePackage
 
         $jsonFile = 'apps/' . ucfirst($appType['app_type']) . '/Install/type.json';
 
-        if (isset($appType['id'])) {
-            unset($appType['id']);
-        }
+        $jsonContent["app_type"] = $appType["app_type"];
+        $jsonContent["name"] = $appType["name"];
+        $jsonContent["description"] = $appType["description"];
+        $jsonContent["version"] = $appType["version"];
+        $jsonContent["repo"] = $appType["repo"];
+
+        $jsonContent = $this->helper->encode($jsonContent, JSON_UNESCAPED_SLASHES);
+        $jsonContent = str_replace('\\"', '"', $jsonContent);
+        $jsonContent = str_replace('"{', '{', $jsonContent);
+        $jsonContent = str_replace('}"', '}', $jsonContent);
+        $jsonContent = str_replace('\\n', '', $jsonContent);
+        $jsonContent = $this->basepackages->utils->formatJson(['json' => $jsonContent]);
 
         try {
-            $this->localContent->write($jsonFile, $this->helper->encode($appType));
+            $this->localContent->write($jsonFile, $jsonContent);
         } catch (FilesystemException | UnableToWriteFile $exception) {
             $this->addResponse('Unable to write json content to file: ' . $jsonFile);
 
             return false;
         }
-
 
         return true;
     }
