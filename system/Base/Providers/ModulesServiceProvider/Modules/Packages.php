@@ -382,13 +382,20 @@ class Packages extends BasePackage
 			$packageSettingsProperty = $packageReflection->getProperty('settings');
 			$settingsClass = $packageSettingsProperty->getValue(new $package['class']);
 
-			(new $settingsClass)->onUpdate($data);
+			$settingsClass = new $settingsClass;
+			if (method_exists($settingsClass, 'beforeUpdate')) {
+				$settingsClass->beforeUpdate($this, $package, $data);
+			}
+
+			$this->update($package);
+
+			if (method_exists($settingsClass, 'afterUpdate')) {
+				$settingsClass->afterUpdate($this, $package, $data);
+			}
 		} catch (\Exception $e) {
 			throw $e;
 		}
 
-		$package['settings'] = $this->helper->encode($package['settings']);
-
-		$this->update($package);
+		return true;
 	}
 }

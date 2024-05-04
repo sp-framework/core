@@ -33,6 +33,13 @@ class ServicesComponent extends BaseComponent
                 if (isset($this->getData()['repository'])) {
                     $api['repository'] = true;
                 }
+
+                if (isset($api['used_by']) && $api['used_by'] !== '') {
+                    $api['used_by'] = $this->helper->decode($api['used_by'], true);
+                    $api['used_by'] = implode(', ', $api['used_by']);
+                } else if (isset($api['used_by']) && $api['used_by'] === '') {
+                    $api['used_by'] = '-';
+                }
             } else {
                 $api = [];
                 $api['setup'] = 0;
@@ -109,30 +116,30 @@ class ServicesComponent extends BaseComponent
     protected function replaceColumns($dataArr)
     {
         foreach ($dataArr as $dataKey => &$data) {
-            if ($data['in_use'] == '0') {
+            if (isset($data['in_use']) && $data['in_use'] == '0') {
                 $data['in_use'] = '<span class="badge badge-secondary text-uppercase">No</span>';
-            } else if ($data['in_use'] == '1') {
+            } else if (isset($data['in_use']) && $data['in_use'] == '1') {
                 $data['in_use'] = '<span class="badge badge-success text-uppercase">Yes</span>';
             }
 
             $data['category'] = ucfirst($data['category']);
 
-            if ($data['used_by'] !== '') {
+            if (isset($data['used_by']) && $data['used_by'] !== '') {
                 $data['used_by'] = $this->helper->decode($data['used_by'], true);
                 $data['used_by'] = implode(', ', $data['used_by']);
-            } else if ($data['used_by'] === '') {
+            } else if (isset($data['used_by']) && $data['used_by'] === '') {
                 $data['used_by'] = '-';
             }
 
-            if ($data['setup'] == '1') {
+            if (isset($data['setup']) && $data['setup'] == '1') {
                 $data['setup'] ='<a href="' . $this->links->url('system/api/q/') . '" type="button" data-id="" data-rowid="" class="pl-2 pr-2 text-white btn btn-primary btn-xs rowSetup contentAjaxLink"><i class="mr-1 fas fa-fw fa-xs fa-magic"></i> <span class="text-xs text-uppercase">Complete Setup</span></a>';
-            } else if ($data['setup'] == '2') {
+            } else if (isset($data['setup']) && $data['setup'] == '2') {
                 $data['setup'] = '<a href="' . $this->links->url('system/api/q/') . '" type="button" data-id="" data-rowid="" class="pl-2 pr-2 text-white btn btn-primary btn-xs rowSetup contentAjaxLink"><i class="mr-1 fas fa-fw fa-xs fa-magic"></i> <span class="text-xs text-uppercase">Complete Setup</span></a>';
-            } else if ($data['setup'] == '3') {
+            } else if (isset($data['setup']) && $data['setup'] == '3') {
                 $data['setup'] = '<a href="' . $this->links->url('system/api/q/') . '" type="button" data-id="" data-rowid="" class="pl-2 pr-2 text-white btn btn-primary btn-xs rowSetup contentAjaxLink"><i class="mr-1 fas fa-fw fa-xs fa-magic"></i> <span class="text-xs text-uppercase">Complete Setup</span></a>';
-            } else if ($data['setup'] == '4') {
+            } else if (isset($data['setup']) && $data['setup'] == '4') {
                 $data['setup'] = '<h6><span class="badge badge-success">Complete</span></h6>';
-            } else if ($data['setup'] == '5') {
+            } else if (isset($data['setup']) && $data['setup'] == '5') {
                 $data['setup'] = '<a href="' . $this->links->url('system/api/q/') . '" type="button" data-id="" data-rowid="" class="pl-2 pr-2 text-white btn btn-primary btn-xs rowSetup contentAjaxLink"><i class="mr-1 fas fa-fw fa-xs fa-magic"></i> <span class="text-xs text-uppercase">Refresh Token</span></a>';//When token is about to expire <= 10 days
             }
         }
