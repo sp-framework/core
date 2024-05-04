@@ -49,10 +49,10 @@ class Repos extends BasePackage
 
         if ($this->apiConfig['location'] === 'system') {
             $this->serviceClass =
-                    "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\{$this->apiConfig['category']}\\{$this->apiConfig['provider']}\\Api\\";
+                    "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\Repos\\{$this->apiConfig['provider']}\\Api\\";
         } else if ($this->apiConfig['location'] === 'apps') {
             $this->serviceClass =
-                    "Apps\\Dash\\Packages\\System\\ApiClientServices\\Apis\\{$this->apiConfig['category']}\\{$this->apiConfig['provider']}\\Api\\";
+                    "Apps\\Dash\\Packages\\System\\ApiClientServices\\Apis\\Repos\\{$this->apiConfig['provider']}\\Api\\";
         }
 
         return $this;
@@ -72,12 +72,18 @@ class Repos extends BasePackage
             $api->apiStats->updateApiCallStats($method, $apiConfig['id'], $stats->getHandlerStats(), $errorCode);
         };
 
+        if (strtolower($apiConfig['provider']) === 'github') {
+            $this->httpOptions['headers']['Authorization'] = 'Bearer ' . $apiConfig['authorization'];
+        }
+
         $this->remoteWebContent = (new \System\Base\Providers\ContentServiceProvider\RemoteWeb\Content)->init($this->httpOptions);
     }
 
     protected function setConfiguration()
     {
-        $this->config = new Configuration;
+        $configurationClass = "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\Repos\\{$this->apiConfig['provider']}\\Configuration";
+
+        $this->config = new $configurationClass;
 
         $this->config->setHost($this->helper->reduceSlashes($this->apiConfig['api_url']));
 
@@ -96,8 +102,12 @@ class Repos extends BasePackage
         } else if ($this->apiConfig['auth_type'] === 'access_token') {
             $this->config->setApiKey('access_token', $this->apiConfig['access_token']);
         } else if ($this->apiConfig['auth_type'] === 'autho') {
-            $this->config->setApiKey('Authorization', $this->apiConfig['authorization']);
-            $this->config->setApiKeyPrefix('Authorization', 'token');
+            if (strtolower($this->apiConfig['provider']) === 'gitea') {
+                $this->config->setApiKey('Authorization', $this->apiConfig['authorization']);
+                $this->config->setApiKeyPrefix('Authorization', 'token');
+            } else {
+                //Set Authorization for github via $this->httpOptions as Openapi tool does not generate method to include authentication.
+            }
         }
     }
 
