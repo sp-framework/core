@@ -233,12 +233,14 @@ dataCollectionSection =
 
                     $('#{{componentId}}-{{sectionId}}-edit-module').attr('disabled', false);
 
-                    if (label !== 'bundles') {
+                    if (label !== 'bundles' && label !== 'apptypes') {
                         $('#{{componentId}}-{{sectionId}}-clone-module').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-commit-bundle-json').attr('disabled', true);
-                    } else if (label === 'bundles') {
+                    } else if (label === 'bundles' || label === 'apptypes') {
                         $('#{{componentId}}-{{sectionId}}-clone-module').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-commit-bundle-json').attr('disabled', false);
+                        if (label === 'bundles') {
+                            $('#{{componentId}}-{{sectionId}}-commit-bundle-json').attr('disabled', false);
+                        }
                     }
 
                     if (label === 'core') {

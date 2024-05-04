@@ -109,7 +109,6 @@ class ModulesComponent extends BaseComponent
 		}
 
 		$this->view->modules = $modules;
-		$this->view->releases = $modules;
 
 		$modulesJson = [];
 
@@ -307,7 +306,9 @@ class ModulesComponent extends BaseComponent
 					}
 				}
 
-				if ($module['module_details']['module_type'] === 'bundles') {
+				if (isset($module['module_details']['module_type']) &&
+					$module['module_details']['module_type'] === 'bundles'
+				) {
 					$moduleArr = [];
 
 					$moduleArr = $module['module_details'];
@@ -322,7 +323,6 @@ class ModulesComponent extends BaseComponent
 					$module['buildMeta'] = false;
 					$module['isCustom'] = false;
 
-					$module['version'] = 'v1.0';
 					if ($module['version'] !== '0.0.0') {
 						try {
 							$parsedVersion = Version::parse($module['version']);
@@ -589,7 +589,6 @@ class ModulesComponent extends BaseComponent
 			$this->modulesPackage->packagesData->responseCode,
 			$this->modulesPackage->packagesData->responseData ?? []
 		);
-
 	}
 
 	public function syncBranchesAction()
@@ -597,6 +596,26 @@ class ModulesComponent extends BaseComponent
 		$this->requestIsPost();
 
 		if ($this->modulesPackage->syncBranches($this->postData())) {
+			$this->addResponse(
+				$this->modulesPackage->packagesData->responseMessage,
+				$this->modulesPackage->packagesData->responseCode,
+				$this->modulesPackage->packagesData->responseData
+			);
+
+			return;
+		}
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
+	}
+
+	public function syncMilestonesAction()
+	{
+		$this->requestIsPost();
+
+		if ($this->modulesPackage->syncMilestones($this->postData())) {
 			$this->addResponse(
 				$this->modulesPackage->packagesData->responseMessage,
 				$this->modulesPackage->packagesData->responseCode,

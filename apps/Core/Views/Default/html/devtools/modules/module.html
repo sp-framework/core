@@ -135,6 +135,11 @@ dataCollectionSection =
                             $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
                             $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', false);
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
                         }
 
                         $('#{{componentId}}-{{sectionId}}-get-next-release').attr('disabled', false);
@@ -196,7 +201,11 @@ dataCollectionSection =
                             $('#security-token').val(response.token);
                         }
 
-                        if (response.responseCode == 0 || response.responseCode == -1 || response.responseCode == 2) {
+                        if (response.responseCode == 0 ||
+                            response.responseCode == -1 ||
+                            response.responseCode == 2 ||
+                            response.responseCode == 3
+                        ) {
                             var color = 'primary';
                             if (response.responseCode == -1) {
                                 PNotify.notice({'text': 'Local version is lower than remote version!'});
@@ -204,14 +213,29 @@ dataCollectionSection =
                             } else if (response.responseCode == 2) {
                                 PNotify.error({'text': 'Local Version is greater than remote version!'});
                                 color = 'danger';
+                            } else if (response.responseCode == 3) {
+                                PNotify.info({'text': 'Remote release is set as draft!'});
+                                color = 'info';
+                                $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked = true;
+                                $('#{{componentId}}-{{sectionId}} .card-header').removeClass('bg-success').addClass('bg-info');
                             }
 
-                            if (response.responseData && response.responseData.currentVersion && response.responseData.newVersion) {
-                                $('#release-version-text').html(
-                                    '<h4><span class="text-' + color + '">' + response.responseData.currentVersion + '</span> ' +
-                                    '<i class="fa-solid fa-arrow-right"></i> ' +
-                                    '<span class="text-primary">' + response.responseData.newVersion + '</span></h4>'
-                                );
+                            if (color === 'info') {
+                                if (response.responseData && response.responseData.currentVersion && response.responseData.newVersion) {
+                                    $('#release-version-text').html(
+                                        '<h4><span class="text-' + color + '">' + response.responseData.currentVersion + '</span> ' +
+                                        '<i class="text-success fa-solid fa-arrow-right"></i> ' +
+                                        '<span class="text-info" id="next-release-text">' + response.responseData.newVersion + '</span></h4>'
+                                    );
+                                }
+                            } else {
+                                if (response.responseData && response.responseData.currentVersion && response.responseData.newVersion) {
+                                    $('#release-version-text').html(
+                                        '<h4><span class="text-' + color + '">' + response.responseData.currentVersion + '</span> ' +
+                                        '<i class="text-success fa-solid fa-arrow-right"></i> ' +
+                                        '<span class="text-primary" id="next-release-text">' + response.responseData.newVersion + '</span></h4>'
+                                    );
+                                }
                             }
                         } else {
                             if (response.responseData && response.responseData.release) {
@@ -227,6 +251,20 @@ dataCollectionSection =
                             PNotify.error({'text': response.responseMessage});
                         }
                     }, 'json');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-mark-as-draft').change(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === true) {
+                        $('#{{componentId}}-{{sectionId}} .card-header').removeClass('bg-success').addClass('bg-info');
+                        if ($('#next-release-text').hasClass('text-primary')) {
+                            $('#next-release-text').removeClass('text-primary').addClass('text-info');
+                        }
+                    } else if ($('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === false) {
+                        $('#{{componentId}}-{{sectionId}} .card-header').removeClass('bg-info').addClass('bg-success');
+                        if ($('#next-release-text').hasClass('text-info')) {
+                            $('#next-release-text').removeClass('text-info').addClass('text-primary');
+                        }
+                    }
                 });
             }
         },
@@ -274,6 +312,8 @@ dataCollectionSection =
                         postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
                         postData['branch'] = $('#{{componentId}}-{{sectionId}}-branch').val();
                         postData['release_notes'] = $('#{{componentId}}-{{sectionId}}-release-notes').trumbowyg('html');
+                        postData['force-mark-prerelease'] = $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked;
+                        postData['mark-as-draft'] = $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked;
 
                         $.post('{{links.url("devtools/modules/generateRelease")}}', postData, function(response) {
                             if (response.tokenKey && response.token) {
@@ -281,29 +321,29 @@ dataCollectionSection =
                                 $('#security-token').val(response.token);
                             }
 
-                            if (response.responseCode == 0) {
-                                PNotify.success({'text': response.responseMessage});
+                            // if (response.responseCode == 0) {
+                            //     PNotify.success({'text': response.responseMessage});
 
-                                BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-cancelForm'), {
-                                    ajaxBefore                      : function () {
-                                                                        Pace.restart();
-                                                                        $("#baz-content").empty();
-                                                                        $("#loader").attr('hidden', false);
-                                                                    },
-                                    ajaxFinished                    : function () {
-                                                                        BazCore.updateBreadcrumb();
-                                                                        $("#loader").attr('hidden', true);
-                                                                    },
-                                    ajaxError                       : function () {
-                                                                        $("#loader").attr('hidden', true);
-                                                                        BazCore.updateBreadcrumb();
-                                                                    }
-                                });
-                            } else {
-                                PNotify.error({'text': response.responseMessage});
+                            //     BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-cancelForm'), {
+                            //         ajaxBefore                      : function () {
+                            //                                             Pace.restart();
+                            //                                             $("#baz-content").empty();
+                            //                                             $("#loader").attr('hidden', false);
+                            //                                         },
+                            //         ajaxFinished                    : function () {
+                            //                                             BazCore.updateBreadcrumb();
+                            //                                             $("#loader").attr('hidden', true);
+                            //                                         },
+                            //         ajaxError                       : function () {
+                            //                                             $("#loader").attr('hidden', true);
+                            //                                             BazCore.updateBreadcrumb();
+                            //                                         }
+                            //     });
+                            // } else {
+                            //     PNotify.error({'text': response.responseMessage});
 
-                                $('#generate').attr('disabled', false);
-                            }
+                            //     $('#generate').attr('disabled', false);
+                            // }
 
                             // $('#generate').children('i').removeClass('fa-spin fa-cog').addClass('fa-wand-sparkles');
                         }, 'json');
@@ -322,7 +362,7 @@ dataCollectionSection =
                     e.preventDefault();
 
                     $('#{{componentId}}-{{sectionId}}-sync-branches').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-sync-branches').children('i').removeClass('code-branch').addClass('fa-spin fa-cog');
+                    $('#{{componentId}}-{{sectionId}}-sync-branches').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
 
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -337,6 +377,7 @@ dataCollectionSection =
 
                         if (response.responseCode == 0) {
                             if (response.responseData && response.responseData.branches) {
+                                $('#{{componentId}}-{{sectionId}}-branch').empty().trigger('change');
                                 for (var branch in response.responseData.branches) {
                                     var newOption
                                         = new Option(
@@ -353,11 +394,58 @@ dataCollectionSection =
                         }
 
                         $('#{{componentId}}-{{sectionId}}-sync-branches').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-sync-branches').children('i').removeClass('fa-spin fa-cog').addClass('code-branch');
+                        $('#{{componentId}}-{{sectionId}}-sync-branches').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
                     }, 'json');
                 });
             }
         },
+        '{{componentId}}-{{sectionId}}-milestone'                               : {
+            placeholder : "SELECT MILESTONE",
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-sync-milestones').off();
+                $('#{{componentId}}-{{sectionId}}-sync-milestones').click(function(e) {
+                    e.preventDefault();
+
+                    $('#{{componentId}}-{{sectionId}}-sync-milestones').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-sync-milestones').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+
+                    $.post('{{links.url("devtools/modules/syncMilestones")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.milestones) {
+                                $('#{{componentId}}-{{sectionId}}-milestone').empty().trigger('change');
+                                for (var milestone in response.responseData.milestones) {
+                                    var newOption
+                                        = new Option(
+                                            response.responseData.milestones[milestone]['title'],
+                                            response.responseData.milestones[milestone]['title'], false, false
+                                        );
+
+                                    $('#{{componentId}}-{{sectionId}}-milestone').append(newOption).trigger('change');
+                                }
+                            }
+                            PNotify.success({'text': 'Synced ' + response.responseData.milestones.length + ' milestones.'});
+                        } else {
+                            PNotify.error({'text': response.responseMessage});
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-sync-milestones').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-sync-milestones').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-force-mark-prerelease'                   : { },
+        '{{componentId}}-{{sectionId}}-mark-as-draft'                           : { },
         '{{componentId}}-{{sectionId}}-labels'                                  : {
             placeholder : "SELECT LABELS TO IMPORT RESOLVED ISSUES",
             afterInit : function() {
@@ -365,7 +453,7 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-sync-labels').click(function(e) {
                     e.preventDefault();
                     $('#{{componentId}}-{{sectionId}}-sync-labels').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-sync-labels').children('i').addClass('fa-spin');
+                    $('#{{componentId}}-{{sectionId}}-sync-labels').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
                     $('#{{componentId}}-{{sectionId}}-labels').empty().trigger('change');
 
                     var postData = { };
@@ -396,7 +484,7 @@ dataCollectionSection =
                             PNotify.error({'text': response.responseMessage});
                         }
                         $('#{{componentId}}-{{sectionId}}-sync-labels').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-sync-labels').children('i').removeClass('fa-spin');
+                        $('#{{componentId}}-{{sectionId}}-sync-labels').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
                     }, 'json');
                 });
             }

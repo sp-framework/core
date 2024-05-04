@@ -1,3 +1,6 @@
+{% set moduleApiIdDisabled = false %}
+{% set moduleApp_typeDisabled = false %}
+{% set createRepoDisabled = true %}
 {% if module['id'] is defined %}
     {% set moduleId = module['id'] %}
     {% set moduleName = module['name'] %}
@@ -6,6 +9,9 @@
     {% set moduleApiId = module['module_details']['api_id'] %}
     {% set moduleVersion = module['version'] %}
     {% set moduleRepo = module['repo'] %}
+    {% set moduleApiIdDisabled = true %}
+    {% set moduleApp_typeDisabled = true %}
+    {% set createRepoDisabled = false %}
 {% else %}
     {% set moduleId = '' %}
     {% set moduleName = '' %}
@@ -17,28 +23,6 @@
 {% endif %}
 <div class="row">
     <div class="col">
-        {% if clone is defined and clone === true %}
-            {{adminltetags.useTag('fields',
-                [
-                    'component'                      : component,
-                    'componentName'                  : componentName,
-                    'componentId'                    : componentId,
-                    'sectionId'                      : sectionId,
-                    'fieldId'                        : 'is_clone',
-                    'fieldLabel'                     : 'Is Clone',
-                    'fieldType'                      : 'input',
-                    'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : 'Is Clone',
-                    'fieldRequired'                  : true,
-                    'fieldBazScan'                   : true,
-                    'fieldBazPostOnCreate'           : true,
-                    'fieldBazPostOnUpdate'           : true,
-                    'fieldHidden'                    : true,
-                    'fieldDisabled'                  : true,
-                    'fieldValue'                     : 'true'
-                ]
-            )}}
-        {% endif %}
         {{adminltetags.useTag('fields',
             [
                 'component'                      : component,
@@ -75,6 +59,7 @@
                 'fieldHelp'                            : true,
                 'fieldHelpTooltipContent'              : 'App Type : core, blog, ecom, finance, etc',
                 'fieldRequired'                        : true,
+                'fieldDisabled'                        : moduleApp_typeDisabled,
                 'fieldBazPostOnCreate'                 : true,
                 'fieldBazPostOnUpdate'                 : true,
                 'fieldBazScan'                         : true,
@@ -148,6 +133,7 @@
                 'fieldHelp'                            : true,
                 'fieldHelpTooltipContent'              : 'Select repo if the module will be available on a repo. If not, choose local and you can pass zip file to the end user.',
                 'fieldRequired'                        : true,
+                'fieldDisabled'                        : moduleApiIdDisabled,
                 'fieldBazScan'                         : true,
                 'fieldBazPostOnCreate'                 : true,
                 'fieldBazPostOnUpdate'                 : true,
@@ -239,7 +225,7 @@
                 'fieldId'                        : 'createrepo',
                 'fieldLabel'                     : 'Create New Repo?',
                 'fieldHelp'                      : true,
-                'fieldDisabled'                  : true,
+                'fieldDisabled'                  : createRepoDisabled,
                 'fieldHelpTooltipContent'        : 'Create new repository if it does not exist on remote?',
                 'fieldType'                      : 'checkbox',
                 'fieldCheckboxType'              : 'primary',
