@@ -20,7 +20,8 @@ trait DynamicTable {
         bool $dtAdditionControlButtonsBeforeControlButtons = false,
         int $componentId = null,
         $resetCache = false,
-        $enableCache = true
+        $enableCache = true,
+        $packageData = []
     ) {
         if (gettype($package) === 'string') {
             $package = $this->usePackage($package);
@@ -146,11 +147,16 @@ trait DynamicTable {
             }
 
             try {
+                if (count($packageData) === 0) {
+                    $packageData = false;
+                }
+
                 $pagedData =
                     $package->getPaged(
                         $conditions,
                         $resetCache,
-                        $enableCache
+                        $enableCache,
+                        $packageData
                     );
 
                 $rows = $pagedData->getItems();
