@@ -4,7 +4,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
 use Carbon\Carbon;
 use System\Base\BasePackage;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Api\BasepackagesApiCalls;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\ApiClientServices\BasepackagesApiClientServicesCalls;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersJobs;
 
 class Jobs extends BasePackage
@@ -44,7 +44,7 @@ class Jobs extends BasePackage
             $job['response_data'] = $this->helper->encode($job['response_data']);
         }
 
-        $apiModel = BasepackagesApiCalls::class;
+        $apiModel = BasepackagesApiClientServicesCalls::class;
 
         if (is_string($job['run_on'])) {
             $job['run_on'] = $this->helper->decode($job['run_on'], true);

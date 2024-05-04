@@ -46,7 +46,7 @@ class ApiClientServicesCalls
                 new Column(
                     'call_response_code',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
+                        'type'    => Column::TYPE_SMALLINTEGER,
                         'notNull' => true,
                     ]
                 ),
