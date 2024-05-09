@@ -170,6 +170,14 @@
                             'position'                : 'left',
                             'disabled'                : true
                         ],
+                        'remove-module' : [
+                            'title'                   : 'Remove Module',
+                            'size'                    : 'xs',
+                            'type'                    : 'danger',
+                            'icon'                    : 'trash',
+                            'position'                : 'left',
+                            'disabled'                : true
+                        ],
                         'generate-new-release' : [
                             'title'                   : 'Generate New Release',
                             'size'                    : 'xs',
@@ -192,7 +200,7 @@
     </div>
 </div>
 <script>
-/* globals BazContentLoader Pace BazCore */
+/* globals BazContentLoader Pace BazCore PNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -231,7 +239,7 @@ dataCollectionSection =
                     id = e.params.data.id;
                     label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
 
-                    $('#{{componentId}}-{{sectionId}}-edit-module').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-edit-module, #{{componentId}}-{{sectionId}}-remove-module').attr('disabled', false);
 
                     if (label !== 'bundles' && label !== 'apptypes') {
                         $('#{{componentId}}-{{sectionId}}-clone-module').attr('disabled', false);
@@ -245,7 +253,7 @@ dataCollectionSection =
 
                     if (label === 'core') {
                         $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-clone-module').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-clone-module, #{{componentId}}-{{sectionId}}-remove-module').attr('disabled', true);
                     } else if (label !== 'core') {
                         if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === false) {
                             $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', false);
@@ -282,6 +290,32 @@ dataCollectionSection =
                     } else {
                         dataCollectionSectionForm['funcs']['loadAjax'](id, label, false, false, true);
                     }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-remove-module').off();
+                $('#{{componentId}}-{{sectionId}}-remove-module').click(function() {
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = id;
+                    postData['module_type'] = label;
+
+                    $.post('{{links.url("devtools/modules/remove")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            PNotify.success({'text': response.responseMessage});
+                            if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                                dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
+                            } else {
+                                dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
+                            }
+                        } else {
+                            PNotify.error({'text': response.responseMessage});
+                        }
+                    }, 'json');
                 });
 
                 $('#{{componentId}}-{{sectionId}}-generate-new-release').off();

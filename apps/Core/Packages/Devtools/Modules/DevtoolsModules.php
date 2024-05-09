@@ -242,16 +242,22 @@ class DevtoolsModules extends BasePackage
         $this->addResponse('Error updating Module', 1);
     }
 
-    // public function removeModule($data)
-    // {
-    //     $module = $this->getById($data['id']);
+    public function removeModule($data)
+    {
+        if ($data['module_type'] !== 'core') {
+            $module = $this->modules->{$data['module_type']}->getById($data['id']);
+        } else {
+            $this->addResponse('Cannot remove Core!.', 1);
 
-    //     if ($this->remove($module['id'])) {
-    //         $this->addResponse('Removed module ' . $module['name']);
-    //     } else {
-    //         $this->addResponse('Error removing module.', 1);
-    //     }
-    // }
+            return false;
+        }
+
+        if ($this->modules->{$data['module_type']}->remove($module['id'])) {
+            $this->addResponse('Removed module ' . $module['display_name'] . ' from DB. Remove files manually...');
+        } else {
+            $this->addResponse('Error removing module.', 1);
+        }
+    }
 
     protected function checkAppType($data)
     {
@@ -401,7 +407,7 @@ class DevtoolsModules extends BasePackage
         }
 
         if ($data['module_type'] === 'packages') {//Possible error can happen when cloning core modules.
-            if ($data['category'] === 'basepackages' || $data['category'] === 'providers') {
+            if (str_starts_with($data['category'], 'basepackages') || $data['category'] === 'providers') {
                 $data['app_type'] = 'core';
             }
         }
@@ -623,10 +629,10 @@ class DevtoolsModules extends BasePackage
             $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Components/';
         } else if ($data['module_type'] === 'packages') {
             if ($data['app_type'] === 'core' &&
-                ($data['category'] === 'basepackages' ||
+                (str_starts_with($data['category'], 'basepackages') ||
                  $data['category'] === 'providers')
             ) {
-                if ($data['category'] === 'basepackages') {
+                if (str_starts_with($data['category'], 'basepackages')) {
                     $moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/';
                 } else if ($data['category'] === 'providers') {
                     $moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/';
@@ -641,8 +647,8 @@ class DevtoolsModules extends BasePackage
         }
 
         if ($data['module_type'] === 'packages' &&
-            ($data['category'] === 'basepackages' ||
-             $data['category'] === 'providers')
+            (str_starts_with($data['category'], 'basepackages') ||
+            $data['category'] === 'providers')
         ) {
             return
                 $moduleLocation .
@@ -709,11 +715,13 @@ class DevtoolsModules extends BasePackage
             $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Components/';
         } else if ($data['module_type'] === 'packages') {
             if ($data['app_type'] === 'core' &&
-                ($data['category'] === 'basepackages' ||
+                (str_starts_with($data['category'], 'basepackages') ||
                  $data['category'] === 'providers')
             ) {
-                if ($data['category'] === 'basepackages') {
+                if (str_starts_with($data['category'], 'basepackages')) {
                     $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/';
+                } else if ($data['category'] === 'basepackages_apis') {
+                    $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/ApiClientServices/Apis/';
                 } else if ($data['category'] === 'providers') {
                     $moduleLocation = 'system/Base/Providers/';
                 }
@@ -733,10 +741,9 @@ class DevtoolsModules extends BasePackage
         }
 
         if ($data['module_type'] === 'packages' &&
-            ($data['category'] === 'basepackages' ||
-             $data['category'] === 'providers')
+            (str_starts_with($data['category'], 'basepackages') || $data['category'] === 'providers')
         ) {
-            if ($data['category'] === 'basepackages') {
+            if (str_starts_with($data['category'], 'basepackages')) {
                 $pathArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
 
                 unset($pathArr[$this->helper->lastKey($pathArr)]);
@@ -883,13 +890,15 @@ $file .= '
         $file = str_replace('"PACKAGENAME"', $data['name'], $file);
         $file = str_replace('"PACKAGENAMELC"', strtolower($data['name']), $file);
 
-        if ($data['category'] === 'basepackages') {
+        if (str_starts_with($data['category'], 'basepackages')) {
             $fileName = $moduleFilesLocation . $this->helper->last(preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY)) . '.php';
         } else {
             $fileName = $moduleFilesLocation . $data['name'] . '.php';
         }
+
         try {
             $this->localContent->write($fileName, $file);
+
             array_push($this->newFiles, $fileName);
         } catch (FilesystemException | UnableToWriteFile $exception) {
             $this->addResponse('Unable to write module component file');
@@ -912,7 +921,8 @@ $file .= '
             return false;
         }
 
-        if ($data['category'] === 'basepackages' || $data['category'] === 'providers') {
+        if (str_starts_with($data['category'], 'basepackages') || $data['category'] === 'providers') {
+            // str_starts_with($data['category'], 'basepackages')
             $moduleFilesLocation = $this->getModuleJsonFileLocation($data);
             $moduleFilesLocation = str_replace('Register/Modules/Packages', 'Schema', $moduleFilesLocation);
             $moduleFilesLocation = rtrim(str_replace('package.json', '', $moduleFilesLocation), '/');
@@ -949,7 +959,7 @@ $file .= '
             return false;
         }
 
-        if ($data['category'] !== 'basepackages' && $data['category'] !== 'providers') {
+        if ($data['category'] !== str_starts_with($data['category'], 'basepackages') && $data['category'] !== 'providers') {
             $moduleFilesLocation = str_replace('/Schema', '', ucfirst($moduleFilesLocation));
             $fileName = $moduleFilesLocation . '/' . 'Package.php';
             $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
@@ -982,10 +992,10 @@ $file .= '
             return false;
         }
 
-        if ($data['category'] === 'basepackages' || $data['category'] === 'providers') {
+        if (str_starts_with($data['category'], 'basepackages') || $data['category'] === 'providers') {
             $nameArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
 
-            if ($data['category'] === 'basepackages') {
+            if (str_starts_with($data['category'], 'basepackages')) {
                 $moduleFilesLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Model/';
 
                 if (count($nameArr) === 1) {
@@ -2041,7 +2051,7 @@ $file .= '
 
             if ($data['category'] === 'providers') {
                 $class .= 'System\Base\Providers\\' . ucfirst($data['name']) . 'ServiceProvider' . '\\' . ucfirst($data['name']);
-            } else if ($data['category'] === 'basepackages') {
+            } else if (str_starts_with($data['category'], 'basepackages')) {
                 $class .= 'System\Base\Providers\BasepackagesServiceProvider\Packages\\' . ucfirst($data['name']);
             } else {
                 $name = lcfirst($data['name']);
@@ -2207,11 +2217,14 @@ $file .= '
             foreach ($apisArr as $api) {
                 if ($api['category'] === 'repos') {
                     $useApi = $this->basepackages->apiClientServices->useApi($api['id'], true);
-                    $apiConfig = $useApi->getApiConfig();
 
-                    $apis[$api['id']]['id'] = $apiConfig['id'];
-                    $apis[$api['id']]['name'] = $apiConfig['name'];
-                    $apis[$api['id']]['data']['url'] = $apiConfig['repo_url'];
+                    if ($useApi) {
+                        $apiConfig = $useApi->getApiConfig();
+
+                        $apis[$api['id']]['id'] = $apiConfig['id'];
+                        $apis[$api['id']]['name'] = $apiConfig['name'];
+                        $apis[$api['id']]['data']['url'] = $apiConfig['repo_url'];
+                    }
                 }
             }
         }

@@ -429,23 +429,17 @@ class ModulesComponent extends BaseComponent
 		);
 	}
 
-	// public function removeAction()
-	// {
-	// 	if ($this->request->isPost()) {
-	// 		if (!$this->checkCSRF()) {
-	// 			return;
-	// 		}
+	public function removeAction()
+	{
+		$this->requestIsPost();
 
-	// 		$this->modulesPackage->removeModule($this->postData());
+		$this->modulesPackage->removeModule($this->postData());
 
-	// 		$this->addResponse(
-	// 			$this->modulesPackage->packagesData->responseMessage,
-	// 			$this->modulesPackage->packagesData->responseCode
-	// 		);
-	// 	} else {
-	// 		$this->addResponse('Method Not Allowed', 1);
-	// 	}
-	// }
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
+	}
 
 	// public function validateJsonAction()
 	// {
