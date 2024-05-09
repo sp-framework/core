@@ -92,7 +92,7 @@ class ApiClientServices extends BasePackage
                     $this->apiCategories[$category]['childs']  = [];
                 }
 
-                $provider = strtolower($this->helper->last($api['class']));
+                $provider = strtolower($api['class'][$this->helper->lastKey($api['class']) - 1]);
 
                 if (!isset($this->apiCategories[$category]['childs'][$provider])) {
                     $this->apiCategories[$category]['childs'][$provider] = [];
@@ -320,7 +320,11 @@ class ApiClientServices extends BasePackage
                     }
                 }
             } else if (isset($data['config'])) {
-                $this->apiConfig = $data['config'];
+                if (isset($data['config']['id'])) {
+                    $this->apiConfig = $this->getApiById((int) $data['config']['id']);
+                } else {
+                    $this->apiConfig = $data['config'];
+                }
             }
         } else if (is_int($data) || is_string($data)) {
             $this->apiConfig = $this->getApiById((int) $data);
@@ -350,7 +354,11 @@ class ApiClientServices extends BasePackage
         $apiClass = $this->getApiClass($config['category'], $config['provider']);
 
         if ($apiClass) {
-            return (new $apiClass())->init($config, $this);
+            try {
+                return (new $apiClass())->init($config, $this);
+            } catch (\Exception $e) {
+                throw $e;
+            }
         }
 
         return false;
@@ -358,14 +366,19 @@ class ApiClientServices extends BasePackage
 
     public function getApiClass($category, $provider, $basepackages = true)
     {
+        //Class of API defined in the package defined the location of the API and its category and provider
+        //Example: WhateverLocation\\Apis\\{Category}\\{Provider}\\API_CLASS
+        $basepackagesApis = $this->modules->packages->getPackagesForCategory('basepackages_apis');
         $apis = $this->modules->packages->getPackagesForCategory('apis');
+
+        $apis = array_merge($basepackagesApis, $apis);
 
         if ($apis && is_array($apis) && count($apis) > 0) {
             foreach ($apis as $apiKey => $api) {
                 $api['class'] = explode('\\', $api['class']);
 
                 $apiCategory = strtolower($api['class'][$this->helper->lastKey($api['class']) - 2]);
-                $apiProvider = strtolower($this->helper->last($api['class']));
+                $apiProvider = strtolower($api['class'][$this->helper->lastKey($api['class']) - 1]);
 
                 if ($category === $apiCategory &&
                     $provider === $apiProvider
@@ -407,44 +420,6 @@ class ApiClientServices extends BasePackage
                         $api = $this->getApiById($api->id);
 
                         if ($api['category'] === strtolower($category)) {
-                            return $api;
-                        }
-                    }
-                );
-        }
-
-        return $filter;
-    }
-
-    public function getApiByProvider($provider, $inuse = null)
-    {
-        $this->getAll();
-
-        if (isset($inuse)) {
-            if ($inuse === true) {
-                $inUse = '1';
-            } else {
-                $inUse = '0'|null;
-            }
-            $filter =
-                $this->model->filter(
-                    function($api) use ($provider, $inUse) {
-                        $api = $this->getApiById($api->id);
-
-                        if ($api['provider'] === strtolower($provider) &&
-                            $api['in_use'] == $inUse
-                        ) {
-                            return $api;
-                        }
-                    }
-                );
-        } else {
-            $filter =
-                $this->model->filter(
-                    function($api) use ($provider) {
-                        $api = $this->getApiById($api->id);
-
-                        if ($api['provider'] === strtolower($provider)) {
                             return $api;
                         }
                     }

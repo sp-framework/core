@@ -2216,7 +2216,15 @@ $file .= '
         if (count($apisArr) > 0) {
             foreach ($apisArr as $api) {
                 if ($api['category'] === 'repos') {
-                    $useApi = $this->basepackages->apiClientServices->useApi($api['id'], true);
+                    $useApi = $this->basepackages->apiClientServices->useApi([
+                            'config' =>
+                                [
+                                    'id'           => $api['id'],
+                                    'category'     => $api['category'],
+                                    'provider'     => $api['provider'],
+                                    'checkOnly'    => true//Set this to check if the API exists and can be instantiated.
+                                ]
+                        ]);
 
                     if ($useApi) {
                         $apiConfig = $useApi->getApiConfig();
@@ -2232,6 +2240,7 @@ $file .= '
         if ($returnApis) {
             return $apis;
         }
+
         return $apisArr;
     }
 }

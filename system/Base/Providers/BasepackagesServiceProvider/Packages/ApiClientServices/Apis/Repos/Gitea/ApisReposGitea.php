@@ -4,7 +4,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientSe
 
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Repos;
 
-class ApisRepoGitea extends Repos
+class ApisReposGitea extends Repos
 {
     public function init($apiConfig = null, $api = null, $httpOptions = null)
     {

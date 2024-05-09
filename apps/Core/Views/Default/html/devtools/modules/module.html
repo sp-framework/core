@@ -1972,15 +1972,27 @@ dataCollectionSection =
                     keys =
                     [
                         {
-                            'databasetype' : {
-                                'id'        : 'databasetype',
-                                'text'      : 'Database Type'
+                            'dev' : {
+                                'id'        : 'dev',
+                                'text'      : 'Development Mode?'
                             }
                         },
                         {
                             'debug' : {
                                 'id'        : 'debug',
                                 'text'      : 'Debug Enabled?'
+                            }
+                        },
+                        {
+                            'auto_off_debug' : {
+                                'id'        : 'auto_off_debug',
+                                'text'      : 'Auto Off Debug'
+                            }
+                        },
+                        {
+                            'databasetype' : {
+                                'id'        : 'databasetype',
+                                'text'      : 'Database Type'
                             }
                         },
                         {
@@ -1999,6 +2011,12 @@ dataCollectionSection =
                             'cache-service' : {
                                 'id'        : 'cache-service',
                                 'text'      : 'Cache Service'
+                            }
+                        },
+                        {
+                            'security-sso' : {
+                                'id'        : 'security-sso',
+                                'text'      : 'Single Sign On'
                             }
                         },
                         {
@@ -2353,12 +2371,12 @@ dataCollectionSection =
                             }
                     } else if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
                         switch (key) {
-                            case 'databasetype' :
-                                type = 'text';
+                            case 'dev' :
+                                type = 'boolean';
                                 settings = '';
 
-                                if (dataCollectionSectionForm['vars']['moduleSettings']['databasetype']) {
-                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['databasetype'];
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['dev']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['dev'];
                                 }
 
                                 break;
@@ -2368,6 +2386,24 @@ dataCollectionSection =
 
                                 if (dataCollectionSectionForm['vars']['moduleSettings']['debug']) {
                                     settings = dataCollectionSectionForm['vars']['moduleSettings']['debug'];
+                                }
+
+                                break;
+                            case 'auto_off_debug' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['auto_off_debug']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['auto_off_debug'];
+                                }
+
+                                break;
+                            case 'databasetype' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['databasetype']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['databasetype'];
                                 }
 
                                 break;
@@ -2395,6 +2431,15 @@ dataCollectionSection =
 
                                 if (dataCollectionSectionForm['vars']['moduleSettings']['cache']['service']) {
                                     settings = dataCollectionSectionForm['vars']['moduleSettings']['cache']['service'];
+                                }
+
+                                break;
+                            case 'security-sso' :
+                                type = 'boolean';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['security']['sso']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['security']['sso'];
                                 }
 
                                 break;
@@ -2633,13 +2678,23 @@ dataCollectionSection =
                         }
                     } else if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
                         switch (key) {
-                            case 'databasetype' :
-                                dataCollectionSectionForm['vars']['moduleSettings']['databasetype']
+                            case 'dev' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['dev']
                                     = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
                                 break;
                             case 'debug' :
                                 dataCollectionSectionForm['vars']['moduleSettings']['debug']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'auto_off_debug' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['auto_off_debug']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'databasetype' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['databasetype']
                                     = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
                                 break;
@@ -2655,6 +2710,11 @@ dataCollectionSection =
                                 break;
                             case 'cache-service' :
                                 dataCollectionSectionForm['vars']['moduleSettings']['cache']['service']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'security-sso' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['security']['sso']
                                     = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
 
                                 break;
@@ -2809,12 +2869,16 @@ dataCollectionSection =
                     e.preventDefault();
 
                     var found = false;
-
                     if (label === 'core') {
                         dataCollectionSectionForm['vars']['moduleDependencies'][label] = { };
                         dataCollectionSectionForm['vars']['moduleDependencies'][label]['name'] = moduleData['name'];
                         dataCollectionSectionForm['vars']['moduleDependencies'][label]['version'] = moduleData['version'];
                         dataCollectionSectionForm['vars']['moduleDependencies'][label]['repo'] = moduleData['repo'];
+                    } else if (label === 'apptypes') {
+                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype'] = { };
+                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['name'] = moduleData['name'];
+                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['version'] = moduleData['version'];
+                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['repo'] = moduleData['repo'];
                     } else if (label === 'external') {
                         if (dataCollectionSectionForm['vars']['moduleDependencies']['external'].length === 0) {
                             dataCollectionSectionForm['vars']['moduleDependencies']['external'] = { };
@@ -2874,6 +2938,8 @@ dataCollectionSection =
 
                     if (label === 'core') {
                         dataCollectionSectionForm['vars']['moduleDependencies'][label] = { };
+                    } else if (label === 'apptypes') {
+                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype'] = { };
                     } else if (label === 'external') {
                         delete dataCollectionSectionForm['vars']['moduleDependencies'][label][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()];
                     } else {

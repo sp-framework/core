@@ -57,9 +57,10 @@ class ServicesComponent extends BaseComponent
                     //Check if provider class exists
                     if (!$this->apiPackage->useApi([
                             'config' =>
-                                ['category'     => $this->getData()['category'],
-                                 'provider'     => $this->getData()['provider'],
-                                 'checkOnly'    => true//Set this to check if the API exists and can be instantiated.
+                                [
+                                    'category'     => $this->getData()['category'],
+                                    'provider'     => $this->getData()['provider'],
+                                    'checkOnly'    => true//Set this to check if the API exists and can be instantiated.
                                 ]
                         ])
                     ) {
