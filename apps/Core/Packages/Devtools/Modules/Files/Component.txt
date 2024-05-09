@@ -26,20 +26,14 @@ class "COMPONENTNAME" extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            //$this->package->add{?}($this->postData());
+        //$this->package->add{?}($this->postData());
 
-            $this->addResponse(
-                $this->package->packagesData->responseMessage,
-                $this->package->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->package->packagesData->responseMessage,
+            $this->package->packagesData->responseCode
+        );
     }
 
     /**
@@ -47,20 +41,14 @@ class "COMPONENTNAME" extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            //$this->package->update{?}($this->postData());
+        //$this->package->update{?}($this->postData());
 
-            $this->addResponse(
-                $this->package->packagesData->responseMessage,
-                $this->package->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->package->packagesData->responseMessage,
+            $this->package->packagesData->responseCode
+        );
     }
 
     /**
@@ -68,19 +56,13 @@ class "COMPONENTNAME" extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            //$this->package->remove{?}($this->postData());
+        //$this->package->remove{?}($this->postData());
 
-            $this->addResponse(
-                $this->package->packagesData->responseMessage,
-                $this->package->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->package->packagesData->responseMessage,
+            $this->package->packagesData->responseCode
+        );
     }
 }

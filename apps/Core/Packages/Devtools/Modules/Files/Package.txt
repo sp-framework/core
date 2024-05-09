@@ -8,7 +8,7 @@ class "PACKAGENAME" extends BasePackage
 {
     //protected $modelToUse = ::class;
 
-    protected $packageName = "PACKAGENAMELC"
+    protected $packageName = '"PACKAGENAMELC"';
 
     public $"PACKAGENAMELC";
 

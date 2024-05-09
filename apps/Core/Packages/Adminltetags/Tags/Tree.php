@@ -410,15 +410,20 @@ class Tree extends Adminltetags
 
                                         if (isset($itemValue[$optionsValueKey])) {
                                             $value = $itemValue[$optionsValueKey];
+
                                             break;
                                         }
                                     } else {
-                                        if (isset($itemValue[$optionsValueKey[0]])) {
+                                        if (isset($itemValue[$optionsValueKey[0]]) && isset($itemValue[$optionsValueKey[1]])) {
                                             $value = $itemValue[$optionsValueKey[0]] . ' (' . $itemValue[$optionsValueKey[1]] . ')';
 
                                             break;
                                         }
                                     }
+                                }
+
+                                if (!isset($value)) {
+                                    $value = 'INCORRECT KEYS SET FOR fieldDataSelect2OptionsValue';
                                 }
                             }
                         // }

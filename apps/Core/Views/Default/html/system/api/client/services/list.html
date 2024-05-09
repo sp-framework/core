@@ -6,12 +6,16 @@
             {% for apiCategoryProvider in apiCategory['childs'] %}
                 {% set link = links.url('system/api/client/services/q/category/' ~ apiCategoryKey ~ '/provider/' ~ apiCategoryProvider['id'] ~ '/id/0') %}
                 {% set apiButtons =
-                    apiButtons ~ '"' ~ apiCategoryProvider['id'] ~ '-api" : {"title" : "' ~ apiCategoryProvider['id'] ~ '","type" : "primary","additionalClass" : "contentAjaxLink","url" : "' ~ link ~ '"}'
+                    apiButtons ~ '"' ~ apiCategoryProvider['id'] ~ '-api" : {"title" : "' ~ apiCategory['name'] ~ ': ' ~ apiCategoryProvider['name'] ~ '","type" : "primary","additionalClass" : "contentAjaxLink","url" : "' ~ link ~ '"}'
                 %}
                 {% if not loop.last %}
                     {% set apiButtons = apiButtons ~ ',' %}
                 {% endif %}
             {% endfor %}
+            {% if not loop.last %}
+                {% set apiButtons = apiButtons ~ ',' %}
+                {% set apiButtons = apiButtons ~ '"divider" : "",' %}
+            {% endif %}
         {% endif %}
     {% endfor %}
     {% set apiButtons = apiButtons ~ '}' %}
