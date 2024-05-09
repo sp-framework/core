@@ -28,8 +28,6 @@ class ApiClientServices extends BasePackage
     {
         $this->setModelToUse(BasepackagesApiClientServices::class);
 
-        $this->packageName = 'apiClientServices';
-
         if (!$this->apiCategories) {
             $this->registerApiCategories();
         }
@@ -45,58 +43,63 @@ class ApiClientServices extends BasePackage
 
     public function getApiById(int $id, bool $resetCache = false, bool $enableCache = true)
     {
-        if ($id) {
-            $this->switchApiModel();
+        $this->switchApiModel();
 
-            $api = $this->getById($id, false, false);
+        $api = $this->getById($id, false, false);
 
-            if (!$api) {
-                return false;
-            }
-
-            $this->switchApiModel($api);
-
-            $apiData = $this->getById($api['api_category_id'], false, false);
-
-            if (!$apiData) {
-                return false;
-            }
-
-            unset($apiData['id']);
-
-            if ($apiData) {
-                $api = array_merge($api, $apiData);
-            }
-
-            $api = $this->decryptPassToken($api);
-
-            return $api;
+        if (!$api) {
+            return false;
         }
 
-        throw new \Exception('getById needs id parameter to be set.');
+        $this->switchApiModel($api);
+
+        $apiData = $this->getById($api['api_category_id'], false, false);
+
+        if (!$apiData) {
+            return false;
+        }
+
+        unset($apiData['id']);
+
+        if ($apiData) {
+            $api = array_merge($api, $apiData);
+        }
+
+        $api = $this->decryptPassToken($api);
+
+        return $api;
     }
 
     protected function registerApiCategories()
     {
-        try {
-            $this->apiCategories = [];
+        $this->apiCategories = [];
 
-            $categories =
-                $this->localContent->listContents(
-                    'system/Base/Providers/BasepackagesServiceProvider/Packages/ApiClientServices/Apis/'
-                );
+        $basepackagesApis = $this->modules->packages->getPackagesForCategory('basepackages_apis');
+        $apis = $this->modules->packages->getPackagesForCategory('apis');
 
-            $this->registerApis($categories);
+        $apis = array_merge($basepackagesApis, $apis);
 
-            $categories =
-                $this->localContent->listContents(
-                    'apps/Dash/Packages/System/ApiClientServices/Apis/'
-                );
+        if ($apis && is_array($apis) && count($apis) > 0) {
+            foreach ($apis as $apiKey => $api) {
+                $api['class'] = explode('\\', $api['class']);
 
-            $this->registerApis($categories);
+                $category = strtolower($api['class'][$this->helper->lastKey($api['class']) - 2]);
 
-        } catch (FilesystemException $exception) {
-            throw $exception;
+                if (!isset($this->apiCategories[$category])) {
+                    $this->apiCategories[$category]  = [];
+                    $this->apiCategories[$category]['id']  = $category;
+                    $this->apiCategories[$category]['name']  = ucfirst($category);
+                    $this->apiCategories[$category]['childs']  = [];
+                }
+
+                $provider = strtolower($this->helper->last($api['class']));
+
+                if (!isset($this->apiCategories[$category]['childs'][$provider])) {
+                    $this->apiCategories[$category]['childs'][$provider] = [];
+                    $this->apiCategories[$category]['childs'][$provider]['id'] = $provider;
+                    $this->apiCategories[$category]['childs'][$provider]['name'] = ucfirst($api['display_name']);
+                }
+            }
         }
     }
 
@@ -115,43 +118,6 @@ class ApiClientServices extends BasePackage
                         'name'  => 'Apps'
                     ]
             ];
-    }
-
-    protected function registerApis($categories)
-    {
-        foreach ($categories as $item) {
-            if ($item instanceof \League\Flysystem\DirectoryAttributes) {
-                $path = explode('/', $item->path());
-
-                $folderName = $this->helper->last($path);
-
-                if (!isset($this->apiCategories[$folderName])) {
-                    $this->apiCategories[strtolower($folderName)] =
-                        [
-                            'id'    => strtolower($folderName),
-                            'name'  => $folderName
-                        ];
-                }
-
-                $category = $this->localContent->listContents($item->path());
-
-                foreach ($category as $subCategory) {
-                    if ($subCategory instanceof \League\Flysystem\DirectoryAttributes) {
-                        $path = explode('/', $subCategory->path());
-
-                        $subCategoryFolderName = $this->helper->last($path);
-
-                        if (!isset($this->apiCategories[strtolower($folderName)]['childs'][$subCategoryFolderName])) {
-                            $this->apiCategories[strtolower($folderName)]['childs'][strtolower($subCategoryFolderName)] =
-                                [
-                                    'id'    => strtolower($subCategoryFolderName),
-                                    'name'  => $subCategoryFolderName
-                                ];
-                        }
-                    }
-                }
-            }
-        }
     }
 
     protected function switchApiModel($api = null)
@@ -381,34 +347,35 @@ class ApiClientServices extends BasePackage
             $config = array_merge($config, $this->apiConfig);
         }
 
-        try {
-            $apiClass = $this->getApiClass($config['category'], $config['provider']);
+        $apiClass = $this->getApiClass($config['category'], $config['provider']);
 
+        if ($apiClass) {
             return (new $apiClass())->init($config, $this);
-        } catch (\throwable $e) {
-            try {
-                $apiClass = $this->getApiClass($config['category'], $config['provider'], false);
-
-                return (new $apiClass())->init($config, $this);
-            } catch (\throwable $e) {
-                return false;
-            }
-
-            return false;
         }
+
+        return false;
     }
 
     public function getApiClass($category, $provider, $basepackages = true)
     {
-        if ($basepackages) {
-            $this->apiLocation = 'system';
+        $apis = $this->modules->packages->getPackagesForCategory('apis');
 
-            return 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\' . ucfirst($category) . '\\' . ucfirst($provider) . '\\' . ucfirst($provider);
+        if ($apis && is_array($apis) && count($apis) > 0) {
+            foreach ($apis as $apiKey => $api) {
+                $api['class'] = explode('\\', $api['class']);
+
+                $apiCategory = strtolower($api['class'][$this->helper->lastKey($api['class']) - 2]);
+                $apiProvider = strtolower($this->helper->last($api['class']));
+
+                if ($category === $apiCategory &&
+                    $provider === $apiProvider
+                ) {
+                    return implode('\\', $api['class']);
+                }
+            }
         }
 
-        $this->apiLocation = 'apps';
-
-        return 'Apps\\Core\\Packages\\System\\ApiClientServices\\Apis' . ucfirst($category) . '\\' . ucfirst($provider) . '\\' . ucfirst($provider);
+        return false;
     }
 
     public function getApiByCategory($category, $inuse = null)

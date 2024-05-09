@@ -1,10 +1,10 @@
 <?php
 
-namespace System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github;
+namespace System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Gitea;
 
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Repos;
 
-class Github extends Repos
+class ApisRepoGitea extends Repos
 {
     public function init($apiConfig = null, $api = null, $httpOptions = null)
     {

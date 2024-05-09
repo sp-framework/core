@@ -55,12 +55,14 @@ class ServicesComponent extends BaseComponent
                     $api['provider'] = $this->getData()['provider'];
 
                     //Check if provider class exists
-                    if (!$this->apiPackage->useApi(['config' =>
-                        ['category' => $this->getData()['category'],
-                         'provider' => $this->getData()['provider'],
-                         'test'     => true
-                        ]
-                    ])) {
+                    if (!$this->apiPackage->useApi([
+                            'config' =>
+                                ['category'     => $this->getData()['category'],
+                                 'provider'     => $this->getData()['provider'],
+                                 'checkOnly'    => true//Set this to check if the API exists and can be instantiated.
+                                ]
+                        ])
+                    ) {
                         throw new ControllerNotFoundException;
                     }
 
