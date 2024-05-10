@@ -60,4 +60,15 @@ class Types extends BasePackage
             $this->addResponse('Error updating app type.', 1);
         }
     }
+
+    public function removeAppsType(array $data)
+    {
+        $appType = $this->getAppTypeById($data['id']);
+
+        if ($this->remove($appType['id'])) {
+            $this->addResponse('Removed ' . $appType['name'] . ' app type');
+        } else {
+            $this->addResponse('Error updating app type.', 1);
+        }
+    }
 }

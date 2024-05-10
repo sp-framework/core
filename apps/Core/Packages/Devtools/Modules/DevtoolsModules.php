@@ -245,12 +245,20 @@ class DevtoolsModules extends BasePackage
     public function removeModule($data)
     {
         if ($data['module_type'] !== 'core') {
+            if ($data['module_type'] === 'apptypes') {
+                $this->apps->types->removeAppsType($data);
+                $this->addResponse('Removed app type from DB. Remove files manually...');
+
+                return true;
+            }
+
             $module = $this->modules->{$data['module_type']}->getById($data['id']);
         } else {
             $this->addResponse('Cannot remove Core!.', 1);
 
             return false;
         }
+
 
         if ($this->modules->{$data['module_type']}->remove($module['id'])) {
             $this->addResponse('Removed module ' . $module['display_name'] . ' from DB. Remove files manually...');
