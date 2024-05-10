@@ -8,6 +8,13 @@ class ApisReposGitea extends Repos
 {
     public function init($apiConfig = null, $api = null, $httpOptions = null)
     {
+        if (!isset($apiConfig['category'])) {
+            $apiConfig['category'] = 'Repos';
+        }
+        if (!isset($apiConfig['provider'])) {
+            $apiConfig['provider'] = 'Gitea';
+        }
+
         parent::init($apiConfig, $api, $httpOptions);
 
         return $this;

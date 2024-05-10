@@ -27,16 +27,19 @@ class Apis extends BasePackage
         'verify'          => false
     ];
 
-    public function init($apiConfig = null, $api = null, $httpOptions = null)
+    public function init($apiConfig = null, $apiClientServices = null, $httpOptions = null)
     {
         if (isset($apiConfig['checkOnly']) && $apiConfig['checkOnly'] === true) {//used for checking via ServicesComponent if the API exists
             return $this;
         }
 
+        $apiConfig['location'] = ucfirst($apiConfig['location']);
         $apiConfig['category'] = ucfirst($apiConfig['category']);
         $apiConfig['provider'] = ucfirst($apiConfig['provider']);
 
         $this->apiConfig = $apiConfig;
+
+        $this->apiClientServices = $apiClientServices;
 
         $this->setConfiguration();
 
@@ -44,14 +47,12 @@ class Apis extends BasePackage
             $this->httpOptions = array_merge($this->httpOptions, $httpOptions);
         }
 
-        $this->api = $api;
-
-        if ($this->apiConfig['location'] === 'system') {
+        if ($this->apiConfig['location'] === 'Basepackages') {
             $this->serviceClass =
                     "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\{$this->apiConfig['category']}\\{$this->apiConfig['provider']}\\Api\\";
-        } else if ($this->apiConfig['location'] === 'apps') {
+        } else {
             $this->serviceClass =
-                    "Apps\\Dash\\Packages\\System\\ApiClientServices\\Apis\\{$this->apiConfig['category']}\\{$this->apiConfig['provider']}\\Api\\";
+                    "Apps\\{$this->apiConfig['location']}\\Packages\\System\\ApiClientServices\\Apis\\{$this->apiConfig['category']}\\{$this->apiConfig['provider']}\\Api\\";
         }
 
         return $this;
@@ -80,7 +81,11 @@ class Apis extends BasePackage
 
     protected function setConfiguration()
     {
-        $configurationClass = "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\Repos\\{$this->apiConfig['provider']}\\Configuration";
+        if ($this->apiConfig['location'] === 'Basepackages') {
+            $configurationClass = "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\{$this->apiConfig['category']}\\{$this->apiConfig['provider']}\\Configuration";
+        } else {
+            $configurationClass = "Apps\\{$this->apiConfig['location']}\\Packages\\System\\ApiClientServices\\Apis\\{$this->apiConfig['category']}\\{$this->apiConfig['provider']}\\Configuration";
+        }
 
         $this->config = new $configurationClass;
 
@@ -88,7 +93,7 @@ class Apis extends BasePackage
 
         if (isset($this->apiConfig['debug']) && $this->apiConfig['debug'] === true) {
             $this->config->setDebug(true);
-            $this->config->setDebugFile(base_path('var/log/api.log'));
+            $this->config->setDebugFile(base_path("var/log/api_{$this->apiConfig['category']}_{$this->apiConfig['provider']}.log"));
             $this->httpOptions['debug'] = true;
         }
 
@@ -156,9 +161,9 @@ class Apis extends BasePackage
         return $responseArr;
     }
 
-    public function getApi()
+    public function getApiClientServices()
     {
-        return $this->api;
+        return $this->apiClientServices;
     }
 
     public function getApiConfig()

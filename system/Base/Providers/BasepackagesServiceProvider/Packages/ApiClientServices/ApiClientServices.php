@@ -74,8 +74,8 @@ class ApiClientServices extends BasePackage
     {
         $this->apiCategories = [];
 
-        $basepackagesApis = $this->modules->packages->getPackagesForCategory('basepackages_apis');
-        $apis = $this->modules->packages->getPackagesForCategory('apis');
+        $basepackagesApis = $this->modules->packages->getPackagesForCategory('basepackagesApis');
+        $apis = $this->modules->packages->getPackagesForCategory('appsApis');
 
         $apis = array_merge($basepackagesApis, $apis);
 
@@ -107,33 +107,39 @@ class ApiClientServices extends BasePackage
     {
         $this->apiLocations =
             [
-                'system'    =>
+                'basepackages'    =>
                     [
-                        'id'    => 'system',
-                        'name'  => 'System'
+                        'id'    => 'basepackages',
+                        'name'  => 'Base Packages'
                     ],
-                'apps'    =>
-                    [
-                        'id'    => 'apps',
-                        'name'  => 'Apps'
-                    ]
             ];
+
+        $appTypes = $this->apps->types->types;
+
+        foreach ($appTypes as $type) {
+            $this->apiLocations[$type['app_type']]['id'] = $type['app_type'];
+            $this->apiLocations[$type['app_type']]['name'] = $type['name'];
+        }
     }
 
     protected function switchApiModel($api = null)
     {
         if ($api) {
-            if ($api['location'] === 'system') {
-                $modelClass = 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Model\\ApiClientServices\\Apis\\' . ucfirst($api['category']) . '\\';
+            $api['location'] = ucfirst($api['location']);
+            $api['category'] = ucfirst($api['category']);
+            $api['provider'] = ucfirst($api['provider']);
 
-                $this->setModelToUse($modelClass . 'BasepackagesApiClientServicesApis' . ucfirst($api['category']) . ucfirst($api['provider']));
-            } else if ($api['location'] === 'apps') {
-                $modelClass = 'Apps\\Core\\Packages\\System\\ApiClientServices\\Apis\\' . ucfirst($api['category']) . '\\' . ucfirst($api['provider']) . '\\';
+            if ($api['location'] === 'Basepackages') {
+                $modelClass = 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Model\\ApiClientServices\\Apis\\' . $api['category'] . '\\';
 
-                $this->setModelToUse($modelClass . 'Model\\SystemApiApis' . ucfirst($api['category']) . ucfirst($api['provider']));
+                $this->setModelToUse($modelClass . 'BasepackagesApiClientServicesApis' . $api['category'] . $api['provider']);
+            } else {
+                $modelClass = 'Apps\\' . $api['location'] . '\\Packages\\System\\ApiClientServices\\Apis\\' . $api['category'] . '\\' . $api['provider'] . '\\';
+
+                $this->setModelToUse($modelClass . 'Model\\SystemApiApis' . $api['category'] . $api['provider']);
             }
 
-            $this->packageName = 'apiApis' . ucfirst($api['category']) . ucfirst($api['provider']);
+            $this->packageName = 'apiApis' . $api['category'] . $api['provider'];
         } else {
             $this->setModelToUse($modelToUse = BasepackagesApiClientServices::class);
 
@@ -368,8 +374,8 @@ class ApiClientServices extends BasePackage
     {
         //Class of API defined in the package defined the location of the API and its category and provider
         //Example: WhateverLocation\\Apis\\{Category}\\{Provider}\\API_CLASS
-        $basepackagesApis = $this->modules->packages->getPackagesForCategory('basepackages_apis');
-        $apis = $this->modules->packages->getPackagesForCategory('apis');
+        $basepackagesApis = $this->modules->packages->getPackagesForCategory('basepackagesApis');
+        $apis = $this->modules->packages->getPackagesForCategory('appsApis');
 
         $apis = array_merge($basepackagesApis, $apis);
 

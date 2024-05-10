@@ -4,7 +4,7 @@
     "description"   : "Package for connecting to Repository Github using API",
     "module_type"   : "packages",
     "app_type"      : "core",
-    "category"      : "basepackages_apis",
+    "category"      : "basepackagesApis",
     "version"       : "0.0.0",
     "repo"          : "https://.../",
     "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\Repos\\Github\\ApisReposGithub",

@@ -25,7 +25,7 @@ class Repos
                 'in_use'            => 1,
                 'used_by'           => json_encode(['modules']),
                 'setup'             => 4,
-                'location'          => 'system'
+                'location'          => 'basepackages'
             ];
 
         $modulesRepo =
@@ -47,7 +47,7 @@ class Repos
                 'in_use'                => 1,
                 'used_by'               => json_encode(['modules']),
                 'setup'                 => 4,
-                'location'              => 'system'
+                'location'              => 'basepackages'
             ];
 
         $githubModulesRepo =
@@ -69,7 +69,7 @@ class Repos
                 'in_use'                => 1,
                 'used_by'               => json_encode(['modules']),
                 'setup'                 => 4,
-                'location'              => 'system'
+                'location'              => 'basepackages'
             ];
 
         if ($db) {
