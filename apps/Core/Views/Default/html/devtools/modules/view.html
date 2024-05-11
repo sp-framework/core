@@ -79,6 +79,10 @@
         ]
     )}}
 {% else %}
+    {% set title = 'Modules : ' ~ moduleName ~ ' (' ~ type ~ ')' %}
+    {% if subview is defined and subview === true %}
+        {% set title = 'Modules : ' ~ moduleName ~ ' (SUBVIEW)' %}
+    {% endif %}
     {{adminltetags.useTag('content',
         [
             'component'                     : component,
@@ -91,7 +95,7 @@
             'cardFooter'                    : true,
             'cardType'                      : 'primary',
             'cardIcon'                      : 'th',
-            'cardTitle'                     : 'Modules : ' ~ moduleName ~ ' (' ~ type ~ ')',
+            'cardTitle'                     : title,
             'cardAdditionalClass'           : 'rounded-0',
             'cardBodyInclude'               : 'modules/module',
             'formButtons'                   :

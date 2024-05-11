@@ -18,7 +18,7 @@ external/cache/*
 external/base.lock
 ignore/*
 composer.json
-apps/Dash/Packages/System/Api/CallStats/*
+apps/Core/Packages/System/Api/CallStats/*
 system/.keys
 system/.dbkeys
 composer

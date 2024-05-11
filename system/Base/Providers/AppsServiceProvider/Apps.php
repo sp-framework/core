@@ -394,10 +394,18 @@ class Apps extends BasePackage
 
 	protected function getReservedRoutes()
 	{
-		return
+		$reservedRoutes =
 			[
-				'core', 'dash', 'api', 'pub', 'pusher', 'messenger'
+				'core', 'api', 'pub', 'pusher', 'messenger'
 			];
+
+		foreach ($this->types->types as $type) {
+			if (!in_array($type['app_type'], $reservedRoutes)) {
+				array_push($reservedRoutes, strtolower($type['app_type']));
+			}
+		}
+
+		return $reservedRoutes;
 	}
 
 	public function getAcceptableUsernamesForAppId()

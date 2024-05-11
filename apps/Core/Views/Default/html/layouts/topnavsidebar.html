@@ -9,7 +9,7 @@
                 <meta name="{{meta.getType()}}" content="{{meta.getContent()}}">
             {% endif %}
         {% endfor %}
-        {{assets.get('doctype').getCodes()[0].getContent()}}
+        {{assets.get('title').getCodes()[0].getContent()}}
         {{assets.outputCss('headLinks')}}
         {{assets.outputJs('headJs')}}
     </head>

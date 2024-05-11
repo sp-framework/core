@@ -1,11 +1,12 @@
-{% if newrelease is defined and newrelease === true %}
-    <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
-        <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
-            {% include 'modules/module/release.html' %}
-        </fieldset>
-    </form>
-    {% set moduleId = module['id'] %}
-    <script>
+<div id="module-details">
+    {% if newrelease is defined and newrelease === true %}
+        <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {% include 'modules/module/release.html' %}
+            </fieldset>
+        </form>
+        {% set moduleId = module['id'] %}
+        <script>
 /* globals PNotify BazContentLoader Pace BazCore */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
@@ -511,16 +512,16 @@ dataCollectionSection =
         }
     });
 </script>
-{% else %}
-    {% if type === 'bundles' %}
-        {% if bundlesjson is defined and bundlesjson === true %}
-            <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
-                <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
-                    {% include 'modules/bundle/json.html' %}
-                </fieldset>
-            </form>
-            {% set moduleId = bundle['id'] %}
-            <script>
+    {% else %}
+        {% if type === 'bundles' %}
+            {% if bundlesjson is defined and bundlesjson === true %}
+                <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+                    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                        {% include 'modules/bundle/json.html' %}
+                    </fieldset>
+                </form>
+                {% set moduleId = bundle['id'] %}
+                <script>
 /* globals PNotify BazContentLoader Pace BazCore */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
@@ -636,48 +637,48 @@ dataCollectionSection =
     });
     //For some reason when you save this file, you have to save module.js as well else sp-linter does not update this file.
 </script>
-        {% else %}
-            {% set tabsData =
-                [
-                    'info'   :
-                    [
-                        'tabTitle'          : 'Info',
-                        'tabInclude'        : 'modules/bundle/info'
-                    ],
-                    'description'   :
-                    [
-                        'tabTitle'          : 'Description',
-                        'tabInclude'        : 'modules/bundle/description'
-                    ],
-                    'modules'   :
-                        [
-                            'tabTitle'          : 'Modules',
-                            'tabInclude'        : 'modules/bundle/modules'
-                        ]
-                ]
-            %}
-            <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
-                <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
-                    {{adminltetags.useTag('tabs',
-                        [
-                            'component'                     : component,
-                            'componentName'                 : componentName,
-                            'componentId'                   : componentId,
-                            'sectionId'                     : 'main',
-                            'tabsId'                        : 'tabs',
-                            'tabsStyle'                     : 'card-outline-tabs',
-                            'tabsData'                      : tabsData
-                        ]
-                    )}}
-                </fieldset>
-            </form>
-            {% if bundle['id'] is defined %}
-                {% set bundleId = bundle['id'] %}
-                {% set bundleModules = bundle['bundle_modules'] %}
             {% else %}
-                {% set bundleId = '0' %}
-            {% endif %}
-            <script>
+                {% set tabsData =
+                    [
+                        'info'   :
+                        [
+                            'tabTitle'          : 'Info',
+                            'tabInclude'        : 'modules/bundle/info'
+                        ],
+                        'description'   :
+                        [
+                            'tabTitle'          : 'Description',
+                            'tabInclude'        : 'modules/bundle/description'
+                        ],
+                        'modules'   :
+                            [
+                                'tabTitle'          : 'Modules',
+                                'tabInclude'        : 'modules/bundle/modules'
+                            ]
+                    ]
+                %}
+                <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+                    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                        {{adminltetags.useTag('tabs',
+                            [
+                                'component'                     : component,
+                                'componentName'                 : componentName,
+                                'componentId'                   : componentId,
+                                'sectionId'                     : 'main',
+                                'tabsId'                        : 'tabs',
+                                'tabsStyle'                     : 'card-outline-tabs',
+                                'tabsData'                      : tabsData
+                            ]
+                        )}}
+                    </fieldset>
+                </form>
+                {% if bundle['id'] is defined %}
+                    {% set bundleId = bundle['id'] %}
+                    {% set bundleModules = bundle['bundle_modules'] %}
+                {% else %}
+                    {% set bundleId = '0' %}
+                {% endif %}
+                <script>
 /* globals PNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
@@ -1019,15 +1020,15 @@ dataCollectionSection =
         }
     });
 </script>
-        {% endif %}
-    {% elseif type === 'apptypes' %}
-        <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
-            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
-                {% include 'modules/apptypes.html' %}
-            </fieldset>
-        </form>
-        <script>
-/* globals PNotify */
+            {% endif %}
+        {% elseif type === 'apptypes' %}
+            <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+                <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                    {% include 'modules/apptypes.html' %}
+                </fieldset>
+            </form>
+            <script>
+/* globals PNotify BazHelpers */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -1161,85 +1162,103 @@ dataCollectionSection =
             messages: {
                 '{{componentId}}-{{sectionId}}-app_type'                        : 'Please enter app type',
                 '{{componentId}}-{{sectionId}}-name'                            : 'Please enter app type name',
+            },
+            onSubmitResponse: function(response) {
+                if (response.responseData && response.responseData.newRepo && $('#repo-details').length > 0) {
+                    $('#path').html(BazHelpers.capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val()));
+                    $('#repo_url').html(response.responseData.newRepo.clone_url);
+                    $('#repo_url_dev').html(response.responseData.newRepo.html_url);
+                    $('#repo_url_dev_a').attr('href', response.responseData.newRepo.html_url + '/src/branch/dev');
+
+                    $('#repo-details').attr('hidden', false);
+                    $('#module-details').attr('hidden', true);
+                    $('.addData').attr('hidden', true);
+                    $('.cancelForm').attr('hidden', true);
+                    $('.closeForm').attr('hidden', false);
+
+                    return false;
+                }
+
+                return true;
             }
         }
     });
 </script>
-    {% else %}
-        {% set tabsData =
-            [
-                'info'   :
+        {% else %}
+            {% set tabsData =
                 [
-                    'tabTitle'          : 'Info',
-                    'tabInclude'        : 'modules/module/info'
-                ],
-                'description'   :
-                [
-                    'tabTitle'          : 'Description',
-                    'tabInclude'        : 'modules/module/description'
+                    'info'   :
+                    [
+                        'tabTitle'          : 'Info',
+                        'tabInclude'        : 'modules/module/info'
+                    ],
+                    'description'   :
+                    [
+                        'tabTitle'          : 'Description',
+                        'tabInclude'        : 'modules/module/description'
+                    ]
                 ]
-            ]
-        %}
-        {% if module is defined and module['module_type'] === 'components' or type === 'components' %}
+            %}
+            {% if module is defined and module['module_type'] === 'components' or type === 'components' %}
+                {% set tabsData = array_merge(tabsData,
+                    [
+                        'menu'   :
+                        [
+                            'tabTitle'          : 'Menu',
+                            'tabInclude'        : 'modules/module/menu'
+                        ]
+                    ],
+                    [
+                        'widgets'   :
+                        [
+                            'tabTitle'          : 'Widgets',
+                            'tabInclude'        : 'modules/module/widgets'
+                        ]
+                    ])
+                %}
+            {% endif %}
             {% set tabsData = array_merge(tabsData,
                 [
-                    'menu'   :
+                    'settings'   :
                     [
-                        'tabTitle'          : 'Menu',
-                        'tabInclude'        : 'modules/module/menu'
+                        'tabTitle'          : 'Settings',
+                        'tabInclude'        : 'modules/module/settings'
                     ]
                 ],
                 [
-                    'widgets'   :
-                    [
-                        'tabTitle'          : 'Widgets',
-                        'tabInclude'        : 'modules/module/widgets'
-                    ]
+                    'dependencies'   :
+                        [
+                            'tabTitle'          : 'Dependencies',
+                            'tabInclude'        : 'modules/module/dependencies'
+                        ]
                 ])
             %}
-        {% endif %}
-        {% set tabsData = array_merge(tabsData,
-            [
-                'settings'   :
-                [
-                    'tabTitle'          : 'Settings',
-                    'tabInclude'        : 'modules/module/settings'
-                ]
-            ],
-            [
-                'dependencies'   :
-                    [
-                        'tabTitle'          : 'Dependencies',
-                        'tabInclude'        : 'modules/module/dependencies'
-                    ]
-            ])
-        %}
-        <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
-            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
-                {{adminltetags.useTag('tabs',
-                    [
-                        'component'                     : component,
-                        'componentName'                 : componentName,
-                        'componentId'                   : componentId,
-                        'sectionId'                     : 'main',
-                        'tabsId'                        : 'tabs',
-                        'tabsStyle'                     : 'card-outline-tabs',
-                        'tabsData'                      : tabsData
-                    ]
-                )}}
-            </fieldset>
-        </form>
-        {% if module['id'] is defined %}
-            {% set moduleId = module['id'] %}
-        {% else %}
-            {% set moduleId = '0' %}
-        {% endif %}
-        {% set subView = false %}
-        {% if subview is defined and subview === true %}
-            {% set subView = true %}
-        {% endif %}
-        <script>
-/* globals PNotify */
+            <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+                <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                    {{adminltetags.useTag('tabs',
+                        [
+                            'component'                     : component,
+                            'componentName'                 : componentName,
+                            'componentId'                   : componentId,
+                            'sectionId'                     : 'main',
+                            'tabsId'                        : 'tabs',
+                            'tabsStyle'                     : 'card-outline-tabs',
+                            'tabsData'                      : tabsData
+                        ]
+                    )}}
+                </fieldset>
+            </form>
+            {% if module['id'] is defined %}
+                {% set moduleId = module['id'] %}
+            {% else %}
+                {% set moduleId = '0' %}
+            {% endif %}
+            {% set subView = false %}
+            {% if subview is defined and subview === true %}
+                {% set subView = true %}
+            {% endif %}
+            <script>
+/* globals PNotify BazHelpers */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -1317,6 +1336,9 @@ if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
     }
 } else {
     dataCollectionSectionForm['vars']['moduleSettings'] = JSON.parse('{{moduleSettings}}');
+    if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
+        dataCollectionSectionForm['vars']['subview'] = '{{subView}}';
+    }
 }
 if (dataCollectionSectionForm['vars']['module_type'] !== 'views' &&
     !dataCollectionSectionForm['vars']['moduleDependencies']['external']
@@ -1414,7 +1436,7 @@ dataCollectionSection =
                     }
 
                     if (postData['api_id'] === '') {
-                        PNotify.error('Please select api.');
+                        PNotify.error('Please select repository.');
                         return;
                     }
 
@@ -1440,6 +1462,19 @@ dataCollectionSection =
                             PNotify.error('Please select category.');
                             return;
                         }
+                    }
+
+                    if (dataCollectionSectionForm['vars']['subview'] == true &&
+                        ($('#{{componentId}}-{{sectionId}}-base_view_module_id').val() === '' ||
+                         $('#{{componentId}}-{{sectionId}}-base_view_module_id').val() == '0')
+                    ) {
+                        PNotify.error('View dependency for this subview not set.');
+                        return;
+                    }
+
+                    if (dataCollectionSectionForm['vars']['subview'] == true) {
+                        postData['base_view_module_id'] = $('#{{componentId}}-{{sectionId}}-base_view_module_id').val();
+                        postData['subview'] = true;
                     }
 
                     $.post('{{links.url("devtools/modules/generateModuleRepoUrl")}}', postData, function(response) {
@@ -2954,7 +2989,7 @@ dataCollectionSection =
 
                                 if (found) {
                                     if (modules === 'views') {
-                                        $('#{{componentId}}-{{sectionId}}-base_view_module_id').val('');
+                                        $('#{{componentId}}-{{sectionId}}-base_view_module_id').val('0');
 
                                         $('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked = true;
                                         $('#{{componentId}}-{{sectionId}}-base_view_module').attr('disabled', false);
@@ -3132,6 +3167,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-name'                            : 'required',
                 '{{componentId}}-{{sectionId}}-display_name'                    : 'required',
                 '{{componentId}}-{{sectionId}}-route'                           : 'required',
+                '{{componentId}}-{{sectionId}}-api_id'                          : 'required',
                 '{{componentId}}-{{sectionId}}-version'                         : 'required',
                 '{{componentId}}-{{sectionId}}-repo'                            : 'required',
                 '{{componentId}}-{{sectionId}}-class'                           : 'required',
@@ -3145,6 +3181,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-name'                            : 'Please enter module name',
                 '{{componentId}}-{{sectionId}}-display_name'                    : 'Please enter module display name',
                 '{{componentId}}-{{sectionId}}-route'                           : 'Please enter route',
+                '{{componentId}}-{{sectionId}}-api_id'                          : 'Please select Repository',
                 '{{componentId}}-{{sectionId}}-version'                         : 'Please enter version',
                 '{{componentId}}-{{sectionId}}-repo'                            : 'Please enter repo',
                 '{{componentId}}-{{sectionId}}-class'                           : 'Please enter class',
@@ -3152,10 +3189,71 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-menu'                            : 'Please enter menu'
             },
             onSubmitResponse: function(response) {
+                var appType = BazHelpers.capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
+                var moduleType = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                var path = appType + '/' + BazHelpers.capitalizeFirstLetter(moduleType) + '/';
+                var pathPublic = $('#{{componentId}}-{{sectionId}}-app_type').val().toLowerCase() + '/';
+                if (moduleType === 'components') {
+                    var routeArr = [];
+
+                    $($('#{{componentId}}-{{sectionId}}-route').val().split('/')).each(function(i, route) {
+                        routeArr.push(BazHelpers.capitalizeFirstLetter(route));
+                    });
+
+                    path += routeArr.join('/');
+                } else {
+                    if (moduleType === 'views') {
+                        if (dataCollectionSectionForm['vars']['subview']) {
+                            path += dataCollectionSectionForm['vars']['moduleDependencies']['views'][0]['name'] + '/html/';
+                            path += $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
+                        } else {
+                            path += $('#{{componentId}}-{{sectionId}}-name').val();
+                        }
+                        pathPublic += $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
+                    } else {
+                        var nameArr = $('#{{componentId}}-{{sectionId}}-name').val().split(/(?=[A-Z])/);
+                        path += nameArr.join('/');
+                    }
+                }
+
+                var newRepo;
+                if (response.responseData && response.responseData.newRepo && $('#repo-details').length > 0) {
+                    if (response.responseData.newRepo.base) {
+                        newRepo  = response.responseData.newRepo.base;
+                    } else {
+                        newRepo  = response.responseData.newRepo;
+                    }
+
+                    $('#path').html(path);
+                    $('#repo_url').html(newRepo.clone_url);
+                    $('#repo_url_dev').html(newRepo.html_url);
+                    $('#repo_url_dev_a').attr('href', newRepo.html_url + '/src/branch/dev');
+
+                    if (response.responseData.newRepo.public && $('#views-public').length > 0) {
+                        $('#path_public').html(pathPublic);
+                        $('#repo_url_public').html(response.responseData.newRepo.public.clone_url);
+                        $('#repo_url_dev_public').html(response.responseData.newRepo.public.html_url);
+                        $('#repo_url_dev_a_public').attr('href', response.responseData.newRepo.public.html_url + '/src/branch/dev');
+                        $('#views-public').attr('hidden', false);
+                    }
+
+                    $('#repo-details').attr('hidden', false);
+                    $('#module-details').attr('hidden', true);
+                    $('.addData').attr('hidden', true);
+                    $('.cancelForm').attr('hidden', true);
+                    $('.closeForm').attr('hidden', false);
+
+                    return false;
+                }
+
                 return true;
             }
         }
     });
 </script>
+        {% endif %}
     {% endif %}
-{% endif %}
+</div>
+<div id="repo-details" hidden>
+    {% include 'modules/repodetails.html' %}
+</div>

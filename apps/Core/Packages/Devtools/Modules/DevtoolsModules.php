@@ -39,7 +39,15 @@ class DevtoolsModules extends BasePackage
 
     public function addModule($data)
     {
-        if (!checkCtype($data['name'], 'alpha', [''])) {
+        if (isset($data['module_type']) &&
+            $data['module_type'] === 'components'
+        ) {
+            $ignoreChars = [' '];
+        } else {
+            $ignoreChars = [''];
+        }
+
+        if (!checkCtype($data['name'], 'alpha', $ignoreChars)) {
             $this->addResponse('Name cannot have special chars or numbers.', 1);
 
             return false;
@@ -120,13 +128,20 @@ class DevtoolsModules extends BasePackage
         }
 
         try {
-            if ($this->modules->{$data['module_type']}->add($data) &&
-                $this->updateModuleJson($data) &&
-                $this->generateNewFiles($data)
+            if ($this->updateModuleJson($data) &&
+                $this->generateNewFiles($data) &&
+                $this->modules->{$data['module_type']}->add($data)
             ) {
                 if ($data['createrepo'] == true) {
-                    if (!$this->checkRepo($data)) {
-                        $newRepo = $this->createRepo($data);
+                    if ($data['module_type'] === 'views' && $data['base_view_module_id'] == 0) {//Create public repository as well
+                        if (!$this->checkRepo($data)) {
+                            $newRepo['base'] = $this->createRepo($data);
+                        }
+
+                        $data['repo'] = $data['repo'] . '-public';
+                        if (!$this->checkRepo($data)) {
+                            $newRepo['public'] = $this->createRepo($data);
+                        }
 
                         $this->addResponse('Module added & created new repo.',
                                            0,
@@ -138,6 +153,21 @@ class DevtoolsModules extends BasePackage
                                         );
 
                         return;
+                    } else {
+                        if (!$this->checkRepo($data)) {
+                            $newRepo = $this->createRepo($data);
+
+                            $this->addResponse('Module added & created new repo.',
+                                               0,
+                                               [
+                                                'newFiles'  => $this->newFiles,
+                                                'newDirs'   => $this->newDirs,
+                                                'newRepo'   => $newRepo
+                                               ]
+                                            );
+
+                            return;
+                        }
                     }
                 }
 
@@ -161,7 +191,15 @@ class DevtoolsModules extends BasePackage
 
     public function updateModule($data)
     {
-        if (!checkCtype($data['name'], 'alpha', [''])) {
+        if (isset($data['module_type']) &&
+            $data['module_type'] === 'components'
+        ) {
+            $ignoreChars = [' '];
+        } else {
+            $ignoreChars = [''];
+        }
+
+        if (!checkCtype($data['name'], 'alpha', $ignoreChars)) {
             $this->addResponse('Name cannot have special chars or numbers.', 1);
 
             return false;
@@ -211,8 +249,8 @@ class DevtoolsModules extends BasePackage
 
                 $module = array_merge($module, $data);
 
-                if ($this->modules->{$data['module_type']}->update($module) &&
-                    $this->updateModuleJson($data)
+                if ($this->updateModuleJson($data) &&
+                    $this->modules->{$data['module_type']}->update($module)
                 ) {
                     if ($data['module_type'] === 'components') {
                         $this->addUpdateComponentMenu($data);
@@ -259,9 +297,8 @@ class DevtoolsModules extends BasePackage
             return false;
         }
 
-
-        if ($this->modules->{$data['module_type']}->remove($module['id'])) {
-            $this->addResponse('Removed module ' . $module['display_name'] . ' from DB. Remove files manually...');
+        if ($module && $this->modules->{$data['module_type']}->remove($module['id'])) {
+            $this->addResponse('Removed module from DB. Remove files manually...');
         } else {
             $this->addResponse('Error removing module.', 1);
         }
@@ -879,6 +916,36 @@ $file .= '
         return true;
     }
 
+    protected function generateNewMiddlewaresFiles($moduleFilesLocation, $data)
+    {
+        //Package File
+        try {
+            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/Middleware.txt');
+        } catch (FilesystemException | UnableToReadFile $exception) {
+            $this->addResponse('Unable to read module base package file.');
+
+            return false;
+        }
+
+        $data['class'] = explode('\\', $data['class']);
+        unset($data['class'][$this->helper->lastKey($data['class'])]);
+        $namespaceClass = implode('\\', $data['class']);
+
+        $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass . ';', $file);
+        $file = str_replace('"MIDDLEWARENAME"', $data['name'], $file);
+        $fileName = $moduleFilesLocation . $data['name'] . '.php';
+
+        try {
+            $this->localContent->write($fileName, $file);
+
+            array_push($this->newFiles, $fileName);
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write module middleware file');
+
+            return false;
+        }
+    }
+
     protected function generateNewPackagesFiles($moduleFilesLocation, $data)
     {
         //Package File
@@ -909,7 +976,7 @@ $file .= '
 
             array_push($this->newFiles, $fileName);
         } catch (FilesystemException | UnableToWriteFile $exception) {
-            $this->addResponse('Unable to write module component file');
+            $this->addResponse('Unable to write module package file');
 
             return false;
         }
@@ -953,7 +1020,7 @@ $file .= '
             $this->localContent->write($fileName, $file);
             array_push($this->newFiles, $fileName);
         } catch (FilesystemException | UnableToWriteFile $exception) {
-            $this->addResponse('Unable to write module component file');
+            $this->addResponse('Unable to write module package file');
 
             return false;
         }
@@ -968,7 +1035,7 @@ $file .= '
         }
 
         if ($data['category'] !== str_starts_with($data['category'], 'basepackages') && $data['category'] !== 'providers') {
-            $moduleFilesLocation = str_replace('/Schema', '', ucfirst($moduleFilesLocation));
+            $moduleFilesLocation = str_replace('/Schema', '', $moduleFilesLocation);
             $fileName = $moduleFilesLocation . '/' . 'Package.php';
             $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
             $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
@@ -980,7 +1047,7 @@ $file .= '
                 $this->localContent->write($fileName, $file);
                 array_push($this->newFiles, $fileName);
             } catch (FilesystemException | UnableToWriteFile $exception) {
-                $this->addResponse('Unable to write module component file');
+                $this->addResponse('Unable to write module package file');
 
                 return false;
             }
@@ -1039,7 +1106,7 @@ $file .= '
             $this->localContent->write($fileName, $file);
             array_push($this->newFiles, $fileName);
         } catch (FilesystemException | UnableToWriteFile $exception) {
-            $this->addResponse('Unable to write module component file');
+            $this->addResponse('Unable to write module package file');
 
             return false;
         }
@@ -1051,6 +1118,7 @@ $file .= '
     {
         if ($data['base_view_module_id'] == 0) {
             $modulePublicFilesLocation = $this->getNewFilesLocation($data, true);
+
             try {
                 if (is_string($data['settings'])) {
                     $data['settings'] = $this->helper->decode($data['settings'], true);
@@ -1060,8 +1128,12 @@ $file .= '
                 array_push($this->newDirs, $moduleFilesLocation . 'html');
                 $this->localContent->createDirectory($moduleFilesLocation . 'html/layouts');
                 array_push($this->newDirs, $moduleFilesLocation . 'html/layouts');
+                $this->localContent->createDirectory($moduleFilesLocation . 'html/common');
+                array_push($this->newDirs, $moduleFilesLocation . 'html/common');
+                $this->localContent->write($moduleFilesLocation . 'html/common/.gitkeep', '');
 
-                $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/layout.txt');
+                $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/ViewsLayout.txt');
+
                 foreach ($data['settings']['layouts'] as $layout) {
                     $this->localContent->write($moduleFilesLocation . 'html/layouts/' . $layout['view'] . '.html', $file);
                     array_push($this->newFiles, $moduleFilesLocation . 'html/layouts/' . $layout['view'] . '.html');
@@ -1069,16 +1141,28 @@ $file .= '
 
                 $this->localContent->createDirectory($modulePublicFilesLocation . 'css');
                 array_push($this->newDirs, $modulePublicFilesLocation . 'css');
+                $this->localContent->write($modulePublicFilesLocation . 'css/.gitkeep', '');
+
                 $this->localContent->createDirectory($modulePublicFilesLocation . 'fonts');
                 array_push($this->newDirs, $modulePublicFilesLocation . 'fonts');
+                $this->localContent->write($modulePublicFilesLocation . 'fonts/.gitkeep', '');
+
                 $this->localContent->createDirectory($modulePublicFilesLocation . 'images');
                 array_push($this->newDirs, $modulePublicFilesLocation . 'images');
+                $this->localContent->write($modulePublicFilesLocation . 'images/.gitkeep', '');
+
                 $this->localContent->createDirectory($modulePublicFilesLocation . 'js');
                 array_push($this->newDirs, $modulePublicFilesLocation . 'js');
+                $this->localContent->write($modulePublicFilesLocation . 'js/.gitkeep', '');
+
                 $this->localContent->createDirectory($modulePublicFilesLocation . 'sounds');
                 array_push($this->newDirs, $modulePublicFilesLocation . 'sounds');
-            } catch (FilesystemException | UnableToCreateDirectory $exception) {
-                $this->addResponse('Unable to create view directories in public folder.');
+                $this->localContent->write($modulePublicFilesLocation . 'sounds/.gitkeep', '');
+
+                $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/ViewsGitignore.txt');
+                $this->localContent->write($moduleFilesLocation . '.gitignore', $file);
+            } catch (FilesystemException | UnableToCreateDirectory | UnableToWriteFile | UnableToReadFile $exception) {
+                $this->addResponse('Unable to create view directories or read/write module base html files in public folder.');
 
                 return false;
             }
@@ -1890,6 +1974,7 @@ $file .= '
                 return false;
             }
         }
+
         if (isset($repo)) {
             return $repo;
         }
@@ -2101,14 +2186,38 @@ $file .= '
             }
         } else {
             $this->validation->add('name', PresenceOf::class, ["message" => "Please provide name."]);
+
             if ($data['module_type'] !== 'bundles' && $data['module_type'] !== 'apps_types') {
                 $this->validation->add('category', PresenceOf::class, ["message" => "Please provide category."]);
+            }
+
+            if ($data['module_type'] === 'views' && isset($data['subview']) && $data['subview'] == 'true') {
+                $this->validation->add('base_view_module_id', PresenceOf::class, ["message" => "Please provide main view module id."]);
             }
 
             if (!$this->validateData($data)) {
                 return false;
             }
-            if (!checkCtype($data['name'], 'alpha', [''])) {
+
+            if ($data['module_type'] === 'views' &&
+                strtolower($data['name']) === 'public'
+            ) {
+                $this->addResponse('Public keyword for module type views is reserved', 1);
+
+                return false;
+            }
+
+            if ($data['module_type'] === 'views' && isset($data['subview']) && $data['subview'] == 'true') {
+                $baseView = $this->modules->views->getViewById($data['base_view_module_id']);
+            }
+
+            if ($data['module_type'] === 'components') {
+                $ignoreChars = [' '];
+            } else {
+                $ignoreChars = [''];
+            }
+
+            if (!checkCtype($data['name'], 'alpha', $ignoreChars)) {
                 $this->addResponse('Name cannot have special chars or numbers.', 1);
 
                 return false;
@@ -2140,7 +2249,13 @@ $file .= '
             $name = preg_split('/(?=[A-Z])/', $name);
 
             if ($data['module_type'] !== 'bundles') {
-                $url .= '/' . $data['app_type'] . '-' . $data['module_type'] . '-' . $data['category'] . '-' . strtolower(implode('', $name));
+                if (isset($baseView) && isset($baseView['name'])) {
+                    $name = strtolower($baseView['name'] . '-' . implode('', $name));
+                } else {
+                    $name = strtolower(implode('', $name));
+                }
+
+                $url .= '/' . $data['app_type'] . '-' . $data['module_type'] . '-' . $data['category'] . '-' . $name;
             } else {
                 $url .= '/' . $data['app_type'] . '-' . $data['module_type'] . '-' . strtolower(implode('', $name));
             }

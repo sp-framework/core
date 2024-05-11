@@ -3468,6 +3468,10 @@ var BazHelpers = function() {
         return promise;
     }
 
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
     function setup(BazHelpersConstructor) {
         BazHelpers = BazHelpersConstructor;
 
@@ -3553,6 +3557,10 @@ var BazHelpers = function() {
 
         BazHelpers.ping = function(source, options, callback) {
             ping(source, options, callback);
+        }
+
+        BazHelpers.capitalizeFirstLetter = function(string) {
+            return capitalizeFirstLetter(string);
         }
     }
 
