@@ -1,12 +1,16 @@
-<div id="module-details">
-    {% if newrelease is defined and newrelease === true %}
+{% if newrelease is defined and newrelease === true %}
+    <div id="release-module-details">
         <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
                 {% include 'modules/module/release.html' %}
             </fieldset>
         </form>
-        {% set moduleId = module['id'] %}
-        <script>
+    </div>
+    <div id="release-details" hidden>
+        {% include 'modules/releasedetails.html' %}
+    </div>
+    {% set moduleId = module['id'] %}
+    <script>
 /* globals PNotify BazContentLoader Pace BazCore */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
@@ -47,22 +51,6 @@ dataCollectionSection =
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-import-issues').off();
                 $('#{{componentId}}-{{sectionId}}-import-issues').click(function(e) {
-                    var selectedLabels = $('#{{componentId}}-{{sectionId}}-labels').select2('data');
-                    var labelsArr = [];
-                    if (selectedLabels.length === 0) {
-                        PNotify.error({'text': 'Please select labels to import issues'});
-
-                        return;
-                    }
-
-                    $(selectedLabels).each(function(i, labels) {
-                        for (var label in labels) {
-                            if (labels[label]['text']) {
-                                labelsArr.push(labels[label]['text']);
-                            }
-                        }
-                    });
-
                     $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', true);
                     $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-list-check').addClass('fa-spin fa-cog');
 
@@ -70,9 +58,17 @@ dataCollectionSection =
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
                     postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
                     postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
-                    postData['labels'] = labelsArr;
+                    postData['milestone'] = $('#{{componentId}}-{{sectionId}}-milestone').val();
+                    if (postData['milestone'] === '' || postData['milestone'] === '0') {
+                        PNotify.error({'text': 'Select milestone to import issues.'});
 
-                    $.post('{{links.url("devtools/modules/getLabelIssues")}}', postData, function(response) {
+                        return;
+                    }
+                    if ($('#{{componentId}}-{{sectionId}}-label').val()) {
+                        postData['label'] = $('#{{componentId}}-{{sectionId}}-label').select2('data')[0].text;
+                    }
+
+                    $.post('{{links.url("devtools/modules/getMilestoneLabelIssues")}}', postData, function(response) {
                         if (response.tokenKey && response.token) {
                             $('#security-token').attr('name', response.tokenKey);
                             $('#security-token').val(response.token);
@@ -82,7 +78,13 @@ dataCollectionSection =
                             if (response.responseData && response.responseData.issues) {
                                 var html = $('#{{componentId}}-{{sectionId}}-release-notes').trumbowyg('html');
 
-                                html += '<h6>RESOLVED ISSUES (' + labelsArr.join() + '):</h6>';
+                                html += '<h6>RESOLVED ISSUES (' + $('#{{componentId}}-{{sectionId}}-milestone').text() + ')';
+
+                                if ($('#{{componentId}}-{{sectionId}}-label').val()) {
+                                    html += ' (' + $('#{{componentId}}-{{sectionId}}-label').select2('data')[0].text + ')';
+                                }
+
+                                html += ':</h6>';
 
                                 $(response.responseData.issues).each(function(i, issues) {
                                     html += '<span>#' + issues['number'] + ' : ' + issues['title'] + '</span><br>';
@@ -221,22 +223,17 @@ dataCollectionSection =
                                 $('#{{componentId}}-{{sectionId}} .card-header').removeClass('bg-success').addClass('bg-info');
                             }
 
-                            if (color === 'info') {
-                                if (response.responseData && response.responseData.currentVersion && response.responseData.newVersion) {
-                                    $('#release-version-text').html(
-                                        '<h4><span class="text-' + color + '">' + response.responseData.currentVersion + '</span> ' +
-                                        '<i class="text-success fa-solid fa-arrow-right"></i> ' +
-                                        '<span class="text-info" id="next-release-text">' + response.responseData.newVersion + '</span></h4>'
-                                    );
-                                }
-                            } else {
-                                if (response.responseData && response.responseData.currentVersion && response.responseData.newVersion) {
-                                    $('#release-version-text').html(
-                                        '<h4><span class="text-' + color + '">' + response.responseData.currentVersion + '</span> ' +
-                                        '<i class="text-success fa-solid fa-arrow-right"></i> ' +
-                                        '<span class="text-primary" id="next-release-text">' + response.responseData.newVersion + '</span></h4>'
-                                    );
-                                }
+                            var newVersionColor = 'primary';
+                            if (color === 'info' || $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === true) {
+                                newVersionColor = 'info';
+                            }
+
+                            if (response.responseData && response.responseData.currentVersion && response.responseData.newVersion) {
+                                $('#release-version-text').html(
+                                    '<h4><span class="text-' + color + '">' + response.responseData.currentVersion + '</span> ' +
+                                    '<i class="text-success fa-solid fa-arrow-right"></i> ' +
+                                    '<span class="text-' + newVersionColor + '" id="next-release-text">' + response.responseData.newVersion + '</span></h4>'
+                                );
                             }
                         } else {
                             if (response.responseData && response.responseData.release) {
@@ -278,8 +275,8 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}').BazContentSectionWithForm({'task':'validateForm'});
 
                     if ($('#{{componentId}}-{{sectionId}}-alert').length === 0) {
-                        // $('#generate').attr('disabled', true);
-                        // $('#generate').children('i').removeClass('fa-wand-sparkles').addClass('fa-spin fa-cog');
+                        $('#generate').attr('disabled', true);
+                        $('#generate').children('i').removeClass('fa-wand-sparkles').addClass('fa-spin fa-cog');
 
                         var postData = { };
                         postData['bump'] = $('#{{componentId}}-{{sectionId}}-release-type').val();
@@ -322,31 +319,28 @@ dataCollectionSection =
                                 $('#security-token').val(response.token);
                             }
 
-                            // if (response.responseCode == 0) {
-                            //     PNotify.success({'text': response.responseMessage});
+                            if (response.responseCode == 0) {
+                                PNotify.success({'text': response.responseMessage});
 
-                            //     BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-cancelForm'), {
-                            //         ajaxBefore                      : function () {
-                            //                                             Pace.restart();
-                            //                                             $("#baz-content").empty();
-                            //                                             $("#loader").attr('hidden', false);
-                            //                                         },
-                            //         ajaxFinished                    : function () {
-                            //                                             BazCore.updateBreadcrumb();
-                            //                                             $("#loader").attr('hidden', true);
-                            //                                         },
-                            //         ajaxError                       : function () {
-                            //                                             $("#loader").attr('hidden', true);
-                            //                                             BazCore.updateBreadcrumb();
-                            //                                         }
-                            //     });
-                            // } else {
-                            //     PNotify.error({'text': response.responseMessage});
+                                if (response.responseData && response.responseData.newRelease && $('#release-details').length > 0) {
+                                    $('#release_url').html(response.responseData.newRelease.html_url);
+                                    $('#release_url_a').attr('href', response.responseData.newRelease.html_url);
+                                    $('#release-details').attr('hidden', false);
+                                    $('#release-module-details').attr('hidden', true);
+                                    $('.addData').attr('hidden', true);
+                                    $('.updateData').attr('hidden', true);
+                                    $('.cancelForm').attr('hidden', true);
+                                    $('.closeForm').attr('hidden', false);
+                                }
 
-                            //     $('#generate').attr('disabled', false);
-                            // }
+                                $('#generate').attr('hidden', true);
+                            } else {
+                                PNotify.error({'text': response.responseMessage});
 
-                            // $('#generate').children('i').removeClass('fa-spin fa-cog').addClass('fa-wand-sparkles');
+                                $('#generate').attr('disabled', false);
+                            }
+
+                            $('#generate').children('i').removeClass('fa-spin fa-cog').addClass('fa-wand-sparkles');
                         }, 'json');
                     }
                 });
@@ -401,7 +395,7 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-milestone'                               : {
-            placeholder : "SELECT MILESTONE",
+            placeholder : "SELECT MILESTONE TO IMPORT ISSUES",
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-sync-milestones').off();
                 $('#{{componentId}}-{{sectionId}}-sync-milestones').click(function(e) {
@@ -428,7 +422,7 @@ dataCollectionSection =
                                     var newOption
                                         = new Option(
                                             response.responseData.milestones[milestone]['title'],
-                                            response.responseData.milestones[milestone]['title'], false, false
+                                            response.responseData.milestones[milestone]['number'], false, false
                                         );
 
                                     $('#{{componentId}}-{{sectionId}}-milestone').append(newOption).trigger('change');
@@ -447,15 +441,16 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-force-mark-prerelease'                   : { },
         '{{componentId}}-{{sectionId}}-mark-as-draft'                           : { },
-        '{{componentId}}-{{sectionId}}-labels'                                  : {
-            placeholder : "SELECT LABELS TO IMPORT RESOLVED ISSUES",
+        '{{componentId}}-{{sectionId}}-label'                                   : {
+            placeholder : "SELECT LABEL TO IMPORT ISSUES",
+            allowClear: true,
             afterInit : function() {
-                $('#{{componentId}}-{{sectionId}}-sync-labels').off();
-                $('#{{componentId}}-{{sectionId}}-sync-labels').click(function(e) {
+                $('#{{componentId}}-{{sectionId}}-sync-label').off();
+                $('#{{componentId}}-{{sectionId}}-sync-label').click(function(e) {
                     e.preventDefault();
-                    $('#{{componentId}}-{{sectionId}}-sync-labels').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-sync-labels').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
-                    $('#{{componentId}}-{{sectionId}}-labels').empty().trigger('change');
+                    $('#{{componentId}}-{{sectionId}}-sync-label').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-sync-label').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+                    $('#{{componentId}}-{{sectionId}}-label').empty().trigger('change');
 
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -477,15 +472,15 @@ dataCollectionSection =
                                             response.responseData.labels[label]['id'], false, false
                                         );
 
-                                    $('#{{componentId}}-{{sectionId}}-labels').append(newOption).trigger('change');
+                                    $('#{{componentId}}-{{sectionId}}-label').append(newOption).trigger('change');
                                 }
                             }
-                            PNotify.success({'text': 'Synced ' + response.responseData.labels.length + ' labels.'});
+                            PNotify.success({'text': 'Synced ' + response.responseData.labels.length + ' label.'});
                         } else {
                             PNotify.error({'text': response.responseMessage});
                         }
-                        $('#{{componentId}}-{{sectionId}}-sync-labels').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-sync-labels').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+                        $('#{{componentId}}-{{sectionId}}-sync-label').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-sync-label').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
                     }, 'json');
                 });
             }
@@ -512,7 +507,8 @@ dataCollectionSection =
         }
     });
 </script>
-    {% else %}
+{% else %}
+    <div id="module-details">
         {% if type === 'bundles' %}
             {% if bundlesjson is defined and bundlesjson === true %}
                 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
@@ -576,8 +572,8 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}').BazContentSectionWithForm({'task':'validateForm'});
 
                     if ($('#{{componentId}}-{{sectionId}}-alert').length === 0) {
-                        $('#commit').attr('disabled', true);
-                        $('#commit').children('i').removeClass('fa-code').addClass('fa-spin fa-cog');
+                        // $('#commit').attr('disabled', true);
+                        // $('#commit').children('i').removeClass('fa-code').addClass('fa-spin fa-cog');
 
                         var postData = { };
                         postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -679,7 +675,7 @@ dataCollectionSection =
                     {% set bundleId = '0' %}
                 {% endif %}
                 <script>
-/* globals PNotify */
+/* globals PNotify BazHelpers */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -1015,6 +1011,30 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-bundle_modules'                  : 'Please enter bundle modules',
             },
             onSubmitResponse: function(response) {
+                if (response.responseData && response.responseData.bundle && response.responseData.newRepo && $('#repo-details').length > 0) {
+                    var link = "{{links.url('devtools/modules/q/bundles/true/bundlesjson/true/id/')}}" + response.responseData.bundle.id;
+                    var devLink = '/src/branch/dev';
+
+                    if (response.responseData.newRepo.html_url.includes('github')) {
+                        devLink = '/tree/dev';
+                    }
+
+                    $('#bundle_url').html(link);
+                    $('#bundle_url_a').attr('href', link);
+
+                    $('#bundlerepo_url_dev').html(response.responseData.newRepo.html_url + devLink);
+                    $('#bundlerepo_url_dev_a').attr('href', response.responseData.newRepo.html_url + devLink);
+
+                    $('#repo-details').attr('hidden', false);
+                    $('#module-details').attr('hidden', true);
+                    $('.addData').attr('hidden', true);
+                    $('.updateData').attr('hidden', true);
+                    $('.cancelForm').attr('hidden', true);
+                    $('.closeForm').attr('hidden', false);
+
+                    return false;
+                }
+
                 return true;
             }
         }
@@ -3189,57 +3209,62 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-menu'                            : 'Please enter menu'
             },
             onSubmitResponse: function(response) {
-                var appType = BazHelpers.capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
-                var moduleType = $('#{{componentId}}-{{sectionId}}-module_type').val();
-                var path = appType + '/' + BazHelpers.capitalizeFirstLetter(moduleType) + '/';
-                var pathPublic = $('#{{componentId}}-{{sectionId}}-app_type').val().toLowerCase() + '/';
-                if (moduleType === 'components') {
-                    var routeArr = [];
-
-                    $($('#{{componentId}}-{{sectionId}}-route').val().split('/')).each(function(i, route) {
-                        routeArr.push(BazHelpers.capitalizeFirstLetter(route));
-                    });
-
-                    path += routeArr.join('/');
-                } else {
-                    if (moduleType === 'views') {
-                        if (dataCollectionSectionForm['vars']['subview']) {
-                            path += dataCollectionSectionForm['vars']['moduleDependencies']['views'][0]['name'] + '/html/';
-                            path += $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
-                        } else {
-                            path += $('#{{componentId}}-{{sectionId}}-name').val();
-                        }
-                        pathPublic += $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
-                    } else {
-                        var nameArr = $('#{{componentId}}-{{sectionId}}-name').val().split(/(?=[A-Z])/);
-                        path += nameArr.join('/');
-                    }
-                }
-
-                var newRepo;
                 if (response.responseData && response.responseData.newRepo && $('#repo-details').length > 0) {
+                    var newRepo;
+                    var appType = BazHelpers.capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
+                    var moduleType = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                    var path = appType + '/' + BazHelpers.capitalizeFirstLetter(moduleType) + '/';
+                    var pathPublic = $('#{{componentId}}-{{sectionId}}-app_type').val().toLowerCase() + '/';
+                    var devLink = '/src/branch/dev';
+
+                    if (moduleType === 'components') {
+                        var routeArr = [];
+
+                        $($('#{{componentId}}-{{sectionId}}-route').val().split('/')).each(function(i, route) {
+                            routeArr.push(BazHelpers.capitalizeFirstLetter(route));
+                        });
+
+                        path += routeArr.join('/');
+                    } else {
+                        if (moduleType === 'views') {
+                            if (dataCollectionSectionForm['vars']['subview']) {
+                                path += dataCollectionSectionForm['vars']['moduleDependencies']['views'][0]['name'] + '/html/';
+                                path += $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
+                            } else {
+                                path += $('#{{componentId}}-{{sectionId}}-name').val();
+                            }
+                            pathPublic += $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
+                        } else {
+                            var nameArr = $('#{{componentId}}-{{sectionId}}-name').val().split(/(?=[A-Z])/);
+                            path += nameArr.join('/');
+                        }
+                    }
                     if (response.responseData.newRepo.base) {
                         newRepo  = response.responseData.newRepo.base;
                     } else {
                         newRepo  = response.responseData.newRepo;
                     }
 
+                    if (newRepo.html_url.includes('github')) {
+                        devLink = '/tree/dev';
+                    }
                     $('#path').html(path);
                     $('#repo_url').html(newRepo.clone_url);
-                    $('#repo_url_dev').html(newRepo.html_url);
-                    $('#repo_url_dev_a').attr('href', newRepo.html_url + '/src/branch/dev');
+                    $('#repo_url_dev').html(newRepo.html_url + devLink);
+                    $('#repo_url_dev_a').attr('href', newRepo.html_url + devLink);
 
                     if (response.responseData.newRepo.public && $('#views-public').length > 0) {
                         $('#path_public').html(pathPublic);
                         $('#repo_url_public').html(response.responseData.newRepo.public.clone_url);
-                        $('#repo_url_dev_public').html(response.responseData.newRepo.public.html_url);
-                        $('#repo_url_dev_a_public').attr('href', response.responseData.newRepo.public.html_url + '/src/branch/dev');
+                        $('#repo_url_dev_public').html(response.responseData.newRepo.public.html_url + devLink);
+                        $('#repo_url_dev_a_public').attr('href', response.responseData.newRepo.public.html_url + devLink);
                         $('#views-public').attr('hidden', false);
                     }
 
                     $('#repo-details').attr('hidden', false);
                     $('#module-details').attr('hidden', true);
                     $('.addData').attr('hidden', true);
+                    $('.updateData').attr('hidden', true);
                     $('.cancelForm').attr('hidden', true);
                     $('.closeForm').attr('hidden', false);
 
@@ -3252,8 +3277,8 @@ dataCollectionSection =
     });
 </script>
         {% endif %}
-    {% endif %}
-</div>
-<div id="repo-details" hidden>
-    {% include 'modules/repodetails.html' %}
-</div>
+    </div>
+    <div id="repo-details" hidden>
+        {% include 'modules/repodetails.html' %}
+    </div>
+{% endif %}

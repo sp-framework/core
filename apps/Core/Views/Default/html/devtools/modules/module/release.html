@@ -2,7 +2,7 @@
 {% set moduleName = module['name'] %}
 {% set moduleModule_type = module['module_type'] %}
 {% set moduleApiId = module['module_details']['api_id'] %}
-{% set moduleVersion = module['version'] %}
+{% set moduleVersion = module['module_details']['version'] %}
 {% set moduleRepo = module['repo'] %}
 <div class="row" hidden>
     <div class="col">
@@ -480,11 +480,11 @@
                 'componentName'                  : componentName,
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
-                'fieldId'                        : 'labels',
-                'fieldLabel'                     : 'Labels',
+                'fieldId'                        : 'label',
+                'fieldLabel'                     : 'Label',
                 'fieldType'                      : 'select2',
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Select labels and hit import resolved issues. If you are managing issues via gitea/github, the system will grab information (if available) of issues with selected labels from the server.',
+                'fieldHelpTooltipContent'        : 'Select label and hit import issues with selected label. If you are managing issues via gitea/github, the system will grab information (if available) of issues with selected label from the server.',
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnCreate'           : false,
                 'fieldBazPostOnUpdate'           : false,
@@ -492,7 +492,7 @@
                 'fieldDisabled'                  : false,
                 'fieldGroupPreAddonButtons'      :
                     [
-                        'sync-labels'   : [
+                        'sync-label'   : [
                             'title'                   : false,
                             'icon'                    : 'sync-alt',
                             'noMargin'                : true,
@@ -501,7 +501,6 @@
                         ]
                     ],
                 'fieldBazJstreeSearch'           : true,
-                'fieldDataSelect2Multiple'       : true,
                 'fieldDataSelect2Options'        : [],
                 'fieldDataSelect2OptionsKey'     : 'id',
                 'fieldDataSelect2OptionsValue'   : 'name',

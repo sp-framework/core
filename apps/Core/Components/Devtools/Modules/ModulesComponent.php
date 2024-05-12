@@ -300,7 +300,10 @@ class ModulesComponent extends BaseComponent
 							]
 						));
 
+						$module['module_type'] = 'apptypes';
+
 						$module['id'] = $module['module_details']['id'];
+
 					} catch (\throwable $e) {
 						throw new \Exception($e->getMessage());
 					}
@@ -425,7 +428,8 @@ class ModulesComponent extends BaseComponent
 
 		$this->addResponse(
 			$this->modulesPackage->packagesData->responseMessage,
-			$this->modulesPackage->packagesData->responseCode
+			$this->modulesPackage->packagesData->responseCode,
+			$this->modulesPackage->packagesData->responseData ?? []
 		);
 	}
 
@@ -440,20 +444,6 @@ class ModulesComponent extends BaseComponent
 			$this->modulesPackage->packagesData->responseCode
 		);
 	}
-
-	// public function validateJsonAction()
-	// {
-	// 	if ($this->request->isPost()) {
-	// 		if (!$this->checkCSRF()) {
-	// 			return;
-	// 		}
-	// 		$this->modulesPackage->updateModules($this->postData());
-
-	// 		$this->addResponse($this->modulesPackage->packagesData->responseMessage, $this->modulesPackage->packagesData->responseCode);
-	// 	} else {
-	// 		$this->addResponse('Method Not Allowed', 1);
-	// 	}
-	// }
 
 	public function formatJsonAction()
 	{
@@ -544,11 +534,11 @@ class ModulesComponent extends BaseComponent
 		);
 	}
 
-	public function getLabelIssuesAction()
+	public function getMilestoneLabelIssuesAction()
 	{
 		$this->requestIsPost();
 
-		if ($this->modulesPackage->getLabelIssues($this->postData())) {
+		if ($this->modulesPackage->getMilestoneLabelIssues($this->postData())) {
 			$this->addResponse(
 				$this->modulesPackage->packagesData->responseMessage,
 				$this->modulesPackage->packagesData->responseCode,
