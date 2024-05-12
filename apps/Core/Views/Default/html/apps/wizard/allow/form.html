@@ -224,8 +224,8 @@ $(document).ready(function() {
 
             $('#{{componentId}}-{{sectionId}}-view').on('select2:select', function() {
                 window.dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['formValidator'].valid();
-
             });
+
             $.post('{{links.url("apps/getViewsForAppType")}}', postData, function(response) {
                 if (response.tokenKey && response.token) {
                     $("#security-token").attr("name", response.tokenKey);
@@ -233,7 +233,7 @@ $(document).ready(function() {
                 }
 
                 if (response.responseCode == 0) {
-                    if (response.responseData.views) {
+                    if (response.responseData && response.responseData.views) {
                         for (var view in response.responseData.views) {
                             var newOption = new Option(
                                 response.responseData.views[view]['display_name'],

@@ -327,22 +327,23 @@ class AppsComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $viewsArr = $this->modules->views->getViewsForAppType($this->postData()['app_type']);
 
-            $this->apps->addApp($this->postData());
+        if (count($viewsArr) === 0) {
+            $this->addResponse('No Views Available for app type ' . $this->postData()['app_type'] . ' cannot proceed!', 1);
 
-            $this->addResponse(
-                $this->apps->packagesData->responseMessage,
-                $this->apps->packagesData->responseCode,
-                $this->apps->packagesData->responseData
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
+            return;
         }
+
+        $this->apps->addApp($this->postData());
+
+        $this->addResponse(
+            $this->apps->packagesData->responseMessage,
+            $this->apps->packagesData->responseCode,
+            $this->apps->packagesData->responseData
+        );
     }
 
     /**
@@ -350,21 +351,14 @@ class AppsComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->apps->updateApp($this->postData());
 
-            $this->apps->updateApp($this->postData());
-
-            $this->addResponse(
-                $this->apps->packagesData->responseMessage,
-                $this->apps->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->apps->packagesData->responseMessage,
+            $this->apps->packagesData->responseCode
+        );
     }
 
     /**
@@ -372,142 +366,102 @@ class AppsComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->apps->removeApp($this->postData());
 
-            $this->apps->removeApp($this->postData());
-
-            $this->addResponse(
-                $this->apps->packagesData->responseMessage,
-                $this->apps->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->apps->packagesData->responseMessage,
+            $this->apps->packagesData->responseCode
+        );
     }
 
     public function getFiltersAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
+        $filters = $this->apps->ipFilter->getFilters($this->postData());
+
+        foreach ($filters as $key => &$filter) {
+            unset ($filter['app_id']);
+            if ($filter['address_type'] == '1') {
+                $filter['address_type'] = 'host';
+            } else if ($filter['address_type'] == '2') {
+                $filter['address_type'] = 'network';
             }
 
-            $filters = $this->apps->ipFilter->getFilters($this->postData());
+            if ($filter['filter_type'] == '1') {
+                $filter['filter_type'] = "allow";
+            } else if ($filter['filter_type'] == '2') {
+                $filter['filter_type'] = "block";
+            } else if ($filter['filter_type'] == '3') {
+                $filter['filter_type'] = "monitor";
+            }
 
-            foreach ($filters as $key => &$filter) {
-                unset ($filter['app_id']);
-                if ($filter['address_type'] == '1') {
-                    $filter['address_type'] = 'host';
-                } else if ($filter['address_type'] == '2') {
-                    $filter['address_type'] = 'network';
-                }
+            if ($filter['added_by'] == '0') {
+                $filter['added_by'] = "System";
+            } else {
+                $user = $this->basepackages->accounts->getAccountById($filter['added_by']);
 
-                if ($filter['filter_type'] == '1') {
-                    $filter['filter_type'] = "allow";
-                } else if ($filter['filter_type'] == '2') {
-                    $filter['filter_type'] = "block";
-                } else if ($filter['filter_type'] == '3') {
-                    $filter['filter_type'] = "monitor";
-                }
-
-                if ($filter['added_by'] == '0') {
-                    $filter['added_by'] = "System";
+                if ($user && isset($user['profile']['full_name'])) {
+                    $filter['added_by'] = $user['profile']['full_name'];
                 } else {
-                    $user = $this->basepackages->accounts->getAccountById($filter['added_by']);
-
-                    if ($user && isset($user['profile']['full_name'])) {
-                        $filter['added_by'] = $user['profile']['full_name'];
-                    } else {
-                        $filter['added_by'] = "System";
-                    }
+                    $filter['added_by'] = "System";
                 }
-
-                $filter['actions'] = '';
             }
 
-            $this->view->data = $filters;
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $filter['actions'] = '';
         }
+
+        $this->view->data = $filters;
     }
 
     public function addFilterAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->apps->ipFilter->addFilter($this->postData());
 
-            $this->apps->ipFilter->addFilter($this->postData());
-
-            $this->addResponse(
-                $this->apps->ipFilter->packagesData->responseMessage,
-                $this->apps->ipFilter->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->apps->ipFilter->packagesData->responseMessage,
+            $this->apps->ipFilter->packagesData->responseCode
+        );
     }
 
     public function removeFilterAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->apps->ipFilter->removeFilter($this->postData());
 
-            $this->apps->ipFilter->removeFilter($this->postData());
-
-            $this->addResponse(
-                $this->apps->ipFilter->packagesData->responseMessage,
-                $this->apps->ipFilter->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->apps->ipFilter->packagesData->responseMessage,
+            $this->apps->ipFilter->packagesData->responseCode
+        );
     }
 
     public function blockMonitorFilterAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->apps->ipFilter->blockMonitorFilter($this->postData());
+        $this->apps->ipFilter->blockMonitorFilter($this->postData());
 
-            $this->addResponse(
-                $this->apps->ipFilter->packagesData->responseMessage,
-                $this->apps->ipFilter->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->apps->ipFilter->packagesData->responseMessage,
+            $this->apps->ipFilter->packagesData->responseCode
+        );
     }
 
     public function resetAppFiltersAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->apps->ipFilter->resetAppFilters($this->postData());
+        $this->apps->ipFilter->resetAppFilters($this->postData());
 
-            $this->addResponse(
-                $this->apps->ipFilter->packagesData->responseMessage,
-                $this->apps->ipFilter->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->apps->ipFilter->packagesData->responseMessage,
+            $this->apps->ipFilter->packagesData->responseCode
+        );
     }
 
     private function seqMenu($menu)
@@ -525,33 +479,26 @@ class AppsComponent extends BaseComponent
 
     public function getViewsForAppTypeAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $viewsArr = $this->modules->views->getViewsForAppType($this->postData()['app_type']);
+        $viewsArr = $this->modules->views->getViewsForAppType($this->postData()['app_type']);
 
-            if ($viewsArr) {
-                $views = [];
+        if ($viewsArr && count($viewsArr) > 0) {
+            $views = [];
 
-                foreach ($viewsArr as $key => &$viewValue) {
-                    if ($viewValue['base_view_module_id'] != '0') {
-                        continue;
-                    }
-
-                    $views[$key] = $viewValue;
+            foreach ($viewsArr as $key => &$viewValue) {
+                if ($viewValue['base_view_module_id'] != '0') {
+                    continue;
                 }
 
-                $this->addResponse('Ok', 0, ['views' => $views]);
-            } else {
-                $this->addResponse(
-                    $this->modules->views->packagesData->responseMessage,
-                    $this->modules->views->packagesData->responseCode
-                );
+                $views[$key] = $viewValue;
             }
+
+            $this->addResponse('Ok', 0, ['views' => $views]);
+
+            return $views;
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->addResponse('No Views Installed', 1);
         }
     }
 }
