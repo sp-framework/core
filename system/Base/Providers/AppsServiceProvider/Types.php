@@ -47,12 +47,19 @@ class Types extends BasePackage
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function updateAppsType(array $data)
+    public function updateAppType(array $data)
     {
         $appType = $this->getAppTypeById($data['id']);
 
-        $appType['name'] = $data['name'];
-        $appType['description'] = $data['description'];
+        if (isset($data['name'])) {
+            $appType['name'] = $data['name'];
+        }
+        if (isset($data['description'])) {
+            $appType['description'] = $data['description'];
+        }
+        if (isset($data['version'])) {
+            $appType['version'] = $data['version'];
+        }
 
         if ($this->update($appType)) {
             $this->addResponse('Updated ' . $appType['name'] . ' app type');
@@ -61,7 +68,7 @@ class Types extends BasePackage
         }
     }
 
-    public function removeAppsType(array $data)
+    public function removeAppType(array $data)
     {
         $appType = $this->getAppTypeById($data['id']);
 

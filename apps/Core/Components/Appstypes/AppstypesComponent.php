@@ -72,7 +72,7 @@ class AppstypesComponent extends BaseComponent
                 return;
             }
 
-            $this->appsTypes->updateAppsType($this->postData());
+            $this->appsTypes->updateAppType($this->postData());
 
             $this->addResponse(
                 $this->apps->packagesData->responseMessage,
