@@ -111,6 +111,19 @@ class Packages extends BasePackage
 		return false;
 	}
 
+	public function getPackageByAppTypeAndName($appType, $name)
+	{
+		foreach($this->packages as $package) {
+			if ($package['app_type'] === $appType &&
+				$package['name'] === $name
+			) {
+				return $package;
+			}
+		}
+
+		return false;
+	}
+
 	public function getPackageByNameForRepo($name, $repo)
 	{
 		foreach($this->packages as $package) {

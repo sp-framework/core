@@ -454,12 +454,16 @@ class Views extends BasePackage
             }
 
             if (isset($view['settings']['tags'])) {
-                $package = $this->modules->packages->getPackageByName($view['settings']['tags']);
+                $package = $this->modules->packages->getPackageByAppTypeAndName($data['app_type'], $view['settings']['tags']);
 
                 if ($package) {
                     $package['apps'] = $this->helper->decode($package['apps'], true);
 
-                    $package['apps'][$data['id']]['enabled'] = true;
+                    if ($status === true) {
+                        $package['apps'][$data['id']]['enabled'] = true;
+                    } else if ($status === false) {
+                        $package['apps'][$data['id']]['enabled'] = false;
+                    }
 
                     $package['apps'] = $this->helper->encode($package['apps']);
 

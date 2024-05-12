@@ -1,3 +1,4 @@
+{% set defaultDashboardHidden = 'hidden' %}
 {% if app['id'] is defined %}
     {% set appId = app['id'] %}
     {% set appName = app['name'] %}
@@ -64,7 +65,6 @@
     {% set appIncorrectLoginAttemptBlockIp = '' %}
     {% set appIpFilterDefaultAction = '1' %}
     {% set wizard = true %}
-    {% set defaultDashboardHidden = 'hidden' %}
     {% set defaultDashboard = '' %}
 {% endif %}
 {% if wizard === true %}

@@ -35,6 +35,12 @@ class AppsComponent extends BaseComponent
                         if ($dashboard) {
                             $app['default_component'] = $dashboard['id'];
                         }
+                    } else {
+                        $home = $this->modules->components->getComponentByNameForAppType('home', $app['app_type']);
+
+                        if ($home) {
+                            $app['default_component'] = $home['id'];
+                        }
                     }
                 }
 
@@ -45,6 +51,12 @@ class AppsComponent extends BaseComponent
 
                     if ($errors) {
                         $app['errors_component'] = $errors['id'];
+                    } else {
+                        $home = $this->modules->components->getComponentByNameForAppType('home', $app['app_type']);
+
+                        if ($home) {
+                            $app['errors_component'] = $home['id'];
+                        }
                     }
                 }
 

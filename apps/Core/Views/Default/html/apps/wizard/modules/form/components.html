@@ -11,7 +11,11 @@
     {% endif %}
     {% set selectComponents = [] %}
     {% for key, selectComponent in components %}
-        {% if selectComponent['route'] != 'home' %}
+        {% if app['app_type'] === 'core' or app['app_type'] === 'dash' %}
+            {% if selectComponent['route'] != 'home' %}
+                {% set selectComponents[key] = selectComponent %}
+            {% endif %}
+        {% else %}
             {% set selectComponents[key] = selectComponent %}
         {% endif %}
     {% endfor %}

@@ -129,18 +129,30 @@ class ViewsSettings extends BasePackage
             }
         }
 
-        $view['settings']['head']['title'] = $data['head_title'];
-        unset($data['head_title']);
-        $view['settings']['head']['meta']['keywords'] = $data['head_meta_keywords'];
-        unset($data['head_meta_keywords']);
-        $view['settings']['head']['meta']['description'] = $data['head_meta_description'];
-        unset($data['head_meta_description']);
-        $view['settings']['footer']['copyright']['name'] = $data['copyright_name'];
-        unset($data['copyright_name']);
-        $view['settings']['footer']['copyright']['site'] = $data['copyright_site'];
-        unset($data['copyright_site']);
-        $view['settings']['footer']['copyright']['fromYear'] = $data['copyright_fromYear'];
-        unset($data['copyright_fromYear']);
+        if (isset($data['head_title'])) {
+            $view['settings']['head']['title'] = $data['head_title'];
+            unset($data['head_title']);
+        }
+        if (isset($data['head_meta_keywords'])) {
+            $view['settings']['head']['meta']['keywords'] = $data['head_meta_keywords'];
+            unset($data['head_meta_keywords']);
+        }
+        if (isset($data['head_meta_description'])) {
+            $view['settings']['head']['meta']['description'] = $data['head_meta_description'];
+            unset($data['head_meta_description']);
+        }
+        if (isset($data['copyright_name'])) {
+            $view['settings']['footer']['copyright']['name'] = $data['copyright_name'];
+            unset($data['copyright_name']);
+        }
+        if (isset($data['copyright_site'])) {
+            $view['settings']['footer']['copyright']['site'] = $data['copyright_site'];
+            unset($data['copyright_site']);
+        }
+        if (isset($data['copyright_fromYear'])) {
+            $view['settings']['footer']['copyright']['fromYear'] = $data['copyright_fromYear'];
+            unset($data['copyright_fromYear']);
+        }
 
         $data['settings'] = $view['settings'];
 
@@ -223,6 +235,27 @@ class ViewsSettings extends BasePackage
         }
 
         return $settings;
+    }
+
+    public function getViewsSettingsByViewId($viewId)
+    {
+        if (!$this->viewssettings) {
+            return false;
+        }
+
+        $settings = [];
+
+        foreach($this->viewssettings as $setting) {
+            if ($setting['view_id'] == $viewId) {
+                $settings[$setting['id']] = $setting;
+            }
+        }
+
+        if (count($settings) > 0) {
+            return $settings;
+        }
+
+        return false;
     }
 
     public function getViewsSettingsByViewIdDomainIdAndAppId($viewId, $domainId, $appId)
